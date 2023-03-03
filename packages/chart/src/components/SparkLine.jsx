@@ -43,7 +43,6 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   // i.e. if a series has any bad data points the entire series wont plot
    const cleanData = (data, testing = false) => {
     let cleanedup = []
-    if (testing) console.log('## Data to clean=', data)
     data.forEach(function (d, i) {
       let cleanedSeries = {}
       Object.keys(d).forEach(function (key) {
@@ -53,7 +52,6 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
         } else {
           // remove comma and dollar signs
           let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
-          if (testing) console.log("tmp no comma or $", tmp)
           if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
             cleanedSeries[key] = tmp
           } else {
@@ -64,7 +62,6 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
       })
       cleanedup.push(cleanedSeries)
     })
-    if (testing) console.log('## cleanedData =', cleanedup)
     return cleanedup
    }
 

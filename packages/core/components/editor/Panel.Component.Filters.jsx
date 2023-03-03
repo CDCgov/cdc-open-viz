@@ -2,6 +2,7 @@ import React from 'react'
 
 // Store
 import useConfigStore from '../../stores/configStore'
+import useDataStore from '../../stores/dataStore'
 
 // Helpers
 import getDataColumns from '../../helpers/data/getDataColumns'
@@ -12,9 +13,11 @@ import InputSelect from '../input/InputSelect'
 import Label from '../element/Label'
 import SectionBlock from '../ui/SectionBlock'
 
+
 const PanelComponentFilters = () => {
   // Store Selectors
   const { config, updateConfig } = useConfigStore()
+  const { data } = useDataStore()
 
   const addNewFilter = () => {
     let newFilters = config.filters ? [ ...config.filters ] : []
@@ -40,8 +43,8 @@ const PanelComponentFilters = () => {
   const getFilterColumnValues = (filterIndex) => {
     const filterColumnName = config.filters[filterIndex].columnName
     let filterDataOptions = []
-    if (config.data && filterColumnName) {
-      config.data.forEach(row => {
+    if (data && filterColumnName) {
+      data.forEach(row => {
         if (undefined !== row[filterColumnName] && -1 === filterDataOptions.indexOf(row[filterColumnName])) {
           filterDataOptions.push(row[filterColumnName])
         }
@@ -63,7 +66,7 @@ const PanelComponentFilters = () => {
         </Button>
         <InputSelect
           label="Column"
-          options={getDataColumns(config.data)}
+          options={getDataColumns(data)}
           initial="Select data column"
           onChange={(e) => updateFilter('columnName', index, e.target.value)}
           value={filter.columnName}

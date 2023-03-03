@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
 // Store
-import useConfigStore from '@cdc/core/stores/configStore'
+import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
+import useDataStore from '@cdc/core/stores/dataStore'
 
 // Helpers
 import { getDataColumns } from '@cdc/core/helpers/data/index'
@@ -19,12 +20,13 @@ import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../data/consts'
 import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.Filters.jsx'
 
-const EditorPanels = ({ setParentConfig }) => {
+const EditorPanels = () => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStore()
+  const { config, updateConfigField } = useConfigStoreContext()
+  const { data } = useDataStore()
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
-  const [ tempConfig, setTempConfig ] = useState(config)
+  /*const [ tempConfig, setTempConfig ] = useState(config)
 
   useEffect(() => {
     // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
@@ -38,7 +40,7 @@ const EditorPanels = ({ setParentConfig }) => {
   useEffect(() => {
     // Pass tempConfig settings back up to parent, if one exists
     if (setParentConfig) setParentConfig(tempConfig)
-  }, [ tempConfig, setParentConfig ])
+  }, [ tempConfig, setParentConfig ])*/
 
 
   /** Component Effects -------------------------------------------------------------------------- */
@@ -80,7 +82,7 @@ const EditorPanels = ({ setParentConfig }) => {
       <SectionWrapper label="Numerator">
         <InputSelect
           label="Data Column"
-          options={getDataColumns(config.data)}
+          options={getDataColumns(data)}
           configField="dataColumn"
           initialDisabled
         />
@@ -96,7 +98,7 @@ const EditorPanels = ({ setParentConfig }) => {
           <div className="cove-grid__col--4">
             <InputSelect
               className="mb-0"
-              options={getDataColumns(config.data)}
+              options={getDataColumns(data)}
               configField="dataConditionalColumn"
               initialDisabled
             />
@@ -138,7 +140,7 @@ const EditorPanels = ({ setParentConfig }) => {
           <>
             <InputSelect
               label="Data Column"
-              options={getDataColumns(config.data)}
+              options={getDataColumns(data)}
               configField="dataDenomColumn"
             />
             <InputSelect

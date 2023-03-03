@@ -4,7 +4,7 @@ import React, { useCallback } from 'react'
 import parse from 'html-react-parser'
 
 // Store
-import useConfigStore from '@cdc/core/stores/configStore'
+import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 
 // Data
 import {
@@ -19,15 +19,26 @@ import {
 } from '../data/consts.js'
 
 // Helpers
-import { numberFromString, applyPrecision, getSum, getMean, getMedian, getMode, convertNumberToLocaleString } from '@cdc/core/helpers/coveHelpers'
+import {
+  numberFromString,
+  applyPrecision,
+  getSum,
+  getMean,
+  getMedian,
+  getMode,
+  convertNumberToLocaleString
+} from '@cdc/core/helpers/coveHelpers'
 
 // Components - Core
 import CircleCallout from '../components/CircleCallout'
-import DataBiteImage from './DataBite.Image.jsx'
+import DataBiteImage from './DataBite.Image'
+import useDataStore from '@cdc/core/stores/dataStore'
 
 // Visualization
 const DataBite = () => {
-  const { config } = useConfigStore()
+  // Store Selectors
+  const { config } = useConfigStoreContext()
+  const { data } = useDataStore()
 
   const calculateDataBite = (includePrefixSuffix = true) => {
     //If either the column or function aren't set, do not calculate
@@ -43,7 +54,7 @@ const DataBite = () => {
     }
 
     //Optionally filter the data based on the user's filter
-    let filteredData = config.data
+    let filteredData = data
     let numericalData = []
 
     config.filters.map(filter => {
@@ -63,7 +74,7 @@ const DataBite = () => {
         if (typeof value === 'number') numericalData.push(value)
       })
     } else {
-      numericalData = config.data.map(item => Number(item[config.dataColumn]))
+      numericalData = data.map(item => Number(item[config.dataColumn]))
     }
 
     let dataBite = ''
@@ -166,7 +177,7 @@ const DataBite = () => {
             }
             {parse(config.biteBody)}
           </p>
-          {config.subtext && !config.general.isCompactStyle &&
+          {config.subtext &&
             <p className="cove-data-bite__subtext">{parse(config.subtext)}</p>
           }
         </div>

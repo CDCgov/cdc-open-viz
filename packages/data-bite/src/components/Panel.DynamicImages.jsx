@@ -1,7 +1,7 @@
 import React from 'react'
 
 // Store
-import useConfigStore from '@cdc/core/stores/configStore'
+import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 
 // Components - Core
 import Button from '@cdc/core/components/element/Button'
@@ -15,7 +15,7 @@ import { DATA_OPERATORS } from '../data/consts'
 
 const PanelDynamicImages = () => {
   // Store Selectors
-  const { config, updateConfig } = useConfigStore()
+  const { config, updateConfig } = useConfigStoreContext()
 
   const createDynamicImage = () => {
     let imageOptions = config.imageData.options ? [ ...config.imageData.options ] : []

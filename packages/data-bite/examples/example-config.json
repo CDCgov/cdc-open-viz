@@ -23,5 +23,10 @@
   "subtext": "*This is an optional subtext or citation.",
   "title": "Average Insured Rate",
   "theme": "blue",
-  "bob": true
+  "visual": {
+    "accent": "right",
+    "background": "theme",
+    "border": "theme",
+    "shadow": true
+  }
 }

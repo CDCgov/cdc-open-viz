@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, Suspense } from 'react'
+import React, { createContext, useState, useCallback, useContext, useEffect, Suspense } from 'react'
 
 // Third Party
 import { useStore } from 'zustand'
@@ -6,11 +6,17 @@ import PropTypes from 'prop-types'
 
 // Store
 import useConfigStore from '../../stores/configStore'
-import RenderFallback from '../loader/RenderFallback'
 
+// Components - Core
+import RenderFallback from '../loader/RenderFallback'
+import { fetchAsyncUrl } from '../../helpers/data'
+import useDataStore from '../../stores/dataStore'
+
+// Store Exports
 export const ConfigStoreContext = createContext({})
 export const useConfigStoreContext = () => useContext(ConfigStoreContext)
 
+// Component
 const ConfigProxy = (
   {
     configObj,
@@ -22,45 +28,56 @@ const ConfigProxy = (
   }
 ) => {
   // Store Selectors
-  const { config, setConfigDefaults, fetchConfig, runConfigUpdater } = useConfigStore(state => state)
-  const sliceStoreConfigObj = useStore(useConfigStore, store => store.config.visualizations)
+  const { store, config, setConfigDefaults, updateConfig, runConfigUpdater } = useConfigStore(state => ({
+    store: state,
+    config: state.config,
+    setConfigDefaults: state.setConfigDefaults,
+    updateConfig: state.updateConfig,
+    runConfigUpdater: state.runConfigUpdater
+  }))
 
-  const loadingConfig = useRef(true)
+  const { getData } = useDataStore()
 
+  const sliceStoreConfigObj = useStore(useConfigStore, store => store.config?.visualizations)
+
+  const [ isLoading, setIsLoading ] = useState(true)
+
+  // Loads the config object and sets defaults
   useEffect(() => {
     if (visualizationKey) {
       // If a visualizationKey is provided, then we are in a component consumed by Dashboard or Wizard
       setConfigDefaults(defaults, visualizationKey) // Update the config with defaults
+        .then(setIsLoading(false))
     } else {
-      setConfigDefaults(defaults) // Update the config with defaults
-      fetchConfig(configObj, configUrl) // Get initial configObj, or object from configUrl
-      runConfigUpdater() // Run the updater for config entry maintenance
+      async function fetchConfig() {
+        let response = configObj || await fetchAsyncUrl(configUrl) || {}
+
+        setConfigDefaults(defaults) // Update the config with defaults
+
+        updateConfig(response) // Get initial configObj, or object from configUrl
+        getData(response) // Get initial data
+
+        runConfigUpdater() // Run the updater for config entry maintenance
+      }
+      fetchConfig().then(() => setIsLoading(false))
     }
-    loadingConfig.current = false // Tell subcomponents that the config is ready
-  }, [ configObj, configUrl, defaults, setConfigDefaults, fetchConfig, runConfigUpdater ])
+  }, [ configObj, configUrl, visualizationKey ])
 
-
-  const processedConfigEntry = useCallback(() => {
+  // Determine the config object entry to use:
+  // Again, if a visualizationKey is provided, then we are in a component consumed by Dashboard or Wizard
+  const getStoreObj = useCallback(() => {
     if (config?.visualizations?.[visualizationKey]) {
-      console.log('sliced', sliceStoreConfigObj[visualizationKey])
       return sliceStoreConfigObj[visualizationKey]
     } else {
-      return configObj
+      return store
     }
-  }, [ config, configObj ])
-
-
-  if (visualizationKey) return (
-    <ConfigStoreContext.Provider value={{ config: processedConfigEntry() }}>
-      <Suspense fallback={<RenderFallback/>}>
-        {!loadingConfig.current && children}
-      </Suspense>
-    </ConfigStoreContext.Provider>
-  )
+  }, [ store, config ])
 
   return (
     <Suspense fallback={<RenderFallback/>}>
-      {!loadingConfig.current && children}
+      <ConfigStoreContext.Provider value={getStoreObj()}>
+        {!isLoading && children}
+      </ConfigStoreContext.Provider>
     </Suspense>
   )
 }

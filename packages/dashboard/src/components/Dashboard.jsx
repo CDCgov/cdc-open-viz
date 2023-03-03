@@ -364,7 +364,7 @@ const Dashboard = () => {
     let subVisualizationEditing = false
 
     Object.keys(config.visualizations).forEach(visualizationKey => {
-      let visualizationConfig = { ...config.visualizations[visualizationKey] }
+      let visualizationConfig = config.visualizations[visualizationKey]
 
       const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
 

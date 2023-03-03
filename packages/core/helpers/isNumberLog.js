@@ -1,8 +1,8 @@
 export default function isNumberLog(value = '', state = null) {
   // if you need to check data to see if there is junk in there that can't be handled
   // you can run the points through this and see values on the console
-  console.log("entering isNumber valuetype is:",typeof value);
-  var test;
+  console.log('entering isNumber valuetype is:', typeof value)
+  let test
   if (typeof value === 'number') {
     test = !Number.isNaN(value)
   }

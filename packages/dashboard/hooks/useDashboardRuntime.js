@@ -98,8 +98,6 @@ const useDashboardRuntime = async (newConfig) => {
           if (visualizationKeys[j] === filter.setBy) {
             const filterValues = generateValuesForFilter(filter.columnName, newConfig.data)
 
-            console.log(filterValues)
-
             if (newConfig.dashboard.sharedFilters[i].order === 'asc') {
               filterValues.sort()
             }

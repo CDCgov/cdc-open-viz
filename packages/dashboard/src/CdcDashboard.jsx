@@ -17,11 +17,11 @@ import Dashboard from './components/Dashboard'
 // Styles
 import './scss/cove-dashboard.scss'
 
-const CdcDashboard = ({ config: configObj, configUrl, isWizard = false, setConfig: setParentConfig }) => {
+const CdcDashboard = ({ config: configObj, configUrl }) => {
   return (
   <ErrorBoundary component="CdcDashboard">
-    <ConfigProxy configObj={configObj} configUrl={configUrl} setParentConfig={setParentConfig} defaults={defaults}>
-      <View isDashboard={true} isWizard={isWizard}>
+    <ConfigProxy configObj={configObj} configUrl={configUrl} defaults={defaults}>
+      <View>
         <Dashboard/>
       </View>
     </ConfigProxy>

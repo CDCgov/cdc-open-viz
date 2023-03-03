@@ -25,10 +25,10 @@ const PanelGlobal = (
   <Accordion.Section label="Component">
     <InputText type="text" configField={[ 'tooltip', 'content' ]} label="Tooltip"/>
     <InputSelect configField={[ 'tooltip', 'position' ]} options={{ bottom: 'Bottom', left: 'Left' }} label="Tooltip Position" initialDisabled/>
-    <InputSelect configField={[ 'visual', 'border' ]} options={optionsObj} label="Border"/>
-    <InputSelect configField={[ 'visual', 'accent' ]} options={accentOptions} label="Border Accent"/>
-    <InputSelect configField={[ 'visual', 'background' ]} options={optionsObj} label="Background Color"/>
-    <InputCheckbox configField={[ 'visual', 'shadow' ]} label="Show Dropshadow"/>
+    <InputSelect configField={[ 'componentStyle', 'border' ]} options={optionsObj} label="Border"/>
+    <InputSelect configField={[ 'componentStyle', 'accent' ]} options={accentOptions} label="Border Accent"/>
+    <InputSelect configField={[ 'componentStyle', 'background' ]} options={optionsObj} label="Background Color"/>
+    <InputCheckbox configField={[ 'componentStyle', 'shadow' ]} label="Show Dropshadow"/>
     <ColorPicker label="Theme Color" tooltip="Select the theme color for the component" colorTooltip/>
   </Accordion.Section>
 )

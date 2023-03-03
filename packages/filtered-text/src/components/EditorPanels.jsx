@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
 // Store
-import useConfigStore from '@cdc/core/stores/configStore'
+import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
+import useDataStore from '@cdc/core/stores/dataStore'
 
 // Helpers
-import { isConfigEqual } from '@cdc/core/helpers/configHelpers'
 import getDataColumns from '@cdc/core/helpers/data/getDataColumns'
 
 // Components - Core
@@ -14,12 +14,13 @@ import InputText from '@cdc/core/components/input/InputText'
 import InputSelect from '@cdc/core/components/input/InputSelect'
 import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.Filters.jsx'
 
-const EditorPanels = ({ setParentConfig }) => {
+const EditorPanels = () => {
   // Store Selectors
-  const { config } = useConfigStore()
+  const { config } = useConfigStoreContext()
+  const { data } = useDataStore()
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
-  const [ tempConfig, setTempConfig ] = useState(config)
+  /*const [ tempConfig, setTempConfig ] = useState(config)
 
   useEffect(() => {
     // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
@@ -33,7 +34,7 @@ const EditorPanels = ({ setParentConfig }) => {
   useEffect(() => {
     // Pass tempConfig settings back up to parent, if one exists
     if (setParentConfig) setParentConfig(tempConfig)
-  }, [ tempConfig, setParentConfig ])
+  }, [ tempConfig, setParentConfig ])*/
 
 
   /** Panels ------------------------------------------------------------------------------------- */
@@ -45,7 +46,7 @@ const EditorPanels = ({ setParentConfig }) => {
 
   const panelData = (
     <Accordion.Section label="Data">
-      <InputSelect label="Text Column" options={getDataColumns(config.data)} configField="textColumn" initialDisabled/>
+      <InputSelect label="Text Column" options={getDataColumns(data)} configField="textColumn" initialDisabled/>
       <hr className="cove-editor__divider"/>
       <PanelComponentFilters/>
     </Accordion.Section>

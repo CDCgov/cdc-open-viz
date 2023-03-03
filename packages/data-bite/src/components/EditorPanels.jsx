@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
 // Store
-import useConfigStore from '@cdc/core/stores/configStore'
+import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 
 // Helpers
 import { getDataColumns } from '@cdc/core/helpers/data/index'
-import { isConfigEqual } from '@cdc/core/helpers/configHelpers'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -13,20 +12,22 @@ import PanelGlobal from '@cdc/core/components/editor/Panel.Global.jsx'
 import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
 import InputSelect from '@cdc/core/components/input/InputSelect'
 import InputText from '@cdc/core/components/input/InputText'
+import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.Filters'
 import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
+
+// Components - Local
+import PanelDynamicImages from './Panel.DynamicImages'
 
 // Constants
 import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS } from '../data/consts'
-import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.Filters.jsx'
-import PanelDynamicImages from './Panel.DynamicImages.jsx'
-import InputToggle from '@cdc/core/components/input/InputToggle'
+import useDataStore from '@cdc/core/stores/dataStore'
 
-
-const EditorPanels = ({ setParentConfig }) => {
-  const { config, setMissingRequiredSections } = useConfigStore()
+const EditorPanels = () => {
+  const { config, setMissingRequiredSections } = useConfigStoreContext()
+  const { data } = useDataStore()
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
-  const [ tempConfig, setTempConfig ] = useState(config)
+  /*const [ tempConfig, setTempConfig ] = useState(config)
 
   useEffect(() => {
     // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
@@ -40,7 +41,7 @@ const EditorPanels = ({ setParentConfig }) => {
   useEffect(() => {
     // Pass tempConfig settings back up to parent, if one exists
     if (setParentConfig) setParentConfig(tempConfig)
-  }, [ tempConfig, setParentConfig ])
+  }, [ tempConfig, setParentConfig ])*/
 
 
   /** Required Sections -------------------------------------------------------------------------- */
@@ -52,7 +53,8 @@ const EditorPanels = ({ setParentConfig }) => {
 
   useEffect(() => {
     const validateSections = setTimeout(() => {
-      if (requiredSections && config) setMissingRequiredSections(!requiredSections.every(isValid => !!isValid === true))
+      if (requiredSections && config)
+        setMissingRequiredSections(!requiredSections.every(isValid => !!isValid === true))
     }, 500)
     return clearTimeout(validateSections)
   }, [ config ])
@@ -85,7 +87,7 @@ const EditorPanels = ({ setParentConfig }) => {
     <Accordion.Section label="Data" warnIf={(!config.dataColumn || !config.dataFunction)}>
       <div className="cove-grid cove-grid--gap--2">
         <div className="cove-grid__col--6">
-          <InputSelect label="Data Column" options={getDataColumns(config.data)} configField="dataColumn" initialDisabled required/>
+          <InputSelect label="Data Column" options={getDataColumns(data)} configField="dataColumn" initialDisabled required/>
         </div>
         <div className="cove-grid__col--6">
           <InputSelect label="Data Function" options={DATA_FUNCTIONS} configField="dataFunction" initialDisabled required/>

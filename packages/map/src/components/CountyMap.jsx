@@ -64,8 +64,6 @@ const CountyMap = props => {
 
   const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
 
-  console.log(data)
-
   useEffect(() => {
     if (containerEl) {
       if (containerEl.className.indexOf('loaded') === -1) {
@@ -109,7 +107,7 @@ const CountyMap = props => {
 
   const focusGeo = (geoKey, geo) => {
     if (!geoKey) {
-      console.log('County Map: no geoKey provided to focusGeo')
+      console.warn('County Map: no geoKey provided to focusGeo')
       return
     }
 

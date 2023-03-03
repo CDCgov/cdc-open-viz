@@ -126,7 +126,6 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
   }, [ config.datasets ])
 
   const filterModal = (filter, index) => {
-    console.log(config)
     const saveChanges = () => {
       let tempConfig = { ...config.dashboard }
       tempConfig.sharedFilters[index] = filter

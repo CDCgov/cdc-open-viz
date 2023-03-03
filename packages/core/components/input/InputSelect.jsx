@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, memo } from 'react'
 import PropTypes from 'prop-types'
 
 // Store
-import useConfigStore from '../../stores/configStore'
+import { useConfigStoreContext } from '../hoc/ConfigProxy'
 
 // Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
@@ -24,14 +24,14 @@ const InputSelect = memo((
     tooltip,
 
     configField,
-    value: inlineValue,
+    value: inlineValue = '',
     onChange, className, ...attributes
   }
 ) => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStore()
+  const { config, updateConfigField } = useConfigStoreContext()
 
-  const [ value, setValue ] = useState(inlineValue = '')
+  const [ value, setValue ] = useState(inlineValue)
 
   const inputRef = useRef(null)
 

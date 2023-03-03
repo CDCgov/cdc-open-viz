@@ -2,11 +2,13 @@
 import parse from 'html-react-parser'
 
 // Store
-import useConfigStore from '@cdc/core/stores/configStore'
+import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
+import useDataStore from '@cdc/core/stores/dataStore'
 
 // Visualization
 const FilteredText = () => {
-  const { config } = useConfigStore()
+  const { config } = useConfigStoreContext()
+  const { data } = useDataStore()
 
   const filteredText = () => {
     let filteredData = []
@@ -14,7 +16,7 @@ const FilteredText = () => {
     if (config.filters && config.filters.length) {
       config.filters.map(filter => {
         if (filter.columnName && filter.columnValue) {
-          return filteredData = config.data.filter(
+          return filteredData = data.filter(
             (entry) => entry[filter.columnName] === filter.columnValue
           )
         } else {
@@ -23,8 +25,8 @@ const FilteredText = () => {
       })
     } else {
       // filter by textColumn if selected
-      if (config.data && config.textColumn) {
-        return (filteredData = config.data.filter(
+      if (data && config.textColumn) {
+        return (filteredData = data.filter(
             (entry, index) => entry[config.textColumn] && index === 0)
         )
       }

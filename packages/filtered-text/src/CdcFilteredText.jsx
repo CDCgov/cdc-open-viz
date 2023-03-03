@@ -17,17 +17,11 @@ import FilteredText from './components/FilteredText'
 import './scss/cove-filtered-text.scss'
 
 // Visualization
-const CdcFilteredText = (
-  {
-    config: configObj,
-    configUrl,
-    setParentConfig
-  }
-) => {
+const CdcFilteredText = ({ config: configObj, configUrl }) => {
   return (
     <ErrorBoundary component="CdcFilteredText">
       <ConfigProxy configObj={configObj} configUrl={configUrl} defaults={defaults}>
-        <View editorPanels={<EditorPanels setParentConfig={setParentConfig}/>}>
+        <View editorPanels={<EditorPanels/>}>
           <Component className="cove-filtered-text">
             <FilteredText/>
           </Component>

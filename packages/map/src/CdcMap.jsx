@@ -763,11 +763,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
 
       obj.data.forEach(row => {
-        if (test) {
-          console.log('object', obj)
-          console.log('row', row)
-        }
-
         if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
         // When on a single state map filter runtime data by state
@@ -1132,7 +1127,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const handleMapAriaLabels = (state = '', testing = false) => {
-    if (testing) console.log(`handleMapAriaLabels Testing On: ${state}`)
     try {
       if (!state.general.geoType) throw Error('handleMapAriaLabels: no geoType found in state')
       let ariaLabel = ''

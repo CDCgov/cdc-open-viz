@@ -1,4 +1,4 @@
-const update423 = (config) => {
+const update_4_23 = (config) => {
   const ver = 4.23
 
   let newConfig = { ...config }
@@ -10,10 +10,18 @@ const update423 = (config) => {
       newConfig.theme = newConfig.theme.split('-')[1]
     }
 
-    // Remove old visual config entries since these were consolidated into a new format
-    delete newConfig.hideBackgroundColor
-    delete newConfig.roundedBorders
-    delete newConfig.borderColorTheme
+    // Move old visual config entries into new key
+    if (newConfig.visual) {
+      newConfig.componentStyle = {
+        accent: newConfig.visual.accent,
+        background: newConfig.visual.background,
+        border: newConfig.visual.border,
+        shadow: newConfig.visual.shadow,
+      }
+    }
+
+    // Remove old visual config entries
+    delete newConfig.visual
 
     // Config alterations complete
     // Add validation mark to config...
@@ -23,4 +31,4 @@ const update423 = (config) => {
   return newConfig
 }
 
-export default update423
+export default update_4_23

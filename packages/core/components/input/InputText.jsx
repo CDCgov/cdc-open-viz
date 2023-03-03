@@ -26,16 +26,15 @@ const InputText = memo((
     test,
 
     configField,
-    value: inlineValue,
+    value: inlineValue = '',
     min, max, className, onChange, ...attributes
   }
 ) => {
   // Store Selectors
-  const { updateConfigField } = useConfigStore()
-  const { config } = useConfigStoreContext()
+  const { config, updateConfigField } = useConfigStoreContext()
 
   // Input will only accept either an inline value from the element, or a value from a connected config key
-  const [ value, setValue ] = useState(inlineValue = '')
+  const [ value, setValue ] = useState(inlineValue)
   const [ debouncedValue ] = useDebounce(value, 300)
 
   const inputRef = useRef(null)

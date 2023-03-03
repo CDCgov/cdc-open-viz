@@ -1,21 +1,19 @@
 import React, { useState, useRef } from 'react'
 
 // Store
-import useConfigStore from '@cdc/core/stores/configStore'
+import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 
 const DataBiteImage = ({ calculateDataBite }) => {
-  const { biteStyle, imageData } = useConfigStore(state => ({
-    biteStyle: state.config.biteStyle,
-    imageData: state.config.imageData
-  }))
+  const { config } = useConfigStoreContext()
+  const { biteStyle, imageData } = config
 
-  const [ imgSrc, setImgSrc ] = useState(() => imageData.url)
-  const [ imgAlt, setImgAlt ] = useState(() => imageData.alt)
+  const [ imgSrc, setImgSrc ] = useState(imageData.url || '')
+  const [ imgAlt, setImgAlt ] = useState(imageData.alt || '')
   const [ targetValue ] = useState(Number(calculateDataBite(false)))
 
   const activeArgument = useRef(false)
 
-  const checkValueAgainstArguments = (option) => {
+  const getDynamicImage = (option) => {
     let { source, alt, arguments: argumentArr } = option
 
     if (activeArgument.current === false && argumentArr.length > 0) { // If option has arguments
@@ -39,11 +37,12 @@ const DataBiteImage = ({ calculateDataBite }) => {
     }
   }
 
-  if (imageData.display === 'dynamic' && imageData.options && imageData.options?.length > 0) {
-    imageData.options.forEach((option, index) => checkValueAgainstArguments(option))
+  // Check for Dynamic Images
+  if (imageData && imageData.display === 'dynamic' && imageData.options && imageData.options?.length > 0) {
+    imageData.options.forEach((option, index) => getDynamicImage(option))
   }
 
-  return imgSrc.length > 0 && biteStyle !== 'graphic' && imageData.display !== 'none'
+  return imgSrc && imgSrc.length > 0 && biteStyle !== 'graphic' && imageData.display !== 'none'
     ? <img alt={imgAlt} srcSet={imgSrc} className="cove-data-bite__image"/>
     : null
 }

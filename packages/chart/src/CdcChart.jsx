@@ -73,7 +73,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
   const handleChartAriaLabels = (state, testing = false) => {
-    if (testing) console.log(`handleChartAriaLabels Testing On:`, state)
     try {
       if (!state.visualizationType) throw Error('handleChartAriaLabels: no visualization type found in state')
       let ariaLabel = ''

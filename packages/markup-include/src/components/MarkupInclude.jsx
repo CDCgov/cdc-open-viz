@@ -120,14 +120,16 @@ const MarkupInclude = () => {
 
   return <>
     {config.missingRequiredSections && <>Missing data in sections</>}
-    {!config.missingRequiredSections && <>
-      {!markupError && urlMarkup &&
-        <Markup content={parseBodyMarkup(urlMarkup)}/>
-      }
-      {markupError && config.srcUrl &&
-        <AlertBox type="error"><Markup content={errorMessage}/></AlertBox>
-      }
-    </>}
+    {!config.missingRequiredSections &&
+      <>
+        {!markupError && urlMarkup &&
+          <Markup content={parseBodyMarkup(urlMarkup)}/>
+        }
+        {markupError && config.srcUrl &&
+          <AlertBox type="error"><Markup content={errorMessage}/></AlertBox>
+        }
+      </>
+    }
   </>
 }
 

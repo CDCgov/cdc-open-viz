@@ -327,8 +327,6 @@ const EditorPanel = () => {
 
     let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
 
-    console.log('section value', sectionValue)
-
     if (null !== subsection) {
       if (isArray) {
         sectionValue = [...config[section]]

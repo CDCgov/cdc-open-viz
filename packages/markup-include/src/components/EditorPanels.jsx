@@ -13,12 +13,12 @@ import Icon from '@cdc/core/components/ui/Icon'
 import InputText from '@cdc/core/components/input/InputText'
 import PanelGlobal from '@cdc/core/components/editor/Panel.Global'
 
-const EditorPanels = ({ setParentConfig }) => {
+const EditorPanels = () => {
   // Store Selectors
   const { config } = useConfigStoreContext()
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
-/*  const [ tempConfig, setTempConfig ] = useState(config)
+  /*const [ tempConfig, setTempConfig ] = useState(config)
 
   useEffect(() => {
     // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
