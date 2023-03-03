@@ -9,7 +9,7 @@ function useReduceData(config, data) {
     // remove comma and $ signs
     let tmp
     if (typeof value === 'string') {
-      tmp = value !== null && value !== '' ? value.replace(/[,\$]/g, '') : ''
+      tmp = value !== null && value !== '' ? value.replace(/[,$]/g, '') : ''
     } else {
       tmp = value !== null && value !== '' ? value : ''
     }
@@ -41,7 +41,7 @@ function useReduceData(config, data) {
 
       if (config.runtime.barSeriesKeys && config.runtime.lineSeriesKeys) {
         // get barSeries max Values added to each other
-        data.map(function (d, index) {
+        data.foreach(function (d, index) {
           const totalYValues = config.runtime.barSeriesKeys.reduce((yTotal, k) => {
             yTotal += Number(d[k])
             return yTotal

@@ -12,7 +12,7 @@ import ConfigContext from '../ConfigContext'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext(ConfigContext)
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
 
   // Debugging.
   // if (config.visualizationType === 'Box Plot') return null
@@ -138,7 +138,7 @@ export default function DataTable() {
     }
 
     if (config.visualizationType === 'Box Plot') {
-      config.boxplot.tableData.map((plot, index) => {
+      config.boxplot.tableData.foreach((plot, index) => {
         const newCol = {
           Header: plot.columnCategory,
           Cell: props => {
@@ -167,7 +167,7 @@ export default function DataTable() {
     }
 
     return newTableColumns
-  }, [config, colorScale])
+  }, [config, colorScale]) // eslint-disable-line
 
   // prettier-ignore
   const tableData = useMemo(() => (
@@ -176,7 +176,8 @@ export default function DataTable() {
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])
         : config.runtime.seriesKeys),
-    [config.runtime.seriesKeys])
+    [config.runtime.seriesKeys]
+  ) // eslint-disable-line
 
   // Change accessibility label depending on expanded status
   useEffect(() => {

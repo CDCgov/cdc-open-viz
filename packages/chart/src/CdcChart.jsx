@@ -12,7 +12,7 @@ import { timeParse, timeFormat } from 'd3-time-format'
 import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
-import { Base64 } from 'js-base64'
+//import { Base64 } from 'js-base64'
 import 'react-tooltip/dist/react-tooltip.css'
 
 // Primary Components
@@ -63,12 +63,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
-  const legendGlyphSize = 15
-  const legendGlyphSizeHalf = legendGlyphSize / 2
+  //const legendGlyphSize = 15
+  //const legendGlyphSizeHalf = legendGlyphSize / 2
 
   // Destructure items from config for more readable JSX
   const { legend, title, description, visualizationType } = config
-  const { barBorderClass, lineDatapointClass, contentClasses, innerContainerClasses, sparkLineStyles } = useDataVizClasses(config)
+  const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
@@ -270,9 +270,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       // make deep copy so we can remove some fields for data
       // this appears to be the easiest option instead of running logic against the datatable cell...
       tableData = JSON.parse(JSON.stringify(plots))
-      tableData.map(table => {
+      tableData.foreach(table => {
         delete table.columnIqr
         delete table.nonOutlierValues
+        return
       })
 
       // any other data we can add to boxplots
@@ -386,7 +387,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     setContainer(node)
-  }, [])
+  }, []) // eslint-disable-line
 
   function isEmpty(obj) {
     return Object.keys(obj).length === 0
@@ -395,7 +396,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Load data when component first mounts
   useEffect(() => {
     loadConfig()
-  }, [])
+  }, []) // eslint-disable-line
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
@@ -405,7 +406,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       publish('cove_loaded', { config: config })
       setCoveLoadedEventRan(true)
     }
-  }, [container, config])
+  }, [container, config]) // eslint-disable-line
 
   /**
    * Handles filter change events outside of COVE
@@ -448,14 +449,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setConfig(newConfigHere)
       setFilteredData(filterData(externalFilters, excludedData))
     }
-  }, [externalFilters])
+  }, [externalFilters]) // eslint-disable-line
 
   // Load data when configObj data changes
   if (configObj) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       loadConfig()
-    }, [configObj.data])
+    }, [configObj.data]) // eslint-disable-line
   }
 
   // Generates color palette to pass to child chart component
@@ -484,7 +485,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (config && stateData && config.sortData) {
       stateData.sort(sortData)
     }
-  }, [config, stateData])
+  }, [config, stateData]) // eslint-disable-line
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = label => {
@@ -543,7 +544,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
   }
 
-  const DownloadButton = ({ data }, type = 'link') => {
+  // eslint says DownloadButton is not used so commenting out for now (TT)
+/*   const DownloadButton = ({ data }, type = 'link') => {
     const fileName = `${config.title.substring(0, 50)}.csv`
 
     const csvData = Papa.unparse(data)
@@ -568,7 +570,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         </a>
       )
     }
-  }
+  } */
 
   // function calculates the width of given text and its font-size
   function getTextWidth(text, font) {
@@ -632,7 +634,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // We can't use commas when we're formatting the dataFormatted number
     // Example: commas -> 12,000; abbreviated -> 12k (correct); abbreviated & commas -> 12 (incorrect)
     if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
-      num = num
+      num = num // eslint-disable-line
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
     }
