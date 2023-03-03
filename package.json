@@ -16,7 +16,7 @@
     "@visx/group": "^3.0.0",
     "@visx/heatmap": "^3.0.0",
     "@visx/scale": "^3.0.0",
-    "@vitejs/plugin-react": "^3.0.0",
+    "@vitejs/plugin-react": "^3.1.0",
     "babel-eslint": "^10.1.0",
     "d3-composite-projections": "^1.4.0",
     "eslint": "^7.16.0",

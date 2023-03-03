@@ -1,19 +1,32 @@
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-
+import { render, screen, waitForElementToBeRemoved, queryByText } from '@testing-library/react';
 import CdcMap from './../CdcMap';
 
-/**
- * @jest-environment jsdom
- */
 describe('United States Map', () => {
-  it('Renders', () => {
+  it('Renders', async () => {
     render(<CdcMap configUrl="./../../examples/example-city-state.json" isEditor={false} />);
+    const loadingText = screen.getByText("Content is loading.");
 
+    await waitForElementToBeRemoved(() => queryByText(loadingText))
 
-    waitForElementToBeRemoved()
+    expect(loadingText).toBeInTheDocument()
+
     screen.debug()
-
   });
-
 });
+
+describe('World Maps', () => {
+
+  it('Renders', async () => {
+    render(<CdcMap configUrl="./../../examples/example-city-state.json" isEditor={false} />);
+    const loadingText = screen.getByText("Content is loading.");
+    expect(loadingText).toBeInTheDocument()
+  })
+})
+
+describe('County Maps', () => {
+  it('Renders', async () => {
+    render(<CdcMap configUrl="./../../examples/example-city-state.json" isEditor={false} />);
+    const loadingText = screen.getByText("Content is loading.");
+    expect(loadingText).toBeInTheDocument()
+  })
+})
