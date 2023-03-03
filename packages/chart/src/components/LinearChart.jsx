@@ -39,7 +39,7 @@ export default function LinearChart() {
       // parent element is visible
       setAnimatedChart(prevState => true)
     }
-  })
+  }) // eslint-disable-line
 
   // If the chart is in view, set to animate if it has not already played
   useEffect(() => {
@@ -118,6 +118,9 @@ export default function LinearChart() {
           break
         case maxDataVal > 4 && maxDataVal <= 7:
           max = max * 1.1
+          break
+        default:
+          // do nothing
           break
       }
     }
@@ -246,7 +249,7 @@ export default function LinearChart() {
       if (outlierMax > maxYValue) maxYValue = outlierMax
     }
 
-    const seriesNames = data.map(d => d[config.xAxis.dataKey])
+    //const seriesNames = data.map(d => d[config.xAxis.dataKey])
 
     // Set Scales
     yScale = scaleLinear({
@@ -263,9 +266,10 @@ export default function LinearChart() {
     })
   }
 
-  const handleTick = tick => {
+  // eslint says this is not used - commenting out for now
+/*   const handleTick = tick => {
     return config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick
-  }
+  } */
 
   return isNaN(width) ? (
     <></>

@@ -40,7 +40,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
     if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
       updateField(section, subsection, fieldName, debouncedValue)
     }
-  }, [debouncedValue])
+  }, [debouncedValue]) // eslint-disable-line
 
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
 
@@ -68,19 +68,19 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend } = props
+  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend } = props
 
   const { general, columns, legend, dataTable, tooltips } = state
 
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
 
-  const [configTextboxValue, setConfigTextbox] = useState({})
+  const [configTextboxValue, setConfigTextbox] = useState({})  // eslint-disable-line
 
   const [loadedDefault, setLoadedDefault] = useState(false)
 
   const [displayPanel, setDisplayPanel] = useState(true)
 
-  const [advancedToggle, setAdvancedToggle] = useState(false)
+ // const [advancedToggle, setAdvancedToggle] = useState(false)
 
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
@@ -130,7 +130,7 @@ const EditorPanel = props => {
       if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
         handleEditorChanges('changeLegendDescription', [String(activeFilterValueForDescription), debouncedValue])
       }
-    }, [debouncedValue])
+    }, [debouncedValue]) // eslint-disable-line
 
     const onChange = e => setValue(e.target.value)
 
@@ -919,7 +919,7 @@ const EditorPanel = props => {
     setLoadedDefault(state.defaultData)
 
     columnsRequiredChecker()
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   useEffect(() => {
     //If a categorical map is used and the order is either not defined or incorrect, fix it
@@ -953,7 +953,7 @@ const EditorPanel = props => {
         })
       }
     }
-  }, [runtimeLegend])
+  }, [runtimeLegend]) // eslint-disable-line
 
   // if no state choice by default show alabama
   useEffect(() => {
@@ -969,7 +969,7 @@ const EditorPanel = props => {
         }
       })
     }
-  }, [])
+  }, []) // eslint-disable-line
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -977,7 +977,7 @@ const EditorPanel = props => {
     </option>
   ]
 
-  columnsInData.map(colName => {
+  columnsInData.foreach(colName => {
     columnsOptions.push(
       <option value={colName} key={colName}>
         {colName}
@@ -1180,14 +1180,15 @@ const EditorPanel = props => {
 
   useEffect(() => {
     if (paletteName) handleEditorChanges('color', paletteName)
-  }, [paletteName]) // dont add handleEditorChanges as a dependency even if it requires
+  }, [paletteName]) // eslint-disable-line 
+  // dont add handleEditorChanges as a dependency even if it requires
 
   useEffect(() => {
     const parsedData = convertStateToConfig()
     const formattedData = JSON.stringify(parsedData, undefined, 2)
 
     setConfigTextbox(formattedData)
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   useEffect(() => {
     // Pass up to Editor if needed
@@ -1195,7 +1196,7 @@ const EditorPanel = props => {
       const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   let numberOfItemsLimit = 8
 
