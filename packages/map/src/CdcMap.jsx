@@ -88,7 +88,7 @@ const hashObj = row => {
 
 const indexOfIgnoreType = (arr, item) => {
   for (let i = 0; i < arr.length; i++) {
-    if (item == arr[i]) {
+    if (item === arr[i]) {
       return i
     }
   }
@@ -147,7 +147,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     } catch (e) {
       console.error('Failed to set world map zoom.')
     }
-  }, [filteredCountryCode])
+  }, [filteredCountryCode]) // eslint-disable-line
 
   useEffect(() => {
     setTimeout(() => {
@@ -159,7 +159,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         setRuntimeData(tmpData)
       }
     }, 100)
-  }, [filteredCountryCode])
+  }, [filteredCountryCode]) // eslint-disable-line
 
   useEffect(() => {
     if (state.mapPosition) {
@@ -178,6 +178,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
   // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
   const addUIDs = useCallback((obj, fromColumn) => {
+    // eslint-disable-line
     obj.data.forEach(row => {
       let uid = null
 
@@ -249,6 +250,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   })
 
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
+    // eslint-disable-line
     const newLegendMemo = new Map() // Reset memoization
     var primaryCol = obj.columns.primary.name,
       isBubble = obj.general.type === 'bubble',
@@ -290,7 +292,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           mapColorPalette.unshift(chroma(mapColorPalette[0]).darken(0.75).hex())
         }
       }
-
 
       let colorIdx = legendIdx - specialClasses
 
@@ -537,11 +538,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           let min = removedRows[0][primaryCol],
             max = removedRows[removedRows.length - 1][primaryCol]
 
-
-         
-
           removedRows.forEach(row => {
-            newLegendMemo.set(hashObj(row), result.length)
+            // eslint-disable-line
+            newLegendMemo.set(hashObj(row), result.length) // eslint-disable-line
           })
 
           result.push({
@@ -554,7 +553,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           changingNumber -= 1
           numberOfRows -= chunkAmt
         }
-
       } else {
         // get nums
         let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
@@ -579,7 +577,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           breaks.unshift(0)
         }
 
-        breaks.map((item, index) => {
+        breaks.foreach((item, index) => {
           const setMin = index => {
             let min = breaks[index]
 
@@ -704,22 +702,23 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // DEV-784
     // before returning the legend result
     // add property for bin number and set to index location
-    result.forEach((row,i) => {
-        row.bin = i  // set bin number to index
+    result.forEach((row, i) => {
+      row.bin = i // set bin number to index
     })
     // Move all special legend items from "Special Classes"  to the end of the legend
-    if(state.legend.showSpecialClassesLast) {
+    if (state.legend.showSpecialClassesLast) {
       let specialRows = result.filter(d => d.special === true)
       let otherRows = result.filter(d => !d.special)
-      result = [...otherRows, ...specialRows];
+      result = [...otherRows, ...specialRows]
     }
     //-----------
 
-    return result;
+    return result
   })
 
   const generateRuntimeFilters = useCallback((obj, hash, runtimeFilters) => {
-    if (undefined === obj.filters || obj.filters.length === 0) return []
+    // eslint-disable-line
+    if (typeof obj === 'undefined' || undefined === obj.filters || obj.filters.length === 0) return []
 
     let filters = []
 
@@ -771,6 +770,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Calculates what's going to be displayed on the map and data table at render.
   const generateRuntimeData = useCallback((obj, filters, hash, test) => {
+    // eslint-disable-line
     try {
       const result = {}
 
@@ -836,7 +836,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       resizeObserver.observe(node)
     }
     setContainer(node)
-  }, [])
+  }, []) // eslint-disable-line
 
   const mapSvg = useRef(null)
 
@@ -934,9 +934,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let idx = legendMemo.current.get(hash)
         if (runtimeLegend[idx]?.disabled) return false
 
-        // DEV-784 changed to use bin prop to get color instead of idx 
+        // DEV-784 changed to use bin prop to get color instead of idx
         // bc we re-order legend when showSpecialClassesLast is checked
-        let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color;
+        let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
         return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
       }
 
@@ -1273,28 +1273,28 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Initial load
   useEffect(() => {
     init()
-  }, [])
+  }, []) // eslint-disable-line
 
   useEffect(() => {
     if (state && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: state })
       setCoveLoadedHasRan(true)
     }
-  }, [state, container])
+  }, [state, container]) // eslint-disable-line
 
   useEffect(() => {
     if (state.data) {
       let newData = generateRuntimeData(state)
       setRuntimeData(newData)
     }
-  }, [state.general.statePicked])
+  }, [state.general.statePicked]) // eslint-disable-line
 
   useEffect(() => {
     // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
     }
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   // DEV-769 make "Data Table" both a required field and default value
   useEffect(() => {
@@ -1307,13 +1307,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         }
       })
     }
-  }, [state.dataTable])
+  }, [state.dataTable]) // eslint-disable-line
 
   // When geo label override changes
   // - redo the tooltips
   useEffect(() => {
     applyTooltipsToGeo()
-  }, [state.general.geoLabelOverride])
+  }, [state.general.geoLabelOverride]) // eslint-disable-line
 
   useEffect(() => {
     // UID
@@ -1371,7 +1371,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
       setRuntimeLegend(legend)
     }
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   useEffect(() => {
     const hashLegend = hashObj({
@@ -1391,13 +1391,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       let legend = generateRuntimeLegend(state, runtimeData)
       setRuntimeLegend(legend)
     }
-  }, [runtimeData])
+  }, [runtimeData]) // eslint-disable-line
 
   if (config) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       loadConfig(config)
-    }, [config.data])
+    }, [config.data]) // eslint-disable-line
   }
 
   // Destructuring for more readable JSX
@@ -1484,9 +1484,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType &&
-              <ReactTooltip id="tooltip" variant="light" float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />
-            }
+            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
@@ -1496,9 +1494,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 </div>
               </header>
             )}
-            {general.introText &&
-              <section className='introText'>{parse(general.introText)}</section>
-            }
+            {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             <Filters />
 
