@@ -121,13 +121,13 @@ export const stateToIso = {
 }
 
 export const stateFipsToTwoDigit = {
-  ['01']: 'AL',
-  ['02']: 'AK',
-  ['04']: 'AZ',
-  ['05']: 'AR',
-  ['06']: 'CA',
-  ['08']: 'CO',
-  ['09']: 'CT',
+  ['01']: 'AL', // eslint-disable-line
+  ['02']: 'AK', // eslint-disable-line
+  ['04']: 'AZ', // eslint-disable-line
+  ['05']: 'AR', // eslint-disable-line
+  ['06']: 'CA', // eslint-disable-line
+  ['08']: 'CO', // eslint-disable-line
+  ['09']: 'CT', // eslint-disable-line
   10: 'DE',
   11: 'DC',
   12: 'FL',
