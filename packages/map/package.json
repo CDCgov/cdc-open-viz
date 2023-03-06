@@ -51,13 +51,5 @@
     "react-dom": "^18.2.0"
   },
   "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa",
-  "devDependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^14.0.0",
-    "@vitejs/plugin-react": "^3.1.0",
-    "@vitest/coverage-c8": "^0.29.2",
-    "@vitest/ui": "^0.29.2",
-    "jsdom": "^21.1.0",
-    "vitest": "^0.29.2"
-  }
+  "devDependencies": {}
 }
