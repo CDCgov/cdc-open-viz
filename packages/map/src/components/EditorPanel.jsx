@@ -1413,6 +1413,7 @@ const EditorPanel = props => {
                 <AccordionItemPanel>
                   <TextField
                     value={general.title}
+                    data-testid="title-input"
                     updateField={updateField}
                     section='general'
                     fieldName='title'

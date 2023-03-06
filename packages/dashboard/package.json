@@ -10,7 +10,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "graph": "nx graph",
-    "prepublishOnly": "lerna run --scope @cdc/dashboard build"
+    "prepublishOnly": "lerna run --scope @cdc/dashboard build",
+    "test": "vitest watch --reporter verbose",
+    "test:ui": "vitest --ui"
   },
   "repository": {
     "type": "git",
