@@ -8,6 +8,8 @@
   "scripts": {
     "start": "vite --open",
     "build": "vite build",
+    "test": "vitest watch --reporter verbose",
+    "test:ui": "vitest --ui",
     "preview": "vite preview",
     "graph": "nx graph",
     "prepublishOnly": "lerna run --scope @cdc/map build"
@@ -48,5 +50,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa"
+  "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa",
+  "devDependencies": {}
 }

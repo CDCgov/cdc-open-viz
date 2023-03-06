@@ -10,7 +10,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "graph": "nx graph",
-    "prepublishOnly": "lerna run --scope @cdc/chart build"
+    "prepublishOnly": "lerna run --scope @cdc/chart build",
+    "test": "vitest watch --reporter verbose",
+    "test:ui": "vitest --ui"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
     "@hello-pangea/dnd": "^16.2.0",
     "@visx/axis": "^3.0.0",
     "@visx/curve": "^3.0.0",
+    "@visx/event": "^3.0.1",
     "@visx/gradient": "^3.0.0",
     "@visx/group": "^3.0.0",
     "@visx/legend": "^3.0.0",
