@@ -8,7 +8,7 @@ import useGlobalStore from '@cdc/core/stores/globalStore'
 import useConfigStore from '@cdc/core/stores/configStore'
 
 // Helpers
-import dataTransform from '@cdc/core/helpers/dataTransform'
+import dataTransform from '@cdc/core/helpers/data/dataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 // Components - Core

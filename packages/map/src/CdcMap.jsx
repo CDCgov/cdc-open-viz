@@ -11,8 +11,6 @@ import chroma from 'chroma-js'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
-// Helpers
-import { publish } from '@cdc/core/helpers/events'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -21,8 +19,8 @@ import colorPalettes from '../../core/data/colorPalettes'
 import initialState from './data/initial-state'
 
 // Helpers
-import { getViewport, numberFromString } from '@cdc/core/helpers/coveHelpers'
-import dataTransform from '@cdc/core/helpers/dataTransform'
+import CoveHelper from '@cdc/core/helpers/cove'
+import dataTransform from '@cdc/core/helpers/data/dataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 // Components - Core
@@ -170,7 +168,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
-      let newViewport = getViewport(entry.contentRect.width)
+      let newViewport = CoveHelper.General.getViewport(entry.contentRect.width)
 
       setCurrentViewport(newViewport)
     }
@@ -771,7 +769,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         }
 
         if (row[obj.columns.primary.name]) {
-          row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name], state)
+          row[obj.columns.primary.name] = CoveHelper.String.convertStringToNumber(row[obj.columns.primary.name], state)
         }
 
         // If this is a navigation only map, skip if it doesn't have a URL
@@ -1246,7 +1244,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   useEffect(() => {
     if (state && !coveLoadedHasRan && container) {
-      publish('cove_loaded', { config: state })
+      CoveHelper.Event.publish('cove_loaded', { config: state })
       setCoveLoadedHasRan(true)
     }
   }, [ state, container ])

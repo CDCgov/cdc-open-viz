@@ -12,8 +12,8 @@ export default function useDataVizClasses(config) {
     barBorderClass = ' chart-bar--no-border'
   }
 
-  let innerContainerClasses = ['cove-component__inner']
-  let contentClasses = ['cove-component__content']
+  let innerContainerClasses = [ 'cove-component__inner' ]
+  let contentClasses = [ 'cove-component__content' ]
 
   config.title && innerContainerClasses.push('component--has-title')
   config.subtext && innerContainerClasses.push('component--has-subtext')

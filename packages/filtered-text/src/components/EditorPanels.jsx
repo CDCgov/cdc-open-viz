@@ -5,7 +5,7 @@ import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 import useDataStore from '@cdc/core/stores/dataStore'
 
 // Helpers
-import getDataColumns from '@cdc/core/helpers/data/getDataColumns'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -46,7 +46,7 @@ const EditorPanels = () => {
 
   const panelData = (
     <Accordion.Section label="Data">
-      <InputSelect label="Text Column" options={getDataColumns(data)} configField="textColumn" initialDisabled/>
+      <InputSelect label="Text Column" options={CoveHelper.Data.getDataColumns(data)} configField="textColumn" initialDisabled/>
       <hr className="cove-editor__divider"/>
       <PanelComponentFilters/>
     </Accordion.Section>

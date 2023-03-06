@@ -6,9 +6,10 @@ import chroma from 'chroma-js'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, cleanData, getTextWidth, parseDate } = useContext(ConfigContext)
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, cleanData, getTextWidth, parseDate } = useContext(ConfigContext)
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
   const cleanedData = cleanData(data, config.xAxis.dataKey)
@@ -319,8 +320,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     {barGroup.bars.map((bar, index) => {
                       let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                       let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                      let barHeight = orientation === 'horizontal' ? config.barHeight : isNumber(Math.abs(yScale(bar.value) - yScale(0))) ? Math.abs(yScale(bar.value) - yScale(0)) : 0
-                      let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
+                      let barHeight = orientation === 'horizontal' ? config.barHeight : CoveHelper.Math.equalsValidNumber(Math.abs(yScale(bar.value) - yScale(0))) ? Math.abs(yScale(bar.value) - yScale(0)) : 0
+                      let barY = bar.value >= 0 && CoveHelper.Math.equalsValidNumber(bar.value) ? bar.y : yScale(0)
                       let barGroupWidth = ((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (config.barThickness || 0.8)
                       let offset = (((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
 

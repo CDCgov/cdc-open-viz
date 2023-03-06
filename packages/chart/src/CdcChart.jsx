@@ -22,8 +22,6 @@ import LinearChart from './components/LinearChart'
 
 import { colorPalettesChart as colorPalettes } from '../../core/data/colorPalettes'
 
-import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
-
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import SparkLine from './components/SparkLine'
@@ -36,12 +34,9 @@ import Filters from './components/Filters'
 import MediaControls from '@cdc/core/components/ui/MediaControls'
 
 // Helpers
-import dataTransform from '@cdc/core/helpers/dataTransform'
-import { getViewport, numberFromString, cacheBustingString } from '@cdc/core/helpers/coveHelpers'
-
-// TODO: COVE Refactor - Move these into coveHelpers
-import isNumber from '@cdc/core/helpers/isNumber'
-import cleanData from '@cdc/core/helpers/cleanData'
+import CoveHelper from '@cdc/core/helpers/cove'
+import dataTransform from '@cdc/core/helpers/data/dataTransform'
+import cleanData from '@cdc/core/helpers/data/cleanData'
 
 import './scss/main.scss'
 
@@ -103,7 +98,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
         const ext = regex.exec(response.dataUrl)[1]
         if ('csv' === ext) {
-          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
+          data = await fetch(response.dataUrl + `?v=${CoveHelper.String.generateCacheBustString()}`)
             .then(response => response.text())
             .then(responseText => {
               const parsedCsv = Papa.parse(responseText, {
@@ -116,7 +111,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         }
 
         if ('json' === ext) {
-          data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
+          data = await fetch(response.dataUrl + `?v=${CoveHelper.String.generateCacheBustString()}`).then(response => response.json())
         }
       } catch {
         console.error(`Cannot parse URL: ${response.dataUrl}`)
@@ -193,7 +188,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         // Initial filter should be active
         newConfig.filters[index].active = filterValues[0]
       })
-      currentData = filterData(newConfig.filters, newExcludedData)
+      currentData = CoveHelper.Data.filterData(newConfig.filters, newExcludedData)
       setFilteredData(currentData)
     }
 
@@ -309,22 +304,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setConfig(newConfig)
   }
 
-  const filterData = (filters, data) => {
-    let filteredData = []
-
-    data.forEach(row => {
-      let add = true
-      filters.forEach(filter => {
-        if (row[filter.columnName] !== filter.active) {
-          add = false
-        }
-      })
-
-      if (add) filteredData.push(row)
-    })
-    return filteredData
-  }
-
   // Gets filer values from dataset
   const generateValuesForFilter = (columnName, data = this.state.data) => {
     const values = []
@@ -359,7 +338,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      let newViewport = getViewport(width)
+      let newViewport = CoveHelper.General.getViewport(width)
       let svgMarginWidth = 32
       let editorWidth = 350
 
@@ -401,7 +380,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
    */
   useEffect(() => {
     if (container && !isEmpty(config) && !coveLoadedEventRan) {
-      publish('cove_loaded', { config: config })
+      CoveHelper.Event.publish('cove_loaded', { config: config })
       setCoveLoadedEventRan(true)
     }
   }, [container, config])
@@ -418,10 +397,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setExternalFilters(tmp)
     }
 
-    subscribe('cove_filterData', e => handleFilterData(e))
+    CoveHelper.Event.subscribe('cove_filterData', e => handleFilterData(e))
 
     return () => {
-      unsubscribe('cove_filterData', handleFilterData)
+      CoveHelper.Event.unsubscribe('cove_filterData', handleFilterData)
     }
   }, [config])
 
@@ -438,14 +417,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         let configCopy = { ...config }
         delete configCopy['filters']
         setConfig(configCopy)
-        setFilteredData(filterData(externalFilters, excludedData))
+        setFilteredData(CoveHelper.Data.filterData(externalFilters, excludedData))
       }
     }
 
     if (externalFilters && externalFilters.length > 0 && externalFilters.length > 0 && externalFilters[0].hasOwnProperty('active')) {
       let newConfigHere = { ...config, filters: externalFilters }
       setConfig(newConfigHere)
-      setFilteredData(filterData(externalFilters, excludedData))
+      setFilteredData(CoveHelper.Data.filterData(externalFilters, excludedData))
     }
   }, [externalFilters])
 
@@ -610,7 +589,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     }
 
-    num = numberFromString(num)
+    num = CoveHelper.String.convertStringToNumber(num)
 
     if (isNaN(num)) {
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`
@@ -619,7 +598,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     if (!config.dataFormat) return num
     if (config.dataCutoff) {
-      let cutoff = numberFromString(config.dataCutoff)
+      let cutoff = CoveHelper.String.convertStringToNumber(config.dataCutoff)
 
       if (num < cutoff) {
         num = cutoff
@@ -688,11 +667,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     }
 
-    if (!config.xAxis.dataKey) {
-      return true
-    }
-
-    return false
+    return !config.xAxis.dataKey;
   }
 
   // Prevent render if loading
@@ -717,8 +692,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             </a>
             {/* Filters */}
             {config.filters && !externalFilters && <Filters />}
+
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
+
             <div
               style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
@@ -798,8 +775,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setSeriesHighlight,
     dynamicLegendItems,
     setDynamicLegendItems,
-    filterData,
-    isNumber,
     cleanData,
     imageId,
     getTextWidth

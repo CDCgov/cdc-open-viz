@@ -11,7 +11,7 @@ import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 import demoMarkup from '../templates/demoMarkup'
 
 // Helpers
-import { publish } from '@cdc/core/helpers/events'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components - Core
 import AlertBox from '@cdc/core/components/ui/AlertBox'
@@ -108,7 +108,7 @@ const MarkupInclude = () => {
 
   useEffect(() => {
     if (config && !coveLoadedHasRan && container) {
-      publish('cove_loaded', { config: config })
+      CoveHelper.Event.publish('cove_loaded', { config: config })
       setCoveLoadedHasRan(true)
     }
   }, [ config, container ])

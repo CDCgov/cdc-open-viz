@@ -19,15 +19,7 @@ import {
 } from '../data/consts.js'
 
 // Helpers
-import {
-  numberFromString,
-  applyPrecision,
-  getSum,
-  getMean,
-  getMedian,
-  getMode,
-  convertNumberToLocaleString
-} from '@cdc/core/helpers/coveHelpers'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components - Core
 import CircleCallout from '../components/CircleCallout'
@@ -70,7 +62,7 @@ const DataBite = () => {
     // Get the column's data
     if (filteredData.length) {
       filteredData.forEach(row => {
-        let value = numberFromString(row[config.dataColumn])
+        let value = CoveHelper.String.convertStringToNumber(row[config.dataColumn])
         if (typeof value === 'number') numericalData.push(value)
       })
     } else {
@@ -84,13 +76,13 @@ const DataBite = () => {
         dataBite = getColumnCount(numericalData)
         break
       case DATA_FUNCTION_SUM:
-        dataBite = applyPrecision(getSum(numericalData), config.dataFormat.roundToPlace)
+        dataBite = CoveHelper.Math.roundToPlace(CoveHelper.Math.getSum(numericalData), config.dataFormat.roundToPlace)
         break
       case DATA_FUNCTION_MEAN:
-        dataBite = applyPrecision(getMean(numericalData), config.dataFormat.roundToPlace)
+        dataBite = CoveHelper.Math.roundToPlace(CoveHelper.Math.getMean(numericalData), config.dataFormat.roundToPlace)
         break
       case DATA_FUNCTION_MEDIAN:
-        dataBite = applyPrecision(getMedian(numericalData), config.dataFormat.roundToPlace)
+        dataBite = CoveHelper.Math.roundToPlace(CoveHelper.Math.getMedian(numericalData), config.dataFormat.roundToPlace)
         break
       case DATA_FUNCTION_MAX:
         dataBite = Math.max(...numericalData)
@@ -99,16 +91,16 @@ const DataBite = () => {
         dataBite = Math.min(...numericalData)
         break
       case DATA_FUNCTION_MODE:
-        dataBite = getMode(numericalData).join('')
+        dataBite = CoveHelper.Math.getMode(numericalData).join('')
         break
       case DATA_FUNCTION_RANGE:
         let rangeMin = Math.min(...numericalData)
         let rangeMax = Math.max(...numericalData)
-        rangeMin = applyPrecision(rangeMin, config.dataFormat.roundToPlace)
-        rangeMax = applyPrecision(rangeMax, config.dataFormat.roundToPlace)
+        rangeMin = CoveHelper.Math.roundToPlace(rangeMin, config.dataFormat.roundToPlace)
+        rangeMax = CoveHelper.Math.roundToPlace(rangeMax, config.dataFormat.roundToPlace)
         if (config.dataFormat.commas) {
-          rangeMin = convertNumberToLocaleString(rangeMin)
-          rangeMax = convertNumberToLocaleString(rangeMax)
+          rangeMin = CoveHelper.Math.convertNumberToLocaleString(rangeMin)
+          rangeMax = CoveHelper.Math.convertNumberToLocaleString(rangeMax)
         }
         dataBite = config.dataFormat.prefix + rangeMin + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + rangeMax + config.dataFormat.suffix
         break
@@ -118,10 +110,10 @@ const DataBite = () => {
 
     // If not the range, then round and format here
     if (config.dataFunction !== DATA_FUNCTION_RANGE) {
-      dataBite = applyPrecision(dataBite, config.dataFormat.roundToPlace)
+      dataBite = CoveHelper.Math.roundToPlace(dataBite, config.dataFormat.roundToPlace)
 
       if (config.dataFormat.commas) {
-        dataBite = convertNumberToLocaleString(dataBite)
+        dataBite = CoveHelper.Math.convertNumberToLocaleString(dataBite)
       }
 
       return includePrefixSuffix ? config.dataFormat.prefix + dataBite + config.dataFormat.suffix : dataBite

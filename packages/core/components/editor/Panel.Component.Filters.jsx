@@ -5,7 +5,7 @@ import useConfigStore from '../../stores/configStore'
 import useDataStore from '../../stores/dataStore'
 
 // Helpers
-import getDataColumns from '../../helpers/data/getDataColumns'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components
 import Button from '../element/Button'
@@ -66,7 +66,7 @@ const PanelComponentFilters = () => {
         </Button>
         <InputSelect
           label="Column"
-          options={getDataColumns(data)}
+          options={CoveHelper.Data.getDataColumns(data)}
           initial="Select data column"
           onChange={(e) => updateFilter('columnName', index, e.target.value)}
           value={filter.columnName}

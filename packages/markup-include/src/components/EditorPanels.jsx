@@ -5,6 +5,7 @@ import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 
 // Helpers
 import { isConfigEqual } from '@cdc/core/helpers/configHelpers'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'

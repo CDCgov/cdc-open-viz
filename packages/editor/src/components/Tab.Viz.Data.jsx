@@ -9,7 +9,7 @@ import { useDropzone } from 'react-dropzone'
 import ConfigContext from '../ConfigContext'
 
 // Helpers
-import dataTransform from '@cdc/core/helpers/dataTransform'
+import dataTransform from '@cdc/core/helpers/data/dataTransform'
 
 // Components - Core
 import AlertBox from '@cdc/core/components/ui/AlertBox'

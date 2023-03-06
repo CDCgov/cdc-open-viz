@@ -1,5 +1,4 @@
 const filterDataByTextColumn = (data, filters, textColumn) => {
-  console.log('data', data, 'filters', filters)
   let filteredData = []
 
   if (filters && filters.length) {

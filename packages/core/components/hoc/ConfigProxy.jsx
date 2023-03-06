@@ -6,11 +6,11 @@ import PropTypes from 'prop-types'
 
 // Store
 import useConfigStore from '../../stores/configStore'
+import useDataStore from '../../stores/dataStore'
 
 // Components - Core
 import RenderFallback from '../loader/RenderFallback'
-import { fetchAsyncUrl } from '../../helpers/data'
-import useDataStore from '../../stores/dataStore'
+import fetchAsyncUrl from '../../helpers/fetchAsyncUrl'
 
 // Store Exports
 export const ConfigStoreContext = createContext({})

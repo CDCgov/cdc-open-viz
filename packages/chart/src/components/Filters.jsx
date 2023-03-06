@@ -1,9 +1,10 @@
 import React, { useState, useContext } from 'react'
 import ConfigContext from './../ConfigContext'
 import Button from '@cdc/core/components/element/Button'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 const useFilters = () => {
-  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData, runtimeFilters } = useContext(ConfigContext)
+  const { config, setConfig, filteredData, setFilteredData, excludedData, runtimeFilters } = useContext(ConfigContext)
   const [showApplyButton, setShowApplyButton] = useState(false)
 
   const sortAsc = (a, b) => {
@@ -28,7 +29,7 @@ const useFilters = () => {
 
   const handleApplyButton = newFilters => {
     setConfig({ ...config, filters: newFilters })
-    setFilteredData(filterData(newFilters, excludedData))
+    setFilteredData(CoveHelper.Data.filterData(newFilters, excludedData))
     setShowApplyButton(false)
   }
 
@@ -40,7 +41,7 @@ const useFilters = () => {
       filter.active = filter.values[0]
     })
 
-    setFilteredData(filterData(newFilters, excludedData))
+    setFilteredData(CoveHelper.Data.filterData(newFilters, excludedData))
     setConfig({ ...config, filters: newFilters })
   }
 

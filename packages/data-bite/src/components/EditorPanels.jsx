@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 
 // Helpers
-import { getDataColumns } from '@cdc/core/helpers/data/index'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -87,7 +87,7 @@ const EditorPanels = () => {
     <Accordion.Section label="Data" warnIf={(!config.dataColumn || !config.dataFunction)}>
       <div className="cove-grid cove-grid--gap--2">
         <div className="cove-grid__col--6">
-          <InputSelect label="Data Column" options={getDataColumns(data)} configField="dataColumn" initialDisabled required/>
+          <InputSelect label="Data Column" options={CoveHelper.Data.getDataColumns(data)} configField="dataColumn" initialDisabled required/>
         </div>
         <div className="cove-grid__col--6">
           <InputSelect label="Data Function" options={DATA_FUNCTIONS} configField="dataFunction" initialDisabled required/>

@@ -6,7 +6,7 @@
 import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
 import dataTransform from '@cdc/core/helpers/dataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import filterData from '@cdc/core/helpers/filterData'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 const transform = new dataTransform()
 
@@ -125,7 +125,7 @@ const useDashboardRuntime = async (newConfig) => {
         let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
 
         if (applicableFilters.length > 0) {
-          newFilteredData[visualizationKey] = filterData(
+          newFilteredData[visualizationKey] = CoveHelper.Data.filterData(
             applicableFilters,
             newConfig.visualizations[visualizationKey].formattedData
             || newConfig.visualizations[visualizationKey].data

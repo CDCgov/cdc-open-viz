@@ -6,7 +6,7 @@ const update_4_23 = (config) => {
   if (!config.validated || config.validated < ver) {
 
     // Convert theme definition in config to color only
-    if (newConfig.theme && newConfig.theme.includes("theme-")) {
+    if (newConfig.theme && newConfig.theme.includes('theme-')) {
       newConfig.theme = newConfig.theme.split('-')[1]
     }
 
@@ -16,7 +16,7 @@ const update_4_23 = (config) => {
         accent: newConfig.visual.accent,
         background: newConfig.visual.background,
         border: newConfig.visual.border,
-        shadow: newConfig.visual.shadow,
+        shadow: newConfig.visual.shadow
       }
     }
 

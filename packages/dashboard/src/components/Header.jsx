@@ -8,7 +8,7 @@ import Modal from '@cdc/core/components/ui/Modal'
 import InputText from '@cdc/core/components/input/InputText'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import dataTransform from '@cdc/core/helpers/dataTransform'
+import dataTransform from '@cdc/core/helpers/data/dataTransform'
 import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
 import Button from '@cdc/core/components/element/Button'
 

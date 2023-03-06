@@ -14,10 +14,9 @@ import useConfigStore from '@cdc/core/stores/configStore'
 import DashboardContext from '../DashboardContext'
 
 // Helpers
-import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
-import dataTransform from '@cdc/core/helpers/dataTransform'
+import CoveHelper from '@cdc/core/helpers/cove'
+import dataTransform from '@cdc/core/helpers/data/dataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import filterData from '@cdc/core/helpers/filterData'
 
 // Components - Core
 import MediaControls from '@cdc/core/components/ui/MediaControls'
@@ -126,7 +125,7 @@ const Dashboard = () => {
     let dataset = config.formattedData || config.data
 
     if (config.dataUrl) {
-      dataset = fetchRemoteData(`${config.dataUrl}?v=${cacheBustingString()}`)
+      dataset = fetchRemoteData(`${config.dataUrl}?v=${CoveHelper.String.generateCacheBustString()}`)
 
       if (dataset && config.dataDescription) {
         try {
@@ -210,7 +209,7 @@ const Dashboard = () => {
       if (applicableFilters.length > 0) {
         const visualization = newConfig.visualizations[visualizationKey]
 
-        newFilteredData[visualizationKey] = filterData(applicableFilters, visualization.formattedData || data[visualization.dataKey])
+        newFilteredData[visualizationKey] = CoveHelper.Data.filterData(applicableFilters, visualization.formattedData || data[visualization.dataKey])
       }
     })
 
@@ -271,7 +270,7 @@ const Dashboard = () => {
         let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
 
         if (applicableFilters.length > 0) {
-          newFilteredData[visualizationKey] = filterData(applicableFilters, newConfig.visualizations[visualizationKey].formattedData || newConfig.visualizations[visualizationKey].data || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey])
+          newFilteredData[visualizationKey] = CoveHelper.Data.filterData(applicableFilters, newConfig.visualizations[visualizationKey].formattedData || newConfig.visualizations[visualizationKey].data || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey])
         }
       })
     }*/
@@ -316,7 +315,7 @@ const Dashboard = () => {
       Object.keys(config.visualizations).forEach(key => {
         let applicableFilters = dashboardConfig.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
         if (applicableFilters.length > 0) {
-          newFilteredData[key] = filterData(applicableFilters, config.visualizations[key].formattedData || config.data[config.visualizations[key].dataKey])
+          newFilteredData[key] = CoveHelper.Data.filterData(applicableFilters, config.visualizations[key].formattedData || config.data[config.visualizations[key].dataKey])
         }
       })
 
@@ -664,7 +663,7 @@ const Dashboard = () => {
 
                 //Applys any applicable filters
                 if (applicableFilters.length > 0) {
-                  filteredTableData = filterData(applicableFilters, config.datasets[datasetKey].data)
+                  filteredTableData = CoveHelper.Data.filterData(applicableFilters, config.datasets[datasetKey].data)
                 }
               }
 

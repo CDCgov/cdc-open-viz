@@ -8,7 +8,7 @@ import useConfigStore from '../../stores/configStore'
 import { COVE_BREAKPOINTS as breakpoints } from '../../data/const'
 
 // Helpers
-import { convertKebabToTitle } from '../../helpers/coveHelpers'
+import CoveHelper from '../../helpers/cove'
 
 // Components - Local
 import Button from '../element/Button'
@@ -166,7 +166,9 @@ const Editor = ({ editorPanels, children }) => {
         <button className={`cove-editor__toggle` + (!displayPanel ? ` collapsed` : ``)}
                 title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}/>
         <section className="cove-editor__panel" tabIndex={0} ref={editorPanelRef}>
-          <h2 className="cove-editor__panel-heading" aria-level="2" role="heading">Configure {config.type ? convertKebabToTitle(config.type) : 'Component'}</h2>
+          <h2 className="cove-editor__panel-heading" aria-level="2" role="heading">
+            Configure {config.type ? CoveHelper.String.convertKebabToTitle(config.type) : 'Component'}
+          </h2>
           <div className="cove-editor__panel-container">
             <section className="cove-editor__panel-config">
               {editorPanels}

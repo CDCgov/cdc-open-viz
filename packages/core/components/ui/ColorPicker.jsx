@@ -15,7 +15,7 @@ import Tooltip from './Tooltip'
 import THEME_COLORS from '../../data/componentThemes'
 
 // Helpers
-import { capitalizeFirstLetter } from '../../helpers/coveHelpers'
+import CoveHelper from '../../helpers/cove'
 
 // Styles
 import '../../styles/v2/components/ui/color-picker.scss'
@@ -61,7 +61,7 @@ const ColorPicker = ({ label, colors = THEME_COLORS, tooltip, colorTooltip }) =>
               <Tooltip.Target>
                 <ColorButton color={color}/>
               </Tooltip.Target>
-              <Tooltip.Content>{capitalizeFirstLetter(color)}</Tooltip.Content>
+              <Tooltip.Content>{CoveHelper.String.capitalizeFirstLetter(color)}</Tooltip.Content>
             </Tooltip>
           )) :
           parseColors(colors).map((color, index) => (

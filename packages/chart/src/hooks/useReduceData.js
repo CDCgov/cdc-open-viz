@@ -1,4 +1,4 @@
-import isNumber from '@cdc/core/helpers/isNumber'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 function useReduceData(config, data) {
   // for combo charts check if all  Data Series selected to Bar;
@@ -34,7 +34,7 @@ function useReduceData(config, data) {
 
       max = Math.max(...yTotals)
     } else if (config.visualizationType === 'Bar' && config.series && config.series.dataKey) {
-      max = Math.max(...data.map(d => (isNumber(d[config.series.dataKey]) ? Number(cleanChars(d[config.series.dataKey])) : 0)))
+      max = Math.max(...data.map(d => (CoveHelper.Math.equalsValidNumber(d[config.series.dataKey]) ? Number(cleanChars(d[config.series.dataKey])) : 0)))
       //max = Math.max(...data.map(d => Number(d[config.series.dataKey])))
     } else if (config.visualizationType === 'Combo' && config.visualizationSubType === 'stacked' && !isBar) {
       let total = []
@@ -56,14 +56,14 @@ function useReduceData(config, data) {
         max = Number(barMax) > Number(lineMax) ? barMax : lineMax
       }
     } else {
-      max = Math.max(...data.map(d => Math.max(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
+      max = Math.max(...data.map(d => Math.max(...config.runtime.seriesKeys.map(key => (CoveHelper.Math.equalsValidNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
     }
     return max
   }
 
   const getMinValueFromData = () => {
     let min
-    const minNumberFromData = Math.min(...data.map(d => Math.min(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 1000000000)))))
+    const minNumberFromData = Math.min(...data.map(d => Math.min(...config.runtime.seriesKeys.map(key => (CoveHelper.Math.equalsValidNumber(d[key]) ? Number(cleanChars(d[key])) : 1000000000)))))
     min = String(minNumberFromData)
     return min
   }

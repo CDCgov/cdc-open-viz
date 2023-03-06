@@ -6,13 +6,14 @@ import { LinePath } from '@visx/shape'
 import { Text } from '@visx/text'
 
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 import ConfigContext from '../ConfigContext'
 
 import useRightAxis from '../hooks/useRightAxis'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
-  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig } = useContext(ConfigContext)
+  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, cleanData, updateConfig } = useContext(ConfigContext)
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
   const cleanedData = cleanData(data, config.xAxis.dataKey)
@@ -86,11 +87,11 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
                   d[seriesKey] !== null && (
-                    // isNumber(d[seriesKey]) &&
-                    // isNumber(getYAxisData(d, seriesKey)) &&
-                    // isNumber(getXAxisData(d)) &&
-                    // isNumber(yScaleRight(getXAxisData(d))) &&
-                    // isNumber(yScale(getXAxisData(d))) &&
+                    // CoveHelper.Math.equalsValidNumber(d[seriesKey]) &&
+                    // CoveHelper.Math.equalsValidNumber(getYAxisData(d, seriesKey)) &&
+                    // CoveHelper.Math.equalsValidNumber(getXAxisData(d)) &&
+                    // CoveHelper.Math.equalsValidNumber(yScaleRight(getXAxisData(d))) &&
+                    // CoveHelper.Math.equalsValidNumber(yScale(getXAxisData(d))) &&
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
                       <Text
@@ -152,7 +153,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   shapeRendering='geometricPrecision'
                   strokeDasharray={lineType ? handleLineType(lineType) : 0}
                   defined={(item, i) => {
-                    return isNumber(item[config.runtime.seriesLabels[seriesKey]])
+                    return CoveHelper.Math.equalsValidNumber(item[config.runtime.seriesLabels[seriesKey]])
                   }}
                 />
               )}

@@ -1,6 +1,6 @@
 // Helpers
-import dataTransform from '../helpers/dataTransform'
-import { fetchAsyncUrl } from '../helpers/data'
+import dataTransform from '../helpers/data/dataTransform'
+import fetchAsyncUrl from '../helpers/fetchAsyncUrl'
 
 const transform = new dataTransform()
 

@@ -25,7 +25,7 @@ import {
 import usePrevious from '../hooks/usePrevious'
 
 // Helpers
-import { getSum, getMean, getMedian, getMode, applyPrecision } from '@cdc/core/helpers/coveHelpers'
+import CoveHelper from '@cdc/core/helpers/cove'
 import calculateNodePosition from '../helpers/calculateNodePosition'
 import calculateWaffleAnimation from '../helpers/calculateWaffleAnimation'
 
@@ -111,12 +111,12 @@ const WaffleChart = () => {
 
     const numerFunctionList = {
       [DATA_FUNCTION_COUNT]: String(numericalData.length),
-      [DATA_FUNCTION_SUM]: String(applyPrecision(getSum(numericalData), config.roundToPlace)),
-      [DATA_FUNCTION_MEAN]: String(applyPrecision(getMean(numericalData), config.roundToPlace)),
-      [DATA_FUNCTION_MEDIAN]: applyPrecision(getMedian(numericalData).toString(), config.roundToPlace),
+      [DATA_FUNCTION_SUM]: String(CoveHelper.Math.roundToPlace(CoveHelper.Math.getSum(numericalData), config.roundToPlace)),
+      [DATA_FUNCTION_MEAN]: String(CoveHelper.Math.roundToPlace(CoveHelper.Math.getMean(numericalData), config.roundToPlace)),
+      [DATA_FUNCTION_MEDIAN]: CoveHelper.Math.roundToPlace(CoveHelper.Math.getMedian(numericalData).toString(), config.roundToPlace),
       [DATA_FUNCTION_MAX]: Math.max(...numericalData).toString(),
       [DATA_FUNCTION_MIN]: Math.min(...numericalData).toString(),
-      [DATA_FUNCTION_MODE]: getMode(numericalData).join(', ')
+      [DATA_FUNCTION_MODE]: CoveHelper.Math.getMode(numericalData).join(', ')
     }
 
     waffleNumerator = numerFunctionList[config.dataFunction]
@@ -126,12 +126,12 @@ const WaffleChart = () => {
 
     const denomFunctionList = {
       [DATA_FUNCTION_COUNT]: String(numericalDenomData.length),
-      [DATA_FUNCTION_SUM]: String(applyPrecision(getSum(numericalDenomData), config.roundToPlace)),
-      [DATA_FUNCTION_MEAN]: String(applyPrecision(getMean(numericalDenomData), config.roundToPlace)),
-      [DATA_FUNCTION_MEDIAN]: applyPrecision(getMedian(numericalDenomData).toString(), config.roundToPlace),
+      [DATA_FUNCTION_SUM]: String(CoveHelper.Math.roundToPlace(CoveHelper.Math.getSum(numericalDenomData), config.roundToPlace)),
+      [DATA_FUNCTION_MEAN]: String(CoveHelper.Math.roundToPlace(CoveHelper.Math.getMean(numericalDenomData), config.roundToPlace)),
+      [DATA_FUNCTION_MEDIAN]: CoveHelper.Math.roundToPlace(CoveHelper.Math.getMedian(numericalDenomData).toString(), config.roundToPlace),
       [DATA_FUNCTION_MAX]: Math.max(...numericalDenomData).toString(),
       [DATA_FUNCTION_MIN]: Math.min(...numericalDenomData).toString(),
-      [DATA_FUNCTION_MODE]: getMode(numericalDenomData).join(', '),
+      [DATA_FUNCTION_MODE]: CoveHelper.Math.getMode(numericalDenomData).join(', '),
     }
 
     if (config.customDenom && config.dataDenomColumn && config.dataDenomFunction) {
@@ -140,7 +140,7 @@ const WaffleChart = () => {
       waffleDenominator = config.dataDenom > 0 ? config.dataDenom : 100
     }
 
-    return applyPrecision((waffleNumerator / waffleDenominator) * 100, config.roundToPlace)
+    return CoveHelper.Math.roundToPlace((waffleNumerator / waffleDenominator) * 100, config.roundToPlace)
   }
 
   const setRatio = () => {

@@ -15,7 +15,7 @@ import useReduceData from '../hooks/useReduceData'
 import ConfigContext from '../ConfigContext'
 
 export default function SparkLine({ width: parentWidth, height: parentHeight }) {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale, isNumber, handleChartAriaLabels } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, seriesHighlight, formatNumber, colorScale, handleChartAriaLabels } = useContext(ConfigContext)
   let width = parentWidth
   const { minValue, maxValue } = useReduceData(config, data, ConfigContext)
 

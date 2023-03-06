@@ -5,7 +5,7 @@ import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 import useDataStore from '@cdc/core/stores/dataStore'
 
 // Helpers
-import { getDataColumns } from '@cdc/core/helpers/data/index'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -82,7 +82,7 @@ const EditorPanels = () => {
       <SectionWrapper label="Numerator">
         <InputSelect
           label="Data Column"
-          options={getDataColumns(data)}
+          options={CoveHelper.Data.getDataColumns(data)}
           configField="dataColumn"
           initialDisabled
         />
@@ -98,7 +98,7 @@ const EditorPanels = () => {
           <div className="cove-grid__col--4">
             <InputSelect
               className="mb-0"
-              options={getDataColumns(data)}
+              options={CoveHelper.Data.getDataColumns(data)}
               configField="dataConditionalColumn"
               initialDisabled
             />
@@ -140,7 +140,7 @@ const EditorPanels = () => {
           <>
             <InputSelect
               label="Data Column"
-              options={getDataColumns(data)}
+              options={CoveHelper.Data.getDataColumns(data)}
               configField="dataDenomColumn"
             />
             <InputSelect

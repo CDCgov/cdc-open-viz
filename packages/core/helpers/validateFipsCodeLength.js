@@ -6,8 +6,8 @@
  * In this scenario a user is able to choose the column their Fips Codes are in.
  *
  * When stateOrData is an array...
- * The user hasn't chose which column has their FIPS codes in it. We still
- * want to present the FIPS Codes in a friendly format so we attempt to add leading zeros.
+ * The user hasn't chosen which column has their FIPS codes in it. We still
+ * want to present the FIPS Codes in a friendly format, so we attempt to add leading zeros.
  *
  * @param {object|array} stateOrData
  * @returns {object|array} stateOrData
@@ -31,7 +31,7 @@ export default function validateFipsCodeLength(stateOrData) {
   if (Array.isArray(stateOrData)) {
     let columns = Object.keys(stateOrData[0])
 
-    let potentialColumnNames = ['fips', 'FIPS', 'fips codes', 'FIPS CODES', 'Fips Codes', 'fips Codes', 'Fips codes', 'FIPS Codes']
+    let potentialColumnNames = [ 'fips', 'FIPS', 'fips codes', 'FIPS CODES', 'Fips Codes', 'fips Codes', 'Fips codes', 'FIPS Codes' ]
 
     const fipsCol = columns.filter(columnName => potentialColumnNames.includes(columnName))
 

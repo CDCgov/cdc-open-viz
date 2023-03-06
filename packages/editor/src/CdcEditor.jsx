@@ -9,7 +9,7 @@ import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
 // Helpers
-import { getViewport } from '@cdc/core/helpers/coveHelpers'
+import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components - Core
 import Overlay from '@cdc/core/components/ui/Overlay'
@@ -116,7 +116,7 @@ const CdcEditor = ({ config: configObj = { newViz: true }, hostname, containerEl
 
   const resizeObserver = new ResizeObserver(([ container ]) => {
     let { width, height } = container.contentRect
-    let newViewport = getViewport(width)
+    let newViewport = CoveHelper.General.getViewport(width)
 
     setDimensions([ width, height ])
     setCurrentViewport(newViewport)
