@@ -172,8 +172,8 @@ const UsaMap = props => {
       }
 
       return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)}
-                    data-tooltip-id="tooltip"
-                    data-tooltip-html={toolTip}
+        data-tooltip-id="tooltip"
+        data-tooltip-html={toolTip}
       />
     }
   })
@@ -297,10 +297,10 @@ const UsaMap = props => {
         return (
           <g data-name={geoName} key={key}>
             <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)}
-               id={geoName}
-               data-tooltip-id="tooltip"
-               data-tooltip-html={tooltip}
-               >
+              id={geoName}
+              data-tooltip-id="tooltip"
+              data-tooltip-html={tooltip}
+            >
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
             </g>
@@ -324,18 +324,18 @@ const UsaMap = props => {
     // Cities
     geosJsx.push(
       <CityList
-        projection={projection}
-        key='cities'
-        data={data}
-        state={state}
-        geoClickHandler={geoClickHandler}
-        applyTooltipsToGeo={applyTooltipsToGeo}
-        displayGeoName={displayGeoName}
         applyLegendToRow={applyLegendToRow}
-        titleCase={titleCase}
-        setSharedFilterValue={setSharedFilterValue}
+        applyTooltipsToGeo={applyTooltipsToGeo}
+        data={data}
+        displayGeoName={displayGeoName}
+        geoClickHandler={geoClickHandler}
         isFilterValueSupported={isFilterValueSupported}
         isGeoCodeMap={state.general.type === 'us-geocode'}
+        key='cities'
+        projection={projection}
+        setSharedFilterValue={setSharedFilterValue}
+        state={state}
+        titleCase={titleCase}
       />
     )
 
