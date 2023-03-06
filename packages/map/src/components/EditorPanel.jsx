@@ -1027,8 +1027,8 @@ const EditorPanel = props => {
     </option>
   ]
 
-  columnsInData.foreach(colName => {
-    columnsOptions.push(
+  columnsInData.map(colName => {
+    return columnsOptions.push(
       <option value={colName} key={colName}>
         {colName}
       </option>

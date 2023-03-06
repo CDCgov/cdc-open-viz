@@ -64,9 +64,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
-  //const legendGlyphSize = 15
-  //const legendGlyphSizeHalf = legendGlyphSize / 2
-
   // Destructure items from config for more readable JSX
   const { legend, title, description, visualizationType } = config
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
