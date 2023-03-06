@@ -48,6 +48,8 @@ import './scss/main.scss'
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
 
+  console.log('RENDERING')
+
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState({})
@@ -89,6 +91,19 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       return ariaLabel
     } catch (e) {
       console.error(e.message)
+    }
+  }
+
+  const handleLineType = lineType => {
+    switch (lineType) {
+      case 'dashed-sm':
+        return '5 5'
+      case 'dashed-md':
+        return '10 5'
+      case 'dashed-lg':
+        return '15 5'
+      default:
+        return 0
     }
   }
 
@@ -136,6 +151,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     let newConfig = { ...defaults, ...response }
+    if (newConfig.visualizationType === 'Box Plot') {
+      newConfig.legend.hide = true
+    }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
     updateConfig(newConfig, data)
   }
@@ -149,6 +167,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
     })
+
+    console.log('NEW HERE', newConfig)
 
     // Loop through and set initial data with exclusions - this should persist through any following data transformations (ie. filters)
     let newExcludedData
@@ -282,7 +302,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.boxplot.tableData = tableData
     }
 
-    if (newConfig.visualizationType === 'Combo' && newConfig.series) {
+    if (newConfig.visualizationType === 'Combo' || ('Area Chart' && newConfig.series)) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.series.forEach(series => {
@@ -307,6 +327,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
 
+    console.log('NEW CONFIG HERE 2', newConfig)
     setConfig(newConfig)
   }
 
@@ -587,8 +608,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     // destructure dataFormat values
     let {
-      dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, rightPrefix, rightSuffix }
+      dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix }
     } = config
+
     let formatSuffix = format('.2s')
 
     // check if value contains comma and remove it. later will add comma below.
@@ -597,17 +619,27 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let original = num
     let stringFormattingOptions
 
-    if (axis !== 'right') {
+    if (axis === 'left') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.commas ? true : false,
         minimumFractionDigits: roundTo ? Number(roundTo) : 0,
         maximumFractionDigits: roundTo ? Number(roundTo) : 0
       }
-    } else {
+    }
+
+    if (axis === 'right') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.rightCommas ? true : false,
         minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
         maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
+      }
+    }
+
+    if (axis === 'bottom') {
+      stringFormattingOptions = {
+        useGrouping: config.dataFormat.bottomCommas ? true : false,
+        minimumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0,
+        maximumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0
       }
     }
 
@@ -675,6 +707,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     Combo: <LinearChart />,
     Pie: <PieChart />,
     'Box Plot': <LinearChart />,
+    'Area Chart': <LinearChart />,
     'Scatter Plot': <LinearChart />
   }
 
@@ -800,9 +833,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     dynamicLegendItems,
     setDynamicLegendItems,
     filterData,
+    imageId,
+    handleLineType,
     isNumber,
     cleanData,
-    imageId,
     getTextWidth
   }
 

@@ -28,6 +28,7 @@
     "@hello-pangea/dnd": "^16.2.0",
     "@visx/axis": "^3.0.0",
     "@visx/curve": "^3.0.0",
+    "@visx/event": "^3.0.1",
     "@visx/gradient": "^3.0.0",
     "@visx/group": "^3.0.0",
     "@visx/legend": "^3.0.0",
