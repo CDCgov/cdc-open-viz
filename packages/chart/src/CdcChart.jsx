@@ -20,7 +20,7 @@ import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
 import LinearChart from './components/LinearChart'
 
-import { colorPalettesChart as colorPalettes } from '../../core/data/colorPalettes'
+import { colorPalettesChart as colorPalettes, pairedBarPalettes } from '@cdc/core/data/colorPalettes'
 
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 
@@ -230,10 +230,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
-            return series.dataKey
-          })
+          newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+          newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+          return series.dataKey
+        })
         : []
     }
 
@@ -482,7 +482,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime.seriesKeys) {
-      let palette = config.customColors || colorPalettes[config.palette]
+      const configPalette = config.visualizationType === 'Paired Bar' ? config.pairedBar.palette : config.palette
+      const allPalettes = { ...colorPalettes, ...pairedBarPalettes }
+      let palette = config.customColors || allPalettes[configPalette]
       let numberOfKeys = config.runtime.seriesKeys.length
       let newColorScale
 
@@ -837,7 +839,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     handleLineType,
     isNumber,
     cleanData,
-    getTextWidth
+    getTextWidth,
+    pairedBarPalettes
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
