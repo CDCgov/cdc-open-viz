@@ -7,7 +7,7 @@ import { Circle, Bar } from '@visx/shape'
 
 // Store
 import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
-import useDataStore from '@cdc/core/stores/dataStore'
+import useDataStore from '@cdc/core/stores/data/dataSlice'
 
 // Constants
 import THEME_COLORS from '@cdc/core/data/componentThemes'

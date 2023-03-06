@@ -5,7 +5,7 @@ import { useDebounce } from 'use-debounce'
 import PropTypes from 'prop-types'
 
 // Store
-import useConfigStore from '../../stores/configStore'
+import useConfigStore from '../../store/config/configSlice'
 import { useConfigStoreContext } from '../hoc/ConfigProxy'
 
 // Helpers

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 
 // Store
-import useGlobalStore from '../../stores/globalStore'
-import useConfigStore from '../../stores/configStore'
+import useGlobalStore from '../../store/global/globalSlice'
+import useConfigStore from '../../store/config/configSlice'
 
 // Data
 import { COVE_BREAKPOINTS as breakpoints } from '../../data/const'

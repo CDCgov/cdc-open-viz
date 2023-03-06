@@ -3,7 +3,7 @@ import parse from 'html-react-parser'
 
 // Store
 import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
-import useDataStore from '@cdc/core/stores/dataStore'
+import useDataStore from '@cdc/core/stores/data/dataSlice'
 
 // Visualization
 const FilteredText = () => {

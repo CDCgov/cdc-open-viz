@@ -3,10 +3,11 @@ import React, { createContext, useState, useCallback, useContext, useEffect, Sus
 // Third Party
 import { useStore } from 'zustand'
 import PropTypes from 'prop-types'
+import { shallow } from 'zustand/shallow'
 
 // Store
-import useConfigStore from '../../stores/configStore'
-import useDataStore from '../../stores/dataStore'
+import useConfigStore from '../../store/config/configSlice'
+import useDataStore from '../../store/data/dataSlice'
 
 // Components - Core
 import RenderFallback from '../loader/RenderFallback'
@@ -27,6 +28,7 @@ const ConfigProxy = (
     children
   }
 ) => {
+
   // Store Selectors
   const { store, config, setConfigDefaults, updateConfig, runConfigUpdater } = useConfigStore(state => ({
     store: state,
@@ -37,18 +39,23 @@ const ConfigProxy = (
   }))
 
   const { getData } = useDataStore()
-
   const sliceStoreConfigObj = useStore(useConfigStore, store => store.config?.visualizations)
 
   const [ isLoading, setIsLoading ] = useState(true)
 
-  // Loads the config object and sets defaults
+
+  // Load the config object and set any defaults
   useEffect(() => {
     if (visualizationKey) {
       // If a visualizationKey is provided, then we are in a component consumed by Dashboard or Wizard
       setConfigDefaults(defaults, visualizationKey) // Update the config with defaults
-        .then(setIsLoading(false))
-    } else {
+        .then(setIsLoading(false)) // Set loading to false
+    }
+  }, [ sliceStoreConfigObj, visualizationKey ])
+
+  useEffect(() => {
+    if (!visualizationKey) {
+      // If a visualizationKey is not provided, then we are in standalone mode
       async function fetchConfig() {
         let response = configObj || await fetchAsyncUrl(configUrl) || {}
 
@@ -59,7 +66,7 @@ const ConfigProxy = (
 
         runConfigUpdater() // Run the updater for config entry maintenance
       }
-      fetchConfig().then(() => setIsLoading(false))
+      fetchConfig().then(() => setIsLoading(false)) // Set loading to false
     }
   }, [ configObj, configUrl, visualizationKey ])
 

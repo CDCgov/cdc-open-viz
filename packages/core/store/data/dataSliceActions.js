@@ -1,19 +1,21 @@
 // Helpers
-import dataTransform from '../helpers/data/dataTransform'
-import fetchAsyncUrl from '../helpers/fetchAsyncUrl'
+import dataTransform from '../../helpers/data/dataTransform'
+import fetchAsyncUrl from '../../helpers/fetchAsyncUrl'
 
 const transform = new dataTransform()
 
-const dataStoreActions = (set, get) => ({
+const dataSliceActions = (set, get) => ({
   // Actions --------------------------------------------------------------------------------------------------------------------------------------------------------------
-  setData: value => set(state => {
-    state.data = value
-  }),
+  setData: value => set(state => { state.data = value }),
+  setDatasets: value => set(state => { state.datasets = value }),
+  setFormattedData: value => set(state => { state.formattedData = value }),
 
   getData: async (response) => {
     let res = await response
 
-    let resData = res.formattedData || res.data || []
+    let resData = res.data || []
+    let resFormattedData = res.formattedData || []
+    let resDataset = res.datasets || []
 
     // If a data URL is provided, fetch data then return. Overrides any previous data set.
     if (response.dataUrl) {
@@ -27,7 +29,9 @@ const dataStoreActions = (set, get) => ({
     }
 
     await get().setData(resData)
+    await get().setFormattedData(resFormattedData)
+    await get().setDatasets(resDataset)
   }
 })
 
-export default dataStoreActions
+export default dataSliceActions

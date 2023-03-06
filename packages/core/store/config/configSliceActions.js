@@ -3,10 +3,10 @@ import { merge as _merge } from 'lodash'
 import produce from 'immer'
 
 // Helpers
-import { setConfigKeyValue } from '../helpers/configHelpers'
-import coveUpdateWorker from '../helpers/update/coveUpdateWorker'
+import { setConfigKeyValue } from '../../helpers/configHelpers'
+import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
 
-const configStoreActions = (set, get) => ({
+const configSliceActions = (set, get) => ({
   // Actions --------------------------------------------------------------------------------------------------------------------------------------------------------------
   setMissingRequiredSections: (value) => set(state => {
     state.config.missingRequiredSections = value
@@ -54,4 +54,4 @@ const configStoreActions = (set, get) => ({
   }
 })
 
-export default configStoreActions
+export default configSliceActions

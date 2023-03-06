@@ -1,7 +1,7 @@
 import React from 'react'
 
 // Store
-import useConfigStore from '../../stores/configStore'
+import useConfigStore from '../../store/config/configSlice'
 
 // Third Party
 import PropTypes from 'prop-types'

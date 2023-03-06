@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 // Store
 import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
-import useDataStore from '@cdc/core/stores/dataStore'
+import useDataStore from '@cdc/core/stores/data/dataSlice'
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'

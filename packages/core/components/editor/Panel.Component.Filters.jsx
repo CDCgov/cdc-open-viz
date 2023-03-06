@@ -1,8 +1,8 @@
 import React from 'react'
 
 // Store
-import useConfigStore from '../../stores/configStore'
-import useDataStore from '../../stores/dataStore'
+import useConfigStore from '../../store/config/configSlice'
+import useDataStore from '../../store/data/dataSlice'
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'

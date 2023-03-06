@@ -4,7 +4,7 @@ import React, { Children } from 'react'
 import PropTypes from 'prop-types'
 
 // Store
-import useGlobalStore from '../../stores/globalStore'
+import useGlobalStore from '../../store/global/globalSlice'
 
 // Components
 import Icon from './Icon'

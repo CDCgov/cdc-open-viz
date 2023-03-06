@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 // Store
-import useConfigStore from '../../stores/configStore'
+import useConfigStore from '../../store/config/configSlice'
 
 // Components
 import Icon from '../ui/Icon'

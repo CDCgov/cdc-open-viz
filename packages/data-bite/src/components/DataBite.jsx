@@ -24,7 +24,7 @@ import CoveHelper from '@cdc/core/helpers/cove'
 // Components - Core
 import CircleCallout from '../components/CircleCallout'
 import DataBiteImage from './DataBite.Image'
-import useDataStore from '@cdc/core/stores/dataStore'
+import useDataStore from '@cdc/core/stores/data/dataSlice'
 
 // Visualization
 const DataBite = () => {

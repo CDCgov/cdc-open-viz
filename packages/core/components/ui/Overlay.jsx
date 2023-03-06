@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 // Store
-import useGlobalStore from '../../stores/globalStore'
+import useGlobalStore from '../../store/global/globalSlice'
 
 // Styles
 import '../../styles/v2/components/ui/overlay.scss'

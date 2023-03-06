@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react'
 
 // Store
-import useGlobalStore from '@cdc/core/stores/globalStore'
-import useConfigStore from '@cdc/core/stores/configStore'
+import useGlobalStore from '@cdc/core/stores/global/globalSlice'
+import useConfigStore from '@cdc/core/stores/config/configSlice'
 
 // Components - Core
 import Modal from '@cdc/core/components/ui/Modal'

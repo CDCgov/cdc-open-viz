@@ -1,7 +1,7 @@
 import React from 'react'
 
 // Store
-import useConfigStore from '@cdc/core/stores/configStore'
+import useConfigStore from '@cdc/core/stores/config/configSlice'
 
 // Components - Core
 import Button from '@cdc/core/components/element/Button'

@@ -4,8 +4,8 @@ import React, { useRef, useEffect } from 'react'
 import { useDrag } from 'react-dnd'
 
 // Store
-import useGlobalStore from '@cdc/core/stores/globalStore'
-import useConfigStore from '@cdc/core/stores/configStore'
+import useGlobalStore from '@cdc/core/stores/global/globalSlice'
+import useConfigStore from '@cdc/core/stores/config/configSlice'
 
 // Helpers
 import dataTransform from '@cdc/core/helpers/data/dataTransform'
@@ -69,16 +69,9 @@ const vizHash = {
 
 const BuilderWidget = ({ data = {}, addVisualization, type }) => {
   // Store Selectors
-  const { openOverlay, toggleOverlay } = useGlobalStore(state => ({
-    openOverlay: state.openOverlay,
-    toggleOverlay: state.toggleOverlay
-  }))
+  const { openOverlay, toggleOverlay } = useGlobalStore()
 
-  const { config, updateConfig, updateConfigField } = useConfigStore(state => ({
-    config: state.config,
-    updateConfig: state.updateConfig,
-    updateConfigField: state.updateConfigField
-  }))
+  const { config, updateConfig, updateConfigField } = useConfigStore()
 
   const dataRef = useRef()
   dataRef.current = data

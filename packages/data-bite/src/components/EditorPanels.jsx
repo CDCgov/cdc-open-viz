@@ -20,7 +20,7 @@ import PanelDynamicImages from './Panel.DynamicImages'
 
 // Constants
 import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS } from '../data/consts'
-import useDataStore from '@cdc/core/stores/dataStore'
+import useDataStore from '@cdc/core/stores/data/dataSlice'
 
 const EditorPanels = () => {
   const { config, setMissingRequiredSections } = useConfigStoreContext()

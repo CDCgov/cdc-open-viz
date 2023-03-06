@@ -5,8 +5,8 @@ import parse from 'html-react-parser'
 import PropTypes from 'prop-types'
 
 // Store
-import useGlobalStore from '../../stores/globalStore'
-import useConfigStore from '../../stores/configStore'
+import useGlobalStore from '../../store/global/globalSlice'
+import useConfigStore from '../../store/config/configSlice'
 
 // Components
 import Icon from '../ui/Icon'
