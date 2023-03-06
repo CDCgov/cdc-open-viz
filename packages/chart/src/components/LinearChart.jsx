@@ -40,7 +40,7 @@ export default function LinearChart() {
       // parent element is visible
       setAnimatedChart(prevState => true)
     }
-  })
+  }) // eslint-disable-line
 
   // If the chart is in view, set to animate if it has not already played
   useEffect(() => {
@@ -120,6 +120,9 @@ export default function LinearChart() {
         case maxDataVal > 4 && maxDataVal <= 7:
           max = max * 1.1
           break
+        default:
+          // do nothing
+          break
       }
     }
 
@@ -132,8 +135,8 @@ export default function LinearChart() {
       yScale =
         config.runtime.xAxis.type === 'date'
           ? scaleLinear({
-              domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
-            })
+            domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
+          })
           : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
       seriesScale = scalePoint({
@@ -255,7 +258,6 @@ export default function LinearChart() {
       if (outlierMax > maxYValue) maxYValue = outlierMax
     }
 
-    const seriesNames = data.map(d => d[config.xAxis.dataKey])
 
     // Set Scales
     yScale = scaleLinear({
@@ -272,9 +274,6 @@ export default function LinearChart() {
     })
   }
 
-  const handleTick = tick => {
-    return config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick
-  }
 
   return isNaN(width) ? (
     <></>
@@ -284,30 +283,30 @@ export default function LinearChart() {
         {/* Higlighted regions */}
         {config.regions
           ? config.regions.map(region => {
-              if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+            if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-              const from = xScale(parseDate(region.from).getTime())
-              const to = xScale(parseDate(region.to).getTime())
-              const width = to - from
+            const from = xScale(parseDate(region.from).getTime())
+            const to = xScale(parseDate(region.to).getTime())
+            const width = to - from
 
-              return (
-                <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
-                  <path
-                    stroke='#333'
-                    d={`M${from} -5
+            return (
+              <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
+                <path
+                  stroke='#333'
+                  d={`M${from} -5
                           L${from} 5
                           M${from} 0
                           L${to} 0
                           M${to} -5
                           L${to} 5`}
-                  />
-                  <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-                  <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-                    {region.label}
-                  </Text>
-                </Group>
-              )
-            })
+                />
+                <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+                <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+                  {region.label}
+                </Text>
+              </Group>
+            )
+          })
           : ''}
 
         {/* Y axis */}
