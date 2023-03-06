@@ -70,7 +70,7 @@ const nudges = {
 
 const UsaMap = props => {
   const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, titleCase, handleCircleClick, setSharedFilterValue, handleMapAriaLabels } = props
-
+  
   let isFilterValueSupported = false
 
   if (setSharedFilterValue) {
@@ -79,6 +79,7 @@ const UsaMap = props => {
         isFilterValueSupported = true
       }
     })
+   
     Object.keys(supportedTerritories).forEach(supportedTerritory => {
       if (supportedTerritories[supportedTerritory].indexOf(setSharedFilterValue.toUpperCase()) !== -1) {
         isFilterValueSupported = true
@@ -109,11 +110,15 @@ const UsaMap = props => {
   const territoriesKeys = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
 
   useEffect(() => {
-    // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-    const territoriesList = territoriesKeys.filter(key => data[key])
-
-    setTerritoriesData(territoriesList)
-  }, [data])
+    if (state.general.territoriesAlwaysShow) {
+      // show all Territories whether in the data or not
+      setTerritoriesData(territoriesKeys)
+     } else {
+      // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
+      const territoriesList = territoriesKeys.filter(key => data[key])
+      setTerritoriesData(territoriesList)
+    }
+  }, [data,state.general.territoriesAlwaysShow,territoriesKeys])
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
