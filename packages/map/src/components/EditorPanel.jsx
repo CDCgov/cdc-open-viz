@@ -413,6 +413,15 @@ const EditorPanel = props => {
               }
             })
             break
+          case 'world-geocode':
+            setState({
+              ...state,
+              general: {
+                ...state.general,
+                type: value
+              }
+            })
+            break
           case 'data':
             setState({
               ...state,
@@ -668,6 +677,15 @@ const EditorPanel = props => {
           }
         })
         break
+      case 'territoriesAlwaysShow':
+        setState({
+            ...state,
+            general: {
+              ...state.general,
+              territoriesAlwaysShow: value
+            }
+          })
+        break
       default:
         console.warn(`Did not recognize editor property.`)
         break
@@ -693,11 +711,11 @@ const EditorPanel = props => {
       columnList.push('Navigation')
     }
 
-    if ('us-geocode' === state.general.type && '' === state.columns.latitude.name) {
+    if ((('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && '' === state.columns.latitude.name) {
       columnList.push('Latitude')
     }
 
-    if ('us-geocode' === state.general.type && '' === state.columns.longitude.name) {
+    if ((('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && '' === state.columns.longitude.name) {
       columnList.push('Longitude')
     }
 
@@ -1378,7 +1396,8 @@ const EditorPanel = props => {
                       }}
                     >
                       <option value='data'>Data</option>
-                      <option value='us-geocode'>United States Geocode</option>
+                      {state.general.geoType === 'us-county' && <option value='us-geocode'>Geocode</option>}
+                      {state.general.geoType === 'world' && <option value='world-geocode'>Geocode</option>}
                       <option value='navigation'>Navigation</option>
                       {(state.general.geoType === 'world' || state.general.geoType === 'us') && <option value='bubble'>Bubble</option>}
                     </select>
@@ -1432,6 +1451,7 @@ const EditorPanel = props => {
                 <AccordionItemPanel>
                   <TextField
                     value={general.title}
+                    data-testid="title-input"
                     updateField={updateField}
                     section='general'
                     fieldName='title'
@@ -1520,6 +1540,18 @@ const EditorPanel = props => {
                     }
                   />
                   {'us' === state.general.geoType && <TextField value={general.territoriesLabel} updateField={updateField} section='general' fieldName='territoriesLabel' label='Territories Label' placeholder='Territories' />}
+                  {'us' === state.general.geoType &&
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={general.territoriesAlwaysShow || false}
+                        onChange={event => {
+                          handleEditorChanges('territoriesAlwaysShow', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Show All Territories</span>
+                    </label>
+                  }
                   {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1706,8 +1738,7 @@ const EditorPanel = props => {
                       </label>
                     </fieldset>
                   )}
-
-                  {'us-geocode' === state.general.type && (
+                  {(('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && (
                     <>
                       <label>Latitude Column</label>
                       <select
@@ -2565,7 +2596,7 @@ const EditorPanel = props => {
                       )
                     })}
                   </ul>
-                  {'us-geocode' === state.general.type && (
+                  {(('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && (
                     <label>
                       Geocode Settings
                       <TextField type='number' value={state.visual.geoCodeCircleSize} section='visual' max='10' fieldName='geoCodeCircleSize' label='Geocode Circle Size' updateField={updateField} />
@@ -2615,20 +2646,21 @@ const EditorPanel = props => {
                     </label>
                   )}
                   {state.general.geoType === 'us' ||
-                    (state.general.geoType === 'us-county' && (
-                      <label>
-                        <span className='edit-label'>City Style</span>
-                        <select
-                          value={state.visual.cityStyle || false}
-                          onChange={event => {
-                            handleEditorChanges('handleCityStyle', event.target.value)
-                          }}
-                        >
-                          <option value='circle'>Circle</option>
-                          <option value='pin'>Pin</option>
-                        </select>
-                      </label>
-                    ))}
+                    (state.general.geoType === 'us-county' ||
+                      (state.general.geoType === 'world') && (
+                        <label>
+                          <span className='edit-label'>City Style</span>
+                          <select
+                            value={state.visual.cityStyle || false}
+                            onChange={event => {
+                              handleEditorChanges('handleCityStyle', event.target.value)
+                            }}
+                          >
+                            <option value='circle'>Circle</option>
+                            <option value='pin'>Pin</option>
+                          </select>
+                        </label>
+                      ))}
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
