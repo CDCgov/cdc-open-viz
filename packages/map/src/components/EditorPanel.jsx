@@ -80,7 +80,6 @@ const EditorPanel = props => {
 
   const [displayPanel, setDisplayPanel] = useState(true)
 
- // const [advancedToggle, setAdvancedToggle] = useState(false)
 
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
@@ -1180,7 +1179,7 @@ const EditorPanel = props => {
 
   useEffect(() => {
     if (paletteName) handleEditorChanges('color', paletteName)
-  }, [paletteName]) // eslint-disable-line 
+  }, [paletteName]) // eslint-disable-line
   // dont add handleEditorChanges as a dependency even if it requires
 
   useEffect(() => {
