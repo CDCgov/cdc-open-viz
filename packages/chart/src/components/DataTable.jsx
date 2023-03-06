@@ -176,8 +176,7 @@ export default function DataTable() {
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])
         : config.runtime.seriesKeys),
-    [config.runtime.seriesKeys]
-  ) // eslint-disable-line
+    [config.runtime.seriesKeys]) // eslint-disable-line
 
   // Change accessibility label depending on expanded status
   useEffect(() => {
@@ -225,7 +224,7 @@ export default function DataTable() {
             }
           }}
         >
-          <Icon display={tableExpanded ? 'minus' : 'plus'} base/>
+          <Icon display={tableExpanded ? 'minus' : 'plus'} base />
           {config.table.label}
         </div>
         <div className='table-container' hidden={!tableExpanded} style={{ maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>

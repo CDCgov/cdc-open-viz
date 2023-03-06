@@ -12,7 +12,6 @@ import { timeParse, timeFormat } from 'd3-time-format'
 import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
-//import { Base64 } from 'js-base64'
 import 'react-tooltip/dist/react-tooltip.css'
 
 // Primary Components
@@ -210,10 +209,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
-            return series.dataKey
-          })
+          newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+          newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+          return series.dataKey
+        })
         : []
     }
 
@@ -543,34 +542,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const formatDate = date => {
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
   }
-
-  // eslint says DownloadButton is not used so commenting out for now (TT)
-/*   const DownloadButton = ({ data }, type = 'link') => {
-    const fileName = `${config.title.substring(0, 50)}.csv`
-
-    const csvData = Papa.unparse(data)
-
-    const saveBlob = () => {
-      if (typeof window.navigator.msSaveBlob === 'function') {
-        const dataBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
-        window.navigator.msSaveBlob(dataBlob, fileName)
-      }
-    }
-
-    if (type === 'download') {
-      return (
-        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
-          Download Data (CSV)
-        </a>
-      )
-    } else {
-      return (
-        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn no-border`}>
-          Download Data (CSV)
-        </a>
-      )
-    }
-  } */
 
   // function calculates the width of given text and its font-size
   function getTextWidth(text, font) {

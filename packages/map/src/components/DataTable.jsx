@@ -17,11 +17,7 @@ const DataTable = props => {
     indexTitle,
     mapTitle,
     rawData,
-    //showDownloadImgButton,
-    //showDownloadPdfButton,
-    //showDownloadButton,
     runtimeData,
-    //runtimeLegend,
     headerColor,
     expandDataTable,
     columns,
@@ -33,15 +29,11 @@ const DataTable = props => {
     formatLegendLocation,
     tabbingId,
     setFilteredCountryCode,
-    //innerContainerRef,
-    //imageRef
   } = props
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
-
-  //const [ready, setReady] = useState(false)
 
   const fileName = `${mapTitle || 'data-table'}.csv`
 
@@ -204,7 +196,7 @@ const DataTable = props => {
 
             var labelValue
             if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
-              labelValue= displayGeoName(row.original)
+              labelValue = displayGeoName(row.original)
             } else {
               labelValue = formatLegendLocation(row.original)
             }
@@ -241,7 +233,7 @@ const DataTable = props => {
         .filter(key => applyLegendToRow(runtimeData[key]))
         .sort((a, b) => customSort(a, b)),
     [runtimeData, applyLegendToRow, customSort]
-  ) 
+  )
 
   // Change accessibility label depending on expanded status
   useEffect(() => {
@@ -302,7 +294,7 @@ const DataTable = props => {
             }
           }}
         >
-          <Icon display={expanded ? 'minus' : 'plus'} base/>
+          <Icon display={expanded ? 'minus' : 'plus'} base />
           {tableTitle}
         </div>
         <div className='table-container' style={{ maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' }}>
