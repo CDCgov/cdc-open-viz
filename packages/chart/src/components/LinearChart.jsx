@@ -4,7 +4,7 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
-import { scaleLinear, scalePoint, scaleBand } from '@visx/scale'
+import { scaleLinear, scalePoint, scaleBand, scaleTime } from '@visx/scale'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 
 import CoveScatterPlot from './ScatterPlot'
@@ -14,6 +14,7 @@ import ConfigContext from '../ConfigContext'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
 import CoveBoxPlot from './BoxPlot'
+import CoveAreaChart from './AreaChart'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import '../scss/LinearChart.scss'
@@ -161,6 +162,13 @@ export default function LinearChart() {
       })
     }
 
+    if (config.visualizationType === 'Area Chart' && config.xAxis.type === 'date') {
+      xScale = scaleTime({
+        domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)],
+        range: [0, xMax]
+      })
+    }
+
     if (config.visualizationType === 'Paired Bar') {
       const offset = 1.02 // Offset of the ticks/values from the Axis
       let groupOneMax = Math.max.apply(
@@ -204,7 +212,8 @@ export default function LinearChart() {
 
   const handleBottomTickFormatting = tick => {
     if (config.runtime.xAxis.type === 'date') return formatDate(tick)
-    if (config.orientation === 'horizontal') return formatNumber(tick, 'bottom')
+    if (config.orientation === 'horizontal') return formatNumber(tick, 'left')
+    if (config.xAxis.type === 'continuous' && config.dataFormat.bottomCommas) return formatNumber(tick, 'bottom')
     return tick
   }
 
@@ -528,14 +537,14 @@ export default function LinearChart() {
         {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
 
         {/* Bar chart */}
-        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
+        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && (
           <>
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
           </>
         )}
 
         {/* Line chart */}
-        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
+        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && (
           <>
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
           </>
@@ -546,6 +555,7 @@ export default function LinearChart() {
 
         {/* Box Plot chart */}
         {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
+        {config.visualizationType === 'Area Chart' && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} />}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
