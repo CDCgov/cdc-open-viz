@@ -138,7 +138,7 @@ export default function DataTable() {
     }
 
     if (config.visualizationType === 'Box Plot') {
-      config.boxplot.tableData.foreach((plot, index) => {
+      config.boxplot.tableData.map((plot, index) => {
         const newCol = {
           Header: plot.columnCategory,
           Cell: props => {
@@ -162,7 +162,7 @@ export default function DataTable() {
           canSort: false
         }
 
-        newTableColumns.push(newCol)
+        return newTableColumns.push(newCol)
       })
     }
 

@@ -286,10 +286,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       // make deep copy so we can remove some fields for data
       // this appears to be the easiest option instead of running logic against the datatable cell...
       tableData = JSON.parse(JSON.stringify(plots))
-      tableData.foreach(table => {
+      tableData.map(table => {
         delete table.columnIqr
         delete table.nonOutlierValues
-        return
+        return null; // resolve eslint
       })
 
       // any other data we can add to boxplots
