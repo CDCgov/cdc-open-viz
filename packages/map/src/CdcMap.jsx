@@ -128,6 +128,18 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
 
+  // MATT SAYS PUT THIS INTO THE EDITOR... REPAIR IN THERE
+/*   console.log("state=", state)
+  if (state.legend.specialClasses.length && !state.legend?.specialClasses[0].hasOwnProperty('key')) {
+    console.log("###specialClasses need REPAIR=", state.legend.specialClasses)
+    let fixedSpecialClasses = []
+    state.legend.specialClasses.forEach((specClass,i) => {
+        fixedSpecialClasses[i] =  {key: state.columns.primary.name, value: state.legend.specialClasses[i], label: state.legend.specialClasses[i]}
+    })
+    state.legend.specialClasses = fixedSpecialClasses
+    console.log("###specialClasses REPAIRED=", state.legend.specialClasses)
+  } */
+
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
 

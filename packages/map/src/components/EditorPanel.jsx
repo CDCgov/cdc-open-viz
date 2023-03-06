@@ -104,6 +104,27 @@ const EditorPanel = props => {
     })
   }
 
+    let specialClasses = []
+  if (legend.specialClasses && legend.specialClasses.length && typeof legend.specialClasses[0] === 'string') {
+    legend.specialClasses.forEach(specialClass => {
+      specialClasses.push({
+        key: state.columns.primary && state.columns.primary.name ? state.columns.primary.name : columnsInData[0],
+        value: specialClass,
+        label: specialClass
+      })
+    })
+    // since the above was a repair - need to backpopulate into the state
+    setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            specialClasses: specialClasses
+          }
+    })
+  } else {
+    specialClasses = legend.specialClasses || []
+  }
+
   const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
     let filterOrder = filter.values
     let [movedItem] = filterOrder.splice(idx1, 1)
@@ -714,9 +735,11 @@ const EditorPanel = props => {
   const editColumn = async (columnName, editTarget, value) => {
     let newSpecialClasses
 
+    console.log("columnName, editTarget, value", columnName, editTarget, value)
+
     switch (editTarget) {
       case 'specialClassEdit':
-        newSpecialClasses = Array.from(legend.specialClasses)
+        newSpecialClasses = Array.from(specialClasses) // was legend.specialClasses
 
         newSpecialClasses[value.index][value.prop] = value.value
 
@@ -729,7 +752,7 @@ const EditorPanel = props => {
         })
         break
       case 'specialClassDelete':
-        newSpecialClasses = Array.from(legend.specialClasses)
+        newSpecialClasses = Array.from(specialClasses) // was legend.specialClasses
 
         newSpecialClasses.splice(value, 1)
 
@@ -742,7 +765,7 @@ const EditorPanel = props => {
         })
         break
       case 'specialClassAdd':
-        newSpecialClasses = legend.specialClasses
+        newSpecialClasses = specialClasses // was legend.specialClasses
 
         newSpecialClasses.push(value)
 
@@ -997,7 +1020,7 @@ const EditorPanel = props => {
     })
   })
 
-  let specialClasses = []
+/*   let specialClasses = []
   if (legend.specialClasses && legend.specialClasses.length && typeof legend.specialClasses[0] === 'string') {
     legend.specialClasses.forEach(specialClass => {
       specialClasses.push({
@@ -1008,7 +1031,9 @@ const EditorPanel = props => {
     })
   } else {
     specialClasses = legend.specialClasses || []
-  }
+  } */
+
+  console.log("specialClasses=",specialClasses)
 
   const additionalColumns = Object.keys(state.columns).filter(value => {
     const defaultCols = ['geo', 'navigate', 'primary', 'latitude', 'longitude']
