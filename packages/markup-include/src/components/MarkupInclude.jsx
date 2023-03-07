@@ -1,11 +1,9 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react'
+import Component from '@cdc/core/components/hoc/Component'
 
 // Third Party
 import { Markup } from 'interweave'
 import axios from 'axios'
-
-// Store
-import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 
 // Data
 import demoMarkup from '../templates/demoMarkup'
@@ -15,20 +13,19 @@ import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components - Core
 import AlertBox from '@cdc/core/components/ui/AlertBox'
+import { useMarkupInclude } from '../useMarkupInclude'
 
 // Visualization
-const MarkupInclude = () => {
-  console.log('rendered')
-  // Store Selectors
-  const { config } = useConfigStoreContext()
+const MarkupInclude = props => {
+  const config = useMarkupInclude(props)
 
-  const [ urlMarkup, setUrlMarkup ] = useState('')
-  const [ markupError, setMarkupError ] = useState(null)
-  const [ errorMessage, setErrorMessage ] = useState('')
+  const [urlMarkup, setUrlMarkup] = useState('')
+  const [markupError, setMarkupError] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('')
 
   // Broadcast Loaded State
   const container = useRef()
-  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
 
   // Error Checking & Logging
   useEffect(() => {
@@ -44,7 +41,7 @@ const MarkupInclude = () => {
       let errorList = {
         200: 'This is likely due to a <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing" target="_blank">CORS restriction policy</a> from the remote origin address.',
         404: 'The requested source URL cannot be found. Please verify the link address provided.',
-        'proto': 'Provided source URL must include <strong>https://</strong> or <strong>http://</strong> before the address.'
+        proto: 'Provided source URL must include <strong>https://</strong> or <strong>http://</strong> before the address.'
       }
 
       message += '- <em>' + errorList[errorCode] + '</em>'
@@ -52,7 +49,7 @@ const MarkupInclude = () => {
     } else {
       setErrorMessage('')
     }
-  }, [ markupError ])
+  }, [markupError])
 
   const loadConfigMarkupData = useCallback(async () => {
     console.log(config)
@@ -63,13 +60,11 @@ const MarkupInclude = () => {
         setUrlMarkup(demoMarkup)
       } else {
         try {
-          await axios
-            .get(config.srcUrl)
-            .then((res) => {
-              if (res.data) {
-                setUrlMarkup(res.data)
-              }
-            })
+          await axios.get(config.srcUrl).then(res => {
+            if (res.data) {
+              setUrlMarkup(res.data)
+            }
+          })
         } catch (err) {
           if (err.response) {
             // Received a response with an error, so storing that error in state
@@ -85,11 +80,11 @@ const MarkupInclude = () => {
     } else {
       setUrlMarkup('')
     }
-  }, [ config?.srcUrl ])
+  }, [config?.srcUrl])
 
   // Used to parse the markup either between the <body> tags
   // Parses the entire supplied content if no <body> tags exist
-  const parseBodyMarkup = (markup) => {
+  const parseBodyMarkup = markup => {
     let parse
     let hasBody = false
     if (markup && markup !== '' && markup !== null) {
@@ -113,26 +108,32 @@ const MarkupInclude = () => {
       CoveHelper.Event.publish('cove_loaded', { config: config })
       setCoveLoadedHasRan(true)
     }
-  }, [ config, container ])
+  }, [config, container])
 
   // Refetch the markup content whenever config is updated
   useEffect(() => {
-    loadConfigMarkupData().catch((err) => console.error(err))
-  }, [ loadConfigMarkupData ])
+    loadConfigMarkupData().catch(err => console.error(err))
+  }, [loadConfigMarkupData])
 
-  return <>
-    {config?.missingRequiredSections && <>Missing data in sections</>}
-    {!config?.missingRequiredSections &&
-      <>
-        {!markupError && urlMarkup &&
-          <Markup content={parseBodyMarkup(urlMarkup)}/>
-        }
-        {markupError && config.srcUrl &&
-          <AlertBox type="error"><Markup content={errorMessage}/></AlertBox>
-        }
-      </>
-    }
-  </>
+  if (!config) {
+    return null
+  }
+
+  return (
+    <>
+      {config?.missingRequiredSections && <>Missing data in sections</>}
+      {!config?.missingRequiredSections && (
+        <Component className='cove-markup-include' config={config}>
+          {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
+          {markupError && config.srcUrl && (
+            <AlertBox type='error'>
+              <Markup content={errorMessage} />
+            </AlertBox>
+          )}
+        </Component>
+      )}
+    </>
+  )
 }
 
 export default MarkupInclude
