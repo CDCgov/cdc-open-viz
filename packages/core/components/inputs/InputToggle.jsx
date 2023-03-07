@@ -17,6 +17,7 @@ const InputSlider = ({
   i = null,
   min = null,
   max = null,
+  onClick,
   ...attributes
 }) => {
   const [value, setValue] = useState(stateValue)
@@ -51,10 +52,15 @@ const InputSlider = ({
     }
   }, [value])
 
+  const clickHandler = e => {
+    setValue(!value)
+    if (onClick) onClick(e)
+  }
+
   return (
     <div className='input-group'>
       {label && <label>{label}</label>}
-      <div className={'cove-input__slider' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + sliderTypeClass() + (value ? ' active' : '')} onClick={() => setValue(!value)}>
+      <div className={'cove-input__slider' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + sliderTypeClass() + (value ? ' active' : '')} onClick={clickHandler}>
         <div className='cove-input__slider-button' />
         <div className='cove-input__slider-track' style={value && activeColor ? { backgroundColor: activeColor } : null} />
         <input className='cove-input--hidden' type='checkbox' name={name()} checked={value || false} readOnly />

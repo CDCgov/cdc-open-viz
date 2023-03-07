@@ -1,14 +1,12 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { BoxPlot } from '@visx/stats'
 import { Group } from '@visx/group'
-import { scaleBand, scaleLinear } from '@visx/scale'
 import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {
-  const { transformedData: data, config } = useContext(ConfigContext)
-
+  const { transformedData: data, config, setConfig } = useContext(ConfigContext)
   const boxWidth = xScale.bandwidth()
   const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = colorPalettesChart[config?.palette][0] ? colorPalettesChart[config?.palette][0] : '#000'
@@ -24,6 +22,18 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
       ${config.boxplot.labels.median}: ${d.columnMedian}
     `
   }
+
+  useEffect(() => {
+    if (config.legend.hide === false) {
+      setConfig({
+        ...config,
+        legend: {
+          ...config.legend,
+          hide: true
+        }
+      })
+    }
+  }, []);
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group className='boxplot' key={`boxplot-group`}>
