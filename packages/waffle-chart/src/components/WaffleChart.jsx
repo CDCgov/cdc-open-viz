@@ -7,7 +7,7 @@ import { Circle, Bar } from '@visx/shape'
 
 // Store
 import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
-import useDataStore from '@cdc/core/stores/data/dataSlice'
+import useStore from '@cdc/core/store/store'
 
 // Constants
 import THEME_COLORS from '@cdc/core/data/componentThemes'
@@ -32,11 +32,13 @@ import calculateWaffleAnimation from '../helpers/calculateWaffleAnimation'
 // Visualization
 const WaffleChart = () => {
   const { config } = useConfigStoreContext()
-  const { data } = useDataStore()
+  const { data } = useStore()
+
+  console.log(useConfigStoreContext())
 
   const calculateData = () => {
     //If either the column or function aren't set, do not calculate
-    if (!config.dataColumn || !config.dataFunction) return ''
+    if (!config?.dataColumn || !config.dataFunction) return ''
 
     //Optionally filter the data based on the user's filter
     let filteredData = data

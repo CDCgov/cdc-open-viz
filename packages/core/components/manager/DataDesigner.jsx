@@ -17,7 +17,6 @@ import InputSelect from '../input/InputSelect'
 import '../../styles/v2/components/manager/data-designer.scss'
 
 const DataDesigner = ({ configureData, updateDescriptionProp, visualizationKey, dataKey }) => {
-
   return (
     <div className="cove-data-designer__container">
       <div className="mb-2">

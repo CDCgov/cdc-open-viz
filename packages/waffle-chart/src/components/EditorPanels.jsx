@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
 // Store
 import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
-import useDataStore from '@cdc/core/stores/data/dataSlice'
+import useStore from '@cdc/core/store/store'
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
@@ -23,7 +23,7 @@ import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.F
 const EditorPanels = () => {
   // Store Selectors
   const { config, updateConfigField } = useConfigStoreContext()
-  const { data } = useDataStore()
+  const { data } = useStore()
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
   /*const [ tempConfig, setTempConfig ] = useState(config)

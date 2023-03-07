@@ -1,6 +1,3 @@
-// Slice Actions
-import globalSliceActions from './globalSliceActions'
-
 // Slice
 const globalSlice = (set, get) => ({
   // Global State
@@ -15,9 +12,7 @@ const globalSlice = (set, get) => ({
     show: false,
     disableBgClose: false
   },
-  dimensions: null,
-
-  ...globalSliceActions(set, get)
+  dimensions: null
 })
 
 export default globalSlice

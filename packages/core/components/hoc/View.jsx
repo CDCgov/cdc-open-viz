@@ -4,7 +4,7 @@ import React, { useEffect, useCallback, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 // Store
-import useGlobalStore from '../../store/global/globalSlice'
+import useStore from '../../store/store'
 
 // Components - Core
 import Editor from '../editor/Editor'
@@ -15,10 +15,7 @@ import '../../styles/v2/main.scss'
 
 const View = ({ editorPanels, isPreview, children }) => {
   // Store Selectors
-  const { viewMode, setViewMode } = useGlobalStore(state => ({
-    viewMode: state.viewMode,
-    setViewMode: state.setViewMode
-  }))
+  const { viewMode, setViewMode } = useStore()
 
   const winLocation = window.location.href
 

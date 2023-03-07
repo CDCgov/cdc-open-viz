@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 
 // Store
-import useGlobalStore from '../../store/global/globalSlice'
-import useConfigStore from '../../store/config/configSlice'
+import useStore from '../../store/store'
 
 // Data
 import { COVE_BREAKPOINTS as breakpoints } from '../../data/const'
@@ -21,8 +20,8 @@ import '../../styles/v2/components/element/editor-utils.scss'
 
 const Editor = ({ editorPanels, children }) => {
   // Store Selectors
-  const { os } = useGlobalStore()
-  const { config, updateConfig, updateParentConfig } = useConfigStore()
+  const { os } = useStore()
+  const { config, updateConfig, updateParentConfig } = useStore()
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
   const [ displayGrid, setDisplayGrid ] = useState(false)

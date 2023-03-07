@@ -18,6 +18,7 @@ import AlertBox from '@cdc/core/components/ui/AlertBox'
 
 // Visualization
 const MarkupInclude = () => {
+  console.log('rendered')
   // Store Selectors
   const { config } = useConfigStoreContext()
 
@@ -54,9 +55,10 @@ const MarkupInclude = () => {
   }, [ markupError ])
 
   const loadConfigMarkupData = useCallback(async () => {
+    console.log(config)
     setMarkupError(null)
 
-    if (config.srcUrl) {
+    if (config?.srcUrl) {
       if (config.srcUrl === '#example') {
         setUrlMarkup(demoMarkup)
       } else {
@@ -83,7 +85,7 @@ const MarkupInclude = () => {
     } else {
       setUrlMarkup('')
     }
-  }, [ config.srcUrl ])
+  }, [ config?.srcUrl ])
 
   // Used to parse the markup either between the <body> tags
   // Parses the entire supplied content if no <body> tags exist
@@ -119,8 +121,8 @@ const MarkupInclude = () => {
   }, [ loadConfigMarkupData ])
 
   return <>
-    {config.missingRequiredSections && <>Missing data in sections</>}
-    {!config.missingRequiredSections &&
+    {config?.missingRequiredSections && <>Missing data in sections</>}
+    {!config?.missingRequiredSections &&
       <>
         {!markupError && urlMarkup &&
           <Markup content={parseBodyMarkup(urlMarkup)}/>

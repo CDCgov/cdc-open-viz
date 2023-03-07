@@ -4,7 +4,7 @@ import React, { Children } from 'react'
 import PropTypes from 'prop-types'
 
 // Store
-import useGlobalStore from '../../store/global/globalSlice'
+import useStore from '../../store/store'
 
 // Components
 import Icon from './Icon'
@@ -28,10 +28,7 @@ const Modal = ({
                }) => {
 
   // Store Selectors - Access global overlay state
-  let [ overlay, toggleOverlay ] = useGlobalStore(state => [
-    state.overlay,
-    state.toggleOverlay
-  ])
+  let { overlay, toggleOverlay } = useStore()
 
   //Parse, organize, and pull "slotted" children data from subcomponents
   const childNodes = Children.toArray(children)

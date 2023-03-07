@@ -5,8 +5,7 @@ import { useDebounce } from 'use-debounce'
 import PropTypes from 'prop-types'
 
 // Store
-import useConfigStore from '../../store/config/configSlice'
-import { useConfigStoreContext } from '../hoc/ConfigProxy'
+import useStore from '../../store/store'
 
 // Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
@@ -31,7 +30,7 @@ const InputText = memo((
   }
 ) => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStoreContext()
+  const { config, updateConfigField } = useStore()
 
   // Input will only accept either an inline value from the element, or a value from a connected config key
   const [ value, setValue ] = useState(inlineValue)

@@ -4,7 +4,7 @@ import React, { useState, useEffect, memo, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 // Store
-import { useConfigStoreContext } from '../hoc/ConfigProxy'
+import useStore from '../../store/store'
 
 // Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
@@ -30,7 +30,7 @@ const InputToggle = memo((
   }
 ) => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStoreContext()
+  const { config, updateConfigField } = useStore()
 
   const [ value, setValue ] = useState(inlineValue || false)
 

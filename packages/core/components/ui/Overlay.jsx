@@ -2,17 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 // Store
-import useGlobalStore from '../../store/global/globalSlice'
+import useStore from '../../store/store'
 
 // Styles
 import '../../styles/v2/components/ui/overlay.scss'
 
 const Overlay = ({ anchor }) => {
   // Store Selectors - Access global modal state
-  let [ overlay, toggleOverlay ] = useGlobalStore(state => [
-    state.overlay,
-    state.toggleOverlay
-  ])
+  let { overlay, toggleOverlay } = useStore()
 
   let overlayAnchor = anchor === true ? anchor.current : document.body
 

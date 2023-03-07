@@ -1,7 +1,7 @@
 import React from 'react'
 
 // Store
-import useConfigStore from '../../store/config/configSlice'
+import useStore from '../../store/store'
 
 // Third Party
 import PropTypes from 'prop-types'
@@ -22,7 +22,7 @@ import '../../styles/v2/components/ui/color-picker.scss'
 
 const ColorButton = ({ color }) => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStore()
+  const { config, updateConfigField } = useStore()
 
   const customAttrs = color === config.theme && { 'data-selected': true }
 

@@ -39,9 +39,9 @@ const EditorPanels = () => {
   /** Panels ------------------------------------------------------------------------------------- */
   const panelGeneral = (
     <Accordion.Section label="General">
-      {/*<InputText label="Title" configField="title" placeholder="Markup Include Title"/>*/}
-      {/*<InputText label="Source URL" configField="srcUrl" placeholder="https://www.example.com/file.html"/>*/}
-      {config.srcUrl === '' &&
+      <InputText label="Title" configField="title" placeholder="Markup Include Title"/>
+      <InputText label="Source URL" configField="srcUrl" placeholder="https://www.example.com/file.html"/>
+      {config?.srcUrl === '' &&
         <AlertBox type="info">
           <Icon display="info"/> Need a preview? Set the <strong>Source URL</strong> as <code>#example</code> to use example markup data.
         </AlertBox>

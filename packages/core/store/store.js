@@ -5,22 +5,28 @@ import { immer } from 'zustand/middleware/immer'
 
 // Store Slices
 import globalSlice from './global/globalSlice'
+import globalSliceActions from './global/globalSliceActions'
 import configSlice from './config/configSlice'
+import configSliceActions from './config/configSliceActions'
 import dataSlice from './data/dataSlice'
+import dataSliceActions from './data/dataSliceActions'
 
 // Store
 export const store = (set, get) => ({
   // Global Slice
   ...globalSlice(set, get),
+  ...globalSliceActions(set, get),
 
   // Config Slice
   ...configSlice(set, get),
+  ...configSliceActions(set, get),
 
   // Data Slice
-  ...dataSlice(set, get)
+  ...dataSlice(set, get),
+  ...dataSliceActions(set, get)
 })
 
-const useConfigStore = create(
+const useStore = create(
   immer(
     devtools(
       store,
@@ -32,4 +38,4 @@ const useConfigStore = create(
   )
 )
 
-export default useConfigStore
+export default useStore

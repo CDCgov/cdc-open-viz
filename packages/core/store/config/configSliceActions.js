@@ -30,7 +30,6 @@ const configSliceActions = (set, get) => ({
       })
   },
 
-
   // Config Defaults & Processing ---------------------------------------------------------------------------------------------------------------------------------------
   setConfigDefaults: async (defaults = null, visualizationKey = null) => {
     // If defaults exist, create the new config object with shallow merge of defaults and data

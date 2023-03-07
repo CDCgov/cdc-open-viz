@@ -5,8 +5,7 @@ import parse from 'html-react-parser'
 import PropTypes from 'prop-types'
 
 // Store
-import useGlobalStore from '../../store/global/globalSlice'
-import useConfigStore from '../../store/config/configSlice'
+import useStore from '../../store/store'
 
 // Components
 import Icon from '../ui/Icon'
@@ -17,9 +16,7 @@ import '../../styles/v2/components/component.scss'
 
 const Component = ({ className, children, exampleConfig, ...attributes }) => {
   // Store Selectors
-  const setDimensions = useGlobalStore(state => state.setDimensions)
-
-  const { config, updateConfig } = useConfigStore()
+  const {setDimensions, config, updateConfig } = useStore()
 
   // Provide an example configObj for documentation purposes
   useEffect(() => {

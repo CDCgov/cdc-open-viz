@@ -4,22 +4,24 @@ import React, { useId } from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 // Styles
-import 'react-tooltip/dist/react-tooltip.css';
+import 'react-tooltip/dist/react-tooltip.css'
 import '../../styles/v2/components/ui/tooltip.scss'
 
 const TooltipTarget = () => null
 const TooltipContent = () => null
 
-const Tooltip = ({
-                   place = 'top',
-                   trigger = 'hover',
-                   float = false,
-                   shadow = true,
-                   border = false,
-                   children,
-                   style,
-                   ...attributes
-                 }) => {
+const Tooltip = (
+  {
+    place = 'top',
+    trigger = 'hover',
+    float = false,
+    shadow = true,
+    border = false,
+    children,
+    style,
+    ...attributes
+  }
+) => {
 
   const tooltipTargetChildren = children.find(el => el.type === TooltipTarget)
   const tooltipContentChildren = children.find(el => el.type === TooltipContent)
@@ -46,14 +48,14 @@ const Tooltip = ({
         {tooltipTargetChildren ? tooltipTargetChildren.props.children : null}
       </a>
       <ReactTooltip id={uid}
-        className={
-          'cove-tooltip__content'
-            + (' place-' + place)
-            + (!float ? ' cove-tooltip__content--animated' : '')
-            + (trigger === 'click' ? ' interactive' : '')
-            + (border ? (' cove-tooltip--border') : '')
-            + (shadow ? ' has-shadow' : '')
-        }
+                    className={
+                      'cove-tooltip__content'
+                      + (' place-' + place)
+                      + (!float ? ' cove-tooltip__content--animated' : '')
+                      + (trigger === 'click' ? ' interactive' : '')
+                      + (border ? (' cove-tooltip--border') : '')
+                      + (shadow ? ' has-shadow' : '')
+                    }
       >
         {tooltipContentChildren ? tooltipContentChildren.props.children : null}
       </ReactTooltip>

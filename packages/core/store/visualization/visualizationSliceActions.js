@@ -1,29 +1,14 @@
 const visualizationSliceActions = (set, get) => ({
   // Actions --------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-  setViewMode: (view, value) => set((state) => ({
-    viewMode: {
-      ...state.viewMode,
-      [view]: value
-    }
-  })),
-  setDimensions: (dimensions) => set(() => ({
-    dimensions: dimensions
-  })),
-
-  // Overlay Actions
-  openOverlay: (obj, disableBgClose = false) => set(() => ({
-    overlay: {
-      object: obj,
-      show: true,
-      disableBgClose: disableBgClose
-    }
-  })),
-  toggleOverlay: (display = false) => set(() => ({
-    overlay: {
-      show: display
-    }
-  }))
+  addVisualization(key, config) {
+    set(state => ({ visualizations: { ...state.visualizations, [key]: config } }))
+  },
+  removeVisualization(key) {
+    set(state => {
+      delete state.visualizations[key]
+      return { ...state }
+    })
+  }
 })
 
 export default visualizationSliceActions

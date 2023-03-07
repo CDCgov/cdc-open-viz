@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, memo } from 'react'
 import PropTypes from 'prop-types'
 
 // Store
-import { useConfigStoreContext } from '../hoc/ConfigProxy'
+import useStore from '../../store/store'
 
 // Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
@@ -29,7 +29,7 @@ const InputSelect = memo((
   }
 ) => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStoreContext()
+  const { config, updateConfigField } = useStore()
 
   const [ value, setValue ] = useState(inlineValue)
 
