@@ -33,7 +33,7 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
         }
       })
     }
-  }, []);
+  }, [])
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group className='boxplot' key={`boxplot-group`}>
@@ -42,13 +42,13 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
           const radius = 4
           return (
             <>
-              {config.boxplot.plotNonOutlierValues && d.nonOutlierValues.map(value => <circle cx={xScale(d.columnCategory) + config.yAxis.size + boxWidth / 2} cy={yScale(value)} r={radius} fill={'#ccc'} style={{ opacity: 1, fillOpacity: 1, stroke: 'black' }} />)}
+              {config.boxplot.plotNonOutlierValues && d.nonOutlierValues.map(value => <circle cx={xScale(d.columnCategory) + Number(config.yAxis.size) + boxWidth / 2} cy={yScale(value)} r={radius} fill={'#ccc'} style={{ opacity: 1, fillOpacity: 1, stroke: 'black' }} />)}
               <BoxPlot
                 data-left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
                 key={`box-plot-${i}`}
                 min={d.columnMin}
                 max={d.columnMax}
-                left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
+                left={Number(xScale(d.columnCategory)) + Number(config.yAxis.size) + offset / 2 + 0.5}
                 firstQuartile={d.columnFirstQuartile}
                 thirdQuartile={d.columnThirdQuartile}
                 median={d.columnMedian}
@@ -73,8 +73,7 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
                   style: {
                     stroke: 'black',
                     strokeWidth: config.boxplot.borders === 'true' ? 1 : 0
-                  },
-                  'data-tooltip-html': 'cool'
+                  }
                 }}
                 maxProps={{
                   style: {
