@@ -113,7 +113,7 @@ const EditorPanel = props => {
         label: specialClass
       })
     })
-    // DEV-3033 - since the above was a repair of bad config - need to backpopulate into the state
+    // DEV-3303 - since the above was a repair of bad config - need to backpopulate into the state
     setState({
           ...state,
           legend: {
