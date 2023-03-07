@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 
 // Third Party
 import parse from 'html-react-parser'
@@ -14,14 +14,9 @@ import Tooltip from '../ui/Tooltip'
 // Styles
 import '../../styles/v2/components/component.scss'
 
-const Component = ({ className, children, exampleConfig, ...attributes }) => {
+const Component = ({ className, children, config, ...attributes }) => {
   // Store Selectors
-  const {setDimensions, config, updateConfig } = useStore()
-
-  // Provide an example configObj for documentation purposes
-  useEffect(() => {
-    if (exampleConfig) updateConfig(exampleConfig)
-  }, [ exampleConfig ])
+  const { setDimensions } = useStore()
 
   // Observe changes to component container sizes for use with SVG renders
   const outerContainerRef = useRef()
@@ -36,8 +31,7 @@ const Component = ({ className, children, exampleConfig, ...attributes }) => {
       })
       outerContainerObserver.observe(outerContainerRef.current)
     }
-    return () => {
-    }
+    return () => {}
   })
 
   // Component Attributes
@@ -65,50 +59,39 @@ const Component = ({ className, children, exampleConfig, ...attributes }) => {
     ...customBgAttrs
   }
 
-  const tooltip = (<>
-    {config.tooltip && (config.tooltip.content && config.tooltip.content !== '') && <>
-      <Tooltip place={config.tooltip.position || 'left'}>
-        <Tooltip.Target>
-          <Icon display="questionCircle"/>
-        </Tooltip.Target>
-        <Tooltip.Content>
-          {typeof config.tooltip.content === 'object'
-            ? config.tooltip.content
-            : typeof config.tooltip.content === 'string' && (
-            <p>{parse(config.tooltip.content)}</p>
-          )}
-        </Tooltip.Content>
-      </Tooltip>
+  const tooltip = (
+    <>
+      {config.tooltip && config.tooltip.content && config.tooltip.content !== '' && (
+        <>
+          <Tooltip place={config.tooltip.position || 'left'}>
+            <Tooltip.Target>
+              <Icon display='questionCircle' />
+            </Tooltip.Target>
+            <Tooltip.Content>{typeof config.tooltip.content === 'object' ? config.tooltip.content : typeof config.tooltip.content === 'string' && <p>{parse(config.tooltip.content)}</p>}</Tooltip.Content>
+          </Tooltip>
+        </>
+      )}
     </>
-    }
-  </>)
+  )
+
+  const theme = useMemo(() => `cove-theme--${config.theme ?? 'blue'}`, [config.theme])
 
   // Return Component
   return (
-    <div className={'cove-component'
-      + (config.theme ? ' cove-theme--' + config.theme : ' cove-theme--blue')
-      + (className ? ' ' + className : '')}
-         {...customComponentAttrs}
-    >
-      <div className="cove-component__container">
-        {config.title &&
-          <header className="cove-component__header" role="heading" aria-hidden="true" aria-level={2}>
+    <div className={'cove-component ' + theme + (className ? ' ' + className : '')} {...customComponentAttrs}>
+      <div className='cove-component__container'>
+        {config.title && (
+          <header className='cove-component__header' role='heading' aria-hidden='true' aria-level={2}>
             {parse(config.title)}
             {config.title.trim().length !== 0 && tooltip}
           </header>
-        }
-        <div className="cove-component__content" {...customContentAttrs}>
-          {(!config.title || config.title.trim().length === 0) &&
-            <div className="cove-component__content--tooltip">
-              {tooltip}
-            </div>
-          }
-          <div className="cove-component__visualization" ref={outerContainerRef}>
+        )}
+        <div className='cove-component__content' {...customContentAttrs}>
+          {(!config.title || config.title.trim().length === 0) && <div className='cove-component__content--tooltip'>{tooltip}</div>}
+          <div className='cove-component__visualization' ref={outerContainerRef}>
             {children}
           </div>
-          {config.description &&
-            <div className="cove-component__description">{parse(config.description)}</div>
-          }
+          {config.description && <div className='cove-component__description'>{parse(config.description)}</div>}
           {config.tableShowIf && config.table}
         </div>
       </div>
@@ -122,15 +105,15 @@ Component.propTypes = {
   /** Additional classes to be appended to the component */
   className: PropTypes.string,
   config: PropTypes.shape({
-    theme: PropTypes.oneOf([ 'blue', 'purple', 'brown', 'teal', 'pink', 'orange', 'slate', 'indigo', 'cyan', 'green', 'amber' ]),
+    theme: PropTypes.oneOf(['blue', 'purple', 'brown', 'teal', 'pink', 'orange', 'slate', 'indigo', 'cyan', 'green', 'amber']),
     /** Set a custom title for the component; defaults to a `config.title` entry for the component config */
     title: PropTypes.string,
     description: PropTypes.string,
     visual: PropTypes.shape({
-      border: PropTypes.oneOf([ 'default', 'theme', 'none' ]),
-      background: PropTypes.oneOf([ 'default', 'theme', 'none' ]),
+      border: PropTypes.oneOf(['default', 'theme', 'none']),
+      background: PropTypes.oneOf(['default', 'theme', 'none']),
       shadow: PropTypes.bool,
-      accent: PropTypes.oneOf([ 'none', 'top', 'right', 'bottom', 'left' ])
+      accent: PropTypes.oneOf(['none', 'top', 'right', 'bottom', 'left'])
     })
   })
 }

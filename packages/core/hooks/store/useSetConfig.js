@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { shallow } from 'zustand/shallow'
 
 // Store
 import useStore from '../../store/store'
@@ -7,7 +8,11 @@ import useStore from '../../store/store'
 import fetchAsyncUrl from '../../helpers/fetchAsyncUrl'
 
 const useSetConfig = (configObj, configUrl, defaults, visualizationKey = null) => {
-  const { config, setConfig, setConfigDefaults, runConfigUpdater, getData } = useStore()
+  const config = useStore(state => state.config)
+  const setConfig = useStore(state => state.setConfig)
+  const setConfigDefaults = useStore(state => state.setConfigDefaults)
+  const runConfigUpdater = useStore(state => state.runConfigUpdater)
+  const getData = useStore(state => state.getData)
 
   async function fetchConfig() {
     let response = configObj || await fetchAsyncUrl(configUrl) || {}

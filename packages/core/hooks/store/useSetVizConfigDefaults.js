@@ -3,17 +3,14 @@ import { useEffect } from 'react'
 // Store
 import useStore from '../../store/store'
 
-const useSetVizConfigDefaults = (visualizationKey, defaults, setIsLoading) => {
-  const { visualizations, setConfigDefaults } = useStore()
+const useSetVizConfigDefaults = (visualizationKey, defaults) => {
+  const visualizations = useStore(state => state.visualizations)
+  const setConfigDefaults = useStore(state => state.setConfigDefaults)
 
   useEffect(() => {
     if (visualizationKey && defaults) setConfigDefaults(defaults, visualizationKey)
-  }, [ visualizationKey, defaults ])
+  }, [visualizationKey, defaults, setConfigDefaults])
 
-  if (visualizationKey) {
-    setIsLoading(false)
-    return visualizations[visualizationKey]
-  }
 
   return visualizationKey ? visualizations[visualizationKey] : null
 }
