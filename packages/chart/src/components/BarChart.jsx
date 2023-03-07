@@ -105,13 +105,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         }
       })
     }
-  }, [config, updateConfig])
+  }, [config, updateConfig]) // eslint-disable-line
 
   useEffect(() => {
     if (config.isLollipopChart === false && config.barHeight < 25) {
       updateConfig({ ...config, barHeight: 25 })
     }
-  }, [config.isLollipopChart])
+  }, [config.isLollipopChart]) // eslint-disable-line
 
   useEffect(() => {
     if (config.visualizationSubType === 'horizontal') {
@@ -120,7 +120,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         orientation: 'horizontal'
       })
     }
-  }, [])
+  }, []) // eslint-disable-line
 
   useEffect(() => {
     if (config.barStyle === 'lollipop' && !config.isLollipopChart) {
@@ -129,7 +129,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     if (isRounded || config.barStyle === 'flat') {
       updateConfig({ ...config, isLollipopChart: false })
     }
-  }, [config.barStyle])
+  }, [config.barStyle]) // eslint-disable-line
 
   return (
     <ErrorBoundary component='BarChart'>
