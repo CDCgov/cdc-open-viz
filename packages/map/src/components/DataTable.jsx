@@ -36,7 +36,7 @@ const DataTable = props => {
     innerContainerRef,
     imageRef
   } = props
-
+  
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
@@ -182,8 +182,12 @@ const DataTable = props => {
             if (runtimeData) {
               if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
                 for (let i = 0; i < state.legend.specialClasses.length; i++) {
-                  if (String(runtimeData[row][state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
-                    return state.legend.specialClasses[i].label
+                  // DEV-3033 - Special Classes label should only apply to selected special class key
+                  // - you have to ALSO check that the column name matches - putting here otherwise the if stmt too long
+                  if (columns[column].name === state.legend.specialClasses[i].key) {
+                    if (String(runtimeData[row][state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
+                      return state.legend.specialClasses[i].label
+                    }
                   }
                 }
               }
