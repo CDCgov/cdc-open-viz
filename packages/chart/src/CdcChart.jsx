@@ -47,9 +47,6 @@ import './scss/main.scss'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
-
-  console.log('RENDERING')
-
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState({})
@@ -90,7 +87,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       return ariaLabel
     } catch (e) {
-      console.error(e.message)
+      console.error(e.message) // eslint-disable-line
     }
   }
 
@@ -677,6 +674,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     let result = ''
 
+    // TODO: combine below.w/ below & add option for right axis
     if (abbreviated && axis === 'left') {
       num = formatSuffix(parseFloat(num)).replace('G', 'B')
     }

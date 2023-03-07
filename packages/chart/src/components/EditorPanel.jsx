@@ -632,6 +632,8 @@ const EditorPanel = () => {
   const visCanAnimate = () => {
     const { visualizationType } = config
     switch (visualizationType) {
+      case 'Scatter Plot':
+        return false
       case 'Box Plot':
         return false
       default:
@@ -649,6 +651,27 @@ const EditorPanel = () => {
       default:
         return true
     }
+  }
+
+  const visHasLabelOnData = () => {
+    const { visualizationType } = config
+    switch (visualizationType) {
+      case 'Box Plot':
+        return false
+      case 'Pie':
+        return false
+      case 'Scatter Plot':
+        return false
+      default:
+        return true
+    }
+  }
+
+  const visHasBarBorders = () => {
+    const { series, visualizationType } = config
+    if (visualizationType === 'Box Plot') return false
+    if (visualizationType === 'Scatter Plot') return false
+    return series.some(series => series.type === 'Bar' || series.type === 'Paired Bar')
   }
 
   const handleSeriesChange = (idx1, idx2) => {
@@ -750,7 +773,7 @@ const EditorPanel = () => {
                   {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar') ? (
                     <CheckBox value={config.yAxis.displayNumbersOnBar} section='yAxis' fieldName='displayNumbersOnBar' label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
                   ) : (
-                    config.visualizationType !== 'Pie' && config.visualizationType !== 'Box Plot' && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
+                    visHasLabelOnData() && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
                   )}
                   {config.visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
 
@@ -1851,7 +1874,7 @@ const EditorPanel = () => {
                   )}
 
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
-                  {config.visualizationType !== 'Box Plot' && config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
+                  {visHasBarBorders() && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
 
                   {visCanAnimate() && <CheckBox value={config.animate} fieldName='animate' label='Animate Visualization' updateField={updateField} />}
 
