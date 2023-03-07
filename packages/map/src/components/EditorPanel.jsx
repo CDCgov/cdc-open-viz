@@ -104,7 +104,7 @@ const EditorPanel = props => {
     })
   }
 
-    let specialClasses = []
+  let specialClasses = []
   if (legend.specialClasses && legend.specialClasses.length && typeof legend.specialClasses[0] === 'string') {
     legend.specialClasses.forEach(specialClass => {
       specialClasses.push({
@@ -113,7 +113,7 @@ const EditorPanel = props => {
         label: specialClass
       })
     })
-    // since the above was a repair - need to backpopulate into the state
+    // DEV-3033 - since the above was a repair of bad config - need to backpopulate into the state
     setState({
           ...state,
           legend: {
@@ -734,9 +734,6 @@ const EditorPanel = props => {
 
   const editColumn = async (columnName, editTarget, value) => {
     let newSpecialClasses
-
-    console.log("columnName, editTarget, value", columnName, editTarget, value)
-
     switch (editTarget) {
       case 'specialClassEdit':
         newSpecialClasses = Array.from(specialClasses) // was legend.specialClasses
@@ -1019,21 +1016,6 @@ const EditorPanel = props => {
       }
     })
   })
-
-/*   let specialClasses = []
-  if (legend.specialClasses && legend.specialClasses.length && typeof legend.specialClasses[0] === 'string') {
-    legend.specialClasses.forEach(specialClass => {
-      specialClasses.push({
-        key: state.columns.primary && state.columns.primary.name ? state.columns.primary.name : columnsInData[0],
-        value: specialClass,
-        label: specialClass
-      })
-    })
-  } else {
-    specialClasses = legend.specialClasses || []
-  } */
-
-  console.log("specialClasses=",specialClasses)
 
   const additionalColumns = Object.keys(state.columns).filter(value => {
     const defaultCols = ['geo', 'navigate', 'primary', 'latitude', 'longitude']
