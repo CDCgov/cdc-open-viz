@@ -168,8 +168,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     })
 
-    console.log('NEW HERE', newConfig)
-
     // Loop through and set initial data with exclusions - this should persist through any following data transformations (ie. filters)
     let newExcludedData
 
@@ -238,8 +236,16 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
+      // console.log('filtered', excludedData)
       // stats
-      let allKeys = data.map(d => d[newConfig.xAxis.dataKey])
+      let allKeys = data.map(d => {
+        // if we have an excluded category remove it.
+        if (excludedData) {
+          // console.log(excludedData)
+          console.log('TESTING', excludedData[0][config.xAxis.dataKey])
+        }
+        return d[newConfig.xAxis.dataKey]
+      })
       let allValues = data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
 
       const uniqueArray = function (arrArg) {
@@ -260,6 +266,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         let filteredData = data.filter(item => item[newConfig.xAxis.dataKey] === g)
         let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
         // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
+
         const q1 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
         const q3 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
         const iqr = q3 - q1

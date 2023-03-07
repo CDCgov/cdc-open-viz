@@ -629,6 +629,28 @@ const EditorPanel = () => {
     updateConfig({ ...config, filters })
   }
 
+  const visCanAnimate = () => {
+    const { visualizationType } = config
+    switch (visualizationType) {
+      case 'Box Plot':
+        return false
+      default:
+        return true
+    }
+  }
+
+  const visHasDataCutoff = () => {
+    const { visualizationType } = config
+    switch (visualizationType) {
+      case 'Box Plot':
+        return false
+      case 'Pie':
+        return false
+      default:
+        return true
+    }
+  }
+
   const handleSeriesChange = (idx1, idx2) => {
     let seriesOrder = config.series
     let [movedItem] = seriesOrder.splice(idx1, 1)
@@ -728,7 +750,7 @@ const EditorPanel = () => {
                   {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar') ? (
                     <CheckBox value={config.yAxis.displayNumbersOnBar} section='yAxis' fieldName='displayNumbersOnBar' label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
                   ) : (
-                    config.visualizationType !== 'Pie' && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
+                    config.visualizationType !== 'Pie' && config.visualizationType !== 'Box Plot' && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
                   )}
                   {config.visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
 
@@ -902,17 +924,19 @@ const EditorPanel = () => {
                                                 <div className='series-list__name-text'>{series.dataKey}</div>
                                               </div>
                                               <span>
-                                                {(config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && (
-                                                  <>
-                                                    <span className='series-list__dropdown'>{typeDropdown}</span>
-                                                    <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>
-                                                    {config.series && config.series.length > 1 && (
-                                                      <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                                        &#215;
-                                                      </button>
-                                                    )}
-                                                  </>
-                                                )}
+                                                <>
+                                                  {(config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && (
+                                                    <>
+                                                      <span className='series-list__dropdown'>{typeDropdown}</span>
+                                                      <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>
+                                                    </>
+                                                  )}
+                                                  {config.series && config.series.length > 1 && (
+                                                    <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
+                                                      &#215;
+                                                    </button>
+                                                  )}
+                                                </>
                                               </span>
                                             </div>
                                           </li>
@@ -1252,7 +1276,7 @@ const EditorPanel = () => {
                   {config.visualizationType !== 'Pie' && (
                     <>
                       <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
-                      {config.runtime.seriesKeys && config.runtime.seriesKeys.length === 1 && <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />}
+                      {config.runtime.seriesKeys && config.runtime.seriesKeys.length === 1 && config.visualizationType !== 'Box Plot' && <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />}
                       <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
                       {config.visualizationType === 'Paired Bar' && <TextField value={config.yAxis.tickRotation || 0} type='number' min='0' section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       <TextField
@@ -1829,7 +1853,7 @@ const EditorPanel = () => {
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
                   {config.visualizationType !== 'Box Plot' && config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
 
-                  <CheckBox value={config.animate} fieldName='animate' label='Animate Visualization' updateField={updateField} />
+                  {visCanAnimate() && <CheckBox value={config.animate} fieldName='animate' label='Animate Visualization' updateField={updateField} />}
 
                   {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 
@@ -1925,7 +1949,7 @@ const EditorPanel = () => {
                     })}
                   </ul>
 
-                  {config.visualizationType !== 'Pie' && (
+                  {visHasDataCutoff() && (
                     <>
                       <TextField
                         value={config.dataCutoff}
