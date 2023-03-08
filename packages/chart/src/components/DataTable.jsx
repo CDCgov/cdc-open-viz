@@ -272,7 +272,7 @@ export default function DataTable() {
               })}
             </tbody>
           </table>
-          {config.regions && config.regions.length > 0 ? (
+          {config.regions && config.regions.length > 0 && !config.visualizationType === 'Box Plot' ? (
             <table className='region-table data-table'>
               <caption className='visually-hidden'>Table of the highlighted regions in the visualization</caption>
               <thead>
@@ -284,6 +284,7 @@ export default function DataTable() {
               </thead>
               <tbody>
                 {config.regions.map((region, index) => {
+                  if (config.visualizationType === 'Box Plot') return false;
                   if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
                   return (
