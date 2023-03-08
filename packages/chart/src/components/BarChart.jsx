@@ -313,6 +313,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   <Group
                     className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`}
                     key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
+                    id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
                     top={config.runtime.horizontal ? barGroup.y : 0}
                     left={config.runtime.horizontal ? 0 : (xMax / barGroups.length) * barGroup.index}
                   >
@@ -379,7 +380,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         </div>`
 
                       return (
-                        <>
+                        <Group key={`${barGroup.index}--${index}--${orientation}`}>
                           {/* This feels gross but inline transition was not working well*/}
                           <style>
                             {`
@@ -478,7 +479,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               </rect>
                             )}
                           </Group>
-                        </>
+                        </Group>
                       )
                     })}
                   </Group>
@@ -499,7 +500,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     lowerPos = xScale(getYAxisData(d, config.confidenceKeys.lower))
                     return (
                       <path
-                        key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`}
+                        key={`confidence-interval-h-${yPos}-${d[config.runtime.originalXAxis.dataKey]}`}
                         stroke='#333'
                         strokeWidth='px'
                         d={`
@@ -517,7 +518,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
                     return (
                       <path
-                        key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`}
+                        key={`confidence-interval-v-${yPos}-${d[config.runtime.originalXAxis.dataKey]}`}
                         stroke='#333'
                         strokeWidth='px'
                         d={`
