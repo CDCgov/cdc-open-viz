@@ -132,8 +132,8 @@ export default function LinearChart() {
       yScale =
         config.runtime.xAxis.type === 'date'
           ? scaleLinear({
-              domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
-            })
+            domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
+          })
           : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
       seriesScale = scalePoint({
@@ -213,7 +213,7 @@ export default function LinearChart() {
   const handleBottomTickFormatting = tick => {
     if (config.runtime.xAxis.type === 'date') return formatDate(tick)
     if (config.orientation === 'horizontal') return formatNumber(tick, 'left')
-    if (config.xAxis.type === 'continuous' && config.dataFormat.bottomCommas) return formatNumber(tick, 'bottom')
+    if (config.xAxis.type === 'continuous') return formatNumber(tick, 'bottom')
     return tick
   }
 
@@ -284,30 +284,30 @@ export default function LinearChart() {
         {/* Higlighted regions */}
         {config.regions
           ? config.regions.map(region => {
-              if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+            if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-              const from = xScale(parseDate(region.from).getTime())
-              const to = xScale(parseDate(region.to).getTime())
-              const width = to - from
+            const from = xScale(parseDate(region.from).getTime())
+            const to = xScale(parseDate(region.to).getTime())
+            const width = to - from
 
-              return (
-                <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
-                  <path
-                    stroke='#333'
-                    d={`M${from} -5
+            return (
+              <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
+                <path
+                  stroke='#333'
+                  d={`M${from} -5
                           L${from} 5
                           M${from} 0
                           L${to} 0
                           M${to} -5
                           L${to} 5`}
-                  />
-                  <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-                  <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-                    {region.label}
-                  </Text>
-                </Group>
-              )
-            })
+                />
+                <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+                <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+                  {region.label}
+                </Text>
+              </Group>
+            )
+          })
           : ''}
 
         {/* Y axis */}

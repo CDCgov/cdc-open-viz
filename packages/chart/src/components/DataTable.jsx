@@ -127,7 +127,7 @@ export default function DataTable() {
         const newCol = {
           Header: resolveTableHeader(),
           Cell: ({ row }) => {
-            return <>{numberFormatter(d[row.original])}</>
+            return <>{numberFormatter(d[row.original], 'left')}</>
           },
           id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
           canSort: true
@@ -224,7 +224,7 @@ export default function DataTable() {
             }
           }}
         >
-          <Icon display={tableExpanded ? 'minus' : 'plus'} base/>
+          <Icon display={tableExpanded ? 'minus' : 'plus'} base />
           {config.table.label}
         </div>
         <div className='table-container' hidden={!tableExpanded} style={{ maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>
