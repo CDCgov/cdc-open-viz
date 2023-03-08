@@ -9,6 +9,7 @@ export default {
     displayAsHex: false,
     displayStateLabels: false,
     territoriesLabel: 'Territories',
+    territoriesAlwaysShow: false,
     language: 'en',
     geoType: 'single-state',
     geoLabelOverride: '',
