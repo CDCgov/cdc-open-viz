@@ -161,7 +161,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   ${xAxisTooltip}
                     </div>`
                   return (
-                    <>
+                    <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
                       <style>
                         {`
                          #barStack${barStack.index}-${bar.index} rect,
@@ -188,7 +188,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                         ></foreignObject>
                       </Group>
-                    </>
+                    </Group>
                   )
                 })
               )
