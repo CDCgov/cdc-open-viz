@@ -7,11 +7,13 @@ const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
 
   // TODO: copied from line chart should probably be a constant somewhere.
   let circleRadii = 4.5
-  console.log('teest')
+  const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
+
 
   const handleTooltip = (item, s) => `<div>
- ${config.xAxis.label}: ${item[config.xAxis.dataKey]} <br/>
- ${config.yAxis.label}: ${item[s]}
+    ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[s] || ''}<br/>` : ''}
+    ${config.xAxis.label}: ${formatNumber(item[config.xAxis.dataKey], 'bottom')} <br/>
+    ${config.yAxis.label}: ${formatNumber(item[s], 'left')}
 </div>`
 
   return (
@@ -19,7 +21,6 @@ const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
       {data.map((item, dataIndex) => {
         // prettier-ignore
         return config.runtime.seriesKeys.map((s, index) => {
-          console.log('s', s)
           const transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s) === -1
           const displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s) !== -1
           const seriesColor = config.palette ? colorPalettes[config.palette][index] : '#000'
@@ -32,7 +33,7 @@ const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
 
           return (
             <circle
-              key={`${dataIndex}`}
+              key={`${dataIndex}-${index}`}
               r={circleRadii}
               cx={xScale(item[config.xAxis.dataKey])}
               cy={yScale(item[s])}

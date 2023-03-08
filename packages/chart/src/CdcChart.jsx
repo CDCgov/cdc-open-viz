@@ -225,10 +225,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
-            return series.dataKey
-          })
+          newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+          newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+          return series.dataKey
+        })
         : []
     }
 
@@ -331,7 +331,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
 
-    console.log('NEW CONFIG HERE 2', newConfig)
     setConfig(newConfig)
   }
 
@@ -674,6 +673,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     let result = ''
 
+
     // TODO: combine below.w/ below & add option for right axis
     if (abbreviated && axis === 'left') {
       num = formatSuffix(parseFloat(num)).replace('G', 'B')
@@ -683,7 +683,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       num = formatSuffix(parseFloat(num)).replace('G', 'B')
     }
 
-    if (prefix && axis !== 'right') {
+    if (prefix && axis === 'left') {
       result += prefix
     }
 
@@ -693,7 +693,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     result += num
 
-    if (suffix && axis !== 'right') {
+    if (suffix && axis === 'left') {
       result += suffix
     }
 
