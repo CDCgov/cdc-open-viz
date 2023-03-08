@@ -1,6 +1,6 @@
-import { useVisualization } from '@cdc/core/hooks/store/useVisualization'
+import { useLoadConfig } from '@cdc/core/hooks/store/useLoadConfig'
 import defaults from './data/initial-state'
 
 export const useMarkupInclude = visualizationProps => {
-  return useVisualization(visualizationProps, defaults)
+  return useLoadConfig(visualizationProps, defaults)
 }

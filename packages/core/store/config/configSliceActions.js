@@ -43,13 +43,6 @@ const configSliceActions = (set, get) => ({
         await get().setConfig(defaults)
       }
     }
-  },
-
-  runConfigUpdater: async () => {
-    // Validates config file and updates any previous entries into new format;
-    // Manipulations/removals should be done in the worker
-    await set(state => { state.config = { ...coveUpdateWorker(state.config) } })
-    await set(state => { delete state.config.visual })
   }
 })
 

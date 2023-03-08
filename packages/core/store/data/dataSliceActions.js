@@ -9,7 +9,6 @@ const dataSliceActions = (set, get) => ({
   setData: value => set(state => { state.data = value }),
   setDatasets: value => set(state => { state.datasets = value }),
   setFormattedData: value => set(state => { state.formattedData = value }),
-
   getData: async (response) => {
     let res = await response
 

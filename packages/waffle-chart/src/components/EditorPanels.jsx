@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 
 // Store
-import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 import useStore from '@cdc/core/store/store'
 
 // Helpers
@@ -22,7 +21,7 @@ import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.F
 
 const EditorPanels = () => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStoreContext()
+  const { config, updateConfigField } = useStore()
   const { data } = useStore()
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */

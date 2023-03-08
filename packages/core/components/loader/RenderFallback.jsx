@@ -6,14 +6,16 @@ import LoadSpin from '../ui/LoadSpin'
 // Styles
 import '../../styles/v2/components/ui/render.scss'
 
-const RenderFallback = ({
-                          fadeEffect = true,
-                          text = 'Rendering visualization...',
-                          loadSpinColor = '#005eaa',
-                          loadSpinOpacity = 30,
-                          loadSpinSize = 85,
-                          style
-                        }) => {
+const RenderFallback = (
+  {
+    fadeEffect = true,
+    text = 'Rendering visualization...',
+    loadSpinColor = '#005eaa',
+    loadSpinOpacity = 30,
+    loadSpinSize = 85,
+    style
+  }
+) => {
   return (
     <div className="cove-render" style={style}>
       <div className="cove-render__content">
@@ -36,7 +38,7 @@ RenderFallback.propTypes = {
   /** Set the spinner opacity `[0-100]` */
   loadSpinOpacity: PropTypes.number,
   /** Set the size of the displayed spinner in px */
-  loadSpinSize: PropTypes.number,
+  loadSpinSize: PropTypes.number
 }
 
 export default RenderFallback

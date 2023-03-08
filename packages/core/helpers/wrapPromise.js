@@ -28,6 +28,8 @@ function wrapPromise(promise) {
     return handler[status] ? handler[status]() : handler.default()
   }
 
+  console.log(read())
+
   return { read }
 }
 

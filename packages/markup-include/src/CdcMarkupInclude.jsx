@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { Suspense } from 'react'
+
+// Hooks
+import { useLoadConfig } from '@cdc/core/hooks/store/useLoadConfig'
 
 // Data
 import defaults from './data/initial-state'
 
 // Components - Core
-import Component from '@cdc/core/components/hoc/Component'
-import ConfigProxy from '@cdc/core/components/hoc/ConfigProxy'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import RenderFallback from '@cdc/core/components/loader/RenderFallback'
 import View from '@cdc/core/components/hoc/View'
 
 // Components - Local
@@ -18,12 +20,17 @@ import './scss/cove-markup-include.scss'
 
 // Visualization
 const CdcMarkupInclude = visualizationProps => {
-  console.log('render')
+  const [ isLoading ] = useLoadConfig(visualizationProps, defaults)
+
   return (
-    <ErrorBoundary component='CdcMarkupInclude'>
-      <View editorPanels={<EditorPanels {...visualizationProps} />}>
-        <MarkupInclude {...visualizationProps} />
-      </View>
+    <ErrorBoundary component="CdcMarkupInclude">
+      <Suspense fallback={<RenderFallback/>}>
+        {!isLoading &&
+          <View editorPanels={<EditorPanels/>}>
+            <MarkupInclude/>
+          </View>
+        }
+      </Suspense>
     </ErrorBoundary>
   )
 }

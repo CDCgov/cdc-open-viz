@@ -14,9 +14,10 @@ import Tooltip from '../ui/Tooltip'
 // Styles
 import '../../styles/v2/components/component.scss'
 
-const Component = ({ className, children, config, ...attributes }) => {
+const Component = ({ className, children, ...attributes }) => {
   // Store Selectors
-  const { setDimensions } = useStore()
+  const config = useStore(state => state.config)
+  const setDimensions = useStore(state => state.setDimensions)
 
   // Observe changes to component container sizes for use with SVG renders
   const outerContainerRef = useRef()

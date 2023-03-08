@@ -1,6 +1,9 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react'
 import Component from '@cdc/core/components/hoc/Component'
 
+// Store
+import useStore from '@cdc/core/store/store'
+
 // Third Party
 import { Markup } from 'interweave'
 import axios from 'axios'
@@ -13,19 +16,18 @@ import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components - Core
 import AlertBox from '@cdc/core/components/ui/AlertBox'
-import { useMarkupInclude } from '../useMarkupInclude'
 
 // Visualization
-const MarkupInclude = props => {
-  const config = useMarkupInclude(props)
+const MarkupInclude = () => {
+  const config = useStore(state => state.config)
 
-  const [urlMarkup, setUrlMarkup] = useState('')
-  const [markupError, setMarkupError] = useState(null)
-  const [errorMessage, setErrorMessage] = useState('')
+  const [ urlMarkup, setUrlMarkup ] = useState('')
+  const [ markupError, setMarkupError ] = useState(null)
+  const [ errorMessage, setErrorMessage ] = useState('')
 
   // Broadcast Loaded State
   const container = useRef()
-  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
 
   // Error Checking & Logging
   useEffect(() => {
@@ -49,10 +51,9 @@ const MarkupInclude = props => {
     } else {
       setErrorMessage('')
     }
-  }, [markupError])
+  }, [ markupError ])
 
   const loadConfigMarkupData = useCallback(async () => {
-    console.log(config)
     setMarkupError(null)
 
     if (config?.srcUrl) {
@@ -80,7 +81,7 @@ const MarkupInclude = props => {
     } else {
       setUrlMarkup('')
     }
-  }, [config?.srcUrl])
+  }, [ config?.srcUrl ])
 
   // Used to parse the markup either between the <body> tags
   // Parses the entire supplied content if no <body> tags exist
@@ -108,32 +109,29 @@ const MarkupInclude = props => {
       CoveHelper.Event.publish('cove_loaded', { config: config })
       setCoveLoadedHasRan(true)
     }
-  }, [config, container])
+  }, [ config, container ])
 
   // Refetch the markup content whenever config is updated
   useEffect(() => {
     loadConfigMarkupData().catch(err => console.error(err))
-  }, [loadConfigMarkupData])
+  }, [ loadConfigMarkupData ])
 
-  if (!config) {
-    return null
-  }
+  if (!config) return null
 
-  return (
-    <>
+  return <>
+    <Component className="cove-markup-include" config={config}>
       {config?.missingRequiredSections && <>Missing data in sections</>}
-      {!config?.missingRequiredSections && (
-        <Component className='cove-markup-include' config={config}>
-          {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
+      {!config?.missingRequiredSections && (<>
+          {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)}/>}
           {markupError && config.srcUrl && (
-            <AlertBox type='error'>
-              <Markup content={errorMessage} />
+            <AlertBox type="error">
+              <Markup content={errorMessage}/>
             </AlertBox>
           )}
-        </Component>
+        </>
       )}
-    </>
-  )
+    </Component>
+  </>
 }
 
 export default MarkupInclude

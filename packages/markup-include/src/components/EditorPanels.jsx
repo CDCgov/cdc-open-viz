@@ -1,15 +1,18 @@
 import React from 'react'
 
+// Store
+import useStore from '@cdc/core/store/store'
+
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
 import AlertBox from '@cdc/core/components/ui/AlertBox'
 import Icon from '@cdc/core/components/ui/Icon'
 import InputText from '@cdc/core/components/input/InputText'
-import { useMarkupInclude } from '../useMarkupInclude'
+import PanelGlobal from '@cdc/core/components/editor/Panel.Global'
 
-const EditorPanels = props => {
+const EditorPanels = () => {
   // Store Selectors
-  const config = useMarkupInclude(props)
+  const config = useStore(state => state.config)
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
   /*const [ tempConfig, setTempConfig ] = useState(config)
@@ -33,7 +36,7 @@ const EditorPanels = props => {
     <Accordion.Section label='General'>
       <InputText label='Title' configField='title' placeholder='Markup Include Title' />
       <InputText label='Source URL' configField='srcUrl' placeholder='https://www.example.com/file.html' />
-      {config?.srcUrl === '' && (
+      {config.srcUrl === '' && (
         <AlertBox type='info'>
           <Icon display='info' /> Need a preview? Set the <strong>Source URL</strong> as <code>#example</code> to use example markup data.
         </AlertBox>
@@ -43,7 +46,10 @@ const EditorPanels = props => {
 
   return (
     <>
-      <Accordion>{panelGeneral}</Accordion>
+      <Accordion>
+        {panelGeneral}
+        {PanelGlobal}
+      </Accordion>
     </>
   )
 }

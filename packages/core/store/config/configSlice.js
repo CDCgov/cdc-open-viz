@@ -1,5 +1,5 @@
 // Slice Actions
-import visualizationSlice from '../visualization/visualizationSlice'
+import configSliceActions from './configSliceActions'
 
 // Slice
 export const configSlice = (set, get) => ({
@@ -7,9 +7,11 @@ export const configSlice = (set, get) => ({
   config: {
     defaults: {},
     runtime: {},
-    missingRequiredSections: false,
-    visualizations: visualizationSlice(get).visualizations
-  }
+    missingRequiredSections: false
+  },
+
+  ...configSliceActions(set, get)
+
 })
 
 export default configSlice
