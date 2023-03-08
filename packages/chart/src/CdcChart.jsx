@@ -235,15 +235,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
       // console.log('filtered', excludedData)
       // stats
-      let allKeys = data.map(d => {
-        // if we have an excluded category remove it.
-        if (excludedData) {
-          // console.log(excludedData)
-          console.log('TESTING', excludedData[0][config.xAxis.dataKey])
-        }
-        return d[newConfig.xAxis.dataKey]
-      })
-      let allValues = data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
+      // let currentData = filterData(newConfig.filters, excludedData)
+
+      let allKeys = newExcludedData ? newExcludedData.map(d => d[newConfig.xAxis.dataKey]) : data.map(d => d[newConfig.xAxis.dataKey])
+      let allValues = newExcludedData ? newExcludedData.map(d => Number(d[newConfig?.series[0]?.dataKey])) : data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
 
       const uniqueArray = function (arrArg) {
         return arrArg.filter(function (elem, pos, arr) {
@@ -260,7 +255,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       groups.forEach((g, index) => {
         if (!g) return
         // filter data by group
-        let filteredData = data.filter(item => item[newConfig.xAxis.dataKey] === g)
+        let filteredData = newExcludedData ? newExcludedData.filter(item => item[newConfig.xAxis.dataKey] === g) : data.filter(item => item[newConfig.xAxis.dataKey] === g)
         let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
         // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
 
@@ -276,15 +271,15 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
         plots.push({
           columnCategory: g,
-          columnMax: Number(q3 + 1.5 * iqr).toFixed(2),
-          columnThirdQuartile: q3.toFixed(2),
-          columnMedian: d3.median(filteredDataValues),
-          columnFirstQuartile: q1.toFixed(2),
-          columnMin: Number(q1 - 1.5 * iqr).toFixed(2),
+          columnMax: Number(q3 + 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo),
+          columnThirdQuartile: q3.toFixed(newConfig.dataFormat.roundTo),
+          columnMedian: d3.median(filteredDataValues).toFixed(newConfig.dataFormat.roundTo),
+          columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
+          columnMin: Number(q1 - 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo),
           columnCount: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
-          columnSd: d3.deviation(filteredDataValues).toFixed(2),
-          columnMean: d3.mean(filteredDataValues).toFixed(2),
-          columnIqr: iqr.toFixed(2),
+          columnSd: d3.deviation(filteredDataValues).toFixed(newConfig.dataFormat.roundTo),
+          columnMean: d3.mean(filteredDataValues).toFixed(newConfig.dataFormat.roundTo),
+          columnIqr: iqr.toFixed(newConfig.dataFormat.roundTo),
           columnOutliers: outliers,
           values: filteredDataValues,
           nonOutlierValues: nonOutliers

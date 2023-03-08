@@ -286,9 +286,24 @@ export default function LinearChart() {
           ? config.regions.map(region => {
             if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-            const from = xScale(parseDate(region.from).getTime())
-            const to = xScale(parseDate(region.to).getTime())
-            const width = to - from
+            let from
+            let to
+            let width
+
+            if (config.xAxis.type === 'date') {
+              from = xScale(parseDate(region.from).getTime())
+              to = xScale(parseDate(region.to).getTime())
+              width = to - from
+            }
+
+            if (config.xAxis.type === 'categorical') {
+              from = xScale(region.from)
+              to = xScale(region.to)
+              width = to - from
+            }
+
+            if (!from) return null;
+            if (!to) return null;
 
             return (
               <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
