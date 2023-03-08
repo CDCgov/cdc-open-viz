@@ -17,11 +17,7 @@ const DataTable = props => {
     indexTitle,
     mapTitle,
     rawData,
-    showDownloadImgButton,
-    showDownloadPdfButton,
-    showDownloadButton,
     runtimeData,
-    runtimeLegend,
     headerColor,
     expandDataTable,
     columns,
@@ -33,15 +29,11 @@ const DataTable = props => {
     formatLegendLocation,
     tabbingId,
     setFilteredCountryCode,
-    innerContainerRef,
-    imageRef
   } = props
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
-
-  const [ready, setReady] = useState(false)
 
   const fileName = `${mapTitle || 'data-table'}.csv`
 
@@ -202,10 +194,11 @@ const DataTable = props => {
 
             const legendColor = applyLegendToRow(rowObj)
 
+            var labelValue
             if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
-              var labelValue = displayGeoName(row.original)
+              labelValue = displayGeoName(row.original)
             } else {
-              var labelValue = formatLegendLocation(row.original)
+              labelValue = formatLegendLocation(row.original)
             }
 
             labelValue = getCellAnchor(labelValue, rowObj)
@@ -232,7 +225,7 @@ const DataTable = props => {
     })
 
     return newTableColumns
-  }, [indexTitle, columns, runtimeData, getCellAnchor, displayDataAsText, applyLegendToRow, customSort, displayGeoName, state.legend.specialClasses])
+  }, [indexTitle, columns, runtimeData, getCellAnchor, displayDataAsText, applyLegendToRow, customSort, displayGeoName, state.legend.specialClasses])   // eslint-disable-line
 
   const tableData = useMemo(
     () =>
@@ -301,7 +294,7 @@ const DataTable = props => {
             }
           }}
         >
-          <Icon display={expanded ? 'minus' : 'plus'} base/>
+          <Icon display={expanded ? 'minus' : 'plus'} base />
           {tableTitle}
         </div>
         <div className='table-container' style={{ maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' }}>

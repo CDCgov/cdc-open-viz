@@ -8,10 +8,9 @@ import defaults from './data/initial-state'
 import ConfigContext from './ConfigContext'
 import parse from 'html-react-parser'
 import './scss/main.scss'
-
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
-const CdcFilteredText = ({ configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
+const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
 
   const transform = new DataTransform()
   // Default States
