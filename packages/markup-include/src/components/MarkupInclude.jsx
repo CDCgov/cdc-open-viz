@@ -1,5 +1,4 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react'
-import Component from '@cdc/core/components/hoc/Component'
 
 // Store
 import useStore from '@cdc/core/store/store'
@@ -119,18 +118,16 @@ const MarkupInclude = () => {
   if (!config) return null
 
   return <>
-    <Component className="cove-markup-include" config={config}>
-      {config?.missingRequiredSections && <>Missing data in sections</>}
-      {!config?.missingRequiredSections && (<>
-          {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)}/>}
-          {markupError && config.srcUrl && (
-            <AlertBox type="error">
-              <Markup content={errorMessage}/>
-            </AlertBox>
-          )}
-        </>
-      )}
-    </Component>
+    {config?.missingRequiredSections && <>Missing data in sections</>}
+    {!config?.missingRequiredSections && (<>
+        {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)}/>}
+        {markupError && config.srcUrl && (
+          <AlertBox type="error">
+            <Markup content={errorMessage}/>
+          </AlertBox>
+        )}
+      </>
+    )}
   </>
 }
 

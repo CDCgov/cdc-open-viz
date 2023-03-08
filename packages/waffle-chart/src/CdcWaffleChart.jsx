@@ -7,6 +7,7 @@ import { useLoadConfig } from '@cdc/core/hooks/store/useLoadConfig'
 import defaults from './data/initial-state'
 
 // Components - Core
+import Component from '@cdc/core/components/hoc/Component'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import RenderFallback from '@cdc/core/components/loader/RenderFallback'
 import View from '@cdc/core/components/hoc/View'
@@ -27,7 +28,9 @@ const CdcWaffleChart = visualizationProps => {
       <Suspense fallback={<RenderFallback/>}>
         {!isLoading &&
           <View editorPanels={<EditorPanels/>}>
+            <Component className="cove-waffle-chart">
             <WaffleChart/>
+            </Component>
           </View>
         }
       </Suspense>

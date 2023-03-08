@@ -27,7 +27,6 @@ import usePrevious from '../hooks/usePrevious'
 import CoveHelper from '@cdc/core/helpers/cove'
 import calculateNodePosition from '../helpers/calculateNodePosition'
 import calculateWaffleAnimation from '../helpers/calculateWaffleAnimation'
-import Component from '@cdc/core/components/hoc/Component'
 
 // Visualization
 const WaffleChart = () => {
@@ -131,7 +130,7 @@ const WaffleChart = () => {
       [DATA_FUNCTION_MEDIAN]: CoveHelper.Math.roundToPlace(CoveHelper.Math.getMedian(numericalDenomData).toString(), config.roundToPlace),
       [DATA_FUNCTION_MAX]: Math.max(...numericalDenomData).toString(),
       [DATA_FUNCTION_MIN]: Math.min(...numericalDenomData).toString(),
-      [DATA_FUNCTION_MODE]: CoveHelper.Math.getMode(numericalDenomData).join(', '),
+      [DATA_FUNCTION_MODE]: CoveHelper.Math.getMode(numericalDenomData).join(', ')
     }
 
     if (config.customDenom && config.dataDenomColumn && config.dataDenomFunction) {
@@ -199,36 +198,34 @@ const WaffleChart = () => {
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
   return <>
-    <Component className="cove-waffle-chart">
-      {config.missingRequiredSections && <>Missing data in sections</>}
-      {!config.missingRequiredSections && (<>
-        <div
-          className={`cove-waffle-chart__container${config.orientation === 'vertical' ? ' cove-waffle-chart__container--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-          <div className="cove-waffle-chart__visualization" style={{ width: setRatio() }}>
-            <svg width={setRatio()} height={setRatio()}>
-              <Group>
-                {waffleRender()}
-              </Group>
-            </svg>
+    {config.missingRequiredSections && <>Missing data in sections</>}
+    {!config.missingRequiredSections && (<>
+      <div
+        className={`cove-waffle-chart__container${config.orientation === 'vertical' ? ' cove-waffle-chart__container--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+        <div className="cove-waffle-chart__visualization" style={{ width: setRatio() }}>
+          <svg width={setRatio()} height={setRatio()}>
+            <Group>
+              {waffleRender()}
+            </Group>
+          </svg>
+        </div>
+        {(dataPercentage || config.content) &&
+          <div className="cove-waffle-chart__data">
+            {dataPercentage &&
+              <div className="cove-waffle-chart__data--primary" style={dataFontSize}>
+                {config.prefix ? config.prefix : null}{dataPercentage}{config.suffix ? config.suffix : null}
+              </div>
+            }
+            <div className="cove-waffle-chart__data--text">{parse(config.content)}</div>
           </div>
-          {(dataPercentage || config.content) &&
-            <div className="cove-waffle-chart__data">
-              {dataPercentage &&
-                <div className="cove-waffle-chart__data--primary" style={dataFontSize}>
-                  {config.prefix ? config.prefix : null}{dataPercentage}{config.suffix ? config.suffix : null}
-                </div>
-              }
-              <div className="cove-waffle-chart__data--text">{parse(config.content)}</div>
-            </div>
-          }
-        </div>
-      </>)}
-      {config.subtext &&
-        <div className="cove-waffle-chart__subtext">
-          {parse(config.subtext)}
-        </div>
-      }
-    </Component>
+        }
+      </div>
+    </>)}
+    {config.subtext &&
+      <div className="cove-waffle-chart__subtext">
+        {parse(config.subtext)}
+      </div>
+    }
   </>
 }
 
