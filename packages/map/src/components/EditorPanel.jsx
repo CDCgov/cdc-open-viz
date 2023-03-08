@@ -692,7 +692,6 @@ const EditorPanel = props => {
   }
 
   const columnsRequiredChecker = useCallback(() => {
-    console.info('Running columns required check.')
     let columnList = []
 
     // Geo is always required
@@ -962,7 +961,9 @@ const EditorPanel = props => {
     if (!isReversed && state.color.endsWith('reverse')) {
       paletteName = state.color.slice(0, -7)
     }
-    handleEditorChanges('color', paletteName)
+    if(paletteName){
+      handleEditorChanges('color', paletteName)
+    }
   }, [isReversed])
 
   useEffect(() => {
