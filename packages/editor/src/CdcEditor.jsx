@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 
 // IE11
-import 'core-js/stable'
+// import 'core-js/stable' // temp remove, appears to be used with html2pdf.js which we're temp removing
 import ResizeObserver from 'resize-observer-polyfill'
 
 import getViewport from '@cdc/core/helpers/getViewport'
