@@ -241,6 +241,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const geoName = row[obj.columns.geo.name]
 
         uid = countryKeys.find(key => supportedCountries[key].includes(geoName))
+
+        // Cities
+        if (!uid && 'world-geocode' === state.general.type) {
+          uid = cityKeys.find(key => key === geoName.toUpperCase())
+        }
       }
 
       // County Check
@@ -945,6 +950,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Adds geo label, ie State: Georgia
     let stateOrCounty = state.general.geoType === 'us' ? 'State: ' : state.general.geoType === 'us-county' || state.general.geoType === 'single-state' ? 'County: ' : ''
+
     // check the override
     stateOrCounty = state.general.geoLabelOverride !== '' ? state.general.geoLabelOverride + ': ' : stateOrCounty
 
@@ -955,9 +961,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
     }
 
+
     toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
-    if (('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode') && undefined !== row) {
+    if (('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode' || state.general.type === 'world-geocode') && undefined !== row) {
       toolTipText += `<dl>`
 
       Object.keys(state.columns).forEach(columnKey => {
@@ -1116,6 +1123,18 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const geoClickHandler = (key, value) => {
     if (setSharedFilter) {
       setSharedFilter(state.uid, value)
+    }
+
+    // If world-geocode map zoom to geo point
+    if ('world-geocode' === state.general.type) {
+
+      let lat = value[state.columns.latitude.name]
+      let long = value[state.columns.longitude.name]
+
+      setState({
+        ...state,
+        mapPosition: { coordinates: [long, lat], zoom: 3 }
+      })
     }
 
     // If modals are set or we are on a mobile viewport, display modal
