@@ -120,6 +120,8 @@ export default function LinearChart() {
         case maxDataVal > 4 && maxDataVal <= 7:
           max = max * 1.1
           break
+        default:
+          break;
       }
     }
 
@@ -202,6 +204,36 @@ export default function LinearChart() {
         })
       }
     }
+
+    // Handle Box Plots
+    if (config.visualizationType === 'Box Plot') {
+
+      const allOutliers = []
+      const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
+
+      if (hasOutliers) {
+        let outlierMin = Math.min(...allOutliers)
+        let outlierMax = Math.max(...allOutliers)
+
+        // check if outliers exceed standard bounds
+        if (outlierMin < min) min = outlierMin
+        if (outlierMax > max) max = outlierMax
+      }
+
+      // Set Scales
+      yScale = scaleLinear({
+        range: [yMax, 0],
+        round: true,
+        domain: [min, max]
+      })
+
+      xScale = scaleBand({
+        range: [0, xMax],
+        round: true,
+        domain: config.boxplot.categories,
+        padding: 0.4
+      })
+    }
   }
 
   const handleLeftTickFormatting = tick => {
@@ -233,44 +265,7 @@ export default function LinearChart() {
     return tickCount
   }
 
-  // Handle Box Plots
-  if (config.visualizationType === 'Box Plot') {
-    let minYValue
-    let maxYValue
-    let allOutliers = []
-    let allLowerBounds = config.boxplot.plots.map(plot => plot.columnMin)
-    let allUpperBounds = config.boxplot.plots.map(plot => plot.columnMax)
 
-    minYValue = Math.min(...allLowerBounds)
-    maxYValue = Math.max(...allUpperBounds)
-
-    const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
-
-    if (hasOutliers) {
-      let outlierMin = Math.min(...allOutliers)
-      let outlierMax = Math.max(...allOutliers)
-
-      // check if outliers exceed standard bounds
-      if (outlierMin < minYValue) minYValue = outlierMin
-      if (outlierMax > maxYValue) maxYValue = outlierMax
-    }
-
-    const seriesNames = data.map(d => d[config.xAxis.dataKey])
-
-    // Set Scales
-    yScale = scaleLinear({
-      range: [yMax, 0],
-      round: true,
-      domain: [minYValue, maxYValue]
-    })
-
-    xScale = scaleBand({
-      range: [0, xMax],
-      round: true,
-      domain: config.boxplot.categories,
-      padding: 0.4
-    })
-  }
 
   const handleTick = tick => {
     return config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick
