@@ -777,12 +777,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     try {
       const result = {}
 
-      if (hash) {
-        // Adding property this way prevents it from being enumerated
-        Object.defineProperty(result, 'fromHash', {
-          value: hash
-        })
-      }
+      // Adding property this way prevents it from being enumerated
+      Object.defineProperty(result, 'fromHash', {
+        value: hash
+      })
 
       obj.data.forEach(row => {
         if (test) {
