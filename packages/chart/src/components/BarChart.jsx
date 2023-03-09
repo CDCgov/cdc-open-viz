@@ -440,8 +440,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 {config.runtime.yAxis.type === 'date'
                                   ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
                                   : isHorizontal
-                                  ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                                  : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
+                                    ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                                    : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
                               </Text>
                             )}
                             ;
