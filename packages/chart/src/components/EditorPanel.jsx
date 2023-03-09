@@ -1551,6 +1551,66 @@ const EditorPanel = () => {
                     <>
                       <TextField value={config.xAxis.label} section='xAxis' fieldName='label' label='Label' updateField={updateField} />
 
+                      {config.xAxis.type === 'continuous' &&
+                        <>
+                          <TextField
+                            value={config.dataFormat.bottomPrefix}
+                            section='dataFormat'
+                            fieldName='bottomPrefix'
+                            label='Prefix'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
+                                  {config.visualizationType !== 'Pie' && <p>Enter a data suffix (such as "%"), if applicable.</p>}
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+
+                          <TextField
+                            value={config.dataFormat.bottomSuffix}
+                            section='dataFormat'
+                            fieldName='bottomSuffix'
+                            label='Suffix'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
+                                  {config.visualizationType !== 'Pie' && <p>Enter a data suffix (such as "%"), if applicable.</p>}
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+
+                          <CheckBox
+                            value={config.dataFormat.bottomAbbreviated}
+                            section='dataFormat'
+                            fieldName='bottomAbbreviated'
+                            label='Abbreviate Axis Values'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                        </>
+                      }
+
                       {config.xAxis.type === 'date' && (
                         <>
                           <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
