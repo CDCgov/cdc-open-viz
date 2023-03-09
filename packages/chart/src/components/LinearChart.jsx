@@ -211,6 +211,7 @@ export default function LinearChart() {
       const allOutliers = []
       const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
 
+      // check if outliers are lower
       if (hasOutliers) {
         let outlierMin = Math.min(...allOutliers)
         let outlierMax = Math.max(...allOutliers)
@@ -219,6 +220,15 @@ export default function LinearChart() {
         if (outlierMin < min) min = outlierMin
         if (outlierMax > max) max = outlierMax
       }
+
+      // check fences for max/min
+      let lowestFence = Math.min(...config.boxplot.plots.map(item => item.columnMin))
+      let highestFence = Math.max(...config.boxplot.plots.map(item => item.columnMax))
+
+      if (lowestFence < min) min = lowestFence
+      if (highestFence > max) max = highestFence
+
+      console.log('outliermin', min)
 
       // Set Scales
       yScale = scaleLinear({

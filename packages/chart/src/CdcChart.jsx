@@ -225,10 +225,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
-            return series.dataKey
-          })
+          newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+          newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+          return series.dataKey
+        })
         : []
     }
 
@@ -252,14 +252,25 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       // group specific statistics
       // prevent re-renders
+      if (!groups) return
       groups.forEach((g, index) => {
         try {
           if (!g) throw new Error('No groups resolved in box plots')
+
           // filter data by group
           let filteredData = newExcludedData ? newExcludedData.filter(item => item[newConfig.xAxis.dataKey] === g) : data.filter(item => item[newConfig.xAxis.dataKey] === g)
           let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
           // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
 
+          if (!filteredData) throw new Error('boxplots dont have data yet')
+          if (!plots) throw new Error('boxplots dont have plots yet')
+
+          // test first item of data for numeric when box plot
+          // if (!isNumber(filteredData[0][config.yAxis.dataKey])) {
+          //   newConfig.runtime.editorErrorMessage = 'Issue with box plot'
+          //   // debugger
+          //   throw new Error('boxplots must use numerical data on y axis')
+          // }
           const q1 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
           const q3 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
           const iqr = q3 - q1
@@ -273,14 +284,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           plots.push({
             columnCategory: g,
             columnMax: Number(q3 + 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo),
-            columnThirdQuartile: q3.toFixed(newConfig.dataFormat.roundTo),
-            columnMedian: d3.median(filteredDataValues).toFixed(newConfig.dataFormat.roundTo),
+            columnThirdQuartile: Number(q3).toFixed(newConfig.dataFormat.roundTo),
+            columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
             columnMin: Number(q1 - 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo),
             columnCount: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
-            columnSd: d3.deviation(filteredDataValues).toFixed(newConfig.dataFormat.roundTo),
-            columnMean: d3.mean(filteredDataValues).toFixed(newConfig.dataFormat.roundTo),
-            columnIqr: iqr.toFixed(newConfig.dataFormat.roundTo),
+            columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
+            columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
+            columnIqr: Number(iqr).toFixed(newConfig.dataFormat.roundTo),
             columnOutliers: outliers,
             values: filteredDataValues,
             nonOutlierValues: nonOutliers

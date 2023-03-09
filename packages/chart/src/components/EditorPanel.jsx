@@ -678,6 +678,7 @@ const EditorPanel = () => {
     const { series, visualizationType } = config
     if (visualizationType === 'Box Plot') return false
     if (visualizationType === 'Scatter Plot') return false
+    if (visualizationType === 'Pie') return false
     return series.some(series => series.type === 'Bar' || series.type === 'Paired Bar')
   }
 
@@ -1028,6 +1029,7 @@ const EditorPanel = () => {
                       }}
                       options={getColumns()}
                     />
+
                     {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
                       <>
                         <span className='divider-heading'>Confidence Keys</span>
