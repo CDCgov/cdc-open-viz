@@ -12,7 +12,6 @@ import { timeParse, timeFormat } from 'd3-time-format'
 import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
-import { Base64 } from 'js-base64'
 import 'react-tooltip/dist/react-tooltip.css'
 
 // Primary Components
@@ -20,7 +19,7 @@ import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
 import LinearChart from './components/LinearChart'
 
-import { colorPalettesChart as colorPalettes } from '../../core/data/colorPalettes'
+import { colorPalettesChart as colorPalettes, pairedBarPalettes } from '@cdc/core/data/colorPalettes'
 
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 
@@ -63,12 +62,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
-  const legendGlyphSize = 15
-  const legendGlyphSizeHalf = legendGlyphSize / 2
-
   // Destructure items from config for more readable JSX
   const { legend, title, description, visualizationType } = config
-  const { barBorderClass, lineDatapointClass, contentClasses, innerContainerClasses, sparkLineStyles } = useDataVizClasses(config)
+  const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
   
@@ -89,6 +85,19 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       return ariaLabel
     } catch (e) {
       console.error(e.message)
+    }
+  }
+
+  const handleLineType = lineType => {
+    switch (lineType) {
+      case 'dashed-sm':
+        return '5 5'
+      case 'dashed-md':
+        return '10 5'
+      case 'dashed-lg':
+        return '15 5'
+      default:
+        return 0
     }
   }
 
@@ -136,6 +145,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     let newConfig = { ...defaults, ...response }
+    if (newConfig.visualizationType === 'Box Plot') {
+      newConfig.legend.hide = true
+    }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
     updateConfig(newConfig, data)
   }
@@ -210,10 +222,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
-            return series.dataKey
-          })
+          newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+          newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+          return series.dataKey
+        })
         : []
     }
 
@@ -273,6 +285,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       tableData.map(table => {
         delete table.columnIqr
         delete table.nonOutlierValues
+        return null; // resolve eslint
       })
 
       // any other data we can add to boxplots
@@ -282,7 +295,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.boxplot.tableData = tableData
     }
 
-    if (newConfig.visualizationType === 'Combo' && newConfig.series) {
+    if (newConfig.visualizationType === 'Combo' || ('Area Chart' && newConfig.series)) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.series.forEach(series => {
@@ -386,7 +399,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     setContainer(node)
-  }, [])
+  }, []) // eslint-disable-line
 
   function isEmpty(obj) {
     return Object.keys(obj).length === 0
@@ -395,7 +408,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Load data when component first mounts
   useEffect(() => {
     loadConfig()
-  }, [])
+  }, []) // eslint-disable-line
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
@@ -405,7 +418,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       publish('cove_loaded', { config: config })
       setCoveLoadedEventRan(true)
     }
-  }, [container, config])
+  }, [container, config]) // eslint-disable-line
 
   /**
    * Handles filter change events outside of COVE
@@ -448,20 +461,22 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setConfig(newConfigHere)
       setFilteredData(filterData(externalFilters, excludedData))
     }
-  }, [externalFilters])
+  }, [externalFilters]) // eslint-disable-line
 
   // Load data when configObj data changes
   if (configObj) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       loadConfig()
-    }, [configObj.data])
+    }, [configObj.data]) // eslint-disable-line
   }
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime.seriesKeys) {
-      let palette = config.customColors || colorPalettes[config.palette]
+      const configPalette = config.visualizationType === 'Paired Bar' ? config.pairedBar.palette : config.palette
+      const allPalettes = { ...colorPalettes, ...pairedBarPalettes }
+      let palette = config.customColors || allPalettes[configPalette]
       let numberOfKeys = config.runtime.seriesKeys.length
       let newColorScale
 
@@ -484,7 +499,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (config && stateData && config.sortData) {
       stateData.sort(sortData)
     }
-  }, [config, stateData])
+  }, [config, stateData]) // eslint-disable-line
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = label => {
@@ -543,33 +558,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
   }
 
-  const DownloadButton = ({ data }, type = 'link') => {
-    const fileName = `${config.title.substring(0, 50)}.csv`
-
-    const csvData = Papa.unparse(data)
-
-    const saveBlob = () => {
-      if (typeof window.navigator.msSaveBlob === 'function') {
-        const dataBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
-        window.navigator.msSaveBlob(dataBlob, fileName)
-      }
-    }
-
-    if (type === 'download') {
-      return (
-        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
-          Download Data (CSV)
-        </a>
-      )
-    } else {
-      return (
-        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn no-border`}>
-          Download Data (CSV)
-        </a>
-      )
-    }
-  }
-
   // function calculates the width of given text and its font-size
   function getTextWidth(text, font) {
     const canvas = document.createElement('canvas')
@@ -587,8 +575,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     // destructure dataFormat values
     let {
-      dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, rightPrefix, rightSuffix }
+      dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix }
     } = config
+
     let formatSuffix = format('.2s')
 
     // check if value contains comma and remove it. later will add comma below.
@@ -597,17 +586,27 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let original = num
     let stringFormattingOptions
 
-    if (axis !== 'right') {
+    if (axis === 'left') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.commas ? true : false,
         minimumFractionDigits: roundTo ? Number(roundTo) : 0,
         maximumFractionDigits: roundTo ? Number(roundTo) : 0
       }
-    } else {
+    }
+
+    if (axis === 'right') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.rightCommas ? true : false,
         minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
         maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
+      }
+    }
+
+    if (axis === 'bottom') {
+      stringFormattingOptions = {
+        useGrouping: config.dataFormat.bottomCommas ? true : false,
+        minimumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0,
+        maximumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0
       }
     }
 
@@ -680,6 +679,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     Combo: <LinearChart />,
     Pie: <PieChart />,
     'Box Plot': <LinearChart />,
+    'Area Chart': <LinearChart />,
     'Scatter Plot': <LinearChart />
   }
 
@@ -805,10 +805,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     dynamicLegendItems,
     setDynamicLegendItems,
     filterData,
+    imageId,
+    handleLineType,
     isNumber,
     cleanData,
-    imageId,
-    getTextWidth
+    getTextWidth,
+    pairedBarPalettes
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]

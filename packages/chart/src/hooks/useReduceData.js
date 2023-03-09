@@ -9,7 +9,7 @@ function useReduceData(config, data) {
     // remove comma and $ signs
     let tmp
     if (typeof value === 'string') {
-      tmp = value !== null && value !== '' ? value.replace(/[,\$]/g, '') : ''
+      tmp = value !== null && value !== '' ? value.replace(/[,$]/g, '') : ''
     } else {
       tmp = value !== null && value !== '' ? value : ''
     }
@@ -18,7 +18,6 @@ function useReduceData(config, data) {
   const getMaxValueFromData = () => {
     let max // will hold max number from data.
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && isBar)) && config.visualizationSubType === 'stacked') {
-
       const yTotals = data.reduce((allTotals, xValue) => {
         const totalYValues = config.runtime.seriesKeys.reduce((yTotal, k) => {
           yTotal += Number(xValue[k])
@@ -46,7 +45,7 @@ function useReduceData(config, data) {
             yTotal += Number(d[k])
             return yTotal
           }, 0)
-          total.push(totalYValues)
+          return total.push(totalYValues)
         })
         // get lineSeries largest values
         const lineMax = Math.max(...data.map(d => Math.max(...config.runtime.lineSeriesKeys.map(key => Number(cleanChars(d[key]))))))
