@@ -47,8 +47,6 @@ import './scss/main.scss'
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
 
-  console.log('RENDERING')
-
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState({})
@@ -163,8 +161,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
     })
-
-    console.log('NEW HERE', newConfig)
 
     // Loop through and set initial data with exclusions - this should persist through any following data transformations (ie. filters)
     let newExcludedData
@@ -324,7 +320,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
 
-    console.log('NEW CONFIG HERE 2', newConfig)
     setConfig(newConfig)
   }
 
