@@ -19,8 +19,6 @@ import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import * as allCurves from '@visx/curve'
 
-console.log('alllll curves', allCurves)
-
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -336,7 +334,6 @@ const EditorPanel = () => {
 
     let updatedConfig = { ...config, [section]: sectionValue }
 
-    console.log('section value', updatedConfig)
     enforceRestrictions(updatedConfig)
 
     updateConfig(updatedConfig)
@@ -559,7 +556,6 @@ const EditorPanel = () => {
   useEffect(() => {
     // Pass up to Editor if needed
     if (setParentConfig) {
-      console.log('setting parent config')
       const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
