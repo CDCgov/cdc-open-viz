@@ -124,7 +124,15 @@ export default {
   palette: 'qualitative-bold',
   isPaletteReversed: false,
   labels: false,
-  dataFormat: { commas: false, prefix: '', suffix: '', abbreviated: false },
+  dataFormat: {
+    commas: false,
+    prefix: '',
+    suffix: '',
+    abbreviated: false,
+    bottomSuffix: '',
+    bottomPrefix: '',
+    bottomAbbreviated: false
+  },
   confidenceKeys: {},
   visual: {
     border: true,
