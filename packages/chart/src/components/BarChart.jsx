@@ -439,8 +439,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 {config.runtime.yAxis.type === 'date'
                                   ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
                                   : isHorizontal
-                                    ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                                    : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
+                                  ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                                  : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
                               </Text>
                             )}
                             ;
@@ -488,26 +488,26 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
             {Object.keys(config.confidenceKeys).length > 0
               ? data.map(d => {
-                let xPos = xScale(getXAxisData(d))
-                let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
-                let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
-                let tickWidth = 5
+                  let xPos = xScale(getXAxisData(d))
+                  let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
+                  let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
+                  let tickWidth = 5
 
-                return (
-                  <path
-                    key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`}
-                    stroke='#333'
-                    strokeWidth='2px'
-                    d={`
+                  return (
+                    <path
+                      key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`}
+                      stroke='#333'
+                      strokeWidth='2px'
+                      d={`
                   M${xPos - tickWidth} ${upperPos}
                   L${xPos + tickWidth} ${upperPos}
                   M${xPos} ${upperPos}
                   L${xPos} ${lowerPos}
                   M${xPos - tickWidth} ${lowerPos}
                   L${xPos + tickWidth} ${lowerPos}`}
-                  />
-                )
-              })
+                    />
+                  )
+                })
               : ''}
           </Group>
         )}

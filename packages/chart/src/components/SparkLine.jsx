@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
@@ -15,7 +15,7 @@ import useReduceData from '../hooks/useReduceData'
 import ConfigContext from '../ConfigContext'
 
 export default function SparkLine({ width: parentWidth, height: parentHeight }) {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale, isNumber, handleChartAriaLabels } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale, isNumber, handleChartAriaLabels } = useContext(ConfigContext) // eslint-disable-line
   let width = parentWidth
   const { minValue, maxValue } = useReduceData(config, data, ConfigContext)
 
@@ -35,13 +35,12 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   const isMaxValid = Number(enteredMaxValue) >= Number(maxValue)
   const isMinValid = Number(enteredMinValue) <= Number(minValue)
 
-
   // REMOVE bad data points from the data set
   // Examples: NA, N/A, "1,234", "anystring"
   // - if you dont call this on data into LineGroup below, for example
   // then entire data series are removed because of the defined statement
   // i.e. if a series has any bad data points the entire series wont plot
-   const cleanData = (data, testing = false) => {
+  const cleanData = (data, testing = false) => {
     let cleanedup = []
     if (testing) console.log('## Data to clean=', data)
     data.forEach(function (d, i) {
@@ -52,8 +51,8 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
           cleanedSeries[key] = d[key]
         } else {
           // remove comma and dollar signs
-          let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
-          if (testing) console.log("tmp no comma or $", tmp)
+          let tmp = d[key] !== null && d[key] !== '' ? d[key].replace(/[,$]/g, '') : ''
+          if (testing) console.log('tmp no comma or $', tmp)
           if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
             cleanedSeries[key] = tmp
           } else {
@@ -66,11 +65,11 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
     })
     if (testing) console.log('## cleanedData =', cleanedup)
     return cleanedup
-   }
+  }
 
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data, config.xAxis.dataKey);
+  const cleanedData = cleanData(data, config.xAxis.dataKey)
 
   if (cleanedData) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
@@ -97,6 +96,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
 
       yScale = config.runtime.xAxis.type === 'date' ? scaleLinear({ domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)] }) : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
+      // eslint-disable-next-line
       seriesScale = scalePoint({
         domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
         range: [0, yMax]
@@ -116,6 +116,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
         range: [margin.left, width - margin.right]
       })
 
+      // eslint-disable-next-line
       seriesScale = scalePoint({
         domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
         range: [0, xMax]
