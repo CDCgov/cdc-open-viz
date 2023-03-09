@@ -201,8 +201,12 @@ export default function DataTable() {
     }),
     []
   )
-
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
+
+  if (config.xAxis.type === 'continuous' && headerGroups) {
+    headerGroups[0].headers.sort((a, b) => a.Header - b.Header)
+  }
+
   return (
     <ErrorBoundary component='DataTable'>
 
