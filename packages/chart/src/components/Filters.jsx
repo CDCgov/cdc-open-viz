@@ -3,7 +3,7 @@ import ConfigContext from './../ConfigContext'
 import Button from '@cdc/core/components/elements/Button'
 
 const useFilters = () => {
-  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData, runtimeFilters } = useContext(ConfigContext)
+  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData, runtimeFilters } = useContext(ConfigContext) // eslint-disable-line
   const [showApplyButton, setShowApplyButton] = useState(false)
 
   const sortAsc = (a, b) => {
@@ -14,7 +14,7 @@ const useFilters = () => {
     return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
   }
 
-  const announceChange = text => { }
+  const announceChange = text => {}
 
   const changeFilterActive = (index, value) => {
     let newFilters = config.filters
@@ -38,6 +38,7 @@ const useFilters = () => {
     // reset to first item in values array.
     newFilters.map(filter => {
       filter.active = filter.values[0]
+      return null
     })
 
     setFilteredData(filterData(newFilters, excludedData))

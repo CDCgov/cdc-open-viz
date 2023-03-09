@@ -35,13 +35,14 @@ export default function LinearChart() {
     freezeOnceVisible: false
   })
   // Make sure the chart is visible if in the editor
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const element = document.querySelector('.isEditor')
     if (element) {
       // parent element is visible
       setAnimatedChart(prevState => true)
     }
-  }) // eslint-disable-line
+  }) /* eslint-disable-line */
 
   // If the chart is in view, set to animate if it has not already played
   useEffect(() => {
@@ -74,8 +75,8 @@ export default function LinearChart() {
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
   const isMinValid = (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
 
-  let max = 0; // need outside the if statement
-  let min = 0;
+  let max = 0 // need outside the if statement
+  let min = 0
   if (data) {
     min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
@@ -102,7 +103,7 @@ export default function LinearChart() {
       // if all values in data are negative set max = 0
       max = existPositiveValue ? maxValue : 0
     }
-    
+
     //Adds Y Axis data padding if applicable
     if (config.runtime.yAxis.paddingPercent) {
       let paddingValue = (max - min) * config.runtime.yAxis.paddingPercent
@@ -138,8 +139,8 @@ export default function LinearChart() {
       yScale =
         config.runtime.xAxis.type === 'date'
           ? scaleLinear({
-            domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
-          })
+              domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
+            })
           : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
       seriesScale = scalePoint({
@@ -233,9 +234,9 @@ export default function LinearChart() {
       tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
       // DEV 3163 - to fix edge case of small numbers with decimals
       if (tickCount > max) {
-          // cap it and round it its not an integer
-          tickCount = min < 0 ? Math.round(max) * 2 : Math.round(max); 
-      } 
+        // cap it and round it its not an integer
+        tickCount = min < 0 ? Math.round(max) * 2 : Math.round(max)
+      }
     }
 
     if (axis === 'xAxis') {
@@ -266,7 +267,6 @@ export default function LinearChart() {
       if (outlierMax > maxYValue) maxYValue = outlierMax
     }
 
-
     // Set Scales
     yScale = scaleLinear({
       range: [yMax, 0],
@@ -282,7 +282,6 @@ export default function LinearChart() {
     })
   }
 
-
   return isNaN(width) ? (
     <></>
   ) : (
@@ -291,36 +290,36 @@ export default function LinearChart() {
         {/* Higlighted regions */}
         {config.regions
           ? config.regions.map(region => {
-            if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+              if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-            const from = xScale(parseDate(region.from).getTime())
-            const to = xScale(parseDate(region.to).getTime())
-            const width = to - from
+              const from = xScale(parseDate(region.from).getTime())
+              const to = xScale(parseDate(region.to).getTime())
+              const width = to - from
 
-            return (
-              <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
-                <path
-                  stroke='#333'
-                  d={`M${from} -5
+              return (
+                <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
+                  <path
+                    stroke='#333'
+                    d={`M${from} -5
                           L${from} 5
                           M${from} 0
                           L${to} 0
                           M${to} -5
                           L${to} 5`}
-                />
-                <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-                <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-                  {region.label}
-                </Text>
-              </Group>
-            )
-          })
+                  />
+                  <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+                  <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+                    {region.label}
+                  </Text>
+                </Group>
+              )
+            })
           : ''}
 
         {/* Y axis */}
         {config.visualizationType !== 'Spark Line' && (
           <AxisLeft scale={yScale} left={Number(config.runtime.yAxis.size) - config.yAxis.axisPadding} label={config.runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
-              {props => {
+            {props => {
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
               return (

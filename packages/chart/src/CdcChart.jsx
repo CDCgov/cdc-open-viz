@@ -67,7 +67,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
-  
+
   const handleChartAriaLabels = (state, testing = false) => {
     if (testing) console.log(`handleChartAriaLabels Testing On:`, state)
     try {
@@ -222,10 +222,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-          newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-          newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
-          return series.dataKey
-        })
+            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+            return series.dataKey
+          })
         : []
     }
 
@@ -285,7 +285,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       tableData.map(table => {
         delete table.columnIqr
         delete table.nonOutlierValues
-        return null; // resolve eslint
+        return null // resolve eslint
       })
 
       // any other data we can add to boxplots
@@ -635,7 +635,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // - if roundTo undefined which means it is blank, then do not round
     if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
       num = num // eslint-disable-line
-    } else if (roundTo === undefined)  { // if you put this in if statement above, commas dont work
+    } else if (roundTo === undefined) {
+      // if you put this in if statement above, commas dont work
       num = num // eslint-disable-line
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
@@ -772,7 +773,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
-  
+
   const contextValues = {
     getXAxisData,
     getYAxisData,

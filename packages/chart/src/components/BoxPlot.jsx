@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { BoxPlot } from '@visx/stats'
 import { Group } from '@visx/group'
 import ConfigContext from '../ConfigContext'
@@ -6,7 +6,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {
-  const { transformedData: data, config, setConfig } = useContext(ConfigContext)
+  const { transformedData: data, config, setConfig } = useContext(ConfigContext) // eslint-disable-line
   const boxWidth = xScale.bandwidth()
   const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = colorPalettesChart[config?.palette][0] ? colorPalettesChart[config?.palette][0] : '#000'
@@ -33,7 +33,8 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
         }
       })
     }
-  }, []);
+  }, []) // eslint-disable-line
+
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group className='boxplot' key={`boxplot-group`}>

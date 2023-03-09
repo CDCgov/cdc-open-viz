@@ -25,12 +25,14 @@ const Legend = () => {
       let tmp = {}
       colsToKeep.map(col => {
         tmp[col] = isNaN(dataItem[col]) ? dataItem[col] : dataItem[col]
+        return null
       })
       return tmp
     })
 
     colsToKeep.map(col => {
       tmpLabels[col] = col
+      return null
     })
 
     if (dynamicLegendItems.length > 0) {
@@ -43,7 +45,7 @@ const Legend = () => {
         }
       })
     }
-  }, [dynamicLegendItems])
+  }, [dynamicLegendItems]) // eslint-disable-line
 
   useEffect(() => {
     if (dynamicLegendItems.length === 0) {
@@ -53,7 +55,9 @@ const Legend = () => {
       config.runtime.seriesLabelsAll.map(item => {
         resetSeriesNames.map(col => {
           tmpLabels[col] = col
+          return null
         })
+        return null
       })
 
       setConfig({
@@ -65,7 +69,7 @@ const Legend = () => {
         }
       })
     }
-  }, [dynamicLegendItems])
+  }, [dynamicLegendItems]) // eslint-disable-line
 
   const removeDynamicLegendItem = label => {
     let newLegendItems = dynamicLegendItems.filter(item => item.text !== label.text)
@@ -112,19 +116,20 @@ const Legend = () => {
       setConfig({ ...config, legend: { ...config.legend, position: 'bottom' } })
     }
     setConfig({ ...config, legend: { ...config.legend, position: 'right' } })
-  }, [currentViewport])
+  }, [currentViewport]) // eslint-disable-line
 
-  if (!legend) return null;
+  if (!legend) return null
 
   if (!legend.dynamicLegend)
     return config.visualizationType !== 'Box Plot' ? (
+      // eslint-disable-next-line
       <aside
         style={{ marginTop: config.legend.position === 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px', marginBottom: config.legend.position === 'bottom' ? '15px' : '0px' }}
         id='legend'
         className={containerClasses.join(' ')}
         role='region'
         aria-label='legend'
-        tabIndex={0}
+        tabIndex={0} // eslint-disable-line
       >
         {legend.label && <h2>{parse(legend.label)}</h2>}
         {legend.description && <p>{parse(legend.description)}</p>}
@@ -137,7 +142,7 @@ const Legend = () => {
 
                 // Filter excluded data keys from legend
                 if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-                  return
+                  return null
                 }
 
                 if (config.runtime.seriesLabels) {
@@ -180,13 +185,25 @@ const Legend = () => {
         </LegendOrdinal>
       </aside>
     ) : (
-      <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
+      <aside
+        id='legend'
+        className={containerClasses.join(' ')}
+        role='region'
+        aria-label='legend'
+        tabIndex={0} // eslint-disable-line
+      >
         {config.boxplot.legend.displayHowToReadText && <h3>{config.boxplot.legend.howToReadText}</h3>}
       </aside>
     )
   return (
     config.visualizationType !== 'Box Plot' && (
-      <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
+      <aside
+        id='legend'
+        className={containerClasses.join(' ')}
+        role='region'
+        aria-label='legend'
+        tabIndex={0} // eslint-disable-line
+      >
         {legend.label && <h2>{parse(legend.label)}</h2>}
         {legend.description && <p>{parse(legend.description)}</p>}
 
@@ -209,7 +226,7 @@ const Legend = () => {
 
                     // Filter excluded data keys from legend
                     if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-                      return
+                      return null
                     }
 
                     if (config.runtime.seriesLabels) {
@@ -225,6 +242,7 @@ const Legend = () => {
                       if (listItem.text === label.text) {
                         inDynamicList = true
                       }
+                      return null
                     })
 
                     if (inDynamicList) return true
@@ -254,7 +272,7 @@ const Legend = () => {
 
             // Filter excluded data keys from legend
             if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-              return
+              return null
             }
 
             if (config.runtime.seriesLabels && !config.legend.dynamicLegend) {
