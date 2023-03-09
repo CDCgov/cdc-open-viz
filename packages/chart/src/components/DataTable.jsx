@@ -122,6 +122,7 @@ export default function DataTable() {
       data.forEach((d, index) => {
         const resolveTableHeader = () => {
           if (config.runtime[section].type === 'date') return formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
+          if (config.runtime[section].type === 'continuous') return numberFormatter(d[config.runtime.originalXAxis.dataKey], 'bottom')
           return d[config.runtime.originalXAxis.dataKey]
         }
         const newCol = {
@@ -203,8 +204,9 @@ export default function DataTable() {
   )
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
 
+  // sort continuous x axis scaling for data tables, ie. xAxis should read 1,2,3,4,5
   if (config.xAxis.type === 'continuous' && headerGroups) {
-    headerGroups[0].headers.sort((a, b) => a.Header - b.Header)
+    data.sort((a, b) => a[config.xAxis.dataKey] - b[config.xAxis.dataKey])
   }
 
   return (

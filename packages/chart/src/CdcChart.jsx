@@ -233,9 +233,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      // console.log('filtered', excludedData)
-      // stats
-      // let currentData = filterData(newConfig.filters, excludedData)
 
       let allKeys = newExcludedData ? newExcludedData.map(d => d[newConfig.xAxis.dataKey]) : data.map(d => d[newConfig.xAxis.dataKey])
       let allValues = newExcludedData ? newExcludedData.map(d => Number(d[newConfig?.series[0]?.dataKey])) : data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
@@ -621,7 +618,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     // destructure dataFormat values
     let {
-      dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix }
+      dataFormat: {
+        commas,
+        abbreviated,
+        roundTo,
+        prefix,
+        suffix,
+        rightRoundTo,
+        bottomRoundTo,
+        rightPrefix,
+        rightSuffix,
+        bottomPrefix,
+        bottomSuffix,
+        bottomAbbreviated
+      }
     } = config
 
     let formatSuffix = format('.2s')
@@ -683,14 +693,15 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     let result = ''
 
-    // TODO: combine below.w/ below & add option for right axis
     if (abbreviated && axis === 'left') {
       num = formatSuffix(parseFloat(num)).replace('G', 'B')
     }
 
-    if (abbreviated && axis === 'bottom') {
+    if (bottomAbbreviated && axis === 'bottom') {
       num = formatSuffix(parseFloat(num)).replace('G', 'B')
     }
+
+
 
     if (prefix && axis === 'left') {
       result += prefix
@@ -698,6 +709,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     if (rightPrefix && axis === 'right') {
       result += rightPrefix
+    }
+
+    if (bottomPrefix && axis === 'bottom') {
+      result += bottomPrefix
     }
 
     result += num
@@ -708,6 +723,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     if (rightSuffix && axis === 'right') {
       result += rightSuffix
+    }
+
+    if (bottomSuffix && axis === 'bottom') {
+      result += bottomSuffix
     }
 
     return String(result)

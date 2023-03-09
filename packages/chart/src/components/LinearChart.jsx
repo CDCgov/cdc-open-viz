@@ -228,8 +228,6 @@ export default function LinearChart() {
       if (lowestFence < min) min = lowestFence
       if (highestFence > max) max = highestFence
 
-      console.log('outliermin', min)
-
       // Set Scales
       yScale = scaleLinear({
         range: [yMax, 0],
