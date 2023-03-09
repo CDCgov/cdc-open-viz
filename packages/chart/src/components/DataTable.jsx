@@ -205,6 +205,9 @@ export default function DataTable() {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
   return (
     <ErrorBoundary component='DataTable'>
+
+
+
       <CoveMediaControls.Section classes={['download-links']}>
         <CoveMediaControls.Link config={config} />
         {config.table.download && <DownloadButton data={rawData} type='link' />}
@@ -259,7 +262,8 @@ export default function DataTable() {
               {rows.map((row, index) => {
                 prepareRow(row)
                 return (
-                  <tr {...row.getRowProps()} key={`tbody__tr-${index}`} className={`row-${String(config.visualizationType).replace(' ', '-')}--${index}`}>
+                  <tr {...row.getRowProps()} key={`tbody__tr-${index}`} className={`row-${String(config.visualizationType).replace(' ', '-')}--${index}`}
+                  >
                     {row.cells.map((cell, index) => {
                       return (
                         <td tabIndex='0' {...cell.getCellProps()} key={`tbody__tr__td-${index}`} role='gridcell'>
