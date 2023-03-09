@@ -625,6 +625,17 @@ const EditorPanel = () => {
     updateConfig({ ...config, filters })
   }
 
+  const visHasLegend = () => {
+    const { visualizationType } = config
+
+    switch (visualizationType) {
+      case 'Box Plot':
+        return false
+      default:
+        return true
+    }
+  }
+
   const visCanAnimate = () => {
     const { visualizationType } = config
     switch (visualizationType) {
@@ -901,14 +912,22 @@ const EditorPanel = () => {
                                         }}
                                         style={{ width: '100px', marginRight: '10px' }}
                                       >
-                                        <option value='' default>
+                                        <option value='' default key='default'>
                                           Select
                                         </option>
                                         {config.visualizationType === 'Combo' && <option value='Bar'>Bar</option>}
-                                        <option value='Line'>Solid Line</option>
-                                        <option value='dashed-sm'>Small Dashed</option>
-                                        <option value='dashed-md'>Medium Dashed</option>
-                                        <option value='dashed-lg'>Large Dashed</option>
+                                        <option value='Line' key='Line'>
+                                          Solid Line
+                                        </option>
+                                        <option value='dashed-sm' key='dashed-sm'>
+                                          Small Dashed
+                                        </option>
+                                        <option value='dashed-md' key='dashed-md'>
+                                          Medium Dashed
+                                        </option>
+                                        <option value='dashed-lg' key='dashed-lg'>
+                                          Large Dashed
+                                        </option>
                                       </select>
                                     )
 
@@ -919,17 +938,16 @@ const EditorPanel = () => {
                                           changeLineType(i, event.target.value)
                                         }}
                                         style={{ width: '100px', marginRight: '10px' }}
+                                        key='lineTypeSelection'
                                       >
                                         <option value='' default>
                                           Select
                                         </option>
-                                        <option value='curveMonotoneY'>Monotone Y</option>
-                                        <option value='curveMonotoneX'>Monotone X</option>
-                                        <option value='curveLinear'>Linear</option>
-                                        <option value='curveNatural'>Natural</option>
-                                        <option value='curveStep'>Step</option>
+
                                         {Object.keys(allCurves).map(curveName => (
-                                          <option value={curveName}>{curveName}</option>
+                                          <option value={curveName} key={curveName}>
+                                            {curveName}
+                                          </option>
                                         ))}
                                       </select>
                                     )
@@ -937,7 +955,7 @@ const EditorPanel = () => {
                                     return (
                                       <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
                                         {(provided, snapshot) => (
-                                          <li>
+                                          <li key={i}>
                                             <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                               <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
                                                 <div className='series-list__name-text'>{series.dataKey}</div>
@@ -965,7 +983,7 @@ const EditorPanel = () => {
                                   }
 
                                   return (
-                                    <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
+                                    <Draggable key={`series.dataKey--${i}`} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
                                       {(provided, snapshot) => (
                                         <li
                                           key={series.dataKey}
@@ -1237,10 +1255,12 @@ const EditorPanel = () => {
                                   }}
                                   style={{ width: '100px', marginRight: '10px' }}
                                 >
-                                  <option value='Left' default>
+                                  <option value='Left' default key='left'>
                                     left
                                   </option>
-                                  <option value='Right'>right</option>
+                                  <option value='Right' key='right'>
+                                    right
+                                  </option>
                                 </select>
                               )
 
@@ -1687,13 +1707,14 @@ const EditorPanel = () => {
                 </AccordionItem>
               )}
 
-              <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>Legend</AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <CheckBox value={config.legend.reverseLabelOrder} section='legend' fieldName='reverseLabelOrder' label='Reverse Labels' updateField={updateField} />
-                  {/* <fieldset className="checkbox-group">
+              {visHasLegend() && (
+                <AccordionItem>
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Legend</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <CheckBox value={config.legend.reverseLabelOrder} section='legend' fieldName='reverseLabelOrder' label='Reverse Labels' updateField={updateField} />
+                    {/* <fieldset className="checkbox-group">
                     <CheckBox value={config.legend.dynamicLegend} section="legend" fieldName="dynamicLegend" label="Dynamic Legend" updateField={updateField}/>
                     {config.legend.dynamicLegend && (
                       <>
@@ -1704,7 +1725,6 @@ const EditorPanel = () => {
                       </>
                     )}
                   </fieldset> */}
-                  {config.visualizationType !== 'Box Plot' && (
                     <CheckBox
                       value={config.legend.hide ? true : false}
                       section='legend'
@@ -1722,22 +1742,27 @@ const EditorPanel = () => {
                         </Tooltip>
                       }
                     />
-                  )}
 
-                  {config.visualizationType !== 'Box Plot' &&
-                    <CheckBox value={config.legend.showLegendValuesTooltip ? true : false} section='legend' fieldName='showLegendValuesTooltip' label='Show Legend Values in Tooltip' updateField={updateField} />
-                  }
+                    {/* {config.visualizationType === 'Box Plot' &&
+                    <>
+                      <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />
+                      <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
+                    </>
+                  } */}
 
-                  {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
-                    <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
-                  )}
-                  <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={updateField} options={['highlight', 'isolate']} />
-                  <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
-                  <Select value={config.legend.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
-                  {config.legend.position === 'bottom' && <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />}
-                  <TextField type='textarea' value={config.legend.description} updateField={updateField} section='legend' fieldName='description' label='Legend Description' />
-                </AccordionItemPanel>
-              </AccordionItem>
+                    {config.visualizationType !== 'Box Plot' && <CheckBox value={config.legend.showLegendValuesTooltip ? true : false} section='legend' fieldName='showLegendValuesTooltip' label='Show Legend Values in Tooltip' updateField={updateField} />}
+
+                    {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
+                      <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
+                    )}
+                    <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={updateField} options={['highlight', 'isolate']} />
+                    <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
+                    <Select value={config.legend.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
+                    {config.legend.position === 'bottom' && <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />}
+                    <TextField type='textarea' value={config.legend.description} updateField={updateField} section='legend' fieldName='description' label='Legend Description' />
+                  </AccordionItemPanel>
+                </AccordionItem>
+              )}
 
               <AccordionItem>
                 <AccordionItemHeading>
@@ -1862,13 +1887,11 @@ const EditorPanel = () => {
                   )}
 
                   {config.visualizationType === 'Box Plot' && (
-                    <fieldset fieldset className='fieldset fieldset--boxplot'>
+                    <fieldset className='fieldset fieldset--boxplot'>
                       <legend className=''>Box Plot Settings</legend>
-                      {config.visualizationType === 'Box Plot' && <Select value={config.boxplot.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />}
-                      {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotOutlierValues} fieldName='plotOutlierValues' section='boxplot' label='Plot Outliers' updateField={updateField} />}
-                      {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotNonOutlierValues} fieldName='plotNonOutlierValues' section='boxplot' label='Plot non-outlier values' updateField={updateField} />}
-                      {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />}
-                      <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
+                      <Select value={config.boxplot.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />
+                      <CheckBox value={config.boxplot.plotOutlierValues} fieldName='plotOutlierValues' section='boxplot' label='Plot Outliers' updateField={updateField} />
+                      <CheckBox value={config.boxplot.plotNonOutlierValues} fieldName='plotNonOutlierValues' section='boxplot' label='Plot non-outlier values' updateField={updateField} />
                     </fieldset>
                   )}
 
