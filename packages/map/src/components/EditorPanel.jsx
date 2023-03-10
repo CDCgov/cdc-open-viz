@@ -109,11 +109,11 @@ const EditorPanel = props => {
     })
     // DEV-3303 - since the above was a repair of bad config - need to backpopulate into the state
     setState({
-          ...state,
-          legend: {
-            ...state.legend,
-            specialClasses: specialClasses
-          }
+      ...state,
+      legend: {
+        ...state.legend,
+        specialClasses: specialClasses
+      }
     })
   } else {
     specialClasses = legend.specialClasses || []
@@ -592,6 +592,15 @@ const EditorPanel = props => {
             ...state.legend,
             singleRow: !state.legend.singleRow,
             singleColumn: false
+          }
+        })
+        break
+      case 'legendShowSpecialClassesLast':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            showSpecialClassesLast: !state.legend.showSpecialClassesLast
           }
         })
         break
@@ -2088,6 +2097,17 @@ const EditorPanel = props => {
                         <span className='edit-label'>Single Row Legend</span>
                       </label>
                     )}
+                    {/* always show */}
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={legend.showSpecialClassesLast}
+                        onChange={event => {
+                          handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Show Special Classes Last</span>
+                    </label>
                     {'category' !== legend.type && (
                       <label className='checkbox'>
                         <input type='checkbox' checked={legend.separateZero || false} onChange={event => handleEditorChanges('separateZero', event.target.checked)} />
