@@ -41,7 +41,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   // - if you dont call this on data into LineGroup below, for example
   // then entire data series are removed because of the defined statement
   // i.e. if a series has any bad data points the entire series wont plot
-   const cleanData = (data, testing = false) => {
+  const cleanData = (data, testing = false) => {
     let cleanedup = []
     if (testing) console.log('## Data to clean=', data)
     data.forEach(function (d, i) {
@@ -66,7 +66,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
     })
     if (testing) console.log('## cleanedData =', cleanedup)
     return cleanedup
-   }
+  }
 
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
