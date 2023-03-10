@@ -98,6 +98,27 @@ const EditorPanel = props => {
     })
   }
 
+  let specialClasses = []
+  if (legend.specialClasses && legend.specialClasses.length && typeof legend.specialClasses[0] === 'string') {
+    legend.specialClasses.forEach(specialClass => {
+      specialClasses.push({
+        key: state.columns.primary && state.columns.primary.name ? state.columns.primary.name : columnsInData[0],
+        value: specialClass,
+        label: specialClass
+      })
+    })
+    // DEV-3303 - since the above was a repair of bad config - need to backpopulate into the state
+    setState({
+      ...state,
+      legend: {
+        ...state.legend,
+        specialClasses: specialClasses
+      }
+    })
+  } else {
+    specialClasses = legend.specialClasses || []
+  }
+
   const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
     let filterOrder = filter.values
     let [movedItem] = filterOrder.splice(idx1, 1)
@@ -701,7 +722,6 @@ const EditorPanel = props => {
   }
 
   const columnsRequiredChecker = useCallback(() => {
-
     let columnList = []
 
     // Geo is always required
@@ -734,10 +754,9 @@ const EditorPanel = props => {
 
   const editColumn = async (columnName, editTarget, value) => {
     let newSpecialClasses
-
     switch (editTarget) {
       case 'specialClassEdit':
-        newSpecialClasses = Array.from(legend.specialClasses)
+        newSpecialClasses = Array.from(specialClasses)
 
         newSpecialClasses[value.index][value.prop] = value.value
 
@@ -750,7 +769,7 @@ const EditorPanel = props => {
         })
         break
       case 'specialClassDelete':
-        newSpecialClasses = Array.from(legend.specialClasses)
+        newSpecialClasses = Array.from(specialClasses)
 
         newSpecialClasses.splice(value, 1)
 
@@ -763,7 +782,7 @@ const EditorPanel = props => {
         })
         break
       case 'specialClassAdd':
-        newSpecialClasses = legend.specialClasses
+        newSpecialClasses = specialClasses
 
         newSpecialClasses.push(value)
 
@@ -1055,19 +1074,6 @@ const EditorPanel = props => {
       }
     })
   })
-
-  let specialClasses = []
-  if (legend.specialClasses && legend.specialClasses.length && typeof legend.specialClasses[0] === 'string') {
-    legend.specialClasses.forEach(specialClass => {
-      specialClasses.push({
-        key: state.columns.primary && state.columns.primary.name ? state.columns.primary.name : columnsInData[0],
-        value: specialClass,
-        label: specialClass
-      })
-    })
-  } else {
-    specialClasses = legend.specialClasses || []
-  }
 
   const additionalColumns = Object.keys(state.columns).filter(value => {
     const defaultCols = ['geo', 'navigate', 'primary', 'latitude', 'longitude']
@@ -2093,15 +2099,15 @@ const EditorPanel = props => {
                     )}
                     {/* always show */}
                     <label className='checkbox'>
-                        <input
-                          type='checkbox'
-                          checked={legend.showSpecialClassesLast}
-                          onChange={event => {
-                            handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)
-                          }}
-                        />
-                        <span className='edit-label'>Show Special Classes Last</span>
-                      </label>
+                      <input
+                        type='checkbox'
+                        checked={legend.showSpecialClassesLast}
+                        onChange={event => {
+                          handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Show Special Classes Last</span>
+                    </label>
                     {'category' !== legend.type && (
                       <label className='checkbox'>
                         <input type='checkbox' checked={legend.separateZero || false} onChange={event => handleEditorChanges('separateZero', event.target.checked)} />
