@@ -94,6 +94,18 @@ export default function LinearChart() {
       }
     }
 
+    // DEV-3263 - If Confidence Intervals in data, then need to account for increased height in max for YScale
+    if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') {
+      let ciYMax = 0
+      if (config.hasOwnProperty('confidenceKeys')) {
+        let upperCIValues = data.map(function (d) {
+          return d[config.confidenceKeys.upper]
+        })
+        ciYMax = Math.max.apply(Math, upperCIValues)
+        if (ciYMax > max) max = ciYMax // bump up the max
+      }
+    }
+
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
       min = 0
     }
