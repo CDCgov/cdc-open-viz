@@ -33,6 +33,7 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
+  
   // Make sure the chart is visible if in the editor
   useEffect(() => {
     const element = document.querySelector('.isEditor')
@@ -76,6 +77,18 @@ export default function LinearChart() {
   if (data) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
+
+    // DEV-3263 - If Confidence Intervals in data, then need to account for increased height in max for YScale
+    if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') {
+      let ciYMax = 0;
+      if (config.hasOwnProperty('confidenceKeys')) {
+        let upperCIValues = data.map(function(d) { 
+          return d[config.confidenceKeys.upper]; 
+        })
+        ciYMax = Math.max.apply(Math, upperCIValues)
+        if (ciYMax > max) max = ciYMax // bump up the max
+      } 
+    }
 
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
       min = 0
