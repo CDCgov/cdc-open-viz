@@ -17,9 +17,9 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
+import * as allCurves from '@visx/curve'
 
 /* eslint-disable react-hooks/rules-of-hooks */
-
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
 
@@ -76,7 +76,8 @@ const CheckBox = memo(({ label, value, fieldName, section = null, subsection = n
       type='checkbox'
       name={fieldName}
       checked={value}
-      onChange={() => {
+      onChange={e => {
+        e.preventDefault()
         updateField(section, subsection, fieldName, !value)
       }}
       {...attributes}
@@ -206,17 +207,11 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, pairedBarPalettes, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
-  const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)
-  useEffect(() => {
-    if (paletteName) updateConfig({ ...config, palette: paletteName })
-  }, [paletteName]) // eslint-disable-line
 
-  useEffect(() => {
-    dispatch({ type: 'GET_PALETTE', payload: colorPalettes, paletteName: config.palette })
-  }, [dispatch, config.palette]) // eslint-disable-line
+  const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
   // when the visualization type changes we
   // have to update the individual series type & axis details
@@ -287,7 +282,6 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
-
     if (section === 'boxplot' && subsection === 'legend') {
       updateConfig({
         ...config,
@@ -326,8 +320,6 @@ const EditorPanel = () => {
     const isArray = Array.isArray(config[section])
 
     let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
-
-    console.log('section value', sectionValue)
 
     if (null !== subsection) {
       if (isArray) {
@@ -631,7 +623,7 @@ const EditorPanel = () => {
     let seriesOrder = config.series
     let [movedItem] = seriesOrder.splice(idx1, 1)
     seriesOrder.splice(idx2, 0, movedItem)
-    updateConfig({ ...config, series: seriesOrder })
+    updateConfig({ ...config, series: seriesOrder })    
   }
 
   if (config.isLollipopChart && config?.series?.length > 1) {
@@ -694,6 +686,8 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
+  const enabledChartTypes = ['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line', 'Area Chart', 'Scatter Plot', 'Box Plot']
+
   return (
     <ErrorBoundary component='EditorPanel'>
       {config.newViz && <Confirm />}
@@ -713,7 +707,7 @@ const EditorPanel = () => {
                   <AccordionItemButton>General</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line']} />
+                  <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />
 
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
@@ -832,13 +826,19 @@ const EditorPanel = () => {
                             {provided => (
                               <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
                                 {config.series.map((series, i) => {
-                                  if (config.visualizationType === 'Combo') {
+                                  if (config.visualizationType === 'Combo' || 'Area Chart') {
                                     let changeType = (i, value) => {
                                       let series = [...config.series]
                                       series[i].type = value
 
                                       series[i].axis = 'Left'
 
+                                      updateConfig({ ...config, series })
+                                    }
+
+                                    let changeLineType = (i, value) => {
+                                      let series = [...config.series]
+                                      series[i].lineType = value
                                       updateConfig({ ...config, series })
                                     }
 
@@ -853,11 +853,33 @@ const EditorPanel = () => {
                                         <option value='' default>
                                           Select
                                         </option>
-                                        <option value='Bar'>Bar</option>
+                                        {config.visualizationType === 'Combo' && <option value='Bar'>Bar</option>}
                                         <option value='Line'>Solid Line</option>
                                         <option value='dashed-sm'>Small Dashed</option>
                                         <option value='dashed-md'>Medium Dashed</option>
                                         <option value='dashed-lg'>Large Dashed</option>
+                                      </select>
+                                    )
+
+                                    const lineType = (
+                                      <select
+                                        value={series.lineStyle}
+                                        onChange={event => {
+                                          changeLineType(i, event.target.value)
+                                        }}
+                                        style={{ width: '100px', marginRight: '10px' }}
+                                      >
+                                        <option value='' default>
+                                          Select
+                                        </option>
+                                        <option value='curveMonotoneY'>Monotone Y</option>
+                                        <option value='curveMonotoneX'>Monotone X</option>
+                                        <option value='curveLinear'>Linear</option>
+                                        <option value='curveNatural'>Natural</option>
+                                        <option value='curveStep'>Step</option>
+                                        {Object.keys(allCurves).map(curveName => (
+                                          <option key={`curve-option-${curveName}`} value={curveName}>{curveName}</option>
+                                        ))}
                                       </select>
                                     )
 
@@ -870,11 +892,16 @@ const EditorPanel = () => {
                                                 <div className='series-list__name-text'>{series.dataKey}</div>
                                               </div>
                                               <span>
-                                                <span className='series-list__dropdown'>{typeDropdown}</span>
-                                                {config.series && config.series.length > 1 && (
-                                                  <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                                    &#215;
-                                                  </button>
+                                                {(config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && (
+                                                  <>
+                                                    <span className='series-list__dropdown'>{typeDropdown}</span>
+                                                    <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>
+                                                    {config.series && config.series.length > 1 && (
+                                                      <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
+                                                        &#215;
+                                                      </button>
+                                                    )}
+                                                  </>
                                                 )}
                                               </span>
                                             </div>
@@ -1237,7 +1264,9 @@ const EditorPanel = () => {
                           </Tooltip>
                         }
                       />
-                      <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} />
+
+                      {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
+                      {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
                       {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
                       {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Display Gridlines' updateField={updateField} />}
                     </>
@@ -1518,7 +1547,16 @@ const EditorPanel = () => {
                       <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min='1' section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
 
                       <TextField value={config.xAxis.size} type='number' min='0' section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />
-                      <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} />
+
+                      {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
+                      {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
+
+                      {config.xAxis.type === 'continuous' && (
+                        <>
+                          <CheckBox value={config.dataFormat.bottomCommas} section='dataFormat' fieldName='bottomCommas' label='Add commas' updateField={updateField} />
+                          <TextField value={config.dataFormat.bottomRoundTo} type='number' section='dataFormat' fieldName='bottomRoundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
+                        </>
+                      )}
 
                       {config.yAxis.labelPlacement !== 'Below Bar' && <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       {config.orientation === 'horizontal' ? (
@@ -1613,24 +1651,26 @@ const EditorPanel = () => {
                       </>
                     )}
                   </fieldset> */}
-                  <CheckBox
-                    value={config.legend.hide}
-                    section='legend'
-                    fieldName='hide'
-                    label='Hide Legend'
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                  <CheckBox value={config.legend.showLegendValuesTooltip} section='legend' fieldName='showLegendValuesTooltip' label='Show Legend Values in Tooltip' updateField={updateField} />
+                  {config.visualizationType !== 'Box Plot' && (
+                    <CheckBox
+                      value={config.legend.hide ? true : false}
+                      section='legend'
+                      fieldName='hide'
+                      label='Hide Legend'
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  )}
+                  <CheckBox value={config.legend.showLegendValuesTooltip ? true : false} section='legend' fieldName='showLegendValuesTooltip' label='Show Legend Values in Tooltip' updateField={updateField} />
 
                   {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
                     <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
@@ -1765,7 +1805,7 @@ const EditorPanel = () => {
                     </>
                   )}
 
-                  {config.visualizationType === 'Box Plot' &&
+                  {config.visualizationType === 'Box Plot' && (
                     <fieldset fieldset className='fieldset fieldset--boxplot'>
                       <legend className=''>Box Plot Settings</legend>
                       {config.visualizationType === 'Box Plot' && <Select value={config.boxplot.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />}
@@ -1774,7 +1814,7 @@ const EditorPanel = () => {
                       {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />}
                       <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
                     </fieldset>
-                  }
+                  )}
 
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
                   {config.visualizationType !== 'Box Plot' && config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
@@ -1808,72 +1848,107 @@ const EditorPanel = () => {
                     <span className='edit-label'>Chart Color Palette</span>
                   </label>
                   {/* eslint-enable */}
-                  {/* <InputCheckbox fieldName='isPaletteReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
-                  <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={isPaletteReversed} />
-                  <span>Sequential</span>
-                  <ul className='color-palette'>
-                    {filteredPallets.map(palette => {
-                      const colorOne = {
-                        backgroundColor: colorPalettes[palette][2]
-                      }
+                  {config.visualizationType !== 'Paired Bar' && (
+                    <>
+                      <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.isPaletteReversed} />
+                      <span>Sequential</span>
+                      <ul className='color-palette'>
+                        {sequential.map(palette => {
+                          const colorOne = {
+                            backgroundColor: colorPalettes[palette][2]
+                          }
 
-                      const colorTwo = {
-                        backgroundColor: colorPalettes[palette][3]
-                      }
+                          const colorTwo = {
+                            backgroundColor: colorPalettes[palette][3]
+                          }
 
-                      const colorThree = {
-                        backgroundColor: colorPalettes[palette][5]
-                      }
+                          const colorThree = {
+                            backgroundColor: colorPalettes[palette][5]
+                          }
 
-                      return (
-                        <button
-                          title={palette}
-                          key={palette}
-                          onClick={e => {
-                            e.preventDefault()
-                            updateConfig({ ...config, palette })
-                          }}
-                          className={config.palette === palette ? 'selected' : ''}
-                        >
-                          <span style={colorOne}></span>
-                          <span style={colorTwo}></span>
-                          <span style={colorThree}></span>
-                        </button>
-                      )
-                    })}
-                  </ul>
-                  <span>Non-Sequential</span>
-                  <ul className='color-palette'>
-                    {filteredQualitative.map(palette => {
-                      const colorOne = {
-                        backgroundColor: colorPalettes[palette][2]
-                      }
+                          return (
+                            <button
+                              title={palette}
+                              key={palette}
+                              onClick={e => {
+                                e.preventDefault()
+                                updateConfig({ ...config, palette })
+                              }}
+                              className={config.palette === palette ? 'selected' : ''}
+                            >
+                              <span style={colorOne}></span>
+                              <span style={colorTwo}></span>
+                              <span style={colorThree}></span>
+                            </button>
+                          )
+                        })}
+                      </ul>
+                      <span>Non-Sequential</span>
+                      <ul className='color-palette'>
+                        {nonSequential.map(palette => {
+                          const colorOne = {
+                            backgroundColor: colorPalettes[palette][2]
+                          }
 
-                      const colorTwo = {
-                        backgroundColor: colorPalettes[palette][4]
-                      }
+                          const colorTwo = {
+                            backgroundColor: colorPalettes[palette][4]
+                          }
 
-                      const colorThree = {
-                        backgroundColor: colorPalettes[palette][6]
-                      }
+                          const colorThree = {
+                            backgroundColor: colorPalettes[palette][6]
+                          }
 
-                      return (
-                        <button
-                          title={palette}
-                          key={palette}
-                          onClick={e => {
-                            e.preventDefault()
-                            updateConfig({ ...config, palette })
-                          }}
-                          className={config.palette === palette ? 'selected' : ''}
-                        >
-                          <span style={colorOne}></span>
-                          <span style={colorTwo}></span>
-                          <span style={colorThree}></span>
-                        </button>
-                      )
-                    })}
-                  </ul>
+                          return (
+                            <button
+                              title={palette}
+                              key={palette}
+                              onClick={e => {
+                                e.preventDefault()
+                                updateConfig({ ...config, palette })
+                              }}
+                              className={config.palette === palette ? 'selected' : ''}
+                            >
+                              <span style={colorOne}></span>
+                              <span style={colorTwo}></span>
+                              <span style={colorThree}></span>
+                            </button>
+                          )
+                        })}
+                      </ul>
+                    </>
+                  )}
+
+                  {config.visualizationType === 'Paired Bar' && (
+                    <>
+                      <InputToggle section='pairedBar' fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.pairedBar.isPaletteReversed} />
+                      <ul className='color-palette'>
+                        {twoColorPalettes.map(palette => {
+                          const colorOne = {
+                            backgroundColor: pairedBarPalettes[palette][0]
+                          }
+
+                          const colorTwo = {
+                            backgroundColor: pairedBarPalettes[palette][1]
+                          }
+
+                          return (
+                            <button
+                              title={palette}
+                              key={palette}
+                              onClick={e => {
+                                e.preventDefault()
+                                updateConfig({ ...config, pairedBar: { ...config.pairedBar, palette } })
+                              }}
+                              className={config.pairedBar.palette === palette ? 'selected' : ''}
+                            >
+                              <span className='two-color' style={colorOne}></span>
+                              <span className='two-color' style={colorTwo}></span>
+                            </button>
+                          )
+                        })}
+                      </ul>
+                    </>
+                  )}
 
                   {config.visualizationType !== 'Pie' && (
                     <>
@@ -1976,7 +2051,7 @@ const EditorPanel = () => {
           {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
         </section>
       </section>
-    </ErrorBoundary >
+    </ErrorBoundary>
   )
 }
 

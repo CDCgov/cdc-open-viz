@@ -4,7 +4,7 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
-import { scaleLinear, scalePoint, scaleBand } from '@visx/scale'
+import { scaleLinear, scalePoint, scaleBand, scaleTime } from '@visx/scale'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 
 import CoveScatterPlot from './ScatterPlot'
@@ -14,6 +14,7 @@ import ConfigContext from '../ConfigContext'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
 import CoveBoxPlot from './BoxPlot'
+import CoveAreaChart from './AreaChart'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import '../scss/LinearChart.scss'
@@ -32,6 +33,7 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
+  
   // Make sure the chart is visible if in the editor
   useEffect(() => {
     const element = document.querySelector('.isEditor')
@@ -39,7 +41,7 @@ export default function LinearChart() {
       // parent element is visible
       setAnimatedChart(prevState => true)
     }
-  })
+  }) // eslint-disable-line
 
   // If the chart is in view, set to animate if it has not already played
   useEffect(() => {
@@ -75,6 +77,18 @@ export default function LinearChart() {
   if (data) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
+
+    // DEV-3263 - If Confidence Intervals in data, then need to account for increased height in max for YScale
+    if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') {
+      let ciYMax = 0;
+      if (config.hasOwnProperty('confidenceKeys')) {
+        let upperCIValues = data.map(function(d) { 
+          return d[config.confidenceKeys.upper]; 
+        })
+        ciYMax = Math.max.apply(Math, upperCIValues)
+        if (ciYMax > max) max = ciYMax // bump up the max
+      } 
+    }
 
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
       min = 0
@@ -119,6 +133,9 @@ export default function LinearChart() {
         case maxDataVal > 4 && maxDataVal <= 7:
           max = max * 1.1
           break
+        default:
+          // do nothing
+          break
       }
     }
 
@@ -131,8 +148,8 @@ export default function LinearChart() {
       yScale =
         config.runtime.xAxis.type === 'date'
           ? scaleLinear({
-              domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
-            })
+            domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
+          })
           : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
       seriesScale = scalePoint({
@@ -157,6 +174,13 @@ export default function LinearChart() {
 
       seriesScale = scalePoint({
         domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
+        range: [0, xMax]
+      })
+    }
+
+    if (config.visualizationType === 'Area Chart' && config.xAxis.type === 'date') {
+      xScale = scaleTime({
+        domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)],
         range: [0, xMax]
       })
     }
@@ -204,7 +228,8 @@ export default function LinearChart() {
 
   const handleBottomTickFormatting = tick => {
     if (config.runtime.xAxis.type === 'date') return formatDate(tick)
-    if (config.orientation === 'horizontal') return formatNumber(tick, 'bottom')
+    if (config.orientation === 'horizontal') return formatNumber(tick, 'left')
+    if (config.xAxis.type === 'continuous' && config.dataFormat.bottomCommas) return formatNumber(tick, 'bottom')
     return tick
   }
 
@@ -246,7 +271,6 @@ export default function LinearChart() {
       if (outlierMax > maxYValue) maxYValue = outlierMax
     }
 
-    const seriesNames = data.map(d => d[config.xAxis.dataKey])
 
     // Set Scales
     yScale = scaleLinear({
@@ -263,9 +287,6 @@ export default function LinearChart() {
     })
   }
 
-  const handleTick = tick => {
-    return config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick
-  }
 
   return isNaN(width) ? (
     <></>
@@ -275,30 +296,30 @@ export default function LinearChart() {
         {/* Higlighted regions */}
         {config.regions
           ? config.regions.map(region => {
-              if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+            if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-              const from = xScale(parseDate(region.from).getTime())
-              const to = xScale(parseDate(region.to).getTime())
-              const width = to - from
+            const from = xScale(parseDate(region.from).getTime())
+            const to = xScale(parseDate(region.to).getTime())
+            const width = to - from
 
-              return (
-                <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
-                  <path
-                    stroke='#333'
-                    d={`M${from} -5
+            return (
+              <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
+                <path
+                  stroke='#333'
+                  d={`M${from} -5
                           L${from} 5
                           M${from} 0
                           L${to} 0
                           M${to} -5
                           L${to} 5`}
-                  />
-                  <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-                  <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-                    {region.label}
-                  </Text>
-                </Group>
-              )
-            })
+                />
+                <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+                <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+                  {region.label}
+                </Text>
+              </Group>
+            )
+          })
           : ''}
 
         {/* Y axis */}
@@ -528,14 +549,14 @@ export default function LinearChart() {
         {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
 
         {/* Bar chart */}
-        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
+        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && (
           <>
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
           </>
         )}
 
         {/* Line chart */}
-        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
+        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && (
           <>
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
           </>
@@ -546,6 +567,7 @@ export default function LinearChart() {
 
         {/* Box Plot chart */}
         {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
+        {config.visualizationType === 'Area Chart' && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} />}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
