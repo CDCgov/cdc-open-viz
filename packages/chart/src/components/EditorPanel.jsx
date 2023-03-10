@@ -19,8 +19,6 @@ import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import * as allCurves from '@visx/curve'
 
-console.log('alllll curves', allCurves)
-
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -336,7 +334,6 @@ const EditorPanel = () => {
 
     let updatedConfig = { ...config, [section]: sectionValue }
 
-    console.log('section value', updatedConfig)
     enforceRestrictions(updatedConfig)
 
     updateConfig(updatedConfig)
@@ -559,7 +556,6 @@ const EditorPanel = () => {
   useEffect(() => {
     // Pass up to Editor if needed
     if (setParentConfig) {
-      console.log('setting parent config')
       const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
@@ -627,7 +623,7 @@ const EditorPanel = () => {
     let seriesOrder = config.series
     let [movedItem] = seriesOrder.splice(idx1, 1)
     seriesOrder.splice(idx2, 0, movedItem)
-    updateConfig({ ...config, series: seriesOrder })
+    updateConfig({ ...config, series: seriesOrder })    
   }
 
   if (config.isLollipopChart && config?.series?.length > 1) {
@@ -882,7 +878,7 @@ const EditorPanel = () => {
                                         <option value='curveNatural'>Natural</option>
                                         <option value='curveStep'>Step</option>
                                         {Object.keys(allCurves).map(curveName => (
-                                          <option value={curveName}>{curveName}</option>
+                                          <option key={`curve-option-${curveName}`} value={curveName}>{curveName}</option>
                                         ))}
                                       </select>
                                     )
