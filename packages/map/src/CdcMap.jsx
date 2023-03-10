@@ -177,8 +177,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
   // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
+  // eslint-disable-next-line
   const addUIDs = useCallback((obj, fromColumn) => {
-    // eslint-disable-line
     obj.data.forEach(row => {
       let uid = null
 
@@ -254,10 +254,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     obj.data.fromColumn = fromColumn
   })
 
+  // eslint-disable-next-line
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
-    // eslint-disable-line
     const newLegendMemo = new Map() // Reset memoization
-    var primaryCol = obj.columns.primary.name,
+    let primaryCol = obj.columns.primary.name,
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
       type = obj.legend.type,
@@ -543,9 +543,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           let min = removedRows[0][primaryCol],
             max = removedRows[removedRows.length - 1][primaryCol]
 
+          // eslint-disable-next-line
           removedRows.forEach(row => {
-            // eslint-disable-line
-            newLegendMemo.set(hashObj(row), result.length) // eslint-disable-line
+            newLegendMemo.set(hashObj(row), result.length)
           })
 
           result.push({
@@ -582,7 +582,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           breaks.unshift(0)
         }
 
-        breaks.foreach((item, index) => {
+        // eslint-disable-next-line array-callback-return
+        breaks.map((item, index) => {
           const setMin = index => {
             let min = breaks[index]
 
@@ -710,6 +711,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     result.forEach((row, i) => {
       row.bin = i // set bin number to index
     })
+
     // Move all special legend items from "Special Classes"  to the end of the legend
     if (state.legend.showSpecialClassesLast) {
       let specialRows = result.filter(d => d.special === true)
@@ -721,8 +723,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     return result
   })
 
+  // eslint-disable-next-line
   const generateRuntimeFilters = useCallback((obj, hash, runtimeFilters) => {
-    // eslint-disable-line
     if (typeof obj === 'undefined' || undefined === obj.filters || obj.filters.length === 0) return []
 
     let filters = []
@@ -774,8 +776,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   })
 
   // Calculates what's going to be displayed on the map and data table at render.
+  // eslint-disable-next-line
   const generateRuntimeData = useCallback((obj, filters, hash, test) => {
-    // eslint-disable-line
     try {
       const result = {}
 
@@ -969,7 +971,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
     }
 
-
     toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
     if (('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode' || state.general.type === 'world-geocode') && undefined !== row) {
@@ -1135,7 +1136,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // If world-geocode map zoom to geo point
     if ('world-geocode' === state.general.type) {
-
       let lat = value[state.columns.latitude.name]
       let long = value[state.columns.longitude.name]
 
