@@ -756,7 +756,7 @@ const EditorPanel = props => {
     let newSpecialClasses
     switch (editTarget) {
       case 'specialClassEdit':
-        newSpecialClasses = Array.from(specialClasses) // was legend.specialClasses
+        newSpecialClasses = Array.from(specialClasses)
 
         newSpecialClasses[value.index][value.prop] = value.value
 
@@ -769,7 +769,7 @@ const EditorPanel = props => {
         })
         break
       case 'specialClassDelete':
-        newSpecialClasses = Array.from(specialClasses) // was legend.specialClasses
+        newSpecialClasses = Array.from(specialClasses)
 
         newSpecialClasses.splice(value, 1)
 
@@ -782,7 +782,7 @@ const EditorPanel = props => {
         })
         break
       case 'specialClassAdd':
-        newSpecialClasses = specialClasses // was legend.specialClasses
+        newSpecialClasses = specialClasses
 
         newSpecialClasses.push(value)
 
