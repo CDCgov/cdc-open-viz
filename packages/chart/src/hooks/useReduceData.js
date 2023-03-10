@@ -57,6 +57,7 @@ function useReduceData(config, data) {
     } else {
       max = Math.max(...data.map(d => Math.max(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
     }
+    //console.log("NOTE if you comment this out line chart does not work - max",max)
     return max
   }
 
@@ -64,6 +65,7 @@ function useReduceData(config, data) {
     let min
     const minNumberFromData = Math.min(...data.map(d => Math.min(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 1000000000)))))
     min = String(minNumberFromData)
+      //console.log("min",min)
     return min
   }
 

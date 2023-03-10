@@ -267,7 +267,7 @@
     },
     {
       "Category": "1",
-      "Values": "0.5",
+      "Values": "1",
       "Filter": "Small"
     },
     {
@@ -277,12 +277,12 @@
     },
     {
       "Category": "3",
-      "Values": "1.5",
+      "Values": "1",
       "Filter": "Small"
     },
     {
       "Category": "4",
-      "Values": "1.7",
+      "Values": "2",
       "Filter": "Small"
     },
     {
@@ -302,7 +302,7 @@
     },
     {
       "Category": "8",
-      "Values": "0.4",
+      "Values": "1",
       "Filter": "Small"
     }
   ],
