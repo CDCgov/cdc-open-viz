@@ -574,6 +574,15 @@ const EditorPanel = props => {
           }
         })
         break
+      case 'legendShowSpecialClassesLast':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            showSpecialClassesLast: !state.legend.showSpecialClassesLast
+          }
+        })
+        break
       case 'dynamicDescription':
         setState({
           ...state,
@@ -692,7 +701,7 @@ const EditorPanel = props => {
   }
 
   const columnsRequiredChecker = useCallback(() => {
-    console.info('Running columns required check.')
+
     let columnList = []
 
     // Geo is always required
@@ -2082,6 +2091,17 @@ const EditorPanel = props => {
                         <span className='edit-label'>Single Row Legend</span>
                       </label>
                     )}
+                    {/* always show */}
+                    <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={legend.showSpecialClassesLast}
+                          onChange={event => {
+                            handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Show Special Classes Last</span>
+                      </label>
                     {'category' !== legend.type && (
                       <label className='checkbox'>
                         <input type='checkbox' checked={legend.separateZero || false} onChange={event => handleEditorChanges('separateZero', event.target.checked)} />
