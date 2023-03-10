@@ -207,17 +207,11 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, pairedBarPalettes, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
-  const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)
-  useEffect(() => {
-    if (paletteName) updateConfig({ ...config, palette: paletteName })
-  }, [paletteName]) // eslint-disable-line
 
-  useEffect(() => {
-    dispatch({ type: 'GET_PALETTE', payload: colorPalettes, paletteName: config.palette })
-  }, [dispatch, config.palette]) // eslint-disable-line
+  const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
   // when the visualization type changes we
   // have to update the individual series type & axis details
@@ -946,9 +940,7 @@ const EditorPanel = () => {
                                         </option>
 
                                         {Object.keys(allCurves).map(curveName => (
-                                          <option value={curveName} key={curveName}>
-                                            {curveName}
-                                          </option>
+                                          <option key={`curve-option-${curveName}`} value={curveName}>{curveName}</option>
                                         ))}
                                       </select>
                                     )
@@ -1989,72 +1981,107 @@ const EditorPanel = () => {
                     <span className='edit-label'>Chart Color Palette</span>
                   </label>
                   {/* eslint-enable */}
-                  {/* <InputCheckbox fieldName='isPaletteReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
-                  <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={isPaletteReversed} />
-                  <span>Sequential</span>
-                  <ul className='color-palette'>
-                    {filteredPallets.map(palette => {
-                      const colorOne = {
-                        backgroundColor: colorPalettes[palette][2]
-                      }
+                  {config.visualizationType !== 'Paired Bar' && (
+                    <>
+                      <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.isPaletteReversed} />
+                      <span>Sequential</span>
+                      <ul className='color-palette'>
+                        {sequential.map(palette => {
+                          const colorOne = {
+                            backgroundColor: colorPalettes[palette][2]
+                          }
 
-                      const colorTwo = {
-                        backgroundColor: colorPalettes[palette][3]
-                      }
+                          const colorTwo = {
+                            backgroundColor: colorPalettes[palette][3]
+                          }
 
-                      const colorThree = {
-                        backgroundColor: colorPalettes[palette][5]
-                      }
+                          const colorThree = {
+                            backgroundColor: colorPalettes[palette][5]
+                          }
 
-                      return (
-                        <button
-                          title={palette}
-                          key={palette}
-                          onClick={e => {
-                            e.preventDefault()
-                            updateConfig({ ...config, palette })
-                          }}
-                          className={config.palette === palette ? 'selected' : ''}
-                        >
-                          <span style={colorOne}></span>
-                          <span style={colorTwo}></span>
-                          <span style={colorThree}></span>
-                        </button>
-                      )
-                    })}
-                  </ul>
-                  <span>Non-Sequential</span>
-                  <ul className='color-palette'>
-                    {filteredQualitative.map(palette => {
-                      const colorOne = {
-                        backgroundColor: colorPalettes[palette][2]
-                      }
+                          return (
+                            <button
+                              title={palette}
+                              key={palette}
+                              onClick={e => {
+                                e.preventDefault()
+                                updateConfig({ ...config, palette })
+                              }}
+                              className={config.palette === palette ? 'selected' : ''}
+                            >
+                              <span style={colorOne}></span>
+                              <span style={colorTwo}></span>
+                              <span style={colorThree}></span>
+                            </button>
+                          )
+                        })}
+                      </ul>
+                      <span>Non-Sequential</span>
+                      <ul className='color-palette'>
+                        {nonSequential.map(palette => {
+                          const colorOne = {
+                            backgroundColor: colorPalettes[palette][2]
+                          }
 
-                      const colorTwo = {
-                        backgroundColor: colorPalettes[palette][4]
-                      }
+                          const colorTwo = {
+                            backgroundColor: colorPalettes[palette][4]
+                          }
 
-                      const colorThree = {
-                        backgroundColor: colorPalettes[palette][6]
-                      }
+                          const colorThree = {
+                            backgroundColor: colorPalettes[palette][6]
+                          }
 
-                      return (
-                        <button
-                          title={palette}
-                          key={palette}
-                          onClick={e => {
-                            e.preventDefault()
-                            updateConfig({ ...config, palette })
-                          }}
-                          className={config.palette === palette ? 'selected' : ''}
-                        >
-                          <span style={colorOne}></span>
-                          <span style={colorTwo}></span>
-                          <span style={colorThree}></span>
-                        </button>
-                      )
-                    })}
-                  </ul>
+                          return (
+                            <button
+                              title={palette}
+                              key={palette}
+                              onClick={e => {
+                                e.preventDefault()
+                                updateConfig({ ...config, palette })
+                              }}
+                              className={config.palette === palette ? 'selected' : ''}
+                            >
+                              <span style={colorOne}></span>
+                              <span style={colorTwo}></span>
+                              <span style={colorThree}></span>
+                            </button>
+                          )
+                        })}
+                      </ul>
+                    </>
+                  )}
+
+                  {config.visualizationType === 'Paired Bar' && (
+                    <>
+                      <InputToggle section='pairedBar' fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.pairedBar.isPaletteReversed} />
+                      <ul className='color-palette'>
+                        {twoColorPalettes.map(palette => {
+                          const colorOne = {
+                            backgroundColor: pairedBarPalettes[palette][0]
+                          }
+
+                          const colorTwo = {
+                            backgroundColor: pairedBarPalettes[palette][1]
+                          }
+
+                          return (
+                            <button
+                              title={palette}
+                              key={palette}
+                              onClick={e => {
+                                e.preventDefault()
+                                updateConfig({ ...config, pairedBar: { ...config.pairedBar, palette } })
+                              }}
+                              className={config.pairedBar.palette === palette ? 'selected' : ''}
+                            >
+                              <span className='two-color' style={colorOne}></span>
+                              <span className='two-color' style={colorTwo}></span>
+                            </button>
+                          )
+                        })}
+                      </ul>
+                    </>
+                  )}
 
                   {visHasDataCutoff() && (
                     <>
