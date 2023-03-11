@@ -151,8 +151,8 @@ const DataTable = props => {
   const DownloadButton = memo(() => {
 
     let csvData;
-    //debugger;
-    console.log("state.columns.geo.name",state.columns.geo.name)
+
+/*     console.log("state.columns.geo.name",state.columns.geo.name)
     if (state.general.geoType === 'us-county' || state.general.geoType === 'single-state') {
       // if county or single state have to look up based on fips codes
       csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[state.columns.geo.name]), ...row })))
@@ -162,7 +162,9 @@ const DataTable = props => {
     } else {
       //csvData = Papa.unparse(rawData)
       csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[state.columns.geo.name]), ...row })))
-    }
+    } */
+    csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[state.columns.geo.name]), ...row })))
+ 
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
 
     const saveBlob = () => {
