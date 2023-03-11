@@ -782,6 +782,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         value: hash
       })
 
+      addUIDs(obj, obj.columns.geo.name)
       obj.data.forEach(row => {
         if (test) {
           console.log('object', obj)
@@ -959,7 +960,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
     }
 
-
     toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
     if (('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode' || state.general.type === 'world-geocode') && undefined !== row) {
@@ -1125,7 +1125,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // If world-geocode map zoom to geo point
     if ('world-geocode' === state.general.type) {
-
       let lat = value[state.columns.latitude.name]
       let long = value[state.columns.longitude.name]
 
