@@ -1,4 +1,4 @@
-import React, { useEffect, memo, useRef } from 'react'
+import React, { useEffect, useState, memo, useRef } from 'react'
 
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import { feature } from 'topojson-client'
@@ -9,6 +9,7 @@ import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import topoJSON from '../data/county-map.json'
+import { formatPrefix } from 'd3'
 
 const sortById = (a, b) => {
   if (a.id < b.id) return -1
@@ -61,6 +62,8 @@ function CountyMapChecks(prevState, nextState) {
 const CountyMap = props => {
   const { state, runtimeLegend, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels } = props
 
+  const [focus, setFocus] = useState({})
+
   useEffect(() => {
     if (containerEl) {
       if (containerEl.className.indexOf('loaded') === -1) {
@@ -73,10 +76,12 @@ const CountyMap = props => {
   const canvasRef = useRef()
   const tooltipRef = useRef()
 
+  const runtimeKeys = Object.keys(data)
+
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const onReset = () => {
-    drawCanvas()
+    setFocus({})
   }
 
   const canvasClick = e => {
@@ -112,7 +117,23 @@ const CountyMap = props => {
       }
 
       // Redraw with focus on state
-      drawCanvas(clickedState.id, geoCentroid(clickedState))
+      setFocus({ id: clickedState.id, center: geoCentroid(clickedState) })
+    }
+
+    if (state.general.type === 'us-geocode') {
+      const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
+      let clickedGeo
+      for (let i = 0; i < runtimeKeys.length; i++) {
+        const pixelCoords = projection([data[runtimeKeys[i]][state.columns.longitude.name], data[runtimeKeys[i]][state.columns.latitude.name]])
+        if (Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
+          clickedGeo = data[runtimeKeys[i]]
+          break
+        }
+      }
+
+      if (clickedGeo) {
+        geoClickHandler(displayGeoName(clickedGeo[state.columns.geo.name]), clickedGeo)
+      }
     }
   }
 
@@ -125,63 +146,98 @@ const CountyMap = props => {
     const y = e.clientY - canvasBounds.top
     let pointCoordinates = projection.invert([x, y])
 
-    let currentTooltipIndex = parseInt(tooltipRef.current.getAttribute('data-index'))
-    //If no tooltip is shown, or if the current geo associated with the tooltip shown is no longer containing the mouse, then rerender the tooltip
-    if (isNaN(currentTooltipIndex) || !geoContains(mapData[currentTooltipIndex], pointCoordinates)) {
-      const context = canvas.getContext('2d')
-      const path = geoPath(projection, context)
-      if (!isNaN(currentTooltipIndex)) {
-        context.fillStyle = applyLegendToRow(data[mapData[currentTooltipIndex].id])[0]
-        context.strokeStyle = geoStrokeColor
-        context.beginPath()
-        path(mapData[currentTooltipIndex])
-        context.fill()
-        context.stroke()
-      }
+    const currentTooltipIndex = parseInt(tooltipRef.current.getAttribute('data-index'))
+    const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
 
-      let focusedState = canvas.getAttribute('data-focus')
-      let hoveredState
-      let county
-      let countyIndex
-      // First find the state that is hovered
-      for (let i = 0; i < states.length; i++) {
-        if (geoContains(states[i], pointCoordinates)) {
-          hoveredState = states[i].id
-          break
+    // Handle standard county map hover
+    if (state.general.type !== 'us-geocode') {
+      //If no tooltip is shown, or if the current geo associated with the tooltip shown is no longer containing the mouse, then rerender the tooltip
+      if (isNaN(currentTooltipIndex) || !geoContains(mapData[currentTooltipIndex], pointCoordinates)) {
+        const context = canvas.getContext('2d')
+        const path = geoPath(projection, context)
+        if (!isNaN(currentTooltipIndex)) {
+          context.fillStyle = applyLegendToRow(data[mapData[currentTooltipIndex].id])[0]
+          context.strokeStyle = geoStrokeColor
+          context.beginPath()
+          path(mapData[currentTooltipIndex])
+          context.fill()
+          context.stroke()
         }
-      }
-      // If a state is hovered and it is not an unfocused state, search only the counties within that state for the county hovered
-      if (hoveredState && (focusedState === 'null' || focusedState === hoveredState) && countyIndecies[hoveredState]) {
-        for (let i = countyIndecies[hoveredState][0]; i <= countyIndecies[hoveredState][1]; i++) {
-          if (geoContains(mapData[i], pointCoordinates)) {
-            county = mapData[i]
-            countyIndex = i
+
+        let hoveredState
+        let county
+        let countyIndex
+        // First find the state that is hovered
+        for (let i = 0; i < states.length; i++) {
+          if (geoContains(states[i], pointCoordinates)) {
+            hoveredState = states[i].id
             break
           }
         }
+        // If a state is hovered and it is not an unfocused state, search only the counties within that state for the county hovered
+        if (hoveredState && (!focus.id || focus.id === hoveredState) && countyIndecies[hoveredState]) {
+          for (let i = countyIndecies[hoveredState][0]; i <= countyIndecies[hoveredState][1]; i++) {
+            if (geoContains(mapData[i], pointCoordinates)) {
+              county = mapData[i]
+              countyIndex = i
+              break
+            }
+          }
+        }
+
+        // If the hovered county is found, show the tooltip for that county, otherwise hide the tooltip
+        if (county && data[county.id]) {
+          context.fillStyle = 'white'
+          context.strokeStyle = 'white'
+          context.beginPath()
+          path(mapData[countyIndex])
+          context.fill()
+          context.stroke()
+
+          context.fillStyle = applyLegendToRow(data[county.id])[1]
+          context.strokeStyle = geoStrokeColor
+          context.beginPath()
+          path(mapData[countyIndex])
+          context.fill()
+          context.stroke()
+
+          tooltipRef.current.style.display = 'block'
+          tooltipRef.current.style.top = e.clientY + 'px'
+          tooltipRef.current.style.left = e.clientX + 'px'
+          tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), data[county.id])
+          tooltipRef.current.setAttribute('data-index', countyIndex)
+        } else {
+          tooltipRef.current.style.display = 'none'
+          tooltipRef.current.setAttribute('data-index', null)
+        }
+      }
+    } else {
+      // Handle geo map hover
+      if (!isNaN(currentTooltipIndex)) {
+        const pixelCoords = projection([data[runtimeKeys[currentTooltipIndex]][state.columns.longitude.name], data[runtimeKeys[currentTooltipIndex]][state.columns.latitude.name]])
+        if (Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
+          // Who knew pythagorean theorum was useful
+          return // The user is still hovering over the previous geo point, don't redraw tooltip
+        }
       }
 
-      // If the hovered county is found, show the tooltip for that county, otherwise hide the tooltip
-      if (county && data[county.id]) {
-        context.fillStyle = 'white'
-        context.strokeStyle = 'white'
-        context.beginPath()
-        path(mapData[countyIndex])
-        context.fill()
-        context.stroke()
+      let hoveredGeo
+      let hoveredGeoIndex
+      for (let i = 0; i < runtimeKeys.length; i++) {
+        const pixelCoords = projection([data[runtimeKeys[i]][state.columns.longitude.name], data[runtimeKeys[i]][state.columns.latitude.name]])
+        if (Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
+          hoveredGeo = data[runtimeKeys[i]]
+          hoveredGeoIndex = i
+          break
+        }
+      }
 
-        context.fillStyle = applyLegendToRow(data[county.id])[1]
-        context.strokeStyle = geoStrokeColor
-        context.beginPath()
-        path(mapData[countyIndex])
-        context.fill()
-        context.stroke()
-
+      if (hoveredGeo) {
         tooltipRef.current.style.display = 'block'
         tooltipRef.current.style.top = e.clientY + 'px'
         tooltipRef.current.style.left = e.clientX + 'px'
-        tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), data[county.id])
-        tooltipRef.current.setAttribute('data-index', countyIndex)
+        tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(hoveredGeo[state.columns.geo.name]), hoveredGeo)
+        tooltipRef.current.setAttribute('data-index', hoveredGeoIndex)
       } else {
         tooltipRef.current.style.display = 'none'
         tooltipRef.current.setAttribute('data-index', null)
@@ -190,7 +246,7 @@ const CountyMap = props => {
   }
 
   // Redraws canvas. Takes as parameters the fips id of a state to center on and the [lat,long] center of that state
-  const drawCanvas = (focusId, center) => {
+  const drawCanvas = () => {
     if (canvasRef.current && runtimeLegend.length > 0) {
       const canvas = canvasRef.current
       const context = canvas.getContext('2d')
@@ -202,21 +258,16 @@ const CountyMap = props => {
       projection.scale(canvas.width * 1.25).translate([canvas.width / 2, canvas.height / 2])
 
       // If we are rendering the map without a zoom on a state, hide the reset button
-      if (!focusId) {
-        canvas.setAttribute('data-focus', null)
-        canvas.setAttribute('data-center', null)
+      if (!focus.id) {
         if (resetButton.current) resetButton.current.style.display = 'none'
       } else {
-        // Saves focus info in case redraw is needed without changing focus (resize)
-        canvas.setAttribute('data-focus', focusId)
-        canvas.setAttribute('data-center', JSON.stringify(center))
         if (resetButton.current) resetButton.current.style.display = 'block'
       }
 
       // Centers the projection on the paramter passed
-      if (center) {
+      if (focus.center) {
         projection.scale(canvas.width * 2.5)
-        let offset = projection(center)
+        let offset = projection(focus.center)
         projection.translate([-offset[0] + canvas.width, -offset[1] + canvas.height])
       }
 
@@ -233,13 +284,15 @@ const CountyMap = props => {
         // If invalid geo item, don't render
         if (!geo.id) return
         // If the map is focused on one state, don't render counties that are not in that state
-        if (focusId && geo.id.length > 2 && geo.id.indexOf(focusId) !== 0) return
+        if (focus.id && geo.id.length > 2 && geo.id.indexOf(focus.id) !== 0) return
+        // If rendering a geocode map without a focus, don't render counties
+        if (!focus.id && state.general.type === 'us-geocode' && geo.id.length > 2) return
 
         // Gets numeric data associated with the topo data for this state/county
         const geoData = data[geo.id]
 
         // Marks that the focused state was found for the logic below
-        if (geo.id === focusId) {
+        if (geo.id === focus.id) {
           focusIndex = i
         }
 
@@ -259,6 +312,23 @@ const CountyMap = props => {
         path(mapData[focusIndex])
         context.stroke()
       }
+
+      if (state.general.type === 'us-geocode') {
+        context.strokeStyle = 'black'
+        const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
+
+        runtimeKeys.forEach(key => {
+          const pixelCoords = projection([data[key][state.columns.longitude.name], data[key][state.columns.latitude.name]])
+
+          if (pixelCoords) {
+            context.fillStyle = data[key] !== undefined ? applyLegendToRow(data[key])[0] : '#EEE'
+            context.beginPath()
+            context.arc(pixelCoords[0], pixelCoords[1], geoRadius, 0, 2 * Math.PI)
+            context.fill()
+            context.stroke()
+          }
+        })
+      }
     }
   }
 
@@ -269,7 +339,7 @@ const CountyMap = props => {
 
     const onResize = () => {
       if (canvasRef.current) {
-        drawCanvas(canvasRef.current.getAttribute('data-focus') === 'null' ? undefined : canvasRef.current.getAttribute('data-focus'), canvasRef.current.getAttribute('data-center') ? JSON.parse(canvasRef.current.getAttribute('data-center')) : undefined)
+        drawCanvas()
       }
     }
 
