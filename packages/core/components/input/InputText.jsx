@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef, memo } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 // Third Party
 import { useDebounce } from 'use-debounce'
 import PropTypes from 'prop-types'
 
-// Store
-import useStore from '../../store/store'
+// Hooks
+import { useVisConfig } from '../../hooks/store/useVisConfig'
 
 // Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
@@ -16,51 +16,59 @@ import Label from '../element/Label'
 // Styles
 import '../../styles/v2/components/input/index.scss'
 
-const InputText = memo((
+const InputText = (
   {
     label,
     type = 'text',
     tooltip,
     placeholder,
-    test,
+    required,
 
     configField,
-    value: inlineValue = '',
+    value: inlineValue,
     min, max, className, onChange, ...attributes
   }
 ) => {
   // Store Selectors
-  const { config, updateConfigField } = useStore()
+  const { config, updateVisConfigField } = useVisConfig()
 
   // Input will only accept either an inline value from the element, or a value from a connected config key
-  const [ value, setValue ] = useState(inlineValue)
+  const [ value, setValue ] = useState()
   const [ debouncedValue ] = useDebounce(value, 300)
 
   const inputRef = useRef(null)
 
-  //Set initial value
-  const valueFromConfig = configField && getConfigKeyValue(configField, config) || false
+  // Get initial value
+  const configFieldValue = configField && getConfigKeyValue(configField, config)
 
+  // Check initial value
+  const valueExistsOnConfig = Boolean(configFieldValue && typeof configFieldValue !== undefined)
+
+  // Set initial value
   useEffect(() => {
-    if (valueFromConfig) {
-      valueFromConfig !== value && setValue(getConfigKeyValue(configField, config))
+    if (valueExistsOnConfig) {
+      configFieldValue !== value && setValue(configFieldValue)
     } else {
       setValue(inlineValue)
     }
-  }, [ config ])
+    return () => {
+    }
+  }, [ valueExistsOnConfig ])
 
   useEffect(() => {
-    if (configField) updateConfigField(configField, debouncedValue)
-  }, [ debouncedValue ])
+    if (configField && configFieldValue !== debouncedValue) updateVisConfigField(configField, debouncedValue)
+    return () => {
+    }
+  }, [ configField, debouncedValue, updateVisConfigField ])
 
-  const isNumberWithinBounds = (val) => {
+  const isNumberWithinBounds = val => {
     let inBounds = false
     if (val === '') inBounds = true
     if (min || max) {
-      if (min && (parseFloat(val) >= parseFloat(min))) {
+      if (min && parseFloat(val) >= parseFloat(min)) {
         inBounds = true
       }
-      if (max && (parseFloat(val) <= parseFloat(max))) {
+      if (max && parseFloat(val) <= parseFloat(max)) {
         inBounds = true
       }
     } else {
@@ -69,8 +77,7 @@ const InputText = memo((
     return inBounds
   }
 
-  //TODO: COVE Refactor - Expand to support any additional onChange events included with the call to this component
-  const onChangeHandler = (e) => {
+  const onChangeHandler = e => {
     switch (type) {
       case 'number':
         if (isNumberWithinBounds(e.target.value)) {
@@ -87,16 +94,16 @@ const InputText = memo((
   }
 
   let inputAttrs = {
-    className: `cove-input${'textarea' === type ? ' cove-input--textarea' : ''}${className ? ' ' + className : ''}`,
+    className: `cove-input${'textarea' === type ? ' cove-input--textarea' : ''}${required && (value === undefined || value === '') ? ' cove-input--error' : ''}${className ? ' ' + className : ''}`,
     type,
     placeholder,
-    onChange: onChangeHandler,
+    onChange: (e) => onChangeHandler(e),
     ...attributes
   }
 
   let formElement = 'textarea' === type
-    ? (<textarea {...inputAttrs} ref={inputRef} value={value}/>)
-    : (<input {...inputAttrs} value={value} ref={inputRef}/>)
+    ? (<textarea {...inputAttrs} ref={inputRef} value={value ?? ''}/>)
+    : (<input {...inputAttrs} value={value ?? ''} ref={inputRef}/>)
 
   return (
     <>
@@ -106,28 +113,16 @@ const InputText = memo((
       {formElement}
     </>
   )
-})
+}
 
 InputText.propTypes = {
   label: PropTypes.string,
   type: PropTypes.oneOf([ 'text', 'search', 'textarea', 'number', 'date' ]),
-  value: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number
-  ]),
-  tooltip: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.string
-  ]),
+  value: PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+  tooltip: PropTypes.oneOfType([ PropTypes.object, PropTypes.string ]),
   placeholder: PropTypes.string,
-  min: PropTypes.oneOfType([
-    PropTypes.number,
-    PropTypes.string
-  ]),
-  max: PropTypes.oneOfType([
-    PropTypes.number,
-    PropTypes.string
-  ]),
+  min: PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
+  max: PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
   section: PropTypes.string,
   subsection: PropTypes.string,
   fieldName: PropTypes.string,

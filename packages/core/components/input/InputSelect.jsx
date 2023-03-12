@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState, memo } from 'react'
 import PropTypes from 'prop-types'
 
-// Store
-import useStore from '../../store/store'
+// Hooks
+import { useVisConfig } from '../../hooks/store/useVisConfig'
 
 // Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
@@ -29,22 +29,34 @@ const InputSelect = memo((
   }
 ) => {
   // Store Selectors
-  const { config, updateConfigField } = useStore()
+  const { config, updateVisConfigField } = useVisConfig()
 
-  const [ value, setValue ] = useState(inlineValue)
+  const [ value, setValue ] = useState()
 
   const inputRef = useRef(null)
 
-  //Set initial value
-  const valueFromConfig = configField && getConfigKeyValue(configField, config) || false
+  // Get initial value
+  const configFieldValue = configField && getConfigKeyValue(configField, config)
 
+  // Check initial value
+  const valueExistsOnConfig = Boolean(configFieldValue && typeof configFieldValue !== undefined)
+
+  // Set initial value
   useEffect(() => {
-    if (valueFromConfig) {
-      valueFromConfig !== value && setValue(getConfigKeyValue(configField, config))
+    if (valueExistsOnConfig) {
+      configFieldValue !== value && setValue(configFieldValue)
     } else {
       setValue(inlineValue)
     }
-  }, [ config ])
+  }, [ valueExistsOnConfig ])
+
+  useEffect(() => {
+    // If either no initial option is set, or the option selected is not an initial value
+    if (!isInitial(value)) {
+      // Update a config field value, if configField array was supplied
+      if (configField && value !== configFieldValue) updateVisConfigField(configField, value)
+    }
+  }, [ configField, value, updateVisConfigField ])
 
   const isInitial = (checkValue) => {
     return initial && (checkValue === initial || checkValue === '')
@@ -76,12 +88,6 @@ const InputSelect = memo((
     let eventValue = e.target.value
     setValue(eventValue)
 
-    // If either no initial option is set, or the option selected is not an initial value
-    if (!isInitial(eventValue)) {
-      // Update a config field value, if configField array was supplied
-      if (configField) updateConfigField(configField, eventValue)
-    }
-
     // Run any additional onChange functions supplied
     if (onChange) onChange(e)
 
@@ -102,9 +108,10 @@ const InputSelect = memo((
         </Label>
       }
       {optionsJsx ?
-        <select className={`cove-input${required && (value === undefined || value === '') ? ' cove-input--error' : ''}${className ? ' ' + className : ''}`}
-                value={value} onChange={(e) => onChangeHandler(e)} {...attributes}
-                ref={inputRef}
+        <select
+          className={`cove-input${required && (value === undefined || value === '') ? ' cove-input--error' : ''}${className ? ' ' + className : ''}`}
+          value={value ?? ''} onChange={(e) => onChangeHandler(e)} {...attributes}
+          ref={inputRef}
         >
           {optionsJsx.map(option => (option))}
         </select> :

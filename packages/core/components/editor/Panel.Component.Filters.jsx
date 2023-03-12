@@ -1,8 +1,10 @@
 import React from 'react'
 
 // Store
-import useConfigStore from '../../store/config/configSlice'
-import useDataStore from '../../store/data/dataSlice'
+import useStore from '../../store/store'
+
+// Hooks
+import { useVisConfig } from '../../hooks/store/useVisConfig'
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
@@ -13,16 +15,15 @@ import InputSelect from '../input/InputSelect'
 import Label from '../element/Label'
 import SectionBlock from '../ui/SectionBlock'
 
-
 const PanelComponentFilters = () => {
   // Store Selectors
-  const { config, updateConfig } = useConfigStore()
-  const { data } = useDataStore()
+  const { config, updateVisConfig } = useVisConfig()
+  const data = useStore(state => state.data)
 
   const addNewFilter = () => {
     let newFilters = config.filters ? [ ...config.filters ] : []
     newFilters.push({ values: [] })
-    updateConfig({ filters: newFilters })
+    updateVisConfig({ filters: newFilters })
   }
 
   const updateFilter = (filterName, filterIndex, filterValue) => {
@@ -31,13 +32,13 @@ const PanelComponentFilters = () => {
       ...config.filters[filterIndex],
       [filterName]: filterValue
     }
-    updateConfig({ filters: newFilters })
+    updateVisConfig({ filters: newFilters })
   }
 
   const removeFilter = (removeIndex) => {
     let newFilters = [ ...config.filters ]
     newFilters.splice(removeIndex, 1)
-    updateConfig({ filters: newFilters })
+    updateVisConfig({ filters: newFilters })
   }
 
   const getFilterColumnValues = (filterIndex) => {

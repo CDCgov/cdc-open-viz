@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
 // Store
-import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
-import useDataStore from '@cdc/core/stores/data/dataSlice'
+import useStore from '@cdc/core/store/store'
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
@@ -16,28 +15,8 @@ import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.F
 
 const EditorPanels = () => {
   // Store Selectors
-  const { config } = useConfigStoreContext()
-  const { data } = useDataStore()
+  const data = useStore(state => state.data)
 
-  /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
-  /*const [ tempConfig, setTempConfig ] = useState(config)
-
-  useEffect(() => {
-    // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
-    if (!isConfigEqual(config, tempConfig)) {
-      let tempConfig = { ...config }
-      delete tempConfig.newViz
-      setTempConfig(tempConfig)
-    }
-  }, [ config, tempConfig ])
-
-  useEffect(() => {
-    // Pass tempConfig settings back up to parent, if one exists
-    if (setParentConfig) setParentConfig(tempConfig)
-  }, [ tempConfig, setParentConfig ])*/
-
-
-  /** Panels ------------------------------------------------------------------------------------- */
   const panelGeneral = (
     <Accordion.Section label="General">
       <InputText label="Title" placeholder="Filterable Text Title" configField="title"/>

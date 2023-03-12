@@ -1,13 +1,12 @@
-import React from 'react'
+import React, { Suspense } from 'react'
+
+// Hooks
+import { VisConfigProvider } from '@cdc/core/hooks/store/useVisConfig'
 
 // Data
 import defaults from './data/initial-state'
 
-// Hooks
-// import useDashboardRuntime from '../hooks/useDashboardRuntime'
-
 // Components - Core
-import ConfigProxy from '@cdc/core/components/hoc/ConfigProxy'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import View from '@cdc/core/components/hoc/View'
 
@@ -16,16 +15,21 @@ import Dashboard from './components/Dashboard'
 
 // Styles
 import './scss/cove-dashboard.scss'
+import RenderFallback from '@cdc/core/components/loader/RenderFallback'
 
-const CdcDashboard = ({ config: configObj, configUrl }) => {
+const CdcDashboard = visProps => {
   return (
-  <ErrorBoundary component="CdcDashboard">
-    <ConfigProxy configObj={configObj} configUrl={configUrl} defaults={defaults}>
-      <View>
-        <Dashboard/>
-      </View>
-    </ConfigProxy>
-  </ErrorBoundary>
+    <ErrorBoundary component="CdcDashboard">
+      <Suspense fallback={<RenderFallback/>}>
+        <VisConfigProvider {...visProps} defaultConfig={defaults}>
+          <View>
+            <div className="cove">
+              <Dashboard/>
+            </div>
+          </View>
+        </VisConfigProvider>
+      </Suspense>
+    </ErrorBoundary>
   )
 }
 

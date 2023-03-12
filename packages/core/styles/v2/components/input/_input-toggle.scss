@@ -43,7 +43,8 @@
 }
 
 .cove-input__toggle {
-  display: inline-block;
+  display: inline-flex;
+  flex-flow: row nowrap;
   position: relative;
   width: 30px;
   height: 14px;
@@ -51,15 +52,9 @@
   cursor: pointer;
   z-index: 0;
 
-  &.cove-input__toggle--small {
-    width: 40px;
-    height: 20px;
-  }
-
   &.cove-input__toggle--active {
-    .cove-input__toggle-button {
-      left: 100%;
-      transform: translateX(-100%);
+    .cove-input__toggle-spacer {
+      flex-grow: 1
     }
 
     .cove-input__toggle-track {
@@ -68,13 +63,12 @@
   }
 
   &.cove-input__toggle--block {
-    width: unset;
+    width: 30px;
     padding: 4px;
     aspect-ratio: 1.85/1;
 
     .cove-input__toggle-button {
       border-radius: 10%;
-      box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%);
     }
 
     .cove-input__toggle-track {
@@ -89,6 +83,7 @@
       aspect-ratio: 1.5/1;
     }
 
+    &.cove-input__toggle--medium,
     &.cove-input__toggle--large,
     &.cove-input__toggle--xlarge {
       .cove-input__toggle-button {
@@ -145,7 +140,7 @@
 
     &.cove-input__toggle--active {
       .cove-input__toggle-button {
-        transform: translateX(-80%);
+        transform: translateX(20%);
       }
 
       .cove-input__toggle-track {
@@ -155,15 +150,57 @@
   }
 }
 
+.cove-input__toggle-spacer {
+  flex-grow: 0;
+  transition: all 200ms $transition-expo-out;
+}
+
 .cove-input__toggle--pill {
-  width: 45px;
+  width: 36px;
+  height: 14px;
+}
+
+.cove-input__toggle--medium {
+  @extend .cove-input__toggle;
+  width: 40px;
   height: 20px;
+
+  &.cove-input__toggle--block {
+    width: 40px;
+
+    .cove-input__toggle-button {
+      box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%);
+    }
+  }
+
+  &.cove-input__toggle--pill {
+    width: 45px;
+    height: 20px;
+  }
+
+  &.cove-input__toggle--3d {
+    width: 44px;
+    height: 18px;
+  }
 }
 
 .cove-input__toggle--large {
   @extend .cove-input__toggle;
-  width: 50px;
+  width: 60px;
   height: 26px;
+
+  &.cove-input__toggle--flat {
+    width: 50px;
+    height: 26px;
+  }
+
+  &.cove-input__toggle--block {
+    width: 50px;
+
+    .cove-input__toggle-button {
+      box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%);
+    }
+  }
 
   &.cove-input__toggle--pill {
     width: 60px;
@@ -199,6 +236,13 @@
     width: 65px;
   }
 
+  &.cove-input__toggle--block {
+    width: 65px;
+
+    .cove-input__toggle-button {
+      box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%);
+    }
+  }
 
   &.cove-input__toggle--3d {
     margin-right: 8px;

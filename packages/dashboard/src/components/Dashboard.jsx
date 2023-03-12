@@ -6,9 +6,10 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import parse from 'html-react-parser'
 
 // Store
-import useGlobalStore from '@cdc/core/stores/global/globalSlice'
-import useConfigStore from '@cdc/core/stores/config/configSlice'
-import useDataStore from '@cdc/core/stores/data/dataSlice'
+import useStore from '@cdc/core/store/store'
+
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
@@ -34,6 +35,7 @@ import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
 import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 
 const addVisualization = (type, subType) => {
+  console.log('ran addVisualization')
   let modalWillOpen = type === 'markup-include' ? false : true
   let newVisualizationConfig = {
     newViz: true,
@@ -99,91 +101,348 @@ const VisualizationsPanel = () => (
 
 const Dashboard = () => {
   // Store Selectors
-  const { viewMode, setViewMode } = useGlobalStore()
+  const viewMode = useStore(state => state.viewMode)
+  const setViewMode = useStore(state => state.setViewMode)
 
-  const { config, setConfig, updateConfig, updateConfigField, updateParentConfig } = useConfigStore()
-  const { data, datasets, filteredData } = useDataStore()
+  const { config, setConfig, updateVisConfig, updateVisConfigField } = useVisConfig()
 
   const { title, description } = config.dashboard || config
 
-  const [ previewingVisualization, setPreviewingVisualization ] = useState(false)
-
+  const [ data, setData ] = useState([])
+  const [ filteredData, setFilteredData ] = useState()
+  const [ loading, setLoading ] = useState(true)
+  const [ preview, setPreview ] = useState(false)
   const [ tabSelected, setTabSelected ] = useState(0)
   const [ imageId ] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
-  let editingVisualization = useRef(false)
   const transform = new dataTransform()
 
   useEffect(() => {
     setViewMode('isDashboard', true)
-  }, [])
+  }, [ setViewMode ])
+
+  const processData = async config => {
+    let dataset = config.formattedData || config.data
+
+    if (config.dataUrl) {
+      dataset = fetchRemoteData(`${config.dataUrl}?v=${CoveHelper.String.generateCacheBustString()}`)
+
+      if (dataset && config.dataDescription) {
+        try {
+          dataset = transform.autoStandardize(data)
+          dataset = transform.developerStandardize(data, config.dataDescription)
+        } catch (e) {
+          //Data not able to be standardized, leave as is
+        }
+      }
+    }
+
+    return dataset
+  }
+
+  let isSubEditor = useRef(false)
+
+  /*const loadConfig = async () => {
+    let newConfig = { ...config }
+    let datasets = {}
+
+    if (config.datasets) {
+      await Promise.all(
+        Object.keys(config.datasets).map(async key => {
+          datasets[key] = await processData(config.datasets[key])
+        })
+      )
+    } else {
+      let dataKey = newConfig.dataFileName || 'backwards-compatibility'
+      datasets[dataKey] = await processData(config)
+
+      let datasetsFull = {}
+      datasetsFull[dataKey] = {
+        data: datasets[dataKey],
+        dataDescription: newConfig.dataDescription
+      }
+      newConfig.datasets = datasetsFull
+
+      Object.keys(newConfig.visualizations).forEach(vizKey => {
+        newConfig.visualizations[vizKey].dataKey = dataKey
+        newConfig.visualizations[vizKey].dataDescription = newConfig.dataDescription
+        newConfig.visualizations[vizKey].formattedData = newConfig.formattedData
+      })
+
+      delete newConfig.data
+      delete newConfig.dataUrl
+      delete newConfig.dataFileName
+      delete newConfig.dataFileSourceType
+      delete newConfig.dataDescription
+      delete newConfig.formattedData
+
+      if (newConfig.dashboard && newConfig.dashboard.filters) {
+        newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || []
+        newConfig.dashboard.filters.forEach(filter => {
+          newConfig.dashboard.sharedFilters.push({ ...filter, key: filter.label, showDropdown: true, usedBy: Object.keys(newConfig.visualizations) })
+        })
+
+        delete newConfig.dashboard.filters
+      }
+    }
+
+    setData(datasets)
+
+    // updateConfigFilters(newConfig, datasets)
+    setLoading(false)
+  }*/
+
+  const setSharedFilter = (key, datum) => {
+    let newConfig = { ...config }
+    let newFilteredData = { ...filteredData }
+
+    for (let i = 0; i < newConfig.dashboard.sharedFilters.length; i++) {
+      if (newConfig.dashboard.sharedFilters[i].setBy === key) {
+        newConfig.dashboard.sharedFilters[i].active = datum[newConfig.dashboard.sharedFilters[i].columnName]
+        break
+      }
+    }
+
+    Object.keys(newConfig.visualizations).forEach(visualizationKey => {
+      let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
+
+      if (applicableFilters.length > 0) {
+        const visualization = newConfig.visualizations[visualizationKey]
+
+        newFilteredData[visualizationKey] = CoveHelper.Data.filterData(applicableFilters, visualization.formattedData || data[visualization.dataKey])
+      }
+    })
+
+    setFilteredData(newFilteredData)
+    setConfig(newConfig)
+  }
+
+  // Gets filer values from dataset
+  const generateValuesForFilter = (columnName, data = this.state.data) => {
+    const values = []
+
+    Object.keys(data).forEach(key => {
+      data[key].forEach(row => {
+        const value = row[columnName]
+        if (value && false === values.includes(value)) {
+          values.push(value)
+        }
+      })
+    })
+
+    return values
+  }
+
+  /*const updateConfigFilters = (newConfig, dataOverride = null) => {
+    let newFilteredData = {}
+    let visualizationKeys = Object.keys(newConfig.visualizations)
+
+    if (newConfig.dashboard.sharedFilters) {
+      newConfig.dashboard.sharedFilters.forEach((filter, i) => {
+        for (let j = 0; j < visualizationKeys.length; j++) {
+          if (visualizationKeys[j] === filter.setBy) {
+            const filterValues = generateValuesForFilter(filter.columnName, dataOverride || data)
+
+            if (newConfig.dashboard.sharedFilters[i].order === 'asc') {
+              filterValues.sort()
+            }
+            if (newConfig.dashboard.sharedFilters[i].order === 'desc') {
+              filterValues.sort().reverse()
+            }
+
+            newConfig.dashboard.sharedFilters[i].values = filterValues
+            if (filterValues.length > 0) {
+              newConfig.dashboard.sharedFilters[i].active = newConfig.dashboard.sharedFilters[i].active || newConfig.dashboard.sharedFilters[i].values[0]
+            }
+            break
+          }
+        }
+
+        if ((!newConfig.dashboard.sharedFilters[i].values || newConfig.dashboard.sharedFilters[i].values.length === 0) && newConfig.dashboard.sharedFilters[i].showDropdown) {
+          newConfig.dashboard.sharedFilters[i].values = generateValuesForFilter(filter.columnName, dataOverride || data)
+          if (newConfig.dashboard.sharedFilters[i].values.length > 0) {
+            newConfig.dashboard.sharedFilters[i].active = newConfig.dashboard.sharedFilters[i].active || newConfig.dashboard.sharedFilters[i].values[0]
+          }
+        }
+      })
+
+      visualizationKeys.forEach(visualizationKey => {
+        let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
+
+        if (applicableFilters.length > 0) {
+          newFilteredData[visualizationKey] = CoveHelper.Data.filterData(applicableFilters, newConfig.visualizations[visualizationKey].formattedData || newConfig.visualizations[visualizationKey].data || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey])
+        }
+      })
+    }
+
+    setFilteredData(newFilteredData)
+
+    //Enforce default values that need to be calculated at runtime
+    newConfig.runtime = {}
+    setConfig(newConfig)
+  }*/
+
+  // Load data when component first mounts
+  /*useEffect(() => {
+    loadConfig()
+  }, [])*/
+
+  // Pass up to <CdcEditor /> if it exists when config state changes
+  /*useEffect(() => {
+    if (updateParentConfig && viewMode.isWizard) {
+      updateParentConfig(config)
+    }
+  }, [ config ])*/
+
+  const updateChildConfig = (visualizationKey, newConfig) => {
+    updateVisConfig({
+      visualizations: {
+        ...config.visualizations,
+        [visualizationKey]: { ...newConfig }
+      }
+    })
+  }
+
+  const Filters = () => {
+    const changeFilterActive = (index, value) => {
+      let dashboardConfig = { ...config.dashboard }
+
+      dashboardConfig.sharedFilters[index].active = value
+
+      setConfig({ ...config, dashboard: dashboardConfig })
+
+      let newFilteredData = {}
+      Object.keys(config.visualizations).forEach(key => {
+        let applicableFilters = dashboardConfig.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
+        if (applicableFilters.length > 0) {
+          newFilteredData[key] = CoveHelper.Data.filterData(applicableFilters, config.visualizations[key].formattedData || config.data[config.visualizations[key].dataKey])
+        }
+      })
+
+      setFilteredData(newFilteredData)
+    }
+
+    const announceChange = text => {
+    }
+
+    return config.dashboard.sharedFilters.map((singleFilter, index) => {
+      if (singleFilter.showDropdown) {
+        return (
+          <section className="dashboard-filters-section" key={`${singleFilter.key}-filtersection-${index}`}>
+            <label htmlFor={`filter-${index}`}>{singleFilter.key}</label>
+            <select
+              id={`filter-${index}`}
+              className="filter-select"
+              data-index="0"
+              value={singleFilter.active}
+              onChange={val => {
+                changeFilterActive(index, val.target.value)
+                announceChange(`Filter ${singleFilter.key} value has been changed to ${val.target.value}, please reference the data table to see updated values.`)
+              }}
+            >
+              {singleFilter.values.map((filterOption, index) => (
+                <option key={`${singleFilter.key}-option-${index}`} value={filterOption}>
+                  {filterOption}
+                </option>
+              ))}
+            </select>
+          </section>
+        )
+      }
+    })
+  }
 
   let body = null
 
   // Editor mode
-  if (viewMode.isEditor && !previewingVisualization) {
-    editingVisualization.current = false
+  if (viewMode.isEditor && !preview) {
+    isSubEditor.current = false
+    let subVisualizationEditing = false
 
     Object.keys(config.visualizations).forEach(visualizationKey => {
       let visualizationConfig = config.visualizations[visualizationKey]
 
+      const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
+
+      if (filteredData && filteredData[visualizationKey]) {
+        updateVisConfigField([ 'visualizations', visualizationKey, 'data' ], filteredData[visualizationKey])
+        if (visualizationConfig.formattedData) {
+          updateVisConfigField([ 'visualizations', visualizationKey, 'originalFormattedData' ], visualizationConfig.formattedData)
+          updateVisConfigField([ 'visualizations', visualizationKey, 'formattedData' ], visualizationConfig.data)
+        }
+      } else {
+        updateVisConfigField([ 'visualizations', visualizationKey, 'data' ], data[dataKey])
+        if (visualizationConfig.formattedData) {
+          updateVisConfigField([ 'visualizations', visualizationKey, 'originalFormattedData' ], visualizationConfig.formattedData)
+          updateVisConfigField([ 'visualizations', visualizationKey, 'formattedData' ], transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data)
+        }
+      }
+
+      const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0
+      const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey)[0].active : undefined
+
       if (visualizationConfig.editing) {
-        editingVisualization.current = true
+        isSubEditor.current = true
+        subVisualizationEditing = true
+
+        const back = () => {
+          updateVisConfigField([ 'visualizations', visualizationKey, 'editing' ], false)
+        }
+
+        const updateSubConfig = newConfig => {
+          let dataCorrectedConfig = visualizationConfig.originalFormattedData
+            ? { ...newConfig, formattedData: visualizationConfig.originalFormattedData }
+            : { ...newConfig }
+          updateChildConfig(visualizationKey, dataCorrectedConfig)
+          updateVisConfig(newConfig)
+        }
 
         switch (visualizationConfig.type) {
           case 'chart':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} subEditor="Chart"/>
-                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} isDashboard={true}/>
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Chart"/>
+                <CdcChart key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isEditor={true} isDashboard={true}/>
               </>
             )
             break
           case 'map':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} subEditor="Map"/>
-                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} isDashboard={true}/>
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Map"/>
+                <CdcMap key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isEditor={true} isDashboard={true}/>
               </>
             )
             break
           case 'data-bite':
-            visualizationConfig = { ...visualizationConfig, newViz: true }
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} subEditor="Data Bite"/>
-                <CdcDataBite
-                  config={visualizationConfig}
-                  key={visualizationKey}
-                />
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Data Bite"/>
+                <CdcDataBite visualizationKey={visualizationKey} key={visualizationKey}/>
               </>
             )
             break
           case 'waffle-chart':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} subEditor="Waffle Chart"/>
-                <CdcWaffleChart key={visualizationKey} config={visualizationConfig} isDashboard={true}/>
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Waffle Chart"/>
+                <CdcWaffleChart visualizationKey={visualizationKey} key={visualizationKey}/>
               </>
             )
             break
           case 'markup-include':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} subEditor="Markup Include"/>
-                <CdcMarkupInclude
-                  config={visualizationConfig}
-                  visualizationKey={visualizationKey}
-                  key={visualizationKey}
-                />
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Markup Include"/>
+                <CdcMarkupInclude visualizationKey={visualizationKey} key={visualizationKey}/>
               </>
             )
             break
           case 'filtered-text':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} subEditor="Filtered Text"/>
-                <CdcFilteredText key={visualizationKey} config={visualizationConfig} isDashboard={true}/>
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Filtered Text"/>
+                <CdcFilteredText visualizationKey={visualizationKey} key={visualizationKey}/>
               </>
             )
             break
@@ -194,10 +453,10 @@ const Dashboard = () => {
       }
     })
 
-    if (!editingVisualization.current) {
+    if (!subVisualizationEditing) {
       body = (
         <DndProvider backend={HTML5Backend}>
-          <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={previewingVisualization} setPreview={setPreviewingVisualization}/>
+          <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>
           <div className="cove-dashboard__content">
             <VisualizationsPanel/>
             <Builder/>
@@ -209,20 +468,19 @@ const Dashboard = () => {
     body = (
       <>
         {viewMode.isWizard &&
-          <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={previewingVisualization} setPreview={setPreviewingVisualization}/>
+          <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>
         }
         <div className={`cdc-dashboard-inner-container${viewMode.isWizard ? ' is-wizard' : ''}`}>
-          Showing dashboard inner container
           {/* Title */}
           {title && (
-            <div role="heading" aria-level="3" className={`cove-dashboard-title ${config.dashboard.theme ?? 'blue'}`}>
+            <div role="heading" aria-level="3" className={`dashboard-title ${config.dashboard.theme ?? 'blue'}`}>
               {title}
             </div>
           )}
 
           {/* Description */}
           {description &&
-            <div className="cove-dashboard-description">
+            <div className="subtext">
               {parse(description)}
             </div>
           }
@@ -230,7 +488,7 @@ const Dashboard = () => {
           {/* Filters */}
           {config.dashboard.sharedFilters && (
             <div className="cove-dashboard-filters">
-              {/*<Filters/>*/}
+              <Filters/>
             </div>
           )}
 
@@ -245,7 +503,27 @@ const Dashboard = () => {
                       if (col.width) {
                         if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`dashboard-col dashboard-col-${col.width}`}></div>
 
-                        let visualizationConfig = config.visualizations[col.widget]
+                        let visualizationConfig = { ...config.visualizations[col.widget] }
+
+                        const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
+
+                        if (filteredData && filteredData[col.widget]) {
+                          visualizationConfig.data = filteredData[col.widget]
+                          if (visualizationConfig.formattedData) {
+                            visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+                            visualizationConfig.formattedData = visualizationConfig.data
+                          }
+                        } else {
+                          visualizationConfig.data = data[dataKey]
+                          if (visualizationConfig.formattedData) {
+                            visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+                            visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
+                          }
+                        }
+
+                        const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
+                        const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
+                        const tableLink = <a href={`#data-table-${visualizationConfig.dataKey}`}>{visualizationConfig.dataKey} (Go to Table)</a>
 
                         return (
                           <React.Fragment key={`vis__${index}__${colIndex}`}>
@@ -255,7 +533,12 @@ const Dashboard = () => {
                                   key={col.widget}
                                   config={visualizationConfig}
                                   isEditor={false}
+                                  setConfig={newConfig => {
+                                    updateChildConfig(col.widget, newConfig)
+                                  }}
+                                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                                   isDashboard={true}
+                                  link={config.table && config.table.show && config.datasets ? tableLink : undefined}
                                 />
                               )}
                               {visualizationConfig.type === 'map' && (
@@ -263,12 +546,21 @@ const Dashboard = () => {
                                   key={col.widget}
                                   config={visualizationConfig}
                                   isEditor={false}
+                                  setConfig={newConfig => {
+                                    updateChildConfig(col.widget, newConfig)
+                                  }}
+                                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                                  setSharedFilterValue={setSharedFilterValue}
                                   isDashboard={true}
+                                  link={config.table && config.table.show && config.datasets ? tableLink : undefined}
                                 />
                               )}
                               {visualizationConfig.type === 'data-bite' && (
                                 <CdcDataBite
                                   config={visualizationConfig}
+                                  setParentConfig={newConfig => {
+                                    updateChildConfig(col.widget, newConfig)
+                                  }}
                                   isPreview={true}
                                   key={col.widget}
                                 />
@@ -276,13 +568,19 @@ const Dashboard = () => {
                               {visualizationConfig.type === 'waffle-chart' && (
                                 <CdcWaffleChart
                                   config={visualizationConfig}
+                                  setParentConfig={newConfig => {
+                                    updateChildConfig(col.widget, newConfig)
+                                  }}
                                   isPreview={true}
                                   key={col.widget}
                                 />
                               )}
                               {visualizationConfig.type === 'markup-include' && (
-                                <CdcMarkupInclude
+                                <CdcMarkupIncludeReadonly
                                   config={visualizationConfig}
+                                  setParentConfig={newConfig => {
+                                    updateChildConfig(col.widget, newConfig)
+                                  }}
                                   isPreview={true}
                                   key={col.widget}
                                 />
@@ -290,6 +588,9 @@ const Dashboard = () => {
                               {visualizationConfig.type === 'filtered-text' && (
                                 <CdcFilteredText
                                   config={visualizationConfig}
+                                  setParentConfig={newConfig => {
+                                    updateChildConfig(col.widget, newConfig)
+                                  }}
                                   isPreview={true}
                                   key={col.widget}
                                 />
@@ -303,13 +604,75 @@ const Dashboard = () => {
                   </div>
                 )
               })}
+
+          {/* Image or PDF Inserts */}
+          <section>
+            {config.table?.downloadImageButton &&
+              <MediaControls.Button title="Download Dashboard as Image" type="image" state={config} text="Download Dashboard Image" elementToCapture={imageId}/>
+            }
+            {config.table?.downloadPdfButton &&
+              <MediaControls.Button title="Download Dashboard as PDF" type="pdf" state={config} text="Download Dashboard PDF" elementToCapture={imageId}/>
+            }
+          </section>
+
+          {/* Data Table */}
+          {config.table && config.data &&
+            <DataTable data={config.data} config={config} imageRef={imageId}/>
+          }
+          {config.table &&
+            config.datasets &&
+            Object.keys(config.datasets).map(datasetKey => {
+              //For each dataset, find any shared filters that apply to all visualizations using the dataset
+              //Apply these filters to the table
+              let filteredTableData
+              if (config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0) {
+                //Gets list of visuailzations using the dataset
+                let vizKeysUsingDataset = []
+                Object.keys(config.visualizations).forEach(visualizationKey => {
+                  if (config.visualizations[visualizationKey].dataKey === datasetKey) {
+                    vizKeysUsingDataset.push(visualizationKey)
+                  }
+                })
+
+                //Checks shared filters against list to see if all visualizations are represented
+                let applicableFilters = []
+                config.dashboard.sharedFilters.forEach(sharedFilter => {
+                  let allMatch = true
+                  vizKeysUsingDataset.forEach(visualizationKey => {
+                    if (sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
+                      allMatch = false
+                    }
+                  })
+                  if (allMatch) {
+                    applicableFilters.push(sharedFilter)
+                  }
+                })
+
+                //Applys any applicable filters
+                if (applicableFilters.length > 0) {
+                  filteredTableData = CoveHelper.Data.filterData(applicableFilters, config.datasets[datasetKey].data)
+                }
+              }
+
+              let dataFileSourceType = config.datasets[datasetKey]?.dataFileSourceType
+
+              return (
+                <div className="cove-dashboard__data-table" id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
+                  <DataTable data={filteredTableData || config.datasets[datasetKey].data} downloadData={config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}/>
+                </div>
+              )
+            })}
         </div>
       </>
     )
   }
 
+  const contextValues = {
+    data: filteredData ?? data
+  }
+
   return (
-    <div className={`cove cove-dashboard${1 === 'isSubEditor' ? ' cove-dashboard--subviz' : ''}`} data-download-id={imageId}>
+    <div className={`cove-dashboard${isSubEditor.current ? ' cove-dashboard--subviz' : ''}`} data-download-id={imageId}>
       {body}
     </div>
   )

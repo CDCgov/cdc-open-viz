@@ -1,42 +1,32 @@
 import React, { useState, useEffect } from 'react'
 
-import useGlobalStore from '@cdc/core/stores/global/globalSlice'
-import useConfigStore from '@cdc/core/stores/config/configSlice'
+// Store
+import useStore from '@cdc/core/store/store'
 
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-import Modal from '@cdc/core/components/ui/Modal'
-import InputText from '@cdc/core/components/input/InputText'
-
+// Helpers
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import dataTransform from '@cdc/core/helpers/data/dataTransform'
-import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
+
+// Components - Core
 import Button from '@cdc/core/components/element/Button'
+import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
+import InputText from '@cdc/core/components/input/InputText'
+import Modal from '@cdc/core/components/ui/Modal'
 
 
 const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = null }) => {
   // Store Selectors
-  const { openOverlay, toggleOverlay } = useGlobalStore(state =>({
-    openOverlay: state.openOverlay,
-    toggleOverlay: state.toggleOverlay
-  }))
+  const openOverlay = useStore(state => state.openOverlay)
+  const toggleOverlay = useStore(state => state.toggleOverlay)
 
-  const { config, updateConfig, updateParentConfig } = useConfigStore(state =>({
-    config: state.config,
-    updateConfig: state.updateConfig,
-    updateParentConfig: state.updateParentConfig
-  }))
+  const { config, updateVisConfig } = useVisConfig()
 
   const [ columns, setColumns ] = useState([])
 
   const transform = new dataTransform()
-
-  /*const changeConfigValue = (parentObj, key, value) => {
-    let newConfig = { ...config }
-    if (!newConfig[parentObj]) newConfig[parentObj] = {}
-    newConfig[parentObj][key] = value
-
-    updateConfig(newConfig)
-  }*/
 
   const setTab = index => {
     setTabSelected(index)
@@ -54,7 +44,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
     dashboardConfig.sharedFilters.push({ key: 'Dashboard Filter ' + (dashboardConfig.sharedFilters.length + 1), values: [] })
 
-    updateConfig({ ...config, dashboard: dashboardConfig })
+    updateVisConfig({ ...config, dashboard: dashboardConfig })
   }
 
   const removeFilter = index => {
@@ -62,7 +52,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
     dashboardConfig.sharedFilters.splice(index, 1)
 
-    updateConfig({ ...config, dashboard: dashboardConfig })
+    updateVisConfig({ ...config, dashboard: dashboardConfig })
 
     toggleOverlay()
   }
@@ -78,7 +68,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
   }
 
   useEffect(() => {
-    const parsedData = convertStateToConfig()
+    /*const parsedData = convertStateToConfig()
 
     // Emit the data in a regular JS event so it can be consumed by anything.
     const event = new CustomEvent('updateVizConfig', { detail: parsedData })
@@ -88,7 +78,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
     if (updateParentConfig)
       updateParentConfig(convertStateToConfig('object'))
 
-    return () => {}
+    return () => {}*/
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ config ])
 
@@ -130,7 +120,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
       let tempConfig = { ...config.dashboard }
       tempConfig.sharedFilters[index] = filter
 
-      updateConfig({ dashboard: tempConfig })
+      updateVisConfig({ dashboard: tempConfig })
 
       toggleOverlay()
     }

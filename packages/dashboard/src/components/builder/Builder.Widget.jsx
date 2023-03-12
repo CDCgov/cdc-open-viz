@@ -4,8 +4,10 @@ import React, { useRef, useEffect } from 'react'
 import { useDrag } from 'react-dnd'
 
 // Store
-import useGlobalStore from '@cdc/core/stores/global/globalSlice'
-import useConfigStore from '@cdc/core/stores/config/configSlice'
+import useStore from '@cdc/core/store/store'
+
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Helpers
 import dataTransform from '@cdc/core/helpers/data/dataTransform'
@@ -69,9 +71,10 @@ const vizHash = {
 
 const BuilderWidget = ({ data = {}, addVisualization, type }) => {
   // Store Selectors
-  const { openOverlay, toggleOverlay } = useGlobalStore()
+  const openOverlay = useStore(state => state.openOverlay)
+  const toggleOverlay = useStore(state => state.toggleOverlay)
 
-  const { config, updateConfig, updateConfigField } = useConfigStore()
+  const { config, updateVisConfig, updateVisConfigField } = useVisConfig()
 
   const dataRef = useRef()
   dataRef.current = data
@@ -86,13 +89,13 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
     const { rowIdx, colIdx } = result
 
     if (undefined !== data.rowIdx) {
-      updateConfigField([ 'rows', data.rowIdx, data.colIdx, 'widget' ], null) // Wipe from old position
-      updateConfigField([ 'rows', rowIdx, colIdx, 'widget' ], data.uid) // Add to new row and col
+      updateVisConfigField([ 'rows', data.rowIdx, data.colIdx, 'widget' ], null) // Wipe from old position
+      updateVisConfigField([ 'rows', rowIdx, colIdx, 'widget' ], data.uid) // Add to new row and col
     } else {
       // Item does not exist, instantiate a new one
       const newViz = addVisualization()
-      updateConfigField([ 'visualizations', newViz.uid ], newViz) // Add to widgets collection
-      updateConfigField([ 'rows', rowIdx, colIdx, 'widget' ], newViz.uid) // Store reference in rows collection under the specific column
+      updateVisConfigField([ 'visualizations', newViz.uid ], newViz) // Add to widgets collection
+      updateVisConfigField([ 'rows', rowIdx, colIdx, 'widget' ], newViz.uid) // Store reference in rows collection under the specific column
     }
   }
 
@@ -105,7 +108,7 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
   })
 
   const deleteWidget = () => {
-    updateConfigField([ 'rows', data.rowIdx, data.colIdx, 'widget' ], null)
+    updateVisConfigField([ 'rows', data.rowIdx, data.colIdx, 'widget' ], null)
 
     if (config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0) {
       let filters = [ ...config.dashboard.sharedFilters ]
@@ -114,12 +117,12 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
           sharedFilter.usedBy.splice(sharedFilter.usedBy.indexOf(data.uid), 1)
         }
       })
-      updateConfigField(['dashboard', 'sharedFilters'], filters)
+      updateVisConfigField(['dashboard', 'sharedFilters'], filters)
     }
   }
 
   const editWidget = () => {
-    updateConfigField([ 'visualizations', data.uid, 'editing' ], true)
+    updateVisConfigField([ 'visualizations', data.uid, 'editing' ], true)
   }
 
   const changeDataset = (uid, value) => {
@@ -129,7 +132,7 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
 
     targetVisualization[uid].dataKey = value
 
-    updateConfig({
+    updateVisConfig({
       visualizations: {
         ...config.visualizations,
         ...targetVisualization
@@ -153,7 +156,7 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
     let newVisualizations = { ...config.visualizations }
     newVisualizations[visualizationKey] = { ...newVisualizations[visualizationKey], data: newData, dataDescription, formattedData }
 
-    updateConfig({ ...config, visualizations: newVisualizations })
+    updateVisConfig({ ...config, visualizations: newVisualizations })
 
     openOverlay(dataDesignerModal(newVisualizations[visualizationKey]))
   }
@@ -203,7 +206,7 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
   useEffect(() => {
     if (data.openModal) {
       openOverlay(dataDesignerModal(dataRef.current))
-      updateConfigField([ 'visualizations', data.uid, 'openModal' ], false)
+      updateVisConfigField([ 'visualizations', data.uid, 'openModal' ], false)
     }
   }, [ data.openModal ])
 

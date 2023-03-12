@@ -30,6 +30,6 @@ export const setConfigKeyValue = (configKeyArray, setKeyValue) => {
 export const getConfigKeyValue = (configKeyArray, objectToParse) => {
   if (typeof configKeyArray === 'string') return objectToParse[configKeyArray]
   if (configKeyArray.length === 1) return objectToParse[configKeyArray[0]]
-  if (get(objectToParse, configKeyArray.map(k => k).join('.'))) return configKeyArray.reduce((acc, configKey) => (acc[configKey]), objectToParse)
-  return undefined
+  if (get(objectToParse, configKeyArray.map(k => k).join('.')))
+    return configKeyArray.reduce((acc, configKey) => (acc[configKey]), objectToParse) ?? undefined
 }

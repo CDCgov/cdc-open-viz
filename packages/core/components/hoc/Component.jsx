@@ -7,6 +7,9 @@ import PropTypes from 'prop-types'
 // Store
 import useStore from '../../store/store'
 
+// Hooks
+import { useVisConfig } from '../../hooks/store/useVisConfig'
+
 // Components
 import Icon from '../ui/Icon'
 import Tooltip from '../ui/Tooltip'
@@ -16,7 +19,7 @@ import '../../styles/v2/components/component.scss'
 
 const Component = ({ className, children, ...attributes }) => {
   // Store Selectors
-  const config = useStore(state => state.config)
+  const { config } = useVisConfig()
   const setDimensions = useStore(state => state.setDimensions)
 
   // Observe changes to component container sizes for use with SVG renders

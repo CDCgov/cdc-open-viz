@@ -21,16 +21,10 @@ export default {
     options: []
   },
   dataFormat: {
-    roundToPlace: 0,
+    roundToPlace: 1,
     commas: true,
     prefix: '',
     suffix: '%'
-  },
-  visual: {
-    border: 'default',
-    accent: 'none',
-    background: 'default',
-    shadow: true
   },
   general: {
     isCompactStyle: false

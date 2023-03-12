@@ -1,12 +1,15 @@
-import React from 'react'
+import React, { Suspense } from 'react'
+
+// Hooks
+import { VisConfigProvider } from '@cdc/core/hooks/store/useVisConfig'
 
 // Data
 import defaults from './data/initial-state'
 
 // Components - Core
 import Component from '@cdc/core/components/hoc/Component'
-import ConfigProxy from '@cdc/core/components/hoc/ConfigProxy'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import RenderFallback from '@cdc/core/components/loader/RenderFallback'
 import View from '@cdc/core/components/hoc/View'
 
 // Components - Local
@@ -17,16 +20,18 @@ import FilteredText from './components/FilteredText'
 import './scss/cove-filtered-text.scss'
 
 // Visualization
-const CdcFilteredText = ({ config: configObj, configUrl }) => {
+const CdcFilteredText = visProps => {
   return (
     <ErrorBoundary component="CdcFilteredText">
-      <ConfigProxy configObj={configObj} configUrl={configUrl} defaults={defaults}>
-        <View editorPanels={<EditorPanels/>}>
-          <Component className="cove-filtered-text">
-            <FilteredText/>
-          </Component>
-        </View>
-      </ConfigProxy>
+      <Suspense fallback={<RenderFallback/>}>
+        <VisConfigProvider {...visProps} defaultConfig={defaults}>
+          <View editorPanels={<EditorPanels/>}>
+            <Component className="cove-filtered-text">
+              <FilteredText/>
+            </Component>
+          </View>
+        </VisConfigProvider>
+      </Suspense>
     </ErrorBoundary>
   )
 }

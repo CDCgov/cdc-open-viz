@@ -1,7 +1,7 @@
 import React from 'react'
 
-// Store
-import useStore from '../../store/store'
+// Hooks
+import { useVisConfig } from '../../hooks/store/useVisConfig'
 
 // Third Party
 import PropTypes from 'prop-types'
@@ -22,13 +22,13 @@ import '../../styles/v2/components/ui/color-picker.scss'
 
 const ColorButton = ({ color }) => {
   // Store Selectors
-  const { config, updateConfigField } = useStore()
+  const { config, updateVisConfigField } = useVisConfig()
 
   const customAttrs = color === config.theme && { 'data-selected': true }
 
   return (
     <button className="cove-color-picker__button" {...customAttrs} onClick={() => {
-      updateConfigField("theme", color)
+      updateVisConfigField("theme", color)
     }}>
       <div className="cove-color-picker__color" style={{ backgroundColor: THEME_COLORS[color].primary }}/>
       <div className="cove-color-picker__color--ring"/>

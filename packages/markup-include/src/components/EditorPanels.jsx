@@ -1,7 +1,7 @@
 import React from 'react'
 
-// Store
-import useStore from '@cdc/core/store/store'
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -12,26 +12,8 @@ import PanelGlobal from '@cdc/core/components/editor/Panel.Global'
 
 const EditorPanels = () => {
   // Store Selectors
-  const config = useStore(state => state.config)
+  const { config } = useVisConfig()
 
-  /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
-  /*const [ tempConfig, setTempConfig ] = useState(config)
-
-  useEffect(() => {
-    // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
-    if (!isConfigEqual(config, tempConfig)) {
-      let tempConfig = { ...config }
-      delete tempConfig.newViz
-      setTempConfig(tempConfig)
-    }
-  }, [ config, tempConfig ])
-
-  useEffect(() => {
-    // Pass tempConfig settings back up to parent, if one exists
-    if (setParentConfig) setParentConfig(tempConfig)
-  }, [ tempConfig, setParentConfig ])*/
-
-  /** Panels ------------------------------------------------------------------------------------- */
   const panelGeneral = (
     <Accordion.Section label='General'>
       <InputText label='Title' configField='title' placeholder='Markup Include Title' />

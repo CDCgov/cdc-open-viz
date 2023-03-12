@@ -8,6 +8,9 @@ import { Circle, Bar } from '@visx/shape'
 // Store
 import useStore from '@cdc/core/store/store'
 
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+
 // Constants
 import THEME_COLORS from '@cdc/core/data/componentThemes'
 import {
@@ -30,8 +33,9 @@ import calculateWaffleAnimation from '../helpers/calculateWaffleAnimation'
 
 // Visualization
 const WaffleChart = () => {
-  const { config } = useStore()
-  const { data } = useStore()
+  // Store Selectors
+  const { config } = useVisConfig()
+  const { data } = config
 
   const calculateData = () => {
     //If either the column or function aren't set, do not calculate
@@ -199,7 +203,7 @@ const WaffleChart = () => {
 
   return <>
     {config.missingRequiredSections && <>Missing data in sections</>}
-    {!config.missingRequiredSections && (<>
+    {config.missingRequiredSections === false && (<>
       <div
         className={`cove-waffle-chart__container${config.orientation === 'vertical' ? ' cove-waffle-chart__container--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
         <div className="cove-waffle-chart__visualization" style={{ width: setRatio() }}>

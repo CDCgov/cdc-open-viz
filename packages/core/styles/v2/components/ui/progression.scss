@@ -21,8 +21,8 @@
     align-items: center;
   }
 
-  + .cove-component .cove-component__content {
-    filter: blur(2px);
+  ~ * {
+    filter: blur(3px);
   }
 }
 

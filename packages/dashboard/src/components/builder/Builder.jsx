@@ -1,7 +1,7 @@
 import React from 'react'
 
-// Store
-import useConfigStore from '@cdc/core/stores/config/configSlice'
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Components - Core
 import Button from '@cdc/core/components/element/Button'
@@ -10,13 +10,10 @@ import Button from '@cdc/core/components/element/Button'
 import BuilderRow from './Builder.Row'
 
 const Builder = () => {
-  const { config, updateConfig } = useConfigStore(state => ({
-    config: state.config,
-    updateConfig: state.updateConfig
-  }))
+  const { config, updateVisConfig } = useVisConfig()
 
   const addRow = () => {
-    updateConfig({
+    updateVisConfig({
       rows: [
         ...config.rows,
         [ { width: 12 }, { equalHeight: false }, {}, {} ]

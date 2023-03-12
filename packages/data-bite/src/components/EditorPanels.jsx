@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
 // Store
-import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
+import useStore from '@cdc/core/store/store'
+
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
-import PanelGlobal from '@cdc/core/components/editor/Panel.Global.jsx'
+import PanelGlobal from '@cdc/core/components/editor/Panel.Global'
 import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
 import InputSelect from '@cdc/core/components/input/InputSelect'
 import InputText from '@cdc/core/components/input/InputText'
@@ -20,33 +23,14 @@ import PanelDynamicImages from './Panel.DynamicImages'
 
 // Constants
 import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS } from '../data/consts'
-import useDataStore from '@cdc/core/stores/data/dataSlice'
 
 const EditorPanels = () => {
-  const { config, setMissingRequiredSections } = useConfigStoreContext()
-  const { data } = useDataStore()
-
-  /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
-  /*const [ tempConfig, setTempConfig ] = useState(config)
-
-  useEffect(() => {
-    // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
-    if (!isConfigEqual(config, tempConfig)) {
-      let tempConfig = { ...config }
-      delete tempConfig.newViz
-      setTempConfig(tempConfig)
-    }
-  }, [ config, tempConfig ])
-
-  useEffect(() => {
-    // Pass tempConfig settings back up to parent, if one exists
-    if (setParentConfig) setParentConfig(tempConfig)
-  }, [ tempConfig, setParentConfig ])*/
-
+  // Store Selectors
+  const { config, setMissingRequiredSections } = useVisConfig()
+  const { data } = config
 
   /** Required Sections -------------------------------------------------------------------------- */
   const requiredSections = [
-    config.title,
     config.dataColumn,
     config.dataFunction
   ]
@@ -106,7 +90,7 @@ const EditorPanels = () => {
             <InputText label="Round" configField={[ 'dataFormat', 'roundToPlace' ]} type="number" min="0" max="99"/>
           </div>
         </div>
-        <InputCheckbox label="Add commas" size="small" configField={[ 'dataFormat', 'commas' ]}/>
+        <InputCheckbox label="Add commas" configField={[ 'dataFormat', 'commas' ]}/>
       </SectionWrapper>
     </Accordion.Section>
   )

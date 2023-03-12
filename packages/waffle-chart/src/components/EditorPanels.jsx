@@ -3,6 +3,9 @@ import React, { useEffect } from 'react'
 // Store
 import useStore from '@cdc/core/store/store'
 
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
 
@@ -21,46 +24,40 @@ import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.F
 
 const EditorPanels = () => {
   // Store Selectors
-  const { config, updateConfigField } = useStore()
-  const { data } = useStore()
+  const { config, updateVisConfigField } = useVisConfig()
+  const { data } = config
 
-  /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
-  /*const [ tempConfig, setTempConfig ] = useState(config)
+  /** Required Sections -------------------------------------------------------------------------- */
+  const requiredSections = [
+    config.dataColumn,
+    config.dataFunction
+  ]
+
+  const isValid = (value) => {
+    // Do not simplify! This is a boolean check.
+    if (typeof value !== 'undefined' && value) return true
+    return false
+  }
 
   useEffect(() => {
-    // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
-    if (JSON.stringify(config) !== JSON.stringify(tempConfig)) {
-      let tempConfig = { ...config }
-      delete tempConfig.newViz
-      setTempConfig(tempConfig)
-    }
-  }, [ config, tempConfig ])
-
-  useEffect(() => {
-    // Pass tempConfig settings back up to parent, if one exists
-    if (setParentConfig) setParentConfig(tempConfig)
-  }, [ tempConfig, setParentConfig ])*/
-
+    if (requiredSections && config)
+      updateVisConfigField('missingRequiredSections', !requiredSections.every(section => isValid(section) === true))
+  }, [ config ])
 
   /** Component Effects -------------------------------------------------------------------------- */
-  useEffect(() => {
-    // No sections required, setting to false
-    updateConfigField('missingRequiredSections', false)
-  }, [])
-
   useEffect(() => {
     //Verify comparate data type
     let operators = [ '<', '>', '<=', '>=' ]
     if (config.dataConditionalComparate !== '') {
       if (operators.indexOf(config.dataConditionalOperator) > -1 && isNaN(config.dataConditionalComparate)) {
-        updateConfigField('invalidComparate', true )
+        updateVisConfigField('invalidComparate', true )
       } else {
         if (config.invalidComparate) {
-          updateConfigField('invalidComparate', false )
+          updateVisConfigField('invalidComparate', false )
         }
       }
     } else {
-      updateConfigField('invalidComparate', false )
+      updateVisConfigField('invalidComparate', false )
     }
   }, [ config.dataConditionalOperator, config.dataConditionalComparate ])
 
@@ -77,19 +74,21 @@ const EditorPanels = () => {
   )
 
   const panelData = (
-    <Accordion.Section label="Data">
+    <Accordion.Section label="Data" warnIf={!isValid(config.dataColumn) || !isValid(config.dataFunction)}>
       <SectionWrapper label="Numerator">
         <InputSelect
           label="Data Column"
           options={CoveHelper.Data.getDataColumns(data)}
           configField="dataColumn"
           initialDisabled
+          required
         />
         <InputSelect
           label="Data Function"
           options={DATA_FUNCTIONS}
           configField="dataFunction"
           initialDisabled
+          required
         />
 
         <Label>Data Conditional</Label>

@@ -1,8 +1,10 @@
 import React, { useState, useCallback } from 'react'
 
 // Store
-import useGlobalStore from '@cdc/core/stores/global/globalSlice'
-import useConfigStore from '@cdc/core/stores/config/configSlice'
+import useStore from '@cdc/core/store/store'
+
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Components - Core
 import Modal from '@cdc/core/components/ui/Modal'
@@ -14,9 +16,9 @@ import BuilderColumn from './Builder.Column'
 
 const RowMenu = ({ rowIdx, row }) => {
   // Store Selectors
-  const { openOverlay } = useGlobalStore()
+  const openOverlay = useStore(state => state.openOverlay)
 
-  const { config, updateConfig, updateConfigField } = useConfigStore()
+  const { config, updateVisConfig, updateVisConfigField } = useVisConfig()
 
   const parseRowLayout = (row) => {
     let res = []
@@ -40,7 +42,7 @@ const RowMenu = ({ rowIdx, row }) => {
       newRow.push({ ...rows[i], width: layout[i] ?? null })
     }
 
-    updateConfigField(['rows', rowIdx], newRow)
+    updateVisConfigField(['rows', rowIdx], newRow)
     setLayout(layout.join(''))
   }
 
@@ -61,7 +63,7 @@ const RowMenu = ({ rowIdx, row }) => {
     rows[newIdx] = processImmutableRowArr(row)
     rows[rowIdx] = processImmutableRowArr(config.rows[newIdx])
 
-    updateConfig({ rows: rows })
+    updateVisConfig({ rows: rows })
 
     //Animate Row Movement
     let calcRowMove = dir === 'down' ? 202 : -202
@@ -92,7 +94,7 @@ const RowMenu = ({ rowIdx, row }) => {
     let rows = [ ...config.rows ]
     rows.splice(rowIdx, 1) // Just delete the row. Don't delete the instantiated widgets for now.
 
-    updateConfig({ rows: rows })
+    updateVisConfig({ rows: rows })
   }
 
   const rowItemsHeight = () => {

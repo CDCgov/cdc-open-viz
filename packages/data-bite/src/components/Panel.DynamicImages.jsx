@@ -1,7 +1,7 @@
 import React from 'react'
 
-// Store
-import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Components - Core
 import Button from '@cdc/core/components/element/Button'
@@ -15,14 +15,14 @@ import { DATA_OPERATORS } from '../data/consts'
 
 const PanelDynamicImages = () => {
   // Store Selectors
-  const { config, updateConfig } = useConfigStoreContext()
+  const { config, updateVisConfig } = useVisConfig()
 
   const createDynamicImage = () => {
     let imageOptions = config.imageData.options ? [ ...config.imageData.options ] : []
     imageOptions.push({ source: '', arguments: [ { operator: '', threshold: '' } ], alt: '', secondArgument: false })
 
     let payload = { ...config.imageData, options: imageOptions }
-    updateConfig({ imageData: payload })
+    updateVisConfig({ imageData: payload })
   }
 
   const updateDynamicImageOptions = (name, index, value) => {
@@ -34,7 +34,7 @@ const PanelDynamicImages = () => {
     }
 
     let payload = { ...config.imageData, options: imageOptions }
-    updateConfig({ imageData: payload })
+    updateVisConfig({ imageData: payload })
   }
 
   const deleteDynamicImage = (index) => {
@@ -42,7 +42,7 @@ const PanelDynamicImages = () => {
     imageOptions.splice(index, 1)
 
     let payload = { ...config.imageData, options: imageOptions }
-    updateConfig({ imageData: payload })
+    updateVisConfig({ imageData: payload })
   }
 
   const updateOptionArgument = (name, optionIndex, argumentIndex, value) => {
@@ -54,7 +54,7 @@ const PanelDynamicImages = () => {
     optionsPayload[optionIndex] = argumentsPayload
 
     let payload = { ...config.imageData, options: optionsPayload }
-    updateConfig({ imageData: payload })
+    updateVisConfig({ imageData: payload })
   }
 
   const deleteOptionArgument = (index) => {
@@ -71,7 +71,7 @@ const PanelDynamicImages = () => {
     }
 
     let payload = { ...config.imageData, options: imageOptions }
-    updateConfig({ imageData: payload })
+    updateVisConfig({ imageData: payload })
   }
 
   return (

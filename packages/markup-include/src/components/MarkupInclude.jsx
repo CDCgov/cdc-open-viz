@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react'
 
-// Store
-import useStore from '@cdc/core/store/store'
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Third Party
 import { Markup } from 'interweave'
@@ -18,7 +18,8 @@ import AlertBox from '@cdc/core/components/ui/AlertBox'
 
 // Visualization
 const MarkupInclude = () => {
-  const config = useStore(state => state.config)
+  // Store Selectors
+  const { config } = useVisConfig()
 
   const [ urlMarkup, setUrlMarkup ] = useState('')
   const [ markupError, setMarkupError ] = useState(null)

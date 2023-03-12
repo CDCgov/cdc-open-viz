@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react'
 
 // Hooks
-import { useLoadConfig } from '@cdc/core/hooks/store/useLoadConfig'
+import { VisConfigProvider } from '@cdc/core/hooks/store/useVisConfig'
 
 // Data
 import defaults from './data/initial-state'
@@ -20,19 +20,17 @@ import MarkupInclude from './components/MarkupInclude'
 import './scss/cove-markup-include.scss'
 
 // Visualization
-const CdcMarkupInclude = visualizationProps => {
-  const [ isLoading ] = useLoadConfig(visualizationProps, defaults)
-
+const CdcMarkupInclude = visProps => {
   return (
     <ErrorBoundary component="CdcMarkupInclude">
       <Suspense fallback={<RenderFallback/>}>
-        {!isLoading &&
+        <VisConfigProvider {...visProps} defaultConfig={defaults}>
           <View editorPanels={<EditorPanels/>}>
             <Component className="cove-markup-include">
               <MarkupInclude/>
             </Component>
           </View>
-        }
+        </VisConfigProvider>
       </Suspense>
     </ErrorBoundary>
   )

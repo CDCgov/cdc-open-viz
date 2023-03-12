@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react'
 
 // Hooks
-import { useLoadConfig } from '@cdc/core/hooks/store/useLoadConfig'
+import { VisConfigProvider } from '@cdc/core/hooks/store/useVisConfig'
 
 // Data
 import defaults from './data/initial-state'
@@ -20,19 +20,17 @@ import WaffleChart from './components/WaffleChart.jsx'
 import './scss/cove-waffle-chart.scss'
 
 // Visualization
-const CdcWaffleChart = visualizationProps => {
-  const [ isLoading ] = useLoadConfig(visualizationProps, defaults)
-
+const CdcWaffleChart = visProps => {
   return (
     <ErrorBoundary component="CdcWaffleChart">
       <Suspense fallback={<RenderFallback/>}>
-        {!isLoading &&
+        <VisConfigProvider {...visProps} defaultConfig={defaults}>
           <View editorPanels={<EditorPanels/>}>
             <Component className="cove-waffle-chart">
-            <WaffleChart/>
+              <WaffleChart/>
             </Component>
           </View>
-        }
+        </VisConfigProvider>
       </Suspense>
     </ErrorBoundary>
   )

@@ -3,6 +3,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 // Store
 import useStore from '../../store/store'
 
+// Hooks
+import { useVisConfig } from '../../hooks/store/useVisConfig'
+
 // Data
 import { COVE_BREAKPOINTS as breakpoints } from '../../data/const'
 
@@ -20,8 +23,8 @@ import '../../styles/v2/components/element/editor-utils.scss'
 
 const Editor = ({ editorPanels, children }) => {
   // Store Selectors
-  const { os } = useStore()
-  const { config, updateConfig, updateParentConfig } = useStore()
+  const { config, updateVisConfig } = useVisConfig()
+  const os = useStore(state => state.os)
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
   const [ displayGrid, setDisplayGrid ] = useState(false)
@@ -44,9 +47,9 @@ const Editor = ({ editorPanels, children }) => {
   // If a subcomponent is being consumbed by Wizard or Dashboard, the update function
   // is received by the ConfigProxy and registered in the store.
   // The function is then used below when the config is updated.
-  useEffect(() => {
+  /*useEffect(() => {
     if (updateParentConfig) updateParentConfig(convertStateToConfig())
-  }, [ updateParentConfig ])
+  }, [ updateParentConfig ])*/
 
   // Set and clean up the event listener for the hotkeys
   useEffect(() => {
@@ -68,7 +71,7 @@ const Editor = ({ editorPanels, children }) => {
 
   // If there is no longer a confirmation, update the component's config.
   useEffect(() => {
-    if (showConfirm === false) updateConfig(convertStateToConfig())
+    if (showConfirm === false) updateVisConfig(convertStateToConfig())
   }, [ showConfirm ])
 
   const viewportPreviewController = useCallback((breakpoint) => {

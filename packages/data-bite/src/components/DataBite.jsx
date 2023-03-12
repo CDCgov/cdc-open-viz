@@ -4,7 +4,10 @@ import React, { useCallback } from 'react'
 import parse from 'html-react-parser'
 
 // Store
-import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
+import useStore from '@cdc/core/store/store'
+
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Data
 import {
@@ -24,15 +27,14 @@ import CoveHelper from '@cdc/core/helpers/cove'
 // Components - Core
 import CircleCallout from '../components/CircleCallout'
 import DataBiteImage from './DataBite.Image'
-import useDataStore from '@cdc/core/stores/data/dataSlice'
 
 // Visualization
 const DataBite = () => {
   // Store Selectors
-  const { config } = useConfigStoreContext()
-  const { data } = useDataStore()
+  const { config } = useVisConfig()
+  const data = useStore(state => state.data)
 
-  const calculateDataBite = (includePrefixSuffix = true) => {
+  const calculateDataBite = useCallback((includePrefixSuffix = true) => {
     //If either the column or function aren't set, do not calculate
     if (!config.dataColumn || !config.dataFunction) return ''
 
@@ -122,7 +124,7 @@ const DataBite = () => {
       //Rounding and formatting for ranges happens earlier.
       return includePrefixSuffix ? config.dataFormat.prefix + dataBite + config.dataFormat.suffix : dataBite
     }
-  }
+  }, [ config, data ])
 
   const DataImage = useCallback(() => (
     <DataBiteImage calculateDataBite={calculateDataBite}/>

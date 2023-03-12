@@ -3,9 +3,9 @@ import React from 'react'
 // Components
 import Accordion from '../ui/Accordion'
 import ColorPicker from '../ui/ColorPicker'
-import InputCheckbox from '../input/InputCheckbox'
 import InputSelect from '../input/InputSelect'
 import InputText from '../input/InputText'
+import InputToggle from '../input/InputToggle'
 
 const optionsObj = {
   default: 'Default',
@@ -28,7 +28,7 @@ const PanelGlobal = (
     <InputSelect configField={[ 'componentStyle', 'border' ]} options={optionsObj} label="Border"/>
     <InputSelect configField={[ 'componentStyle', 'accent' ]} options={accentOptions} label="Border Accent"/>
     <InputSelect configField={[ 'componentStyle', 'background' ]} options={optionsObj} label="Background Color"/>
-    <InputCheckbox configField={[ 'componentStyle', 'shadow' ]} label="Show Dropshadow"/>
+    <InputToggle toggleType="flat" size="small" configField={[ 'componentStyle', 'shadow' ]} label="Show Dropshadow"/>
     <ColorPicker label="Theme Color" tooltip="Select the theme color for the component" colorTooltip/>
   </Accordion.Section>
 )

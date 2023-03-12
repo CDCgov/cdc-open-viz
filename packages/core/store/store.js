@@ -5,8 +5,7 @@ import { immer } from 'zustand/middleware/immer'
 
 // Store Slices
 import globalSlice from './global/globalSlice'
-import configSlice from './config/configSlice'
-import visualizationSlice from './visualization/visualizationSlice'
+import visConfigSlice from './config/visConfigSlice'
 import dataSlice from './data/dataSlice'
 
 // Store
@@ -15,10 +14,7 @@ export const store = (set, get) => ({
   ...globalSlice(set, get),
 
   // Config Slice
-  ...configSlice(set, get),
-
-  // Visualization Slice
-  ...visualizationSlice(set, get),
+  ...visConfigSlice(set, get),
 
   // Data Slice
   ...dataSlice(set, get),

@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react'
 
-// Store
-import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 const DataBiteImage = ({ calculateDataBite }) => {
-  const { config } = useConfigStoreContext()
+  // Store Selectors
+  const { config } = useVisConfig()
   const { biteStyle, imageData } = config
 
   const [ imgSrc, setImgSrc ] = useState(imageData.url || '')

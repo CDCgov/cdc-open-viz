@@ -1,14 +1,18 @@
+import React from 'react'
+
 // Third Party
 import parse from 'html-react-parser'
 
 // Store
-import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
-import useDataStore from '@cdc/core/stores/data/dataSlice'
+import useStore from '@cdc/core/store/store'
+
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Visualization
 const FilteredText = () => {
-  const { config } = useConfigStoreContext()
-  const { data } = useDataStore()
+  const { config } = useVisConfig()
+  const data = useStore(state => state.data)
 
   const filteredText = () => {
     let filteredData = []

@@ -1,9 +1,15 @@
 const visualizationSliceActions = (set, get) => ({
   // Actions --------------------------------------------------------------------------------------------------------------------------------------------------------------
   addVisualization(key, config) {
-    set(state => {
-      state.config.visualizations = { ...state.config.visualizations, [key]: config }
-    })
+    set(state => ({ visualizations: { ...state.visualizations, [key]: config } }))
+  },
+  updateVisualization(key, config) {
+    set(state => ({
+      visualizations: {
+        ...state.visualizations,
+        [key]: { ...state.visualizations[key], ...config }
+      }
+    }))
   },
   removeVisualization(key) {
     set(state => {

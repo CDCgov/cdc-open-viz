@@ -9,18 +9,20 @@ import LoadSpin from '../ui/LoadSpin'
 // Styles
 import '../../styles/v2/components/element/button.scss'
 
-const Button = ({
-                  style,
-                  role,
-                  hoverStyle = {},
-                  fluid = false,
-                  disabled = false,
-                  loadingText = "Loading...",
-                  flexCenter = false,
-                  active = false,
-                  onClick,
-                  children, ...attributes
-                }) => {
+const Button = (
+  {
+    style,
+    role,
+    hoverStyle = {},
+    fluid = false,
+    disabled = false,
+    loadingText = 'Loading...',
+    flexCenter = false,
+    active = false,
+    onClick,
+    children, ...attributes
+  }
+) => {
 
   const buttonRef = useRef(null)
 
@@ -74,8 +76,9 @@ const Button = ({
       buttonRef.current.parentNode.removeChild(ghostSpan)
       buttonRef.current.parentNode.removeChild(ghostLoaderSpan)
     }
-    return () => {}
-  }, [role, buttonRef.current])
+    return () => {
+    }
+  }, [ role, buttonRef.current ])
 
   useEffect(() => {
     //Adjust button styles depending on cursor, focus, and active, states
@@ -86,7 +89,8 @@ const Button = ({
         return setCustomStyles({ ...style }) //Button is not 'active', so reset display styles back to default
       }
     }
-    return () => {}
+    return () => {
+    }
   }, [ buttonState, active ])
 
   return (

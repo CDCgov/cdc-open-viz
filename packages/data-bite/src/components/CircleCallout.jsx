@@ -1,4 +1,6 @@
 import React from 'react'
+
+// Third Party
 import themes from '@cdc/core/data/componentThemes'
 import chroma from 'chroma-js'
 

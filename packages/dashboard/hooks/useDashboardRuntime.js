@@ -3,7 +3,7 @@
 // following a proper refactor.
 
 /*// Helpers
-import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
+import { cacheBustingString } from '@cdc/core/helpers/coveHelper'
 import dataTransform from '@cdc/core/helpers/dataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import CoveHelper from '@cdc/core/helpers/cove'

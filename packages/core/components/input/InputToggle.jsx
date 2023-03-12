@@ -3,8 +3,8 @@ import React, { useState, useEffect, memo, useRef } from 'react'
 // Third Party
 import PropTypes from 'prop-types'
 
-// Store
-import useStore from '../../store/store'
+// Hooks
+import { useVisConfig } from '../../hooks/store/useVisConfig'
 
 // Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
@@ -22,7 +22,8 @@ const InputToggle = memo((
     tooltip,
     toggleType = 'flat',
     size = 'small',
-    activeColor = null,
+    activeColor = '#005eaa',
+    required,
 
     configField,
     value: inlineValue,
@@ -30,32 +31,33 @@ const InputToggle = memo((
   }
 ) => {
   // Store Selectors
-  const { config, updateConfigField } = useStore()
+  const { config, updateVisConfigField } = useVisConfig()
 
-  const [ value, setValue ] = useState(inlineValue || false)
+  const [ value, setValue ] = useState(false)
 
   const inputRef = useRef(null)
 
-  // Set initial value
-  const valueFromConfig = configField && getConfigKeyValue(configField, config) !== undefined && getConfigKeyValue(configField, config)
-  const configValueIsValid = valueFromConfig || (valueFromConfig === false && valueFromConfig !== undefined)
+  // Get initial value
+  const configFieldValue = configField && getConfigKeyValue(configField, config)
 
-  //Set initial value
+  // Check initial value
+  // Valid value of 'false' could be returned, so checking undefined
+  const valueExistsOnConfig = Boolean(configFieldValue && typeof configFieldValue !== undefined)
+
+  // Set initial value
   useEffect(() => {
-    if (configValueIsValid) {
-      setValue(getConfigKeyValue(configField, config))
+    if (valueExistsOnConfig) {
+      configFieldValue !== value && setValue(configFieldValue)
     } else {
       setValue(inlineValue)
     }
-  }, [ config ])
+  }, [ valueExistsOnConfig ])
 
   useEffect(() => {
-    if (configValueIsValid && valueFromConfig !== value) updateConfigField(configField, value)
-  }, [ value ])
+    if (configField && value !== configFieldValue) updateVisConfigField(configField, value)
+  }, [ configField, value, updateVisConfigField ])
 
-  const onClickHandler = (e) => {
-    inputRef.current.click()
-  }
+  const onClickHandler = () => inputRef.current.click()
 
   const onChangeHandler = (e) => {
     setValue(value => !value)
@@ -88,19 +90,21 @@ const InputToggle = memo((
   return (
     <>
       {label && labelPosition === 'top' && <TooltipLabel/>}
+
       <div className={'cove-input__toggle-group' + (className ? ' ' + className : '')} flow={labelPosition}>
         {label && labelPosition === 'left' && <TooltipLabel/>}
-        <div className={
-          'cove-input__toggle'
-          + (size === 'medium' ? '--medium' : size === 'large' ? '--large' : size === 'xlarge' ? '--xlarge' : '')
-          + inputClasses()
-          + (value ? ' cove-input__toggle--active' : '')
-        }
-             onClick={(e) => onClickHandler(e)}>
+        <div className={`cove-input__toggle${size === 'medium' ? '--medium' : size === 'large' ? '--large' : size === 'xlarge' ? '--xlarge' : ''}${inputClasses()}${value ? ' cove-input__toggle--active' : ''}${required && (value === undefined) ? ' cove-input--error' : ''}`}
+          tabIndex={0}
+          onKeyUp={(e) => {
+            if (e.code === 'Enter' || e.code === 'NumpadEnter' || e.code === 'Space') onClickHandler()
+          }}
+          onClick={onClickHandler}>
+          <div className="cove-input__toggle-spacer"/>
           <div className="cove-input__toggle-button"/>
           <div className="cove-input__toggle-track" style={value && activeColor ? { backgroundColor: activeColor } : null}/>
-          <input className="cove-input--hidden" type="checkbox" defaultChecked={value} onChange={(e) => onChangeHandler(e)} ref={inputRef} readOnly/>
+          <input className="cove-input--hidden" type="checkbox" defaultChecked={value} onChange={(e) => onChangeHandler(e)} ref={inputRef} tabIndex={-1} readOnly/>
         </div>
+
         {label && labelPosition === 'right' && <TooltipLabel/>}
       </div>
     </>

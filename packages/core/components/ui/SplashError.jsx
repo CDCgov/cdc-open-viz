@@ -11,7 +11,7 @@ const SplashError = ({ title = 'Error', message }) => {
     <section className="cove-splash__waiting">
       <section className="cove-splash__waiting__container">
         {title && <h3 className="cove-heading--2 mb-1">{title}<Icon display="warningTriangle" className="ml-2"/></h3>}
-        {message && <p>{message}</p>}
+        {message}
       </section>
     </section>
   )

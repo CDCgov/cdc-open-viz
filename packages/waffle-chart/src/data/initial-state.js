@@ -29,5 +29,6 @@ export default {
     accent: 'none',
     background: 'default',
     shadow: true
-  }
+  },
+  missingRequiredSections: true //This value should always exist, and should always be true on initial state
 }
