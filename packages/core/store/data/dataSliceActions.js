@@ -6,15 +6,24 @@ const transform = new dataTransform()
 
 const dataSliceActions = (set, get) => ({
   // Actions --------------------------------------------------------------------------------------------------------------------------------------------------------------
-  setData: value => set(state => { state.data = value }),
-  setDatasets: value => set(state => { state.datasets = value }),
-  setFormattedData: value => set(state => { state.formattedData = value }),
-  getData: async (response) => {
+  setData: value =>
+    set(state => {
+      state.data = value
+    }),
+  setDatasets: value =>
+    set(state => {
+      state.datasets = value
+    }),
+  setFormattedData: value =>
+    set(state => {
+      state.formattedData = value
+    }),
+  getData: async response => {
     let res = await response
 
     let resData = res.data || []
     let resFormattedData = res.formattedData || []
-    let resDataset = res.datasets || []
+    let resDatasets = res.datasets || []
 
     // If a data URL is provided, fetch data then return. Overrides any previous data set.
     if (response.dataUrl) {
@@ -29,7 +38,13 @@ const dataSliceActions = (set, get) => ({
 
     await get().setData(resData)
     await get().setFormattedData(resFormattedData)
-    await get().setDatasets(resDataset)
+    await get().setDatasets(resDatasets)
+
+    return {
+      responseData: resData,
+      responseFormattedDate: resFormattedData,
+      responseDatasets: resDatasets
+    }
   }
 })
 

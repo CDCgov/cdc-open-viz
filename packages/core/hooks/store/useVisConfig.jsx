@@ -14,7 +14,7 @@ import fetchAsyncUrl from '../../helpers/fetchAsyncUrl'
 export const ConfigContext = createContext({})
 ConfigContext.displayName = 'VisualizationConfig'
 
-export const VisConfigProvider = ({ visualizationKey = '__default__', config: configObj, configUrl, children, defaultConfig } = {}) => {
+export const VisConfigProvider = ({ visualizationKey = '__default__', config: configObj, configUrl, children, defaultConfig, processRuntimeConfig } = {}) => {
   const [loading, setLoading] = useState(false)
   const addVisConfig = useStore(state => state.addVisConfig)
   const updateVisConfig = useStore(state => state.updateVisConfig)
@@ -22,6 +22,8 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
   const dashboardStoredConfig = useStore(state => state.visualizations['__default__']?.visualizations?.[visualizationKey])
 
   const getData = useStore(state => state.getData)
+
+  const finalConfig = useCallback(() => dashboardStoredConfig ?? storedConfig, [dashboardStoredConfig, storedConfig])
 
   useEffect(() => {
     async function initConfig() {
@@ -32,18 +34,25 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
       if (configUrl) console.log('using config url', configUrl)
 
       const resolvedConfig = merge(defaultConfig, config)
+      const processedConfig = { ...coveUpdateWorker(resolvedConfig) }
 
       // Run update worker on config, then set in store
       if (!dashboardStoredConfig) {
         // Doesn't exist in dashboard store, so add it as either the default, or a new visualization
-        addVisConfig(visualizationKey, { ...coveUpdateWorker(resolvedConfig) })
+        addVisConfig(visualizationKey, processedConfig)
       } else {
         // Exists as dashboard store, so update it
-        updateVisConfig(visualizationKey, { ...coveUpdateWorker(resolvedConfig) })
+        updateVisConfig(visualizationKey, processedConfig)
       }
 
       // Get initial data off config and put in store
-      getData(config)
+      await getData(processedConfig)
+
+      if (processedConfig && processRuntimeConfig) {
+        const { config } = useStore.getState()
+        const runtimeConfig = processRuntimeConfig(config)
+        updateVisConfig(runtimeConfig)
+      }
 
       setLoading(false)
     }
@@ -57,7 +66,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
     return () => {}
   }, [configUrl, defaultConfig, loading, configObj, visualizationKey])
 
-  const finalConfig = useCallback(() => dashboardStoredConfig ?? storedConfig, [dashboardStoredConfig, storedConfig])
+  const data = useStore(state => state.data)
 
   if (!finalConfig()) {
     console.log('no stored config!')
