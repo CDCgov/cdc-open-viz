@@ -12,10 +12,10 @@ import fetchAsyncUrl from '../../helpers/fetchAsyncUrl'
 
 // Context
 export const ConfigContext = createContext({})
-ConfigContext.displayName = 'VisualizationConfig';
+ConfigContext.displayName = 'VisualizationConfig'
 
 export const VisConfigProvider = ({ visualizationKey = '__default__', config: configObj, configUrl, children, defaultConfig } = {}) => {
-  const [ loading, setLoading ] = useState(false)
+  const [loading, setLoading] = useState(false)
   const addVisConfig = useStore(state => state.addVisConfig)
   const updateVisConfig = useStore(state => state.updateVisConfig)
   const storedConfig = useStore(state => state.visualizations[visualizationKey])
@@ -39,10 +39,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
         addVisConfig(visualizationKey, { ...coveUpdateWorker(resolvedConfig) })
       } else {
         // Exists as dashboard store, so update it
-        //TODO: Bypassing this update prevents .newVis from being re-added - something here is pulling from a stale state somehow
-        if (dashboardStoredConfig.newViz) {
-          updateVisConfig(visualizationKey, { ...coveUpdateWorker(resolvedConfig) })
-        }
+        updateVisConfig(visualizationKey, { ...coveUpdateWorker(resolvedConfig) })
       }
 
       // Get initial data off config and put in store
@@ -58,9 +55,9 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
     setLoading(true)
     void initConfig()
     return () => {}
-  }, [ configUrl, defaultConfig, loading, configObj, visualizationKey ])
+  }, [configUrl, defaultConfig, loading, configObj, visualizationKey])
 
-  const finalConfig = useCallback(() => dashboardStoredConfig ?? storedConfig, [ dashboardStoredConfig, storedConfig ])
+  const finalConfig = useCallback(() => dashboardStoredConfig ?? storedConfig, [dashboardStoredConfig, storedConfig])
 
   if (!finalConfig()) {
     console.log('no stored config!')
@@ -69,11 +66,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
 
   const contextValue = { ...finalConfig(), visualizationKey }
 
-  return (
-    <ConfigContext.Provider value={contextValue}>
-      {children}
-    </ConfigContext.Provider>
-  )
+  return <ConfigContext.Provider value={contextValue}>{children}</ConfigContext.Provider>
 }
 
 export const useVisConfig = () => {
@@ -84,13 +77,19 @@ export const useVisConfig = () => {
   const storeUpdateVisConfigField = useStore(state => state.updateVisConfigField)
 
   // Action Proxies ------------------------------------------------------------------------------------------------
-  const updateVisConfig = useCallback(updates => {
-    storeUpdateVisConfig(visualizationKey, updates)
-  }, [ storeUpdateVisConfig, visualizationKey ])
+  const updateVisConfig = useCallback(
+    updates => {
+      storeUpdateVisConfig(visualizationKey, updates)
+    },
+    [storeUpdateVisConfig, visualizationKey]
+  )
 
-  const updateVisConfigField = useCallback((fieldPayload, setValue, merge = true) => {
-    storeUpdateVisConfigField(visualizationKey, fieldPayload, setValue, merge)
-  }, [ storeUpdateVisConfigField, visualizationKey ])
+  const updateVisConfigField = useCallback(
+    (fieldPayload, setValue, merge = true) => {
+      storeUpdateVisConfigField(visualizationKey, fieldPayload, setValue, merge)
+    },
+    [storeUpdateVisConfigField, visualizationKey]
+  )
   // ---------------------------------------------------------------------------------------------------------------
 
   return {
