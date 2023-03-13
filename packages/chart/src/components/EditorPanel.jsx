@@ -279,6 +279,10 @@ const EditorPanel = () => {
     if (updatedConfig.table.show === undefined) {
       updatedConfig.table.show = !isDashboard
     }
+    // DEV-3293 - Force combo to always be vertical
+    if (updatedConfig.visualizationType === 'Combo') {
+      updatedConfig.orientation = "vertical"
+    }
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
@@ -673,7 +677,7 @@ const EditorPanel = () => {
     if (visualizationType === 'Box Plot') return false
     if (visualizationType === 'Scatter Plot') return false
     if (visualizationType === 'Pie') return false
-    return series.some(series => series.type === 'Bar' || series.type === 'Paired Bar')
+    return series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar')
   }
 
   const handleSeriesChange = (idx1, idx2) => {
