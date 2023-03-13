@@ -743,7 +743,17 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
-  const enabledChartTypes = ['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line', 'Area Chart', 'Scatter Plot', 'Box Plot']
+  const enabledChartTypes = [
+    'Pie',
+    'Line',
+    'Bar',
+    'Combo',
+    'Paired Bar',
+    'Spark Line',
+    // 'Area Chart',
+    'Scatter Plot',
+    'Box Plot'
+  ]
 
   return (
     <ErrorBoundary component='EditorPanel'>
