@@ -78,7 +78,8 @@ const CountyMap = props => {
 
   const runtimeKeys = Object.keys(data)
 
-  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgb(90, 90, 90)' : 'rgb(255, 255, 255)'
+  const lineWidth = 0.3
 
   const onReset = () => {
     setFocus({})
@@ -158,6 +159,7 @@ const CountyMap = props => {
         if (!isNaN(currentTooltipIndex)) {
           context.fillStyle = applyLegendToRow(data[mapData[currentTooltipIndex].id])[0]
           context.strokeStyle = geoStrokeColor
+          context.lineWidth = lineWidth
           context.beginPath()
           path(mapData[currentTooltipIndex])
           context.fill()
@@ -187,15 +189,9 @@ const CountyMap = props => {
 
         // If the hovered county is found, show the tooltip for that county, otherwise hide the tooltip
         if (county && data[county.id]) {
-          context.fillStyle = 'white'
-          context.strokeStyle = 'white'
-          context.beginPath()
-          path(mapData[countyIndex])
-          context.fill()
-          context.stroke()
-
           context.fillStyle = applyLegendToRow(data[county.id])[1]
           context.strokeStyle = geoStrokeColor
+          context.lineWidth = lineWidth
           context.beginPath()
           path(mapData[countyIndex])
           context.fill()
@@ -275,8 +271,8 @@ const CountyMap = props => {
       context.clearRect(0, 0, canvas.width, canvas.height)
 
       // Enforces stroke style of the county lines
-      context.lineWidth = 0.85
       context.strokeStyle = geoStrokeColor
+      context.lineWidth = lineWidth
 
       let focusIndex = -1
       // Iterates through each state/county topo and renders it
@@ -307,8 +303,8 @@ const CountyMap = props => {
 
       // If the focused state is found in the geo data, render it with a thicker outline
       if (focusIndex !== -1) {
-        context.lineWidth = 2
         context.strokeStyle = 'black'
+        context.lineWidth = 2
         context.beginPath()
         path(mapData[focusIndex])
         context.stroke()
