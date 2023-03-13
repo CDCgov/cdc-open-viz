@@ -25,6 +25,7 @@ const TextField = memo(({ label, tooltip, section = null, subsection = null, fie
 
   const [debouncedValue] = useDebounce(value, 500)
 
+
   useEffect(() => {
     if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
       updateField(section, subsection, fieldName, debouncedValue, i)
@@ -77,7 +78,6 @@ const CheckBox = memo(({ label, value, fieldName, section = null, subsection = n
       name={fieldName}
       checked={value}
       onChange={e => {
-        e.preventDefault()
         updateField(section, subsection, fieldName, !value)
       }}
       {...attributes}
@@ -213,6 +213,7 @@ const EditorPanel = () => {
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
+
   // when the visualization type changes we
   // have to update the individual series type & axis details
   // dataKey is unchanged here.
@@ -279,6 +280,10 @@ const EditorPanel = () => {
     if (updatedConfig.table.show === undefined) {
       updatedConfig.table.show = !isDashboard
     }
+    // DEV-3293 - Force combo to always be vertical
+    if (updatedConfig.visualizationType === 'Combo') {
+      updatedConfig.orientation = "vertical"
+    }
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
@@ -344,6 +349,19 @@ const EditorPanel = () => {
   if (loading) {
     return null
   }
+
+  useEffect(() => {
+    if (!config.general?.boxplot) return;
+    if (!config.general.boxplot.firstQuartilePercentage) {
+      updateConfig({
+        ...config,
+        boxplot: {
+          ...config.boxplot,
+          firstQuartilePercentage: 25
+        }
+      })
+    }
+  }, [config]);
 
   const setLollipopShape = shape => {
     updateConfig({
@@ -673,7 +691,7 @@ const EditorPanel = () => {
     if (visualizationType === 'Box Plot') return false
     if (visualizationType === 'Scatter Plot') return false
     if (visualizationType === 'Pie') return false
-    return series.some(series => series.type === 'Bar' || series.type === 'Paired Bar')
+    return series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar')
   }
 
   const handleSeriesChange = (idx1, idx2) => {
@@ -743,7 +761,17 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
-  const enabledChartTypes = ['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line', 'Area Chart', 'Scatter Plot', 'Box Plot']
+  const enabledChartTypes = [
+    'Pie',
+    'Line',
+    'Bar',
+    'Combo',
+    'Paired Bar',
+    'Spark Line',
+    // 'Area Chart',
+    'Scatter Plot',
+    'Box Plot'
+  ]
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -1171,7 +1199,7 @@ const EditorPanel = () => {
                     <h4>Percentages for Quartiles</h4>
                     <TextField
                       type='number'
-                      value={config.boxplot.firstQuartilePercentage}
+                      value={config.boxplot.firstQuartilePercentage ? config.boxplot.firstQuartilePercentage : 25}
                       fieldName='firstQuartilePercentage'
                       section='boxplot'
                       label='Lower Quartile'
@@ -1191,7 +1219,7 @@ const EditorPanel = () => {
 
                     <TextField
                       type='number'
-                      value={config.boxplot.thirdQuartilePercentage}
+                      value={config.boxplot.thirdQuartilePercentage ? config.boxplot.thirdQuartilePercentage : 75}
                       fieldName='thirdQuartilePercentage'
                       label='Upper Quartile'
                       section='boxplot'
