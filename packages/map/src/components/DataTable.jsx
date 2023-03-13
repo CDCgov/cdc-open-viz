@@ -150,7 +150,6 @@ const DataTable = props => {
 
   const DownloadButton = memo(() => {
     let csvData;
-    console.log("state.general.type",state.general.type)
     if (state.general.type === 'bubble' || state.general.type === 'us-geocode') {
      // Just Unparse
       csvData = Papa.unparse(rawData)
