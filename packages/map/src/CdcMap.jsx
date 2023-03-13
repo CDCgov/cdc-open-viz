@@ -1047,6 +1047,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       delete legendItem.disabled
     })
 
+    newLegend.runtimeDataHash = runtimeLegend.runtimeDataHash
+
     setRuntimeLegend(newLegend)
   }
 

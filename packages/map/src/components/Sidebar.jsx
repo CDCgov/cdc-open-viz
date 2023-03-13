@@ -22,6 +22,8 @@ const Sidebar = props => {
 
     newLegend['disabledAmt'] = newValue ? disabledAmt + 1 : disabledAmt - 1
 
+    newLegend.runtimeDataHash = runtimeLegend.runtimeDataHash
+
     setRuntimeLegend(newLegend)
 
     setAccessibleStatus(`Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`)
