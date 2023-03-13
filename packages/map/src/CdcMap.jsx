@@ -1046,7 +1046,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Attempts to find the corresponding value
   const displayGeoName = key => {
     let value = key
-
     // Map to first item in values array which is the preferred label
     if (stateKeys.includes(value)) {
       value = titleCase(supportedStates[key][0])
@@ -1061,7 +1060,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       value = titleCase(supportedTerritories[key][0])
     }
 
-    // new case where state FIPS without "US-" need lookup
+    // new case where territory FIPS without "US-" need lookup
     if (territoryKeys.includes('US-' + value)) {
       value = titleCase(supportedTerritories['US-' + key][0])
     }
