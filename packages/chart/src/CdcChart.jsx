@@ -264,13 +264,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
           if (!filteredData) throw new Error('boxplots dont have data yet')
           if (!plots) throw new Error('boxplots dont have plots yet')
+          if (newConfig.boxplot.firstQuartilePercentage === "") {
+            newConfig.boxplot.firstQuartilePercentage = 0
+          }
 
-          // test first item of data for numeric when box plot
-          // if (!isNumber(filteredData[0][config.yAxis.dataKey])) {
-          //   newConfig.runtime.editorErrorMessage = 'Issue with box plot'
-          //   // debugger
-          //   throw new Error('boxplots must use numerical data on y axis')
-          // }
+          if (newConfig.boxplot.thirdQuartilePercentage === "") {
+            newConfig.boxplot.thirdQuartilePercentage = 0
+          }
+
           const q1 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
           const q3 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
           const iqr = q3 - q1
