@@ -142,8 +142,8 @@ const DataTable = props => {
   )
 
   const DownloadButton = memo(() => {
-    let csvData;
-    if (state.general.type === 'bubble' || state.general.type === 'us-geocode') {
+    let csvData
+    if (state.general.type === 'bubble' || state.general.type === 'us-geocode' || state.columns.geo.name === 'County') {
      // Just Unparse
       csvData = Papa.unparse(rawData)
     } else {

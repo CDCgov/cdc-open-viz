@@ -1090,7 +1090,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       value = titleCase(supportedStates[key][0])
     }
 
-    // new case where state FIPS without "US-" need lookup
+    // new case where state FIPS without "US-" needs lookup
     if (stateKeys.includes('US-' + value)) {
       value = titleCase(supportedStates['US-' + key][0])
     }
@@ -1099,7 +1099,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       value = titleCase(supportedTerritories[key][0])
     }
 
-    // new case where territory FIPS without "US-" need lookup
+    // new case where territory FIPS without "US-" needs lookup
     if (territoryKeys.includes('US-' + value)) {
       value = titleCase(supportedTerritories['US-' + key][0])
     }
