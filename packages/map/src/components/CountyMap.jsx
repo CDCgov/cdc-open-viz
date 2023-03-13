@@ -1,7 +1,6 @@
 import React, { useState, useEffect, memo, useRef } from 'react'
 import Loading from '@cdc/core/components/loader/Loading'
 
-import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { geoCentroid, geoPath } from 'd3-geo'
 import { feature, mesh } from 'topojson-client'
@@ -11,6 +10,7 @@ import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import testJSON from '../data/county-map.json'
 import { abbrs } from '../data/abbreviations'
 import CityList from './CityList'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Label lines for smaller states/geo labels
 const offsets = {
@@ -48,21 +48,11 @@ const path = geoPath().projection(projection)
 const stateLines = path(mesh(testJSON, testJSON.objects.states))
 const countyLines = path(mesh(testJSON, testJSON.objects.counties))
 
-function CountyMapChecks(prevState, nextState) {
-  const equalNumberOptIn = prevState.state.general.equalNumberOptIn && nextState.state.general.equalNumberOptIn
-  const equalColumnName = prevState.state.general.type && nextState.state.general.type
-  const equalNavColumn = prevState.state.columns.navigate && nextState.state.columns.navigate
-  const equalLegend = prevState.runtimeLegend === nextState.runtimeLegend
-  const equalBorderColors = prevState.state.general.geoBorderColor === nextState.state.general.geoBorderColor // update when geoborder color changes
-  const equalMapColors = prevState.state.color === nextState.state.color // update when map colors change
-  const equalData = prevState.data === nextState.data // update when data changes
-  return equalMapColors && equalData && equalBorderColors && equalLegend && equalColumnName && equalNavColumn && equalNumberOptIn ? true : false
-}
-
 const CountyMap = props => {
   let mapData = states.concat(counties)
 
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
+  const { applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
+  const { config } = useVisConfig()
 
   useEffect(() => {
     if (containerEl) {
@@ -76,7 +66,7 @@ const CountyMap = props => {
   const [scale, setScale] = useState(0.85)
   const [startingLineWidth, setStartingLineWidth] = useState(1.3)
   const [translate, setTranslate] = useState([0, 0])
-  const [mapColorPalette, setMapColorPalette] = useState(colorPalettes[state.color] || '#fff')
+  const [mapColorPalette, setMapColorPalette] = useState(colorPalettes[config.color] || '#fff')
   const [focusedState, setFocusedState] = useState(null)
   const [showLabel, setShowLabels] = useState(true)
 
@@ -86,7 +76,7 @@ const CountyMap = props => {
   const mapGroup = useRef()
 
   let focusedBorderColor = mapColorPalette[3]
-  let geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+  let geoStrokeColor = config.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const geoLabel = (geo, projection) => {
     let [x, y] = projection(geoCentroid(geo))
@@ -167,9 +157,9 @@ const CountyMap = props => {
 
     const focusedStateLine = path(mesh(testJSON, state[0]))
 
-    currentState.style.display = 'none'
+    myState.style.display = 'none'
 
-    allStates.forEach(state => (state.style.strokeWidth = 0.75 / newScaleWithHypot))
+    allStates.forEach(state => (config.style.strokeWidth = 0.75 / newScaleWithHypot))
     allCounties.forEach(county => (county.style.strokeWidth = 0.75 / newScaleWithHypot))
     otherStates.forEach(el => (el.style.display = 'block'))
 
@@ -185,7 +175,7 @@ const CountyMap = props => {
   }
 
   const onReset = e => {
-    if (state.general.type !== 'us-geocode') {
+    if (config.general.type !== 'us-geocode') {
       e.preventDefault()
       const svg = document.querySelector('.svg-container')
 
@@ -200,7 +190,7 @@ const CountyMap = props => {
       let otherStates = document.querySelectorAll(`.state--inactive`)
       otherStates.forEach(el => (el.style.display = 'none'))
       allCounties.forEach(el => (el.style.strokeWidth = 0.85))
-      allStates.forEach(state => state.setAttribute('stroke-width', 0.75 / 0.85))
+      allStates.forEach(state => config.setAttribute('stroke-width', 0.75 / 0.85))
 
       mapGroup.current.setAttribute('transform', `translate(${[0, 0]}) scale(${0.85})`)
 
@@ -244,7 +234,7 @@ const CountyMap = props => {
     focusedBorderPath.current.setAttribute('stroke', '#000')
 
     if (scale) {
-      allStates.forEach(state => state.setAttribute('stroke-width', 0.75 / scale))
+      allStates.forEach(state => config.setAttribute('stroke-width', 0.75 / scale))
       focusedBorderPath.current.setAttribute('stroke-width', 0.75 / scale)
     }
   }
@@ -313,16 +303,16 @@ const CountyMap = props => {
           }
 
           // When to add pointer cursor
-          if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'hover') {
+          if ((config.columns.navigate && geoData[config.columns.navigate.name]) || config.tooltips.appearanceType === 'hover') {
             styles.cursor = 'pointer'
           }
-          let stateFipsCode = geoData[state.columns.geo.name].substring(0, 2)
+          let stateFipsCode = geoData[config.columns.geo.name].substring(0, 2)
 
           return (
             <g
               tabIndex='-1'
               key={`county--${key}`}
-              className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[state.columns.geo.name]}`}
+              className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[config.columns.geo.name]}`}
               css={styles}
               onMouseEnter={() => {
                 setStateEnter(geo.id)
@@ -407,7 +397,7 @@ const CountyMap = props => {
 
         let stateStyles = {}
 
-        if (state.general.type !== 'us-geocode') {
+        if (config.general.type !== 'us-geocode') {
           stateStyles = {
             cursor: 'default',
             stroke: STATE_BORDER,
@@ -450,7 +440,7 @@ const CountyMap = props => {
                     focusGeo(geo.id, geo)
                   }}
                   onMouseEnter={e => {
-                    e.target.attributes.fill.value = colorPalettes[state.color][3]
+                    e.target.attributes.fill.value = colorPalettes[config.color][3]
                   }}
                   onMouseLeave={e => {
                     e.target.attributes.fill.value = STATE_INACTIVE_FILL
@@ -472,8 +462,8 @@ const CountyMap = props => {
     const counties = geographies.slice(56)
     let geosJsx = []
 
-    'us-geocode' !== state.general.type && geosJsx.push(<CountyOutput geographies={geographies} counties={counties} key='county-key' />)
-    'us-geocode' === state.general.type && geosJsx.push(<GeoCodeCountyLines />)
+    'us-geocode' !== config.general.type && geosJsx.push(<CountyOutput geographies={geographies} counties={counties} key='county-key' />)
+    'us-geocode' === config.general.type && geosJsx.push(<GeoCodeCountyLines />)
 
     geosJsx.push(<StateOutput geographies={geographies} states={states} key='state-key' />)
     geosJsx.push(<StateLines key='stateLines' lineWidth={startingLineWidth} geoStrokeColor={geoStrokeColor} stateLines={stateLines} />)
@@ -482,8 +472,6 @@ const CountyMap = props => {
       <CityList
         projection={projection}
         key='cities'
-        data={data}
-        state={state}
         geoClickHandler={geoClickHandler}
         applyTooltipsToGeo={applyTooltipsToGeo}
         displayGeoName={displayGeoName}
@@ -491,7 +479,7 @@ const CountyMap = props => {
         titleCase={titleCase}
         setSharedFilterValue={setSharedFilterValue}
         isFilterValueSupported={isFilterValueSupported}
-        isGeoCodeMap={state.general.type === 'us-geocode'}
+        isGeoCodeMap={config.general.type === 'us-geocode'}
       />
     )
     return geosJsx
@@ -499,7 +487,7 @@ const CountyMap = props => {
   if (!data) <Loading />
   return (
     <ErrorBoundary component='CountyMap'>
-      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' data-scale={scale ? scale : ''} data-translate={translate ? translate : ''} role='img' aria-label={handleMapAriaLabels(state)}>
+      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' data-scale={scale ? scale : ''} data-translate={translate ? translate : ''} role='img' aria-label={handleMapAriaLabels(config)}>
         <rect className='background center-container ocean' width={WIDTH} height={HEIGHT} fillOpacity={1} fill='white' onClick={e => onReset(e)} tabIndex='0'></rect>
         <CustomProjection data={mapData} translate={[WIDTH / 2, HEIGHT / 2]} projection={geoAlbersUsaTerritories}>
           {({ features, projection }) => {
@@ -520,4 +508,4 @@ const CountyMap = props => {
   )
 }
 
-export default memo(CountyMap, CountyMapChecks)
+export default CountyMap

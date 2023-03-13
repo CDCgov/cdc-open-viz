@@ -31,7 +31,7 @@ import colorPalettes from '@cdc/core/data/colorPalettes'
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
-import dataTransform from '@cdc/core/helpers/data/dataTransform'
+import MediaControls from '@cdc/core/components/ui/MediaControls'
 
 // Components - Core
 
@@ -69,7 +69,7 @@ const GeoMap = ({
   const [modal, setModal] = useState(null)
   const [accessibleStatus, setAccessibleStatus] = useState('')
   const [filteredCountryCode, setFilteredCountryCode] = useState()
-  const { filters, data: configData, runtimeLegend } = config
+  const { filters } = config
 
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
@@ -164,13 +164,13 @@ const GeoMap = ({
 
   // This resets all active legend toggles.
   const resetLegendToggles = async () => {
-    updateVisConfig({
-      runtimeLegend: produce(runtimeLegend, draft => {
+    updateVisConfig(
+      produce(config, draft => {
         draft.forEach(legendItem => {
           delete legendItem.disabled
         })
       })
-    })
+    )
   }
 
   const formatLegendLocation = key => {
@@ -475,7 +475,6 @@ const GeoMap = ({
     geoClickHandler,
     applyLegendToRow,
     displayGeoName,
-    runtimeLegend,
     generateColorsArray,
     titleCase,
     generateRuntimeData,
@@ -513,12 +512,13 @@ const GeoMap = ({
 
   const tabId = handleMapTabbing()
 
+  console.log('the type', general.type)
   return (
     <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
-      {(general.type === 'navigation' || runtimeLegend) && (
+      {(general.type === 'navigation' || config.legend) && (
         <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
           {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
-          {config.general.title && (
+          {general.title && (
             <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !config.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
               {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
               <div role='heading' className={`map-title${general.headerColor ? ' theme-' + general.headerColor : ''}`} tabIndex='0' aria-level='2'>
@@ -565,7 +565,6 @@ const GeoMap = ({
               <Sidebar
                 viewport={currentViewport}
                 legend={config.legend}
-                runtimeLegend={runtimeLegend}
                 columns={config.columns}
                 sharing={config.sharing}
                 prefix={config.columns.primary.prefix}
@@ -578,7 +577,7 @@ const GeoMap = ({
             )}
           </div>
 
-          {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={config.columns} navigationHandler={val => navigationHandler(val)} />}
+          {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} options={general} columns={config.columns} navigationHandler={val => navigationHandler(val)} />}
 
           {link && link}
 
@@ -591,15 +590,12 @@ const GeoMap = ({
 
           {config.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && (
             <DataTable
-              state={config}
               rawData={config.data}
               navigationHandler={navigationHandler}
               expandDataTable={general.expandDataTable}
               headerColor={general.headerColor}
               columns={config.columns}
               showDownloadButton={general.showDownloadButton}
-              runtimeLegend={runtimeLegend}
-              runtimeData={runtimeData}
               displayDataAsText={displayDataAsText}
               displayGeoName={displayGeoName}
               applyLegendToRow={applyLegendToRow}
