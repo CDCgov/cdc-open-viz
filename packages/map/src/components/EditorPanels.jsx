@@ -215,28 +215,11 @@ const EditorPanels = props => {
           messages = []
         }
 
-        updateVisConfigField(['legend'])
-        // TODO: rob halp!
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            type: value
-          },
-          runtime: {
-            ...config.runtime,
-            editorErrorMessage: messages
-          }
-        })
+        updateVisConfigField(['legend', 'type'], value)
+        updateVisConfigField(['runtime', 'editorErrorMessage'], messages)
         break
       case 'legendNumber':
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            numberOfItems: parseInt(value)
-          }
-        })
+        updateVisConfigField(['legend', 'numberOfItems'], parseInt(value))
         break
       case 'changeActiveFilterValue':
         const arrVal = value.split(',')
@@ -244,107 +227,41 @@ const EditorPanels = props => {
         setActiveFilterValueForDescription(arrVal)
         break
       case 'unifiedLegend':
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            unified: value
-          }
-        })
+        updateVisConfigField(['legend', 'unified'], value)
         break
       case 'separateZero':
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            separateZero: value
-          }
-        })
+        updateVisConfigField(['legend', 'separateZero'], value)
         break
       case 'toggleDownloadButton':
-        setState({
-          ...config,
-          general: {
-            ...config.general,
-            showDownloadButton: !config.general.showDownloadButton
-          }
-        })
+        updateVisConfigField(['general', 'showDownloadButton'], !config.general.showDownloadButton)
         break
       case 'toggleDownloadImgButton':
-        setState({
-          ...config,
-          general: {
-            ...config.general,
-            showDownloadImgButton: !config.general.showDownloadImgButton
-          }
-        })
+        updateVisConfigField(['general', 'showDownloadImgButton'], !config.general.showDownloadImgButton)
         break
       case 'toggleDownloadPdfButton':
-        setState({
-          ...config,
-          general: {
-            ...config.general,
-            showDownloadPdfButton: !config.general.showDownloadPdfButton
-          }
-        })
+        updateVisConfigField(['general', 'showDownloadPdfButton'], !config.general.showDownloadPdfButton)
         break
       case 'displayAsHex':
-        setState({
-          ...config,
-          general: {
-            ...config.general,
-            displayAsHex: value
-          }
-        })
+        updateVisConfigField(['general', 'displayAsHex'], value)
         break
       case 'editorMapType':
         switch (value) {
           case 'us-geocode':
-            setState({
-              ...config,
-              general: {
-                ...config.general,
-                type: value
-              }
-            })
+            updateVisConfigField(['general', 'type'], value)
             break
           case 'data':
-            setState({
-              ...config,
-              general: {
-                ...config.general,
-                showSidebar: true,
-                type: 'data'
-              }
-            })
+            updateVisConfigField(['general', 'showSidebar'], true)
+            updateVisConfigField(['general', 'type'], 'data')
             break
           case 'navigation':
-            setState({
-              ...config,
-              general: {
-                ...config.general,
-                showSidebar: false,
-                type: 'navigation'
-              },
-              tooltips: {
-                ...config.tooltips,
-                appearanceType: 'hover'
-              }
-            })
+            updateVisConfigField(['general', 'showSidebar'], false)
+            updateVisConfigField(['general', 'type'], 'navigation')
+            updateVisConfigField(['tooltips', 'appearanceType'], 'hover')
             break
           case 'bubble':
-            setState({
-              ...config,
-              general: {
-                ...config.general,
-                showSidebar: false,
-                type: 'bubble'
-              },
-              tooltips: {
-                ...config.tooltips,
-                appearanceType: 'hover'
-              }
-            })
+            updateVisConfigField(['general', 'showSidebar'], false)
+            updateVisConfigField(['general', 'type'], 'bubble')
+            updateVisConfigField(['tooltips', 'appearanceType'], 'hover')
             break
           default:
             console.warn('Map type not set')
@@ -370,71 +287,26 @@ const EditorPanels = props => {
 
         switch (value) {
           case 'us':
-            setState({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'us'
-              },
-              dataTable: {
-                ...config.dataTable,
-                forceDisplay: true
-              }
-            })
+            updateVisConfigField(['general', 'geoType'], 'us')
+            updateVisConfigField(['dataTable', 'forceDisplay'], true)
             break
           case 'us-region':
-            setState({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'us-region'
-              },
-              dataTable: {
-                ...config.dataTable,
-                forceDisplay: true
-              }
-            })
+            updateVisConfigField(['general', 'geoType'], 'us-region')
+            updateVisConfigField(['dataTable', 'forceDisplay'], true)
             break
           case 'world':
-            setState({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'world'
-              },
-              dataTable: {
-                ...config.dataTable,
-                forceDisplay: true
-              }
-            })
+            updateVisConfigField(['general', 'geoType'], 'world')
+            updateVisConfigField(['dataTable', 'forceDisplay'], true)
             break
           case 'us-county':
-            setState({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'us-county',
-                expandDataTable: false
-              },
-              dataTable: {
-                ...config.dataTable,
-                forceDisplay: true
-              }
-            })
+            updateVisConfigField(['general', 'geoType'], 'us-county')
+            updateVisConfigField(['general', 'expandDataTable'], false)
+            updateVisConfigField(['dataTable', 'forceDisplay'], true)
             break
           case 'single-config':
-            setState({
-              ...config,
-              general: {
-                ...config.general,
-                geoType: 'single-config',
-                expandDataTable: false
-              },
-              dataTable: {
-                ...config.dataTable,
-                forceDisplay: true
-              }
-            })
+            updateVisConfigField(['general', 'geoType'], 'single-config')
+            updateVisConfigField(['general', 'expandDataTable'], false)
+            updateVisConfigField(['dataTable', 'forceDisplay'], true)
             break
           default:
             break
@@ -442,126 +314,48 @@ const EditorPanels = props => {
 
         break
       case 'singleColumnLegend':
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            singleColumn: !config.legend.singleColumn,
-            singleRow: false
-          }
-        })
+        updateVisConfigField(['legend', 'singleColumn'], !config.legend.singleColumn)
+        updateVisConfigField(['legend', 'singleRow'], false)
         break
       case 'singleRowLegend':
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            singleRow: !config.legend.singleRow,
-            singleColumn: false
-          }
-        })
+        updateVisConfigField(['legend', 'singleRow'], !config.legend.singleRow)
+        updateVisConfigField(['legend', 'singleColumn'], false)
         break
       case 'dynamicDescription':
-        setState({
-          ...config,
-          editor: {
-            ...config.editor,
-            activeFilterValueForDescription: value
-          },
-          legend: {
-            ...config.legend,
-            dynamicDescription: !config.legend.dynamicDescription
-          }
-        })
+        updateVisConfigField(['editor', 'activeFilterValueForDescription'], value)
+        updateVisConfigField(['legend', 'dynamicDescription'], !config.legend.dynamicDescription)
         break
       case 'changeLegendDescription':
         const [filterValKey, filterValDesc] = value
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            descriptions: {
-              ...config.legend.descriptions,
-              [filterValKey]: [filterValDesc]
-            }
-          }
-        })
+        updateVisConfigField(['legend', 'descriptions', filterValKey], [filterValDesc])
         break
       case 'appearanceType':
-        setState({
-          ...config,
-          tooltips: {
-            ...config.tooltips,
-            appearanceType: value
-          }
-        })
+        updateVisConfigField(['tooltips', 'appearanceType'], value)
         break
       case 'linkLabel':
-        setState({
-          ...config,
-          tooltips: {
-            ...config.tooltips,
-            linkLabel: value
-          }
-        })
+        updateVisConfigField(['tooltips', 'linkLabel'], value)
         break
       case 'displayStateLabels':
-        setState({
-          ...config,
-          general: {
-            ...config.general,
-            displayStateLabels: !config.general.displayStateLabels
-          }
-        })
+        updateVisConfigField(['general', 'displayStateLabels'], !config.general.displayStateLabels)
         break
       case 'capitalizeLabels':
-        setState({
-          ...config,
-          tooltips: {
-            ...config.tooltips,
-            capitalizeLabels: value
-          }
-        })
+        updateVisConfigField(['tooltips', 'capitalizeLabels'], value)
         break
       case 'showDataTable':
-        setState({
-          ...config,
-          dataTable: {
-            ...config.dataTable,
-            forceDisplay: value
-          }
-        })
+        updateVisConfigField(['dataTable', 'forceDisplay'], value)
         break
       case 'limitDataTableHeight':
-        setState({
-          ...config,
-          dataTable: {
-            ...config.dataTable,
-            limitHeight: value
-          }
-        })
+        updateVisConfigField(['dataTable', 'limitHeight'], value)
         break
       case 'chooseState':
         let fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === value)
         let configName = value
         let configData = { fipsCode, configName }
 
-        setState({
-          ...config,
-          general: {
-            ...config.general,
-            configPicked: configData
-          }
-        })
+        updateVisConfigField(['general', 'configPicked'], configData)
         break
       case 'classificationType':
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            type: value
-          }
-        })
+        updateVisConfigField(['legend', 'type'], value)
         break
       default:
         console.warn(`Did not recognize editor property.`)
@@ -610,64 +404,27 @@ const EditorPanels = props => {
 
         newSpecialClasses[value.index][value.prop] = value.value
 
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            specialClasses: newSpecialClasses
-          }
-        })
+        updateVisConfigField(['legend', 'specialClasses'], newSpecialClasses)
         break
       case 'specialClassDelete':
         newSpecialClasses = Array.from(legend.specialClasses)
 
         newSpecialClasses.splice(value, 1)
 
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            specialClasses: newSpecialClasses
-          }
-        })
+        updateVisConfigField(['legend', 'specialClasses'], newSpecialClasses)
         break
       case 'specialClassAdd':
         newSpecialClasses = legend.specialClasses
 
         newSpecialClasses.push(value)
 
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            specialClasses: newSpecialClasses
-          }
-        })
+        updateVisConfigField(['legend', 'specialClasses'], newSpecialClasses)
         break
       case 'name':
-        setState({
-          ...config,
-          columns: {
-            ...config.columns,
-            [columnName]: {
-              ...config.columns[columnName],
-              [editTarget]: value
-            }
-          }
-        })
-
+        updateVisConfigField(['columns', columnName, editTarget], value)
         break
       default:
-        setState({
-          ...config,
-          columns: {
-            ...config.columns,
-            [columnName]: {
-              ...config.columns[columnName],
-              [editTarget]: value
-            }
-          }
-        })
+        updateVisConfigField(['columns', columnName, editTarget], value)
         break
     }
   }
@@ -715,27 +472,18 @@ const EditorPanels = props => {
         break
     }
 
-    setState({
-      ...config,
-      filters: newFilters
-    })
+    updateVisConfigField('filters', newFilters)
   }
 
   const addAdditionalColumn = number => {
     const columnKey = `additionalColumn${number}`
 
-    setState({
-      ...config,
-      columns: {
-        ...config.columns,
-        [columnKey]: {
-          label: 'New Column',
-          dataTable: false,
-          tooltips: false,
-          prefix: '',
-          suffix: ''
-        }
-      }
+    updateVisConfigField(['columns', columnKey], {
+      label: 'New Column',
+      dataTable: false,
+      tooltips: false,
+      prefix: '',
+      suffix: ''
     })
   }
 
@@ -744,10 +492,7 @@ const EditorPanels = props => {
 
     delete newColumns[columnName]
 
-    setState({
-      ...config,
-      columns: newColumns
-    })
+    updateVisConfigField('columns', newColumns)
   }
 
   const displayFilterLegendValue = arr => {
@@ -807,7 +552,6 @@ const EditorPanels = props => {
 
   useEffect(() => {
     setLoadedDefault(config.defaultData)
-
     columnsRequiredChecker()
   }, [config])
 
@@ -841,6 +585,7 @@ const EditorPanels = props => {
             categoryValuesOrder: arr
           }
         })
+        updateVisConfigField(['legend', 'categoryValuesOrder'], arr)
       }
     }
   }, [runtimeLegend])
@@ -848,15 +593,9 @@ const EditorPanels = props => {
   // if no config choice by default show alabama
   useEffect(() => {
     if (!config.general.configPicked) {
-      setState({
-        ...config,
-        general: {
-          ...general,
-          configPicked: {
-            fipsCode: '01',
-            configName: 'Alabama'
-          }
-        }
+      updateVisConfigField(['general', 'configPicked'], {
+        fipsCode: '01',
+        configName: 'Alabama'
       })
     }
   }, [])
@@ -913,29 +652,6 @@ const EditorPanels = props => {
     return true
   })
 
-  const updateField = (section, subsection, fieldName, newValue) => {
-    const isArray = Array.isArray(config[section])
-    let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
-
-    if (null !== subsection) {
-      if (isArray) {
-        sectionValue = [...config[section]]
-        sectionValue[subsection] = { ...sectionValue[subsection], [fieldName]: newValue }
-      } else {
-        sectionValue = {
-          ...config[section],
-          [subsection]: { ...config[section][subsection], [fieldName]: newValue }
-        }
-      }
-    }
-
-    let updatedState = {
-      ...config,
-      [section]: sectionValue
-    }
-
-    setState(updatedState)
-  }
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
