@@ -1,10 +1,9 @@
-const update_4_23 = (config) => {
+const update_4_23 = config => {
   const ver = 4.23
 
   let newConfig = { ...config }
 
   if (!config.validated || config.validated < ver) {
-
     // Convert theme definition in config to color only
     if (newConfig.theme && newConfig.theme.includes('theme-')) {
       newConfig.theme = newConfig.theme.split('-')[1]
@@ -21,7 +20,7 @@ const update_4_23 = (config) => {
     }
 
     // Remove old visual config entries
-    delete newConfig.visual
+    // delete newConfig.visual
 
     // Config alterations complete
     // Add validation mark to config...

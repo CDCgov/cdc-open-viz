@@ -39,12 +39,6 @@ const dataSliceActions = (set, get) => ({
     await get().setData(resData)
     await get().setFormattedData(resFormattedData)
     await get().setDatasets(resDatasets)
-
-    return {
-      responseData: resData,
-      responseFormattedDate: resFormattedData,
-      responseDatasets: resDatasets
-    }
   }
 })
 

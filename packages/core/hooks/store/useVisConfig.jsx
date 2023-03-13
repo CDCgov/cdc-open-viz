@@ -4,17 +4,18 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { merge } from 'lodash'
 
 // Store
-import useStore from '../../store/store'
+import useStore, { store } from '../../store/store'
 
 // Helpers
 import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
 import fetchAsyncUrl from '../../helpers/fetchAsyncUrl'
+import { resolveConfig } from 'prettier'
 
 // Context
 export const ConfigContext = createContext({})
 ConfigContext.displayName = 'VisualizationConfig'
 
-export const VisConfigProvider = ({ visualizationKey = '__default__', config: configObj, configUrl, children, defaultConfig, processRuntimeConfig } = {}) => {
+export const VisConfigProvider = ({ visualizationKey = '__default__', config: configObj, configUrl, children, defaultConfig, transformConfig } = {}) => {
   const [loading, setLoading] = useState(false)
   const addVisConfig = useStore(state => state.addVisConfig)
   const updateVisConfig = useStore(state => state.updateVisConfig)
@@ -23,7 +24,18 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
 
   const getData = useStore(state => state.getData)
 
-  const finalConfig = useCallback(() => dashboardStoredConfig ?? storedConfig, [dashboardStoredConfig, storedConfig])
+  const finalConfig = useCallback(() => {
+    let resolvedConfig = dashboardStoredConfig ?? storedConfig
+    if (!resolvedConfig) {
+      return null
+    }
+
+    if (transformConfig) {
+      resolvedConfig = transformConfig(resolvedConfig)
+    }
+
+    return resolvedConfig
+  }, [dashboardStoredConfig, storedConfig, transformConfig])
 
   useEffect(() => {
     async function initConfig() {
@@ -34,6 +46,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
       if (configUrl) console.log('using config url', configUrl)
 
       const resolvedConfig = merge(defaultConfig, config)
+      console.log('initConfig resolvedConfig', resolvedConfig)
       const processedConfig = { ...coveUpdateWorker(resolvedConfig) }
 
       // Run update worker on config, then set in store
@@ -48,23 +61,17 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
       // Get initial data off config and put in store
       await getData(processedConfig)
 
-      if (processedConfig && processRuntimeConfig) {
-        const { config } = useStore.getState()
-        const runtimeConfig = processRuntimeConfig(config)
-        updateVisConfig(runtimeConfig)
-      }
-
       setLoading(false)
     }
 
+    console.log('loading, storedConfig', loading, storedConfig)
     if (loading || storedConfig) {
       return
     }
 
     setLoading(true)
     void initConfig()
-    return () => {}
-  }, [configUrl, defaultConfig, loading, configObj, visualizationKey])
+  }, [configUrl, defaultConfig, loading, configObj, visualizationKey, storedConfig, dashboardStoredConfig, getData, addVisConfig, updateVisConfig])
 
   const data = useStore(state => state.data)
 

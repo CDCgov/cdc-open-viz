@@ -1,13 +1,28 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-
-// IE11
-import 'whatwg-fetch'
-import ResizeObserver from 'resize-observer-polyfill'
+import produce from 'immer'
 
 // Third party
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
+
+// IE11
+import 'whatwg-fetch'
+import ResizeObserver from 'resize-observer-polyfill'
+
+// Child Components
+import Filters from './Filters'
+import Modal from './Modal'
+import Sidebar from './Sidebar'
+
+import CountyMap from './CountyMap' // Future: Lazy
+import DataTable from './DataTable' // Future: Lazy
+import NavigationMenu from './NavigationMenu' // Future: Lazy
+import SingleStateMap from './SingleStateMap' // Future: Lazy
+import UsaMap from './UsaMap' // Future: Lazy
+import UsaRegionMap from './UsaRegionMap' // Future: Lazy
+import WorldMap from './WorldMap' // Future: Lazy
 
 // Data
 import { countryCoordinates } from '../data/country-coordinates'
@@ -29,9 +44,8 @@ import ExternalIcon from '../images/external-link.svg'
 
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-import { addUIDs, stateKeys, countryKeys, countyKeys, territoryKeys, generateRuntimeFilters, generateRuntimeData } from '../runtime'
+import { addUIDs, stateKeys, countryKeys, countyKeys, territoryKeys, hashObj, generateRuntimeData } from '../runtime'
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedStatesFipsCodes, stateFipsToTwoDigit } from '../data/supported-geos'
-import produce from 'immer'
 
 // Data props
 
@@ -45,56 +59,23 @@ const generateColorsArray = (color = '#000000', special = false) => {
 const GeoMap = ({
   className, // not needed
   navigationHandler: customNavigationHandler,
-  isDashboard = false,
-  isEditor = false,
-  configUrl,
   logo = null,
-  setConfig,
   setSharedFilter,
   setSharedFilterValue,
-  hostname = 'localhost:8080',
   link
 }) => {
   const { config, updateVisConfig } = useVisConfig()
-  const transform = new dataTransform()
-  const [loading, setLoading] = useState(true)
   const [currentViewport, setCurrentViewport] = useState()
   const [modal, setModal] = useState(null)
   const [accessibleStatus, setAccessibleStatus] = useState('')
   const [filteredCountryCode, setFilteredCountryCode] = useState()
-  const { mapPosition, filters, data: configData, runtimeLegend } = config
+  const { filters, data: configData, runtimeLegend } = config
 
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
-  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
+  const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
-
-  const runtimeData = useMemo(() => {
-    if (filteredCountryCode) {
-      const filteredCountryObj = configData[filteredCountryCode]
-      return {
-        [filteredCountryCode]: filteredCountryObj
-      }
-    }
-
-    return generateRuntimeData(configData, filters)
-  }, [filteredCountryCode, configData, filters])
-
-  useEffect(() => {
-    try {
-      if (filteredCountryCode) {
-        const coordinates = countryCoordinates[filteredCountryCode]
-        const long = coordinates[1]
-        const lat = coordinates[0]
-        const reversedCoordinates = [long, lat]
-
-        updateVisConfig({ mapPosition: { coordinates: reversedCoordinates, zoom: 3 } })
-      }
-    } catch (e) {
-      console.error('Failed to set world map zoom.')
-    }
-  }, [filteredCountryCode, updateVisConfig])
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -130,50 +111,6 @@ const GeoMap = ({
     })
   }
 
-  const displayDataAsText = (value, columnName) => {
-    if (value === null || value === '' || value === undefined) {
-      return ''
-    }
-
-    if (typeof value === 'string' && value.length > 0 && config.legend.type === 'equalnumber') {
-      return value
-    }
-
-    let formattedValue = value
-
-    let columnObj = config.columns[columnName]
-
-    if (columnObj) {
-      // If value is a number, apply specific formattings
-      if (Number(value)) {
-        const hasDecimal = columnObj.roundToPlace && (columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null)
-        const decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
-
-        // Rounding
-        if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
-          formattedValue = Number(value).toFixed(decimalPoint)
-        }
-
-        if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
-          // Formats number to string with commas - allows up to 5 decimal places, if rounding is not defined.
-          // Otherwise, uses the rounding value set at 'columnObj.roundToPlace'.
-          formattedValue = Number(value).toLocaleString('en-US', {
-            style: 'decimal',
-            minimumFractionDigits: hasDecimal ? decimalPoint : 0,
-            maximumFractionDigits: hasDecimal ? decimalPoint : 5
-          })
-        }
-      }
-
-      // Check if it's a special value. If it is not, apply the designated prefix and suffix
-      if (false === config.legend.specialClasses.includes(String(value))) {
-        formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
-      }
-    }
-
-    return formattedValue
-  }
-
   const applyLegendToRow = rowObj => {
     try {
       if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
@@ -196,75 +133,6 @@ const GeoMap = ({
     } catch (e) {
       console.error(e)
     }
-  }
-
-  const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
-    if (!row) return
-    let toolTipText = ''
-
-    // Adds geo label, ie State: Georgia
-    let stateOrCounty = config.general.geoType === 'us' ? 'State: ' : config.general.geoType === 'us-county' || config.general.geoType === 'single-state' ? 'County: ' : ''
-    // check the override
-    stateOrCounty = config.general.geoLabelOverride !== '' ? config.general.geoLabelOverride + ': ' : stateOrCounty
-
-    if (config.general.geoType === 'us-county' && config.general.type !== 'us-geocode') {
-      let stateFipsCode = row[config.columns.geo.name].substring(0, 2)
-      const stateName = supportedStatesFipsCodes[stateFipsCode]
-
-      toolTipText += !config.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
-    }
-
-    toolTipText += !config.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
-
-    if (('data' === config.general.type || config.general.type === 'bubble' || config.general.type === 'us-geocode') && undefined !== row) {
-      toolTipText += `<dl>`
-
-      Object.keys(config.columns).forEach(columnKey => {
-        const column = config.columns[columnKey]
-
-        if (true === column.tooltip) {
-          let label = column.label.length > 0 ? column.label : ''
-
-          let value
-
-          if (config.legend.specialClasses && config.legend.specialClasses.length && typeof config.legend.specialClasses[0] === 'object') {
-            for (let i = 0; i < config.legend.specialClasses.length; i++) {
-              if (String(row[config.legend.specialClasses[i].key]) === config.legend.specialClasses[i].value) {
-                value = displayDataAsText(config.legend.specialClasses[i].label, columnKey)
-                break
-              }
-            }
-          }
-
-          if (!value) {
-            value = displayDataAsText(row[column.name], columnKey)
-          }
-
-          if (0 < value.length) {
-            // Only spit out the tooltip if there's a value there
-            toolTipText += config.general.hidePrimaryColumnInTooltip ? `<div><dd>${value}</dd></div>` : `<div><dt>${label}</dt><dd>${value}</dd></div>`
-          }
-        }
-      })
-      toolTipText += `</dl>`
-    }
-
-    // We convert the markup into JSX and add a navigation link if it's going into a modal.
-    if ('jsx' === returnType) {
-      toolTipText = [<div key='modal-content'>{parse(toolTipText)}</div>]
-
-      if (config.columns.hasOwnProperty('navigate') && row[config.columns.navigate.name]) {
-        toolTipText.push(
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-          <span className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[config.columns.navigate.name])}>
-            {config.tooltips.linkLabel}
-            <ExternalIcon className='inline-icon ml-1' />
-          </span>
-        )
-      }
-    }
-
-    return toolTipText
   }
 
   // if city has a hyphen then in tooltip it ends up UPPER CASE instead of just regular Upper Case
@@ -321,57 +189,26 @@ const GeoMap = ({
     return formattedName
   }
 
-  // Attempts to find the corresponding value
-  const displayGeoName = key => {
-    let value = key
-    // Map to first item in values array which is the preferred label
-    if (stateKeys.includes(value)) {
-      value = titleCase(supportedStates[key][0])
-    }
+  const navigationHandler = useCallback(
+    urlString => {
+      // Call custom navigation method if passed
+      if (customNavigationHandler) {
+        customNavigationHandler(urlString)
+        return
+      }
 
-    if (territoryKeys.includes(value)) {
-      value = titleCase(supportedTerritories[key][0])
-    }
+      // Abort if value is blank
+      if (0 === urlString.length) {
+        throw Error('Blank string passed as URL. Navigation aborted.')
+      }
 
-    if (countryKeys.includes(value)) {
-      value = titleCase(supportedCountries[key][0])
-    }
+      const urlObj = new URL(urlString)
 
-    if (countyKeys.includes(value)) {
-      value = titleCase(supportedCounties[key])
-    }
-
-    const dict = {
-      'Washington D.C.': 'District of Columbia',
-      'WASHINGTON DC': 'District of Columbia',
-      DC: 'District of Columbia',
-      'WASHINGTON DC.': 'District of Columbia',
-      Congo: 'Republic of the Congo'
-    }
-
-    if (true === Object.keys(dict).includes(value)) {
-      value = dict[value]
-    }
-    return titleCase(value)
-  }
-
-  const navigationHandler = urlString => {
-    // Call custom navigation method if passed
-    if (customNavigationHandler) {
-      customNavigationHandler(urlString)
-      return
-    }
-
-    // Abort if value is blank
-    if (0 === urlString.length) {
-      throw Error('Blank string passed as URL. Navigation aborted.')
-    }
-
-    const urlObj = new URL(urlString)
-
-    // Open constructed link in new tab/window
-    window.open(urlObj.toString(), '_blank')
-  }
+      // Open constructed link in new tab/window
+      window.open(urlObj.toString(), '_blank')
+    },
+    [customNavigationHandler]
+  )
 
   const geoClickHandler = (key, value) => {
     if (setSharedFilter) {
@@ -429,32 +266,184 @@ const GeoMap = ({
     }
   }
 
+  // Attempts to find the corresponding value
+  const displayGeoName = useCallback(key => {
+    let value = key
+    // Map to first item in values array which is the preferred label
+    if (stateKeys.includes(value)) {
+      value = titleCase(supportedStates[key][0])
+    }
+
+    if (territoryKeys.includes(value)) {
+      value = titleCase(supportedTerritories[key][0])
+    }
+
+    if (countryKeys.includes(value)) {
+      value = titleCase(supportedCountries[key][0])
+    }
+
+    if (countyKeys.includes(value)) {
+      value = titleCase(supportedCounties[key])
+    }
+
+    const dict = {
+      'Washington D.C.': 'District of Columbia',
+      'WASHINGTON DC': 'District of Columbia',
+      DC: 'District of Columbia',
+      'WASHINGTON DC.': 'District of Columbia',
+      Congo: 'Republic of the Congo'
+    }
+
+    if (true === Object.keys(dict).includes(value)) {
+      value = dict[value]
+    }
+    return titleCase(value)
+  }, [])
+
+  const displayDataAsText = useCallback(
+    (value, columnName) => {
+      if (value === null || value === '' || value === undefined) {
+        return ''
+      }
+
+      if (typeof value === 'string' && value.length > 0 && config.legend.type === 'equalnumber') {
+        return value
+      }
+
+      let formattedValue = value
+
+      let columnObj = config.columns[columnName]
+
+      if (columnObj) {
+        // If value is a number, apply specific formattings
+        if (Number(value)) {
+          const hasDecimal = columnObj.roundToPlace && (columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null)
+          const decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
+
+          // Rounding
+          if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
+            formattedValue = Number(value).toFixed(decimalPoint)
+          }
+
+          if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
+            // Formats number to string with commas - allows up to 5 decimal places, if rounding is not defined.
+            // Otherwise, uses the rounding value set at 'columnObj.roundToPlace'.
+            formattedValue = Number(value).toLocaleString('en-US', {
+              style: 'decimal',
+              minimumFractionDigits: hasDecimal ? decimalPoint : 0,
+              maximumFractionDigits: hasDecimal ? decimalPoint : 5
+            })
+          }
+        }
+
+        // Check if it's a special value. If it is not, apply the designated prefix and suffix
+        if (false === config.legend.specialClasses.includes(String(value))) {
+          formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
+        }
+      }
+
+      return formattedValue
+    },
+    [config.columns, config.legend.specialClasses, config.legend.type]
+  )
+
+  const applyTooltipsToGeo = useCallback(
+    (geoName, row, returnType = 'string') => {
+      if (!row) return
+      let toolTipText = ''
+
+      // Adds geo label, ie State: Georgia
+      let stateOrCounty = config.general.geoType === 'us' ? 'State: ' : config.general.geoType === 'us-county' || config.general.geoType === 'single-state' ? 'County: ' : ''
+      // check the override
+      stateOrCounty = config.general.geoLabelOverride !== '' ? config.general.geoLabelOverride + ': ' : stateOrCounty
+
+      if (config.general.geoType === 'us-county' && config.general.type !== 'us-geocode') {
+        let stateFipsCode = row[config.columns.geo.name].substring(0, 2)
+        const stateName = supportedStatesFipsCodes[stateFipsCode]
+
+        toolTipText += !config.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
+      }
+
+      toolTipText += !config.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
+
+      if (('data' === config.general.type || config.general.type === 'bubble' || config.general.type === 'us-geocode') && undefined !== row) {
+        toolTipText += `<dl>`
+
+        Object.keys(config.columns).forEach(columnKey => {
+          const column = config.columns[columnKey]
+
+          if (true === column.tooltip) {
+            let label = column.label.length > 0 ? column.label : ''
+
+            let value
+
+            if (config.legend.specialClasses && config.legend.specialClasses.length && typeof config.legend.specialClasses[0] === 'object') {
+              for (let i = 0; i < config.legend.specialClasses.length; i++) {
+                if (String(row[config.legend.specialClasses[i].key]) === config.legend.specialClasses[i].value) {
+                  value = displayDataAsText(config.legend.specialClasses[i].label, columnKey)
+                  break
+                }
+              }
+            }
+
+            if (!value) {
+              value = displayDataAsText(row[column.name], columnKey)
+            }
+
+            if (0 < value.length) {
+              // Only spit out the tooltip if there's a value there
+              toolTipText += config.general.hidePrimaryColumnInTooltip ? `<div><dd>${value}</dd></div>` : `<div><dt>${label}</dt><dd>${value}</dd></div>`
+            }
+          }
+        })
+        toolTipText += `</dl>`
+      }
+
+      // We convert the markup into JSX and add a navigation link if it's going into a modal.
+      if ('jsx' === returnType) {
+        toolTipText = [<div key='modal-content'>{parse(toolTipText)}</div>]
+
+        if (config.columns.hasOwnProperty('navigate') && row[config.columns.navigate.name]) {
+          toolTipText.push(
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+            <span className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[config.columns.navigate.name])}>
+              {config.tooltips.linkLabel}
+              <ExternalIcon className='inline-icon ml-1' />
+            </span>
+          )
+        }
+      }
+
+      return toolTipText
+    },
+    [config.columns, config.general.geoLabelOverride, config.general.geoType, config.general.hideGeoColumnInTooltip, config.general.hidePrimaryColumnInTooltip, config.general.type, config.legend.specialClasses, config.tooltips.linkLabel, displayDataAsText, displayGeoName, navigationHandler]
+  )
+
+  useEffect(() => {
+    applyTooltipsToGeo()
+  }, [config.general.geoLabelOverride])
+
+  useEffect(() => {
+    try {
+      if (filteredCountryCode) {
+        const coordinates = countryCoordinates[filteredCountryCode]
+        const long = coordinates[1]
+        const lat = coordinates[0]
+        const reversedCoordinates = [long, lat]
+
+        updateVisConfig({ mapPosition: { coordinates: reversedCoordinates, zoom: 3 } })
+      }
+    } catch (e) {
+      console.error('Failed to set world map zoom.')
+    }
+  }, [filteredCountryCode, updateVisConfig])
+
   useEffect(() => {
     if (config && !coveLoadedHasRan && container) {
       CoveHelper.Event.publish('cove_loaded', config)
       setCoveLoadedHasRan(true)
     }
   }, [config, container])
-
-  useEffect(() => {
-    // When geotype changes - add UID
-    if (config.data && config.columns.geo.name) {
-      updateVisConfig(addUIDs(config, config.columns.geo.name))
-    }
-  }, [config, config.columns.geo.name, config.data, updateVisConfig])
-
-  // DEV-769 make "Data Table" both a required field and default value
-  useEffect(() => {
-    if (config.dataTable?.title === '' || config.dataTable?.title === undefined) {
-      updateVisConfig({ dataTable: { title: 'Data Table' } })
-    }
-  }, [config.dataTable, updateVisConfig])
-
-  // When geo label override changes
-  // - redo the tooltips
-  useEffect(() => {
-    applyTooltipsToGeo()
-  }, [config.general.geoLabelOverride])
 
   // Destructuring for more readable JSX
   const { general, tooltips, dataTable } = config
@@ -480,7 +469,6 @@ const GeoMap = ({
 
   // Props passed to all map types
   const mapProps = {
-    data: runtimeData,
     applyTooltipsToGeo,
     closeModal,
     navigationHandler,
@@ -499,7 +487,7 @@ const GeoMap = ({
     innerContainerRef
   }
 
-  const hasDataTable = config.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading
+  const hasDataTable = config.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation'
 
   const handleMapTabbing = () => {
     let tabbingID
@@ -527,8 +515,7 @@ const GeoMap = ({
 
   return (
     <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
-      {isEditor && <EditorPanel isDashboard={isDashboard} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(config.data[0])} />}
-      {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
+      {(general.type === 'navigation' || runtimeLegend) && (
         <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
           {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
           {config.general.title && (
@@ -579,13 +566,10 @@ const GeoMap = ({
                 viewport={currentViewport}
                 legend={config.legend}
                 runtimeLegend={runtimeLegend}
-                setRuntimeLegend={setRuntimeLegend}
-                runtimeFilters={runtimeFilters}
                 columns={config.columns}
                 sharing={config.sharing}
                 prefix={config.columns.primary.prefix}
                 suffix={config.columns.primary.suffix}
-                setState={setState}
                 resetLegendToggles={resetLegendToggles}
                 changeFilterActive={changeFilterActive}
                 setAccessibleStatus={setAccessibleStatus}
@@ -605,7 +589,7 @@ const GeoMap = ({
             {config.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
           </MediaControls.Section>
 
-          {config.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
+          {config.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && (
             <DataTable
               state={config}
               rawData={config.data}

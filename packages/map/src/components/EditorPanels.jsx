@@ -70,7 +70,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanels = props => {
-  // const { isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend } = props
+  // const { isDashboard, setParentConfig, setRuntimeFilters, filters, runtimeLegend } = props
 
   const { config, updateVisConfig, updateVisConfigField } = useVisConfig()
 
@@ -271,17 +271,17 @@ const EditorPanels = props => {
       case 'geoType':
         // If we're still working with default data, switch to the world default to show it as an example
         if (true === loadedDefault && 'world' === value) {
-          loadConfig(worldDefaultConfig)
+          updateVisConfig(worldDefaultConfig)
           break
         }
 
         if (true === loadedDefault && 'us' === value) {
-          loadConfig(usaDefaultConfig)
+          updateVisConfig(usaDefaultConfig)
           break
         }
 
         if (true === loadedDefault && 'us-county' === value) {
-          loadConfig(countyDefaultConfig)
+          updateVisConfig(countyDefaultConfig)
           break
         }
 
@@ -453,17 +453,17 @@ const EditorPanels = props => {
         break
       case 'filterOrder':
         if (value === 'desc') {
-          newFilters[idx] = { ...runtimeFilters[idx] }
+          newFilters[idx] = { ...filters[idx] }
           delete newFilters[idx].active
           newFilters[idx].order = 'desc'
         }
         if (value === 'asc') {
-          newFilters[idx] = { ...runtimeFilters[idx] }
+          newFilters[idx] = { ...filters[idx] }
           delete newFilters[idx].active
           newFilters[idx].order = 'asc'
         }
         if (value === 'cust') {
-          newFilters[idx] = { ...runtimeFilters[idx] }
+          newFilters[idx] = { ...filters[idx] }
           newFilters[idx].order = 'cust'
         }
         break
@@ -498,7 +498,7 @@ const EditorPanels = props => {
   const displayFilterLegendValue = arr => {
     const filterName = config.filters[arr[0]].label || `Unlabeled Legend`
 
-    const filterValue = runtimeFilters[arr[0]]
+    const filterValue = filters[arr[0]]
 
     if (filterValue) {
       return filterName + ' - ' + filterValue.values[arr[1]]
@@ -560,14 +560,14 @@ const EditorPanels = props => {
     if ('category' === config.legend.type) {
       let valid = true
       if (config.legend.categoryValuesOrder) {
-        runtimeLegend.forEach(item => {
+        config.legend.forEach(item => {
           if (!item.special && config.legend.categoryValuesOrder.indexOf(item.value) === -1) {
             valid = false
           }
         })
-        let runtimeLegendKeys = runtimeLegend.map(item => item.value)
+        let legendKeys = config.legend.map(item => item.value)
         config.legend.categoryValuesOrder.forEach(category => {
-          if (runtimeLegendKeys.indexOf(category) === -1) {
+          if (legendKeys.indexOf(category) === -1) {
             valid = false
           }
         })
@@ -576,19 +576,12 @@ const EditorPanels = props => {
       }
 
       if (!valid) {
-        let arr = runtimeLegend.filter(item => !item.special).map(({ value }) => value)
+        let arr = config.legend.filter(item => !item.special).map(({ value }) => value)
 
-        setState({
-          ...config,
-          legend: {
-            ...config.legend,
-            categoryValuesOrder: arr
-          }
-        })
         updateVisConfigField(['legend', 'categoryValuesOrder'], arr)
       }
     }
-  }, [runtimeLegend])
+  }, [config.legend, updateVisConfigField])
 
   // if no config choice by default show alabama
   useEffect(() => {
@@ -606,7 +599,7 @@ const EditorPanels = props => {
     </option>
   ]
 
-  const [columnsInData] = config.data
+  const columnsInData = Object.keys(config.data[0])
   columnsInData.map(colName => {
     columnsOptions.push(
       <option value={colName} key={colName}>
@@ -652,7 +645,6 @@ const EditorPanels = props => {
     return true
   })
 
-
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
   }
@@ -693,7 +685,7 @@ const EditorPanels = props => {
         >
           Remove
         </button>
-        <TextField value={config.filters[index].label} section='filters' subsection={index} fieldName='label' label='Label' updateField={updateField} />
+        <TextField value={config.filters[index].label} section='filters' subsection={index} fieldName='label' label='Label' />
         <label>
           <span className='edit-label column-heading'>
             Filter Column
@@ -735,11 +727,11 @@ const EditorPanels = props => {
         </label>
 
         {filter.order === 'cust' && (
-          <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, runtimeFilters[index])}>
+          <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, filters[index])}>
             <Droppable droppableId='filter_order'>
               {provided => (
                 <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-                  {runtimeFilters[index]?.values.map((value, index) => {
+                  {filters[index]?.values.map((value, index) => {
                     return (
                       <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
                         {(provided, snapshot) => (
@@ -783,9 +775,9 @@ const EditorPanels = props => {
 
   const filterValueOptionList = []
 
-  if (runtimeFilters.length > 0) {
-    runtimeFilters.forEach((filter, index) => {
-      runtimeFilters[index].values.forEach((value, valueNum) => {
+  if (filters.length > 0) {
+    filters.forEach((filter, index) => {
+      filters[index].values.forEach((value, valueNum) => {
         filterValueOptionList.push([index, valueNum])
       })
     })
@@ -800,14 +792,6 @@ const EditorPanels = props => {
     const formattedData = JSON.stringify(parsedData, undefined, 2)
 
     setConfigTextbox(formattedData)
-  }, [config])
-
-  useEffect(() => {
-    // Pass up to Editor if needed
-    if (setParentConfig) {
-      const newConfig = convertStateToConfig()
-      setParentConfig(newConfig)
-    }
   }, [config])
 
   let numberOfItemsLimit = 8
@@ -1016,7 +1000,6 @@ const EditorPanels = props => {
                 <AccordionItemPanel>
                   <TextField
                     value={general.title}
-                    updateField={updateField}
                     section='general'
                     fieldName='title'
                     label='Title'
@@ -1034,7 +1017,6 @@ const EditorPanels = props => {
                   />
                   <TextField
                     value={general.superTitle || ''}
-                    updateField={updateField}
                     section='general'
                     fieldName='superTitle'
                     label='Super Title'
@@ -1052,7 +1034,6 @@ const EditorPanels = props => {
                   <TextField
                     type='textarea'
                     value={general.introText}
-                    updateField={updateField}
                     section='general'
                     fieldName='introText'
                     label='Intro Text'
@@ -1070,7 +1051,6 @@ const EditorPanels = props => {
                   <TextField
                     type='textarea'
                     value={general.subtext}
-                    updateField={updateField}
                     section='general'
                     fieldName='subtext'
                     label='Subtext'
@@ -1088,7 +1068,6 @@ const EditorPanels = props => {
                   <TextField
                     type='textarea'
                     value={general.footnotes}
-                    updateField={updateField}
                     section='general'
                     fieldName='footnotes'
                     label='Footnotes'
@@ -1103,7 +1082,7 @@ const EditorPanels = props => {
                       </Tooltip>
                     }
                   />
-                  {'us' === config.general.geoType && <TextField value={general.territoriesLabel} updateField={updateField} section='general' fieldName='territoriesLabel' label='Territories Label' placeholder='Territories' />}
+                  {'us' === config.general.geoType && <TextField value={general.territoriesLabel} section='general' fieldName='territoriesLabel' label='Territories Label' placeholder='Territories' />}
                   {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ config.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1155,7 +1134,6 @@ const EditorPanels = props => {
                       fieldName='geoLabelOverride'
                       label='Geography Label'
                       className='edit-label'
-                      updateField={updateField}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -1207,7 +1185,6 @@ const EditorPanels = props => {
                         subsection='primary'
                         fieldName='label'
                         label='Data Label'
-                        updateField={updateField}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
@@ -1221,9 +1198,9 @@ const EditorPanels = props => {
                       />
                       <ul className='column-edit'>
                         <li className='three-col'>
-                          <TextField value={columns.primary.prefix} section='columns' subsection='primary' fieldName='prefix' label='Prefix' updateField={updateField} />
-                          <TextField value={columns.primary.suffix} section='columns' subsection='primary' fieldName='suffix' label='Suffix' updateField={updateField} />
-                          <TextField type='number' value={columns.primary.roundToPlace} section='columns' subsection='primary' fieldName='roundToPlace' label='Round' updateField={updateField} min={0} />
+                          <TextField value={columns.primary.prefix} section='columns' subsection='primary' fieldName='prefix' label='Prefix' />
+                          <TextField value={columns.primary.suffix} section='columns' subsection='primary' fieldName='suffix' label='Suffix' />
+                          <TextField type='number' value={columns.primary.roundToPlace} section='columns' subsection='primary' fieldName='roundToPlace' label='Round' min={0} />
                         </li>
                         <li>
                           <label className='checkbox'>
@@ -1446,12 +1423,12 @@ const EditorPanels = props => {
                               {columnsOptions}
                             </select>
                           </label>
-                          <TextField value={columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' updateField={updateField} />
+                          <TextField value={columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' />
                           <ul className='column-edit'>
                             <li className='three-col'>
-                              <TextField value={columns[val].prefix} section='columns' subsection={val} fieldName='prefix' label='Prefix' updateField={updateField} />
-                              <TextField value={columns[val].suffix} section='columns' subsection={val} fieldName='suffix' label='Suffix' updateField={updateField} />
-                              <TextField type='number' value={columns[val].roundToPlace} section='columns' subsection={val} fieldName='roundToPlace' label='Round' updateField={updateField} />
+                              <TextField value={columns[val].prefix} section='columns' subsection={val} fieldName='prefix' label='Prefix' />
+                              <TextField value={columns[val].suffix} section='columns' subsection={val} fieldName='suffix' label='Suffix' />
+                              <TextField type='number' value={columns[val].roundToPlace} section='columns' subsection={val} fieldName='roundToPlace' label='Round' />
                             </li>
                             <li>
                               <label className='checkbox'>
@@ -1739,8 +1716,8 @@ const EditorPanels = props => {
                         )}
                       </React.Fragment>
                     )}
-                    <TextField value={legend.title} updateField={updateField} section='legend' fieldName='title' label='Legend Title' placeholder='Legend Title' />
-                    {false === legend.dynamicDescription && <TextField type='textarea' value={legend.description} updateField={updateField} section='legend' fieldName='description' label='Legend Description' />}
+                    <TextField value={legend.title} section='legend' fieldName='title' label='Legend Title' placeholder='Legend Title' />
+                    {false === legend.dynamicDescription && <TextField type='textarea' value={legend.description} section='legend' fieldName='description' label='Legend Description' />}
                     {true === legend.dynamicDescription && (
                       <React.Fragment>
                         <label>
@@ -1840,7 +1817,6 @@ const EditorPanels = props => {
                   <AccordionItemPanel>
                     <TextField
                       value={dataTable.title}
-                      updateField={updateField}
                       section='dataTable'
                       fieldName='title'
                       label='Data Table Title'
@@ -1858,7 +1834,6 @@ const EditorPanels = props => {
                     />
                     <TextField
                       value={dataTable.indexLabel || ''}
-                      updateField={updateField}
                       section='dataTable'
                       fieldName='indexLabel'
                       label='Index Column Header'
@@ -1876,7 +1851,6 @@ const EditorPanels = props => {
                     />
                     <TextField
                       value={dataTable.caption}
-                      updateField={updateField}
                       section='dataTable'
                       fieldName='caption'
                       label='Data Table Caption'
@@ -1923,7 +1897,7 @@ const EditorPanels = props => {
                       />
                       <span className='edit-label'>Limit Table Height</span>
                     </label>
-                    {config.dataTable.limitHeight && <TextField value={dataTable.height} updateField={updateField} section='dataTable' fieldName='height' label='Data Table Height' placeholder='Height(px)' type='number' min='0' max='500' />}
+                    {config.dataTable.limitHeight && <TextField value={dataTable.height} section='dataTable' fieldName='height' label='Data Table Height' placeholder='Height(px)' type='number' min='0' max='500' />}
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -2006,7 +1980,7 @@ const EditorPanels = props => {
                       <option value='click'>Click - Popover Modal</option>
                     </select>
                   </label>
-                  {'click' === config.tooltips.appearanceType && <TextField value={tooltips.linkLabel} section='tooltips' fieldName='linkLabel' label='Tooltips Link Label' updateField={updateField} />}
+                  {'click' === config.tooltips.appearanceType && <TextField value={tooltips.linkLabel} section='tooltips' fieldName='linkLabel' label='Tooltips Link Label' />}
                   <label className='checkbox'>
                     <input
                       type='checkbox'
@@ -2081,8 +2055,8 @@ const EditorPanels = props => {
                   <label>
                     <span className='edit-label'>Map Color Palette</span>
                   </label>
-                  {/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
-                  <InputToggle type='3d' section='general' subsection='palette' fieldName='isReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={isPaletteReversed} />
+                  {/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'     value={isPaletteReversed} /> */}
+                  <InputToggle type='3d' section='general' subsection='palette' fieldName='isReversed' size='small' label='Use selected palette in reverse order' value={isPaletteReversed} />
                   <span>Sequential</span>
                   <ul className='color-palette'>
                     {filteredPallets.map(palette => {
@@ -2152,14 +2126,14 @@ const EditorPanels = props => {
                   {'us-geocode' === config.general.type && (
                     <label>
                       Geocode Settings
-                      <TextField type='number' value={config.visual.geoCodeCircleSize} section='visual' max='10' fieldName='geoCodeCircleSize' label='Geocode Circle Size' updateField={updateField} />
+                      <TextField type='number' value={config.visual.geoCodeCircleSize} section='visual' max='10' fieldName='geoCodeCircleSize' label='Geocode Circle Size' />
                     </label>
                   )}
 
                   {config.general.type === 'bubble' && (
                     <>
-                      <TextField type='number' value={config.visual.minBubbleSize} section='visual' fieldName='minBubbleSize' label='Minimum Bubble Size' updateField={updateField} />
-                      <TextField type='number' value={config.visual.maxBubbleSize} section='visual' fieldName='maxBubbleSize' label='Maximum Bubble Size' updateField={updateField} />
+                      <TextField type='number' value={config.visual.minBubbleSize} section='visual' fieldName='minBubbleSize' label='Minimum Bubble Size' />
+                      <TextField type='number' value={config.visual.maxBubbleSize} section='visual' fieldName='maxBubbleSize' label='Maximum Bubble Size' />
                     </>
                   )}
                   {(config.general.geoType === 'world' || (config.general.geoType === 'us' && config.general.type === 'bubble')) && (
@@ -2217,7 +2191,7 @@ const EditorPanels = props => {
               </AccordionItem>
             </Accordion>
           </form>
-          <PanelComponentAdvanced loadConfig={loadConfig} config={config} convertStateToConfig={convertStateToConfig} />
+          <PanelComponentAdvanced config={config} convertStateToConfig={convertStateToConfig} />
         </section>
       </section>
     </ErrorBoundary>

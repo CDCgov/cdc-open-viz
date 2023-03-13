@@ -32,20 +32,21 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const validateFipsCodeLength = config => {
-  if (config.general.geoType === 'us-county' || config.general.geoType === 'single-state' || (config.general.geoType === 'us' && config?.data)) {
-    config?.data.forEach(dataPiece => {
-      if (dataPiece[config.columns.geo.name]) {
-        if (!isNaN(parseInt(dataPiece[config.columns.geo.name])) && dataPiece[config.columns.geo.name].length === 4) {
-          dataPiece[config.columns.geo.name] = 0 + dataPiece[config.columns.geo.name]
+  return produce(config, draft => {
+    if (draft.general.geoType === 'us-county' || draft.general.geoType === 'single-state' || (draft.general.geoType === 'us' && draft.data)) {
+      draft.data.forEach(dataPiece => {
+        if (dataPiece[draft.columns.geo.name]) {
+          if (!isNaN(parseInt(dataPiece[draft.columns.geo.name])) && dataPiece[draft.columns.geo.name].length === 4) {
+            dataPiece[draft.columns.geo.name] = 0 + dataPiece[draft.columns.geo.name]
+          }
+          dataPiece[draft.columns.geo.name] = dataPiece[draft.columns.geo.name].toString()
         }
-        dataPiece[config.columns.geo.name] = dataPiece[config.columns.geo.name].toString()
-      }
-    })
-  }
-  return config
+      })
+    }
+  })
 }
 
-const hashObj = row => {
+export const hashObj = row => {
   try {
     if (!row) throw new Error('No row supplied to hashObj')
 
@@ -75,7 +76,7 @@ const indexOfIgnoreType = (arr, item) => {
   return -1
 }
 
-export const generateRuntimeLegend = (config, runtimeData, hash) => {
+export const generateRuntimeLegend = (config, runtimeData) => {
   const newLegendMemo = new Map() // Reset memoization
   const primaryCol = config.columns.primary.name,
     isBubble = config.general.type === 'bubble',
@@ -83,11 +84,6 @@ export const generateRuntimeLegend = (config, runtimeData, hash) => {
     type = config.legend.type,
     number = config.legend.numberOfItems,
     result = []
-
-  // Add a hash for what we're working from if passed
-  if (hash) {
-    result.fromHash = hash
-  }
 
   // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
   let dataSet = config.legend.unified ? config.data : Object.values(runtimeData)
@@ -521,7 +517,7 @@ export const generateRuntimeLegend = (config, runtimeData, hash) => {
 // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
 export const addUIDs = (config, fromColumn) => {
   const newConfig = produce(config, draft => {
-    draft.data = draft.data.map(row => {
+    draft.data.forEach(row => {
       let uid = null
 
       if (row.uid) row.uid = null // Wipe existing UIDs
@@ -584,9 +580,9 @@ export const addUIDs = (config, fromColumn) => {
         row.uid = uid
       }
     })
-    draft.data.fromColumn = fromColumn
   })
 
+  // newConfig.data.fromColumn = fromColumn
   return newConfig
 }
 
@@ -655,14 +651,12 @@ export const generateRuntimeData = (config, filters, hash) => {
 }
 
 export const generateRuntimeFilters = (config, hash) => {
+  console.log('what is the gen runtime filters conf', config)
   const runtimeFilters = produce(config, draft => {
-    if (undefined === draft.filters || draft.filters.length === 0) return []
+    // console.log('what is draft even', draft)
+    // if (draft.filters && hash) draft.filters.fromHash = hash
 
-    let filters = []
-
-    if (hash) filters.fromHash = hash
-
-    draft.filters.forEach(({ columnName, label, active, values }, idx) => {
+    draft.filters = (draft.filters ?? []).map(({ columnName, label, active, values }, idx) => {
       if (undefined === columnName) return
 
       let newFilter = runtimeFilters[idx]
@@ -700,14 +694,22 @@ export const generateRuntimeFilters = (config, hash) => {
       newFilter.values = values
       newFilter.active = active || values[0] // Default to first found value
 
-      filters.push(newFilter)
+      draft.filters[idx] = newFilter
     })
   })
 
   return runtimeFilters
 }
 
-export const processRuntimeConfig = config => {
+export const transformCdcMapConfig = config => {
+  console.log('processing', config)
+
+  generateRuntimeFilters(config)
+  validateFipsCodeLength(config)
+
+  const runtimeData = generateRuntimeData(config, config.filters)
+  generateRuntimeLegend(config, runtimeData)
+
   // If there's a name for the geo, add UIDs
   if (config.columns.geo.name || config.columns.geo.fips) {
     addUIDs(config, config.columns.geo.name || config.columns.geo.fips)
@@ -717,8 +719,9 @@ export const processRuntimeConfig = config => {
     config.dataTable.forceDisplay = !useStore.getState().viewMode.isDashboard
   }
 
-  generateRuntimeFilters(config)
-  validateFipsCodeLength(config)
-  generateRuntimeLegend(config)
+  if (config.dataTable && (config.dataTable?.title === '' || config.dataTable?.title === undefined)) {
+    config.dataTable.title = 'Data Table'
+  }
+
   return config
 }
