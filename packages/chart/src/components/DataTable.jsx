@@ -57,7 +57,7 @@ export default function DataTable() {
       config.visualizationType === 'Pie'
         ? []
         : config.visualizationType === 'Box Plot'
-          ? [
+        ? [
             {
               Header: 'Measures',
               Cell: props => {
@@ -90,7 +90,7 @@ export default function DataTable() {
               }
             }
           ]
-          : [
+        : [
             {
               Header: '',
               Cell: ({ row }) => {
@@ -105,8 +105,8 @@ export default function DataTable() {
                             ? colorScale(seriesLabel)
                             : // dynamic legend
                             config.legend.dynamicLegend
-                              ? colorPalettes[config.palette][row.index]
-                              : // fallback
+                            ? colorPalettes[config.palette][row.index]
+                            : // fallback
                               '#000'
                         }
                       />
@@ -224,7 +224,7 @@ export default function DataTable() {
             }
           }}
         >
-          <Icon display={tableExpanded ? 'minus' : 'plus'} base/>
+          <Icon display={tableExpanded ? 'minus' : 'plus'} base />
           {config.table.label}
         </div>
         <div className='table-container' hidden={!tableExpanded} style={{ maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>
