@@ -51,8 +51,9 @@ const countyLines = path(mesh(testJSON, testJSON.objects.counties))
 const CountyMap = props => {
   let mapData = states.concat(counties)
 
-  const { applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
+  const { applyTooltipsToGeo, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
   const { config } = useVisConfig()
+  const { data } = config
 
   useEffect(() => {
     if (containerEl) {
@@ -146,7 +147,7 @@ const CountyMap = props => {
     // set the states border
     let allStates = document.querySelectorAll('.state path')
     let allCounties = document.querySelectorAll('.county path')
-    let currentState = document.querySelector(`.state--${myState.id}`)
+    let currentGeoState = document.querySelector(`.state--${myState.id}`)
     let otherStates = document.querySelectorAll(`.state:not(.state--${myState.id})`)
     let svgContainer = document.querySelector('.svg-container')
     svgContainer.setAttribute('data-scaleZoom', newScaleWithHypot)
@@ -157,9 +158,9 @@ const CountyMap = props => {
 
     const focusedStateLine = path(mesh(testJSON, state[0]))
 
-    myState.style.display = 'none'
+    currentGeoState.style.display = 'none'
 
-    allStates.forEach(state => (config.style.strokeWidth = 0.75 / newScaleWithHypot))
+    allStates.forEach(geoState => (geoState.style.strokeWidth = 0.75 / newScaleWithHypot))
     allCounties.forEach(county => (county.style.strokeWidth = 0.75 / newScaleWithHypot))
     otherStates.forEach(el => (el.style.display = 'block'))
 
@@ -190,7 +191,7 @@ const CountyMap = props => {
       let otherStates = document.querySelectorAll(`.state--inactive`)
       otherStates.forEach(el => (el.style.display = 'none'))
       allCounties.forEach(el => (el.style.strokeWidth = 0.85))
-      allStates.forEach(state => config.setAttribute('stroke-width', 0.75 / 0.85))
+      allStates.forEach(geoState => geoState.setAttribute('stroke-width', 0.75 / 0.85))
 
       mapGroup.current.setAttribute('transform', `translate(${[0, 0]}) scale(${0.85})`)
 
@@ -234,7 +235,7 @@ const CountyMap = props => {
     focusedBorderPath.current.setAttribute('stroke', '#000')
 
     if (scale) {
-      allStates.forEach(state => config.setAttribute('stroke-width', 0.75 / scale))
+      allStates.forEach(state => state.setAttribute('stroke-width', 0.75 / scale))
       focusedBorderPath.current.setAttribute('stroke-width', 0.75 / scale)
     }
   }
