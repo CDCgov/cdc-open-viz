@@ -149,11 +149,15 @@ const DataTable = props => {
   )
 
   const DownloadButton = memo(() => {
-
     let csvData;
-    // Add column for full Geo name
-    csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[state.columns.geo.name]), ...row })))
- 
+    console.log("state.general.type",state.general.type)
+    if (state.general.type === 'bubble' || state.general.type === 'us-geocode') {
+     // Just Unparse
+      csvData = Papa.unparse(rawData)
+    } else {
+      // Unparse + Add column for full Geo name
+      csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[state.columns.geo.name]), ...row })))
+    }
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
 
     const saveBlob = () => {
