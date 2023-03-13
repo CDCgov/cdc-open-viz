@@ -297,7 +297,8 @@ const CountyMap = props => {
         }
 
         // Renders state/county
-        context.fillStyle = geoData !== undefined ? applyLegendToRow(geoData)[0] : '#EEE'
+        const legendValues = geoData !== undefined ? applyLegendToRow(geoData) : false
+        context.fillStyle = legendValues ? legendValues[0] : '#EEE'
         context.beginPath()
         path(geo)
         context.fill()
