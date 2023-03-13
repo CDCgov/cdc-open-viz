@@ -35,7 +35,6 @@ export default function PieChart() {
     const element = document.querySelector('.isEditor')
     if (element) {
       // parent element is visible
-      console.log('setAnimation')
       setAnimatePie(prevState => true)
     }
   })
