@@ -17,11 +17,7 @@ const DataTable = props => {
     indexTitle,
     mapTitle,
     rawData,
-    showDownloadImgButton,
-    showDownloadPdfButton,
-    showDownloadButton,
     runtimeData,
-    runtimeLegend,
     headerColor,
     expandDataTable,
     columns,
@@ -33,15 +29,11 @@ const DataTable = props => {
     formatLegendLocation,
     tabbingId,
     setFilteredCountryCode,
-    innerContainerRef,
-    imageRef
   } = props
-
+  
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
-
-  const [ready, setReady] = useState(false)
 
   const fileName = `${mapTitle || 'data-table'}.csv`
 
@@ -182,8 +174,12 @@ const DataTable = props => {
             if (runtimeData) {
               if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
                 for (let i = 0; i < state.legend.specialClasses.length; i++) {
-                  if (String(runtimeData[row][state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
-                    return state.legend.specialClasses[i].label
+                  // DEV-3303 - Special Classes label should only apply to selected special class key
+                  // - you have to ALSO check that the column name matches - putting here otherwise the if stmt too long
+                  if (columns[column].name === state.legend.specialClasses[i].key) {
+                    if (String(runtimeData[row][state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
+                      return state.legend.specialClasses[i].label
+                    }
                   }
                 }
               }
@@ -202,10 +198,11 @@ const DataTable = props => {
 
             const legendColor = applyLegendToRow(rowObj)
 
+            var labelValue
             if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
-              var labelValue = displayGeoName(row.original)
+              labelValue = displayGeoName(row.original)
             } else {
-              var labelValue = formatLegendLocation(row.original)
+              labelValue = formatLegendLocation(row.original)
             }
 
             labelValue = getCellAnchor(labelValue, rowObj)
@@ -232,7 +229,7 @@ const DataTable = props => {
     })
 
     return newTableColumns
-  }, [indexTitle, columns, runtimeData, getCellAnchor, displayDataAsText, applyLegendToRow, customSort, displayGeoName, state.legend.specialClasses])
+  }, [indexTitle, columns, runtimeData, getCellAnchor, displayDataAsText, applyLegendToRow, customSort, displayGeoName, state.legend.specialClasses])   // eslint-disable-line
 
   const tableData = useMemo(
     () =>
@@ -301,7 +298,7 @@ const DataTable = props => {
             }
           }}
         >
-          <Icon display={expanded ? 'minus' : 'plus'} base/>
+          <Icon display={expanded ? 'minus' : 'plus'} base />
           {tableTitle}
         </div>
         <div className='table-container' style={{ maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' }}>
