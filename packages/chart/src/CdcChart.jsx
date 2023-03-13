@@ -488,24 +488,24 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // DEV-3218 make "Chart Title" both a required field and default value
   useEffect(() => {
-    if (config?.title === "" || config?.title === undefined) {
+    if (config?.title === '' || config?.title === undefined) {
       setConfig({
-          ...config,
-          title: "Chart Title"
-        })
+        ...config,
+        title: 'Chart Title'
+      })
     }
   }, [config.title])
 
   // DEV-3221 make "Data Table" both a required field and default value
   useEffect(() => {
-    if (config.table?.label === "" || config.table?.label === undefined) {
+    if (config.table?.label === '' || config.table?.label === undefined) {
       setConfig({
-          ...config,
+        ...config,
         table: {
-            ...config.table,
-            label: "Data Table"
-          }
-        })
+          ...config.table,
+          label: 'Data Table'
+        }
+      })
     }
   }, [config.table])
 
