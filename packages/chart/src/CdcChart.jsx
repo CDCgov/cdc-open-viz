@@ -534,6 +534,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }, [config.title])
 
+  
   // DEV-3221 make "Data Table" both a required field and default value
   useEffect(() => {
     if (config.table?.label === '' || config.table?.label === undefined) {
