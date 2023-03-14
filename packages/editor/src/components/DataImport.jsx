@@ -398,10 +398,15 @@ export default function DataImport() {
       <button className='btn danger' onClick={() => resetEditor({ type: config.type, visualizationType: config.visualizationType }, 'Resetting will remove your data and settings. Do you want to continue?')}>
         Clear
         <CloseIcon />
-      </button>
-      <button className='link link-replace' onClick={() => resetEditor({ type: config.type, visualizationType: config.visualizationType }, 'Resetting will remove your data and settings. Do you want to continue?')}>
-          or replace file</button>
- 
+        </button>
+        {/* DEV-851 link to replace file should pop file dialog */}
+        {config.dataFileSourceType === 'file' && (
+          <div className='link link-replace' {...getRootProps2()}>
+            <input {...getInputProps2()} />
+            <p>
+              <span>or replace file</span>
+            </p>
+          </div>)}
       </>
     )
   }

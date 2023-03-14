@@ -12,8 +12,26 @@ import Loading from '@cdc/core/components/Loading'
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 
 const DataTable = props => {
-  const { state, tableTitle, indexTitle, mapTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
-
+  const {
+    state,
+    tableTitle,
+    indexTitle,
+    mapTitle,
+    rawData,
+    runtimeData,
+    headerColor,
+    expandDataTable,
+    columns,
+    displayDataAsText,
+    applyLegendToRow,
+    displayGeoName,
+    navigationHandler,
+    viewport,
+    formatLegendLocation,
+    tabbingId,
+    setFilteredCountryCode,
+  } = props
+  
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
 
