@@ -1,36 +1,108 @@
 {
   "type": "chart",
-  "title": "Bar Chart with Confidence Intervals",
-  "theme": "theme-green",
+  "title": "Example Bar Chart",
+  "theme": "theme-blue",
+  "animate": false,
   "fontSize": "medium",
-  "height": 300,
+  "lineDatapointStyle": "hover",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
   "padding": {
     "left": 5,
     "right": 5
   },
   "yAxis": {
-    "size": "75",
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "150",
     "gridLines": true,
-    "label": "Y-Axis Example Label"
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 0,
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "isLegendValue": false,
+    "numTicks": "",
+    "label": "Y Axis Example Label"
   },
-  "barThickness": 0.35,
+  "topAxis": {
+    "hasLine": false
+  },
+  "barThickness": "0.6",
+  "barHeight": 25,
+  "height": 300,
   "xAxis": {
-    "size": "50",
+    "type": "categorical",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "59",
     "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "isLegendValue": false,
+    "numTicks": "",
     "dataKey": "Date",
-    "label": "X-Axis Sample Label"
+    "label": "X Axis Example Label"
   },
   "table": {
-    "label": "Data Table",
-    "expanded": true
+    "label": "Data Type by Date",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "show": true,
+    "download": true
   },
+  "orientation": "vertical",
   "legend": {
     "behavior": "isolate",
-    "position": "right"
+    "position": "right",
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "Type of Data"
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
   },
   "palette": "qualitative-bold",
+  "isPaletteReversed": false,
   "labels": false,
-  "dataFormat": {},
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": " units"
+  },
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true
+  },
   "confidenceKeys": {
     "upper": "high",
     "lower": "low"
@@ -61,8 +133,18 @@
   "visualizationType": "Bar",
   "series": [
     {
-      "dataKey": "Value",
+      "dataKey": "data1",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "data2",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "data3",
       "type": "Bar"
     }
-  ]
+  ],
+  "description": "This example shows a bar chart created in the visualization editor in WCMS",
+  "dataCutoff": "0"
 }
