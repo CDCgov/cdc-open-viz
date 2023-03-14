@@ -12,6 +12,7 @@ const visConfigSliceActions = (set, get) => ({
     })
   },
   updateVisConfig: (key, config) => {
+    console.log('updating vis config', key, config)
 
     // TODO: CANT USE MERGE HERE, PERSISTING DELETED VISUALIZATIONS AND ROWS IN STATE
     if (key === '__default__') {
@@ -27,17 +28,15 @@ const visConfigSliceActions = (set, get) => ({
     }
   },
   updateVisConfigField: (key, fieldPayload, setValue, merge = true) => {
+    console.log('updating vis config field', key, fieldPayload, setValue, merge)
     if (key === '__default__') {
       // Dashboard or Visualization Standalone
       if (merge) {
-        set((state) => {
-          state.visualizations[key] = _merge(
-            state.visualizations[key],
-            setConfigKeyValue(fieldPayload, setValue)
-          )
+        set(state => {
+          state.visualizations[key] = _merge(state.visualizations[key], setConfigKeyValue(fieldPayload, setValue))
         })
       } else {
-        set((state) => {
+        set(state => {
           state.visualizations[key] = { ...state.visualizations[key], ...setConfigKeyValue(fieldPayload, setValue) }
         })
       }
@@ -48,20 +47,17 @@ const visConfigSliceActions = (set, get) => ({
       })
 
       if (merge) {
-        set((state) => {
-          state.visualizations['__default__'].visualizations[key] = _merge(
-            state.visualizations['__default__'].visualizations[key],
-            setConfigKeyValue(fieldPayload, setValue)
-          )
+        set(state => {
+          state.visualizations['__default__'].visualizations[key] = _merge(state.visualizations['__default__'].visualizations[key], setConfigKeyValue(fieldPayload, setValue))
         })
       } else {
-        set((state) => {
+        set(state => {
           state.visualizations['__default__'].visualizations[key] = { ...state.visualizations['__default__'].visualizations[key], ...setConfigKeyValue(fieldPayload, setValue) }
         })
       }
     }
   },
-  removeVisConfig: (key) => {
+  removeVisConfig: key => {
     set(state => {
       delete state.visualizations[key]
       return { ...state }

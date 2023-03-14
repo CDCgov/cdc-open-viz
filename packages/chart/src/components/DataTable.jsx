@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
@@ -7,12 +7,11 @@ import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/element/LegendCircle'
 import Icon from '@cdc/core/components/ui/Icon'
 
-import ConfigContext from '../ConfigContext'
-
 import MediaControls from '@cdc/core/components/ui/MediaControls'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext(ConfigContext)
+export default function DataTable({ rawData, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId }) {
+  const { config } = useVisConfig()
 
   // Debugging.
   // if (config.visualizationType === 'Box Plot') return null
@@ -57,7 +56,7 @@ export default function DataTable() {
       config.visualizationType === 'Pie'
         ? []
         : config.visualizationType === 'Box Plot'
-          ? [
+        ? [
             {
               Header: 'Measures',
               Cell: props => {
@@ -90,7 +89,7 @@ export default function DataTable() {
               }
             }
           ]
-          : [
+        : [
             {
               Header: '',
               Cell: ({ row }) => {
@@ -105,8 +104,8 @@ export default function DataTable() {
                             ? colorScale(seriesLabel)
                             : // dynamic legend
                             config.legend.dynamicLegend
-                              ? colorPalettes[config.palette][row.index]
-                              : // fallback
+                            ? colorPalettes[config.palette][row.index]
+                            : // fallback
                               '#000'
                         }
                       />
@@ -119,7 +118,7 @@ export default function DataTable() {
             }
           ]
     if (config.visualizationType !== 'Box Plot') {
-      data.forEach((d, index) => {
+      config.data.forEach((d, index) => {
         const resolveTableHeader = () => {
           if (config.runtime[section].type === 'date') return formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
           return d[config.runtime.originalXAxis.dataKey]
@@ -224,7 +223,7 @@ export default function DataTable() {
             }
           }}
         >
-          <Icon display={tableExpanded ? 'minus' : 'plus'} base/>
+          <Icon display={tableExpanded ? 'minus' : 'plus'} base />
           {config.table.label}
         </div>
         <div className='table-container' hidden={!tableExpanded} style={{ maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>

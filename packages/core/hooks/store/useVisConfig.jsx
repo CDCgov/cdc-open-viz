@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { merge } from 'lodash'
 
 // Store
-import useStore, { store } from '../../store/store'
+import useStore, { store } from '@cdc/core/store/store'
 
 // Helpers
 import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
@@ -59,7 +59,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
       }
 
       // Get initial data off config and put in store
-      await getData(processedConfig)
+      await getData(visualizationKey, processedConfig)
 
       setLoading(false)
     }
@@ -73,9 +73,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
     void initConfig()
   }, [configUrl, defaultConfig, loading, configObj, visualizationKey, storedConfig, dashboardStoredConfig, getData, addVisConfig, updateVisConfig])
 
-  const data = useStore(state => state.data)
-
-  if (!finalConfig()) {
+  if (loading || !finalConfig()) {
     console.log('no stored config!')
     return null
   }

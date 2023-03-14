@@ -1,14 +1,14 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Group } from '@visx/group'
 import { Bar } from '@visx/shape'
 import { scaleLinear } from '@visx/scale'
 import { Text } from '@visx/text'
 
-import ConfigContext from '../ConfigContext'
 import chroma from 'chroma-js'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-const PairedBarChart = ({ width, height, originalWidth }) => {
-  const { config, colorScale, transformedData: data, formatNumber, seriesHighlight, getTextWidth } = useContext(ConfigContext)
+const PairedBarChart = ({ width, height, originalWidth, colorScale, formatNumber, seriesHighlight, getTextWidth }) => {
+  const { config } = useVisConfig()
 
   if (!config || config?.series?.length < 2) return
 
@@ -23,7 +23,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
     color: colorScale(config.runtime.seriesLabels[config.series[0].dataKey]),
     max: Math.max.apply(
       Math,
-      data.map(item => item[config.series[0].dataKey])
+      config.data.map(item => item[config.series[0].dataKey])
     ),
     labelColor: ''
   }
@@ -34,7 +34,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
     color: colorScale(config.runtime.seriesLabels[config.series[1].dataKey]),
     max: Math.max.apply(
       Math,
-      data.map(item => item[config.series[1].dataKey])
+      config.data.map(item => item[config.series[1].dataKey])
     ),
     labelColor: ''
   }
@@ -86,7 +86,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
         </style>
         <svg id='cdc-visualization__paired-bar-chart' width={originalWidth} height={height} viewBox={`0 0 ${width + Number(config.runtime.yAxis.size)} ${height}`} role='img' tabIndex={0}>
           <Group top={0} left={Number(config.xAxis.size)}>
-            {data
+            {config.data
               .filter(item => config.series[0].dataKey === groupOne.dataKey)
               .map((d, index) => {
                 let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[0].dataKey) === -1
@@ -96,7 +96,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 // update bar Y to give dynamic Y when user applyes BarSpace
                 let y = 0
                 y = index !== 0 ? (Number(config.barSpace) + barHeight + borderWidth) * index : y
-                const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
+                const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * config.data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
                 const textWidth = getTextWidth(formatNumber(d[groupOne.dataKey]), `normal ${fontSize[config.fontSize]}px sans-serif`)
@@ -130,7 +130,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                   </>
                 )
               })}
-            {data
+            {config.data
               .filter(item => config.series[1].dataKey === groupTwo.dataKey)
               .map((d, index) => {
                 let barWidth = xScale(d[config.series[1].dataKey])
@@ -140,7 +140,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 // update bar Y to give dynamic Y when user applyes BarSpace
                 let y = 0
                 y = index !== 0 ? (Number(config.barSpace) + barHeight + borderWidth) * index : y
-                const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
+                const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * config.data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
                 const textWidth = getTextWidth(formatNumber(d[groupTwo.dataKey]), `normal ${fontSize[config.fontSize]}px sans-serif`)

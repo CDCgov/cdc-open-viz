@@ -1,9 +1,9 @@
-import React, { useContext } from 'react'
-import ConfigContext from '../ConfigContext'
+import React from 'react'
 import { Group } from '@visx/group'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
-  const { colorScale, transformedData: data, config } = useContext(ConfigContext)
+const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData, colorScale }) => {
+  const { config } = useVisConfig()
 
   // copied from line chart
   // should probably be a constant somewhere.
@@ -22,7 +22,7 @@ const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
 
   return (
     <Group className='scatter-plot' left={config.yAxis.size}>
-      {data.map((item, dataIndex) => {
+      {config.data.map((item, dataIndex) => {
         // prettier-ignore
         return config.runtime.seriesKeys.map(s => {
 

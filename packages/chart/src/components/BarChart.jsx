@@ -1,18 +1,20 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Group } from '@visx/group'
 import { BarGroup, BarStack } from '@visx/shape'
 import { Text } from '@visx/text'
 import chroma from 'chroma-js'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
-import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
 import CoveHelper from '@cdc/core/helpers/cove'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, cleanData, getTextWidth, parseDate } = useContext(ConfigContext)
+import cleanData from '@cdc/core/helpers/data/cleanData'
+
+export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible, colorScale, seriesHighlight, formatNumber, colorPalettes, formatDate, getTextWidth, parseDate }) {
+  const { config, updateVisConfigField } = useVisConfig()
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data, config.xAxis.dataKey)
+  const cleanedData = cleanData(config.data, config.xAxis.dataKey)
 
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
@@ -98,37 +100,28 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
   useEffect(() => {
     if (orientation === 'horizontal' && !config.yAxis.labelPlacement) {
-      updateConfig({
-        ...config,
-        yAxis: {
-          ...config,
-          labelPlacement: 'Below Bar'
-        }
-      })
+      updateVisConfigField('yAxis', { labelPlacement: 'Below Bar' })
     }
-  }, [config, updateConfig])
+  }, [config, orientation, updateVisConfigField])
 
   useEffect(() => {
     if (config.isLollipopChart === false && config.barHeight < 25) {
-      updateConfig({ ...config, barHeight: 25 })
+      updateVisConfigField('barHeight', 25)
     }
-  }, [config.isLollipopChart])
+  }, [config.isLollipopChart, updateVisConfigField])
 
   useEffect(() => {
     if (config.visualizationSubType === 'horizontal') {
-      updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
+      updateVisConfigField('orientation', 'horizontal')
     }
-  }, [])
+  }, [config.visualizationSubType, updateVisConfigField])
 
   useEffect(() => {
     if (config.barStyle === 'lollipop' && !config.isLollipopChart) {
-      updateConfig({ ...config, isLollipopChart: true })
+      updateVisConfigField('isLollipopChart', true)
     }
     if (isRounded || config.barStyle === 'flat') {
-      updateConfig({ ...config, isLollipopChart: false })
+      updateVisConfigField('isLollipopChart', false)
     }
   }, [config.barStyle])
 
@@ -147,8 +140,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
                   let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
                   // tooltips
-                  const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
-                  const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
+                  const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(config.config.data[bar.index][config.runtime.xAxis.dataKey])) : config.config.data[bar.index][config.runtime.xAxis.dataKey]
+                  const yAxisValue = formatNumber(bar.bar ? bar.bar.config.data[bar.key] : 0)
                   const style = applyRadius(barStack.index, yAxisValue < 0)
                   let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -174,7 +167,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       </style>
                       <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className='stack vertical'>
                         <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barThickness * bar.index + offset} y={bar.y - 5} fill={bar.color} textAnchor='middle'>
-                          {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
+                          {formatNumber(bar.bar ? bar.bar.config.data[bar.key] : 0)}
                         </Text>
                         <foreignObject
                           key={`bar-stack-${barStack.index}-${bar.index}`}
@@ -209,8 +202,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     config.barHeight = Number(config.barHeight)
                     let labelColor = '#000000'
                     // tooltips
-                    const xAxisValue = formatNumber(data[bar.index][bar.key])
-                    const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
+                    const xAxisValue = formatNumber(config.data[bar.index][bar.key])
+                    const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(config.data[bar.index][config.runtime.originalXAxis.dataKey])) : config.data[bar.index][config.runtime.originalXAxis.dataKey]
                     const style = applyRadius(barStack.index, yAxisValue < 0)
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                     let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -281,7 +274,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 }
                               }}
                             >
-                              {formatNumber(data[bar.index][bar.key])}
+                              {formatNumber(config.data[bar.index][bar.key])}
                             </Text>
                           )}
                         </Group>
@@ -330,7 +323,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         offset = (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2 - lollipopBarWidth / 2
                       }
                       const set = new Set()
-                      data.forEach(d => set.add(d[config.legend.colorCode]))
+                      config.data.forEach(d => set.add(d[config.legend.colorCode]))
                       const uniqValues = Array.from(set)
 
                       let palette = colorPalettes[config.palette].slice(0, uniqValues.length)
@@ -343,7 +336,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       if (config.legend.colorCode && config.series.length === 1) barColor = palette[barGroup.index]
 
                       let yAxisValue = formatNumber(bar.value)
-                      let xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                      let xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(config.data[barGroup.index][config.runtime.originalXAxis.dataKey])) : config.data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                       if (config.runtime.horizontal) {
                         let tempValue = yAxisValue
@@ -438,10 +431,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             {orientation === 'horizontal' && isLabelBelowBar && !config.yAxis.hideLabel && (
                               <Text x={config.yAxis.hideAxis ? 0 : 5} y={barGroup.height} dy={4} verticalAnchor={'start'} textAnchor={'start'}>
                                 {config.runtime.yAxis.type === 'date'
-                                  ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
+                                  ? formatDate(parseDate(config.data[barGroup.index][config.runtime.originalXAxis.dataKey]))
                                   : isHorizontal
-                                  ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                                  : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
+                                  ? config.data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                                  : formatNumber(config.data[barGroup.index][config.runtime.originalXAxis.dataKey])}
                               </Text>
                             )}
                             ;
@@ -488,7 +481,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             </BarGroup>
 
             {Object.keys(config.confidenceKeys).length > 0
-              ? data.map(d => {
+              ? config.data.map(d => {
                   let xPos = xScale(getXAxisData(d))
                   let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
                   let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))

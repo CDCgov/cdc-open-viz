@@ -1,10 +1,9 @@
 import React, { useState, useContext } from 'react'
-import ConfigContext from './../ConfigContext'
 import Button from '@cdc/core/components/element/Button'
-import CoveHelper from '@cdc/core/helpers/cove'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 const useFilters = () => {
-  const { config, setConfig, filteredData, setFilteredData, excludedData, runtimeFilters } = useContext(ConfigContext)
+  const { config, updateVisConfigField } = useVisConfig()
   const [showApplyButton, setShowApplyButton] = useState(false)
 
   const sortAsc = (a, b) => {
@@ -15,21 +14,17 @@ const useFilters = () => {
     return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
   }
 
-  const announceChange = text => { }
+  const announceChange = text => {}
 
   const changeFilterActive = (index, value) => {
     let newFilters = config.filters
     newFilters[index].active = value
-    setConfig({
-      ...config,
-      filters: newFilters
-    })
+    updateVisConfigField('filters', newFilters)
     setShowApplyButton(true)
   }
 
   const handleApplyButton = newFilters => {
-    setConfig({ ...config, filters: newFilters })
-    setFilteredData(CoveHelper.Data.filterData(newFilters, excludedData))
+    updateVisConfigField('filters', newFilters)
     setShowApplyButton(false)
   }
 
@@ -41,16 +36,15 @@ const useFilters = () => {
       filter.active = filter.values[0]
     })
 
-    setFilteredData(CoveHelper.Data.filterData(newFilters, excludedData))
-    setConfig({ ...config, filters: newFilters })
+    updateVisConfigField('filters', newFilters)
   }
 
   return { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset }
 }
 
 const Filters = () => {
-  const { config } = useContext(ConfigContext)
   const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset } = useFilters()
+  const { config } = useVisConfig()
   const { filters } = config
   const buttonText = 'Apply Filters'
   const resetText = 'Reset All'

@@ -1,6 +1,9 @@
 // Helpers
 import dataTransform from '../../helpers/data/dataTransform'
 import fetchAsyncUrl from '../../helpers/fetchAsyncUrl'
+import CoveHelper from '../../helpers/cove'
+
+import Papa from 'papaparse'
 
 const transform = new dataTransform()
 
@@ -18,7 +21,7 @@ const dataSliceActions = (set, get) => ({
     set(state => {
       state.formattedData = value
     }),
-  getData: async response => {
+  getData: async (visKey, response) => {
     let res = await response
 
     let resData = res.data || []
@@ -27,7 +30,23 @@ const dataSliceActions = (set, get) => ({
 
     // If a data URL is provided, fetch data then return. Overrides any previous data set.
     if (response.dataUrl) {
-      resData = await fetchAsyncUrl(response.dataUrl)
+      const regex = /(?:\.([^.]+))?$/
+
+      const ext = regex.exec(response.dataUrl)[1]
+      if ('csv' === ext) {
+        resData = await fetch(response.dataUrl + `?v=${CoveHelper.String.generateCacheBustString()}`)
+          .then(response => response.text())
+          .then(responseText => {
+            const parsedCsv = Papa.parse(responseText, {
+              header: true,
+              dynamicTyping: true,
+              skipEmptyLines: true
+            })
+            return parsedCsv.data
+          })
+      } else {
+        resData = await fetch(response.dataUrl + `?v=${CoveHelper.String.generateCacheBustString()}`).then(response => response.json())
+      }
 
       // If data from the URL has a "data description", use the standardization functions on that returned data
       if (response.dataDescription) {
@@ -36,9 +55,11 @@ const dataSliceActions = (set, get) => ({
       }
     }
 
+    await get().updateVisConfig(visKey, { data: resData })
     await get().setData(resData)
     await get().setFormattedData(resFormattedData)
     await get().setDatasets(resDatasets)
+    return resData
   }
 })
 

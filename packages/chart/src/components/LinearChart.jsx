@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 import { Group } from '@visx/group'
@@ -10,7 +10,6 @@ import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import CoveScatterPlot from './ScatterPlot'
 import BarChart from './BarChart'
 import LineChart from './LineChart'
-import ConfigContext from '../ConfigContext'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
 import CoveBoxPlot from './BoxPlot'
@@ -19,12 +18,13 @@ import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useTopAxis from '../hooks/useTopAxis'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // TODO: Move scaling functions into hooks to manage complexity
-export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
+export default function LinearChart({ dimensions, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels }) {
+  const { config } = useVisConfig()
   let [width] = dimensions
-  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData()
   const [animatedChart, setAnimatedChart] = useState(false)
 
   const triggerRef = useRef()
@@ -57,7 +57,7 @@ export default function LinearChart() {
   const xMax = width - config.runtime.yAxis.size - (config.visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
 
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
+  const { yScaleRight, hasRightAxis } = useRightAxis({ yMax })
   const { hasTopAxis } = useTopAxis(config)
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
@@ -71,7 +71,7 @@ export default function LinearChart() {
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
   const isMinValid = (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
 
-  if (data) {
+  if (config.data) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
@@ -105,10 +105,10 @@ export default function LinearChart() {
       max += paddingValue
     }
 
-    let xAxisDataMapped = data.map(d => getXAxisData(d))
+    let xAxisDataMapped = config.data.map(d => getXAxisData(d))
 
     if (config.isLollipopChart && config.yAxis.displayNumbersOnBar) {
-      const dataKey = data.map(item => item[config.series[0].dataKey])
+      const dataKey = config.data.map(item => item[config.series[0].dataKey])
       const maxDataVal = Math.max(...dataKey).toString().length
 
       switch (true) {
@@ -164,11 +164,11 @@ export default function LinearChart() {
       const offset = 1.02 // Offset of the ticks/values from the Axis
       let groupOneMax = Math.max.apply(
         Math,
-        data.map(d => d[config.series[0].dataKey])
+        config.data.map(d => d[config.series[0].dataKey])
       )
       let groupTwoMax = Math.max.apply(
         Math,
-        data.map(d => d[config.series[1].dataKey])
+        config.data.map(d => d[config.series[1].dataKey])
       )
 
       // group one
@@ -214,7 +214,7 @@ export default function LinearChart() {
     let tickCount = undefined
 
     if (axis === 'yAxis') {
-      tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      tickCount = isHorizontal && !numTicks ? config.data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
     }
 
     if (axis === 'xAxis') {
@@ -245,7 +245,7 @@ export default function LinearChart() {
       if (outlierMax > maxYValue) maxYValue = outlierMax
     }
 
-    const seriesNames = data.map(d => d[config.xAxis.dataKey])
+    const seriesNames = config.data.map(d => d[config.xAxis.dataKey])
 
     // Set Scales
     yScale = scaleLinear({
@@ -269,7 +269,7 @@ export default function LinearChart() {
   return isNaN(width) ? (
     <></>
   ) : (
-    <ErrorBoundary component='LinearChart'>
+    <>
       <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
         {/* Higlighted regions */}
         {config.regions
@@ -548,6 +548,6 @@ export default function LinearChart() {
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
-    </ErrorBoundary>
+    </>
   )
 }

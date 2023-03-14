@@ -1,14 +1,13 @@
-import React, { useContext, useEffect } from 'react'
-import ConfigContext from '../ConfigContext'
+import React, { useEffect } from 'react'
 import parse from 'html-react-parser'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendCircle from '@cdc/core/components/element/LegendCircle'
 
 import useLegendClasses from './../hooks/useLegendClasses'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-const Legend = () => {
-  const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
-
+const Legend = ({ legend, colorScale, seriesHighlight, setSeriesHighlight, highlight, highlightReset, dynamicLegendItems, setDynamicLegendItems, colorPalettes, currentViewport }) => {
+  const { config, updateVisConfigField } = useVisConfig()
   const { innerClasses, containerClasses } = useLegendClasses(config)
 
   useEffect(() => {
@@ -21,7 +20,7 @@ const Legend = () => {
     let colsToKeep = [...itemsToHighlight]
     let tmpLabels = []
 
-    rawData.map(dataItem => {
+    config.data.map(dataItem => {
       let tmp = {}
       colsToKeep.map(col => {
         tmp[col] = isNaN(dataItem[col]) ? dataItem[col] : dataItem[col]
@@ -34,16 +33,12 @@ const Legend = () => {
     })
 
     if (dynamicLegendItems.length > 0) {
-      setConfig({
-        ...config,
-        runtime: {
-          ...config.runtime,
-          seriesKeys: colsToKeep,
-          seriesLabels: tmpLabels
-        }
+      updateVisConfigField('runtime', {
+        seriesKeys: colsToKeep,
+        seriesLabels: tmpLabels
       })
     }
-  }, [dynamicLegendItems])
+  }, [dynamicLegendItems, setSeriesHighlight, updateVisConfigField])
 
   useEffect(() => {
     if (dynamicLegendItems.length === 0) {
@@ -56,16 +51,12 @@ const Legend = () => {
         })
       })
 
-      setConfig({
-        ...config,
-        runtime: {
-          ...config.runtime,
-          seriesKeys: config.runtime.seriesLabelsAll,
-          seriesLabels: tmpLabels
-        }
+      updateVisConfigField('runtime', {
+        seriesKeys: config.runtime.seriesLabelsAll,
+        seriesLabels: tmpLabels
       })
     }
-  }, [dynamicLegendItems])
+  }, [config.runtime.seriesLabelsAll, dynamicLegendItems, updateVisConfigField])
 
   const removeDynamicLegendItem = label => {
     let newLegendItems = dynamicLegendItems.filter(item => item.text !== label.text)
@@ -109,10 +100,11 @@ const Legend = () => {
   // in small screens update config legend position.
   useEffect(() => {
     if (currentViewport === 'sm' || currentViewport === 'xs' || config.legend.position === 'left') {
-      setConfig({ ...config, legend: { ...config.legend, position: 'bottom' } })
+      updateVisConfigField('legend', { position: 'bottom' })
+    } else {
+      updateVisConfigField('legend', { position: 'right' })
     }
-    setConfig({ ...config, legend: { ...config.legend, position: 'right' } })
-  }, [currentViewport])
+  }, [config.legend.position, currentViewport, updateVisConfigField])
 
   if (!legend) return
 
@@ -131,7 +123,7 @@ const Legend = () => {
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => (
             <div className={innerClasses.join(' ')}>
-              {createLegendLabels(data, labels).map((label, i) => {
+              {createLegendLabels(config.data, labels).map((label, i) => {
                 let className = 'legend-item'
                 let itemName = label.datum
 

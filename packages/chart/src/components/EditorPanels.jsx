@@ -4,8 +4,6 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
 import { useDebounce } from 'use-debounce'
-
-import ConfigContext from '../ConfigContext'
 import WarningImage from '../images/warning.svg'
 import PanelComponentAdvanced from '@cdc/core/components/editor/Panel.Component.Advanced'
 
@@ -17,6 +15,8 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+import produce from 'immer'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 
@@ -124,7 +124,8 @@ const Select = memo(({ label, value, options, fieldName, section = null, subsect
   )
 })
 
-const Regions = memo(({ config, updateConfig }) => {
+const Regions = memo(() => {
+  const { config } = useVisConfig()
   let regionUpdate = (fieldName, value, i) => {
     let regions = []
 
@@ -133,7 +134,7 @@ const Regions = memo(({ config, updateConfig }) => {
     }
 
     regions[i][fieldName] = value
-    updateConfig({ ...config, regions })
+    // updateConfig({ ...config, regions })
   }
 
   let updateField = (section, subsection, fieldName, value, i) => regionUpdate(fieldName, value, i)
@@ -147,7 +148,7 @@ const Regions = memo(({ config, updateConfig }) => {
 
     regions.splice(i, 1)
 
-    updateConfig({ ...config, regions })
+    // updateConfig({ ...config, regions })
   }
 
   let addColumn = () => {
@@ -159,7 +160,7 @@ const Regions = memo(({ config, updateConfig }) => {
 
     regions.push({})
 
-    updateConfig({ ...config, regions })
+    // updateConfig({ ...config, regions })
   }
 
   return (
@@ -205,13 +206,13 @@ const Regions = memo(({ config, updateConfig }) => {
 
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
-const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
+const EditorPanels = ({ colorPalettes, unfilteredData, excludedData, isDashboard, missingRequiredSections }) => {
+  const { config, updateVisConfigField, updateVisConfig } = useVisConfig()
 
-  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData()
   const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)
   useEffect(() => {
-    if (paletteName) updateConfig({ ...config, palette: paletteName })
+    if (paletteName) updateVisConfigField('palette', paletteName)
   }, [paletteName]) // eslint-disable-line
 
   useEffect(() => {
@@ -234,13 +235,10 @@ const EditorPanel = () => {
       })
     }
 
-    updateConfig({
-      ...config,
-      series: newSeries
-    })
+    updateVisConfigField('series', newSeries)
   }, [config.visualizationType]) // eslint-disable-line
 
-  const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
+  const { hasRightAxis } = useRightAxis({ yMax: config.yAxis.size })
 
   const filterOptions = [
     {
@@ -287,31 +285,10 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
-
-    if (section === 'boxplot' && subsection === 'legend') {
-      updateConfig({
-        ...config,
-        [section]: {
-          ...config[section],
-          [subsection]: {
-            ...config.boxplot[subsection],
-            [fieldName]: newValue
-          }
-        }
-      })
-      return
-    }
-
-    if (section === 'boxplot' && subsection === 'labels') {
-      updateConfig({
-        ...config,
-        [section]: {
-          ...config[section],
-          [subsection]: {
-            ...config.boxplot[subsection],
-            [fieldName]: newValue
-          }
-        }
+    if (section === 'boxplot' && (subsection === 'legend' || subsection === 'labels')) {
+      updateVisConfigField([section, subsection], {
+        ...config.boxplot[subsection],
+        [fieldName]: newValue
       })
       return
     }
@@ -319,7 +296,7 @@ const EditorPanel = () => {
     if (null === section && null === subsection) {
       let updatedConfig = { ...config, [fieldName]: newValue }
       enforceRestrictions(updatedConfig)
-      updateConfig(updatedConfig)
+      updateVisConfigField(fieldName, newValue)
       return
     }
 
@@ -342,20 +319,13 @@ const EditorPanel = () => {
 
     enforceRestrictions(updatedConfig)
 
-    updateConfig(updatedConfig)
+    updateVisConfigField(section, sectionValue)
   }
 
   const [displayPanel, setDisplayPanel] = useState(true)
 
-  if (loading) {
-    return null
-  }
-
   const setLollipopShape = shape => {
-    updateConfig({
-      ...config,
-      lollipopShape: shape
-    })
+    updateVisConfigField('lollipopShape', shape)
   }
 
   const removeFilter = index => {
@@ -363,40 +333,42 @@ const EditorPanel = () => {
 
     filters.splice(index, 1)
 
-    updateConfig({ ...config, filters })
+    updateVisConfigField('filters', filters, false)
   }
 
   const updateFilterProp = (name, index, value) => {
-    let filters = [...config.filters]
-
-    filters[index][name] = value
-
-    updateConfig({ ...config, filters })
+    updateVisConfig(
+      produce(config, draft => {
+        draft.filters[index][name] = value
+      })
+    )
   }
 
   const addNewFilter = () => {
-    let filters = config.filters ? [...config.filters] : []
-
-    filters.push({ values: [] })
-
-    updateConfig({ ...config, filters })
+    updateVisConfig(
+      produce(config, draft => {
+        draft.filters.push({ values: [] })
+      })
+    )
   }
 
   const addNewSeries = seriesKey => {
-    let newSeries = config.series ? [...config.series] : []
-    newSeries.push({ dataKey: seriesKey, type: 'Bar' })
-    updateConfig({ ...config, series: newSeries }) // left axis series keys
+    updateVisConfig(
+      produce(config, draft => {
+        draft.series.push({ dataKey: seriesKey, type: 'Bar' })
+      })
+    )
   }
 
   const sortSeries = e => {
-    const series = config.series[0].dataKey
-    const sorted = data.sort((a, b) => a[series] - b[series])
+    const seriesKey = config.series[0].dataKey
+    const sorted = config.data.sort((a, b) => a[seriesKey] - b[seriesKey])
     const newData = e === 'asc' ? sorted : sorted.reverse()
-    updateConfig({ ...config }, newData)
+    updateVisConfigField('data', newData, false)
   }
 
   const removeSeries = seriesKey => {
-    let series = [...config.series]
+    let series = config.series
     let seriesIndex = -1
 
     for (let i = 0; i < series.length; i++) {
@@ -409,20 +381,17 @@ const EditorPanel = () => {
     if (seriesIndex !== -1) {
       series.splice(seriesIndex, 1)
 
-      let newConfig = { ...config, series }
-
       if (series.length === 0) {
-        delete newConfig.series
+        updateVisConfig(
+          produce(config, draft => {
+            delete draft.series
+          })
+        )
       }
-
-      updateConfig(newConfig)
     }
 
     if (config.visualizationType === 'Paired Bar') {
-      updateConfig({
-        ...config,
-        series: []
-      })
+      updateVisConfigField('series', [])
     }
   }
 
@@ -431,7 +400,7 @@ const EditorPanel = () => {
     newExclusion.push(exclusionKey)
 
     let payload = { ...config.exclusions, keys: newExclusion }
-    updateConfig({ ...config, exclusions: payload })
+    updateVisConfigField('exclusions', payload)
   }
 
   const removeExclusion = excludeValue => {
@@ -455,14 +424,14 @@ const EditorPanel = () => {
         delete newExclusionsPayload.exclusions.keys
       }
 
-      updateConfig(newExclusionsPayload)
+      updateVisConfig(newExclusionsPayload)
     }
   }
 
   const getColumns = (filter = true) => {
     let columns = {}
 
-    unfilteredData.forEach(row => {
+    config.data.forEach(row => {
       Object.keys(row).forEach(columnName => (columns[columnName] = true))
     })
 
@@ -533,7 +502,7 @@ const EditorPanel = () => {
       let newConfig = { ...config }
       delete newConfig.newViz
 
-      updateConfig(newConfig)
+      // updateConfig(newConfig)
     }
 
     return (
@@ -559,32 +528,16 @@ const EditorPanel = () => {
     return strippedState
   }
 
-  useEffect(() => {
-    // Pass up to Editor if needed
-    if (setParentConfig) {
-      const newConfig = convertStateToConfig()
-      setParentConfig(newConfig)
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config])
-
   // Set paired bars to be horizontal, even though that option doesn't display
   useEffect(() => {
     if (config.visualizationType === 'Paired Bar') {
-      updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
+      updateVisConfigField('orientation', 'horizontal')
     }
   }, []) // eslint-disable-line
 
   useEffect(() => {
     if (config.orientation === 'horizontal') {
-      updateConfig({
-        ...config,
-        lollipopShape: config.lollipopShape
-      })
+      updateVisConfigField('lollipopShape', config.lollipopShape)
     }
   }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
 
@@ -622,14 +575,14 @@ const EditorPanel = () => {
     filterItem.orderedValues = filterOrder
     filterItem.order = 'cust'
     filters[filterIndex] = filterItem
-    updateConfig({ ...config, filters })
+    updateVisConfigField('filters', filters, false)
   }
 
   const handleSeriesChange = (idx1, idx2) => {
     let seriesOrder = config.series
     let [movedItem] = seriesOrder.splice(idx1, 1)
     seriesOrder.splice(idx2, 0, movedItem)
-    updateConfig({ ...config, series: seriesOrder })
+    updateVisConfigField('series', seriesOrder, false)
   }
 
   if (config.isLollipopChart && config?.series?.length > 1) {
@@ -837,7 +790,7 @@ const EditorPanel = () => {
 
                                       series[i].axis = 'Left'
 
-                                      updateConfig({ ...config, series })
+                                      updateVisConfigField('series', series, false)
                                     }
 
                                     let typeDropdown = (
@@ -1144,7 +1097,7 @@ const EditorPanel = () => {
                               let changeAxis = (i, value) => {
                                 let series = [...config.series]
                                 series[i].axis = value
-                                updateConfig({ ...config, series })
+                                updateVisConfigField('series', series, false)
                               }
 
                               let axisDropdown = (
@@ -1589,7 +1542,7 @@ const EditorPanel = () => {
                     <AccordionItemButton>Regions</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <Regions config={config} updateConfig={updateConfig} />
+                    <Regions />
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
@@ -1631,7 +1584,7 @@ const EditorPanel = () => {
                   <CheckBox value={config.legend.showLegendValuesTooltip} section='legend' fieldName='showLegendValuesTooltip' label='Show Legend Values in Tooltip' updateField={updateField} />
 
                   {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
-                    <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
+                    <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(config.data)} />
                   )}
                   <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={updateField} options={['highlight', 'isolate']} />
                   <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
@@ -1827,7 +1780,7 @@ const EditorPanel = () => {
                           key={palette}
                           onClick={e => {
                             e.preventDefault()
-                            updateConfig({ ...config, palette })
+                            updateVisConfigField('palette', palette)
                           }}
                           className={config.palette === palette ? 'selected' : ''}
                         >
@@ -1859,7 +1812,7 @@ const EditorPanel = () => {
                           key={palette}
                           onClick={e => {
                             e.preventDefault()
-                            updateConfig({ ...config, palette })
+                            updateVisConfigField('palette', palette)
                           }}
                           className={config.palette === palette ? 'selected' : ''}
                         >
@@ -1969,11 +1922,11 @@ const EditorPanel = () => {
               </AccordionItem>
             </Accordion>
           </form>
-          {config.type !== 'Spark Line' && <PanelComponentAdvanced loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
+          {config.type !== 'Spark Line' && <PanelComponentAdvanced />}
         </section>
       </section>
     </ErrorBoundary>
   )
 }
 
-export default EditorPanel
+export default EditorPanels

@@ -653,7 +653,6 @@ export const generateRuntimeData = (config, filters, hash) => {
 }
 
 export const generateRuntimeFilters = (config, hash) => {
-  console.log('what is the gen runtime filters conf', config)
   const runtimeFilters = produce(config, draft => {
     // console.log('what is draft even', draft)
     // if (draft.filters && hash) draft.filters.fromHash = hash
@@ -704,8 +703,6 @@ export const generateRuntimeFilters = (config, hash) => {
 }
 
 export const transformCdcMapConfig = config => {
-  console.log('processing', config)
-
   generateRuntimeFilters(config)
   validateFipsCodeLength(config)
 

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { animated, useTransition, interpolate } from 'react-spring'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 
@@ -8,19 +8,17 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import useIntersectionObserver from './useIntersectionObserver'
 
-import ConfigContext from '../ConfigContext'
-
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 const enterUpdateTransition = ({ startAngle, endAngle }) => ({
   startAngle,
   endAngle
 })
 
-export default function PieChart() {
-  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels, cleanData } = useContext(ConfigContext)
-
-  const cleanedData = cleanData(data, config.xAxis.dataKey);
+export default function PieChart({ dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels, cleanData }) {
+  const { config } = useVisConfig()
+  const cleanedData = cleanData(config.data, config.xAxis.dataKey)
 
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
@@ -45,18 +43,15 @@ export default function PieChart() {
         setAnimatePie(true)
       }, 500)
     }
-  }, [ dataRef?.isIntersecting, config.animate ])
-
+  }, [dataRef?.isIntersecting, config.animate])
 
   function AnimatedPie({ arcs, path, getKey }) {
-    const transitions = useTransition(arcs, getKey,
-      {
-        from: enterUpdateTransition,
-        enter: enterUpdateTransition,
-        update: enterUpdateTransition,
-        leave: enterUpdateTransition
-      }
-    )
+    const transitions = useTransition(arcs, getKey, {
+      from: enterUpdateTransition,
+      enter: enterUpdateTransition,
+      update: enterUpdateTransition,
+      leave: enterUpdateTransition
+    })
 
     return (
       <>
@@ -72,7 +67,7 @@ export default function PieChart() {
           return (
             <Group key={key} style={{ opacity: config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1 ? 0.5 : 1 }}>
               <animated.path
-                d={interpolate([ props.startAngle, props.endAngle ], (startAngle, endAngle) =>
+                d={interpolate([props.startAngle, props.endAngle], (startAngle, endAngle) =>
                   path({
                     ...arc,
                     startAngle,
@@ -87,7 +82,7 @@ export default function PieChart() {
           )
         })}
         {transitions.map(({ item: arc, key }) => {
-          const [ centroidX, centroidY ] = path.centroid(arc)
+          const [centroidX, centroidY] = path.centroid(arc)
           const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1
 
           let textColor = '#FFF'
@@ -98,7 +93,7 @@ export default function PieChart() {
           return (
             <animated.g key={key}>
               {hasSpaceForLabel && (
-                <Text style={{ fill: textColor }} x={centroidX} y={centroidY} dy=".33em" textAnchor="middle" pointerEvents="none">
+                <Text style={{ fill: textColor }} x={centroidX} y={centroidY} dy='.33em' textAnchor='middle' pointerEvents='none'>
                   {Math.round((((arc.endAngle - arc.startAngle) * 180) / Math.PI / 360) * 100) + '%'}
                 </Text>
               )}
@@ -109,7 +104,7 @@ export default function PieChart() {
     )
   }
 
-  let [ width ] = dimensions
+  let [width] = dimensions
 
   if (config && config.legend && !config.legend.hide && currentViewport === 'lg') {
     width = width * 0.73
@@ -126,7 +121,7 @@ export default function PieChart() {
     if (seriesHighlight.length > 0 && config.legend.behavior !== 'highlight') {
       let newFilteredData = []
 
-      data.forEach(d => {
+      config.data.forEach(d => {
         if (seriesHighlight.indexOf(d[config.runtime.xAxis.dataKey]) !== -1) {
           newFilteredData.push(d)
         }
@@ -136,11 +131,11 @@ export default function PieChart() {
     } else {
       setFilteredData(undefined)
     }
-  }, [ seriesHighlight ])
+  }, [seriesHighlight])
 
   return (
-    <ErrorBoundary component="PieChart">
-      <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role="img" aria-label={handleChartAriaLabels(config)}>
+    <ErrorBoundary component='PieChart'>
+      <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
         <Group top={centerY} left={centerX}>
           <Pie data={filteredData || cleanedData} pieValue={d => d[config.runtime.yAxis.dataKey]} pieSortValues={() => -1} innerRadius={radius - donutThickness} outerRadius={radius}>
             {pie => <AnimatedPie {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]} />}

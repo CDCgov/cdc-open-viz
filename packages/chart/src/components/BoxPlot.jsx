@@ -1,13 +1,12 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { BoxPlot } from '@visx/stats'
 import { Group } from '@visx/group'
-import { scaleBand, scaleLinear } from '@visx/scale'
-import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {
-  const { transformedData: data, config } = useContext(ConfigContext)
+  const { config } = useVisConfig()
 
   const boxWidth = xScale.bandwidth()
   const constrainedWidth = Math.min(40, boxWidth)
