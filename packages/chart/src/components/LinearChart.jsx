@@ -80,10 +80,10 @@ export default function LinearChart() {
 
     // DEV-3263 - If Confidence Intervals in data, then need to account for increased height in max for YScale
     if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') {
-      let ciYMax = 0;
+      let ciYMax = 0
       if (config.hasOwnProperty('confidenceKeys')) {
         let upperCIValues = data.map(function (d) {
-          return d[config.confidenceKeys.upper];
+          return d[config.confidenceKeys.upper]
         })
         ciYMax = Math.max.apply(Math, upperCIValues)
         if (ciYMax > max) max = ciYMax // bump up the max
@@ -134,7 +134,7 @@ export default function LinearChart() {
           max = max * 1.1
           break
         default:
-          break;
+          break
       }
     }
 
@@ -147,8 +147,8 @@ export default function LinearChart() {
       yScale =
         config.runtime.xAxis.type === 'date'
           ? scaleLinear({
-            domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
-          })
+              domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
+            })
           : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
       seriesScale = scalePoint({
@@ -220,7 +220,6 @@ export default function LinearChart() {
 
     // Handle Box Plots
     if (config.visualizationType === 'Box Plot') {
-
       const allOutliers = []
       const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
 
@@ -286,9 +285,6 @@ export default function LinearChart() {
     return tickCount
   }
 
-
-
-
   return isNaN(width) ? (
     <></>
   ) : (
@@ -297,45 +293,45 @@ export default function LinearChart() {
         {/* Higlighted regions */}
         {config.regions
           ? config.regions.map(region => {
-            if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+              if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-            let from
-            let to
-            let width
+              let from
+              let to
+              let width
 
-            if (config.xAxis.type === 'date') {
-              from = xScale(parseDate(region.from).getTime())
-              to = xScale(parseDate(region.to).getTime())
-              width = to - from
-            }
+              if (config.xAxis.type === 'date') {
+                from = xScale(parseDate(region.from).getTime())
+                to = xScale(parseDate(region.to).getTime())
+                width = to - from
+              }
 
-            if (config.xAxis.type === 'categorical') {
-              from = xScale(region.from)
-              to = xScale(region.to)
-              width = to - from
-            }
+              if (config.xAxis.type === 'categorical') {
+                from = xScale(region.from)
+                to = xScale(region.to)
+                width = to - from
+              }
 
-            if (!from) return null;
-            if (!to) return null;
+              if (!from) return null
+              if (!to) return null
 
-            return (
-              <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
-                <path
-                  stroke='#333'
-                  d={`M${from} -5
+              return (
+                <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
+                  <path
+                    stroke='#333'
+                    d={`M${from} -5
                           L${from} 5
                           M${from} 0
                           L${to} 0
                           M${to} -5
                           L${to} 5`}
-                />
-                <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-                <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-                  {region.label}
-                </Text>
-              </Group>
-            )
-          })
+                  />
+                  <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+                  <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+                    {region.label}
+                  </Text>
+                </Group>
+              )
+            })
           : ''}
 
         {/* Y axis */}

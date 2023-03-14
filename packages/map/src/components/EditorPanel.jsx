@@ -1478,11 +1478,21 @@ const EditorPanel = props => {
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
+                          <p>Title is required to set the name of the download file but can be hidden using the option below.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
                   />
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={state.general.showTitle || false}
+                      onChange={event => {
+                        handleEditorChanges('showTitle', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Show Title</span>
+                  </label>
                   <TextField
                     value={general.superTitle || ''}
                     updateField={updateField}
