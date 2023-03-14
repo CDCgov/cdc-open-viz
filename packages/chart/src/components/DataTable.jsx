@@ -57,7 +57,7 @@ export default function DataTable() {
       config.visualizationType === 'Pie'
         ? []
         : config.visualizationType === 'Box Plot'
-        ? [
+          ? [
             {
               Header: 'Measures',
               Cell: props => {
@@ -90,7 +90,7 @@ export default function DataTable() {
               }
             }
           ]
-        : [
+          : [
             {
               Header: '',
               Cell: ({ row }) => {
@@ -105,8 +105,8 @@ export default function DataTable() {
                             ? colorScale(seriesLabel)
                             : // dynamic legend
                             config.legend.dynamicLegend
-                            ? colorPalettes[config.palette][row.index]
-                            : // fallback
+                              ? colorPalettes[config.palette][row.index]
+                              : // fallback
                               '#000'
                         }
                       />

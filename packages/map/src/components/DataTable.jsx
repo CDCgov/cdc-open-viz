@@ -142,14 +142,8 @@ const DataTable = props => {
   )
 
   const DownloadButton = memo(() => {
-    let csvData
-    if (state.general.type === 'bubble' || state.general.type === 'us-geocode' || state.columns.geo.name === 'County') {
-     // Just Unparse
-      csvData = Papa.unparse(rawData)
-    } else {
-      // Unparse + Add column for full Geo name
-      csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[state.columns.geo.name]), ...row })))
-    }
+    const csvData = Papa.unparse(rawData)
+
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
 
     const saveBlob = () => {
@@ -280,7 +274,7 @@ const DataTable = props => {
 
   const rand = Math.random().toString(16).substr(2, 8)
   const skipId = `btn__${rand}`
-  
+
   if (!state.data) return <Loading />
   return (
     <ErrorBoundary component='DataTable'>
@@ -292,7 +286,8 @@ const DataTable = props => {
         <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
           Skip Navigation or Skip to Content
         </a>
-        <div className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
+        <div
+          className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
           onClick={() => {
             setExpanded(!expanded)
           }}
