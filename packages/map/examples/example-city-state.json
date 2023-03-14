@@ -28,8 +28,8 @@
       "fipsCode": "01",
       "stateName": "Alabama"
     },
-    "showDownloadImgButton": true,
-    "showDownloadPdfButton": true
+    "showDownloadImgButton": false,
+    "showDownloadPdfButton": false
   },
   "type": "map",
   "color": "yelloworangered",
@@ -79,8 +79,8 @@
     "description": "Legend Text",
     "type": "equalnumber",
     "specialClasses": [
-      "*",
-      "NA"
+      {"key": "Rate", "value": "*", "label": "*"},
+      {"key": "Rate", "value": "NA", "label": "N/A"}
     ],
     "unified": false,
     "singleColumn": false,
@@ -137,6 +137,12 @@
     {
       "STATE": "AS",
       "Rate": 14,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "EAU CLAIRE",
+      "Rate": 140,
       "Location": "Work",
       "URL": "https://www.cdc.gov/"
     },

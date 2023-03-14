@@ -9,25 +9,24 @@
 }
 
 div.data-table-heading {
+  position: relative;
   background: rgba(0, 0, 0, 0.05);
   padding: 0.5em 0.7em;
   border: $lightGray 1px solid;
   border-bottom: 0;
   cursor: pointer;
-  background-image: url(../assets/icon-minus.svg);
-  background-size: 15px 15px; // Need to define both for IE11
-  background-position: right 0.7em center;
-  background-repeat: no-repeat;
+
+  svg {
+    position: absolute;
+    height: 100%;
+    width: 15px;
+    top: 0;
+    right: 1em;
+  }
+
   &:focus {
     z-index: 2;
     position: relative;
-  }
-  &.collapsed {
-    background-image: url(../assets/icon-plus.svg);
-    background-size: 15px 15px; // Need to define both for IE11
-    background-position: right 0.7em center;
-    background-repeat: no-repeat;
-    border-bottom: $lightGray 1px solid;
   }
 }
 

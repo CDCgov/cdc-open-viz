@@ -14,7 +14,7 @@
     "territoriesLabel": "Territories",
     "language": "en",
     "hasRegions": false,
-	"displayAsHex": true
+    "displayAsHex": true
   },
   "filters": [{ "label": "", "values": [], "columnName": "Condition" }],
   "columns": {
@@ -57,8 +57,8 @@
     "description": "Legend Text",
     "type": "equalnumber",
     "specialClasses": [
-      "*",
-      "NA"
+      { "key": "Rate", "value": "*", "label": "*" },
+      { "key": "Rate", "value": "NA", "label": "N/A" }
     ],
     "unified": false,
     "singleColumn": false,
@@ -473,5 +473,3 @@
   "usingWidgetLoader": true,
   "type": "map"
 }
-
-

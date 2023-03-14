@@ -1,58 +1,68 @@
-import { useEffect, useReducer } from 'react'
+import { colorPalettesChart, pairedBarPalettes } from '@cdc/core/data/colorPalettes'
+import { useEffect } from 'react'
 
-// constants
-const SEQUENTIAL = 'SEQUENTIAL'
-const SEQUENTIAL_REVERSE = 'SEQUENTIAL_REVERSE'
-export const GET_PALETTE = 'GET_PALETTE'
+export const useColorPalette = (config, updateConfig) => {
+  let twoColorPalettes = []
+  let sequential = []
+  let nonSequential = []
 
-// create initial state
-const initialState = {
-  filteredPallets: [],
-  isPaletteReversed: false,
-  filteredQualitative: [],
-  paletteName: undefined
-}
+  // Get two color palettes if visualization type is Paired Bar
+  if (config.visualizationType === 'Paired Bar') {
+    const isReversed = config.pairedBar.isPaletteReversed
+    twoColorPalettes = Object.keys(pairedBarPalettes).filter(name => (isReversed ? name.endsWith('reverse') : !name.endsWith('reverse')))
+  } else {
+    // Get sequential and non-sequential palettes for other visualization types
+    const seqPalettes = []
+    const nonSeqPalettes = []
 
-function reducer(state, action) {
-  const palletNamesArr = Object.keys(action.payload) // action.payload === colorPalettes object
-  let paletteName = ''
-  switch (action.type) {
-    case GET_PALETTE:
-      return { ...state, paletteName: action.paletteName }
-    case SEQUENTIAL:
-      paletteName = state.paletteName && state.paletteName.endsWith('reverse') ? String(state.paletteName).substring(0, state.paletteName.length - 7) : String(state.paletteName)
-      const qualitative = palletNamesArr.filter((name) => String(name).startsWith('qualitative') && !String(name).endsWith('reverse'))
-      const sequential = palletNamesArr.filter((name) => String(name).startsWith('sequential') && !String(name).endsWith('reverse'))
-      return { ...state, filteredPallets: sequential, filteredQualitative: qualitative, paletteName: paletteName, isPaletteReversed: false }
+    for (const paletteName in colorPalettesChart) {
+      const isSequential = paletteName.startsWith('sequential')
+      const isQualitative = paletteName.startsWith('qualitative')
+      const isReversed = paletteName.endsWith('reverse')
 
-    case SEQUENTIAL_REVERSE:
-      paletteName = palletNamesArr.find((name) => name === String(state.paletteName).concat('reverse') || name === String(state.paletteName).concat('-reverse'))
-      const qualitativeReverse = palletNamesArr.filter((name) => String(name).startsWith('qualitative') && String(name).endsWith('reverse'))
-      const sequentialReverse = palletNamesArr.filter((name) => String(name).startsWith('sequential') && String(name).endsWith('reverse'))
-      return { ...state, filteredQualitative: qualitativeReverse, filteredPallets: sequentialReverse, paletteName: paletteName, isPaletteReversed: true }
-    default:
-      return state
-  }
-}
+      if (isSequential && ((!config.isPaletteReversed && !isReversed) || (config.isPaletteReversed && isReversed))) {
+        seqPalettes.push(paletteName)
+      }
 
-function init(initialState) {
-  return initialState
-}
-
-export function useColorPalette(colorPalettes, configState) {
-  const [state, dispatch] = useReducer(reducer, initialState, init)
-  const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative } = state
-
-  useEffect(() => {
-    dispatch({ type: SEQUENTIAL, payload: colorPalettes })
-  }, [])
-
-  useEffect(() => {
-    if (configState.isPaletteReversed) {
-      dispatch({ type: 'SEQUENTIAL_REVERSE', payload: colorPalettes })
-      return () => dispatch({ type: 'SEQUENTIAL', payload: colorPalettes })
+      if (isQualitative && ((!config.isPaletteReversed && !isReversed) || (config.isPaletteReversed && isReversed))) {
+        nonSeqPalettes.push(paletteName)
+      }
     }
-  }, [configState.isPaletteReversed, dispatch, colorPalettes])
 
-  return { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch }
+    sequential = seqPalettes
+    nonSequential = nonSeqPalettes
+  }
+
+  // Update pairedBar.palette based on isPaletteReversed
+  useEffect(() => {
+    let palette = ''
+
+    if (config.pairedBar.isPaletteReversed && !config.pairedBar.palette.endsWith('reverse')) {
+      palette = config.pairedBar.palette + 'reverse'
+    }
+
+    if (!config.pairedBar.isPaletteReversed && config.pairedBar.palette.endsWith('reverse')) {
+      palette = config.pairedBar.palette.slice(0, -7)
+    }
+
+    updateConfig({ ...config, pairedBar: { ...config.pairedBar, palette: palette } })
+  }, [config.pairedBar.isPaletteReversed])
+
+  // Update palette based on isPaletteReversed
+  useEffect(() => {
+    let palette = ''
+
+    if (config.isPaletteReversed && !config.palette.endsWith('reverse')) {
+      palette = config.palette + 'reverse'
+    }
+
+    if (!config.isPaletteReversed && config.palette.endsWith('reverse')) {
+      palette = config.palette.slice(0, -7)
+    }
+
+    updateConfig({ ...config, palette: palette })
+  }, [config.isPaletteReversed])
+
+  // Return all palettes
+  return { twoColorPalettes, sequential, nonSequential }
 }
