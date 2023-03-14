@@ -48,19 +48,16 @@ const useFilters = () => {
 
 export const Filters = () => {
   const { config } = useVisConfig()
+  const { filters } = config
+
   const { handleApplyButton, changeFilterActive, announceChange, showApplyButton, handleReset } = useFilters()
 
   const buttonText = 'Apply Filters'
   const resetText = 'Reset All'
 
-  const { filters } = config
-
   if (filters.length === 0) return false
 
   const FilterList = () => {
-    const {
-      config: { filters }
-    } = useVisConfig()
     if (filters) {
       return filters.map((singleFilter, idx) => {
         const values = []
@@ -106,7 +103,7 @@ export const Filters = () => {
           <Button onClick={handleApplyButton} disabled={!showApplyButton} style={{ marginRight: '10px' }}>
             {buttonText}
           </Button>
-          <a href='#!' role='button' onClick={handleReset}>
+          <a href='#' role='button' onClick={handleReset}>
             {resetText}
           </a>
         </div>

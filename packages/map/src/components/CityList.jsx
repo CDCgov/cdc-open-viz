@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react'
-
-import { jsx } from '@emotion/react'
+import { useEffect, useState } from 'react'
 import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
@@ -38,7 +36,7 @@ const CityList = ({ geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLe
   if (!cityList) return true
 
   // Cities output
-  const cities = cityList.map((city, i) => {
+  return cityList.map((city, i) => {
     const geoData = isGeoCodeMap ? data.filter(item => city === item[config.columns.geo.name])[0] : data[city]
     const cityDisplayName = isGeoCodeMap ? city : titleCase(displayGeoName(city))
 
@@ -100,19 +98,17 @@ const CityList = ({ geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLe
     }
 
     if (isGeoCodeMap) {
-      let coords = [Number(geoData?.[config.columns.longitude.name]), Number(geoData?.[config.columns.latitude.name])]
+      let coords = [ Number(geoData?.[config.columns.longitude.name]), Number(geoData?.[config.columns.latitude.name]) ]
       transform = `translate(${projection(coords)})`
     }
 
     return (
-      <g key={i} transform={transform} css={styles} className='geo-point'>
+      <g className='geo-point' css={styles} transform={transform} key={i}>
         {config.visual.cityStyle === 'circle' && circle}
         {config.visual.cityStyle === 'pin' && pin}
       </g>
     )
   })
-
-  return cities
 }
 
 export default CityList

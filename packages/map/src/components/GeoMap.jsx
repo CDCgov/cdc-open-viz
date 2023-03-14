@@ -512,7 +512,6 @@ const GeoMap = ({
 
   const tabId = handleMapTabbing()
 
-  console.log('the type', general.type)
   return (
     <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
       {(general.type === 'navigation' || config.legend) && (

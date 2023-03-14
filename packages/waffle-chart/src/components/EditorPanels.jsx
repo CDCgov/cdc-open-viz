@@ -1,8 +1,5 @@
 import React, { useEffect } from 'react'
 
-// Store
-import useStore from '@cdc/core/store/store'
-
 // Hooks
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 

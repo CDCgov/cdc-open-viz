@@ -1,6 +1,6 @@
-import { useStore } from 'zustand'
 import { produce } from 'immer'
 import CoveHelper from '@cdc/core/helpers/cove'
+import useStore from '@cdc/core/store/store'
 import * as d3 from 'd3'
 
 import colorPalettes from '@cdc/core/data/colorPalettes'
@@ -703,24 +703,38 @@ export const generateRuntimeFilters = (config, hash) => {
 }
 
 export const transformCdcMapConfig = config => {
-  generateRuntimeFilters(config)
-  validateFipsCodeLength(config)
+  let transformedConfig = {...config}
 
-  const runtimeData = generateRuntimeData(config, config.filters)
-  generateRuntimeLegend(config, runtimeData)
+  generateRuntimeFilters(transformedConfig)
+  validateFipsCodeLength(transformedConfig)
+
+  const runtimeData = generateRuntimeData(transformedConfig, transformedConfig.filters)
+  generateRuntimeLegend(transformedConfig, runtimeData)
 
   // If there's a name for the geo, add UIDs
-  if (config.columns.geo.name || config.columns.geo.fips) {
-    addUIDs(config, config.columns.geo.name || config.columns.geo.fips)
+  if (transformedConfig.columns.geo.name || transformedConfig.columns.geo.fips) {
+    addUIDs(transformedConfig, transformedConfig.columns.geo.name || transformedConfig.columns.geo.fips)
   }
 
-  if (config.dataTable.forceDisplay === undefined) {
-    config.dataTable.forceDisplay = !useStore.getState().viewMode.isDashboard
+  if (transformedConfig.dataTable.forceDisplay === undefined) {
+    transformedConfig = {
+      ...transformedConfig,
+      dataTable: {
+        ...transformedConfig.dataTable,
+        forceDisplay: !useStore.getState().viewMode.isDashboard
+      }
+    }
   }
 
-  if (config.dataTable && (config.dataTable?.title === '' || config.dataTable?.title === undefined)) {
-    config.dataTable.title = 'Data Table'
+  if (transformedConfig.dataTable && (transformedConfig.dataTable?.title === '' || transformedConfig.dataTable?.title === undefined)) {
+    transformedConfig = {
+      ...transformedConfig,
+      dataTable: {
+        ...transformedConfig.dataTable,
+        title: 'Data Table'
+      }
+    }
   }
 
-  return config
+  return transformedConfig
 }

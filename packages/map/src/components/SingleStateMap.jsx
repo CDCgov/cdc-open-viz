@@ -1,5 +1,4 @@
 import { useState, useEffect, memo } from 'react'
-import { produce } from 'immer'
 
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
@@ -23,16 +22,19 @@ let { features: states } = feature(testJSON, testJSON.objects.states)
 
 const SingleStateMap = props => {
   const { config, updateVisConfig } = useVisConfig()
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, runtimeLegend, generateColorsArray, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
+  const { applyTooltipsToGeo, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, runtimeLegend, generateColorsArray, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
 
   const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const cityListProjection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const geoStrokeColor = config.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+  const [stateToShow, setStateToShow] = useState(null)
 
   const [countiesToShow, setCountiesToShow] = useState(null)
+
   const [translate, setTranslate] = useState()
   const [scale, setScale] = useState()
   const [strokeWidth, setStrokeWidth] = useState(0.75)
+
   let mapColorPalette = colorPalettes[config.color] || '#fff'
   let focusedBorderColor = mapColorPalette[3]
 
@@ -40,37 +42,35 @@ const SingleStateMap = props => {
 
   // When choosing a state changes...
   useEffect(() => {
-    let statePicked = config.general.statePicked.stateName
-    let statePickedData = states.find(s => s.properties.name === statePicked)
+    if (config.general.statePicked) {
+      let statePicked = config.general.statePicked.stateName
+      let statePickedData = states.find(s => s.properties.name === statePicked)
 
-    updateVisConfig(
-      produce(config, draft => {
-        draft.general.statePicked = statePickedData
-      })
-    )
+      setStateToShow(statePickedData)
 
-    let countiesFound = counties.filter(c => c.id.substring(0, 2) === config.general.statePicked.fipsCode)
+      let countiesFound = counties.filter(c => c.id.substring(0, 2) === config.general.statePicked.fipsCode)
 
-    setCountiesToShow(countiesFound)
+      setCountiesToShow(countiesFound)
 
-    const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
-    const newProjection = projection.fitExtent(
-      [
-        [PADDING, PADDING],
-        [WIDTH - PADDING, HEIGHT - PADDING]
-      ],
-      statePickedData
-    )
-    const newScale = newProjection.scale()
-    const newScaleWithHypot = newScale / 1070
+      const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
+      const newProjection = projection.fitExtent(
+        [
+          [PADDING, PADDING],
+          [WIDTH - PADDING, HEIGHT - PADDING]
+        ],
+        statePickedData
+      )
+      const newScale = newProjection.scale()
+      const newScaleWithHypot = newScale / 1070
 
-    let [x, y] = newProjection.translate()
-    x = x - WIDTH / 2
-    y = y - HEIGHT / 2
+      let [x, y] = newProjection.translate()
+      x = x - WIDTH / 2
+      y = y - HEIGHT / 2
 
-    setTranslate([x, y])
-    setScale(newScaleWithHypot)
-  }, [config, config.general.statePicked, updateVisConfig])
+      setTranslate([x, y])
+      setScale(newScaleWithHypot)
+    }
+  }, [config.general.statePicked, updateVisConfig])
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
@@ -84,16 +84,15 @@ const SingleStateMap = props => {
         return s.id === statePassed.id
       })
 
-      // const stateLine = path(mesh(testJSON, lines ))
       let stateLines = path(mesh(testJSON, geo[0]))
       return (
-        <g key={'single-state'} className='single-state' style={{ fill: '#E6E6E6' }} stroke={geoStrokeColor} strokeWidth={0.95 / scale}>
+        <g className='single-state' style={{ fill: '#E6E6E6' }} stroke={geoStrokeColor} strokeWidth={0.95 / scale}>
           <path tabIndex={-1} className='state-path' d={stateLines} />
         </g>
       )
     }
 
-    const countyOutput = counties.map(county => {
+    const countyOutput = counties.forEach(county => {
       // Map the name from the geo data with the appropriate key for the processed data
       let geoKey = county.id
 
@@ -101,7 +100,7 @@ const SingleStateMap = props => {
 
       let countyPath = path(county)
 
-      let geoData = data[county.id]
+      let geoData = config.data[county.id]
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
@@ -152,9 +151,6 @@ const SingleStateMap = props => {
     geosJsx.push(
       <CityList
         projection={cityListProjection}
-        key='cities'
-        data={data}
-        state={state}
         geoClickHandler={geoClickHandler}
         applyTooltipsToGeo={applyTooltipsToGeo}
         displayGeoName={displayGeoName}
@@ -171,18 +167,18 @@ const SingleStateMap = props => {
 
   return (
     <ErrorBoundary component='SingleStateMap'>
-      {config.statePicked && (
-        <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
+      {stateToShow && (
+        <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(config)}>
           <rect className='background center-container ocean' width={WIDTH} height={HEIGHT} fillOpacity={1} fill='white'></rect>
           <CustomProjection
-            data={[{ states: config.statePicked, counties: countiesToShow }]}
+            data={[{ states: stateToShow, counties: countiesToShow }]}
             projection={geoAlbersUsaTerritories}
             fitExtent={[
               [
                 [PADDING, PADDING],
                 [WIDTH - PADDING, HEIGHT - PADDING]
               ],
-              config.statePicked
+              stateToShow
             ]}
           >
             {({ features, projection }) => {
@@ -195,7 +191,7 @@ const SingleStateMap = props => {
           </CustomProjection>
         </svg>
       )}
-      {!config.statePicked && 'No State Picked'}
+      {!stateToShow && 'No State Picked'}
     </ErrorBoundary>
   )
 }

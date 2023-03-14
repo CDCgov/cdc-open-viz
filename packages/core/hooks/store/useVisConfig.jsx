@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { merge } from 'lodash'
 
 // Store
-import useStore, { store } from '@cdc/core/store/store'
+import useStore from '../../store/store'
 
 // Helpers
 import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
@@ -41,12 +41,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
     async function initConfig() {
       const config = dashboardStoredConfig ?? configObj ?? (await fetchAsyncUrl(configUrl))
 
-      if (dashboardStoredConfig) console.log('using dashboard stored config', dashboardStoredConfig)
-      if (configObj) console.log('using config obj', configObj)
-      if (configUrl) console.log('using config url', configUrl)
-
       const resolvedConfig = merge(defaultConfig, config)
-      console.log('initConfig resolvedConfig', resolvedConfig)
       const processedConfig = { ...coveUpdateWorker(resolvedConfig) }
 
       // Run update worker on config, then set in store
@@ -64,7 +59,6 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
       setLoading(false)
     }
 
-    console.log('loading, storedConfig', loading, storedConfig)
     if (loading || storedConfig) {
       return
     }
