@@ -211,6 +211,9 @@ export default function DataTable() {
 
   return (
     <ErrorBoundary component='DataTable'>
+
+
+
       <CoveMediaControls.Section classes={['download-links']}>
         <CoveMediaControls.Link config={config} />
         {config.table.download && <DownloadButton data={rawData} type='link' />}
@@ -265,7 +268,8 @@ export default function DataTable() {
               {rows.map((row, index) => {
                 prepareRow(row)
                 return (
-                  <tr {...row.getRowProps()} key={`tbody__tr-${index}`} className={`row-${String(config.visualizationType).replace(' ', '-')}--${index}`}>
+                  <tr {...row.getRowProps()} key={`tbody__tr-${index}`} className={`row-${String(config.visualizationType).replace(' ', '-')}--${index}`}
+                  >
                     {row.cells.map((cell, index) => {
                       return (
                         <td tabIndex='0' {...cell.getCellProps()} key={`tbody__tr__td-${index}`} role='gridcell'>
@@ -290,7 +294,7 @@ export default function DataTable() {
               </thead>
               <tbody>
                 {config.regions.map((region, index) => {
-                  if (config.visualizationType === 'Box Plot') return false
+                  if (config.visualizationType === 'Box Plot') return false;
                   if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
                   return (
