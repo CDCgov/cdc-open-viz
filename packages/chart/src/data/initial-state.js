@@ -1,7 +1,6 @@
 export default {
   type: 'chart',
   title: '',
-  showTitle: true,
   theme: 'theme-blue',
   animate: false,
   fontSize: 'medium',

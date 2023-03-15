@@ -115,8 +115,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey)
                     : // is dynamic legend
                     config.legend.dynamicLegend
-                    ? colorPalettes[config.palette][index]
-                    : // fallback
+                      ? colorPalettes[config.palette][index]
+                      : // fallback
                       '#000'
                 }
                 strokeWidth={2}

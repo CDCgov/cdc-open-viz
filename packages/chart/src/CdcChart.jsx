@@ -229,14 +229,15 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
-            return series.dataKey
-          })
+          newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+          newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+          return series.dataKey
+        })
         : []
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
+
       let allKeys = newExcludedData ? newExcludedData.map(d => d[newConfig.xAxis.dataKey]) : data.map(d => d[newConfig.xAxis.dataKey])
       let allValues = newExcludedData ? newExcludedData.map(d => Number(d[newConfig?.series[0]?.dataKey])) : data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
 
@@ -264,11 +265,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
           if (!filteredData) throw new Error('boxplots dont have data yet')
           if (!plots) throw new Error('boxplots dont have plots yet')
-          if (newConfig.boxplot.firstQuartilePercentage === '') {
+          if (newConfig.boxplot.firstQuartilePercentage === "") {
             newConfig.boxplot.firstQuartilePercentage = 0
           }
 
-          if (newConfig.boxplot.thirdQuartilePercentage === '') {
+          if (newConfig.boxplot.thirdQuartilePercentage === "") {
             newConfig.boxplot.thirdQuartilePercentage = 0
           }
 
@@ -308,7 +309,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       tableData.map(table => {
         delete table.columnIqr
         delete table.nonOutlierValues
-        return null // resolve eslint
+        return null; // resolve eslint
       })
 
       // any other data we can add to boxplots
@@ -622,7 +623,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     // destructure dataFormat values
     let {
-      dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix, bottomPrefix, bottomSuffix, bottomAbbreviated }
+      dataFormat: {
+        commas,
+        abbreviated,
+        roundTo,
+        prefix,
+        suffix,
+        rightRoundTo,
+        bottomRoundTo,
+        rightPrefix,
+        rightSuffix,
+        bottomPrefix,
+        bottomSuffix,
+        bottomAbbreviated
+      }
     } = config
 
     let formatSuffix = format('.2s')
@@ -691,6 +705,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (bottomAbbreviated && axis === 'bottom') {
       num = formatSuffix(parseFloat(num)).replace('G', 'B')
     }
+
+
 
     if (prefix && axis === 'left') {
       result += prefix
@@ -762,7 +778,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           <div className='cdc-chart-inner-container'>
             {/* Title */}
 
-            {title && config.showTitle && (
+            {title && (
               <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
                 {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
                 <div>{parse(title)}</div>
