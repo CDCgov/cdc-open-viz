@@ -1320,19 +1320,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [state]) // eslint-disable-line
 
-  // DEV-3218 make "Map Title" both a required field and default value
-  useEffect(() => {
-    if (state.general?.title === "" || state.general?.title === undefined) {
-      setState({
-          ...state,
-        general: {
-          ...state.general,
-          title: 'Map Title'
-        }
-      })
-    }
-  }, [state.general.title])
-
   // DEV-769 make "Data Table" both a required field and default value
   useEffect(() => {
     if (state.dataTable?.title === '' || state.dataTable?.title === undefined) {

@@ -22,7 +22,7 @@ export default function useIntersectionObserver(elementRef, { threshold = 0, roo
       observer.observe(node)
 
       return () => observer.disconnect()
-    }, 500)
+    }, 500);
   }, [elementRef, threshold, root, rootMargin, frozen])
 
   return entry

@@ -440,8 +440,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 {config.runtime.yAxis.type === 'date'
                                   ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
                                   : isHorizontal
-                                  ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                                  : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
+                                    ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                                    : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
                               </Text>
                             )}
                             ;
@@ -491,11 +491,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               ? data.map(d => {
                   let xPos, yPos
                   let upperPos
-                  let lowerPos
+                  let lowerPos 
                   let tickWidth = 5
                   // DEV-3264 Make Confidence Intervals work on horizontal bar charts
                   if (orientation === 'horizontal') {
-                    yPos = yScale(getXAxisData(d)) - 0.75 * config.barHeight
+                    yPos = yScale(getXAxisData(d)) - (0.75 * config.barHeight)
                     upperPos = xScale(getYAxisData(d, config.confidenceKeys.upper))
                     lowerPos = xScale(getYAxisData(d, config.confidenceKeys.lower))
                     return (
@@ -531,6 +531,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       />
                     )
                   }
+
                 })
               : ''}
           </Group>

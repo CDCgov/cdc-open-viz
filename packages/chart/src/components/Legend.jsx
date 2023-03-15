@@ -114,7 +114,7 @@ const Legend = () => {
     setConfig({ ...config, legend: { ...config.legend, position: 'right' } })
   }, [currentViewport])
 
-  if (!legend) return null
+  if (!legend) return null;
 
   if (!legend.dynamicLegend)
     return config.visualizationType !== 'Box Plot' ? (
