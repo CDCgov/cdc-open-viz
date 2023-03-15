@@ -13,6 +13,10 @@
     display: flex;
     align-items: center;
 
+    &.cove-input__toggle-group--stretch {
+      justify-content: space-between;
+    }
+
     .cove-label {
       display: inline-block;
       margin-bottom: 0;

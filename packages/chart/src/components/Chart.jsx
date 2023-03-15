@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 
 import Papa from 'papaparse'
+import produce from 'immer'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -19,7 +20,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 import PieChart from './PieChart'
 import LinearChart from './LinearChart'
 
-import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChart as colorPalettes, pairedBarPalettes } from '@cdc/core/data/colorPalettes'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
@@ -33,6 +34,7 @@ import MediaControls from '@cdc/core/components/ui/MediaControls'
 import CoveHelper from '@cdc/core/helpers/cove'
 
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+
 
 export default function CdcChart({ hostname, link }) {
   const { config, updateVisConfig, updateVisConfigField } = useVisConfig()
@@ -53,8 +55,6 @@ export default function CdcChart({ hostname, link }) {
 
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
-
-  console.log('===== CONFIG DATA ======', config.data)
 
   // Destructure items from config for more readable JSX
   const { legend, title, description, visualizationType } = config
@@ -162,7 +162,9 @@ export default function CdcChart({ hostname, link }) {
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (config.data && config.xAxis && config.runtime.seriesKeys) {
-      let palette = config.customColors || colorPalettes[config.palette]
+      const configPalette = config.visualizationType === 'Paired Bar' ? config.pairedBar.palette : config.palette
+      const allPalettes = { ...colorPalettes, ...pairedBarPalettes }
+      let palette = config.customColors || allPalettes[configPalette]
       let numberOfKeys = config.runtime.seriesKeys.length
       let newColorScale
 
@@ -232,7 +234,9 @@ export default function CdcChart({ hostname, link }) {
   const parseDate = dateString => {
     let date = timeParse(config.runtime[section].dateParseFormat)(dateString)
     if (!date) {
-      config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
+      updateVisConfigField(['runtime', 'editorErrorMessage'], produce(config, draft => {
+        draft.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
+      }))
       return new Date()
     } else {
       return date
@@ -426,63 +430,58 @@ export default function CdcChart({ hostname, link }) {
   return (
     <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart} data-download-id={imageId}>
       {!missingRequiredSections() && (
-        <div className='cdc-chart-inner-container'>
-          {/* Title */}
+        <div className='cove-chart__container'>
+          <div className="cove-chart__visualization">
+            {/* Title */}
+            <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
+              Skip Over Chart Container
+            </a>
+            {/* Filters */}
+            {config.filters && !config.externalFilters && <Filters />}
 
-          {title && (
-            <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
-              {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
-              <div>{parse(title)}</div>
+            {/* Visualization */}
+            {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
+
+            <div
+              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
+              className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
+            >
+              {/* All charts except sparkline */}
+              {config.visualizationType !== 'Spark Line' && <ChartComponent {...chartProps} />}
+
+              {/* Sparkline */}
+              {config.visualizationType === 'Spark Line' && (
+                <>
+                  {description && <div className='subtext'>{parse(description)}</div>}
+                  <div style={sparkLineStyles}>
+                    <ParentSize>
+                      {parent => (
+                        <>
+                          <SparkLine width={parent.width} height={parent.height} {...chartProps} />
+                        </>
+                      )}
+                    </ParentSize>
+                  </div>
+                </>
+              )}
+              {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend {...chartProps} />}
             </div>
-          )}
-          <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
-            Skip Over Chart Container
-          </a>
-          {/* Filters */}
-          {config.filters && !config.externalFilters && <Filters />}
+            {/* Link */}
+            {link && link}
+            {/* Description */}
+            {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
 
-          {/* Visualization */}
-          {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
+            {/* buttons */}
+            <MediaControls.Section classes={['download-buttons']}>
+              {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+              {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+            </MediaControls.Section>
 
-          <div
-            style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
-            className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
-          >
-            {/* All charts except sparkline */}
-            {config.visualizationType !== 'Spark Line' && <ChartComponent {...chartProps} />}
-
-            {/* Sparkline */}
-            {config.visualizationType === 'Spark Line' && (
-              <>
-                {description && <div className='subtext'>{parse(description)}</div>}
-                <div style={sparkLineStyles}>
-                  <ParentSize>
-                    {parent => (
-                      <>
-                        <SparkLine width={parent.width} height={parent.height} {...chartProps} />
-                      </>
-                    )}
-                  </ParentSize>
-                </div>
-              </>
-            )}
-            {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend {...chartProps} />}
+            {/* Data Table */}
+            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}
+            {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
+            {/* show pdf or image button */}
           </div>
-          {/* Link */}
-          {link && link}
-          {/* Description */}
-          {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
-
-          {/* buttons */}
-          <MediaControls.Section classes={['download-buttons']}>
-            {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
-            {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
-          </MediaControls.Section>
-
-          {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}
-          {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
-          {/* show pdf or image button */}
         </div>
       )}
     </div>

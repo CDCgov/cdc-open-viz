@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, useTransition } from 'react'
 
 // Third Party
 import { merge } from 'lodash'
@@ -16,7 +16,8 @@ export const ConfigContext = createContext({})
 ConfigContext.displayName = 'VisualizationConfig'
 
 export const VisConfigProvider = ({ visualizationKey = '__default__', config: configObj, configUrl, children, defaultConfig, transformConfig } = {}) => {
-  const [loading, setLoading] = useState(false)
+  const [ loading, setLoading ] = useState(false)
+
   const addVisConfig = useStore(state => state.addVisConfig)
   const updateVisConfig = useStore(state => state.updateVisConfig)
   const storedConfig = useStore(state => state.visualizations[visualizationKey])
@@ -35,7 +36,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
     }
 
     return resolvedConfig
-  }, [dashboardStoredConfig, storedConfig, transformConfig])
+  }, [ dashboardStoredConfig, storedConfig, transformConfig ])
 
   useEffect(() => {
     async function initConfig() {
@@ -65,7 +66,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
 
     setLoading(true)
     void initConfig()
-  }, [configUrl, defaultConfig, loading, configObj, visualizationKey, storedConfig, dashboardStoredConfig, getData, addVisConfig, updateVisConfig])
+  }, [ configUrl, defaultConfig, loading, configObj, visualizationKey, storedConfig, dashboardStoredConfig, getData, addVisConfig, updateVisConfig ])
 
   if (loading || !finalConfig()) {
     console.log('no stored config!')
@@ -80,6 +81,8 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
 export const useVisConfig = () => {
   const { visualizationKey, ...config } = useContext(ConfigContext)
 
+  const [, startTransition ] = useTransition()
+
   // Actions -------------------------------------------------------------------------------------------------------
   const storeUpdateVisConfig = useStore(state => state.updateVisConfig)
   const storeUpdateVisConfigField = useStore(state => state.updateVisConfigField)
@@ -87,16 +90,16 @@ export const useVisConfig = () => {
   // Action Proxies ------------------------------------------------------------------------------------------------
   const updateVisConfig = useCallback(
     updates => {
-      storeUpdateVisConfig(visualizationKey, updates)
+      startTransition(() => storeUpdateVisConfig(visualizationKey, updates))
     },
-    [storeUpdateVisConfig, visualizationKey]
+    [ storeUpdateVisConfig, visualizationKey ]
   )
 
   const updateVisConfigField = useCallback(
     (fieldPayload, setValue, merge = true) => {
-      storeUpdateVisConfigField(visualizationKey, fieldPayload, setValue, merge)
+      startTransition(() => storeUpdateVisConfigField(visualizationKey, fieldPayload, setValue, merge))
     },
-    [storeUpdateVisConfigField, visualizationKey]
+    [ storeUpdateVisConfigField, visualizationKey ]
   )
   // ---------------------------------------------------------------------------------------------------------------
 

@@ -12,8 +12,6 @@ const visConfigSliceActions = (set, get) => ({
     })
   },
   updateVisConfig: (key, config) => {
-    console.log('updating vis config', key, config)
-
     // TODO: CANT USE MERGE HERE, PERSISTING DELETED VISUALIZATIONS AND ROWS IN STATE
     if (key === '__default__') {
       // Dashboard or Visualization Standalone
@@ -28,7 +26,6 @@ const visConfigSliceActions = (set, get) => ({
     }
   },
   updateVisConfigField: (key, fieldPayload, setValue, merge = true) => {
-    console.log('updating vis config field', key, fieldPayload, setValue, merge)
     if (key === '__default__') {
       // Dashboard or Visualization Standalone
       if (merge) {

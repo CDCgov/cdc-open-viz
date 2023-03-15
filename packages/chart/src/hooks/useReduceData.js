@@ -3,12 +3,13 @@ import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 function useReduceData() {
   const { config } = useVisConfig()
-  console.log(config)
 
   // for combo charts check if all  Data Series selected to Bar;
   const isBar = config?.series?.every(element => element?.type === 'Bar')
+
   // for combo charts check if all Data series selected Line or dashed-md/sm/lg.
   const isAllLine = config?.series?.every(el => el.type === 'Line' || el.type === 'dashed-sm' || el.type === 'dashed-md' || el.type === 'dashed-lg')
+
   const cleanChars = value => {
     // remove comma and $ signs
     let tmp
@@ -19,6 +20,7 @@ function useReduceData() {
     }
     return tmp
   }
+
   const getMaxValueFromData = () => {
     let max // will hold max number from data.
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && isBar)) && config.visualizationSubType === 'stacked') {

@@ -22,6 +22,7 @@ const InputCheckbox = memo((
     size = 'small',
     activeColor = null,
     activeCheckColor = null,
+    stretch,
     required,
 
     configField,
@@ -52,7 +53,8 @@ const InputCheckbox = memo((
   }, [ valueExistsOnConfig ])
 
   useEffect(() => {
-    if (configField && value !== configFieldValue) updateVisConfigField(configField, value)
+    if (configField && value !== configFieldValue)
+      updateVisConfigField(configField, value)
   }, [ configField, value, updateVisConfigField ])
 
   const onClickHandler = () => inputRef.current.click()
@@ -62,27 +64,71 @@ const InputCheckbox = memo((
     onClick && onClick(e)
   }
 
+  const generateWrapperClasses = () => {
+    const classList = []
+
+    // Root class
+    const root = 'cove-input__checkbox-group'
+    classList.push(root)
+
+    // Stretch class
+    if (stretch) classList.push('cove-input__checkbox-group--stretch')
+
+    // Props classes
+    if (className) classList.push(className)
+
+    return classList.join(' ')
+  }
+
+  const generateInputClasses = () => {
+    const classList = []
+
+    // Root class
+    const root = 'cove-input__checkbox'
+    const suffixArr = {
+      small: '',
+      medium: '--medium',
+      large: '--large',
+      xlarge: '--xlarge'
+    }
+    classList.push(root + suffixArr[size])
+
+    // Active class
+    if (value) classList.push('cove-input__checkbox--active')
+
+    // Required class
+    // if (required && (value === undefined)) classList.push('cove-input--error')
+
+    return classList.join(' ')
+  }
+
   const TooltipLabel = () => (
-    <Label tooltip={tooltip} onClick={onClickHandler}>{label}</Label>
+    <div className="cove-input__checkbox-group__label">
+      <Label tooltip={tooltip} onClick={onClickHandler}>{label}</Label>
+    </div>
   )
 
   return (
-    <div className={'cove-input__checkbox-group' + (className ? ' ' + className : '')} flow={labelPosition}>
-      {label && labelPosition === 'left' && <TooltipLabel/>}
-      <div className={`cove-input__checkbox${size === 'small' ? '--small' : size === 'large' ? '--large' : ''}${required && (value === undefined) ? ' cove-input--error' : ''}${value ? ' active' : ''}`}
+    <div className={generateWrapperClasses()} flow={labelPosition}>
+      {label && labelPosition === 'left' &&
+        <TooltipLabel/>
+      }
+      <div className={generateInputClasses()}
         tabIndex={0}
         onClick={onClickHandler}
         onKeyUp={(e) => {
           if (e.code === 'Enter' || e.code === 'NumpadEnter' || e.code === 'Space') onClickHandler()
         }}
       >
-        <div className={`cove-input__checkbox-box${activeColor ? ' custom-color' : ''}`}
+        <div className={`cove-input__checkbox-box${activeColor ? ' cove-input__checkbox-box--custom-color' : ''}`}
              style={value && activeColor ? { backgroundColor: activeColor } : null}>
           <Icon display="check" className="cove-input__checkbox-check" color={activeCheckColor || '#025eaa'}/>
         </div>
         <input className="cove-input--hidden" type="checkbox" defaultChecked={value} onChange={(e) => onChangeHandler(e)} ref={inputRef} tabIndex={-1} readOnly/>
       </div>
-      {label && labelPosition === 'right' && <TooltipLabel/>}
+      {label && labelPosition === 'right' &&
+        <TooltipLabel/>
+      }
     </div>
   )
 })

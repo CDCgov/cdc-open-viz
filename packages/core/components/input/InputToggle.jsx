@@ -18,16 +18,19 @@ import '../../styles/v2/components/input/index.scss'
 const InputToggle = memo((
   {
     label,
-    labelPosition = 'left',
+    labelPosition = 'right',
     tooltip,
     toggleType = 'flat',
     size = 'small',
     activeColor = '#005eaa',
-    required,
+    stretch,
+    // required,
 
     configField,
     value: inlineValue,
-    className, onClick, ...attributes
+    className,
+    onClick,
+    ...attributes
   }
 ) => {
   // Store Selectors
@@ -54,7 +57,8 @@ const InputToggle = memo((
   }, [ valueExistsOnConfig ])
 
   useEffect(() => {
-    if (configField && value !== configFieldValue) updateVisConfigField(configField, value)
+    if (configField && value !== configFieldValue)
+      updateVisConfigField(configField, value)
   }, [ configField, value, updateVisConfigField ])
 
   const onClickHandler = () => inputRef.current.click()
@@ -64,36 +68,69 @@ const InputToggle = memo((
     onClick && onClick(e)
   }
 
-  const inputClasses = () => {
-    const typeArr = {
-      flat: ' cove-input__toggle--flat',
-      block: ' cove-input__toggle--block',
-      pill: ' cove-input__toggle--pill',
-      '3d': ' cove-input__toggle--3d'
+  const generateWrapperClasses = () => {
+    const classList = []
+
+    // Root class
+    const root = 'cove-input__toggle-group'
+    classList.push(root)
+
+    // Stretch class
+    if (stretch) classList.push('cove-input__toggle-group--stretch')
+
+    // Props classes
+    if (className) classList.push(className)
+
+    return classList.join(' ')
+  }
+
+  const generateInputClasses = () => {
+    const classList = []
+
+    // Root class
+    const root = 'cove-input__toggle'
+    const suffixArr = {
+      small: '',
+      medium: '--medium',
+      large: '--large',
+      xlarge: '--xlarge'
     }
-    return typeArr[toggleType] || ''
-  }
+    classList.push(root + suffixArr[size])
 
-  const tooltipCheck = () => {
-    if (tooltip) return { 'data-has-tooltip': true }
-    return {}
-  }
+    // Type class
+    const typeArr = {
+      flat: 'cove-input__toggle--flat',
+      block: 'cove-input__toggle--block',
+      pill: 'cove-input__toggle--pill',
+      '3d': 'cove-input__toggle--3d'
+    }
+    classList.push(typeArr[toggleType] || '')
 
-  const tooltipArgs = { ...tooltipCheck() }
+    // Active class
+    if (value) classList.push('cove-input__toggle--active')
+
+    // Required class
+    // if (required && (value === undefined)) classList.push('cove-input--error')
+
+    return classList.join(' ')
+  }
 
   const TooltipLabel = () => (
-    <div className="cove-input__toggle-group__label" {...tooltipArgs}>
+    <div className="cove-input__toggle-group__label">
       <Label tooltip={tooltip} onClick={onClickHandler}>{label}</Label>
     </div>
   )
 
   return (
     <>
-      {label && labelPosition === 'top' && <TooltipLabel/>}
-
-      <div className={'cove-input__toggle-group' + (className ? ' ' + className : '')} flow={labelPosition}>
-        {label && labelPosition === 'left' && <TooltipLabel/>}
-        <div className={`cove-input__toggle${size === 'medium' ? '--medium' : size === 'large' ? '--large' : size === 'xlarge' ? '--xlarge' : ''}${inputClasses()}${value ? ' cove-input__toggle--active' : ''}${required && (value === undefined) ? ' cove-input--error' : ''}`}
+      {label && labelPosition === 'top' &&
+        <TooltipLabel/>
+      }
+      <div className={generateWrapperClasses()} flow={labelPosition}>
+        {label && labelPosition === 'left' &&
+          <TooltipLabel/>
+        }
+        <div className={generateInputClasses()}
           tabIndex={0}
           onKeyUp={(e) => {
             if (e.code === 'Enter' || e.code === 'NumpadEnter' || e.code === 'Space') onClickHandler()
@@ -104,8 +141,9 @@ const InputToggle = memo((
           <div className="cove-input__toggle-track" style={value && activeColor ? { backgroundColor: activeColor } : null}/>
           <input className="cove-input--hidden" type="checkbox" defaultChecked={value} onChange={(e) => onChangeHandler(e)} ref={inputRef} tabIndex={-1} readOnly/>
         </div>
-
-        {label && labelPosition === 'right' && <TooltipLabel/>}
+        {label && labelPosition === 'right' &&
+          <TooltipLabel/>
+        }
       </div>
     </>
   )
@@ -127,6 +165,10 @@ InputToggle.propTypes = {
   size: PropTypes.oneOf([ 'small', 'medium', 'large', 'xlarge' ]),
   /** Select the preferred color for the toggle when active */
   activeColor: PropTypes.string,
+  /** Stretch the toggle to fill the width of its container */
+  stretch: PropTypes.bool,
+  // /** Mark the toggle as required; will set error style while value is undefined */
+  // required: PropTypes.bool,
   /** Current value of the input, usually the current config option value */
   stateValue: PropTypes.bool
 }

@@ -90,7 +90,10 @@ const InputText = (
         setValue(e.target.value)
     }
     // If supplied a custom onChange event, run after setting the debounced value
-    if (onChange) onChange(e)
+    if (onChange) {
+      console.log(e)
+      onChange(e)
+    }
   }
 
   let inputAttrs = {

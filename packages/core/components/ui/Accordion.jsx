@@ -1,4 +1,4 @@
-import React, { Children, useState, useEffect } from 'react'
+import React, { Children, useState, useMemo } from 'react'
 
 // Third Party
 import {
@@ -24,7 +24,7 @@ const AccordionSection = () => null
 const Accordion = ({ children }) => {
   const [ activeChildren, setActiveChildren ] = useState(children)
 
-  useEffect(() => {
+  useMemo(() => {
     setActiveChildren(children)
   }, [ children ])
 
