@@ -536,7 +536,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   
   // DEV-3221 make "Data Table" both a required field and default value
-  useEffect(() => {
+/*   useEffect(() => {
     if (config.table?.label === '' || config.table?.label === undefined) {
       setConfig({
         ...config,
@@ -546,7 +546,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         }
       })
     }
-  }, [config.table])
+  }, [config.table]) */
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = label => {
