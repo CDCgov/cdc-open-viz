@@ -762,7 +762,6 @@ const EditorPanel = () => {
   }, [minValue, maxValue, config]) // eslint-disable-line
 
   useEffect(() => {
-    debugger;
     if (config?.title === '' || config?.title === undefined) {
       config.title = 'Chart Title'
       updateField(null, null, 'title', 'Chart Title')
@@ -772,6 +771,21 @@ const EditorPanel = () => {
     })
     }
   }, [config.title])
+
+    useEffect(() => {
+    if (config.table?.label === '' || config.table?.label === undefined) {
+      config.table.label = 'Data Table'
+      updateField('table', null, 'label', 'Data Table')
+      updateConfig({
+        ...config,
+        table: {
+          ...config.table,
+          label: 'Data Table'
+        }
+      })
+    }
+    }, [config.table])
+  
 
   const enabledChartTypes = [
     'Pie',
@@ -819,7 +833,18 @@ const EditorPanel = () => {
                   )}
                   {config.visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
 
-                  <TextField value={config.title || 'Chart Title'} fieldName='title' label='Title' updateField={updateField} />
+                  <TextField value={config.title || 'Chart Title'} fieldName='title' label='Title' placeholder='Chart Title' updateField={updateField}
+                      tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Title is required to set the name of the download file but can be hidden using the option below.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }/>
+                  <CheckBox value={config.showTitle} fieldName='showTitle' label='Show Title' updateField={updateField} />
                   <TextField
                     value={config.superTitle}
                     updateField={updateField}
@@ -2172,6 +2197,24 @@ const EditorPanel = () => {
                   <AccordionItemButton>Data Table</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <TextField
+                    value={config.table.label}
+                    updateField={updateField}
+                    section='table'
+                    fieldName='label'
+                    label='Data Table Title'
+                    placeholder='Data Table'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Label is required for Data Table for 508 Compliance</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <CheckBox
                     value={config.table.show}
                     section='table'
@@ -2215,7 +2258,6 @@ const EditorPanel = () => {
                   <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Display Link to Dataset' updateField={updateField} />
                   {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
                   {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
-                  <TextField value={config.table.label} section='table' fieldName='label' label='Label' updateField={updateField} />
                   {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
                 </AccordionItemPanel>
               </AccordionItem>
