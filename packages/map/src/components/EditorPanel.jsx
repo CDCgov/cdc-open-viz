@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, memo } from 'react'
 
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
@@ -118,6 +118,24 @@ const EditorPanel = props => {
   } else {
     specialClasses = legend.specialClasses || []
   }
+
+  const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
+  <label className='checkbox'>
+    <input
+      type='checkbox'
+      name={fieldName}
+      checked={value}
+      onChange={e => {
+        updateField(section, subsection, fieldName, !value)
+      }}
+      {...attributes}
+    />
+    <span className='edit-label'>
+      {label}
+      {tooltip}
+    </span>
+  </label>
+))
 
   const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
     let filterOrder = filter.values
@@ -1259,6 +1277,34 @@ const EditorPanel = props => {
     }
   }, [state]) // eslint-disable-line
 
+    useEffect(() => {
+    if (general?.title === '' || general?.title === undefined) {
+      general.title = 'Map Title'
+      updateField(null, null, 'title', 'Map Title')
+      setState({
+        ...state,
+        general: {
+          ...state.general,
+          title: 'Map Title'
+        }
+      })
+    }
+  }, [general.title])
+
+    useEffect(() => {
+    if (dataTable?.title === '' || dataTable?.title === undefined) {
+      dataTable.title = 'Data Table'
+      updateField('dataTable', null, 'title', 'Data Table')
+      setState({
+        ...state,
+        dataTable: {
+          ...state.dataTable,
+          title: 'Data Table'
+        }
+      })
+    }
+    }, [general.dataTable])
+  
   let numberOfItemsLimit = 8
 
   const getItemStyle = (isDragging, draggableStyle) => ({
@@ -1478,11 +1524,21 @@ const EditorPanel = props => {
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
+                          <p>Title is required to set the name of the download file but can be hidden using the option below.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
                   />
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={state.general.showTitle || false}
+                      onChange={event => {
+                        handleEditorChanges('showTitle', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Show Title</span>
+                  </label>
                   <TextField
                     value={general.superTitle || ''}
                     updateField={updateField}
@@ -2329,6 +2385,26 @@ const EditorPanel = props => {
                         </Tooltip>
                       }
                     />
+                                        <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard}
+                        onChange={event => {
+                          handleEditorChanges('showDataTable', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>
+                        Show Table
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </span>
+                    </label>
                     <TextField
                       value={dataTable.indexLabel || ''}
                       updateField={updateField}
@@ -2366,26 +2442,6 @@ const EditorPanel = props => {
                       }
                       type='textarea'
                     />
-                    <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard}
-                        onChange={event => {
-                          handleEditorChanges('showDataTable', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>
-                        Show Table
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </span>
-                    </label>
                     <label className='checkbox'>
                       <input
                         type='checkbox'
