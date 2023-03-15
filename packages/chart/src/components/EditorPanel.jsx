@@ -25,7 +25,6 @@ const TextField = memo(({ label, tooltip, section = null, subsection = null, fie
 
   const [debouncedValue] = useDebounce(value, 500)
 
-
   useEffect(() => {
     if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
       updateField(section, subsection, fieldName, debouncedValue, i)
@@ -213,7 +212,6 @@ const EditorPanel = () => {
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
-
   // when the visualization type changes we
   // have to update the individual series type & axis details
   // dataKey is unchanged here.
@@ -282,7 +280,7 @@ const EditorPanel = () => {
     }
     // DEV-3293 - Force combo to always be vertical
     if (updatedConfig.visualizationType === 'Combo') {
-      updatedConfig.orientation = "vertical"
+      updatedConfig.orientation = 'vertical'
     }
   }
 
@@ -351,7 +349,7 @@ const EditorPanel = () => {
   }
 
   useEffect(() => {
-    if (!config.general?.boxplot) return;
+    if (!config.general?.boxplot) return
     if (!config.general.boxplot.firstQuartilePercentage) {
       updateConfig({
         ...config,
@@ -361,7 +359,7 @@ const EditorPanel = () => {
         }
       })
     }
-  }, [config]);
+  }, [config])
 
   const setLollipopShape = shape => {
     updateConfig({
@@ -766,13 +764,13 @@ const EditorPanel = () => {
       config.title = 'Chart Title'
       updateField(null, null, 'title', 'Chart Title')
       updateConfig({
-      ...config,
-      title: 'Chart Title'
-    })
+        ...config,
+        title: 'Chart Title'
+      })
     }
   }, [config.title])
 
-    useEffect(() => {
+  useEffect(() => {
     if (config.table?.label === '' || config.table?.label === undefined) {
       config.table.label = 'Data Table'
       updateField('table', null, 'label', 'Data Table')
@@ -784,8 +782,7 @@ const EditorPanel = () => {
         }
       })
     }
-    }, [config.table])
-  
+  }, [config.table])
 
   const enabledChartTypes = [
     'Pie',
@@ -833,8 +830,13 @@ const EditorPanel = () => {
                   )}
                   {config.visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
 
-                  <TextField value={config.title || 'Chart Title'} fieldName='title' label='Title' placeholder='Chart Title' updateField={updateField}
-                      tooltip={
+                  <TextField
+                    value={config.title || 'Chart Title'}
+                    fieldName='title'
+                    label='Title'
+                    placeholder='Chart Title'
+                    updateField={updateField}
+                    tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -843,7 +845,8 @@ const EditorPanel = () => {
                           <p>Title is required to set the name of the download file but can be hidden using the option below.</p>
                         </Tooltip.Content>
                       </Tooltip>
-                    }/>
+                    }
+                  />
                   <CheckBox value={config.showTitle} fieldName='showTitle' label='Show Title' updateField={updateField} />
                   <TextField
                     value={config.superTitle}
@@ -1005,7 +1008,9 @@ const EditorPanel = () => {
                                         </option>
 
                                         {Object.keys(allCurves).map(curveName => (
-                                          <option key={`curve-option-${curveName}`} value={curveName}>{curveName}</option>
+                                          <option key={`curve-option-${curveName}`} value={curveName}>
+                                            {curveName}
+                                          </option>
                                         ))}
                                       </select>
                                     )
@@ -1608,7 +1613,7 @@ const EditorPanel = () => {
                     <>
                       <TextField value={config.xAxis.label} section='xAxis' fieldName='label' label='Label' updateField={updateField} />
 
-                      {config.xAxis.type === 'continuous' &&
+                      {config.xAxis.type === 'continuous' && (
                         <>
                           <TextField
                             value={config.dataFormat.bottomPrefix}
@@ -1666,7 +1671,7 @@ const EditorPanel = () => {
                             }
                           />
                         </>
-                      }
+                      )}
 
                       {config.xAxis.type === 'date' && (
                         <>
