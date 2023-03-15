@@ -526,19 +526,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }, [config, stateData]) // eslint-disable-line
 
   // DEV-3218 make "Chart Title" both a required field and default value
-  useEffect(() => {
+/*   useEffect(() => {
     if (config?.title === '' || config?.title === undefined) {
       setConfig({
         ...config,
         title: 'Chart Title'
       })
     }
-  }, [config.title])
+  }, [config.title]) */
 
   
   // DEV-3221 make "Data Table" both a required field and default value
 /*   useEffect(() => {
-    if (config.table?.label === '' || config.table?.label === undefined) {
+    console.log("set data table label config,stateData",config,stateData)
+    if (config && (config.table?.label === '' || config.table?.label === undefined)) {
       setConfig({
         ...config,
         table: {
@@ -547,7 +548,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         }
       })
     }
-  }, [config.table]) */
+  }, [config]) */
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = label => {

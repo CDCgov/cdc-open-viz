@@ -761,6 +761,18 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
+  useEffect(() => {
+    debugger;
+    if (config?.title === '' || config?.title === undefined) {
+      config.title = 'Chart Title'
+      updateField(null, null, 'title', 'Chart Title')
+      updateConfig({
+      ...config,
+      title: 'Chart Title'
+    })
+    }
+  }, [config.title])
+
   const enabledChartTypes = [
     'Pie',
     'Line',
@@ -807,7 +819,7 @@ const EditorPanel = () => {
                   )}
                   {config.visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
 
-                  <TextField value={config.title} fieldName='title' label='Title' updateField={updateField} />
+                  <TextField value={config.title || 'Chart Title'} fieldName='title' label='Title' updateField={updateField} />
                   <TextField
                     value={config.superTitle}
                     updateField={updateField}
