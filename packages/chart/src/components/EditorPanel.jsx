@@ -342,8 +342,6 @@ const EditorPanel = () => {
     enforceRestrictions(updatedConfig)
 
     updateConfig(updatedConfig)
-
-    console.log("Chart EditorPanel updateConfig=",updatedConfig)
   }
 
   const [displayPanel, setDisplayPanel] = useState(true)
@@ -578,7 +576,6 @@ const EditorPanel = () => {
     if (setParentConfig) {
       const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
-      console.log("## EditorPanel newConfig=",newConfig)
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
