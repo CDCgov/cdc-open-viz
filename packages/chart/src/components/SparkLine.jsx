@@ -43,7 +43,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   // i.e. if a series has any bad data points the entire series wont plot
   const cleanData = (data, testing = false) => {
     let cleanedup = []
-     if (testing) { console.log('## Data to clean=', data) }
+    if (testing) { console.log('## Data to clean=', data) }
     data.forEach(function (d, i) {
       let cleanedSeries = {}
       Object.keys(d).forEach(function (key) {
