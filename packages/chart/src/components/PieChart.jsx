@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react'
 import { animated, useTransition, interpolate } from 'react-spring'
-import ReactTooltip from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie'
 import chroma from 'chroma-js'
@@ -21,7 +21,7 @@ export default function PieChart() {
   const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels, cleanData } = useContext(ConfigContext)
 
   const cleanedData = cleanData(data, config.xAxis.dataKey);
-  
+
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
 
@@ -35,7 +35,6 @@ export default function PieChart() {
     const element = document.querySelector('.isEditor')
     if (element) {
       // parent element is visible
-      console.log('setAnimation')
       setAnimatePie(prevState => true)
     }
   })
@@ -50,7 +49,7 @@ export default function PieChart() {
 
 
   function AnimatedPie({ arcs, path, getKey }) {
-    const transitions = useTransition( arcs, getKey,
+    const transitions = useTransition(arcs, getKey,
       {
         from: enterUpdateTransition,
         enter: enterUpdateTransition,
@@ -81,8 +80,8 @@ export default function PieChart() {
                   })
                 )}
                 fill={colorScale(arc.data[config.runtime.xAxis.dataKey])}
-                data-tip={tooltip}
-                data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                data-tooltip-html={tooltip}
+                data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
               />
             </Group>
           )
@@ -139,10 +138,6 @@ export default function PieChart() {
     }
   }, [seriesHighlight])
 
-  useEffect(() => {
-    ReactTooltip.rebuild()
-  })
-
   return (
     <ErrorBoundary component='PieChart'>
       <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
@@ -153,7 +148,7 @@ export default function PieChart() {
         </Group>
       </svg>
       <div ref={triggerRef} />
-      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
     </ErrorBoundary>
   )
 }

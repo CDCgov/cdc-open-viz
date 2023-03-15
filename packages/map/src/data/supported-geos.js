@@ -121,13 +121,13 @@ export const stateToIso = {
 }
 
 export const stateFipsToTwoDigit = {
-  ['01']: 'AL',
-  ['02']: 'AK',
-  ['04']: 'AZ',
-  ['05']: 'AR',
-  ['06']: 'CA',
-  ['08']: 'CO',
-  ['09']: 'CT',
+  ['01']: 'AL', // eslint-disable-line
+  ['02']: 'AK', // eslint-disable-line
+  ['04']: 'AZ', // eslint-disable-line
+  ['05']: 'AR', // eslint-disable-line
+  ['06']: 'CA', // eslint-disable-line
+  ['08']: 'CO', // eslint-disable-line
+  ['09']: 'CT', // eslint-disable-line
   10: 'DE',
   11: 'DC',
   12: 'FL',
@@ -501,7 +501,7 @@ export const supportedCities = {
   'ALASKA NATIVE TRIBAL HEALTH CONSORTIUM': [-149.8067, 61.1827],
   'ALBUQUERQUE': [-106.650421, 35.084385],
   'ALEXANDRIA': [-77.0469, 38.8048],
-  'AMERICA INDIAN CANCER FOUNDATION': [-93.1777, 45.0119],
+  'AMERICAN INDIAN CANCER FOUNDATION': [-93.1777, 45.0119],
   'ANAHEIM': [-117.914299, 33.836594],
   'ANCHORAGE': [-149.900284, 61.218056],
   'ARCTIC SLOPE NATIVE ASSOCIATION LIMITED': [-156.79225, 71.2907],
@@ -534,6 +534,7 @@ export const supportedCities = {
   'DETROIT': [-83.045753, 42.331429],
   'DISTRICT OF COLUMBIA': [-77.036873, 38.907192],
   'DURHAM': [-78.898621, 35.994034],
+  'EAU CLAIRE': [-91.4985, 44.8113],
   'EL PASO': [-106.485023, 31.761877],
   'FOND DU LAC RESERVATION': [-92.6002, 46.7502],
   'FORT WAYNE': [-85.139351, 41.079273],

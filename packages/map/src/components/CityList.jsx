@@ -3,14 +3,9 @@ import { useState, useEffect } from 'react'
 import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
-import ReactTooltip from 'react-tooltip'
 
 const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, projection, titleCase, setSharedFilterValue, isFilterValueSupported, isGeoCodeMap }) => {
   const [citiesData, setCitiesData] = useState({})
-
-  useEffect(() => {
-    ReactTooltip.rebuild()
-  })
 
   useEffect(() => {
     if (!isGeoCodeMap) {
@@ -50,21 +45,8 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       return true
     }
 
-    const styles = {
-      fill: legendColors[0],
-      opacity: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] !== setSharedFilterValue ? 0.5 : 1,
-      stroke: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] === setSharedFilterValue ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
-      '&:hover': {
-        fill: legendColors[1],
-        outline: 0
-      },
-      '&:active': {
-        fill: legendColors[2],
-        outline: 0
-      }
-    }
+    const toolTip = applyTooltipsToGeo(cityDisplayName, isGeoCodeMap ? geoData : data[city])
 
-    const toolTip = applyTooltipsToGeo(cityDisplayName, data[city])
 
     // If we need to add a cursor pointer
     if ((state.columns.navigate && geoData?.[state.columns.navigate.name] && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
@@ -77,10 +59,24 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       fillOpacity: state.general.type === 'bubble' ? 0.4 : 1
     }
 
-    const circle = <circle data-tip={toolTip} data-for='tooltip' cx={0} cy={0} r={state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius} title='Click for more information' onClick={() => geoClickHandler(cityDisplayName, geoData)} {...additionalProps} />
+    const circle = <circle cx={0} cy={0} r={state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius}
+      title='Click for more information'
+      onClick={() => geoClickHandler(cityDisplayName, geoData)}
+      data-tooltip-id="tooltip"
+      data-tooltip-html={toolTip}
+      {...additionalProps}
+    />
 
     const pin = (
-      <path className='marker' d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z' title='Click for more information' onClick={() => geoClickHandler(cityDisplayName, geoData)} data-tip={toolTip} data-for='tooltip' strokeWidth={2} stroke={'black'} {...additionalProps}></path>
+      <path className='marker' d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
+        title='Click for more information'
+        onClick={() => geoClickHandler(cityDisplayName, geoData)}
+        strokeWidth={2}
+        stroke={'black'}
+        data-tooltip-id="tooltip"
+        data-tooltip-html={toolTip}
+        {...additionalProps}
+      />
     )
 
     let transform = ''
@@ -89,13 +85,37 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       transform = `translate(${projection(supportedCities[city])})`
     }
 
+    let needsPointer = false
+
     if (isGeoCodeMap) {
       let coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
       transform = `translate(${projection(coords)})`
+      needsPointer = true
+    }
+
+
+    const styles = {
+      fill: legendColors[0],
+      opacity: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] !== setSharedFilterValue ? 0.5 : 1,
+      stroke: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] === setSharedFilterValue ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
+      '&:hover': {
+        fill: legendColors[1],
+        outline: 0
+      },
+      '&:active': {
+        fill: legendColors[2],
+        outline: 0
+      },
+      cursor: needsPointer ? 'pointer' : 'default'
     }
 
     return (
-      <g key={i} transform={transform} css={styles} className='geo-point'>
+      <g
+        key={i}
+        transform={transform}
+        css={styles}
+        className='geo-point'
+      >
         {state.visual.cityStyle === 'circle' && circle}
         {state.visual.cityStyle === 'pin' && pin}
       </g>
