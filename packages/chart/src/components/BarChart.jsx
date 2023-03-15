@@ -84,7 +84,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
     // return new updated bars/groupes
     return barsArr.map((bar, i) => {
-      // set bars Y dynamycly to handle space between bars
+      // set bars Y dynamically to handle space between bars
       let y = 0
       bar.index !== 0 && (y = (barHeight + barSpace + labelHeight) * i)
 
@@ -105,13 +105,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         }
       })
     }
-  }, [config, updateConfig])
+  }, [config, updateConfig]) // eslint-disable-line
 
   useEffect(() => {
     if (config.isLollipopChart === false && config.barHeight < 25) {
       updateConfig({ ...config, barHeight: 25 })
     }
-  }, [config.isLollipopChart])
+  }, [config.isLollipopChart]) // eslint-disable-line
 
   useEffect(() => {
     if (config.visualizationSubType === 'horizontal') {
@@ -120,7 +120,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         orientation: 'horizontal'
       })
     }
-  }, [])
+  }, []) // eslint-disable-line
 
   useEffect(() => {
     if (config.barStyle === 'lollipop' && !config.isLollipopChart) {
@@ -129,7 +129,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     if (isRounded || config.barStyle === 'flat') {
       updateConfig({ ...config, isLollipopChart: false })
     }
-  }, [config.barStyle])
+  }, [config.barStyle]) // eslint-disable-line
 
   return (
     <ErrorBoundary component='BarChart'>
@@ -161,7 +161,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   ${xAxisTooltip}
                     </div>`
                   return (
-                    <>
+                    <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
                       <style>
                         {`
                          #barStack${barStack.index}-${bar.index} rect,
@@ -184,11 +184,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
-                          data-tip={tooltip}
-                          data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                          data-tooltip-html={tooltip}
+                          data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                         ></foreignObject>
                       </Group>
-                    </>
+                    </Group>
                   )
                 })
               )
@@ -248,8 +248,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
                             opacity={transparentBar ? 0.5 : 1}
                             display={displayBar ? 'block' : 'none'}
-                            data-tip={tooltip}
-                            data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                            data-tooltip-html={tooltip}
+                            data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                           ></foreignObject>
 
                           {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel && (
@@ -313,6 +313,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   <Group
                     className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`}
                     key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
+                    id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
                     top={config.runtime.horizontal ? barGroup.y : 0}
                     left={config.runtime.horizontal ? 0 : (xMax / barGroups.length) * barGroup.index}
                   >
@@ -379,7 +380,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         </div>`
 
                       return (
-                        <>
+                        <Group key={`${barGroup.index}--${index}--${orientation}`}>
                           {/* This feels gross but inline transition was not working well*/}
                           <style>
                             {`
@@ -404,8 +405,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               }}
                               opacity={transparentBar ? 0.5 : 1}
                               display={displayBar ? 'block' : 'none'}
-                              data-tip={tooltip}
-                              data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                              data-tooltip-html={tooltip}
+                              data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                             ></foreignObject>
                             {orientation === 'horizontal' && !config.isLollipopChart && displayNumbersOnBar && (
                               <Text // prettier-ignore
@@ -439,8 +440,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 {config.runtime.yAxis.type === 'date'
                                   ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
                                   : isHorizontal
-                                  ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                                  : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
+                                    ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                                    : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
                               </Text>
                             )}
                             ;
@@ -457,8 +458,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 r={lollipopShapeSize / 2}
                                 fill={barColor}
                                 key={`circle--${bar.index}`}
-                                data-tip={tooltip}
-                                data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                                data-tooltip-html={tooltip}
+                                data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                                 style={{ filter: 'unset', opacity: 1 }}
                               />
                             )}
@@ -470,15 +471,15 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 height={lollipopShapeSize}
                                 fill={barColor}
                                 key={`circle--${bar.index}`}
-                                data-tip={tooltip}
-                                data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                                data-tooltip-html={tooltip}
+                                data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                                 style={{ opacity: 1, filter: 'unset' }}
                               >
                                 <animate attributeName='height' values={`0, ${lollipopShapeSize}`} dur='2.5s' />
                               </rect>
                             )}
                           </Group>
-                        </>
+                        </Group>
                       )
                     })}
                   </Group>
@@ -488,25 +489,49 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
             {Object.keys(config.confidenceKeys).length > 0
               ? data.map(d => {
-                  let xPos = xScale(getXAxisData(d))
-                  let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
-                  let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
+                  let xPos, yPos
+                  let upperPos
+                  let lowerPos 
                   let tickWidth = 5
+                  // DEV-3264 Make Confidence Intervals work on horizontal bar charts
+                  if (orientation === 'horizontal') {
+                    yPos = yScale(getXAxisData(d)) - (0.75 * config.barHeight)
+                    upperPos = xScale(getYAxisData(d, config.confidenceKeys.upper))
+                    lowerPos = xScale(getYAxisData(d, config.confidenceKeys.lower))
+                    return (
+                      <path
+                        key={`confidence-interval-h-${yPos}-${d[config.runtime.originalXAxis.dataKey]}`}
+                        stroke='#333'
+                        strokeWidth='px'
+                        d={`
+                        M${lowerPos} ${yPos - tickWidth} 
+                        L${lowerPos} ${yPos + tickWidth} 
+                        M${lowerPos} ${yPos} 
+                        L${upperPos} ${yPos} 
+                        M${upperPos} ${yPos - tickWidth} 
+                        L${upperPos} ${yPos + tickWidth} `}
+                      />
+                    )
+                  } else {
+                    xPos = xScale(getXAxisData(d))
+                    upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
+                    lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
+                    return (
+                      <path
+                        key={`confidence-interval-v-${yPos}-${d[config.runtime.originalXAxis.dataKey]}`}
+                        stroke='#333'
+                        strokeWidth='px'
+                        d={`
+                        M${xPos - tickWidth} ${upperPos}
+                        L${xPos + tickWidth} ${upperPos}
+                        M${xPos} ${upperPos}
+                        L${xPos} ${lowerPos}
+                        M${xPos - tickWidth} ${lowerPos}
+                        L${xPos + tickWidth} ${lowerPos}`}
+                      />
+                    )
+                  }
 
-                  return (
-                    <path
-                      key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`}
-                      stroke='#333'
-                      strokeWidth='2px'
-                      d={`
-                  M${xPos - tickWidth} ${upperPos}
-                  L${xPos + tickWidth} ${upperPos}
-                  M${xPos} ${upperPos}
-                  L${xPos} ${lowerPos}
-                  M${xPos - tickWidth} ${lowerPos}
-                  L${xPos + tickWidth} ${lowerPos}`}
-                    />
-                  )
                 })
               : ''}
           </Group>

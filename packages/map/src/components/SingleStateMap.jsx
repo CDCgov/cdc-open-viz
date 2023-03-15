@@ -20,7 +20,7 @@ let { features: counties } = feature(testJSON, testJSON.objects.counties)
 let { features: states } = feature(testJSON, testJSON.objects.states)
 
 const SingleStateMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, rebuildTooltips, runtimeLegend, generateColorsArray, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, runtimeLegend, generateColorsArray, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
 
   const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const cityListProjection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
@@ -32,8 +32,6 @@ const SingleStateMap = props => {
   const [strokeWidth, setStrokeWidth] = useState(0.75)
   let mapColorPalette = colorPalettes[state.color] || '#fff'
   let focusedBorderColor = mapColorPalette[3]
-
-  useEffect(() => rebuildTooltips())
 
   const path = geoPath().projection(projection)
 
@@ -110,7 +108,7 @@ const SingleStateMap = props => {
       // For some reason, these two geos are breaking the display.
       if (geoDisplayName === 'Franklin City' || geoDisplayName === 'Waynesboro') return null
 
-      const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
+      const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
       if (legendColors && legendColors[0] !== '#000000') {
         let styles = {
@@ -130,13 +128,26 @@ const SingleStateMap = props => {
         }
 
         return (
-          <g data-for='tooltip' data-tip={tooltip} key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[state.columns.geo.name]}`} css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)}>
+          <g
+            key={`key--${county.id}`}
+            className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[state.columns.geo.name]}`}
+            css={styles}
+            onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            data-tooltip-id="tooltip"
+            data-tooltip-html={toolTip}
+          >
             <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
           </g>
         )
       } else {
         return (
-          <g data-for='tooltip' data-tip={tooltip} key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')}`} style={{ fill: '#e6e6e6' }}>
+          <g
+            key={`key--${county.id}`}
+            className={`county county--${geoDisplayName.split(' ').join('')}`}
+            style={{ fill: '#e6e6e6' }}
+            data-tooltip-id="tooltip"
+            data-tooltip-html={toolTip}
+          >
             <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
           </g>
         )

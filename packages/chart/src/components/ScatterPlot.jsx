@@ -3,43 +3,45 @@ import ConfigContext from '../ConfigContext'
 import { Group } from '@visx/group'
 
 const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
-  const { colorScale, transformedData: data, config } = useContext(ConfigContext)
+  const { colorScale, transformedData: data, config, formatNumber, seriesHighlight, colorPalettes } = useContext(ConfigContext)
 
-  // copied from line chart
-  // should probably be a constant somewhere.
+  // TODO: copied from line chart should probably be a constant somewhere.
   let circleRadii = 4.5
+  const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
-  let pointStyles = {
-    filter: 'unset',
-    opacity: 1,
-    stroke: 'black'
-  }
 
   const handleTooltip = (item, s) => `<div>
- ${config.xAxis.label}: ${item[config.xAxis.dataKey]} <br/>
- ${config.yAxis.label}: ${item[s]}
+    ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[s] || ''}<br/>` : ''}
+    ${config.xAxis.label}: ${formatNumber(item[config.xAxis.dataKey], 'bottom')} <br/>
+    ${config.yAxis.label}: ${formatNumber(item[s], 'left')}
 </div>`
 
   return (
     <Group className='scatter-plot' left={config.yAxis.size}>
       {data.map((item, dataIndex) => {
         // prettier-ignore
-        return config.runtime.seriesKeys.map(s => {
+        return config.runtime.seriesKeys.map((s, index) => {
+          const transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s) === -1
+          const displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s) !== -1
+          const seriesColor = config.palette ? colorPalettes[config.palette][index] : '#000'
 
-          console.log('ITEM', item)
-          console.log('series', s)
+          let pointStyles = {
+            filter: 'unset',
+            opacity: 1,
+            stroke: displayArea ? 'black' : ''
+          }
+
           return (
             <circle
-              key={`${dataIndex}`}
+              key={`${dataIndex}-${index}`}
               r={circleRadii}
               cx={xScale(item[config.xAxis.dataKey])}
               cy={yScale(item[s])}
-              fillOpacity={1}
-              opacity={1}
+              fill={displayArea ? seriesColor : 'transparent'}
+              fillOpacity={transparentArea ? .25 : 1}
               style={pointStyles}
-              fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s] : s) : '#000'}
-              data-tip={handleTooltip(item, s)}
-              data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+              data-tooltip-html={handleTooltip(item, s)}
+              data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
             />
           )
         })

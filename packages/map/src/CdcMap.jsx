@@ -6,44 +6,49 @@ import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
 
 // Third party
-import ReactTooltip from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
+import 'react-tooltip/dist/react-tooltip.css'
+
+// Helpers
+import { publish } from '@cdc/core/helpers/events'
 
 // Data
-import colorPalettes from '../../core/data/colorPalettes'
-import ExternalIcon from './images/external-link.svg'
-import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
-import initialState from './data/initial-state'
 import { countryCoordinates } from './data/country-coordinates'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
+import colorPalettes from '../../core/data/colorPalettes'
+import initialState from './data/initial-state'
+
+// Assets
+import ExternalIcon from './images/external-link.svg'
 
 // Sass
 import './scss/main.scss'
 import './scss/btn.scss'
 
 // Core
-import Loading from '@cdc/core/components/Loading'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import getViewport from '@cdc/core/helpers/getViewport'
-import numberFromString from '@cdc/core/helpers/numberFromString'
+import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import getViewport from '@cdc/core/helpers/getViewport'
+import Loading from '@cdc/core/components/Loading'
+import numberFromString from '@cdc/core/helpers/numberFromString'
 
 // Child Components
-import Sidebar from './components/Sidebar'
+import ConfigContext from './context'
+import Filters from './components/Filters'
 import Modal from './components/Modal'
-import EditorPanel from './components/EditorPanel' // Future: Lazy
-import UsaMap from './components/UsaMap' // Future: Lazy
-import UsaRegionMap from './components/UsaRegionMap' // Future: Lazy
+import Sidebar from './components/Sidebar'
+
 import CountyMap from './components/CountyMap' // Future: Lazy
 import DataTable from './components/DataTable' // Future: Lazy
+import EditorPanel from './components/EditorPanel' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
-import WorldMap from './components/WorldMap' // Future: Lazy
 import SingleStateMap from './components/SingleStateMap' // Future: Lazy
-import Filters from './components/Filters'
-import Context from './context'
-
-import { publish } from '@cdc/core/helpers/events'
+import UsaMap from './components/UsaMap' // Future: Lazy
+import UsaRegionMap from './components/UsaRegionMap' // Future: Lazy
+import WorldMap from './components/WorldMap' // Future: Lazy
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -83,7 +88,7 @@ const hashObj = row => {
 
 const indexOfIgnoreType = (arr, item) => {
   for (let i = 0; i < arr.length; i++) {
-    if (item == arr[i]) {
+    if (item === arr[i]) {
       return i
     }
   }
@@ -142,7 +147,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     } catch (e) {
       console.error('Failed to set world map zoom.')
     }
-  }, [filteredCountryCode])
+  }, [filteredCountryCode]) // eslint-disable-line
 
   useEffect(() => {
     setTimeout(() => {
@@ -154,7 +159,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         setRuntimeData(tmpData)
       }
     }, 100)
-  }, [filteredCountryCode])
+  }, [filteredCountryCode]) // eslint-disable-line
 
   useEffect(() => {
     if (state.mapPosition) {
@@ -172,6 +177,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
   // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
+  // eslint-disable-next-line
   const addUIDs = useCallback((obj, fromColumn) => {
     obj.data.forEach(row => {
       let uid = null
@@ -220,6 +226,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const geoName = row[obj.columns.geo.name]
 
         uid = countryKeys.find(key => supportedCountries[key].includes(geoName))
+
+        // Cities
+        if (!uid && 'world-geocode' === state.general.type) {
+          uid = cityKeys.find(key => key === geoName.toUpperCase())
+        }
       }
 
       // County Check
@@ -243,9 +254,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     obj.data.fromColumn = fromColumn
   })
 
+  // eslint-disable-next-line
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
     const newLegendMemo = new Map() // Reset memoization
-    const primaryCol = obj.columns.primary.name,
+    let primaryCol = obj.columns.primary.name,
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
       type = obj.legend.type,
@@ -531,6 +543,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           let min = removedRows[0][primaryCol],
             max = removedRows[removedRows.length - 1][primaryCol]
 
+          // eslint-disable-next-line
           removedRows.forEach(row => {
             newLegendMemo.set(hashObj(row), result.length)
           })
@@ -569,6 +582,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           breaks.unshift(0)
         }
 
+        // eslint-disable-next-line array-callback-return
         breaks.map((item, index) => {
           const setMin = index => {
             let min = breaks[index]
@@ -641,7 +655,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
 
     // Equal Interval
-
     if (type === 'equalinterval' && dataSet?.length !== 0) {
       if (!dataSet || dataSet.length === 0) {
         setState({
@@ -690,11 +703,29 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     })
 
     legendMemo.current = newLegendMemo
+
+    //----------
+    // DEV-784
+    // before returning the legend result
+    // add property for bin number and set to index location
+    result.forEach((row, i) => {
+      row.bin = i // set bin number to index
+    })
+
+    // Move all special legend items from "Special Classes"  to the end of the legend
+    if (state.legend.showSpecialClassesLast) {
+      let specialRows = result.filter(d => d.special === true)
+      let otherRows = result.filter(d => !d.special)
+      result = [...otherRows, ...specialRows]
+    }
+    //-----------
+
     return result
   })
 
+  // eslint-disable-next-line
   const generateRuntimeFilters = useCallback((obj, hash, runtimeFilters) => {
-    if (undefined === obj.filters || obj.filters.length === 0) return []
+    if (typeof obj === 'undefined' || undefined === obj.filters || obj.filters.length === 0) return []
 
     let filters = []
 
@@ -745,6 +776,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   })
 
   // Calculates what's going to be displayed on the map and data table at render.
+  // eslint-disable-next-line
   const generateRuntimeData = useCallback((obj, filters, hash, test) => {
     try {
       const result = {}
@@ -811,7 +843,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       resizeObserver.observe(node)
     }
     setContainer(node)
-  }, [])
+  }, []) // eslint-disable-line
 
   const mapSvg = useRef(null)
 
@@ -892,6 +924,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     return formattedValue
   }
 
+  // this is passed DOWN into the various components
+  // then they do a lookup based on the bin number as index into here (TT)
   const applyLegendToRow = rowObj => {
     try {
       if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
@@ -906,7 +940,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       if (legendMemo.current.has(hash)) {
         let idx = legendMemo.current.get(hash)
         if (runtimeLegend[idx]?.disabled) return false
-        return generateColorsArray(runtimeLegend[idx]?.color, runtimeLegend[idx]?.special)
+
+        // DEV-784 changed to use bin prop to get color instead of idx
+        // bc we re-order legend when showSpecialClassesLast is checked
+        let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
+        return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
       }
 
       // Fail state
@@ -923,16 +961,19 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // Adds geo label, ie State: Georgia
     let stateOrCounty = state.general.geoType === 'us' ? 'State: ' : state.general.geoType === 'us-county' || state.general.geoType === 'single-state' ? 'County: ' : ''
 
+    // check the override
+    stateOrCounty = state.general.geoLabelOverride !== '' ? state.general.geoLabelOverride + ': ' : stateOrCounty
+
     if (state.general.geoType === 'us-county' && state.general.type !== 'us-geocode') {
       let stateFipsCode = row[state.columns.geo.name].substring(0, 2)
       const stateName = supportedStatesFipsCodes[stateFipsCode]
 
-      toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>State:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
+      toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
     }
 
     toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
-    if (('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode') && undefined !== row) {
+    if (('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode' || state.general.type === 'world-geocode') && undefined !== row) {
       toolTipText += `<dl>`
 
       Object.keys(state.columns).forEach(columnKey => {
@@ -944,10 +985,15 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           let value
 
           if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
+            // THIS CODE SHOULD NOT ACT ON THE ENTIRE ROW OF KEYS BUT ONLY THE ONE KEY IN THE SPECIAL CLASS
             for (let i = 0; i < state.legend.specialClasses.length; i++) {
-              if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
-                value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
-                break
+                // DEV-3303 - Special Classes label in HOVERS should only apply to selected special class key
+                // - you have to ALSO check that the key matches - putting here otherwise the if stmt too long
+              if (columnKey === state.legend.specialClasses[i].key) {
+                  if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
+                    value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
+                    break
+                  }
               }
             }
           }
@@ -1091,6 +1137,17 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const geoClickHandler = (key, value) => {
     if (setSharedFilter) {
       setSharedFilter(state.uid, value)
+    }
+
+    // If world-geocode map zoom to geo point
+    if ('world-geocode' === state.general.type) {
+      let lat = value[state.columns.latitude.name]
+      let long = value[state.columns.longitude.name]
+
+      setState({
+        ...state,
+        mapPosition: { coordinates: [long, lat], zoom: 3 }
+      })
     }
 
     // If modals are set or we are on a mobile viewport, display modal
@@ -1240,42 +1297,47 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Initial load
   useEffect(() => {
     init()
-  }, [])
+  }, []) // eslint-disable-line
 
   useEffect(() => {
     if (state && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: state })
       setCoveLoadedHasRan(true)
     }
-  }, [state, container])
+  }, [state, container]) // eslint-disable-line
 
   useEffect(() => {
     if (state.data) {
       let newData = generateRuntimeData(state)
       setRuntimeData(newData)
     }
-  }, [state.general.statePicked])
+  }, [state.general.statePicked]) // eslint-disable-line
 
-  
   useEffect(() => {
     // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
     }
-  }, [state])
-  
+  }, [state]) // eslint-disable-line
+
   // DEV-769 make "Data Table" both a required field and default value
   useEffect(() => {
-    if (state.dataTable?.title === "" || state.dataTable?.title === undefined) {
+    if (state.dataTable?.title === '' || state.dataTable?.title === undefined) {
       setState({
-          ...state,
+        ...state,
         dataTable: {
-            ...state.dataTable,
-            title: "Data Table"
-          }
-        })
+          ...state.dataTable,
+          title: 'Data Table'
+        }
+      })
     }
-  }, [state.dataTable])
+  }, [state.dataTable]) // eslint-disable-line
+
+  // When geo label override changes
+  // - redo the tooltips
+  useEffect(() => {
+    applyTooltipsToGeo()
+  }, [state.general.geoLabelOverride]) // eslint-disable-line
 
   useEffect(() => {
     // UID
@@ -1333,7 +1395,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
       setRuntimeLegend(legend)
     }
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   useEffect(() => {
     const hashLegend = hashObj({
@@ -1350,16 +1412,16 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Legend - Update when runtimeData does
     if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
-      const legend = generateRuntimeLegend(state, runtimeData)
+      let legend = generateRuntimeLegend(state, runtimeData)
       setRuntimeLegend(legend)
     }
-  }, [runtimeData])
+  }, [runtimeData]) // eslint-disable-line
 
   if (config) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       loadConfig(config)
-    }, [config.data])
+    }, [config.data]) // eslint-disable-line
   }
 
   // Destructuring for more readable JSX
@@ -1388,7 +1450,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const mapProps = {
     state,
     data: runtimeData,
-    rebuildTooltips: ReactTooltip.rebuild,
     applyTooltipsToGeo,
     closeModal,
     navigationHandler,
@@ -1445,12 +1506,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const tableLink = <a href={`#data-table-${config.dataKey}`}>{config.dataKey} (Go to Table)</a>
 
   return (
-    <Context.Provider value={mapProps}>
+    <ConfigContext.Provider value={mapProps}>
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
-        {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
+        {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} changeFilterActive={changeFilterActive} />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
+            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
@@ -1460,8 +1521,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 </div>
               </header>
             )}
-
-            <div>{general.introText && <section className='introText'>{parse(general.introText)}</section>}</div>
+            {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             <Filters />
 
@@ -1564,7 +1624,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {accessibleStatus}
         </div>
       </div>
-    </Context.Provider>
+    </ConfigContext.Provider>
   )
 }
 
