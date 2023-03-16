@@ -264,11 +264,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
           if (!filteredData) throw new Error('boxplots dont have data yet')
           if (!plots) throw new Error('boxplots dont have plots yet')
-          if (newConfig.boxplot.firstQuartilePercentage === "") {
+          if (newConfig.boxplot.firstQuartilePercentage === '') {
             newConfig.boxplot.firstQuartilePercentage = 0
           }
 
-          if (newConfig.boxplot.thirdQuartilePercentage === "") {
+          if (newConfig.boxplot.thirdQuartilePercentage === '') {
             newConfig.boxplot.thirdQuartilePercentage = 0
           }
 
@@ -656,8 +656,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     //
     // DEV 3163 edge case for small numbers with decimals
     // - if roundTo undefined which means it is blank, then do not round
-    //debugger;
-    console.log('roundTo,commas,abbreviated', roundTo, commas, abbreviated)
     if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
       num = num // eslint-disable-line
       //   } else if (roundTo === undefined) {
