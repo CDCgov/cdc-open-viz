@@ -143,17 +143,17 @@
   "data": [
     {
       "Category": "1",
-      "Values": "100000",
+      "Values": "-100000",
       "Filter": "Big"
     },
     {
       "Category": "2",
-      "Values": "500000",
+      "Values": "-80000",
       "Filter": "Big"
     },
     {
       "Category": "3",
-      "Values": "1000000",
+      "Values": "-1000000",
       "Filter": "Big"
     },
     {
@@ -313,7 +313,7 @@
   "series": [
     {
       "dataKey": "Values",
-      "type": "Bar"
+      "type": "Line"
     }
   ],
   "filters": [
