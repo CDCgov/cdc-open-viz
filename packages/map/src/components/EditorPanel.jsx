@@ -924,6 +924,23 @@ const EditorPanel = props => {
     zIndex: '999'
   }
 
+  const handleMapLayerUrl = (e, index) => {
+
+    let newLayers = [...state.map.layers]
+
+    console.log('NEW LAYERS', newLayers)
+
+    newLayers[index].url = e.target.value
+
+    setState({
+      ...state,
+      map: {
+        ...state.map,
+        layers: newLayers
+      }
+    })
+  }
+
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(state)) // Deep copy
 
@@ -2687,6 +2704,36 @@ const EditorPanel = props => {
                           </select>
                         </label>
                       ))}
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Custom Map Layers</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+
+                  {state.map.layers.length === 0 && <p>There are currently no filters.</p>}
+
+
+
+                  {state.map.layers.map((layer, index) => {
+                    return (
+                      <>
+                        <label>TopoJSON URL:</label>
+                        <input type="text" value={layer.url} onChange={(e) => handleMapLayerUrl(e, index)} />
+                      </>
+                    )
+                  })}
+
+                  <button
+                    className={'btn full-width'}
+                    onClick={event => {
+                      console.log('Add logic for adding map layer')
+                    }}
+                  >
+                    Add Map Layer
+                  </button>
+
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>

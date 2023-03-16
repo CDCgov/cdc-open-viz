@@ -84,5 +84,8 @@ export default {
     geoCodeCircleSize: 2,
     showBubbleZeros: false
   },
-  mapPosition: { coordinates: [0, 30], zoom: 1 }
+  mapPosition: { coordinates: [0, 30], zoom: 1 },
+  map: {
+    layers: [{ name: 'Layer 1', fill: 'blue', url: './examples/testing-layer.json' }]
+  }
 }
