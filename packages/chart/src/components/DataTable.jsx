@@ -5,13 +5,14 @@ import { Base64 } from 'js-base64'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
+import Icon from '@cdc/core/components/ui/Icon'
 
 import ConfigContext from '../ConfigContext'
 
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext(ConfigContext)
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
 
   // Debugging.
   // if (config.visualizationType === 'Box Plot') return null
@@ -121,12 +122,13 @@ export default function DataTable() {
       data.forEach((d, index) => {
         const resolveTableHeader = () => {
           if (config.runtime[section].type === 'date') return formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
+          if (config.runtime[section].type === 'continuous') return numberFormatter(d[config.runtime.originalXAxis.dataKey], 'bottom')
           return d[config.runtime.originalXAxis.dataKey]
         }
         const newCol = {
           Header: resolveTableHeader(),
           Cell: ({ row }) => {
-            return <>{numberFormatter(d[row.original])}</>
+            return <>{numberFormatter(d[row.original], 'left')}</>
           },
           id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
           canSort: true
@@ -161,12 +163,12 @@ export default function DataTable() {
           canSort: false
         }
 
-        newTableColumns.push(newCol)
+        return newTableColumns.push(newCol)
       })
     }
 
     return newTableColumns
-  }, [config, colorScale])
+  }, [config, colorScale]) // eslint-disable-line
 
   // prettier-ignore
   const tableData = useMemo(() => (
@@ -175,7 +177,7 @@ export default function DataTable() {
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])
         : config.runtime.seriesKeys),
-    [config.runtime.seriesKeys])
+    [config.runtime.seriesKeys]) // eslint-disable-line
 
   // Change accessibility label depending on expanded status
   useEffect(() => {
@@ -200,10 +202,18 @@ export default function DataTable() {
     }),
     []
   )
-
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
+
+  // sort continuous x axis scaling for data tables, ie. xAxis should read 1,2,3,4,5
+  if (config.xAxis.type === 'continuous' && headerGroups) {
+    data.sort((a, b) => a[config.xAxis.dataKey] - b[config.xAxis.dataKey])
+  }
+
   return (
     <ErrorBoundary component='DataTable'>
+
+
+
       <CoveMediaControls.Section classes={['download-links']}>
         <CoveMediaControls.Link config={config} />
         {config.table.download && <DownloadButton data={rawData} type='link' />}
@@ -223,6 +233,7 @@ export default function DataTable() {
             }
           }}
         >
+          <Icon display={tableExpanded ? 'minus' : 'plus'} base />
           {config.table.label}
         </div>
         <div className='table-container' hidden={!tableExpanded} style={{ maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>
@@ -257,7 +268,8 @@ export default function DataTable() {
               {rows.map((row, index) => {
                 prepareRow(row)
                 return (
-                  <tr {...row.getRowProps()} key={`tbody__tr-${index}`} className={`row-${String(config.visualizationType).replace(' ', '-')}--${index}`}>
+                  <tr {...row.getRowProps()} key={`tbody__tr-${index}`} className={`row-${String(config.visualizationType).replace(' ', '-')}--${index}`}
+                  >
                     {row.cells.map((cell, index) => {
                       return (
                         <td tabIndex='0' {...cell.getCellProps()} key={`tbody__tr__td-${index}`} role='gridcell'>
@@ -270,7 +282,7 @@ export default function DataTable() {
               })}
             </tbody>
           </table>
-          {config.regions && config.regions.length > 0 ? (
+          {config.regions && config.regions.length > 0 && !config.visualizationType === 'Box Plot' ? (
             <table className='region-table data-table'>
               <caption className='visually-hidden'>Table of the highlighted regions in the visualization</caption>
               <thead>
@@ -282,6 +294,7 @@ export default function DataTable() {
               </thead>
               <tbody>
                 {config.regions.map((region, index) => {
+                  if (config.visualizationType === 'Box Plot') return false;
                   if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
                   return (

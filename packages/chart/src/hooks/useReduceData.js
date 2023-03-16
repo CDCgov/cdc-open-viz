@@ -9,7 +9,7 @@ function useReduceData(config, data) {
     // remove comma and $ signs
     let tmp
     if (typeof value === 'string') {
-      tmp = value !== null && value !== '' ? value.replace(/[,\$]/g, '') : ''
+      tmp = value !== null && value !== '' ? value.replace(/[,$]/g, '') : ''
     } else {
       tmp = value !== null && value !== '' ? value : ''
     }
@@ -48,7 +48,7 @@ function useReduceData(config, data) {
             }
             return yTotal
           }, 0)
-          total.push(totalYValues)
+          return total.push(totalYValues)
         })
         // get lineSeries largest values
         const lineMax = Math.max(...data.map(d => Math.max(...config.runtime.lineSeriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
