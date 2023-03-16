@@ -35,7 +35,6 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   const isMaxValid = Number(enteredMaxValue) >= Number(maxValue)
   const isMinValid = Number(enteredMinValue) <= Number(minValue)
 
-
   // REMOVE bad data points from the data set
   // Examples: NA, N/A, "1,234", "anystring"
   // - if you dont call this on data into LineGroup below, for example
@@ -43,7 +42,9 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   // i.e. if a series has any bad data points the entire series wont plot
   const cleanData = (data, testing = false) => {
     let cleanedup = []
-    if (testing) { console.log('## Data to clean=', data) }
+    if (testing) {
+      console.log('## Data to clean=', data)
+    }
     data.forEach(function (d, i) {
       let cleanedSeries = {}
       Object.keys(d).forEach(function (key) {
@@ -53,7 +54,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
         } else {
           // remove comma and dollar signs
           let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
-          if (testing) console.log("tmp no comma or $", tmp)
+          if (testing) console.log('tmp no comma or $', tmp)
           if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
             cleanedSeries[key] = tmp
           } else {
@@ -70,7 +71,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
 
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data, config.xAxis.dataKey);
+  const cleanedData = cleanData(data, config.xAxis.dataKey)
 
   if (cleanedData) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
