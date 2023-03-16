@@ -20,7 +20,9 @@ function useReduceData(config, data) {
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && isBar)) && config.visualizationSubType === 'stacked') {
       const yTotals = data.reduce((allTotals, xValue) => {
         const totalYValues = config.runtime.seriesKeys.reduce((yTotal, k) => {
-          yTotal += Number(xValue[k])
+          if (isNumber(cleanChars(xValue[k]))) {
+            yTotal += Number(cleanChars(xValue[k]))
+          }
           return yTotal
         }, 0)
 
@@ -37,18 +39,19 @@ function useReduceData(config, data) {
       //max = Math.max(...data.map(d => Number(d[config.series.dataKey])))
     } else if (config.visualizationType === 'Combo' && config.visualizationSubType === 'stacked' && !isBar) {
       let total = []
-
       if (config.runtime.barSeriesKeys && config.runtime.lineSeriesKeys) {
         // get barSeries max Values added to each other
         data.map(function (d, index) {
           const totalYValues = config.runtime.barSeriesKeys.reduce((yTotal, k) => {
-            yTotal += Number(d[k])
+            if (isNumber(cleanChars(d[k]))) {
+              yTotal += Number(cleanChars(d[k]))
+            }
             return yTotal
           }, 0)
           return total.push(totalYValues)
         })
         // get lineSeries largest values
-        const lineMax = Math.max(...data.map(d => Math.max(...config.runtime.lineSeriesKeys.map(key => Number(cleanChars(d[key]))))))
+        const lineMax = Math.max(...data.map(d => Math.max(...config.runtime.lineSeriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
 
         const barMax = Math.max(...total)
 
@@ -65,7 +68,7 @@ function useReduceData(config, data) {
     let min
     const minNumberFromData = Math.min(...data.map(d => Math.min(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 1000000000)))))
     min = String(minNumberFromData)
-      //console.log("min",min)
+    //console.log("min",min)
     return min
   }
 

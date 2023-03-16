@@ -24,10 +24,13 @@ import useTopAxis from '../hooks/useTopAxis'
 
 // TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
-  let [width] = dimensions
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, cleanData, updateConfig } = useContext(ConfigContext)
+  // Just do this once up front otherwise we end up
+  // calling clean several times on same set of data (TT)
+  const cleanedData = cleanData(data, config.xAxis.dataKey)
 
-  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
+  let [width] = dimensions
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, cleanedData)
   const [animatedChart, setAnimatedChart] = useState(false)
 
   const triggerRef = useRef()
@@ -62,7 +65,7 @@ export default function LinearChart() {
   const xMax = width - config.runtime.yAxis.size - (config.visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
 
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, cleanedData, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
@@ -136,10 +139,10 @@ export default function LinearChart() {
       max += paddingValue
     }
 
-    let xAxisDataMapped = data.map(d => getXAxisData(d))
+    let xAxisDataMapped = cleanedData.map(d => getXAxisData(d))
 
     if (config.isLollipopChart && config.yAxis.displayNumbersOnBar) {
-      const dataKey = data.map(item => item[config.series[0].dataKey])
+      const dataKey = cleanedData.map(item => item[config.series[0].dataKey])
       const maxDataVal = Math.max(...dataKey).toString().length
 
       switch (true) {
@@ -204,11 +207,11 @@ export default function LinearChart() {
       const offset = 1.02 // Offset of the ticks/values from the Axis
       let groupOneMax = Math.max.apply(
         Math,
-        data.map(d => d[config.series[0].dataKey])
+        cleanedData.map(d => d[config.series[0].dataKey])
       )
       let groupTwoMax = Math.max.apply(
         Math,
-        data.map(d => d[config.series[1].dataKey])
+        cleanedData.map(d => d[config.series[1].dataKey])
       )
 
       // group one
