@@ -11,6 +11,8 @@ import useIntersectionObserver from './useIntersectionObserver'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
+import useStore from '@cdc/core/store/store'
+
 const enterUpdateTransition = ({ startAngle, endAngle }) => ({
   startAngle,
   endAngle
@@ -18,6 +20,7 @@ const enterUpdateTransition = ({ startAngle, endAngle }) => ({
 
 export default function PieChart({ dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels, cleanData }) {
   const { config } = useVisConfig()
+
   const cleanedData = cleanData(config.data, config.xAxis.dataKey)
 
   const [filteredData, setFilteredData] = useState(undefined)
@@ -30,12 +33,13 @@ export default function PieChart({ dimensions, seriesHighlight, colorScale, form
 
   // Make sure the chart is visible if in the editor
   useEffect(() => {
-    const element = document.querySelector('.isEditor')
+    const element = useStore.getState().viewMode.isEditor
     if (element) {
       // parent element is visible
       setAnimatePie(prevState => true)
     }
-  })
+
+  }, [useStore.getState().viewMode]) // eslint-disable-line
 
   useEffect(() => {
     if (dataRef?.isIntersecting && config.animate && !animatedPie) {

@@ -1,16 +1,43 @@
 import React, { useState, useEffect } from 'react'
-import { Group } from '@visx/group'
+
+// Third Party
 import { BarGroup, BarStack } from '@visx/shape'
+import { BarStackHorizontal } from '@visx/shape'
+import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import chroma from 'chroma-js'
-import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
-import { BarStackHorizontal } from '@visx/shape'
-import CoveHelper from '@cdc/core/helpers/cove'
+
+// Hooks
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
+// Helpers
 import cleanData from '@cdc/core/helpers/data/cleanData'
+import CoveHelper from '@cdc/core/helpers/cove'
 
-export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible, colorScale, seriesHighlight, formatNumber, colorPalettes, formatDate, getTextWidth, parseDate }) {
+// Components - Core
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+
+
+const BarChart = (
+  {
+    xScale,
+    yScale,
+    seriesScale,
+    xMax,
+    yMax,
+    getXAxisData,
+    getYAxisData,
+    animatedChart,
+    visible,
+    colorScale,
+    seriesHighlight,
+    formatNumber,
+    colorPalettes,
+    formatDate,
+    getTextWidth,
+    parseDate
+  }
+) => {
   const { config, updateVisConfigField } = useVisConfig()
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
@@ -61,7 +88,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     // function updates  stacked && regular && lollipop horizontal bars
     if (config.visualizationType !== 'Bar' && !isHorizontal) return defaultBars
 
-    const barsArr = [...defaultBars]
+    const barsArr = [ ...defaultBars ]
     let barHeight
 
     const heights = {
@@ -96,25 +123,25 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   }
 
   // Using State
-  const [textWidth, setTextWidth] = useState(null)
+  const [ textWidth, setTextWidth ] = useState(null)
 
   useEffect(() => {
     if (orientation === 'horizontal' && !config.yAxis.labelPlacement) {
       updateVisConfigField('yAxis', { labelPlacement: 'Below Bar' })
     }
-  }, [config, orientation, updateVisConfigField])
+  }, [ config, orientation, updateVisConfigField ])
 
   useEffect(() => {
     if (config.isLollipopChart === false && config.barHeight < 25) {
       updateVisConfigField('barHeight', 25)
     }
-  }, [config.isLollipopChart, updateVisConfigField])
+  }, [ config.isLollipopChart, updateVisConfigField ])
 
   useEffect(() => {
     if (config.visualizationSubType === 'horizontal') {
       updateVisConfigField('orientation', 'horizontal')
     }
-  }, [config.visualizationSubType, updateVisConfigField])
+  }, [ config.visualizationSubType, updateVisConfigField ])
 
   useEffect(() => {
     if (config.barStyle === 'lollipop' && !config.isLollipopChart) {
@@ -123,10 +150,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     if (isRounded || config.barStyle === 'flat') {
       updateVisConfigField('isLollipopChart', false)
     }
-  }, [config.barStyle])
+  }, [ config.barStyle ])
 
   return (
-    <ErrorBoundary component='BarChart'>
+    <ErrorBoundary component="BarChart">
       <Group left={parseFloat(config.runtime.yAxis.size)}>
         {/* Stacked Vertical */}
         {config.visualizationSubType === 'stacked' && !isHorizontal && (
@@ -157,7 +184,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   return (
                     <>
                       <style>
-                        {`
+                      {`
                          #barStack${barStack.index}-${bar.index} rect,
                          #barStack${barStack.index}-${bar.index} foreignObject{
                           animation-delay: ${barStack.index * 0.5}s;
@@ -165,8 +192,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         }
                       `}
                       </style>
-                      <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className='stack vertical'>
-                        <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barThickness * bar.index + offset} y={bar.y - 5} fill={bar.color} textAnchor='middle'>
+                      <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className="stack vertical">
+                        <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barThickness * bar.index + offset} y={bar.y - 5} fill={bar.color} textAnchor="middle">
                           {formatNumber(bar.bar ? bar.bar.config.data[bar.key] : 0)}
                         </Text>
                         <foreignObject
@@ -193,7 +220,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         {/* Stacked Horizontal */}
         {config.visualizationSubType === 'stacked' && isHorizontal && (
           <>
-            <BarStackHorizontal data={cleanedData} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={d => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
+            <BarStackHorizontal data={cleanedData} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={d => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset="none">
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
@@ -223,7 +250,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     return (
                       <>
                         <style>
-                          {`
+                        {`
                          #barStack${barStack.index}-${bar.index} rect,
                          #barStack${barStack.index}-${bar.index} foreignObject{
                           animation-delay: ${barStack.index * 0.5}s;
@@ -231,7 +258,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         }
                       `}
                         </style>
-                        <Group key={index} id={`barStack${barStack.index}-${bar.index}`} className='stack horizontal'>
+                        <Group key={index} id={`barStack${barStack.index}-${bar.index}`} className="stack horizontal">
                           <foreignObject
                             key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                             className={`animated-chart group ${animatedChart ? 'animated' : ''}`}
@@ -251,8 +278,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               x={`${bar.x + (config.isLollipopChart ? 15 : 5)}`} // padding
                               y={bar.y + bar.height * 1.2}
                               fill={'#000000'}
-                              textAnchor='start'
-                              verticalAnchor='start'
+                              textAnchor="start"
+                              verticalAnchor="start"
                             >
                               {yAxisValue}
                             </Text>
@@ -264,8 +291,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               x={bar.x + barStack.bars[bar.index].width / 2} // padding
                               y={bar.y + bar.height / 2}
                               fill={labelColor}
-                              textAnchor='middle'
-                              verticalAnchor='middle'
+                              textAnchor="middle"
+                              verticalAnchor="middle"
                               innerRef={e => {
                                 if (e) {
                                   // use font sizes and padding to set the bar height
@@ -376,7 +403,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         <>
                           {/* This feels gross but inline transition was not working well*/}
                           <style>
-                            {`
+                          {`
                             .linear #barGroup${barGroup.index},
                             .Combo #barGroup${barGroup.index} {
                               transform-origin: 0 ${barY + barHeight}px;
@@ -408,7 +435,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 y={config.barHeight / 2 + config.barHeight * bar.index}
                                 fill={labelColor}
                                 dx={textFits ? -5 : 5}
-                                verticalAnchor='middle'
+                                verticalAnchor="middle"
                                 textAnchor={textFits ? 'end' : 'start'}
                               >
                                 {xAxisValue}
@@ -421,8 +448,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 x={`${bar.y + (config.isLollipopChart ? 15 : 5) + (config.isLollipopChart && barGroup.bars.length === bar.index ? offset : 0)}`} // padding
                                 y={0}
                                 fill={'#000000'}
-                                textAnchor='start'
-                                verticalAnchor='middle'
+                                textAnchor="start"
+                                verticalAnchor="middle"
                                 fontWeight={'normal'}
                               >
                                 {xAxisValue}
@@ -433,13 +460,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 {config.runtime.yAxis.type === 'date'
                                   ? formatDate(parseDate(config.data[barGroup.index][config.runtime.originalXAxis.dataKey]))
                                   : isHorizontal
-                                  ? config.data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                                  : formatNumber(config.data[barGroup.index][config.runtime.originalXAxis.dataKey])}
+                                    ? config.data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                                    : formatNumber(config.data[barGroup.index][config.runtime.originalXAxis.dataKey])}
                               </Text>
                             )}
                             ;
                             {orientation === 'vertical' && (
-                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
+                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={barColor} textAnchor="middle">
                                 {formatNumber(bar.value)}
                               </Text>
                             )}
@@ -468,7 +495,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                                 style={{ opacity: 1, filter: 'unset' }}
                               >
-                                <animate attributeName='height' values={`0, ${lollipopShapeSize}`} dur='2.5s' />
+                                <animate attributeName="height" values={`0, ${lollipopShapeSize}`} dur="2.5s"/>
                               </rect>
                             )}
                           </Group>
@@ -482,26 +509,26 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
             {Object.keys(config.confidenceKeys).length > 0
               ? config.data.map(d => {
-                  let xPos = xScale(getXAxisData(d))
-                  let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
-                  let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
-                  let tickWidth = 5
+                let xPos = xScale(getXAxisData(d))
+                let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
+                let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
+                let tickWidth = 5
 
-                  return (
-                    <path
-                      key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`}
-                      stroke='#333'
-                      strokeWidth='2px'
-                      d={`
+                return (
+                  <path
+                    key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`}
+                    stroke="#333"
+                    strokeWidth="2px"
+                    d={`
                   M${xPos - tickWidth} ${upperPos}
                   L${xPos + tickWidth} ${upperPos}
                   M${xPos} ${upperPos}
                   L${xPos} ${lowerPos}
                   M${xPos - tickWidth} ${lowerPos}
                   L${xPos + tickWidth} ${lowerPos}`}
-                    />
-                  )
-                })
+                  />
+                )
+              })
               : ''}
           </Group>
         )}
@@ -509,3 +536,5 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     </ErrorBoundary>
   )
 }
+
+export default BarChart
