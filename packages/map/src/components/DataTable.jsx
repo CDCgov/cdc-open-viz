@@ -10,28 +10,9 @@ import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 import Loading from '@cdc/core/components/Loading'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
-
 const DataTable = props => {
-  const {
-    state,
-    tableTitle,
-    indexTitle,
-    mapTitle,
-    rawData,
-    runtimeData,
-    headerColor,
-    expandDataTable,
-    columns,
-    displayDataAsText,
-    applyLegendToRow,
-    displayGeoName,
-    navigationHandler,
-    viewport,
-    formatLegendLocation,
-    tabbingId,
-    setFilteredCountryCode,
-  } = props
-  
+  const { state, tableTitle, indexTitle, mapTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
+
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
 
@@ -42,10 +23,7 @@ const DataTable = props => {
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
   const customSort = (a, b) => {
-    if (a < b) return -1
-    if (b < a) return 1
-    return 0
-    /*const digitRegex = /\d+/
+    const digitRegex = /\d+/
 
     const hasNumber = value => digitRegex.test(value)
 
@@ -112,7 +90,7 @@ const DataTable = props => {
     }
     // returning 0, undefined or any falsey value will use subsequent sorts or
     // the index as a tiebreaker
-    return 0*/
+    return 0
   }
 
   // Optionally wrap cell with anchor if config defines a navigation url
