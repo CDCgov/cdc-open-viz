@@ -49,6 +49,7 @@
         display: inline-flex;
         flex-wrap: wrap;
         width: 33%;  // changed from 20% so that long checkbox name will fit without wrapping
+        font-size: 0.8em;
 
         .table-height-input {
           width: 100%;
