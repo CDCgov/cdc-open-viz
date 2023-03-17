@@ -106,20 +106,16 @@ const Legend = () => {
 
     return uniqeLabels
   }
-  // in small screens update config legend position.
-  useEffect(() => {
-    if (currentViewport === 'sm' || currentViewport === 'xs' || config.legend.position === 'left') {
-      setConfig({ ...config, legend: { ...config.legend, position: 'bottom' } })
-    }
-    setConfig({ ...config, legend: { ...config.legend, position: 'right' } })
-  }, [currentViewport])
 
-  if (!legend) return null;
+  if (!legend) return null
 
   if (!legend.dynamicLegend)
     return config.visualizationType !== 'Box Plot' ? (
       <aside
-        style={{ marginTop: config.legend.position === 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px', marginBottom: config.legend.position === 'bottom' ? '15px' : '0px' }}
+        style={{
+          marginTop: (config.legend.position === 'bottom' || currentViewport === 'sm' || currentViewport === 'xs') && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px',
+          marginBottom: config.legend.position === 'bottom' || currentViewport === 'sm' || currentViewport === 'xs' ? '15px' : '0px'
+        }}
         id='legend'
         className={containerClasses.join(' ')}
         role='region'

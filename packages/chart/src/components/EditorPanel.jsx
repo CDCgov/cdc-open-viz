@@ -19,8 +19,6 @@ import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import * as allCurves from '@visx/curve'
 
-console.log('alllll curves', allCurves)
-
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -209,7 +207,7 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, pairedBarPalettes, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
@@ -336,7 +334,6 @@ const EditorPanel = () => {
 
     let updatedConfig = { ...config, [section]: sectionValue }
 
-    console.log('section value', updatedConfig)
     enforceRestrictions(updatedConfig)
 
     updateConfig(updatedConfig)
@@ -501,7 +498,7 @@ const EditorPanel = () => {
   }
 
   const showBarStyleOptions = () => {
-    if (config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked' && (config.orientation === 'horizontal' || config.orientation === 'vertical')) {
+    if ((config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.visualizationSubType !== 'stacked' && (config.orientation === 'horizontal' || config.orientation === 'vertical')) {
       return ['flat', 'rounded', 'lollipop']
     } else {
       return ['flat', 'rounded']
@@ -559,7 +556,6 @@ const EditorPanel = () => {
   useEffect(() => {
     // Pass up to Editor if needed
     if (setParentConfig) {
-      console.log('setting parent config')
       const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
@@ -690,7 +686,7 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
-  const enabledChartTypes = ['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line', 'Area Chart', 'Scatter Plot', 'Box Plot']
+  const enabledChartTypes = ['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line', 'Area Chart', 'Scatter Plot', 'Box Plot', 'Deviation Bar']
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -712,14 +708,16 @@ const EditorPanel = () => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />
-
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
-                  {config.visualizationType === 'Bar' && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
-                  {config.visualizationType === 'Bar' && config.barStyle === 'rounded' && <Select value={config.tipRounding || 'top'} fieldName='tipRounding' label='tip rounding' updateField={updateField} options={['top', 'full']} />}
-                  {config.visualizationType === 'Bar' && config.barStyle === 'rounded' && <Select value={config.roundingStyle || 'standard'} fieldName='roundingStyle' label='rounding style' updateField={updateField} options={['standard', 'shallow', 'finger']} />}
+                  {config.visualizationType === 'Deviation Bar' && <Select value={config.orientation || 'horizontal'} fieldName='orientation' label='Orientation' updateField={updateField} options={['horizontal', 'vertical']} />}
+                  {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
+                  {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.barStyle === 'rounded' && <Select value={config.tipRounding || 'top'} fieldName='tipRounding' label='tip rounding' updateField={updateField} options={['top', 'full']} />}
+                  {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.barStyle === 'rounded' && (
+                    <Select value={config.roundingStyle || 'standard'} fieldName='roundingStyle' label='rounding style' updateField={updateField} options={['standard', 'shallow', 'finger']} />
+                  )}
                   {config.visualizationType === 'Bar' && config.orientation === 'horizontal' && <Select value={config.yAxis.labelPlacement || 'Below Bar'} section='yAxis' fieldName='labelPlacement' label='Label Placement' updateField={updateField} options={['Below Bar', 'On Date/Category Axis']} />}
-                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar') ? (
+                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') ? (
                     <CheckBox value={config.yAxis.displayNumbersOnBar} section='yAxis' fieldName='displayNumbersOnBar' label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
                   ) : (
                     config.visualizationType !== 'Pie' && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
@@ -1341,6 +1339,7 @@ const EditorPanel = () => {
                       <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
                       <TextField value={config.xAxis.max} section='xAxis' fieldName='max' label='update max value' type='number' placeholder='Auto' updateField={updateField} />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
+                      <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Update target Value' placeholder='Auto' className='number-narrow' updateField={updateField} />
                     </>
                   ) : (
                     config.visualizationType !== 'Pie' && (
@@ -1821,7 +1820,7 @@ const EditorPanel = () => {
                   )}
 
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
-                  {config.visualizationType !== 'Box Plot' && config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
+                  {config.visualizationType !== 'Box Plot' && config.series?.some(({ type }) => ['Bar', 'Paired Bar', 'Deviation Bar'].includes(type)) && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
 
                   <CheckBox value={config.animate} fieldName='animate' label='Animate Visualization' updateField={updateField} />
 
@@ -1852,7 +1851,7 @@ const EditorPanel = () => {
                     <span className='edit-label'>Chart Color Palette</span>
                   </label>
                   {/* eslint-enable */}
-                  {config.visualizationType !== 'Paired Bar' && (
+                  {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Deviation Bar' && (
                     <>
                       <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.isPaletteReversed} />
                       <span>Sequential</span>
@@ -1921,18 +1920,17 @@ const EditorPanel = () => {
                       </ul>
                     </>
                   )}
-
-                  {config.visualizationType === 'Paired Bar' && (
+                  {(config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') && (
                     <>
-                      <InputToggle section='pairedBar' fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.pairedBar.isPaletteReversed} />
+                      <InputToggle section='twoColor' fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.twoColor.isPaletteReversed} />
                       <ul className='color-palette'>
                         {twoColorPalettes.map(palette => {
                           const colorOne = {
-                            backgroundColor: pairedBarPalettes[palette][0]
+                            backgroundColor: twoColorPalette[palette][0]
                           }
 
                           const colorTwo = {
-                            backgroundColor: pairedBarPalettes[palette][1]
+                            backgroundColor: twoColorPalette[palette][1]
                           }
 
                           return (
@@ -1941,9 +1939,9 @@ const EditorPanel = () => {
                               key={palette}
                               onClick={e => {
                                 e.preventDefault()
-                                updateConfig({ ...config, pairedBar: { ...config.pairedBar, palette } })
+                                updateConfig({ ...config, twoColor: { ...config.twoColor, palette } })
                               }}
-                              className={config.pairedBar.palette === palette ? 'selected' : ''}
+                              className={config.twoColor.palette === palette ? 'selected' : ''}
                             >
                               <span className='two-color' style={colorOne}></span>
                               <span className='two-color' style={colorTwo}></span>
