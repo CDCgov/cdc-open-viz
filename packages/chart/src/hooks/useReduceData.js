@@ -18,7 +18,6 @@ function useReduceData(config, data) {
   const getMaxValueFromData = () => {
     let max // will hold max number from data.
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && isBar)) && config.visualizationSubType === 'stacked') {
-
       const yTotals = data.reduce((allTotals, xValue) => {
         const totalYValues = config.runtime.seriesKeys.reduce((yTotal, k) => {
           yTotal += Number(xValue[k])
@@ -33,7 +32,7 @@ function useReduceData(config, data) {
       }, [])
 
       max = Math.max(...yTotals)
-    } else if (config.visualizationType === 'Bar' && config.series && config.series.dataKey) {
+    } else if ((config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.series && config.series.dataKey) {
       max = Math.max(...data.map(d => (isNumber(d[config.series.dataKey]) ? Number(cleanChars(d[config.series.dataKey])) : 0)))
       //max = Math.max(...data.map(d => Number(d[config.series.dataKey])))
     } else if (config.visualizationType === 'Combo' && config.visualizationSubType === 'stacked' && !isBar) {
