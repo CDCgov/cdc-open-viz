@@ -313,7 +313,18 @@ const EditorPanel = () => {
       return
     }
 
+    if ('table' === section && null === subsection) {
+      // set default for dataTable title without using useEffect
+      if (fieldName === "label" && (newValue === '' || newValue === undefined)) {
+        newValue = document.getElementById("tableLabel")?.getAttribute("placeholder")
+      }
+    }
+    
     if (null === section && null === subsection) {
+      // set default for title without using useEffect
+      if (fieldName === "title" && (newValue === '' || newValue === undefined)) {
+        newValue = document.getElementById("title")?.getAttribute("placeholder")
+      }
       let updatedConfig = { ...config, [fieldName]: newValue }
       enforceRestrictions(updatedConfig)
       updateConfig(updatedConfig)
@@ -759,31 +770,6 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
-  useEffect(() => {
-    if (config?.title === '' || config?.title === undefined) {
-      config.title = 'Chart Title'
-      updateField(null, null, 'title', 'Chart Title')
-      updateConfig({
-        ...config,
-        title: 'Chart Title'
-      })
-    }
-  }, [config.title])
-
-  useEffect(() => {
-    if (config.table?.label === '' || config.table?.label === undefined) {
-      config.table.label = 'Data Table'
-      updateField('table', null, 'label', 'Data Table')
-      updateConfig({
-        ...config,
-        table: {
-          ...config.table,
-          label: 'Data Table'
-        }
-      })
-    }
-  }, [config.table])
-
   const enabledChartTypes = [
     'Pie',
     'Line',
@@ -833,9 +819,12 @@ const EditorPanel = () => {
                   <TextField
                     value={config.title || 'Chart Title'}
                     fieldName='title'
+                    id='title'
                     label='Title'
                     placeholder='Chart Title'
+                    //defaultValue='Chart Title'
                     updateField={updateField}
+                    //onChange={handleTitleChange}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
@@ -2207,6 +2196,7 @@ const EditorPanel = () => {
                     updateField={updateField}
                     section='table'
                     fieldName='label'
+                    id='tableLabel'
                     label='Data Table Title'
                     placeholder='Data Table'
                     tooltip={

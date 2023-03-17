@@ -1104,6 +1104,21 @@ const EditorPanel = props => {
 
   const updateField = (section, subsection, fieldName, newValue) => {
     const isArray = Array.isArray(state[section])
+
+    // Set Map Title and Data Table Title defaults without using useEffect
+    if ('general' === section && null === subsection) {
+      // set default for title without using useEffect
+      if (fieldName === 'title' && (newValue === '' || newValue === undefined)) {
+        newValue = document.getElementById('title')?.getAttribute("placeholder")
+      }
+    }
+    if ('dataTable' === section && null === subsection) {
+      // set default for dataTable title without using useEffect
+      if (fieldName === "title" && (newValue === '' || newValue === undefined)) {
+        newValue = document.getElementById("dataTableTitle")?.getAttribute("placeholder")
+      }
+    }
+
     let sectionValue = isArray ? [...state[section], newValue] : { ...state[section], [fieldName]: newValue }
 
     if (null !== subsection) {
@@ -1117,7 +1132,7 @@ const EditorPanel = props => {
         }
       }
     }
-
+    
     let updatedState = {
       ...state,
       [section]: sectionValue
@@ -1276,34 +1291,6 @@ const EditorPanel = props => {
       setParentConfig(newConfig)
     }
   }, [state]) // eslint-disable-line
-
-    useEffect(() => {
-    if (general?.title === '' || general?.title === undefined) {
-      general.title = 'Map Title'
-      updateField(null, null, 'title', 'Map Title')
-      setState({
-        ...state,
-        general: {
-          ...state.general,
-          title: 'Map Title'
-        }
-      })
-    }
-  }, [general.title])
-
-    useEffect(() => {
-    if (dataTable?.title === '' || dataTable?.title === undefined) {
-      dataTable.title = 'Data Table'
-      updateField('dataTable', null, 'title', 'Data Table')
-      setState({
-        ...state,
-        dataTable: {
-          ...state.dataTable,
-          title: 'Data Table'
-        }
-      })
-    }
-    }, [general.dataTable])
   
   let numberOfItemsLimit = 8
 
@@ -1516,6 +1503,7 @@ const EditorPanel = props => {
                     updateField={updateField}
                     section='general'
                     fieldName='title'
+                    id='title'
                     label='Title'
                     placeholder='Map Title'
                     tooltip={
@@ -2372,6 +2360,7 @@ const EditorPanel = props => {
                       updateField={updateField}
                       section='dataTable'
                       fieldName='title'
+                      id='dataTableTitle'
                       label='Data Table Title'
                       placeholder='Data Table'
                       tooltip={
