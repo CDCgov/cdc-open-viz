@@ -20,7 +20,7 @@ import EditorPanels from './components/EditorPanels'
 import Chart from './components/Chart'
 
 // Styles
-import './scss/main.scss'
+// import './scss/old/main.scss'
 import './scss/cove-chart.scss'
 
 // Visualization

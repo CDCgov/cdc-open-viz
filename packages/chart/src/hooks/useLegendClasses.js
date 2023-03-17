@@ -1,14 +1,6 @@
 export default function useLegendClasses(config) {
   let containerClasses = ['cove-chart__legend-container']
 
-	// Legend Positioning
-	if (config.legend.position === "left") {
-		containerClasses.push('cove-chart__legend-container--left')
-	}
-	if (config.legend.position === "bottom") {
-		containerClasses.push('cove-chart__legend-container--bottom')
-	}
-
 	if(config.legend.position==='bottom' && config.legend.singleRow){
     containerClasses.push('cove-chart__legend-container--single-row')
 	}

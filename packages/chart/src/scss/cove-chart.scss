@@ -102,8 +102,17 @@
   flex-direction: column;
   margin-top: 0.5rem;
 
+  &.cove-chart__legend-container--single-row {
+    flex-direction: row;
+  }
+
   &.cove-chart__legend-container--reverse {
     flex-direction: column-reverse;
+  }
+
+  &.cove-chart__legend-container--reverse.cove-chart__legend-container--single-row {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
   }
 }
 
@@ -119,12 +128,21 @@
   }
 
   @at-root {
+
+    .cove-chart__legend-container--single-row:not(.cove-chart__legend-container--reverse) #{&}:not(:last-of-type) {
+      margin-right: 1rem !important; //Override visx
+    }
+
     .cove-chart__legend-container:not(.cove-chart__legend-container--reverse) #{&}:last-of-type {
       margin-bottom: 0 !important; //Override visx
     }
 
-    .cove-chart__legend-container.cove-chart__legend-container--reverse #{&}:first-of-type {
+    .cove-chart__legend-container--reverse #{&}:first-of-type {
       margin-bottom: 0 !important; //Override visx - reverse
+    }
+
+    .cove-chart__legend-container--single-row.cove-chart__legend-container--reverse #{&}:not(:first-of-type) {
+      margin-right: 1rem !important; //Override visx
     }
   }
 }

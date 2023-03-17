@@ -4,7 +4,6 @@ import produce from 'immer'
 // Third party
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
-import 'react-tooltip/dist/react-tooltip.css'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 // IE11

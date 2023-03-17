@@ -37,7 +37,7 @@
     "react-dnd": "^14.0.2",
     "react-dnd-html5-backend": "^14.0.0",
     "react-table": "^7.5.0",
-    "react-tooltip": "5.8.3",
+    "react-tooltip": "5.10.0",
     "use-debounce": "^6.0.1",
     "whatwg-fetch": "^3.6.2"
   },
