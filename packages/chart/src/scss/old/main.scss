@@ -1,7 +1,7 @@
-@import '@cdc/core/styles/v1/base';
-@import '@cdc/core/styles/v1/heading-colors';
-@import 'variables';
-@import '@cdc/core/styles/v2/themes/theme-colors';
+@import '../../../../../node_modules/@cdc/core/styles/v1/base';
+@import '../../../../../node_modules/@cdc/core/styles/v1/heading-colors';
+@import 'old/variables';
+@import '../../../../../node_modules/@cdc/core/styles/v2/themes/theme-colors';
 
 .form-container {
   overflow-y: auto;
@@ -15,8 +15,8 @@
 }
 
 .cdc-open-viz-module.type-chart {
-  @import 'DataTable';
-  @import 'editor-panel';
+  @import 'old/DataTable';
+  @import 'old/editor-panel';
 
   border-radius: 3px;
 
@@ -260,6 +260,7 @@
       flex-wrap: nowrap;
       flex-direction: column;
     }
+
     &.legend-hidden > svg {
       width: 100% !important;
     }

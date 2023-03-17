@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React from 'react'
 
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
@@ -11,13 +11,12 @@ import { MarkerArrow } from '@visx/marker'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 
 import useReduceData from '../hooks/useReduceData'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-import ConfigContext from '../ConfigContext'
-
-export default function SparkLine({ width: parentWidth, height: parentHeight }) {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, seriesHighlight, formatNumber, colorScale, handleChartAriaLabels } = useContext(ConfigContext)
+export default function SparkLine({ width: parentWidth, height: parentHeight, dimensions, parseDate, formatDate, seriesHighlight, formatNumber, colorScale, handleChartAriaLabels }) {
+  const { config } = useVisConfig()
   let width = parentWidth
-  const { minValue, maxValue } = useReduceData(config, data, ConfigContext)
+  const { minValue, maxValue } = useReduceData()
 
   const margin = { top: 5, right: 10, bottom: 10, left: 10 }
   const height = parentHeight
@@ -35,13 +34,12 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   const isMaxValid = Number(enteredMaxValue) >= Number(maxValue)
   const isMinValid = Number(enteredMinValue) <= Number(minValue)
 
-
   // REMOVE bad data points from the data set
   // Examples: NA, N/A, "1,234", "anystring"
   // - if you dont call this on data into LineGroup below, for example
   // then entire data series are removed because of the defined statement
   // i.e. if a series has any bad data points the entire series wont plot
-   const cleanData = (data, testing = false) => {
+  const cleanData = (data, testing = false) => {
     let cleanedup = []
     data.forEach(function (d, i) {
       let cleanedSeries = {}
@@ -63,11 +61,11 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
       cleanedup.push(cleanedSeries)
     })
     return cleanedup
-   }
+  }
 
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data, config.xAxis.dataKey);
+  const cleanedData = cleanData(config.data, config.xAxis.dataKey)
 
   if (cleanedData) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
@@ -153,7 +151,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
                       {formatNumber(d[seriesKey])}
                     </Text>
 
-                    {dataIndex + 1 !== data.length && (config.lineDatapointStyle === 'always show' || config.lineDatapointStyle === 'hover') && (
+                    {dataIndex + 1 !== config.data.length && (config.lineDatapointStyle === 'always show' || config.lineDatapointStyle === 'hover') && (
                       <circle
                         key={`${seriesKey}-${dataIndex}`}
                         r={circleRadii}

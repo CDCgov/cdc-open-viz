@@ -2,7 +2,12 @@
 @import "../../themes/theme-colors";
 
 .cove-guidance-block {
-  display: block;
+  display: grid;
+  grid-column-gap: 0;
+  grid-row-gap: 0;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+
   position: relative;
   padding: .75rem 1rem;
   margin-left: 5px;
@@ -55,19 +60,28 @@
 }
 
 .cove-guidance-block__icon {
-  display: block;
-  float: left;
-  height: 45px;
+  display: flex;
+  place-content: center;
+  grid-area: 1 / 1 / 3 / 3;
   margin-right: 1rem;
   color: #005eaa;
   aspect-ratio: 1/1;
+
+  > svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
 }
 
 .cove-guidance-block__header {
+  grid-area: 1 / 3 / 2 / 9;
   font-size: 1.125rem;
   font-weight: bold;
 }
 
 .cove-guidance-block__content {
+  grid-area: 2 / 3 / 3 / 9;
   font-size: .875rem;
 }

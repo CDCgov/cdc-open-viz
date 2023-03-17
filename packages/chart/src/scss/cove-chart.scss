@@ -1,0 +1,172 @@
+@import "@cdc/core/styles/v2/themes/theme-colors";
+@import "../../core/styles/v2/utils/breakpoints";
+
+.cove-chart {
+}
+
+.cove-chart__container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 1rem;
+
+  &.no-border {
+    .visx-group:not(.visx-axis) {
+      rect {
+        stroke: none;
+      }
+    }
+  }
+}
+
+.cove-chart__visualization {
+  flex: 1 1 auto;
+  font-size: 0.875rem;
+  overflow: visible;
+
+  .visx-linepath {
+    pointer-events: none;
+  }
+
+  circle {
+    opacity: 0;
+  }
+
+  > svg {
+    flex: 1 1 0;
+  }
+
+  @at-root {
+    .cove-chart__container {
+      &.legend-hidden .cove-chart__visualization {
+        width: 100% !important;
+      }
+
+      &.line--hover .cove-chart__visualization {
+        circle {
+          opacity: 0;
+        }
+
+        circle:hover {
+          opacity: 1;
+        }
+      }
+
+      &.line--always .cove-chart__visualization {
+        circle {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+.cove-chart__legend {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  align-self: start;
+  position: relative;
+  width: 100%;
+  padding: 0.75rem;
+  vertical-align: top;
+  background-color: #fff;
+  border: 1px solid $lightGray;
+  order: 1;
+
+  @at-root {
+    .cove-chart__container[legend-display="left"] #{&} {
+      order: -1;
+      margin-right: 2rem;
+    }
+
+    .cove-chart__container[legend-display="right"] #{&} {
+      margin-left: 2rem;
+    }
+
+    .cove-chart__container[legend-display="bottom"] #{&} {
+      width: 100%;
+      margin-top: 1.5rem
+    }
+
+    .cove-chart__container:not([legend-display="bottom"]) #{&} {
+      @include containerBreakpoint(md) {
+        width: 23%;
+      }
+    }
+  }
+}
+
+.cove-chart__legend-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+
+  &.cove-chart__legend-container--single-row {
+    flex-direction: row;
+  }
+
+  &.cove-chart__legend-container--reverse {
+    flex-direction: column-reverse;
+  }
+
+  &.cove-chart__legend-container--reverse.cove-chart__legend-container--single-row {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+  }
+}
+
+.cove-chart__legend-item {
+  align-items: flex-start !important; //Needed to override visx
+  margin-bottom: 0.25rem !important; //Needed to override visx
+  text-align: left;
+  user-select: none;
+  cursor: pointer;
+
+  &.cove-chart__legend-item--inactive {
+    opacity: .5;
+  }
+
+  @at-root {
+
+    .cove-chart__legend-container--single-row:not(.cove-chart__legend-container--reverse) #{&}:not(:last-of-type) {
+      margin-right: 1rem !important; //Override visx
+    }
+
+    .cove-chart__legend-container:not(.cove-chart__legend-container--reverse) #{&}:last-of-type {
+      margin-bottom: 0 !important; //Override visx
+    }
+
+    .cove-chart__legend-container--reverse #{&}:first-of-type {
+      margin-bottom: 0 !important; //Override visx - reverse
+    }
+
+    .cove-chart__legend-container--single-row.cove-chart__legend-container--reverse #{&}:not(:first-of-type) {
+      margin-right: 1rem !important; //Override visx
+    }
+  }
+}
+
+.cove-chart__legend__reset-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  min-height: unset;
+  padding: 0.375rem;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.1);
+  border: 0;
+  border-radius: 3px;
+
+  &:hover {
+    background: rgba(0, 0, 0, .15);
+  }
+}
+
+.cove-chart__visualization {
+  .visx-axis-bottom .bottom-axis > .visx-line {
+    shape-rendering: geometricprecision; //Resolve issue with bottom axis line disappearing at certain widths
+  }
+}

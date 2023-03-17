@@ -188,7 +188,7 @@ const Editor = ({ editorPanels, children }) => {
               </div>
               <div className="cove-editor__grid-caret--top" ref={componentContainerRef}>
                 <div className="cove-editor__grid-caret--bottom">
-                  {undefined === config?.newViz && config?.runtime && config?.runtime?.editorErrorMessage &&
+                  {undefined === config?.newViz && config?.runtime?.editorErrorMessage && config?.runtime?.editorErrorMessage.length > 0 &&
                     <SplashError title="Error With Configuration" message={config.runtime.editorErrorMessage}/>
                   }
                   {children}

@@ -1,14 +1,13 @@
-import React, { useContext, useEffect } from 'react'
-import ConfigContext from '../ConfigContext'
+import React, { useEffect } from 'react'
 import parse from 'html-react-parser'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendCircle from '@cdc/core/components/element/LegendCircle'
 
 import useLegendClasses from './../hooks/useLegendClasses'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-const Legend = () => {
-  const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
-
+const Legend = ({ legend, colorScale, seriesHighlight, setSeriesHighlight, highlight, highlightReset, dynamicLegendItems, setDynamicLegendItems, colorPalettes, currentViewport }) => {
+  const { config, updateVisConfigField } = useVisConfig()
   const { innerClasses, containerClasses } = useLegendClasses(config)
 
   useEffect(() => {
@@ -18,10 +17,10 @@ const Legend = () => {
 
     setSeriesHighlight(itemsToHighlight)
 
-    let colsToKeep = [...itemsToHighlight]
+    let colsToKeep = [ ...itemsToHighlight ]
     let tmpLabels = []
 
-    rawData.map(dataItem => {
+    config.data.map(dataItem => {
       let tmp = {}
       colsToKeep.map(col => {
         tmp[col] = isNaN(dataItem[col]) ? dataItem[col] : dataItem[col]
@@ -34,21 +33,17 @@ const Legend = () => {
     })
 
     if (dynamicLegendItems.length > 0) {
-      setConfig({
-        ...config,
-        runtime: {
-          ...config.runtime,
-          seriesKeys: colsToKeep,
-          seriesLabels: tmpLabels
-        }
+      updateVisConfigField('runtime', {
+        seriesKeys: colsToKeep,
+        seriesLabels: tmpLabels
       })
     }
-  }, [dynamicLegendItems])
+  }, [ dynamicLegendItems, setSeriesHighlight ])
 
   useEffect(() => {
     if (dynamicLegendItems.length === 0) {
       // loop through all labels and add keys
-      let resetSeriesNames = [...config.runtime.seriesLabelsAll]
+      let resetSeriesNames = [ ...config.runtime.seriesLabelsAll ]
       let tmpLabels = []
       config.runtime.seriesLabelsAll.map(item => {
         resetSeriesNames.map(col => {
@@ -56,16 +51,14 @@ const Legend = () => {
         })
       })
 
-      setConfig({
-        ...config,
-        runtime: {
-          ...config.runtime,
-          seriesKeys: config.runtime.seriesLabelsAll,
-          seriesLabels: tmpLabels
-        }
+      updateVisConfigField('runtime', {
+        seriesKeys: config.runtime.seriesLabelsAll,
+        seriesLabels: tmpLabels
       })
     }
-  }, [dynamicLegendItems])
+  }, [ config.runtime.seriesLabelsAll, dynamicLegendItems ])
+
+  // Dev Note: !!! DO NOT override legend position config based on viewport. Leave values as-is, and let the CSS handle it. !!!
 
   const removeDynamicLegendItem = label => {
     let newLegendItems = dynamicLegendItems.filter(item => item.text !== label.text)
@@ -74,7 +67,7 @@ const Legend = () => {
     setSeriesHighlight(newLegendItemsText)
   }
   const handleDynamicLegendChange = e => {
-    setDynamicLegendItems([...dynamicLegendItems, JSON.parse(e.target.value)])
+    setDynamicLegendItems([ ...dynamicLegendItems, JSON.parse(e.target.value) ])
   }
 
   const createLegendLabels = (data, defaultLabels) => {
@@ -106,33 +99,36 @@ const Legend = () => {
 
     return uniqeLabels
   }
-  // in small screens update config legend position.
-  useEffect(() => {
-    if (currentViewport === 'sm' || currentViewport === 'xs' || config.legend.position === 'left') {
-      setConfig({ ...config, legend: { ...config.legend, position: 'bottom' } })
-    }
-    setConfig({ ...config, legend: { ...config.legend, position: 'right' } })
-  }, [currentViewport])
 
   if (!legend) return
+
+  //TODO: Legend shouldn't be split into two separate returns - there's a lot of shared, top-level logic between the two; Need to tighten this section up and make it more readable
 
   if (!legend.dynamicLegend)
     return config.visualizationType !== 'Box Plot' ? (
       <aside
-        style={{ marginTop: config.legend.position === 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px', marginBottom: config.legend.position === 'bottom' ? '15px' : '0px' }}
-        id='legend'
-        className={containerClasses.join(' ')}
-        role='region'
-        aria-label='legend'
+        id="legend"
+        className="cove-chart__legend"
+        //TODO: Why are we inlining styles here? This should ideally be handled by CSS and conditional classes. If a calculated margin is absolutely necessary, can provide just a single override
+        // style={{ marginTop: config.legend.position === 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px', marginBottom: config.legend.position === 'bottom' ? '15px' : '0px' }}
+        role="region"
+        aria-label="legend"
         tabIndex={0}
       >
-        {legend.label && <h2>{parse(legend.label)}</h2>}
-        {legend.description && <p>{parse(legend.description)}</p>}
-        <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
-          {labels => (
-            <div className={innerClasses.join(' ')}>
-              {createLegendLabels(data, labels).map((label, i) => {
-                let className = 'legend-item'
+        {legend.label &&
+          <span className="cove-heading--4 mb-1">
+            {parse(legend.label)}
+          </span>
+        }
+
+        {legend.description &&
+          <p>{parse(legend.description)}</p>
+        }
+        <div className={containerClasses.join(' ')}>
+          <LegendOrdinal scale={colorScale} itemDirection="row" labelMargin="0 20px 0 0" shapeMargin="0 10px 0">
+            {labels => (<>
+              {createLegendLabels(config.data, labels).map((label, i) => {
+                let className = 'cove-chart__legend-item'
                 let itemName = label.datum
 
                 // Filter excluded data keys from legend
@@ -146,7 +142,7 @@ const Legend = () => {
                 }
 
                 if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                  className += ' inactive'
+                  className += ' cove-chart__legend-item--inactive'
                 }
 
                 return (
@@ -163,135 +159,146 @@ const Legend = () => {
                       highlight(label)
                     }}
                   >
-                    <LegendCircle fill={label.value} />
-                    <LegendLabel align='left' margin='0 0 0 4px'>
+                    <LegendCircle fill={label.value}/>
+                    <LegendLabel align="left" margin="0 0 0 4px">
                       {label.text}
                     </LegendLabel>
                   </LegendItem>
                 )
               })}
               {seriesHighlight.length > 0 && (
-                <button className={`legend-reset ${config.theme}`} onClick={labels => highlightReset(labels)} tabIndex={0}>
+                <button className="cove-chart__legend__reset-button" onClick={labels => highlightReset(labels)} tabIndex={0}>
                   Reset
                 </button>
               )}
-            </div>
-          )}
-        </LegendOrdinal>
+            </>)}
+          </LegendOrdinal>
+        </div>
       </aside>
     ) : (
-      <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
-        {config.boxplot.legend.displayHowToReadText && <h3>{config.boxplot.legend.howToReadText}</h3>}
+      <aside id="legend" className="cove-chart__legend" role="region" aria-label="legend" tabIndex={0}>
+        {config.boxplot.legend.displayHowToReadText &&
+          <h3>{config.boxplot.legend.howToReadText}</h3>
+        }
       </aside>
     )
+
   return (
     config.visualizationType !== 'Box Plot' && (
-      <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
-        {legend.label && <h2>{parse(legend.label)}</h2>}
+      <aside
+        id="legend"
+        className="cove-chart__legend"
+        role="region"
+        aria-label="legend"
+        tabIndex={0}
+      >
+        {legend.label && <h2 className="cove-heading--4 mb-1">{parse(legend.label)}</h2>}
         {legend.description && <p>{parse(legend.description)}</p>}
 
-        <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
-          {labels => {
-            if (
-              Number(config.legend.dynamicLegendItemLimit) > dynamicLegendItems.length && // legend items are less than limit
-              dynamicLegendItems.length !== config.runtime.seriesLabelsAll.length
-            ) {
-              // legend items are equal to series length
-              return (
-                <select className='dynamic-legend-dropdown' onChange={e => handleDynamicLegendChange(e)}>
-                  <option className={'all'} tabIndex={0} value={JSON.stringify({ text: config.legend.dynamicLegendDefaultText })}>
-                    {config.legend.dynamicLegendDefaultText}
-                  </option>
-                  {labels.map((label, i) => {
-                    let className = 'legend-item'
-                    let itemName = label.datum
-                    let inDynamicList = false
+        <div className={containerClasses.join(' ')}>
+          <LegendOrdinal scale={colorScale} itemDirection="row" labelMargin="0 20px 0 0" shapeMargin="0 10px 0">
+            {labels => {
+              if (
+                Number(config.legend.dynamicLegendItemLimit) > dynamicLegendItems.length && // legend items are less than limit
+                dynamicLegendItems.length !== config.runtime.seriesLabelsAll.length
+              ) {
+                // legend items are equal to series length
+                return (
+                  <select className="dynamic-legend-dropdown" onChange={e => handleDynamicLegendChange(e)}>
+                    <option className={'all'} tabIndex={0} value={JSON.stringify({ text: config.legend.dynamicLegendDefaultText })}>
+                      {config.legend.dynamicLegendDefaultText}
+                    </option>
+                    {labels.map((label, i) => {
+                      let className = 'cove-chart__legend-item'
+                      let itemName = label.datum
+                      let inDynamicList = false
 
-                    // Filter excluded data keys from legend
-                    if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-                      return
-                    }
-
-                    if (config.runtime.seriesLabels) {
-                      let index = config.runtime.seriesLabelsAll.indexOf(itemName)
-                      itemName = config.runtime.seriesKeys[index]
-                    }
-
-                    if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                      className += ' inactive'
-                    }
-
-                    dynamicLegendItems.map(listItem => {
-                      if (listItem.text === label.text) {
-                        inDynamicList = true
+                      // Filter excluded data keys from legend
+                      if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
+                        return
                       }
-                    })
 
-                    if (inDynamicList) return true
-                    let palette = colorPalettes[config.palette]
+                      if (config.runtime.seriesLabels) {
+                        let index = config.runtime.seriesLabelsAll.indexOf(itemName)
+                        itemName = config.runtime.seriesKeys[index]
+                      }
 
-                    label.value = palette[dynamicLegendItems.length]
+                      if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
+                        className += ' cove-chart__legend-item--inactive'
+                      }
 
-                    return (
-                      <option className={className} tabIndex={0} value={JSON.stringify(label)}>
+                      dynamicLegendItems.map(listItem => {
+                        if (listItem.text === label.text) {
+                          inDynamicList = true
+                        }
+                      })
+
+                      if (inDynamicList) return true
+                      let palette = colorPalettes[config.palette]
+
+                      label.value = palette[dynamicLegendItems.length]
+
+                      return (
+                        <option className={className} tabIndex={0} value={JSON.stringify(label)}>
+                          {label.text}
+                        </option>
+                      )
+                    })}
+                  </select>
+                )
+              } else {
+                return config.legend.dynamicLegendItemLimitMessage
+              }
+            }}
+          </LegendOrdinal>
+          <div className="dynamic-legend-list">
+            {dynamicLegendItems.map((label, i) => {
+              let className = [ 'cove-chart__legend-item' ]
+              let itemName = label.text
+              let palette = colorPalettes[config.palette]
+
+              // Filter excluded data keys from legend
+              if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
+                return
+              }
+
+              if (config.runtime.seriesLabels && !config.legend.dynamicLegend) {
+                let index = config.runtime.seriesLabelsAll.indexOf(itemName)
+                itemName = config.runtime.seriesKeys[index]
+              }
+
+              if (seriesHighlight.length > 0 && !seriesHighlight.includes(itemName)) {
+                className.push('cove-chart__legend-item--inactive')
+              }
+
+              if (seriesHighlight.length === 0 && config.legend.dynamicLegend) {
+                className.push('cove-chart__legend-item--inactive')
+              }
+
+              return (
+                <>
+                  <LegendItem className={className.join(' ')} tabIndex={0} key={`dynamic-legend-item-${i}`} alignItems="center">
+                    <button
+                      className="btn-wrapper"
+                      onClick={() => {
+                        highlight(label)
+                      }}
+                    >
+                      <LegendCircle fill={palette[i]} config={config}/>
+                      <LegendLabel align="space-between" margin="4px 0 0 4px">
                         {label.text}
-                      </option>
-                    )
-                  })}
-                </select>
+                      </LegendLabel>
+                    </button>
+                    <button onClick={() => removeDynamicLegendItem(label)}>x</button>
+                  </LegendItem>
+                </>
               )
-            } else {
-              return config.legend.dynamicLegendItemLimitMessage
-            }
-          }}
-        </LegendOrdinal>
-
-        <div className='dynamic-legend-list'>
-          {dynamicLegendItems.map((label, i) => {
-            let className = ['legend-item']
-            let itemName = label.text
-            let palette = colorPalettes[config.palette]
-
-            // Filter excluded data keys from legend
-            if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-              return
-            }
-
-            if (config.runtime.seriesLabels && !config.legend.dynamicLegend) {
-              let index = config.runtime.seriesLabelsAll.indexOf(itemName)
-              itemName = config.runtime.seriesKeys[index]
-            }
-
-            if (seriesHighlight.length > 0 && !seriesHighlight.includes(itemName)) {
-              className.push('inactive')
-            }
-
-            if (seriesHighlight.length === 0 && config.legend.dynamicLegend) {
-              className.push('inactive')
-            }
-
-            return (
-              <>
-                <LegendItem className={className.join(' ')} tabIndex={0} key={`dynamic-legend-item-${i}`} alignItems='center'>
-                  <button
-                    className='btn-wrapper'
-                    onClick={() => {
-                      highlight(label)
-                    }}
-                  >
-                    <LegendCircle fill={palette[i]} config={config} />
-                    <LegendLabel align='space-between' margin='4px 0 0 4px'>
-                      {label.text}
-                    </LegendLabel>
-                  </button>
-                  <button onClick={() => removeDynamicLegendItem(label)}>x</button>
-                </LegendItem>
-              </>
-            )
-          })}
+            })}
+          </div>
         </div>
+
         {seriesHighlight.length < dynamicLegendItems.length && (
-          <button className={`legend-reset legend-reset--dynamic ${config.theme}`} onClick={highlightReset} tabIndex={0}>
+          <button className="cove-chart__legend__reset-button" onClick={highlightReset} tabIndex={0}>
             Reset
           </button>
         )}

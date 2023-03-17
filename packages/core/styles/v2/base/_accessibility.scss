@@ -3,8 +3,8 @@
   outline: 2px solid rgba(255, 102, 1, 0.9);
 }
 
-.sr-only,
-.sr-only-focusable:not(:focus) {
+.cove-sr-only,
+.cove-sr-only-focusable:not(:focus) {
   position: absolute !important;
   width: 1px !important;
   height: 1px !important;

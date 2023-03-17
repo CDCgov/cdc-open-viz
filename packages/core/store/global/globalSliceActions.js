@@ -1,10 +1,10 @@
 const globalSliceActions = (set, get) => ({
   // Actions --------------------------------------------------------------------------------------------------------------------------------------------------------------
-  setViewMode: (view, value) => set((state) => ({
-    viewMode: {
-      ...state.viewMode,
-      [view]: value
-    }
+  setViewMode: (view, value) => set(state => {
+    state.viewMode[view] = value
+  }),
+  setViewport: (viewport) => set(() => ({
+    viewport: viewport
   })),
   setDimensions: (dimensions) => set(() => ({
     dimensions: dimensions

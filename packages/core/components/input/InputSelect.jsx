@@ -13,7 +13,7 @@ import Label from '../element/Label'
 // Styles
 import '../../styles/v2/components/input/index.scss'
 
-const InputSelect = memo((
+const InputSelect = (
   {
     label,
     options = [ '' ],
@@ -39,7 +39,7 @@ const InputSelect = memo((
   const configFieldValue = configField && getConfigKeyValue(configField, config)
 
   // Check initial value
-  const valueExistsOnConfig = Boolean(configFieldValue && typeof configFieldValue !== undefined)
+  const valueExistsOnConfig = !!(configFieldValue && typeof configFieldValue !== undefined)
 
   // Set initial value
   useEffect(() => {
@@ -54,9 +54,12 @@ const InputSelect = memo((
     // If either no initial option is set, or the option selected is not an initial value
     if (!isInitial(value)) {
       // Update a config field value, if configField array was supplied
-      if (configField && value !== configFieldValue) updateVisConfigField(configField, value)
+      if (configField && value !== configFieldValue) {
+        console.log('checking if the configField', configField, 'exists. If it does, we are making sure the value', value, ' isnt the same as the configFieldValue', configFieldValue)
+        updateVisConfigField(configField, value)
+      }
     }
-  }, [ configField, value, updateVisConfigField ])
+  }, [ configField, value ])
 
   const isInitial = (checkValue) => {
     return initial && (checkValue === initial || checkValue === '')
@@ -119,7 +122,7 @@ const InputSelect = memo((
       }
     </>
   )
-})
+}
 
 InputSelect.propTypes = {
   label: PropTypes.string,
@@ -140,4 +143,4 @@ InputSelect.propTypes = {
   onChange: PropTypes.func
 }
 
-export default InputSelect
+export default memo(InputSelect)

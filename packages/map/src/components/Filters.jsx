@@ -1,11 +1,12 @@
-import React, { useState, useContext } from 'react'
-import Context from './../context'
+import React, { useEffect, useRef, useState } from 'react'
 import Button from '@cdc/core/components/element/Button'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // TODO: Combine Charts/Maps Filters.js files
 const useFilters = () => {
-  const { state: config, setState: setConfig, runtimeFilters, setRuntimeFilters } = useContext(Context)
+  const { config, updateVisConfig } = useVisConfig()
   const [showApplyButton, setShowApplyButton] = useState(false)
+  const lastFiltersRef = useRef()
 
   const sortAsc = (a, b) => {
     return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
@@ -15,49 +16,50 @@ const useFilters = () => {
     return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
   }
 
-  const announceChange = text => { }
+  const announceChange = text => {}
+
+  useEffect(() => {
+    if (!lastFiltersRef.current) {
+      lastFiltersRef.current = config.filters
+    }
+  }, [config.filters, lastFiltersRef])
 
   const changeFilterActive = (index, value) => {
+    lastFiltersRef.current = config.filters
     let newFilters = config.filters
     newFilters[index].active = value
-    setRuntimeFilters(newFilters)
+    updateVisConfig({ filters: newFilters })
     setShowApplyButton(true)
   }
 
   const handleApplyButton = () => {
-    setConfig({ ...config, filters: runtimeFilters })
+    lastFiltersRef.current = null
     setShowApplyButton(false)
   }
 
-  const handleReset = (e) => {
+  const handleReset = e => {
     e.preventDefault()
-    let newFilters = runtimeFilters
-
-    // reset to first item in values array.
-    newFilters.map(filter => {
-      filter.active = filter.values[0]
-    })
-
-    setConfig({ ...config, filters: newFilters })
+    updateVisConfig({ filters: lastFiltersRef.current })
+    lastFiltersRef.current = null
   }
 
   return { announceChange, sortAsc, sortDesc, changeFilterActive, showApplyButton, handleReset, handleApplyButton }
 }
 
 export const Filters = () => {
-  const { runtimeFilters, state: config } = useContext(Context)
-  const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset } = useFilters()
+  const { config } = useVisConfig()
+  const { filters } = config
+
+  const { handleApplyButton, changeFilterActive, announceChange, showApplyButton, handleReset } = useFilters()
 
   const buttonText = 'Apply Filters'
   const resetText = 'Reset All'
 
-  const { filters } = config
-
   if (filters.length === 0) return false
 
-  const FilterList = ({ filters: runtimeFilters }) => {
-    if (runtimeFilters) {
-      return runtimeFilters.map((singleFilter, idx) => {
+  const FilterList = () => {
+    if (filters) {
+      return filters.map((singleFilter, idx) => {
         const values = []
 
         if (undefined === singleFilter.active) return null
@@ -96,12 +98,12 @@ export const Filters = () => {
   return (
     <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
       <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px' }}>
-        <FilterList filters={runtimeFilters} />
+        <FilterList />
         <div className='filter-section__buttons' style={{ width: '100%' }}>
           <Button onClick={handleApplyButton} disabled={!showApplyButton} style={{ marginRight: '10px' }}>
             {buttonText}
           </Button>
-          <a href='#!' role='button' onClick={handleReset}>
+          <a href='#' role='button' onClick={handleReset}>
             {resetText}
           </a>
         </div>

@@ -1,11 +1,10 @@
-import React, { useState, useContext } from 'react'
-import ConfigContext from './../ConfigContext'
+import React, { useState } from 'react'
 import Button from '@cdc/core/components/element/Button'
-import CoveHelper from '@cdc/core/helpers/cove'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 const useFilters = () => {
-  const { config, setConfig, filteredData, setFilteredData, excludedData, runtimeFilters } = useContext(ConfigContext)
-  const [showApplyButton, setShowApplyButton] = useState(false)
+  const { config, updateVisConfigField } = useVisConfig()
+  const [ showApplyButton, setShowApplyButton ] = useState(false)
 
   const sortAsc = (a, b) => {
     return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
@@ -15,21 +14,18 @@ const useFilters = () => {
     return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
   }
 
-  const announceChange = text => { }
+  const announceChange = text => {
+  }
 
   const changeFilterActive = (index, value) => {
     let newFilters = config.filters
     newFilters[index].active = value
-    setConfig({
-      ...config,
-      filters: newFilters
-    })
+    updateVisConfigField('filters', newFilters)
     setShowApplyButton(true)
   }
 
   const handleApplyButton = newFilters => {
-    setConfig({ ...config, filters: newFilters })
-    setFilteredData(CoveHelper.Data.filterData(newFilters, excludedData))
+    updateVisConfigField('filters', newFilters)
     setShowApplyButton(false)
   }
 
@@ -41,25 +37,24 @@ const useFilters = () => {
       filter.active = filter.values[0]
     })
 
-    setFilteredData(CoveHelper.Data.filterData(newFilters, excludedData))
-    setConfig({ ...config, filters: newFilters })
+    updateVisConfigField('filters', newFilters)
   }
 
   return { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset }
 }
 
 const Filters = () => {
-  const { config } = useContext(ConfigContext)
+  const { config } = useVisConfig()
   const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset } = useFilters()
-  const { filters } = config
+
   const buttonText = 'Apply Filters'
   const resetText = 'Reset All'
 
-  // A List of Dropdowns
-  const FilterList = () => {
+  const ActiveFiltersList = () => {
     if (config.filters) {
       return config.filters.map((singleFilter, index) => {
-        const values = []
+        console.log('singleFilter', singleFilter, 'index', index)
+        let dropdownOptions = []
 
         if (!singleFilter.order || singleFilter.order === '') {
           singleFilter.order = 'asc'
@@ -74,7 +69,7 @@ const Filters = () => {
         }
 
         singleFilter.values.forEach((filterOption, index) => {
-          values.push(
+          dropdownOptions.push(
             <option key={index} value={filterOption}>
               {filterOption}
             </option>
@@ -82,19 +77,19 @@ const Filters = () => {
         })
 
         return (
-          <div className='single-filter' key={index}>
+          <div className="single-filter" key={index}>
             <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
             <select
               id={`filter-${index}`}
-              className='filter-select'
-              data-index='0'
+              className="filter-select"
+              data-index="0"
               value={singleFilter.active}
               onChange={e => {
                 changeFilterActive(index, e.target.value)
                 announceChange(`Filter ${singleFilter.label} value has been changed to ${e.target.value}, please reference the data table to see updated values.`)
               }}
             >
-              {values}
+              {dropdownOptions}
             </select>
           </div>
         )
@@ -106,14 +101,14 @@ const Filters = () => {
 
   return (
     <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
-      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px' }}>
-        <FilterList />
+      <div className="filters-section__wrapper" style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px' }}>
+        <ActiveFiltersList/>
         {config.filters.length > 0 && (
-          <div className='filter-section__buttons' style={{ width: '100%' }}>
-            <Button onClick={() => handleApplyButton(filters)} disabled={!showApplyButton} style={{ marginRight: '10px' }}>
+          <div className="filter-section__buttons" style={{ width: '100%' }}>
+            <Button onClick={() => handleApplyButton(config.filters)} disabled={!showApplyButton} style={{ marginRight: '10px' }}>
               {buttonText}
             </Button>
-            <a href='#!' role='button' onClick={handleReset}>
+            <a href="#!" role="button" onClick={handleReset}>
               {resetText}
             </a>
           </div>

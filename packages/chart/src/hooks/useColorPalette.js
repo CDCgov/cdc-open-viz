@@ -6,14 +6,14 @@ const SEQUENTIAL_REVERSE = 'SEQUENTIAL_REVERSE'
 export const GET_PALETTE = 'GET_PALETTE'
 
 // create initial state
-const initialState = {
+const initialArgs = {
   filteredPallets: [],
   isPaletteReversed: false,
   filteredQualitative: [],
   paletteName: undefined
 }
 
-function reducer(state, action) {
+function paletteReducer(state, action) {
   const palletNamesArr = Object.keys(action.payload) // action.payload === colorPalettes object
   let paletteName = ''
   switch (action.type) {
@@ -35,16 +35,18 @@ function reducer(state, action) {
   }
 }
 
-function init(initialState) {
-  return initialState
+// Pass payload to reducer
+function init(payload) {
+  return payload
 }
 
 export function useColorPalette(colorPalettes, configState) {
-  const [state, dispatch] = useReducer(reducer, initialState, init)
+  const [state, dispatch] = useReducer(paletteReducer, initialArgs, init)
+
   const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative } = state
 
   useEffect(() => {
-    dispatch({ type: SEQUENTIAL, payload: colorPalettes })
+    dispatch({ type: 'SEQUENTIAL', payload: colorPalettes })
   }, [])
 
   useEffect(() => {

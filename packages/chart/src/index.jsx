@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom/client'
 
 import CdcChart from './CdcChart'
 
-import 'react-tooltip/dist/react-tooltip.css'
-
 let isEditor = window.location.href.includes('editor=true')
 
 let domContainer = document.getElementsByClassName('react-container')[0]

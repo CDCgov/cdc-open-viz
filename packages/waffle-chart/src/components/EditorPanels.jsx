@@ -1,8 +1,5 @@
 import React, { useEffect } from 'react'
 
-// Store
-import useStore from '@cdc/core/store/store'
-
 // Hooks
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
@@ -11,7 +8,8 @@ import CoveHelper from '@cdc/core/helpers/cove'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
-import PanelGlobal from '@cdc/core/components/editor/Panel.Global.jsx'
+import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.Filters'
+import PanelGlobal from '@cdc/core/components/editor/Panel.Global'
 import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
 import InputSelect from '@cdc/core/components/input/InputSelect'
 import InputText from '@cdc/core/components/input/InputText'
@@ -20,7 +18,6 @@ import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
 
 // Constants
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../data/consts'
-import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.Filters.jsx'
 
 const EditorPanels = () => {
   // Store Selectors

@@ -4,30 +4,33 @@ import parse from 'html-react-parser'
 
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/element/LegendCircle'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 const Sidebar = props => {
-  const { legend, runtimeFilters, columns, setAccessibleStatus, changeFilterActive, resetLegendToggles, runtimeLegend, setRuntimeLegend, prefix, suffix, viewport, displayDataAsText } = props
+  const { legend, columns, setAccessibleStatus, changeFilterActive, resetLegendToggles, prefix, suffix, viewport, displayDataAsText } = props
+  const { config, updateVisConfig } = useVisConfig()
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
-    const newValue = !runtimeLegend[i].disabled
+    const newValue = !config.legend[i].disabled
 
-    runtimeLegend[i].disabled = newValue // Toggle!
+    config.legend[i].disabled = newValue // Toggle!
 
-    let newLegend = [...runtimeLegend]
+    let newLegend = [...config.legend]
 
     newLegend[i].disabled = newValue
 
-    const disabledAmt = runtimeLegend.disabledAmt ?? 0
+    const disabledAmt = config.legend.disabledAmt ?? 0
 
     newLegend['disabledAmt'] = newValue ? disabledAmt + 1 : disabledAmt - 1
 
-    setRuntimeLegend(newLegend)
+    updateVisConfig({ legend: newLegend })
 
     setAccessibleStatus(`Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`)
   }
 
-  const legendList = runtimeLegend.map((entry, idx) => {
+  // TODO: this very suspicious -- austin
+  const legendList = Object.entries(config.legend).map(([, entry], idx) => {
     const entryMax = displayDataAsText(entry.max, 'primary')
 
     const entryMin = displayDataAsText(entry.min, 'primary')
@@ -35,7 +38,7 @@ const Sidebar = props => {
     let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
 
     // If interval, add some formatting
-    if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
+    if (legend.type === 'equalinterval' && idx !== config.legend.length - 1) {
       formattedText = `${entryMin} - < ${entryMax}`
     }
 
@@ -69,38 +72,6 @@ const Sidebar = props => {
     )
   })
 
-  const filtersList = runtimeFilters.map((singleFilter, idx) => {
-    const values = []
-
-    if (undefined === singleFilter.active) return null
-
-    singleFilter.values.forEach((filterOption, idx) => {
-      values.push(
-        <option key={idx} value={filterOption}>
-          {filterOption}
-        </option>
-      )
-    })
-
-    return (
-      <section className='filter-col' key={idx}>
-        {singleFilter.label?.length > 0 && <label htmlFor={`filter-${idx}`}>{singleFilter.label}</label>}
-        <select
-          id={`filter-${idx}`}
-          className='filter-select'
-          aria-label='select filter'
-          value={singleFilter.active}
-          onChange={val => {
-            changeFilterActive(idx, val.target.value)
-            setAccessibleStatus(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`)
-          }}
-        >
-          {values}
-        </select>
-      </section>
-    )
-  })
-
   const columnLogic = legend.position === 'side' && legend.singleColumn ? 'single-column' : legend.position === 'bottom' && legend.singleRow ? 'single-row' : ''
 
   const classNames = [`${legend.position}`, `${columnLogic}`, `cdcdataviz-sr-focusable`, `${viewport}`]
@@ -109,7 +80,7 @@ const Sidebar = props => {
     <ErrorBoundary component='Sidebar'>
       <aside id='legend' className={classNames.join(' ')} role='region' aria-label='Legend' tabIndex='0'>
         <section className='legend-section' aria-label='Map Legend'>
-          {runtimeLegend.disabledAmt > 0 && (
+          {config.legend.disabledAmt > 0 && (
             <button
               onClick={e => {
                 e.preventDefault()
@@ -124,7 +95,7 @@ const Sidebar = props => {
           {legend.title && <span className='heading-2'>{parse(legend.title)}</span>}
           {legend.dynamicDescription === false && legend.description && <p>{parse(legend.description)}</p>}
           {legend.dynamicDescription === true &&
-            runtimeFilters.map((filter, idx) => {
+            config.filters.map((filter, idx) => {
               const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
 
               // Do we have a custom description for this?

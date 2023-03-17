@@ -3,6 +3,7 @@ import React from 'react'
 // Third Party
 import html2pdf from 'html2pdf.js'
 import html2canvas from 'html2canvas'
+import { useVisConfig } from '../../hooks/store/useVisConfig'
 
 const buttonText = {
   pdf: 'Download PDF',
@@ -96,7 +97,8 @@ const Button = ({ state, text, type, title, elementToCapture }) => {
 }
 
 // Link to CSV/JSON data
-const Link = ({ config }) => {
+const Link = () => {
+  const { config } = useVisConfig()
   // Handles Maps & Charts
   if (config.dataFileSourceType === 'url' && config.dataFileName && config.table.showDownloadUrl) {
     return (
@@ -115,8 +117,8 @@ const Link = ({ config }) => {
 }
 
 // TODO: convert to standardized COVE section
-const Section = ({ children, classes }) => {
-  return <section className={classes.join(' ')}>{children}</section>
+const Section = ({ children, className }) => {
+  return <section className={className}>{children}</section>
 }
 
 const MediaControls = () => null

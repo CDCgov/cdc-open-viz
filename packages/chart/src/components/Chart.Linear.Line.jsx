@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
@@ -7,17 +7,34 @@ import { Text } from '@visx/text'
 
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import CoveHelper from '@cdc/core/helpers/cove'
-
-import ConfigContext from '../ConfigContext'
+import cleanData from '@cdc/core/helpers/data/cleanData'
 
 import useRightAxis from '../hooks/useRightAxis'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
-  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, cleanData, updateConfig } = useContext(ConfigContext)
+const ChartLinearLine = (
+  {
+    xScale,
+    yScale,
+    getXAxisData,
+    getYAxisData,
+    xMax,
+    yMax,
+    seriesStyle = 'Line',
+    colorPalettes,
+    colorScale,
+    seriesHighlight,
+    formatNumber,
+    formatDate,
+    parseDate
+  }
+) => {
+  const { config } = useVisConfig()
+
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data, config.xAxis.dataKey)
-  const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
+  const cleanedData = cleanData(config.data, config.xAxis.dataKey)
+  const { yScaleRight } = useRightAxis({ config, yMax, data: config.data })
 
   const handleLineType = lineType => {
     switch (lineType) {
@@ -33,7 +50,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   }
 
   const handleAxisFormating = (axis = 'left', label, value) => {
-    // if this is an x axis category/date value return without doing any formatting.
+    // if this is an x-axis category/date value, return without doing any formatting
     if (label === config.runtime.xAxis.label) return value
 
     axis = String(axis).toLocaleLowerCase()
@@ -129,8 +146,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey)
                     : // is dynamic legend
                     config.legend.dynamicLegend
-                      ? colorPalettes[config.palette][index]
-                      : '#000'// fallback
+                    ? colorPalettes[config.palette][index]
+                    : '#000' // fallback
                 }
                 strokeWidth={2}
                 strokeOpacity={1}
@@ -162,9 +179,9 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               {config.showLineSeriesLabels &&
                 (config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map(seriesKey => {
                   let lastDatum
-                  for (let i = data.length - 1; i >= 0; i--) {
-                    if (data[i][seriesKey]) {
-                      lastDatum = data[i]
+                  for (let i = config.data.length - 1; i >= 0; i--) {
+                    if (config.data[i][seriesKey]) {
+                      lastDatum = config.data[i]
                       break
                     }
                   }
@@ -190,3 +207,5 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     </ErrorBoundary>
   )
 }
+
+export default ChartLinearLine

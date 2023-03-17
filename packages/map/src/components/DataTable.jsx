@@ -9,39 +9,15 @@ import LegendCircle from '@cdc/core/components/element/LegendCircle'
 import MediaControls from '@cdc/core/components/ui/MediaControls'
 
 import Loading from '@cdc/core/components/loader/Loading'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 const DataTable = props => {
-  const {
-    state,
-    tableTitle,
-    indexTitle,
-    mapTitle,
-    rawData,
-    showDownloadImgButton,
-    showDownloadPdfButton,
-    showDownloadButton,
-    runtimeData,
-    runtimeLegend,
-    headerColor,
-    expandDataTable,
-    columns,
-    displayDataAsText,
-    applyLegendToRow,
-    displayGeoName,
-    navigationHandler,
-    viewport,
-    formatLegendLocation,
-    tabbingId,
-    setFilteredCountryCode,
-    innerContainerRef,
-    imageRef
-  } = props
-
+  const { tableTitle, indexTitle, mapTitle, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
+  const { config } = useVisConfig()
+  const { data } = config
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
-
-  const [ready, setReady] = useState(false)
 
   const fileName = `${mapTitle || 'data-table'}.csv`
 
@@ -150,7 +126,7 @@ const DataTable = props => {
   )
 
   const DownloadButton = memo(() => {
-    const csvData = Papa.unparse(rawData)
+    const csvData = Papa.unparse(data)
 
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
 
@@ -167,7 +143,7 @@ const DataTable = props => {
         Download Data (CSV)
       </a>
     )
-  }, [rawData])
+  }, [data])
 
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {
@@ -179,15 +155,15 @@ const DataTable = props => {
           Header: columns[column].label ? columns[column].label : columns[column].name,
           id: column,
           accessor: row => {
-            if (runtimeData) {
-              if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
-                for (let i = 0; i < state.legend.specialClasses.length; i++) {
-                  if (String(runtimeData[row][state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
-                    return state.legend.specialClasses[i].label
+            if (data) {
+              if (config.legend.specialClasses && config.legend.specialClasses.length && typeof config.legend.specialClasses[0] === 'object') {
+                for (let i = 0; i < config.legend.specialClasses.length; i++) {
+                  if (String(data[row][config.legend.specialClasses[i].key]) === config.legend.specialClasses[i].value) {
+                    return config.legend.specialClasses[i].label
                   }
                 }
               }
-              return runtimeData[row][columns[column].name] ?? null
+              return data[row][columns[column].name] ?? null
             }
 
             return null
@@ -198,11 +174,11 @@ const DataTable = props => {
         if (column === 'geo') {
           newCol.Header = indexTitle || 'Location'
           newCol.Cell = ({ row, value }) => {
-            const rowObj = runtimeData[row.original]
+            const rowObj = data[row.original]
 
             const legendColor = applyLegendToRow(rowObj)
 
-            if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
+            if (config.general.geoType !== 'us-county' || config.general.type === 'us-geocode') {
               var labelValue = displayGeoName(row.original)
             } else {
               var labelValue = formatLegendLocation(row.original)
@@ -232,14 +208,14 @@ const DataTable = props => {
     })
 
     return newTableColumns
-  }, [indexTitle, columns, runtimeData, getCellAnchor, displayDataAsText, applyLegendToRow, customSort, displayGeoName, state.legend.specialClasses])
+  }, [indexTitle, columns, data, getCellAnchor, displayDataAsText, applyLegendToRow, customSort, displayGeoName, config.legend.specialClasses])
 
   const tableData = useMemo(
     () =>
-      Object.keys(runtimeData)
-        .filter(key => applyLegendToRow(runtimeData[key]))
+      Object.keys(data)
+        .filter(key => applyLegendToRow(data[key]))
         .sort((a, b) => customSort(a, b)),
-    [runtimeData, applyLegendToRow, customSort]
+    [data, applyLegendToRow, customSort]
   )
 
   // Change accessibility label depending on expanded status
@@ -278,12 +254,11 @@ const DataTable = props => {
   const rand = Math.random().toString(16).substr(2, 8)
   const skipId = `btn__${rand}`
 
-  if (!state.data) return <Loading />
   return (
     <ErrorBoundary component='DataTable'>
       <MediaControls.Section classes={['download-links']}>
-        <MediaControls.Link config={state} />
-        {state.general.showDownloadButton && <DownloadButton />}
+        <MediaControls.Link />
+        {config.general.showDownloadButton && <DownloadButton />}
       </MediaControls.Section>
       <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
         <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
@@ -301,12 +276,12 @@ const DataTable = props => {
             }
           }}
         >
-          <Icon display={expanded ? 'minus' : 'plus'} base/>
+          <Icon display={expanded ? 'minus' : 'plus'} base />
           {tableTitle}
         </div>
-        <div className='table-container' style={{ maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' }}>
-          <table height={expanded ? null : 0} {...getTableProps()} aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={state?.data.length ? state.data.length : '-1'}>
-            <caption className='cdcdataviz-sr-only'>{state.dataTable.caption ? state.dataTable.caption : `Datatable showing data for the ${mapLookup[state.general.geoType]} figure.`}</caption>
+        <div className='table-container' style={{ maxHeight: config.dataTable.limitHeight && `${config.dataTable.height}px`, overflowY: 'scroll' }}>
+          <table height={expanded ? null : 0} {...getTableProps()} aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={config?.data.length ? config.data.length : '-1'}>
+            <caption className='cdcdataviz-sr-only'>{config.dataTable.caption ? config.dataTable.caption : `Datatable showing data for the ${mapLookup[config.general.geoType]} figure.`}</caption>
             <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>
               {headerGroups.map(headerGroup => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
@@ -343,7 +318,7 @@ const DataTable = props => {
                   <tr {...row.getRowProps()} role='row'>
                     {row.cells.map(cell => {
                       return (
-                        <td tabIndex='0' {...cell.getCellProps()} role='gridcell' onClick={e => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world' ? setFilteredCountryCode(cell.row.original) : true)}>
+                        <td tabIndex='0' {...cell.getCellProps()} role='gridcell' onClick={e => (config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? setFilteredCountryCode(cell.row.original) : true)}>
                           {cell.render('Cell')}
                         </td>
                       )

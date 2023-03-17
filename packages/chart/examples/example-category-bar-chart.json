@@ -1,0 +1,188 @@
+{
+  "type": "chart",
+  "title": "Categorical Bar Chart",
+  "theme": "theme-blue",
+  "animate": true,
+  "fontSize": "medium",
+  "lineDatapointStyle": "hover",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "rounded",
+  "roundingStyle": "shallow",
+  "tipRounding": "top",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "75",
+    "gridLines": true,
+    "min": "",
+    "max": "4200000",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 50,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "",
+    "label": "Y-Axis Example Label"
+  },
+  "boxplot": [],
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": "0.54",
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 750
+  },
+  "xAxis": {
+    "type": "categorical",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": true,
+    "size": "54",
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 65,
+    "dataKey": "Location",
+    "label": "X-Axis Example Label"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "show": true
+  },
+  "orientation": "vertical",
+  "legend": {
+    "behavior": "isolate",
+    "position": "right",
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "Sample Groups"
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
+  "labels": false,
+  "dataFormat": {
+    "commas": true,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": true
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true
+  },
+  "datasets": {},
+  "visualizationType": "Bar",
+  "data": [
+    {
+      "Location": "Vehicle",
+      "Group A": "1000000",
+      "Group B": "1500000",
+      "Group C": "4000000"
+    },
+    {
+      "Location": "Home",
+      "Group A": "1200000",
+      "Group B": "1400000",
+      "Group C": "3000000"
+    },
+    {
+      "Location": "Work",
+      "Group A": "2300000",
+      "Group B": "1000000",
+      "Group C": "2000000"
+    },
+    {
+      "Location": "Office",
+      "Group A": "1200000",
+      "Group B": "3200000",
+      "Group C": "1000000"
+    }
+  ],
+  "formattedData": [
+    {
+      "Location": "Vehicle",
+      "Group A": "1000000",
+      "Group B": "1500000",
+      "Group C": "4000000"
+    },
+    {
+      "Location": "Home",
+      "Group A": "1200000",
+      "Group B": "1400000",
+      "Group C": "3000000"
+    },
+    {
+      "Location": "Work",
+      "Group A": "2300000",
+      "Group B": "1000000",
+      "Group C": "2000000"
+    },
+    {
+      "Location": "Office",
+      "Group A": "1200000",
+      "Group B": "3200000",
+      "Group C": "1000000"
+    }
+  ],
+  "dataDescription": {
+    "horizontal": false,
+    "series": true,
+    "singleRow": true
+  },
+  "series": [
+    {
+      "dataKey": "Group A",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Group B",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Group C",
+      "type": "Bar"
+    }
+  ],
+  "description": "This example shows a Standard Categorical (Non-Time-Based) Bar Chart created in the visualization editor in WCMS"
+}

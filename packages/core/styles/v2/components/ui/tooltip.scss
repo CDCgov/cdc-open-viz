@@ -44,6 +44,8 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
   }
 }
 
+$react-tooltip-show-class-prefix: 'react-tooltip__show';
+
 .cove-tooltip__content {
   max-width: 280px;
   padding: 10px 8px;
@@ -63,7 +65,7 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    &.cove-tooltip__content--animated[class*='styles-module_show__'] {
+    &.cove-tooltip__content--animated[class*=#{$react-tooltip-show-class-prefix}] {
       animation: tooltip-btt $cove-tooltip-animation;
     }
   }
@@ -73,7 +75,7 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
       box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.15), -4px 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    &.cove-tooltip__content--animated[class*='styles-module_show__'] {
+    &.cove-tooltip__content--animated[class*=#{$react-tooltip-show-class-prefix}] {
       animation: tooltip-ltr $cove-tooltip-animation;
     }
   }
@@ -83,7 +85,7 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
       box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.15), 0 8px 8px rgba(0, 0, 0, 0.1);
     }
 
-    &.cove-tooltip__content--animated[class*='styles-module_show__'] {
+    &.cove-tooltip__content--animated[class*=#{$react-tooltip-show-class-prefix}] {
       animation: tooltip-ttb $cove-tooltip-animation;
     }
   }
@@ -93,7 +95,7 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
       box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15), 4px 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    &.cove-tooltip__content--animated[class*='styles-module_show__'] {
+    &.cove-tooltip__content--animated[class*=#{$react-tooltip-show-class-prefix}] {
       animation: tooltip-rtl $cove-tooltip-animation;
     }
   }

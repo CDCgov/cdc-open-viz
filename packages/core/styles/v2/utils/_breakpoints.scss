@@ -1,6 +1,14 @@
-// Breakpoint Classes
+@mixin containerBreakpoint($class) {
+  @if $class == xs {@container (min-width: 480px) { @content; }}
+  @else if $class == sm {@container (min-width: 768px) { @content; }}
+  @else if $class == md {@container (min-width: 960px) { @content; }}
+  @else if $class == lg {@container (min-width: 1170px) { @content; }}
+  @else if $class == xl {@container (min-width: 1280px) { @content; }}
+  @else {@warn "Breakpoint mixin supports: xs, sm, md, lg, xl";}
+}
+
 @mixin breakpoint($class) {
-  @if $class == xs {@media (max-width: 767.98px) { @content; }}
+  @if $class == xs {@media (min-width: 480px) { @content; }}
   @else if $class == sm {@media (min-width: 768px) { @content; }}
   @else if $class == md {@media (min-width: 960px) { @content; }}
   @else if $class == lg {@media (min-width: 1170px) { @content; }}

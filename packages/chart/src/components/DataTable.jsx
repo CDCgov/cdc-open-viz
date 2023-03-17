@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
@@ -7,19 +7,30 @@ import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/element/LegendCircle'
 import Icon from '@cdc/core/components/ui/Icon'
 
-import ConfigContext from '../ConfigContext'
-
 import MediaControls from '@cdc/core/components/ui/MediaControls'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext(ConfigContext)
+import '@cdc/core/styles/v2/components/element/data-table.scss'
+
+const DataTable = (
+  {
+    colorScale,
+    parseDate,
+    formatDate,
+    formatNumber: numberFormatter,
+    colorPalettes,
+    imageId
+  }
+) => {
+  const { config } = useVisConfig()
 
   // Debugging.
   // if (config.visualizationType === 'Box Plot') return null
 
+  const [ tableExpanded, setTableExpanded ] = useState(config.table.expanded)
+  const [ accessibilityLabel, setAccessibilityLabel ] = useState('')
+
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
-  const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
-  const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
   const DownloadButton = ({ data }, type) => {
     const fileName = `${config.title.substring(0, 50)}.csv`
@@ -29,97 +40,90 @@ export default function DataTable() {
     const saveBlob = () => {
       //@ts-ignore
       if (typeof window.navigator.msSaveBlob === 'function') {
-        const dataBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+        const dataBlob = new Blob([ csvData ], { type: 'text/csv;charset=utf-8;' })
         //@ts-ignore
         window.navigator.msSaveBlob(dataBlob, fileName)
       }
     }
 
-    switch (type) {
-      case 'download':
-        return (
-          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
-            Download Data (CSV)
-          </a>
-        )
-      default:
-        return (
-          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`no-border`}>
-            Download Data (CSV)
-          </a>
-        )
-    }
+    return (
+      <a
+        className={(type === 'download' ? 'btn btn-download ' : '') + 'no-border'}
+        href={`data:text/csv;base64,${Base64.encode(csvData)}`}
+        download={fileName}
+        onClick={saveBlob}
+        aria-label="Download this data in a CSV file format."
+      >
+        Download Data (CSV)
+      </a>
+    )
   }
 
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {
-    const newTableColumns =
-      config.visualizationType === 'Pie'
-        ? []
-        : config.visualizationType === 'Box Plot'
-          ? [
-            {
-              Header: 'Measures',
-              Cell: props => {
-                const resolveName = () => {
-                  let {
-                    boxplot: { labels }
-                  } = config
-                  const columnLookup = {
-                    columnMean: labels.mean,
-                    columnMax: labels.maximum,
-                    columnMin: labels.minimum,
-                    columnIqr: labels.iqr,
-                    columnCategory: 'Category',
-                    columnMedian: labels.median,
-                    columnFirstQuartile: labels.q1,
-                    columnThirdQuartile: labels.q3,
-                    columnOutliers: labels.outliers,
-                    values: labels.values,
-                    columnCount: labels.count,
-                    columnSd: 'Standard Deviation',
-                    nonOutlierValues: 'Non Outliers'
-                  }
-
-                  let resolvedName = columnLookup[props.row.original[0]]
-
-                  return resolvedName
-                }
-
-                return resolveName()
+    const newTableColumns = config.visualizationType === 'Pie'
+      ? []
+      : config.visualizationType === 'Box Plot'
+        ? [ {
+          Header: 'Measures',
+          Cell: props => {
+            const resolveName = () => {
+              let {
+                boxplot: { labels }
+              } = config
+              const columnLookup = {
+                columnMean: labels.mean,
+                columnMax: labels.maximum,
+                columnMin: labels.minimum,
+                columnIqr: labels.iqr,
+                columnCategory: 'Category',
+                columnMedian: labels.median,
+                columnFirstQuartile: labels.q1,
+                columnThirdQuartile: labels.q3,
+                columnOutliers: labels.outliers,
+                values: labels.values,
+                columnCount: labels.count,
+                columnSd: 'Standard Deviation',
+                nonOutlierValues: 'Non Outliers'
               }
+
+              let resolvedName = columnLookup[props.row.original[0]]
+
+              return resolvedName
             }
-          ]
-          : [
-            {
-              Header: '',
-              Cell: ({ row }) => {
-                const seriesLabel = config.runtime.seriesLabels ? config.runtime.seriesLabels[row.original] : row.original
-                return (
-                  <>
-                    {config.visualizationType !== 'Pie' && (
-                      <LegendCircle
-                        fill={
-                          // non-dynamic leged
-                          !config.legend.dynamicLegend
-                            ? colorScale(seriesLabel)
-                            : // dynamic legend
-                            config.legend.dynamicLegend
-                              ? colorPalettes[config.palette][row.index]
-                              : // fallback
-                              '#000'
-                        }
-                      />
-                    )}
-                    <span>{seriesLabel}</span>
-                  </>
-                )
-              },
-              id: 'series-label'
-            }
-          ]
+
+            return resolveName()
+          }
+        } ]
+        : [ {
+          Header: '',
+          Cell: ({ row }) => {
+            const seriesLabel = config.runtime.seriesLabels ? config.runtime.seriesLabels[row.original] : row.original
+            return (
+              <>
+                {config.visualizationType !== 'Pie' && (
+                  <LegendCircle
+                    fill={
+                      // non-dynamic leged
+                      !config.legend.dynamicLegend
+                        ? colorScale(seriesLabel)
+                        : // dynamic legend
+                        config.legend.dynamicLegend
+                          ? colorPalettes[config.palette][row.index]
+                          : // fallback
+                          '#000'
+                    }
+                  />
+                )}
+                <span>{seriesLabel}</span>
+              </>
+            )
+          },
+          id: 'series-label'
+        } ]
+
     if (config.visualizationType !== 'Box Plot') {
-      data.forEach((d, index) => {
+      config.data.forEach((d, index) => {
         const resolveTableHeader = () => {
           if (config.runtime[section].type === 'date') return formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
           return d[config.runtime.originalXAxis.dataKey]
@@ -162,21 +166,22 @@ export default function DataTable() {
           canSort: false
         }
 
-        newTableColumns.push(newCol)
+        return newTableColumns.push(newCol)
       })
     }
 
     return newTableColumns
-  }, [config, colorScale])
+  }, [ config.data, config.visualizationType, config.runtime.originalXAxis, config.runtime.seriesLabels, colorScale ])
 
   // prettier-ignore
   const tableData = useMemo(() => (
     config.visualizationType === 'Pie'
-      ? [config.yAxis.dataKey]
+      ? [ config.yAxis.dataKey ]
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])
-        : config.runtime.seriesKeys),
-    [config.runtime.seriesKeys])
+        : config.runtime.seriesKeys
+
+  ), [ config.runtime.seriesKeys ])
 
   // Change accessibility label depending on expanded status
   useEffect(() => {
@@ -191,7 +196,7 @@ export default function DataTable() {
       setAccessibilityLabel(collapsedLabel)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tableExpanded])
+  }, [ tableExpanded ])
 
   const defaultColumn = useMemo(
     () => ({
@@ -202,18 +207,30 @@ export default function DataTable() {
     []
   )
 
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
+    {
+      columns: tableColumns,
+      data: tableData,
+      defaultColumn
+    },
+    useSortBy,
+    useBlockLayout,
+    useResizeColumns
+  )
+
   return (
-    <ErrorBoundary component='DataTable'>
-      <MediaControls.Section classes={['download-links']}>
-        <MediaControls.Link config={config} />
-        {config.table.download && <DownloadButton data={rawData} type='link' />}
+    <ErrorBoundary component="DataTable">
+      <MediaControls.Section classes={[ 'download-links' ]}>
+        <MediaControls.Link config={config}/>
+        {config.table.download &&
+          <DownloadButton data={config.data} type="link"/>
+        }
       </MediaControls.Section>
 
-      <section id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
+      <section id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`cove-data-table`} aria-label={accessibilityLabel}>
         <div
-          role='button'
-          className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}
+          role="button"
+          className={`cove-data-table__table-heading${!tableExpanded ? ' cove-data-table--collapsed' : ''}`}
           tabIndex={0}
           onClick={() => {
             setTableExpanded(!tableExpanded)
@@ -224,83 +241,110 @@ export default function DataTable() {
             }
           }}
         >
-          <Icon display={tableExpanded ? 'minus' : 'plus'} base/>
           {config.table.label}
         </div>
-        <div className='table-container' hidden={!tableExpanded} style={{ maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>
-          <table className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} {...getTableProps()} aria-rowcount={config?.series?.length ? config?.series?.length : '-1'}>
-            <caption className='cdcdataviz-sr-only'>{config.table.caption ? config.table.caption : ''}</caption>
-            <caption className='visually-hidden'>{config.table.label}</caption>
+
+        <div
+          className="cove-data-table__table-wrapper"
+          hidden={!tableExpanded}
+          style={{ maxHeight: config.table.limitHeight ? `${config.table.height}px` : ``, overflowY: 'scroll' }}>
+
+          <table
+            className={`cove-data-table__table${!tableExpanded ? 'cove-sr-only' : ''}`}
+            aria-rowcount={config?.series?.length ? config?.series?.length : '-1'}
+            {...getTableProps()}
+          >
+            <caption className="cove-sr-only">{config.table.caption ? config.table.caption : ''}</caption>
+            <caption className="cove-sr-only">{config.table.label}</caption>
             <thead>
-              {headerGroups.map((headerGroup, index) => (
-                <tr {...headerGroup.getHeaderGroupProps()} key={`headerGroups--${index}`}>
-                  {headerGroup.headers.map((column, index) => (
-                    <th
-                      tabIndex='0'
-                      title={column.Header}
-                      key={`trth--${index}`}
-                      role='columnheader'
-                      scope='col'
-                      {...column.getHeaderProps(column.getSortByToggleProps())}
-                      className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : 'sort'}
-                      {...(column.isSorted ? (column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' }) : null)}
-                    >
-                      {index === 0 ? (config.table.indexLabel ? config.table.indexLabel : column.render('Header')) : column.render('Header')}
-                      <button>
-                        <span className='cdcdataviz-sr-only'>{`Sort by ${typeof column.render('Header') === 'string' ? column.render('Header').toLowerCase() : column.render('Header')} in ${column.isSorted ? (column.isSortedDesc ? 'descending' : 'ascending') : 'no'} `} order</span>
-                      </button>
-                      <div {...column.getResizerProps()} className='resizer' />
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-              {rows.map((row, index) => {
-                prepareRow(row)
-                return (
-                  <tr {...row.getRowProps()} key={`tbody__tr-${index}`} className={`row-${String(config.visualizationType).replace(' ', '-')}--${index}`}>
-                    {row.cells.map((cell, index) => {
-                      return (
-                        <td tabIndex='0' {...cell.getCellProps()} key={`tbody__tr__td-${index}`} role='gridcell'>
-                          {cell.render('Cell')}
-                        </td>
-                      )
-                    })}
+              {headerGroups.map(
+                (headerGroup, index) => (
+                  <tr {...headerGroup.getHeaderGroupProps()} key={`headerGroups--${index}`}>
+                    {headerGroup.headers.map((column, index) => (
+                      <th
+                        tabIndex="0"
+                        title={column.Header}
+                        key={`trth--${index}`}
+                        role="columnheader"
+                        scope="col"
+                        {...column.getHeaderProps(column.getSortByToggleProps())}
+                        className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : 'sort'}
+                        {...(column.isSorted ? (column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' }) : null)}
+                      >
+                        {index === 0 ? (config.table.indexLabel ? config.table.indexLabel : column.render('Header')) : column.render('Header')}
+                        <button className="cove-sr-only">
+                          <span className="cove-sr-only">{`Sort by ${typeof column.render('Header') === 'string' ? column.render('Header').toLowerCase() : column.render('Header')} in ${column.isSorted ? (column.isSortedDesc ? 'descending' : 'ascending') : 'no'} `} order</span>
+                        </button>
+                        <div {...column.getResizerProps()} className="resizer"/>
+                      </th>
+                    ))}
                   </tr>
                 )
-              })}
+              )}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {rows.map(
+                (row, index) => {
+                  prepareRow(row)
+                  return (
+                    <tr {...row.getRowProps()}
+                        className={`row-${String(config.visualizationType).replace(' ', '-')}--${index}`}
+                        key={`tbody__tr-${index}`}
+                    >
+                      {row.cells.map(
+                        (cell, index) => {
+                          return (
+                            <td
+                              tabIndex="0" {...cell.getCellProps()}
+                              role="gridcell"
+                              key={`tbody__tr__td-${index}`}
+                            >
+                              {cell.render('Cell')}
+                            </td>
+                          )
+                        }
+                      )}
+                    </tr>
+                  )
+                }
+              )}
             </tbody>
           </table>
-          {config.regions && config.regions.length > 0 ? (
-            <table className='region-table data-table'>
-              <caption className='visually-hidden'>Table of the highlighted regions in the visualization</caption>
-              <thead>
+
+          {config.regions && config.regions.length > 0
+            ? (
+              <table className="region-table data-table">
+                <caption className="visually-hidden">Table of the highlighted regions in the visualization</caption>
+                <thead>
                 <tr>
                   <th>Region Name</th>
                   <th>Start Date</th>
                   <th>End Date</th>
                 </tr>
-              </thead>
-              <tbody>
-                {config.regions.map((region, index) => {
-                  if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+                </thead>
+                <tbody>
+                {config.regions.map(
+                  (region, index) => {
+                    if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-                  return (
-                    <tr key={`row-${region.label}--${index}`}>
-                      <td>{region.label}</td>
-                      <td>{formatDate(parseDate(region.from))}</td>
-                      <td>{formatDate(parseDate(region.to))}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          ) : (
-            ''
-          )}
+                    return (
+                      <tr key={`row-${region.label}--${index}`}>
+                        <td>{region.label}</td>
+                        <td>{formatDate(parseDate(region.from))}</td>
+                        <td>{formatDate(parseDate(region.to))}</td>
+                      </tr>
+                    )
+                  }
+                )}
+                </tbody>
+              </table>
+            )
+            : ('')
+          }
         </div>
       </section>
     </ErrorBoundary>
   )
 }
+
+export default DataTable
