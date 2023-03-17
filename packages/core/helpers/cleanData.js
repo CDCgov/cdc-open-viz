@@ -18,7 +18,8 @@ export default function cleanData (data, excludeKey, testing = false) {
     let cleanedupData = []
     if (testing) console.log('## Data to clean=', data)
     if (excludeKey === undefined) {
-      excludeKey = "Date"  // have a default value
+      console.log('COVE: cleanData excludeKey undefined')
+      return data // because no excludeKey 
     }
     data.forEach(function (d, i) {
       if (testing) console.log("clean", i, " d", d);
