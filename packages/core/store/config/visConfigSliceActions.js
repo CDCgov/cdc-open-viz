@@ -30,6 +30,7 @@ const visConfigSliceActions = (set, get) => ({
       // Dashboard or Visualization Standalone
       if (merge) {
         set(state => {
+          console.log('attempting to set', fieldPayload, 'to ', setValue)
           state.visualizations[key] = _merge(state.visualizations[key], setConfigKeyValue(fieldPayload, setValue))
         })
       } else {

@@ -33,7 +33,6 @@ const ChartLinear = chartProps => {
     dimensions,
     parseDate,
     formatDate,
-    currentViewport,
     formatNumber,
     handleChartAriaLabels
   } = chartProps
@@ -68,8 +67,9 @@ const ChartLinear = chartProps => {
   }, [ dataRef?.isIntersecting, config.animate ])
 
   let [ width ] = dimensions
-  if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && (currentViewport === 'lg' || currentViewport === 'md')) {
-    width = width * 0.73
+  if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom') {
+    // If width reaches a certain point, reduce the width of the chart to compensate for the legend
+    width = width >= 926 ? width * 0.73 : width
   }
 
   const { horizontal: heightHorizontal } = config.heights

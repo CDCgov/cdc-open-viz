@@ -1,5 +1,5 @@
 export const COVE_BREAKPOINTS = [
-  '360',  // xxs (mobile)
+  '360',  // xxs (mobile) 0 - 360
   '480',  // xs
   '768',  // sm
   '960',  // md

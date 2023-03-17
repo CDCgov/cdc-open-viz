@@ -1,28 +1,24 @@
 export default function useLegendClasses(config) {
-  let containerClasses = ['legend-container']
-  let innerClasses = ['legend-container__inner']
+  let containerClasses = ['cove-chart__legend-container']
 
 	// Legend Positioning
 	if (config.legend.position === "left") {
-		containerClasses.push('left')
+		containerClasses.push('cove-chart__legend-container--left')
 	}
 	if (config.legend.position === "bottom") {
-		containerClasses.push('bottom')
-		innerClasses.push('bottom')
+		containerClasses.push('cove-chart__legend-container--bottom')
 	}
 
 	if(config.legend.position==='bottom' && config.legend.singleRow){
-		innerClasses.push('single-row')
+    containerClasses.push('cove-chart__legend-container--single-row')
 	}
 
   // Legend > Item Ordering
   if (config.legend.reverseLabelOrder) {
-    innerClasses.push('d-flex')
-    innerClasses.push('flex-column-reverse')
+    containerClasses.push('cove-chart__legend-container--reverse')
   }
 
   return {
-    containerClasses,
-    innerClasses
+    containerClasses
   }
 }

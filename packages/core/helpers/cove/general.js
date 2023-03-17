@@ -1,6 +1,11 @@
 export function getViewport(size) {
-  const viewports = { 'xxs': 360, 'xs': 480, 'sm': 768, 'md': 960, 'lg': 1170, 'xl': 1280 }
-
-  for (let viewport in viewports)
-    if (size >= viewports[viewport]) return viewport
+  const breakpoints = { xl: 1280, lg: 1170, md: 960, sm: 768, xs: 480, xxs: 360 }
+  let output = 'xxs'
+  for (let breakpoint in breakpoints) {
+    if (size >= breakpoints[breakpoint]) {
+      output = breakpoint
+      break
+    }
+  }
+  return output
 }

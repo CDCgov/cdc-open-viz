@@ -6,6 +6,9 @@ import PropTypes from 'prop-types'
 // Store
 import useStore from '../../store/store'
 
+// Helpers
+import CoveHelper from '@cdc/core/helpers/cove'
+
 // Components - Core
 import Editor from '../editor/Editor'
 import Overlay from '../ui/Overlay'
@@ -14,10 +17,19 @@ import Overlay from '../ui/Overlay'
 import '../../styles/v2/main.scss'
 
 const View = ({ editorPanels, isPreview, children }) => {
-  // Store Selectors
-  const { viewMode, setViewMode } = useStore()
+  // Global Store Selectors
+  const { viewMode, setViewMode, setViewport } = useStore()
 
   const winLocation = window.location.href
+
+  useEffect(() => {
+    const viewportObserver = new ResizeObserver((entries) => {
+      const { width } = entries[0].contentRect;
+      setViewport(CoveHelper.General.getViewport(width))
+    });
+    viewportObserver.observe(document.documentElement);
+    return () => viewportObserver.disconnect();
+  }, []);
 
   useEffect(() => {
     if (winLocation.includes('editor=true')) setViewMode('isEditor', true)

@@ -33,9 +33,6 @@ import Filters from './Filters'
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
 
-// Styles
-import 'react-tooltip/dist/react-tooltip.css'
-
 // Primary Components
 const SparkLine = lazy(() => import ('./SparkLine'))
 const ChartPie = lazy(() => import ('./Chart.Pie'))
@@ -52,7 +49,6 @@ const CdcChart = ({ hostname, link }) => {
     })
   )
   const [ seriesHighlight, setSeriesHighlight ] = useState([])
-  const [ currentViewport, setCurrentViewport ] = useState('lg')
   const [ dimensions, setDimensions ] = useState([])
   const [ container, setContainer ] = useState()
   const [ coveLoadedEventRan, setCoveLoadedEventRan ] = useState(false)
@@ -108,17 +104,6 @@ const CdcChart = ({ hostname, link }) => {
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-      let newViewport = CoveHelper.General.getViewport(width)
-      let svgMarginWidth = 32
-
-      setCurrentViewport(newViewport)
-
-      if (entry.target.dataset.lollipop === 'true') {
-        width = width - 2.5
-      }
-
-      width = width - svgMarginWidth
-
       setDimensions([ width, height ])
     }
   })
@@ -407,7 +392,6 @@ const CdcChart = ({ hostname, link }) => {
     seriesHighlight,
     colorScale,
     dimensions,
-    currentViewport,
     parseDate,
     formatDate,
     formatNumber,

@@ -1,5 +1,5 @@
 @import "@cdc/core/styles/v2/themes/theme-colors";
-@import "@cdc/core/styles/v2/utils/breakpoints";
+@import "../../core/styles/v2/utils/breakpoints";
 
 .cove-chart {
 }
@@ -38,14 +38,6 @@
   }
 
   @at-root {
-    .cove-chart__container[legend-display="left"] #{&} {
-      order: 1;
-    }
-
-    .cove-chart__container[legend-display="right"] #{&} {
-      order: 0;
-    }
-
     .cove-chart__container {
       &.legend-hidden .cove-chart__visualization {
         width: 100% !important;
@@ -77,34 +69,40 @@
   position: relative;
   width: 100%;
   padding: 0.75rem;
-  text-align: center;
   vertical-align: top;
   background-color: #fff;
   border: 1px solid $lightGray;
   order: 1;
 
-  @include containerBreakpoint(md) {
-    width: 23%;
-  }
-
-  /*@include breakpoint(md) {
-    width: 23%;
-    margin-left: 1rem;
-    order: 2;
-
-    &[flow="left"] {
-      margin-right: 1rem;
-      margin-left: 0;
-      order: 0;
+  @at-root {
+    .cove-chart__container[legend-display="left"] #{&} {
+      order: -1;
+      margin-right: 2rem;
     }
-  }*/
+
+    .cove-chart__container[legend-display="right"] #{&} {
+      margin-left: 2rem;
+    }
+
+    .cove-chart__container[legend-display="bottom"] #{&} {
+      width: 100%;
+      margin-top: 1.5rem
+    }
+
+    .cove-chart__container:not([legend-display="bottom"]) #{&} {
+      @include containerBreakpoint(md) {
+        width: 23%;
+      }
+    }
+  }
 }
 
 .cove-chart__legend-container {
   display: flex;
   flex-direction: column;
+  margin-top: 0.5rem;
 
-  &.reverse {
+  &.cove-chart__legend-container--reverse {
     flex-direction: column-reverse;
   }
 }
@@ -116,16 +114,16 @@
   user-select: none;
   cursor: pointer;
 
-  &.inactive {
+  &.cove-chart__legend-item--inactive {
     opacity: .5;
   }
 
   @at-root {
-    .cove-chart__legend-container:not(.reverse) #{&}:last-of-type {
+    .cove-chart__legend-container:not(.cove-chart__legend-container--reverse) #{&}:last-of-type {
       margin-bottom: 0 !important; //Override visx
     }
 
-    .cove-chart__legend-container.reverse #{&}:first-of-type {
+    .cove-chart__legend-container.cove-chart__legend-container--reverse #{&}:first-of-type {
       margin-bottom: 0 !important; //Override visx - reverse
     }
   }
@@ -141,6 +139,8 @@
   text-transform: uppercase;
   color: rgba(0, 0, 0, 0.6);
   background-color: rgba(0, 0, 0, 0.1);
+  border: 0;
+  border-radius: 3px;
 
   &:hover {
     background: rgba(0, 0, 0, .15);

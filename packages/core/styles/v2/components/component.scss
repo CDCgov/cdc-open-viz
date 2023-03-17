@@ -28,6 +28,7 @@ $componentBorderRadius: 3px;
   height: auto;
   border-radius: $componentBorderRadius;
   overflow: hidden;
+  container-type: inline-size;
 
   @at-root .cove-component[data-accent] #{&} {
     transition: border-color 200ms ease;
@@ -44,7 +45,6 @@ $componentBorderRadius: 3px;
   border-bottom-style: solid;
   border-bottom-color: #d2d2d2;
   transition: background-color 200ms ease, border-color 200ms ease;
-
 
   .cove-tooltip {
     position: absolute;

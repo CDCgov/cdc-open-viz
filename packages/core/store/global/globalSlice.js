@@ -15,6 +15,7 @@ const globalSlice = (set, get) => ({
     show: false,
     disableBgClose: false
   },
+  viewport: 'lg',
   dimensions: null,
 
   ...globalSliceActions(set, get),

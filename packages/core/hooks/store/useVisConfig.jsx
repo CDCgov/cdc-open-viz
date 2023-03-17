@@ -18,11 +18,13 @@ ConfigContext.displayName = 'VisualizationConfig'
 export const VisConfigProvider = ({ visualizationKey = '__default__', config: configObj, configUrl, children, defaultConfig, transformConfig } = {}) => {
   const [ loading, setLoading ] = useState(false)
 
+  // Config Store Selectors
   const addVisConfig = useStore(state => state.addVisConfig)
   const updateVisConfig = useStore(state => state.updateVisConfig)
   const storedConfig = useStore(state => state.visualizations[visualizationKey])
   const dashboardStoredConfig = useStore(state => state.visualizations['__default__']?.visualizations?.[visualizationKey])
 
+  // Data Store Selectors
   const getData = useStore(state => state.getData)
 
   const finalConfig = useCallback(() => {
