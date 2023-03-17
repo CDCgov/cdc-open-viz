@@ -37,7 +37,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
     if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
       updateField(section, subsection, fieldName, debouncedValue)
     }
-  }, [debouncedValue])
+  }, [debouncedValue]) // eslint-disable-line
 
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
 
@@ -65,19 +65,18 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend } = props
+  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend, changeFilterActive } = props
 
   const { general, columns, legend, dataTable, tooltips } = state
 
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
 
-  const [configTextboxValue, setConfigTextbox] = useState({})
+  const [configTextboxValue, setConfigTextbox] = useState({})  // eslint-disable-line
 
   const [loadedDefault, setLoadedDefault] = useState(false)
 
   const [displayPanel, setDisplayPanel] = useState(true)
 
-  const [advancedToggle, setAdvancedToggle] = useState(false)
 
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
@@ -97,6 +96,27 @@ const EditorPanel = props => {
         categoryValuesOrder
       }
     })
+  }
+
+  let specialClasses = []
+  if (legend.specialClasses && legend.specialClasses.length && typeof legend.specialClasses[0] === 'string') {
+    legend.specialClasses.forEach(specialClass => {
+      specialClasses.push({
+        key: state.columns.primary && state.columns.primary.name ? state.columns.primary.name : columnsInData[0],
+        value: specialClass,
+        label: specialClass
+      })
+    })
+    // DEV-3303 - since the above was a repair of bad config - need to backpopulate into the state
+    setState({
+      ...state,
+      legend: {
+        ...state.legend,
+        specialClasses: specialClasses
+      }
+    })
+  } else {
+    specialClasses = legend.specialClasses || []
   }
 
   const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
@@ -125,7 +145,7 @@ const EditorPanel = props => {
       if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
         handleEditorChanges('changeLegendDescription', [String(activeFilterValueForDescription), debouncedValue])
       }
-    }, [debouncedValue])
+    }, [debouncedValue]) // eslint-disable-line
 
     const onChange = e => setValue(e.target.value)
 
@@ -575,6 +595,15 @@ const EditorPanel = props => {
           }
         })
         break
+      case 'legendShowSpecialClassesLast':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            showSpecialClassesLast: !state.legend.showSpecialClassesLast
+          }
+        })
+        break
       case 'dynamicDescription':
         setState({
           ...state,
@@ -679,12 +708,12 @@ const EditorPanel = props => {
         break
       case 'territoriesAlwaysShow':
         setState({
-            ...state,
-            general: {
-              ...state.general,
-              territoriesAlwaysShow: value
-            }
-          })
+          ...state,
+          general: {
+            ...state.general,
+            territoriesAlwaysShow: value
+          }
+        })
         break
       default:
         console.warn(`Did not recognize editor property.`)
@@ -693,7 +722,6 @@ const EditorPanel = props => {
   }
 
   const columnsRequiredChecker = useCallback(() => {
-    console.info('Running columns required check.')
     let columnList = []
 
     // Geo is always required
@@ -726,10 +754,9 @@ const EditorPanel = props => {
 
   const editColumn = async (columnName, editTarget, value) => {
     let newSpecialClasses
-
     switch (editTarget) {
       case 'specialClassEdit':
-        newSpecialClasses = Array.from(legend.specialClasses)
+        newSpecialClasses = Array.from(specialClasses)
 
         newSpecialClasses[value.index][value.prop] = value.value
 
@@ -742,7 +769,7 @@ const EditorPanel = props => {
         })
         break
       case 'specialClassDelete':
-        newSpecialClasses = Array.from(legend.specialClasses)
+        newSpecialClasses = Array.from(specialClasses)
 
         newSpecialClasses.splice(value, 1)
 
@@ -755,7 +782,7 @@ const EditorPanel = props => {
         })
         break
       case 'specialClassAdd':
-        newSpecialClasses = legend.specialClasses
+        newSpecialClasses = specialClasses
 
         newSpecialClasses.push(value)
 
@@ -970,7 +997,7 @@ const EditorPanel = props => {
     setLoadedDefault(state.defaultData)
 
     columnsRequiredChecker()
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   useEffect(() => {
     //If a categorical map is used and the order is either not defined or incorrect, fix it
@@ -1004,7 +1031,7 @@ const EditorPanel = props => {
         })
       }
     }
-  }, [runtimeLegend])
+  }, [runtimeLegend]) // eslint-disable-line
 
   // if no state choice by default show alabama
   useEffect(() => {
@@ -1020,7 +1047,7 @@ const EditorPanel = props => {
         }
       })
     }
-  }, [])
+  }, []) // eslint-disable-line
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1029,7 +1056,7 @@ const EditorPanel = props => {
   ]
 
   columnsInData.map(colName => {
-    columnsOptions.push(
+    return columnsOptions.push(
       <option value={colName} key={colName}>
         {colName}
       </option>
@@ -1047,19 +1074,6 @@ const EditorPanel = props => {
       }
     })
   })
-
-  let specialClasses = []
-  if (legend.specialClasses && legend.specialClasses.length && typeof legend.specialClasses[0] === 'string') {
-    legend.specialClasses.forEach(specialClass => {
-      specialClasses.push({
-        key: state.columns.primary && state.columns.primary.name ? state.columns.primary.name : columnsInData[0],
-        value: specialClass,
-        label: specialClass
-      })
-    })
-  } else {
-    specialClasses = legend.specialClasses || []
-  }
 
   const additionalColumns = Object.keys(state.columns).filter(value => {
     const defaultCols = ['geo', 'navigate', 'primary', 'latitude', 'longitude']
@@ -1160,6 +1174,7 @@ const EditorPanel = props => {
             value={filter.order}
             onChange={e => {
               changeFilter(index, 'filterOrder', e.target.value)
+              changeFilterActive(index, filter.values[0])
             }}
           >
             {filterOptions.map((option, index) => {
@@ -1234,7 +1249,7 @@ const EditorPanel = props => {
     const formattedData = JSON.stringify(parsedData, undefined, 2)
 
     setConfigTextbox(formattedData)
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   useEffect(() => {
     // Pass up to Editor if needed
@@ -1242,7 +1257,7 @@ const EditorPanel = props => {
       const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   let numberOfItemsLimit = 8
 
@@ -2083,6 +2098,17 @@ const EditorPanel = props => {
                         <span className='edit-label'>Single Row Legend</span>
                       </label>
                     )}
+                    {/* always show */}
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={legend.showSpecialClassesLast}
+                        onChange={event => {
+                          handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Show Special Classes Last</span>
+                    </label>
                     {'category' !== legend.type && (
                       <label className='checkbox'>
                         <input type='checkbox' checked={legend.separateZero || false} onChange={event => handleEditorChanges('separateZero', event.target.checked)} />

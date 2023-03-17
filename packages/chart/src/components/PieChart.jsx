@@ -35,7 +35,6 @@ export default function PieChart() {
     const element = document.querySelector('.isEditor')
     if (element) {
       // parent element is visible
-      console.log('setAnimation')
       setAnimatePie(prevState => true)
     }
   })
@@ -50,7 +49,7 @@ export default function PieChart() {
 
 
   function AnimatedPie({ arcs, path, getKey }) {
-    const transitions = useTransition( arcs, getKey,
+    const transitions = useTransition(arcs, getKey,
       {
         from: enterUpdateTransition,
         enter: enterUpdateTransition,
