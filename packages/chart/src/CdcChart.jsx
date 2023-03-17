@@ -3,6 +3,9 @@ import React, { Suspense } from 'react'
 // Hooks
 import { VisConfigProvider } from '@cdc/core/hooks/store/useVisConfig'
 
+// Runtime
+import { transformCdcChartConfig } from './runtime'
+
 // Data
 import defaults from './data/initial-state'
 
@@ -19,7 +22,6 @@ import Chart from './components/Chart'
 // Styles
 import './scss/main.scss'
 import './scss/cove-chart.scss'
-import { transformCdcChartConfig } from './runtime'
 
 // Visualization
 const CdcChart = visProps => {

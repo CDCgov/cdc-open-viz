@@ -7,11 +7,28 @@ import { Text } from '@visx/text'
 
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import CoveHelper from '@cdc/core/helpers/cove'
+import cleanData from '@cdc/core/helpers/data/cleanData'
 
 import useRightAxis from '../hooks/useRightAxis'
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line', colorPalettes, colorScale, seriesHighlight, formatNumber, formatDate, parseDate, cleanData }) {
+const ChartLinearLine = (
+  {
+    xScale,
+    yScale,
+    getXAxisData,
+    getYAxisData,
+    xMax,
+    yMax,
+    seriesStyle = 'Line',
+    colorPalettes,
+    colorScale,
+    seriesHighlight,
+    formatNumber,
+    formatDate,
+    parseDate
+  }
+) => {
   const { config } = useVisConfig()
 
   // Just do this once up front otherwise we end up
@@ -33,7 +50,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   }
 
   const handleAxisFormating = (axis = 'left', label, value) => {
-    // if this is an x axis category/date value return without doing any formatting.
+    // if this is an x-axis category/date value, return without doing any formatting
     if (label === config.runtime.xAxis.label) return value
 
     axis = String(axis).toLocaleLowerCase()
@@ -190,3 +207,5 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     </ErrorBoundary>
   )
 }
+
+export default ChartLinearLine

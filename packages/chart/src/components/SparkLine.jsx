@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React from 'react'
 
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'

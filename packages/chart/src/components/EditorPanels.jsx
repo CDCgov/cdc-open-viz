@@ -5,7 +5,6 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import produce from 'immer'
 
 // Hooks
-import { useColorPalette } from '../hooks/useColorPalette'
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
@@ -851,7 +850,7 @@ const EditorPanels = () => {
             <>
               {config.xAxis.type === 'categorical' && (
                 <>
-                  {config.exclusions.keys.length > 0 && (
+                  {config.exclusions.keys && config.exclusions.keys.length > 0 && (
                     <>
                       <SectionWrapper label="Excluded Keys">
                         <ExclusionsList/>

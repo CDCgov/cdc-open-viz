@@ -1,70 +1,77 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { Suspense, useState, useEffect, useCallback, lazy } from 'react'
 
-import Papa from 'papaparse'
-import produce from 'immer'
-
-// IE11
+// IE11 - Deprecate ASAP
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 
-// External Libraries
+// Third Party
 import { scaleOrdinal } from '@visx/scale'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
-import { timeParse, timeFormat } from 'd3-time-format'
+
 import { format } from 'd3-format'
-import parse from 'html-react-parser'
+import { timeParse, timeFormat } from 'd3-time-format'
 import { Base64 } from 'js-base64'
-import 'react-tooltip/dist/react-tooltip.css'
+import Papa from 'papaparse'
+import parse from 'html-react-parser'
+import produce from 'immer'
 
-// Primary Components
-import PieChart from './PieChart'
-import LinearChart from './LinearChart'
+// Hooks
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
+// Data
 import { colorPalettesChart as colorPalettes, pairedBarPalettes } from '@cdc/core/data/colorPalettes'
 
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+// Components - Core
+import MediaControls from '@cdc/core/components/ui/MediaControls'
+import RenderFallback from '@cdc/core/components/loader/RenderFallback'
 
-import SparkLine from './SparkLine'
+// Components - Local
 import Legend from './Legend'
 import DataTable from './DataTable'
 import Filters from './Filters'
-import MediaControls from '@cdc/core/components/ui/MediaControls'
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
 
-import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+// Styles
+import 'react-tooltip/dist/react-tooltip.css'
 
+// Primary Components
+const SparkLine = lazy(() => import ('./SparkLine'))
+const ChartPie = lazy(() => import ('./Chart.Pie'))
+const ChartLinear = lazy(() => import ('./Chart.Linear'))
 
-export default function CdcChart({ hostname, link }) {
-  const { config, updateVisConfig, updateVisConfigField } = useVisConfig()
+// Visualization
+const CdcChart = ({ hostname, link }) => {
+  const { config, updateVisConfigField } = useVisConfig()
 
-  const [colorScale, setColorScale] = useState(() =>
+  const [ colorScale, setColorScale ] = useState(() =>
     scaleOrdinal({
       domain: config.runtime.seriesLabelsAll,
-      range: config.palette
+      range: config.customColors || colorPalettes[config.palette]
     })
   )
-  const [seriesHighlight, setSeriesHighlight] = useState([])
-  const [currentViewport, setCurrentViewport] = useState('lg')
-  const [dimensions, setDimensions] = useState([])
-  const [container, setContainer] = useState()
-  const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
-  const [dynamicLegendItems, setDynamicLegendItems] = useState([])
-  const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [ seriesHighlight, setSeriesHighlight ] = useState([])
+  const [ currentViewport, setCurrentViewport ] = useState('lg')
+  const [ dimensions, setDimensions ] = useState([])
+  const [ container, setContainer ] = useState()
+  const [ coveLoadedEventRan, setCoveLoadedEventRan ] = useState(false)
+  const [ dynamicLegendItems, setDynamicLegendItems ] = useState([])
+  const [ imageId ] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
 
   // Destructure items from config for more readable JSX
-  const { legend, title, description, visualizationType } = config
-  const { barBorderClass, lineDatapointClass, contentClasses, innerContainerClasses, sparkLineStyles } = useDataVizClasses(config)
+  const { legend, description, visualizationType } = config
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
   const handleChartAriaLabels = (state, testing = false) => {
     try {
-      if (!state.visualizationType) throw Error('handleChartAriaLabels: no visualization type found in state')
+      if (!state.visualizationType)
+        throw Error('handleChartAriaLabels: no visualization type found in state')
+
       let ariaLabel = ''
 
       if (state.visualizationType) {
@@ -95,9 +102,7 @@ export default function CdcChart({ hostname, link }) {
       } else {
         return 0
       }
-    },
-    [config.sortData, config.visualizationSubType, config.visualizationType, config.xAxis.dataKey, config.yAxis.sortKey]
-  )
+    }, [ config.sortData, config.visualizationSubType, config.visualizationType, config.xAxis.dataKey, config.yAxis.sortKey ])
 
   // Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
@@ -114,15 +119,12 @@ export default function CdcChart({ hostname, link }) {
 
       width = width - svgMarginWidth
 
-      setDimensions([width, height])
+      setDimensions([ width, height ])
     }
   })
 
   const outerContainerRef = useCallback(node => {
-    if (node !== null) {
-      resizeObserver.observe(node)
-    }
-
+    if (node !== null) resizeObserver.observe(node)
     setContainer(node)
   }, [])
 
@@ -138,7 +140,7 @@ export default function CdcChart({ hostname, link }) {
       CoveHelper.Event.publish('cove_loaded', { config: config })
       setCoveLoadedEventRan(true)
     }
-  }, [container, config])
+  }, [ container, config ])
 
   /**
    * Handles filter change events outside of COVE
@@ -157,7 +159,7 @@ export default function CdcChart({ hostname, link }) {
     return () => {
       CoveHelper.Event.unsubscribe('cove_filterData', handleFilterData)
     }
-  }, [config, updateVisConfigField])
+  }, [ config, updateVisConfigField ])
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
@@ -186,7 +188,7 @@ export default function CdcChart({ hostname, link }) {
     if (config && config.sortData) {
       updateVisConfigField('data', config.data.sort(sortData))
     }
-  }, [sortData, updateVisConfigField])
+  }, [ sortData, updateVisConfigField ])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = label => {
@@ -234,7 +236,7 @@ export default function CdcChart({ hostname, link }) {
   const parseDate = dateString => {
     let date = timeParse(config.runtime[section].dateParseFormat)(dateString)
     if (!date) {
-      updateVisConfigField(['runtime', 'editorErrorMessage'], produce(config, draft => {
+      updateVisConfigField([ 'runtime', 'editorErrorMessage' ], produce(config, draft => {
         draft.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
       }))
       return new Date()
@@ -254,20 +256,20 @@ export default function CdcChart({ hostname, link }) {
 
     const saveBlob = () => {
       if (typeof window.navigator.msSaveBlob === 'function') {
-        const dataBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+        const dataBlob = new Blob([ csvData ], { type: 'text/csv;charset=utf-8;' })
         window.navigator.msSaveBlob(dataBlob, fileName)
       }
     }
 
     if (type === 'download') {
       return (
-        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
+        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label="Download this data in a CSV file format." className={`btn btn-download no-border`}>
           Download Data (CSV)
         </a>
       )
     } else {
       return (
-        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn no-border`}>
+        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label="Download this data in a CSV file format." className={`btn no-border`}>
           Download Data (CSV)
         </a>
       )
@@ -275,7 +277,7 @@ export default function CdcChart({ hostname, link }) {
   }
 
   // function calculates the width of given text and its font-size
-  function getTextWidth(text, font) {
+  const getTextWidth = (text, font) => {
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
 
@@ -373,13 +375,13 @@ export default function CdcChart({ hostname, link }) {
 
   // Select appropriate chart type
   const chartComponents = {
-    'Paired Bar': LinearChart,
-    Bar: LinearChart,
-    Line: LinearChart,
-    Combo: LinearChart,
-    Pie: PieChart,
-    'Box Plot': LinearChart,
-    'Scatter Plot': LinearChart
+    'Paired Bar': ChartLinear,
+    Bar: ChartLinear,
+    Line: ChartLinear,
+    Combo: ChartLinear,
+    Pie: ChartPie,
+    'Box Plot': ChartLinear,
+    'Scatter Plot': ChartLinear
   }
 
   const missingRequiredSections = () => {
@@ -422,68 +424,115 @@ export default function CdcChart({ hostname, link }) {
     getTextWidth
   }
 
-  const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
+  const chartClasses = () => {
+    let classList = [ '' ]
+    classList.push(`cove-chart--font-${config.fontSize}`)
+    classList.push(`cove-chart--type-${config.visualizationType.toLowerCase()}`)
+    if (config.visualizationType === 'Spark Line') classList.push(`cove-chart--sparkline`)
 
-  config.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)
+    return classList
+  }
+
+  const legendAppearance = () => {
+    let display = {}
+
+    if (config.legend.position) {
+      display['legend-display'] = config.legend.position
+
+      if (config.legend.hide)
+        display['legend-display'] = 'hidden'
+    }
+
+    return display
+  }
+
   const ChartComponent = chartComponents[visualizationType]
 
   return (
-    <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart} data-download-id={imageId}>
+    <div className={'cove-chart' + (chartClasses().join(' '))}>
+      <a className="cove-sr-only-focusable" href={handleChartTabbing}>
+        Skip Over Chart Container
+      </a>
+
+      {/* Filters */}
+      {config.filters && !config.externalFilters &&
+        <Filters/>
+      }
+
+      {/* Intro Text */}
+      {config?.introText &&
+        <section className="cove-chart__intro-text">{parse(config.introText)}</section>
+      }
+
       {!missingRequiredSections() && (
-        <div className='cove-chart__container'>
-          <div className="cove-chart__visualization">
-            {/* Title */}
-            <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
-              Skip Over Chart Container
-            </a>
-            {/* Filters */}
-            {config.filters && !config.externalFilters && <Filters />}
+        <div className="cove-chart__container" {...legendAppearance()} data-lollipop={config.isLollipopChart} data-download-id={imageId} ref={outerContainerRef}>
 
-            {/* Visualization */}
-            {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
+          {/* All charts except sparkline */}
+          {config.visualizationType !== 'Spark Line' &&
+            <Suspense fallback={<RenderFallback/>}>
+              {/* Visualization */}
+              <div className="cove-chart__visualization">
+                <ChartComponent {...chartProps} />
+              </div>
+              {/* Legend */}
+              {!config.legend.hide &&
+                <Legend {...chartProps} />
+              }
+            </Suspense>
+          }
 
-            <div
-              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
-              className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
-            >
-              {/* All charts except sparkline */}
-              {config.visualizationType !== 'Spark Line' && <ChartComponent {...chartProps} />}
-
-              {/* Sparkline */}
-              {config.visualizationType === 'Spark Line' && (
-                <>
-                  {description && <div className='subtext'>{parse(description)}</div>}
-                  <div style={sparkLineStyles}>
-                    <ParentSize>
-                      {parent => (
-                        <>
-                          <SparkLine width={parent.width} height={parent.height} {...chartProps} />
-                        </>
-                      )}
-                    </ParentSize>
-                  </div>
-                </>
-              )}
-              {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend {...chartProps} />}
+          {/* Sparkline */}
+          {config.visualizationType === 'Spark Line' && (<>
+            {description &&
+              <div className="cove-chart__description">
+                {parse(description)}
+              </div>
+            }
+            <div className="cove-chart__sparkline">
+              <ParentSize>
+                {parent => (<>
+                  <SparkLine width={parent.width} height={parent.height} {...chartProps} />
+                </>)}
+              </ParentSize>
             </div>
-            {/* Link */}
-            {link && link}
-            {/* Description */}
-            {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
+          </>)}
 
-            {/* buttons */}
-            <MediaControls.Section classes={['download-buttons']}>
-              {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
-              {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
-            </MediaControls.Section>
+          {/* Link */}
+          {link && link}
 
-            {/* Data Table */}
-            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}
-            {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
-            {/* show pdf or image button */}
-          </div>
+          {/* Buttons */}
+          <MediaControls.Section className={[ 'download-buttons' ]}>
+            {config.table.showDownloadImgButton &&
+              <MediaControls.Button text="Download Image" title="Download Chart as Image" type="image" state={config} elementToCapture={imageId}/>
+            }
+            {config.table.showDownloadPdfButton &&
+              <MediaControls.Button text="Download PDF" title="Download Chart as PDF" type="pdf" state={config} elementToCapture={imageId}/>
+            }
+          </MediaControls.Section>
+
         </div>
       )}
+
+      {/* Description - Referenced here, but part of the global 'Component' styles */}
+      {description && config.visualizationType !== 'Spark Line' &&
+        <div className="cove-component__description">
+          {parse(description)}
+        </div>
+      }
+
+      {/* Data Table */}
+      {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' &&
+        <DataTable {...chartProps}/>
+      }
+
+      {/* Footnotes - Referenced here, but part of the global 'Component' styles */}
+      {config.footnotes &&
+        <section className="cove-component__footnotes">
+          {parse(config.footnotes)}
+        </section>
+      }
     </div>
   )
 }
+
+export default CdcChart

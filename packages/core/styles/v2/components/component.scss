@@ -134,6 +134,10 @@ $componentBorderRadius: 3px;
   margin-bottom: 1.5rem;
 }
 
+.cove-component__footnotes {
+  margin-top: 1.5rem;
+}
+
 // Apply Themes
 @each $theme-name, $theme-colors in $theme {
   .cove-theme--#{$theme-name} {

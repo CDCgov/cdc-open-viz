@@ -5,24 +5,13 @@
   position: relative;
 }
 
-.cove-data-table__header {
-  margin-bottom: 1.5rem;
-}
-
-.collapsed + .cove-data-table__table-wrapper {
-  border-bottom: none;
-}
-
-.cove-data-table__table-wrapper {
-  border-right: 1px solid $lightGray;
-  border-bottom: 1px solid $lightGray;
-  border-left: 1px solid $lightGray;
-  overflow-x: auto;
-}
-
 .cove-data-table__table-heading {
   padding: 0.5em 0.7em;
-  background: url('../../../../assets/icon-minus.svg'), rgba(0, 0, 0, 0.05) right .7em center / 15px 15px no-repeat;
+  background-image: url('../../../../assets/icon-minus.svg');
+  background-color: rgba(0, 0, 0, 0.05);
+  background-size: 15px 15px;
+  background-position: right 0.7em center;
+  background-repeat: no-repeat;
   border: $lightGray 1px solid;
   border-bottom: 0;
   cursor: pointer;
@@ -32,9 +21,24 @@
     z-index: 2;
   }
 
-  &.collapsed {
+  &.cove-data-table--collapsed {
     background-image: url('../../../../assets/icon-plus.svg');
     border-bottom: $lightGray 1px solid;
+  }
+}
+
+.cove-data-table__header {
+  margin-bottom: 1.5rem;
+}
+
+.cove-data-table__table-wrapper {
+  border-right: 1px solid $lightGray;
+  border-bottom: 1px solid $lightGray;
+  border-left: 1px solid $lightGray;
+  overflow-x: auto;
+
+  @at-root .cove-data-table--collapsed + #{&} {
+    border-bottom: none;
   }
 }
 

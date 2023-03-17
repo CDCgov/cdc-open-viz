@@ -92,11 +92,13 @@ const Component = ({ className, children, ...attributes }) => {
         )}
         <div className='cove-component__content' {...customContentAttrs}>
           {(!config.title || config.title.trim().length === 0) && <div className='cove-component__content--tooltip'>{tooltip}</div>}
-          <div className='cove-component__visualization' ref={outerContainerRef}>
+          <div className='cove-component__wrapper' ref={outerContainerRef}>
             {children}
           </div>
-          {config.description && <div className='cove-component__description'>{parse(config.description)}</div>}
-          {config.tableShowIf && config.table}
+          {/*{config.description &&
+            <div className='cove-component__description'>{parse(config.description)}</div>
+          }*/}
+          {/*{config.tableShowIf && config.table}*/}
         </div>
       </div>
     </div>

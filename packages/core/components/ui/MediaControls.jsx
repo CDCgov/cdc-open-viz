@@ -117,8 +117,8 @@ const Link = () => {
 }
 
 // TODO: convert to standardized COVE section
-const Section = ({ children, classes }) => {
-  return <section className={classes.join(' ')}>{children}</section>
+const Section = ({ children, className }) => {
+  return <section className={className}>{children}</section>
 }
 
 const MediaControls = () => null

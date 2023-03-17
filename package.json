@@ -61,7 +61,7 @@
     "react-tooltip": "^5.7.2",
     "react-visibility-sensor": "^5.1.1",
     "resize-observer-polyfill": "^1.5.1",
-    "sass": "^1.57.1",
+    "sass": "^1.59.3",
     "storybook": "^7.0.0-beta.39",
     "use-debounce": "^7.0.1",
     "vite": "^4.0.0",

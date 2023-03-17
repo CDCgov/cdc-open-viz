@@ -58,6 +58,15 @@ const Legend = ({ legend, colorScale, seriesHighlight, setSeriesHighlight, highl
     }
   }, [config.runtime.seriesLabelsAll, dynamicLegendItems, updateVisConfigField])
 
+  // in small screens update config legend position.
+  useEffect(() => {
+    if (currentViewport === 'sm' || currentViewport === 'xs' || config.legend.position === 'left') {
+      updateVisConfigField('legend', { position: 'bottom' })
+    } else {
+      updateVisConfigField('legend', { position: 'right' })
+    }
+  }, [config.legend.position, currentViewport, updateVisConfigField])
+
   const removeDynamicLegendItem = label => {
     let newLegendItems = dynamicLegendItems.filter(item => item.text !== label.text)
     let newLegendItemsText = newLegendItems.map(item => item.text)
@@ -97,14 +106,6 @@ const Legend = ({ legend, colorScale, seriesHighlight, setSeriesHighlight, highl
 
     return uniqeLabels
   }
-  // in small screens update config legend position.
-  useEffect(() => {
-    if (currentViewport === 'sm' || currentViewport === 'xs' || config.legend.position === 'left') {
-      updateVisConfigField('legend', { position: 'bottom' })
-    } else {
-      updateVisConfigField('legend', { position: 'right' })
-    }
-  }, [config.legend.position, currentViewport, updateVisConfigField])
 
   if (!legend) return
 
@@ -113,12 +114,12 @@ const Legend = ({ legend, colorScale, seriesHighlight, setSeriesHighlight, highl
       <aside
         style={{ marginTop: config.legend.position === 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px', marginBottom: config.legend.position === 'bottom' ? '15px' : '0px' }}
         id='legend'
-        className={containerClasses.join(' ')}
+        className={'cove-chart__legend ' + containerClasses.join(' ')}
         role='region'
         aria-label='legend'
         tabIndex={0}
       >
-        {legend.label && <h2>{parse(legend.label)}</h2>}
+        {legend.label && <h2 className="cove-heading--4 mb-1">{parse(legend.label)}</h2>}
         {legend.description && <p>{parse(legend.description)}</p>}
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => (
@@ -172,14 +173,15 @@ const Legend = ({ legend, colorScale, seriesHighlight, setSeriesHighlight, highl
         </LegendOrdinal>
       </aside>
     ) : (
-      <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
+      <aside id='legend' className={'cove-chart__legend ' + containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
         {config.boxplot.legend.displayHowToReadText && <h3>{config.boxplot.legend.howToReadText}</h3>}
       </aside>
     )
+
   return (
     config.visualizationType !== 'Box Plot' && (
-      <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
-        {legend.label && <h2>{parse(legend.label)}</h2>}
+      <aside id='legend' className={'cove-chart__legend ' + containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
+        {legend.label && <h2 className="cove-heading--4 mb-1">{parse(legend.label)}</h2>}
         {legend.description && <p>{parse(legend.description)}</p>}
 
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
