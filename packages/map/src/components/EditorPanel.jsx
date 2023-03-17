@@ -2718,10 +2718,21 @@ const EditorPanel = props => {
 
                   {state.map.layers.map((layer, index) => {
                     return (
-                      <>
-                        <label>TopoJSON URL:</label>
-                        <input type="text" value={layer.url} onChange={(e) => handleMapLayerUrl(e, index)} />
-                      </>
+                      <Accordion allowZeroExpanded>
+                        <AccordionItem className='map-layers-list'>
+                          <AccordionItemHeading className='map-layers-list--title'>
+                            <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
+                          </AccordionItemHeading>
+                          <AccordionItemPanel>
+                            <div className="map-layers-panel">
+                              <label htmlFor="layername">Layer Name:</label>
+                              <input type="text" value={layer.name} onChange={() => console.log('')} />
+                              <label htmlFor="filename">File:</label>
+                              <input type="text" value={layer.url} onChange={(e) => handleMapLayerUrl(e, index)} />
+                            </div>
+                          </AccordionItemPanel>
+                        </AccordionItem>
+                      </Accordion>
                     )
                   })}
 
