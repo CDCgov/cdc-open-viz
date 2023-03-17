@@ -312,19 +312,7 @@ const EditorPanel = () => {
       })
       return
     }
-
-    if ('table' === section && null === subsection) {
-      // set default for dataTable title without using useEffect
-      if (fieldName === "label" && (newValue === '' || newValue === undefined)) {
-        newValue = document.getElementById("tableLabel")?.getAttribute("placeholder")
-      }
-    }
-    
     if (null === section && null === subsection) {
-      // set default for title without using useEffect
-      if (fieldName === "title" && (newValue === '' || newValue === undefined)) {
-        newValue = document.getElementById("title")?.getAttribute("placeholder")
-      }
       let updatedConfig = { ...config, [fieldName]: newValue }
       enforceRestrictions(updatedConfig)
       updateConfig(updatedConfig)

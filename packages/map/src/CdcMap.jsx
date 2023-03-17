@@ -1429,6 +1429,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   let { title = 'Map Title', subtext = '' } = general
 
   if (!title || title === '') title = 'Map Title'
+  if (!dataTable.title || dataTable.title === '') dataTable.title = 'Data Table'
 
   // Outer container classes
   let outerContainerClasses = ['cdc-open-viz-module', 'cdc-map-outer-container', currentViewport]
