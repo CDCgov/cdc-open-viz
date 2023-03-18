@@ -15,7 +15,6 @@ import { geoAlbersUsa } from 'd3-composite-projections'
 
 import useMapLayers from '../hooks/useMapLayers'
 
-
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
 
@@ -111,7 +110,6 @@ const UsaMap = props => {
 
   const [territoriesData, setTerritoriesData] = useState([])
 
-
   const territoriesKeys = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
 
   useEffect(() => {
@@ -176,10 +174,7 @@ const UsaMap = props => {
         }
       }
 
-      return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)}
-        data-tooltip-id="tooltip"
-        data-tooltip-html={toolTip}
-      />
+      return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
     }
   })
 
@@ -226,10 +221,8 @@ const UsaMap = props => {
     )
   }
 
-  // create a path generator using the same projection visx is using.
-  // set the translate to what we're using in visx and pass to the generator to the hook.
   let pathGenerator = geoPath().projection(geoAlbersUsa().translate(translate))
-  const { layers } = useMapLayers(state, pathGenerator, translate)
+  const { layers } = useMapLayers(state, '', pathGenerator, translate, false)
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
@@ -306,11 +299,7 @@ const UsaMap = props => {
 
         return (
           <g data-name={geoName} key={key}>
-            <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)}
-              id={geoName}
-              data-tooltip-id="tooltip"
-              data-tooltip-html={tooltip}
-            >
+            <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
             </g>
@@ -363,9 +352,6 @@ const UsaMap = props => {
     }
     return geosJsx
   }
-
-
-
 
   return (
     <ErrorBoundary component='UsaMap'>

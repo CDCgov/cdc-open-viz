@@ -664,14 +664,24 @@
 
     .map-layers-list {
       list-style: none;
-      border-bottom: 1px solid #ccc;
+
+      $border: 1px solid #ccc;
+
+      @at-root .accordion:first-of-type .map-layers-list--title {
+        border-top: $border;
+      }
+
+      @at-root .accordion:last-of-type .map-layers-list--title {
+        border-bottom: $border;
+      }
 
       .accordion__button {
         border-bottom: unset;
       }
 
       .accordion__panel {
-        border: 1px solid #ccc;
+        border-left: $border;
+        border-right: $border;
       }
 
       label {
@@ -682,16 +692,14 @@
       .map-layers-list--title {
         width: 100%;
         background-color: #f5f5f5;
-        border-top: 1px solid #ccc;
-        border-right: 1px solid #ccc;
-        border-left: 1px solid #ccc;
+        border-right: $border;
+        border-left: $border;
         display: block;
         padding: 5px;
       }
 
       li {
         padding: 5px;
-        border: 1px solid #ccc;
       }
 
       .map-layers-list--title {
