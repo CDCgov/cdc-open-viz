@@ -27,6 +27,7 @@ import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import worldDefaultConfig from '../../examples/default-world.json'
 import usaDefaultConfig from '../../examples/default-usa.json'
 import countyDefaultConfig from '../../examples/default-county.json'
+import useMapLayers from '../hooks/useMapLayers'
 
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -71,16 +72,19 @@ const EditorPanel = props => {
 
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
 
-  const [configTextboxValue, setConfigTextbox] = useState({})  // eslint-disable-line
+  const [configTextboxValue, setConfigTextbox] = useState({}) // eslint-disable-line
 
   const [loadedDefault, setLoadedDefault] = useState(false)
 
   const [displayPanel, setDisplayPanel] = useState(true)
 
-
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
+
+  const {
+    MapLayerHandlers: { handleAddLayer, handleMapLayerName, handleMapLayerUrl, handleRemoveLayer }
+  } = useMapLayers(state, setState, false, true)
 
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = [...state.legend.categoryValuesOrder]
@@ -739,11 +743,11 @@ const EditorPanel = props => {
       columnList.push('Navigation')
     }
 
-    if ((('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && '' === state.columns.latitude.name) {
+    if (('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && '' === state.columns.latitude.name) {
       columnList.push('Latitude')
     }
 
-    if ((('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && '' === state.columns.longitude.name) {
+    if (('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && '' === state.columns.longitude.name) {
       columnList.push('Longitude')
     }
 
@@ -922,23 +926,6 @@ const EditorPanel = props => {
     marginBottom: '.3em',
     cursor: 'move',
     zIndex: '999'
-  }
-
-  const handleMapLayerUrl = (e, index) => {
-
-    let newLayers = [...state.map.layers]
-
-    console.log('NEW LAYERS', newLayers)
-
-    newLayers[index].url = e.target.value
-
-    setState({
-      ...state,
-      map: {
-        ...state.map,
-        layers: newLayers
-      }
-    })
   }
 
   const convertStateToConfig = () => {
@@ -1483,7 +1470,7 @@ const EditorPanel = props => {
                 <AccordionItemPanel>
                   <TextField
                     value={general.title}
-                    data-testid="title-input"
+                    data-testid='title-input'
                     updateField={updateField}
                     section='general'
                     fieldName='title'
@@ -1572,7 +1559,7 @@ const EditorPanel = props => {
                     }
                   />
                   {'us' === state.general.geoType && <TextField value={general.territoriesLabel} updateField={updateField} section='general' fieldName='territoriesLabel' label='Territories Label' placeholder='Territories' />}
-                  {'us' === state.general.geoType &&
+                  {'us' === state.general.geoType && (
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -1583,7 +1570,7 @@ const EditorPanel = props => {
                       />
                       <span className='edit-label'>Show All Territories</span>
                     </label>
-                  }
+                  )}
                   {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1770,7 +1757,7 @@ const EditorPanel = props => {
                       </label>
                     </fieldset>
                   )}
-                  {(('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && (
+                  {('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && (
                     <>
                       <label>Latitude Column</label>
                       <select
@@ -2639,7 +2626,7 @@ const EditorPanel = props => {
                       )
                     })}
                   </ul>
-                  {(('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && (
+                  {('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && (
                     <label>
                       Geocode Settings
                       <TextField type='number' value={state.visual.geoCodeCircleSize} section='visual' max='10' fieldName='geoCodeCircleSize' label='Geocode Circle Size' updateField={updateField} />
@@ -2689,21 +2676,21 @@ const EditorPanel = props => {
                     </label>
                   )}
                   {state.general.geoType === 'us' ||
-                    (state.general.geoType === 'us-county' ||
-                      (state.general.geoType === 'world') && (
-                        <label>
-                          <span className='edit-label'>City Style</span>
-                          <select
-                            value={state.visual.cityStyle || false}
-                            onChange={event => {
-                              handleEditorChanges('handleCityStyle', event.target.value)
-                            }}
-                          >
-                            <option value='circle'>Circle</option>
-                            <option value='pin'>Pin</option>
-                          </select>
-                        </label>
-                      ))}
+                    state.general.geoType === 'us-county' ||
+                    (state.general.geoType === 'world' && (
+                      <label>
+                        <span className='edit-label'>City Style</span>
+                        <select
+                          value={state.visual.cityStyle || false}
+                          onChange={event => {
+                            handleEditorChanges('handleCityStyle', event.target.value)
+                          }}
+                        >
+                          <option value='circle'>Circle</option>
+                          <option value='pin'>Pin</option>
+                        </select>
+                      </label>
+                    ))}
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -2711,40 +2698,33 @@ const EditorPanel = props => {
                   <AccordionItemButton>Custom Map Layers</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-
-                  {state.map.layers.length === 0 && <p>There are currently no filters.</p>}
-
-
+                  {state.map.layers.length === 0 && <p>There are currently no layers.</p>}
 
                   {state.map.layers.map((layer, index) => {
                     return (
-                      <Accordion allowZeroExpanded>
-                        <AccordionItem className='map-layers-list'>
-                          <AccordionItemHeading className='map-layers-list--title'>
-                            <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
-                          </AccordionItemHeading>
-                          <AccordionItemPanel>
-                            <div className="map-layers-panel">
-                              <label htmlFor="layername">Layer Name:</label>
-                              <input type="text" value={layer.name} onChange={() => console.log('')} />
-                              <label htmlFor="filename">File:</label>
-                              <input type="text" value={layer.url} onChange={(e) => handleMapLayerUrl(e, index)} />
-                            </div>
-                          </AccordionItemPanel>
-                        </AccordionItem>
-                      </Accordion>
+                      <>
+                        <Accordion allowZeroExpanded>
+                          <AccordionItem className='map-layers-list'>
+                            <AccordionItemHeading className='map-layers-list--title'>
+                              <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
+                            </AccordionItemHeading>
+                            <AccordionItemPanel>
+                              <div className='map-layers-panel'>
+                                <label htmlFor='layername'>Layer Name:</label>
+                                <input type='text' value={layer.name} onChange={e => handleMapLayerName(e, index)} />
+                                <label htmlFor='filename'>File:</label>
+                                <input type='text' value={layer.url} onChange={e => handleMapLayerUrl(e, index)} />
+                                <button onClick={e => handleRemoveLayer(e, index)}>Remove Layer</button>
+                              </div>
+                            </AccordionItemPanel>
+                          </AccordionItem>
+                        </Accordion>
+                      </>
                     )
                   })}
-
-                  <button
-                    className={'btn full-width'}
-                    onClick={event => {
-                      console.log('Add logic for adding map layer')
-                    }}
-                  >
+                  <button className={'btn full-width'} onClick={handleAddLayer}>
                     Add Map Layer
                   </button>
-
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
