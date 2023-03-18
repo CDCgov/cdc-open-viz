@@ -104,7 +104,7 @@ export function DeviationBar({ height, xScale }) {
           config.heights.horizontal = totalheight
 
           // text,labels,shapes postiions
-          const textWidth = getTextWidth(formatNumber(barValue), `normal ${fontSize[config.fontSize]}px sans-serif`)
+          const textWidth = getTextWidth(formatNumber(barValue, 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`)
           const textFits = textWidth < barWidth - 6
           const textX = barBaseX
           const textY = barY + barHeight / 2
@@ -127,7 +127,7 @@ export function DeviationBar({ height, xScale }) {
               <foreignObject x={barX} y={barY} width={barWidth} height={barHeight} style={{ border: `${borderWidth}px solid #333`, backgroundColor: barColor[barPosition], ...borderRadius }} />
               {config.yAxis.displayNumbersOnBar && (
                 <Text verticalAnchor='middle' x={textX} y={textY} {...textProps[barPosition]}>
-                  {formatNumber(d[seriesKey])}
+                  {formatNumber(d[seriesKey], 'left')}
                 </Text>
               )}
 

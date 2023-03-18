@@ -95,7 +95,7 @@ export default function LinearChart() {
       }
     }
 
-    if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
+    if ((config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
       min = 0
     }
     if (config.visualizationType === 'Combo' && isAllLine) {
