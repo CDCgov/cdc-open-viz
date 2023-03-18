@@ -20,9 +20,7 @@ function useReduceData(config, data) {
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && isBar)) && config.visualizationSubType === 'stacked') {
       const yTotals = data.reduce((allTotals, xValue) => {
         const totalYValues = config.runtime.seriesKeys.reduce((yTotal, k) => {
-          if (isNumber(cleanChars(xValue[k]))) {
-            yTotal += Number(cleanChars(xValue[k]))
-          }
+          yTotal += Number(xValue[k])
           return yTotal
         }, 0)
 
@@ -39,19 +37,18 @@ function useReduceData(config, data) {
       //max = Math.max(...data.map(d => Number(d[config.series.dataKey])))
     } else if (config.visualizationType === 'Combo' && config.visualizationSubType === 'stacked' && !isBar) {
       let total = []
+
       if (config.runtime.barSeriesKeys && config.runtime.lineSeriesKeys) {
         // get barSeries max Values added to each other
         data.map(function (d, index) {
           const totalYValues = config.runtime.barSeriesKeys.reduce((yTotal, k) => {
-            if (isNumber(cleanChars(d[k]))) {
-              yTotal += Number(cleanChars(d[k]))
-            }
+            yTotal += Number(d[k])
             return yTotal
           }, 0)
           return total.push(totalYValues)
         })
         // get lineSeries largest values
-        const lineMax = Math.max(...data.map(d => Math.max(...config.runtime.lineSeriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
+        const lineMax = Math.max(...data.map(d => Math.max(...config.runtime.lineSeriesKeys.map(key => Number(cleanChars(d[key]))))))
 
         const barMax = Math.max(...total)
 
