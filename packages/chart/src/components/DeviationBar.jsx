@@ -49,7 +49,7 @@ export function DeviationBar({ height, xScale }) {
   const isRounded = config.barStyle === 'rounded'
   const target = Number(config.xAxis.target)
   const seriesKey = config.series[0].dataKey
-  const maxVal = Math.max(...data.map(d => d[seriesKey]))
+  const maxVal = xScale.domain()[1]
   const hasNegativeValues = data.some(d => d[seriesKey] < 0)
   const shouldShowTargetLine = hasNegativeValues || target > 0
   const borderWidth = config.barHasBorder === 'true' ? 1 : 0
