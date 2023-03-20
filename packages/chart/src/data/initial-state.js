@@ -94,7 +94,8 @@ export default {
     tickColor: '#333',
     numTicks: '',
     labelOffset: 65,
-    axisPadding: 0
+    axisPadding: 0,
+    target: 0
   },
   table: {
     label: 'Data Table',
@@ -107,7 +108,6 @@ export default {
   orientation: 'vertical',
   legend: {
     behavior: 'isolate',
-    position: 'right',
     singleRow: false,
     colorCode: '',
     reverseLabelOrder: false,
@@ -124,7 +124,7 @@ export default {
   },
   palette: 'qualitative-bold',
   isPaletteReversed: false,
-  pairedBar: {
+  twoColor: {
     palette: 'monochrome-1',
     isPaletteReversed: false
   },

@@ -65,5 +65,5 @@ export const colorPalettes3 = {
 
 export const colorPalettesChart = updatePaletteNames(colorPalettes2)
 const colorPalettes = updatePaletteNames(colorPalettesMap)
-export const pairedBarPalettes = updatePaletteNames(colorPalettes3)
+export const twoColorPalette = updatePaletteNames(colorPalettes3)
 export default colorPalettes
