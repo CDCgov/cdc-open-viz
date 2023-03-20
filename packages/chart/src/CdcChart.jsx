@@ -19,7 +19,7 @@ import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
 import LinearChart from './components/LinearChart'
 
-import { colorPalettesChart as colorPalettes, pairedBarPalettes } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 
@@ -336,7 +336,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
     }
 
-    if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
+    if (((newConfig.visualizationType === 'Bar' || newConfig.visualizationType === 'Deviation Bar') && newConfig.orientation === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
       newConfig.runtime.xAxis = newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis
       newConfig.runtime.horizontal = true
@@ -502,8 +502,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime.seriesKeys) {
-      const configPalette = config.visualizationType === 'Paired Bar' ? config.pairedBar.palette : config.palette
-      const allPalettes = { ...colorPalettes, ...pairedBarPalettes }
+      const configPalette = config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar' ? config.twoColor.palette : config.palette
+      const allPalettes = { ...colorPalettes, ...twoColorPalette }
       let palette = config.customColors || allPalettes[configPalette]
       let numberOfKeys = config.runtime.seriesKeys.length
       let newColorScale
@@ -711,7 +711,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     Pie: <PieChart />,
     'Box Plot': <LinearChart />,
     'Area Chart': <LinearChart />,
-    'Scatter Plot': <LinearChart />
+    'Scatter Plot': <LinearChart />,
+    'Deviation Bar': <LinearChart />
   }
 
   const missingRequiredSections = () => {
@@ -757,7 +758,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
-              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
+              style={{ marginBottom: config.legend.position !== 'bottom' && currentViewport !== 'sm' && currentViewport !== 'xs' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
@@ -841,7 +842,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     isNumber,
     cleanData,
     getTextWidth,
-    pairedBarPalettes
+    twoColorPalette
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
