@@ -128,11 +128,13 @@ export default function LinearChart() {
 
     // DEV-3219 - bc some values are going above YScale - adding 10% or 20% factor onto Max
     // - put the statement up here and it works for both vert and horiz charts of all types
-    if (min < 0) {
-      // sets with negative data need more padding on the max
-      max *= 1.20
-    } else {
-      max *= 1.10
+    if (config.yAxis.enablePadding) {
+      if (min < 0) {
+        // sets with negative data need more padding on the max
+        max *= 1.2
+      } else {
+        max *= 1.1
+      }
     }
 
     if (config.runtime.horizontal) {
@@ -141,12 +143,11 @@ export default function LinearChart() {
         range: [0, xMax]
       })
 
-
       yScale =
         config.runtime.xAxis.type === 'date'
           ? scaleLinear({
-            domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
-          })
+              domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
+            })
           : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
       seriesScale = scalePoint({
@@ -157,7 +158,7 @@ export default function LinearChart() {
       yScale.rangeRound([0, yMax])
     } else {
       min = min < 0 ? min * 1.11 : min
-      
+
       yScale = scaleLinear({
         domain: [min, max],
         range: [yMax, 0]
@@ -268,7 +269,6 @@ export default function LinearChart() {
       if (outlierMax > maxYValue) maxYValue = outlierMax
     }
 
-
     // Set Scales
     yScale = scaleLinear({
       range: [yMax, 0],
@@ -284,7 +284,6 @@ export default function LinearChart() {
     })
   }
 
-
   return isNaN(width) ? (
     <></>
   ) : (
@@ -293,30 +292,30 @@ export default function LinearChart() {
         {/* Higlighted regions */}
         {config.regions
           ? config.regions.map(region => {
-            if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+              if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-            const from = xScale(parseDate(region.from).getTime())
-            const to = xScale(parseDate(region.to).getTime())
-            const width = to - from
+              const from = xScale(parseDate(region.from).getTime())
+              const to = xScale(parseDate(region.to).getTime())
+              const width = to - from
 
-            return (
-              <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
-                <path
-                  stroke='#333'
-                  d={`M${from} -5
+              return (
+                <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
+                  <path
+                    stroke='#333'
+                    d={`M${from} -5
                           L${from} 5
                           M${from} 0
                           L${to} 0
                           M${to} -5
                           L${to} 5`}
-                />
-                <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-                <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-                  {region.label}
-                </Text>
-              </Group>
-            )
-          })
+                  />
+                  <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+                  <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+                    {region.label}
+                  </Text>
+                </Group>
+              )
+            })
           : ''}
 
         {/* Y axis */}
