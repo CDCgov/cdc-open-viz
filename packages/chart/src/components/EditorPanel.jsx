@@ -740,7 +740,7 @@ const EditorPanel = () => {
       case config.visualizationType === 'Combo' && isAllLine && enteredValue && parseFloat(enteredValue) > minVal:
         message = 'Value must be less than ' + minValue
         break
-      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
+      case (config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
         message = 'Value must be less than or equal to 0'
         break
       case enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
