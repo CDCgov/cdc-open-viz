@@ -139,6 +139,17 @@ export default function LinearChart() {
       }
     }
 
+    // DEV-3219 - bc some values are going above YScale - adding 10% or 20% factor onto Max
+    // - put the statement up here and it works for both vert and horiz charts of all types
+    if (config.yAxis.enablePadding) {
+      if (min < 0) {
+        // sets with negative data need more padding on the max
+        max *= 1.2
+      } else {
+        max *= 1.1
+      }
+    }
+
     if (config.runtime.horizontal) {
       xScale = scaleLinear({
         domain: [min, max],
