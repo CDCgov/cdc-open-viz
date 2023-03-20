@@ -222,7 +222,7 @@ const UsaMap = props => {
   }
 
   let pathGenerator = geoPath().projection(geoAlbersUsa().translate(translate))
-  const { layers } = useMapLayers(state, '', pathGenerator, translate, false)
+  const { pathArray } = useMapLayers(state, '', pathGenerator)
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
@@ -345,8 +345,8 @@ const UsaMap = props => {
 
     // })
 
-    if (layers.length > 0) {
-      layers.map(layer => {
+    if (pathArray.length > 0) {
+      pathArray.map(layer => {
         return geosJsx.push(layer)
       })
     }
