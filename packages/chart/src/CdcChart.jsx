@@ -93,7 +93,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const reloadURLData = async () => {
-    console.log('reloadURLData')
     if (config.dataUrl) {
       const dataUrl = new URL(config.dataUrl)
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
@@ -108,12 +107,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       if (!isUpdateNeeded) return
 
-      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams).map((param, i) => {
-        let qs = i === 0 ? '?' : '&'
-        qs += param + '='
-        qs += qsParams[param]
-        return qs
-      })}`
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+        .map((param, i) => {
+          let qs = i === 0 ? '?' : '&'
+          qs += param + '='
+          qs += qsParams[param]
+          return qs
+        })
+        .join('')}`
 
       let data
 
