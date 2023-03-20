@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, memo } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { feature } from 'topojson-client'
 import { Group } from '@visx/group'
 
@@ -15,10 +15,13 @@ import { Group } from '@visx/group'
  * 3) Clean (ie. mapshaper -clean) and edit the shape as needed and export the new layer as geoJSON
  * 4) Save the geoJSON somewhere external.
  */
-export default function useMapLayers(config, setConfig, pathGenerator, translate, skipBuildingLayers) {
+export default function useMapLayers(config, setConfig, pathGenerator) {
   const [fetchedTopoJSON, setFetchedTopoJSON] = useState([])
-  const [layers, setLayers] = useState([])
   const geoId = useId()
+
+  // small reminder that we export the feature and the path as options
+  const [pathArray, setPathArray] = useState([])
+  const [featureArray, setFeatureArray] = useState([])
 
   useEffect(() => {
     fetchGeoJSONLayers()
@@ -81,6 +84,26 @@ export default function useMapLayers(config, setConfig, pathGenerator, translate
   }
 
   /**
+   * Updates the index of the layer tooltip
+   * @param {Event} e
+   * @param {Integer} index
+   */
+  const handleMapLayerTooltip = (e, index) => {
+    e.preventDefault()
+    let newLayers = [...config.map.layers]
+
+    newLayers[index].tooltip = e.target.value
+
+    setConfig({
+      ...config,
+      map: {
+        ...config.map,
+        layers: newLayers
+      }
+    })
+  }
+
+  /**
    * Changes the map layer url for a given index
    * @param {Event} e - on add custom layer click
    * @param {Integer} index - index of layer to update
@@ -122,6 +145,27 @@ export default function useMapLayers(config, setConfig, pathGenerator, translate
   }
 
   /**
+   * Changes the map layer namespace for a given index
+   * @param {Event} e - on add custom layer click
+   * @param {Integer} index - index of layer to update
+   */
+  const handleMapLayerNamespace = (e, index) => {
+    e.preventDefault()
+
+    let newLayers = [...config.map.layers]
+
+    newLayers[index].namespace = e.target.value
+
+    setConfig({
+      ...config,
+      map: {
+        ...config.map,
+        layers: newLayers
+      }
+    })
+  }
+
+  /**
    * Fetches TopoJSON urls found in config.map.layers and stores it locally.
    * @returns
    */
@@ -145,28 +189,46 @@ export default function useMapLayers(config, setConfig, pathGenerator, translate
    * @returns {void} new map layers to the config
    */
   const generateCustomLayers = () => {
-    if (skipBuildingLayers) return
     if (fetchedTopoJSON.length === 0 || !fetchedTopoJSON) return false
     let tempArr = []
+    let tempFeatureArray = []
 
     // loop on each file.
     fetchedTopoJSON?.map((layer, index) => {
       if (layer.length === 0) return null
+      let layerObjects = layer.objects[config.map.layers[index].namespace]
+      if (!layerObjects) return null
 
-      let layerData = feature(layer, layer.objects.cove).features
+      let layerData = feature(layer, layerObjects).features
 
       // now loop on each feature
       layerData.forEach(item => {
         let layerClasses = [`custom-map-layer`, `custom-map-layer--${item.properties.name.replace(' ', '-')}`]
 
+        // feature array for county maps
+        tempFeatureArray.push(item)
+
         tempArr.push(
           <Group className={layerClasses.join(' ')} key={`customMapLayer-${item.properties.name.replace(' ', '-')}-${index}`}>
-            <path d={pathGenerator(item)} fill={item.properties.fill} fillOpacity={item.properties['fill-opacity']} key={geoId} data-id={geoId} stroke={item.properties.stroke} strokeWidth={item.properties['stroke-width']} />
+            {/* prettier-ignore */}
+            <path
+              d={pathGenerator(item)}
+              fill={item.properties.fill}
+              fillOpacity={item.properties['fill-opacity']}
+              key={geoId} data-id={geoId}
+              stroke={item.properties.stroke}
+              strokeWidth={item.properties['stroke-width']}
+              data-tooltip-id='tooltip'
+              data-tooltip-html={config.map.layers[index].tooltip ? config.map.layers[index].tooltip : ''}
+            />
           </Group>
         )
       })
     })
-    setLayers(tempArr)
+
+    // export options for either the feature or the path
+    setPathArray(tempArr)
+    setFeatureArray(tempFeatureArray)
   }
 
   const MapLayerHandlers = () => null
@@ -174,6 +236,8 @@ export default function useMapLayers(config, setConfig, pathGenerator, translate
   MapLayerHandlers.handleAddLayer = handleAddLayer
   MapLayerHandlers.handleMapLayerUrl = handleMapLayerUrl
   MapLayerHandlers.handleMapLayerName = handleMapLayerName
+  MapLayerHandlers.handleMapLayerNamespace = handleMapLayerNamespace
+  MapLayerHandlers.handleMapLayerTooltip = handleMapLayerTooltip
 
-  return { layers, MapLayerHandlers }
+  return { pathArray, featureArray, MapLayerHandlers }
 }
