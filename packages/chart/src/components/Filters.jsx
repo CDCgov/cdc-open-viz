@@ -2,9 +2,12 @@ import React, { useState, useContext } from 'react'
 import ConfigContext from './../ConfigContext'
 import Button from '@cdc/core/components/elements/Button'
 
-const useFilters = () => {
-  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData, runtimeFilters } = useContext(ConfigContext)
+const Filters = () => {
+  const { config, setConfig, setFilteredData, excludedData, filterData } = useContext(ConfigContext)
+  const [filters, setFilters] = useState(config)
   const [showApplyButton, setShowApplyButton] = useState(false)
+  const buttonText = 'Apply Filters'
+  const resetText = 'Reset All'
 
   const sortAsc = (a, b) => {
     return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
@@ -14,17 +17,7 @@ const useFilters = () => {
     return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
   }
 
-  const announceChange = text => { }
-
-  const changeFilterActive = (index, value) => {
-    let newFilters = config.filters
-    newFilters[index].active = value
-    setConfig({
-      ...config,
-      filters: newFilters
-    })
-    setShowApplyButton(true)
-  }
+  const announceChange = text => {}
 
   const handleApplyButton = newFilters => {
     setConfig({ ...config, filters: newFilters })
@@ -44,15 +37,12 @@ const useFilters = () => {
     setConfig({ ...config, filters: newFilters })
   }
 
-  return { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset }
-}
-
-const Filters = () => {
-  const { config } = useContext(ConfigContext)
-  const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset } = useFilters()
-  const { filters } = config
-  const buttonText = 'Apply Filters'
-  const resetText = 'Reset All'
+  const changeFilterActive = (index, value) => {
+    let newFilters = config.filters
+    newFilters[index].active = value
+    setFilters(newFilters)
+    setShowApplyButton(true)
+  }
 
   // A List of Dropdowns
   const FilterList = () => {

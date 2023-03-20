@@ -294,8 +294,6 @@ export default function DataImport() {
           setEditingDataset(undefined)
         }
         setAddingDataset(false)
-        setExternalURL('')
-        setKeepURL(false)
       } catch (err) {
         setErrors(err)
       }
@@ -481,6 +479,74 @@ export default function DataImport() {
     readyToConfigure = true
   }
 
+  const urlFilters = (
+    <>
+      {config.filters &&
+        config.filters.map((filter, i) =>
+          filter.type !== 'url' ? (
+            <></>
+          ) : (
+            <fieldset className='edit-block'>
+              <label>
+                <span class='edit-label column-heading'>Query string parameter</span>{' '}
+                <input
+                  type='text'
+                  defaultValue={filter.queryParameter}
+                  onChange={e => {
+                    let newFilters = [...config.filters]
+                    newFilters[i].queryParameter = e.target.value
+                    setConfig({ ...config, filters: newFilters })
+                  }}
+                />
+              </label>
+              <span class='edit-label column-heading'>Values</span>{' '}
+              <ul className='value-list'>
+                {filter.orderedValues &&
+                  filter.orderedValues.map((value, valueIndex) => (
+                    <li>
+                      {value}
+                      <button
+                        onClick={() => {
+                          let newFilters = [...config.filters]
+                          newFilters[i].orderedValues.splice(valueIndex, 1)
+                          setConfig({ ...config, filters: newFilters })
+                        }}
+                      >
+                        X
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+              <form
+                onSubmit={e => {
+                  e.preventDefault()
+                  if (!config.filters[i].orderedValues || config.filters[i].orderedValues.indexOf(e.target[0].value) === -1) {
+                    let newFilters = [...config.filters]
+                    newFilters[i].orderedValues = newFilters[i].orderedValues || []
+                    newFilters[i].orderedValues.push(e.target[0].value)
+                    if (!newFilters[i].active) newFilters[i].active = e.target[0].value
+                    e.target[0].value = ''
+                    setConfig({ ...config, filters: newFilters })
+                  }
+                }}
+              >
+                <input type='text' /> <button type='submit'>Add New Value</button>
+              </form>
+            </fieldset>
+          )
+        )}
+      <button
+        className='btn full-width'
+        onClick={() => {
+          setConfig({ ...config, filters: config.filters ? [...config.filters, { type: 'url' }] : [{ type: 'url' }] })
+        }}
+      >
+        Add New URL Filter
+      </button>
+    </>
+  )
+  console.log(config.filters)
+
   const showDataDesigner = config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot'
 
   return (
@@ -567,10 +633,13 @@ export default function DataImport() {
                   )}
 
                   {config.dataFileSourceType === 'url' && (
-                    <div className='url-source-options'>
-                      <div>{loadFileFromUrl(externalURL)}</div>
-                      <div>{resetButton()}</div>
-                    </div>
+                    <>
+                      <div className='url-source-options'>
+                        <div>{loadFileFromUrl(externalURL)}</div>
+                        <div>{resetButton()}</div>
+                      </div>
+                      {config.dataUrl && urlFilters}
+                    </>
                   )}
                 </div>
               </>
@@ -604,10 +673,10 @@ export default function DataImport() {
             {errors &&
               (errors.map
                 ? errors.map((message, index) => (
-                  <div className='error-box slim mt-2' key={`error-${message}`}>
-                    <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
-                  </div>
-                ))
+                    <div className='error-box slim mt-2' key={`error-${message}`}>
+                      <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
+                    </div>
+                  ))
                 : errors.message)}
             <p className='footnote'>
               Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
@@ -617,29 +686,24 @@ export default function DataImport() {
             <SampleDataContext.Provider value={{ loadData, editingDataset, config }}>
               <SampleData.Buttons />
             </SampleDataContext.Provider>
-          </div >
-        )
-        }
+          </div>
+        )}
 
-        {
-          config.type === 'dashboard' && !addingDataset && (
-            <p>
-              <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
-                + Add More Files
-              </button>
-            </p>
-          )
-        }
+        {config.type === 'dashboard' && !addingDataset && (
+          <p>
+            <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
+              + Add More Files
+            </button>
+          </p>
+        )}
 
-        {
-          readyToConfigure && (
-            <p>
-              <button className='btn btn-primary' onClick={() => setGlobalActive(2)}>
-                Configure your visualization
-              </button>
-            </p>
-          )
-        }
+        {readyToConfigure && (
+          <p>
+            <button className='btn btn-primary' onClick={() => setGlobalActive(2)}>
+              Configure your visualization
+            </button>
+          </p>
+        )}
 
         <a href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html' target='_blank' rel='noopener noreferrer' className='guidance-link'>
           <div>
@@ -647,7 +711,7 @@ export default function DataImport() {
             <p>Documentation and examples on formatting data and configuring visualizations.</p>
           </div>
         </a>
-      </div >
+      </div>
       <div className='right-col'>
         <PreviewDataTable data={previewData} />
       </div>

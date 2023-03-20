@@ -152,6 +152,43 @@
       margin-bottom: 20px;
     }
 
+    .edit-block {
+      padding-left: 1em;
+      border-left: rgba(0, 0, 0, 0.2) 4px solid;
+      transition: 0.2s all;
+
+      &:not(:first-child) {
+        margin-top: 2em;
+      }
+
+      input[type='text'],
+      input[type='number'] {
+        font-size: 1em;
+      }
+
+      label {
+        margin-top: 0;
+      }
+
+      label + label {
+        margin-top: 1em;
+      }
+
+      &:hover {
+        border-left: rgba(0, 0, 0, 0.7) 4px solid;
+        transition: 0.2s all;
+      }
+
+      .column-heading {
+        text-transform: uppercase;
+        display: block;
+      }
+
+      select, input {
+        width: 100%;
+      }
+    }
+
     .url-source-options,
     .data-source-options {
       display: grid;
