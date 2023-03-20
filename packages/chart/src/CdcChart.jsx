@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, memo } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -67,7 +67,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const legendGlyphSizeHalf = legendGlyphSize / 2
 
   // Destructure items from config for more readable JSX
-  const { legend, title, description, visualizationType } = config
+  const { legend, title, description, visualizationType, filters } = config
   const { barBorderClass, lineDatapointClass, contentClasses, innerContainerClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
@@ -89,6 +89,70 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       return ariaLabel
     } catch (e) {
       console.error(e.message)
+    }
+  }
+
+  const reloadURLData = async () => {
+    console.log('reloadURLData')
+    if (config.dataUrl) {
+      const dataUrl = new URL(config.dataUrl)
+      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+
+      let isUpdateNeeded = false
+      config.filters.forEach(filter => {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== filter.active) {
+          qsParams[filter.queryParameter] = filter.active
+          isUpdateNeeded = true
+        }
+      })
+
+      if (!isUpdateNeeded) return
+
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams).map((param, i) => {
+        let qs = i === 0 ? '?' : '&'
+        qs += param + '='
+        qs += qsParams[param]
+        return qs
+      })}`
+
+      let data
+
+      try {
+        const regex = /(?:\.([^.]+))?$/
+
+        const ext = regex.exec(dataUrl.pathname)[1]
+        if ('csv' === ext) {
+          data = await fetch(dataUrlFinal)
+            .then(response => response.text())
+            .then(responseText => {
+              const parsedCsv = Papa.parse(responseText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+              })
+              return parsedCsv.data
+            })
+        } else if ('json' === ext) {
+          data = await fetch(dataUrlFinal).then(response => response.json())
+        } else {
+          data = []
+        }
+      } catch {
+        console.error(`Cannot parse URL: ${dataUrlFinal}`)
+        data = []
+      }
+
+      if (config.dataDescription) {
+        data = transform.autoStandardize(data)
+        data = transform.developerStandardize(data, config.dataDescription)
+      }
+
+      if (data) {
+        setStateData(data)
+        setExcludedData(data)
+      }
+
+      updateConfig({ ...config, dataUrl: dataUrlFinal, data })
     }
   }
 
@@ -315,11 +379,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     data.forEach(row => {
       let add = true
-      filters.forEach(filter => {
-        if (row[filter.columnName] !== filter.active) {
-          add = false
-        }
-      })
+      filters
+        .filter(filter => filter.type !== 'url')
+        .forEach(filter => {
+          if (row[filter.columnName] != filter.active) {
+            add = false
+          }
+        })
 
       if (add) filteredData.push(row)
     })
@@ -394,8 +460,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Load data when component first mounts
   useEffect(() => {
+    console.log(config)
     loadConfig()
   }, [])
+
+  useEffect(() => {
+    console.log('useEffect')
+    reloadURLData()
+  }, [JSON.stringify(config.filters)])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.

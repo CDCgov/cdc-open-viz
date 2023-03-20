@@ -287,7 +287,6 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
-
     if (section === 'boxplot' && subsection === 'legend') {
       updateConfig({
         ...config,
@@ -1650,83 +1649,87 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
                   {config.filters && (
                     <ul className='filters-list'>
-                      {config.filters.map((filter, index) => (
-                        <fieldset className='edit-block' key={index}>
-                          <button
-                            type='button'
-                            className='remove-column'
-                            onClick={() => {
-                              removeFilter(index)
-                            }}
-                          >
-                            Remove
-                          </button>
-                          <label>
-                            <span className='edit-label column-heading'>Filter</span>
-                            <select
-                              value={filter.columnName}
-                              onChange={e => {
-                                updateFilterProp('columnName', index, e.target.value)
+                      {config.filters.map((filter, index) =>
+                        filter.type !== 'url' ? (
+                          <fieldset className='edit-block' key={index}>
+                            <button
+                              type='button'
+                              className='remove-column'
+                              onClick={() => {
+                                removeFilter(index)
                               }}
                             >
-                              <option value=''>- Select Option -</option>
-                              {getColumns().map((dataKey, index) => (
-                                <option value={dataKey} key={index}>
-                                  {dataKey}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-                          <label>
-                            <span className='edit-label column-heading'>Label</span>
-                            <input
-                              type='text'
-                              value={filter.label}
-                              onChange={e => {
-                                updateFilterProp('label', index, e.target.value)
-                              }}
-                            />
-                          </label>
-
-                          <label>
-                            <span className='edit-filterOrder column-heading'>Filter Order</span>
-                            <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
-                              {filterOptions.map((option, index) => {
-                                return (
-                                  <option value={option.value} key={`filter-${index}`}>
-                                    {option.label}
+                              Remove
+                            </button>
+                            <label>
+                              <span className='edit-label column-heading'>Filter</span>
+                              <select
+                                value={filter.columnName}
+                                onChange={e => {
+                                  updateFilterProp('columnName', index, e.target.value)
+                                }}
+                              >
+                                <option value=''>- Select Option -</option>
+                                {getColumns().map((dataKey, index) => (
+                                  <option value={dataKey} key={index}>
+                                    {dataKey}
                                   </option>
-                                )
-                              })}
-                            </select>
+                                ))}
+                              </select>
+                            </label>
+                            <label>
+                              <span className='edit-label column-heading'>Label</span>
+                              <input
+                                type='text'
+                                value={filter.label}
+                                onChange={e => {
+                                  updateFilterProp('label', index, e.target.value)
+                                }}
+                              />
+                            </label>
 
-                            {filter.order === 'cust' && (
-                              <DragDropContext onDragEnd={({ source, destination }) => handleFilterChange(source.index, destination.index, index, config.filters[index])}>
-                                <Droppable droppableId='filter_order'>
-                                  {provided => (
-                                    <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-                                      {config.filters[index]?.values.map((value, index) => {
-                                        return (
-                                          <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
-                                            {(provided, snapshot) => (
-                                              <li>
-                                                <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                  {value}
-                                                </div>
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        )
-                                      })}
-                                      {provided.placeholder}
-                                    </ul>
-                                  )}
-                                </Droppable>
-                              </DragDropContext>
-                            )}
-                          </label>
-                        </fieldset>
-                      ))}
+                            <label>
+                              <span className='edit-filterOrder column-heading'>Filter Order</span>
+                              <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
+                                {filterOptions.map((option, index) => {
+                                  return (
+                                    <option value={option.value} key={`filter-${index}`}>
+                                      {option.label}
+                                    </option>
+                                  )
+                                })}
+                              </select>
+
+                              {filter.order === 'cust' && (
+                                <DragDropContext onDragEnd={({ source, destination }) => handleFilterChange(source.index, destination.index, index, config.filters[index])}>
+                                  <Droppable droppableId='filter_order'>
+                                    {provided => (
+                                      <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
+                                        {config.filters[index]?.values.map((value, index) => {
+                                          return (
+                                            <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
+                                              {(provided, snapshot) => (
+                                                <li>
+                                                  <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                    {value}
+                                                  </div>
+                                                </li>
+                                              )}
+                                            </Draggable>
+                                          )
+                                        })}
+                                        {provided.placeholder}
+                                      </ul>
+                                    )}
+                                  </Droppable>
+                                </DragDropContext>
+                              )}
+                            </label>
+                          </fieldset>
+                        ) : (
+                          <></>
+                        )
+                      )}
                     </ul>
                   )}
                   {!config.filters && <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
@@ -1765,7 +1768,7 @@ const EditorPanel = () => {
                     </>
                   )}
 
-                  {config.visualizationType === 'Box Plot' &&
+                  {config.visualizationType === 'Box Plot' && (
                     <fieldset fieldset className='fieldset fieldset--boxplot'>
                       <legend className=''>Box Plot Settings</legend>
                       {config.visualizationType === 'Box Plot' && <Select value={config.boxplot.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />}
@@ -1774,7 +1777,7 @@ const EditorPanel = () => {
                       {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />}
                       <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
                     </fieldset>
-                  }
+                  )}
 
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
                   {config.visualizationType !== 'Box Plot' && config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
@@ -1976,7 +1979,7 @@ const EditorPanel = () => {
           {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
         </section>
       </section>
-    </ErrorBoundary >
+    </ErrorBoundary>
   )
 }
 
