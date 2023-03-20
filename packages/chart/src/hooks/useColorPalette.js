@@ -1,4 +1,4 @@
-import { colorPalettesChart, pairedBarPalettes } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChart, twoColorPalette } from '@cdc/core/data/colorPalettes'
 import { useEffect } from 'react'
 
 export const useColorPalette = (config, updateConfig) => {
@@ -7,9 +7,9 @@ export const useColorPalette = (config, updateConfig) => {
   let nonSequential = []
 
   // Get two color palettes if visualization type is Paired Bar
-  if (config.visualizationType === 'Paired Bar') {
-    const isReversed = config.pairedBar.isPaletteReversed
-    twoColorPalettes = Object.keys(pairedBarPalettes).filter(name => (isReversed ? name.endsWith('reverse') : !name.endsWith('reverse')))
+  if (config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') {
+    const isReversed = config.twoColor.isPaletteReversed
+    twoColorPalettes = Object.keys(twoColorPalette).filter(name => (isReversed ? name.endsWith('reverse') : !name.endsWith('reverse')))
   } else {
     // Get sequential and non-sequential palettes for other visualization types
     const seqPalettes = []
@@ -37,16 +37,16 @@ export const useColorPalette = (config, updateConfig) => {
   useEffect(() => {
     let palette = ''
 
-    if (config.pairedBar.isPaletteReversed && !config.pairedBar.palette.endsWith('reverse')) {
-      palette = config.pairedBar.palette + 'reverse'
+    if (config.twoColor.isPaletteReversed && !config.twoColor.palette.endsWith('reverse')) {
+      palette = config.twoColor.palette + 'reverse'
     }
 
-    if (!config.pairedBar.isPaletteReversed && config.pairedBar.palette.endsWith('reverse')) {
-      palette = config.pairedBar.palette.slice(0, -7)
+    if (!config.twoColor.isPaletteReversed && config.twoColor.palette.endsWith('reverse')) {
+      palette = config.twoColor.palette.slice(0, -7)
     }
 
-    updateConfig({ ...config, pairedBar: { ...config.pairedBar, palette: palette } })
-  }, [config.pairedBar.isPaletteReversed])
+    updateConfig({ ...config, twoColor: { ...config.twoColor, palette: palette } })
+  }, [config.twoColor.isPaletteReversed])
 
   // Update palette based on isPaletteReversed
   useEffect(() => {
