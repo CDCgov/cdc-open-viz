@@ -79,8 +79,8 @@
     "description": "Legend Text",
     "type": "equalnumber",
     "specialClasses": [
-      {"key": "Rate", "value": "*", "label": "*"},
-      {"key": "Rate", "value": "NA", "label": "N/A"}
+      { "key": "Rate", "value": "*", "label": "*" },
+      { "key": "Rate", "value": "NA", "label": "N/A" }
     ],
     "unified": false,
     "singleColumn": false,
@@ -109,10 +109,7 @@
     "showBubbleZeros": false
   },
   "mapPosition": {
-    "coordinates": [
-      0,
-      30
-    ],
+    "coordinates": [0, 30],
     "zoom": 1
   },
   "sharing": {

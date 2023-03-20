@@ -62,7 +62,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   // Destructure items from config for more readable JSX
-  const { legend, title, description, visualizationType } = config
+  let { legend, title, description, visualizationType } = config
+
+  // set defaults on titles if blank
+  if (!title || title === '') title = 'Chart Title'
+  if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
+
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
@@ -739,7 +744,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           <div className='cdc-chart-inner-container'>
             {/* Title */}
 
-            {title && (
+            {title && config.showTitle && (
               <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
                 {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
                 <div>{parse(title)}</div>
