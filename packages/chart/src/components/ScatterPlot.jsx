@@ -9,7 +9,6 @@ const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
   let circleRadii = 4.5
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
-
   const handleTooltip = (item, s) => `<div>
     ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[s] || ''}<br/>` : ''}
     ${config.xAxis.label}: ${formatNumber(item[config.xAxis.dataKey], 'bottom')} <br/>
