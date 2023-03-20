@@ -27,6 +27,7 @@ import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import worldDefaultConfig from '../../examples/default-world.json'
 import usaDefaultConfig from '../../examples/default-usa.json'
 import countyDefaultConfig from '../../examples/default-county.json'
+import useMapLayers from '../hooks/useMapLayers'
 
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -80,6 +81,10 @@ const EditorPanel = props => {
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
+
+  const {
+    MapLayerHandlers: { handleAddLayer, handleMapLayerName, handleMapLayerUrl, handleRemoveLayer }
+  } = useMapLayers(state, setState, false, true)
 
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = [...state.legend.categoryValuesOrder]
@@ -1007,7 +1012,7 @@ const EditorPanel = props => {
     if (!isReversed && state.color.endsWith('reverse')) {
       paletteName = state.color.slice(0, -7)
     }
-    if(paletteName){
+    if (paletteName) {
       handleEditorChanges('color', paletteName)
     }
   }, [isReversed])
@@ -2719,6 +2724,40 @@ const EditorPanel = props => {
                         </select>
                       </label>
                     ))}
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Custom Map Layers</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  {state.map.layers.length === 0 && <p>There are currently no layers.</p>}
+
+                  {state.map.layers.map((layer, index) => {
+                    return (
+                      <>
+                        <Accordion allowZeroExpanded>
+                          <AccordionItem className='map-layers-list'>
+                            <AccordionItemHeading className='map-layers-list--title'>
+                              <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
+                            </AccordionItemHeading>
+                            <AccordionItemPanel>
+                              <div className='map-layers-panel'>
+                                <label htmlFor='layername'>Layer Name:</label>
+                                <input type='text' value={layer.name} onChange={e => handleMapLayerName(e, index)} />
+                                <label htmlFor='filename'>File:</label>
+                                <input type='text' value={layer.url} onChange={e => handleMapLayerUrl(e, index)} />
+                                <button onClick={e => handleRemoveLayer(e, index)}>Remove Layer</button>
+                              </div>
+                            </AccordionItemPanel>
+                          </AccordionItem>
+                        </Accordion>
+                      </>
+                    )
+                  })}
+                  <button className={'btn full-width'} onClick={handleAddLayer}>
+                    Add Map Layer
+                  </button>
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
