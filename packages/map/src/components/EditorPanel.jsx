@@ -83,7 +83,15 @@ const EditorPanel = props => {
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
   const {
-    MapLayerHandlers: { handleAddLayer, handleMapLayerName, handleMapLayerUrl, handleRemoveLayer }
+    // prettier-ignore
+    MapLayerHandlers: {
+      handleAddLayer,
+      handleMapLayerName,
+      handleMapLayerUrl,
+      handleRemoveLayer,
+      handleMapLayerNamespace,
+      handleMapLayerTooltip
+    }
   } = useMapLayers(state, setState, false, true)
 
   const categoryMove = (idx1, idx2) => {
@@ -2743,10 +2751,14 @@ const EditorPanel = props => {
                             </AccordionItemHeading>
                             <AccordionItemPanel>
                               <div className='map-layers-panel'>
-                                <label htmlFor='layername'>Layer Name:</label>
-                                <input type='text' value={layer.name} onChange={e => handleMapLayerName(e, index)} />
-                                <label htmlFor='filename'>File:</label>
-                                <input type='text' value={layer.url} onChange={e => handleMapLayerUrl(e, index)} />
+                                <label htmlFor='layerName'>Layer Name:</label>
+                                <input type='text' name='layerName' value={layer.name} onChange={e => handleMapLayerName(e, index)} />
+                                <label htmlFor='layerFilename'>File:</label>
+                                <input type='text' name='layerFilename' value={layer.url} onChange={e => handleMapLayerUrl(e, index)} />
+                                <label htmlFor='layerNamespace'>TOPOJSON Namespace:</label>
+                                <input type='text' name='layerNamespace' value={layer.namespace} onChange={e => handleMapLayerNamespace(e, index)} />
+                                <label htmlFor='layerTooltip'>Tooltip:</label>
+                                <textarea name='layerTooltip' value={layer.tooltip} onChange={e => handleMapLayerTooltip(e, index)}></textarea>
                                 <button onClick={e => handleRemoveLayer(e, index)}>Remove Layer</button>
                               </div>
                             </AccordionItemPanel>
