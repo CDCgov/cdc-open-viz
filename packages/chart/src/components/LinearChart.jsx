@@ -226,7 +226,7 @@ export default function LinearChart() {
         range: [0, yMax]
       })
       xScale = scaleLinear({
-        domain: [min * leftOffset, max * 1.05],
+        domain: [min * leftOffset, max],
         range: [0, xMax],
         round: true
       })
