@@ -17,10 +17,14 @@ const update_4_23 = config => {
         border: newConfig.visual.border,
         shadow: newConfig.visual.shadow
       }
+
+      if (newConfig.visual.accent) delete newConfig.visual.accent
+      if (newConfig.visual.background) delete newConfig.visual.background
+      if (newConfig.visual.border) delete newConfig.visual.border
+      if (newConfig.visual.shadow) delete newConfig.visual.shadow
     }
 
     // Remove old visual config entries
-    // delete newConfig.visual
 
     // Config alterations complete
     // Add validation mark to config...

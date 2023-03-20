@@ -100,11 +100,6 @@
     "useFormat": false
   },
   "confidenceKeys": {},
-  "visual": {
-    "border": true,
-    "accent": true,
-    "background": true
-  },
   "dataUrl": "/examples/scatterplot-continuous.csv",
   "visualizationType": "Scatter Plot",
   "description": "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.",

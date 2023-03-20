@@ -55,7 +55,6 @@ const InputSelect = (
     if (!isInitial(value)) {
       // Update a config field value, if configField array was supplied
       if (configField && value !== configFieldValue) {
-        console.log('checking if the configField', configField, 'exists. If it does, we are making sure the value', value, ' isnt the same as the configFieldValue', configFieldValue)
         updateVisConfigField(configField, value)
       }
     }

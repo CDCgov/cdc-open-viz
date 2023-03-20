@@ -121,14 +121,12 @@ export default {
     active: false,
     keys: []
   },
+  pairedBar: {
+    palette: 'monochrome-1'
+  },
   palette: 'qualitative-bold',
   isPaletteReversed: false,
   labels: false,
   dataFormat: { commas: false, prefix: '', suffix: '', abbreviated: false },
-  confidenceKeys: {},
-  visual: {
-    border: true,
-    accent: true,
-    background: true
-  }
+  confidenceKeys: {}
 }

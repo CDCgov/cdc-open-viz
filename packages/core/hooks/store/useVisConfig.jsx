@@ -9,7 +9,6 @@ import useStore from '../../store/store'
 // Helpers
 import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
 import fetchAsyncUrl from '../../helpers/fetchAsyncUrl'
-import { resolveConfig } from 'prettier'
 
 // Context
 export const ConfigContext = createContext({})

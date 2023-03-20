@@ -128,7 +128,6 @@
   }
 
   @at-root {
-
     .cove-chart__legend-container--single-row:not(.cove-chart__legend-container--reverse) #{&}:not(:last-of-type) {
       margin-right: 1rem !important; //Override visx
     }
@@ -167,6 +166,6 @@
 
 .cove-chart__visualization {
   .visx-axis-bottom .bottom-axis > .visx-line {
-    shape-rendering: geometricprecision; //Resolve issue with bottom axis line disappearing at certain widths
+    shape-rendering: geometricprecision; //Resolves issue with bottom axis line disappearing at certain widths
   }
 }

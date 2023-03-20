@@ -37,7 +37,7 @@
     "rightAxisTickLabelColor": "#333",
     "rightAxisTickColor": "#333",
     "numTicks": "4",
-    "label": "Value Axisd"
+    "label": "Value Axis"
   },
   "boxplot": [],
   "topAxis": {
@@ -108,11 +108,6 @@
     "abbreviated": false
   },
   "confidenceKeys": {},
-  "visual": {
-    "border": true,
-    "accent": true,
-    "background": true
-  },
   "height": "400",
   "data": [
     {

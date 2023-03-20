@@ -81,7 +81,6 @@
   "labels": false,
   "dataFormat": { "commas": false, "prefix": "", "suffix": "" },
   "confidenceKeys": {},
-  "visual": { "border": true, "accent": true, "background": true },
   "data": [
     { "Date": "1/15/2016", "Data 1": "N/A", "Data 2": "110", "Data 3": "100", "Data 4": "90", "Monthly-Goal": "100" },
     { "Date": "2/15/2016", "Data 1": "100", "Data 2": "goop", "Data 3": "100", "Data 4": "100", "Monthly-Goal": "100" },

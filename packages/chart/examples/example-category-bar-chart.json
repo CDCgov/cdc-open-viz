@@ -106,11 +106,6 @@
     "abbreviated": true
   },
   "confidenceKeys": {},
-  "visual": {
-    "border": true,
-    "accent": true,
-    "background": true
-  },
   "datasets": {},
   "visualizationType": "Bar",
   "data": [

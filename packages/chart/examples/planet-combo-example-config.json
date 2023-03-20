@@ -137,11 +137,6 @@
     "roundTo": 1
   },
   "confidenceKeys": {},
-  "visual": {
-    "border": true,
-    "accent": true,
-    "background": true
-  },
   "dataUrl": "/examples/planet-example-data.json",
   "animateReplay": true,
   "visualizationType": "Combo",

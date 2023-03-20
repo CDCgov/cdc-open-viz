@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment, useCallback } from 'react'
 
 // Third Party
 import { Bar } from '@visx/shape'
@@ -23,12 +23,15 @@ const ChartLinearBarPaired = (
     getTextWidth
   }
 ) => {
+  // console.log('originalWidth', originalWidth, 'width', width, 'height', height)
   const { config } = useVisConfig()
+
+  const halfWidth = useCallback(() => (width / 2), [ width ])
 
   if (!config || config?.series?.length < 2) return
 
   const borderWidth = config.barHasBorder === 'true' ? 1 : 0
-  const halfWidth = width / 2
+
   const fontSize = { small: 16, medium: 18, large: 20 }
   const offset = 1.02 // Offset of the left bar from the Axis
 
@@ -89,146 +92,157 @@ const ChartLinearBarPaired = (
   `)
 
   return (
-    width > 0 && (<>
-      <style>{`
-        #cdc-visualization__paired-bar-chart,
-        #cdc-visualization__paired-bar-chart > .visx-group {
-          transform-origin: center
-        }
-      `}</style>
+    width > 0 && (
+      <>
+        <style>
+          {`
+            #cdc-visualization__paired-bar-chart,
+            #cdc-visualization__paired-bar-chart > .visx-group {
+              transform-origin: center
+            }
+          `}
+        </style>
 
-      <svg
-        id="cdc-visualization__paired-bar-chart"
-        width={originalWidth}
-        height={height}
-        viewBox={`0 0 ${width + Number(config.runtime.yAxis.size)} ${height}`}
-        role="img"
-        tabIndex={0}
-      >
-        <Group top={0} left={Number(config.xAxis.size)}>
-          {config.data
-            .filter(item => config.series[0].dataKey === groupOne.dataKey)
-            .map((d, index) => {
-              let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[0].dataKey) === -1
-              let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[0].dataKey) !== -1
-              let barWidth = xScale(d[config.series[0].dataKey])
-              let barHeight = Number(config.barHeight) ? Number(config.barHeight) : 25
-              // update bar Y to give dynamic Y when user applyes BarSpace
-              let y = 0
-              y = index !== 0 ? (Number(config.barSpace) + barHeight + borderWidth) * index : y
-              const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * config.data.length
-              config.heights.horizontal = totalheight
-              // check if text fits inside the  bar including suffix/prefix,comma,fontSize ..etc
-              const textWidth = getTextWidth(formatNumber(d[groupOne.dataKey]), `normal ${fontSize[config.fontSize]}px sans-serif`)
-              const textFits = textWidth < barWidth - 5 // minus padding dx(5)
+        <svg
+          id="cdc-visualization__paired-bar-chart"
+          width={originalWidth}
+          height={height}
+          viewBox={`0 0 ${width + Number(config.runtime.yAxis.size)} ${height}`}
+          role="img"
+          tabIndex={0}
+        >
+          <Group top={0} left={Number(config.xAxis.size)}>
+            {config.data
+              .filter(item => config.series[0].dataKey === groupOne.dataKey)
+              .map((datapoint, index) => {
+                let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[0].dataKey) === -1
+                let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[0].dataKey) !== -1
 
-              return (
-                <>
-                  <Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`} className="horizontal">
-                    <Bar
-                      id={`bar-${groupOne.dataKey}-${d[config.dataDescription.xKey]}`}
-                      className="bar group-1"
+                let barWidth = xScale(datapoint[config.series[0].dataKey])
+                let barHeight = Number(config.barHeight) ? Number(config.barHeight) : 25
 
-                      x={halfWidth - barWidth}
-                      y={y}
+                // update bar Y to give dynamic Y when user applyes BarSpace
+                let y = 0
+                y = index !== 0 ? (Number(config.barSpace) + barHeight + borderWidth) * index : y
 
-                      display={displayBar ? 'block' : 'none'}
-                      width={xScale(d[config.series[0].dataKey])}
-                      height={barHeight}
-                      fill={groupOne.color}
-                      stroke="#333"
-                      strokeWidth={borderWidth}
-                      opacity={transparentBar ? 0.5 : 1}
+                const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * config.data.length
+                // config.heights.horizontal = totalheight TODO: fix this
 
-                      data-tooltip-html={dataTipOne(d)}
-                      data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                // check if text fits inside the bar including suffix/prefix, comma, fontSize ..etc
+                const textWidth = getTextWidth(formatNumber(datapoint[groupOne.dataKey]), `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const textFits = textWidth < barWidth - 5 // minus padding dx(5)
 
-                      key={`bar-${groupOne.dataKey}-${d[config.dataDescription.xKey]}`}
-                    />
-                    {config.yAxis.displayNumbersOnBar && displayBar && (
-                      <Text
-                        textAnchor={textFits ? 'start' : 'end'}
-                        verticalAnchor="middle" x={halfWidth - barWidth} y={y + config.barHeight / 2}
-                        dx={textFits ? 5 : -5}
-                        fill={textFits ? groupOne.labelColor : '#000'}
-                      >
-                        {formatNumber(d[groupOne.dataKey])}
-                      </Text>
-                    )}
-                  </Group>
-                </>
-              )
-            })
-          }
+                // TODO: Appears to be an issue with the data format being incorrect?
+                //  Maybe something happening with the tranformedData section on Chart.js, since thats been taken out?
+                return (
+                  <Fragment key={index}>
+                    <Group className="horizontal">
+                      <Bar
+                        id={`bar-${groupOne.dataKey}-${datapoint[config.dataDescription.xKey]}`}
+                        className="bar group-1"
 
-          {config.data
-            .filter(item => config.series[1].dataKey === groupTwo.dataKey)
-            .map((d, index) => {
-              let barWidth = xScale(d[config.series[1].dataKey])
-              let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[1].dataKey) === -1
-              let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[1].dataKey) !== -1
-              let barHeight = config.barHeight ? Number(config.barHeight) : 25
+                        x={halfWidth() - barWidth}
+                        y={y}
 
-              // Update bar Y to give dynamic Y when user applyes BarSpace
-              let y = 0
-              y = index !== 0 ? (Number(config.barSpace) + barHeight + borderWidth) * index : y
+                        display={displayBar ? 'block' : 'none'}
+                        width={barWidth}
+                        height={barHeight}
+                        fill={groupOne.color}
+                        stroke="#333"
+                        strokeWidth={borderWidth}
+                        opacity={transparentBar ? 0.5 : 1}
 
-              const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * config.data.length
-              config.heights.horizontal = totalheight
+                        data-tooltip-html={dataTipOne(datapoint)}
+                        data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                      />
+                      {config.yAxis.displayNumbersOnBar && displayBar && (
+                        <Text
+                          textAnchor={textFits ? 'start' : 'end'}
+                          verticalAnchor="middle" x={halfWidth() - barWidth} y={y + config.barHeight / 2}
+                          dx={textFits ? 5 : -5}
+                          fill={textFits ? groupOne.labelColor : '#000'}
+                        >
+                          {formatNumber(datapoint[groupOne.dataKey])}
+                        </Text>
+                      )}
+                    </Group>
+                  </Fragment>
+                )
+              })
+            }
 
-              // Check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-              const textWidth = getTextWidth(formatNumber(d[groupTwo.dataKey]), `normal ${fontSize[config.fontSize]}px sans-serif`)
-              const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
+            {config.data
+              .filter(item => config.series[1].dataKey === groupTwo.dataKey)
+              .map((datapoint, index) => {
+                let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[1].dataKey) === -1
+                let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[1].dataKey) !== -1
 
-              return (<>
-                <style>{`
-                  .bar-${groupTwo.dataKey}-${d[config.xAxis.dataKey]} {
-                    transform-origin: ${halfWidth}px ${y}px
-                  }
-                `}</style>
+                let barWidth = xScale(datapoint[config.series[1].dataKey])
+                let barHeight = config.barHeight ? Number(config.barHeight) : 25
 
-                <Group key={`group-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`} className="horizontal">
-                  <Bar
-                    id={`bar-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}
-                    className="bar group-2"
+                // Update bar Y to give dynamic Y when user applyes BarSpace
+                let y = 0
+                y = index !== 0 ? (Number(config.barSpace) + barHeight + borderWidth) * index : y
 
-                    x={halfWidth}
-                    y={y}
+                const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * config.data.length
+                // config.heights.horizontal = totalheight TODO: fix this
 
-                    display={displayBar ? 'block' : 'none'}
-                    width={xScale(d[config.series[1].dataKey])}
-                    height={barHeight}
-                    fill={groupTwo.color}
-                    stroke="#333"
-                    strokeWidth={borderWidth}
-                    opacity={transparentBar ? 0.5 : 1}
+                // Check if text fits inside the bar including suffix/prefix, comma, fontSize ..etc
+                const textWidth = getTextWidth(formatNumber(datapoint[groupTwo.dataKey]), `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
 
-                    data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                    data-tooltip-html={dataTipTwo(d)}
+                return (
+                  <Fragment key={index}>
+                    <style>
+                      {`
+                        .bar-${groupTwo.dataKey}-${datapoint[config.xAxis.dataKey]} {
+                          transform-origin: ${halfWidth()}px ${y}px
+                        }
+                      `}
+                    </style>
 
-                    key={`bar-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}
-                  />
+                    <Group className="horizontal">
+                      <Bar
+                        id={`bar-${groupTwo.dataKey}-${datapoint[config.dataDescription.xKey]}`}
+                        className="bar group-2"
 
-                  {config.yAxis.displayNumbersOnBar && displayBar && (
-                    <Text
-                      x={halfWidth + barWidth}
-                      y={y + config.barHeight / 2}
+                        x={halfWidth()}
+                        y={y}
 
-                      textAnchor={isTextFits ? 'end' : 'start'}
-                      verticalAnchor="middle"
-                      dx={isTextFits ? -5 : 5}
-                      fill={isTextFits ? groupTwo.labelColor : '#000'}
-                    >
-                      {formatNumber(d[groupTwo.dataKey])}
-                    </Text>
-                  )}
-                </Group>
-              </>)
-            })
-          }
-        </Group>
-      </svg>
-    </>)
+                        display={displayBar ? 'block' : 'none'}
+                        width={barWidth}
+                        height={barHeight}
+                        fill={groupTwo.color}
+                        stroke="#333"
+                        strokeWidth={borderWidth}
+                        opacity={transparentBar ? 0.5 : 1}
+
+                        data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                        data-tooltip-html={dataTipTwo(datapoint)}
+                      />
+
+                      {config.yAxis.displayNumbersOnBar && displayBar && (
+                        <Text
+                          x={halfWidth + barWidth}
+                          y={y + config.barHeight / 2}
+
+                          textAnchor={isTextFits ? 'end' : 'start'}
+                          verticalAnchor="middle"
+                          dx={isTextFits ? -5 : 5}
+                          fill={isTextFits ? groupTwo.labelColor : '#000'}
+                        >
+                          {formatNumber(datapoint[groupTwo.dataKey])}
+                        </Text>
+                      )}
+                    </Group>
+                  </Fragment>
+                )
+              })
+            }
+          </Group>
+        </svg>
+      </>
+    )
   )
 }
 

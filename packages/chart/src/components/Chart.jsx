@@ -173,7 +173,7 @@ const CdcChart = ({ hostname, link }) => {
     if (config && config.sortData) {
       updateVisConfigField('data', config.data.sort(sortData))
     }
-  }, [ sortData, updateVisConfigField ])
+  }, [ config.data, sortData, updateVisConfigField ])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = label => {
