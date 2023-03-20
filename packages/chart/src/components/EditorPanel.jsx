@@ -1435,6 +1435,12 @@ const EditorPanel = () => {
                       <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
                       <TextField value={config.xAxis.max} section='xAxis' fieldName='max' label='update max value' type='number' placeholder='Auto' updateField={updateField} />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
+                      {config.visualizationType === 'Deviation Bar' && (
+                        <>
+                          <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='update min value' placeholder='Auto' updateField={updateField} />
+                          <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
+                        </>
+                      )}
                       <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Update target Value' placeholder='Auto' className='number-narrow' updateField={updateField} />
                     </>
                   ) : (
