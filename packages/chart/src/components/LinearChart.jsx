@@ -21,6 +21,7 @@ import '../scss/LinearChart.scss'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useTopAxis from '../hooks/useTopAxis'
+import { DeviationBar } from './DeviationBar'
 
 // TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
@@ -29,8 +30,10 @@ export default function LinearChart() {
   // calling clean several times on same set of data (TT)
   const cleanedData = cleanData(data, config.xAxis.dataKey)
 
+  //const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
+
   let [width] = dimensions
-  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, cleanedData)
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const [animatedChart, setAnimatedChart] = useState(false)
 
   const triggerRef = useRef()
@@ -65,7 +68,7 @@ export default function LinearChart() {
   const xMax = width - config.runtime.yAxis.size - (config.visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
 
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, cleanedData, updateConfig })
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
@@ -86,7 +89,7 @@ export default function LinearChart() {
     max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
     // DEV-3263 - If Confidence Intervals in data, then need to account for increased height in max for YScale
-    if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') {
+    if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Deviation Bar') {
       let ciYMax = 0
       if (config.hasOwnProperty('confidenceKeys')) {
         let upperCIValues = data.map(function (d) {
@@ -109,7 +112,7 @@ export default function LinearChart() {
       }
     }
 
-    if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
+    if ((config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
       min = 0
     }
     if (config.visualizationType === 'Combo' && isAllLine) {
@@ -139,10 +142,10 @@ export default function LinearChart() {
       max += paddingValue
     }
 
-    let xAxisDataMapped = cleanedData.map(d => getXAxisData(d))
+    let xAxisDataMapped = data.map(d => getXAxisData(d))
 
     if (config.isLollipopChart && config.yAxis.displayNumbersOnBar) {
-      const dataKey = cleanedData.map(item => item[config.series[0].dataKey])
+      const dataKey = data.map(item => item[config.series[0].dataKey])
       const maxDataVal = Math.max(...dataKey).toString().length
 
       switch (true) {
@@ -154,6 +157,17 @@ export default function LinearChart() {
           break
         default:
           break
+      }
+    }
+
+    // DEV-3219 - bc some values are going above YScale - adding 10% or 20% factor onto Max
+    // - put the statement up here and it works for both vert and horiz charts of all types
+    if (config.yAxis.enablePadding) {
+      if (min < 0) {
+        // sets with negative data need more padding on the max
+        max *= 1.2
+      } else {
+        max *= 1.1
       }
     }
 
@@ -207,11 +221,11 @@ export default function LinearChart() {
       const offset = 1.02 // Offset of the ticks/values from the Axis
       let groupOneMax = Math.max.apply(
         Math,
-        cleanedData.map(d => d[config.series[0].dataKey])
+        data.map(d => d[config.series[0].dataKey])
       )
       let groupTwoMax = Math.max.apply(
         Math,
-        cleanedData.map(d => d[config.series[1].dataKey])
+        data.map(d => d[config.series[1].dataKey])
       )
 
       // group one
@@ -237,6 +251,18 @@ export default function LinearChart() {
       }
     }
 
+    if (config.visualizationType === 'Deviation Bar') {
+      const leftOffset = config.isLollipopChart ? 1.05 : 1.03
+      yScale = scaleBand({
+        domain: xAxisDataMapped,
+        range: [0, yMax]
+      })
+      xScale = scaleLinear({
+        domain: [min * leftOffset, max],
+        range: [0, xMax],
+        round: true
+      })
+    }
     // Handle Box Plots
     if (config.visualizationType === 'Box Plot') {
       const allOutliers = []
@@ -394,6 +420,11 @@ export default function LinearChart() {
 
                         {config.orientation === 'horizontal' && config.visualizationType === 'Paired Bar' && !config.yAxis.hideLabel && (
                           <Text transform={`translate(${tick.to.x - 5}, ${tick.to.y - minY + Number(config.barHeight) / 2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} textAnchor={'end'} verticalAnchor='middle'>
+                            {tick.formattedValue}
+                          </Text>
+                        )}
+                        {config.orientation === 'horizontal' && config.visualizationType === 'Deviation Bar' && !config.yAxis.hideLabel && (
+                          <Text transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.to.y - minY + 2 : tick.to.y - minY + Number(config.barHeight) / 2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} textAnchor={'end'} verticalAnchor='middle'>
                             {tick.formattedValue}
                           </Text>
                         )}
@@ -581,18 +612,20 @@ export default function LinearChart() {
           </>
         )}
 
+        {config.visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
+
         {/* Paired Bar chart */}
         {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
 
         {/* Bar chart */}
-        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && (
+        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && config.visualizationType !== 'Deviation Bar' && (
           <>
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
           </>
         )}
 
         {/* Line chart */}
-        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && (
+        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && config.visualizationType !== 'Deviation Bar' && (
           <>
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
           </>

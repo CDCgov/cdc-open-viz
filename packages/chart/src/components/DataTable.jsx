@@ -14,9 +14,6 @@ import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 export default function DataTable() {
   const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
 
-  // Debugging.
-  // if (config.visualizationType === 'Box Plot') return null
-
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
