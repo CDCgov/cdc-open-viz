@@ -245,7 +245,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         // Cities
         if (!uid && 'world-geocode' === state.general.type) {
-          uid = cityKeys.find(key => key === geoName.toUpperCase())
+          uid = cityKeys.find(key => key === geoName?.toUpperCase())
         }
       }
 
