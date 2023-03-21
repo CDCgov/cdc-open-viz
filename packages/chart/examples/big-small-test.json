@@ -1,0 +1,328 @@
+{
+  "type": "chart",
+  "title": "",
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "medium",
+  "lineDatapointStyle": "hover",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "110",
+    "gridLines": false,
+    "min": "0",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 50,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "4",
+    "axisPadding": 0,
+    "tickRotation": 0
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
+    },
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "count": "Count",
+      "outliers": "Outliers",
+      "values": "Values"
+    }
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": 0.35,
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 750
+  },
+  "xAxis": {
+    "type": "categorical",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 65,
+    "axisPadding": 0,
+    "dataKey": "Category"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "show": true
+  },
+  "orientation": "vertical",
+  "legend": {
+    "behavior": "isolate",
+    "position": "right",
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend"
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
+  "labels": false,
+  "dataFormat": {
+    "commas": true,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true
+  },
+  "datasets": {},
+  "visualizationType": "Line",
+  "data": [
+    {
+      "Category": "1",
+      "Values": "100000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "2",
+      "Values": "500000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "3",
+      "Values": "1000000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "4",
+      "Values": "5000000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "5",
+      "Values": "7000000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "6",
+      "Values": "10000000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "7",
+      "Values": "88888888",
+      "Filter": "Big"
+    },
+    {
+      "Category": "8",
+      "Values": "7654321",
+      "Filter": "Big"
+    },
+    {
+      "Category": "1",
+      "Values": "1",
+      "Filter": "Small"
+    },
+    {
+      "Category": "2",
+      "Values": "0.8",
+      "Filter": "Small"
+    },
+    {
+      "Category": "3",
+      "Values": "1",
+      "Filter": "Small"
+    },
+    {
+      "Category": "4",
+      "Values": "2.1",
+      "Filter": "Small"
+    },
+    {
+      "Category": "5",
+      "Values": "2",
+      "Filter": "Small"
+    },
+    {
+      "Category": "6",
+      "Values": "2",
+      "Filter": "Small"
+    },
+    {
+      "Category": "7",
+      "Values": "1",
+      "Filter": "Small"
+    },
+    {
+      "Category": "8",
+      "Values": "1",
+      "Filter": "Small"
+    }
+  ],
+  "dataFileName": "Small_and_large.csv",
+  "dataFileSourceType": "file",
+  "formattedData": [
+    {
+      "Category": "1",
+      "Values": "100000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "2",
+      "Values": "500000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "3",
+      "Values": "1000000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "4",
+      "Values": "5000000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "5",
+      "Values": "7000000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "6",
+      "Values": "10000000",
+      "Filter": "Big"
+    },
+    {
+      "Category": "7",
+      "Values": "88888888",
+      "Filter": "Big"
+    },
+    {
+      "Category": "8",
+      "Values": "7654321",
+      "Filter": "Big"
+    },
+    {
+      "Category": "1",
+      "Values": "1",
+      "Filter": "Small"
+    },
+    {
+      "Category": "2",
+      "Values": "1",
+      "Filter": "Small"
+    },
+    {
+      "Category": "3",
+      "Values": "0.8",
+      "Filter": "Small"
+    },
+    {
+      "Category": "4",
+      "Values": "2",
+      "Filter": "Small"
+    },
+    {
+      "Category": "5",
+      "Values": "2.1",
+      "Filter": "Small"
+    },
+    {
+      "Category": "6",
+      "Values": "2",
+      "Filter": "Small"
+    },
+    {
+      "Category": "7",
+      "Values": "1",
+      "Filter": "Small"
+    },
+    {
+      "Category": "8",
+      "Values": "1",
+      "Filter": "Small"
+    }
+  ],
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "series": [
+    {
+      "dataKey": "Values",
+      "type": "Line"
+    }
+  ],
+  "filters": [
+    {
+      "values": ["Big", "Small"],
+      "active": "Big",
+      "columnName": "Filter",
+      "label": "Size",
+      "order": "asc"
+    }
+  ]
+}
