@@ -167,6 +167,22 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [state.mapPosition, setPosition])
 
+  const generateRuntimeLegendHash = () => {
+    return hashObj({
+      color: state.color,
+      customColors: state.customColors,
+      numberOfItems: state.legend.numberOfItems,
+      type: state.legend.type,
+      separateZero: state.legend.separateZero ?? false,
+      primary: state.columns.primary.name,
+      categoryValuesOrder: state.legend.categoryValuesOrder,
+      specialClasses: state.legend.specialClasses,
+      geoType: state.general.geoType,
+      data: state.data,
+      ...runtimeFilters
+    })
+  }
+
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let newViewport = getViewport(entry.contentRect.width)
@@ -464,6 +480,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
 
       legendMemo.current = newLegendMemo
+
+      result.forEach((row, i) => {
+        row.bin = i // set bin number to index
+      })
+
       return result
     }
 
@@ -781,13 +802,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     try {
       const result = {}
 
-      if (hash) {
-        // Adding property this way prevents it from being enumerated
-        Object.defineProperty(result, 'fromHash', {
-          value: hash
-        })
-      }
+      // Adding property this way prevents it from being enumerated
+      Object.defineProperty(result, 'fromHash', {
+        value: hash
+      })
 
+      addUIDs(obj, obj.columns.geo.name)
       obj.data.forEach(row => {
         if (test) {
           console.log('object', obj)
@@ -1357,28 +1377,15 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
     }
 
-    const hashLegend = hashObj({
-      color: state.color,
-      customColors: state.customColors,
-      numberOfItems: state.legend.numberOfItems,
-      type: state.legend.type,
-      separateZero: state.legend.separateZero ?? false,
-      categoryValuesOrder: state.legend.categoryValuesOrder,
-      specialClasses: state.legend.specialClasses,
-      geoType: state.general.geoType,
-      data: state.data,
-      ...runtimeLegend,
-      ...runtimeFilters
-    })
+    const hashLegend = generateRuntimeLegendHash()
 
     const hashData = hashObj({
+      data: state.data,
       columns: state.columns,
       geoType: state.general.geoType,
       type: state.general.type,
       geo: state.columns.geo.name,
       primary: state.columns.primary.name,
-      data: state.data,
-      ...runtimeFilters,
       mapPosition: state.mapPosition,
       ...runtimeFilters
     })
@@ -1398,21 +1405,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }, [state]) // eslint-disable-line
 
   useEffect(() => {
-    const hashLegend = hashObj({
-      color: state.color,
-      customColors: state.customColors,
-      numberOfItems: state.legend.numberOfItems,
-      type: state.legend.type,
-      separateZero: state.legend.separateZero ?? false,
-      categoryValuesOrder: state.legend.categoryValuesOrder,
-      specialClasses: state.legend.specialClasses,
-      geoType: state.general.geoType,
-      data: state.data
-    })
+    const hashLegend = generateRuntimeLegendHash()
 
     // Legend - Update when runtimeData does
     if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
-      let legend = generateRuntimeLegend(state, runtimeData)
+      const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
       setRuntimeLegend(legend)
     }
   }, [runtimeData]) // eslint-disable-line
@@ -1474,7 +1471,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     handleMapAriaLabels,
     runtimeFilters,
     setRuntimeFilters,
-    innerContainerRef
+    innerContainerRef,
+    currentViewport
   }
 
   if (!mapProps.data || !state.data) return <Loading />

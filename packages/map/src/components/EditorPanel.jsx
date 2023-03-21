@@ -525,7 +525,8 @@ const EditorPanel = props => {
               ...state,
               general: {
                 ...state.general,
-                geoType: 'us'
+                geoType: 'us',
+                type: state.type === 'us-geocode' ? 'data' : state.type
               },
               dataTable: {
                 ...state.dataTable,
@@ -1007,7 +1008,9 @@ const EditorPanel = props => {
     if (!isReversed && state.color.endsWith('reverse')) {
       paletteName = state.color.slice(0, -7)
     }
-    handleEditorChanges('color', paletteName)
+    if(paletteName){
+      handleEditorChanges('color', paletteName)
+    }
   }, [isReversed])
 
   useEffect(() => {
