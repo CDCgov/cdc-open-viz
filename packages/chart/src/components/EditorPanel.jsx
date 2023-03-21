@@ -25,7 +25,6 @@ const TextField = memo(({ label, tooltip, section = null, subsection = null, fie
 
   const [debouncedValue] = useDebounce(value, 500)
 
-
   useEffect(() => {
     if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
       updateField(section, subsection, fieldName, debouncedValue, i)
@@ -213,7 +212,6 @@ const EditorPanel = () => {
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
-
   // when the visualization type changes we
   // have to update the individual series type & axis details
   // dataKey is unchanged here.
@@ -282,7 +280,7 @@ const EditorPanel = () => {
     }
     // DEV-3293 - Force combo to always be vertical
     if (updatedConfig.visualizationType === 'Combo') {
-      updatedConfig.orientation = "vertical"
+      updatedConfig.orientation = 'vertical'
     }
   }
 
@@ -351,7 +349,7 @@ const EditorPanel = () => {
   }
 
   useEffect(() => {
-    if (!config.general?.boxplot) return;
+    if (!config.general?.boxplot) return
     if (!config.general.boxplot.firstQuartilePercentage) {
       updateConfig({
         ...config,
@@ -361,7 +359,7 @@ const EditorPanel = () => {
         }
       })
     }
-  }, [config]);
+  }, [config])
 
   const setLollipopShape = shape => {
     updateConfig({
@@ -968,7 +966,9 @@ const EditorPanel = () => {
                                         </option>
 
                                         {Object.keys(allCurves).map(curveName => (
-                                          <option key={`curve-option-${curveName}`} value={curveName}>{curveName}</option>
+                                          <option key={`curve-option-${curveName}`} value={curveName}>
+                                            {curveName}
+                                          </option>
                                         ))}
                                       </select>
                                     )
@@ -1571,7 +1571,7 @@ const EditorPanel = () => {
                     <>
                       <TextField value={config.xAxis.label} section='xAxis' fieldName='label' label='Label' updateField={updateField} />
 
-                      {config.xAxis.type === 'continuous' &&
+                      {config.xAxis.type === 'continuous' && (
                         <>
                           <TextField
                             value={config.dataFormat.bottomPrefix}
@@ -1629,7 +1629,7 @@ const EditorPanel = () => {
                             }
                           />
                         </>
-                      }
+                      )}
 
                       {config.xAxis.type === 'date' && (
                         <>
