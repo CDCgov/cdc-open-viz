@@ -394,10 +394,20 @@ export default function DataImport() {
   const resetButton = () => {
     return (
       //todo convert to modal
-      <button className='btn danger' onClick={() => resetEditor({ type: config.type, visualizationType: config.visualizationType }, 'Reseting will remove your data and settings. Do you want to continue?')}>
+      <>
+      <button className='btn danger' onClick={() => resetEditor({ type: config.type, visualizationType: config.visualizationType }, 'Resetting will remove your data and settings. Do you want to continue?')}>
         Clear
         <CloseIcon />
-      </button>
+        </button>
+        {/* DEV-851 link to replace file should pop file dialog */}
+        {config.dataFileSourceType === 'file' && (
+          <div className='link link-replace' {...getRootProps2()}>
+            <input {...getInputProps2()} />
+            <p>
+              <span>or replace file</span>
+            </p>
+          </div>)}
+      </>
     )
   }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, memo } from 'react'
 
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
@@ -10,9 +10,6 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 // Data
 import colorPalettes from '@cdc/core/data/colorPalettes'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
-
-// Hooks
-import { useColorPalette } from '../hooks/useColorPalette'
 
 // Components - Core
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
@@ -40,7 +37,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
     if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
       updateField(section, subsection, fieldName, debouncedValue)
     }
-  }, [debouncedValue])
+  }, [debouncedValue]) // eslint-disable-line
 
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
 
@@ -68,23 +65,19 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend } = props
+  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend, changeFilterActive } = props
 
   const { general, columns, legend, dataTable, tooltips } = state
 
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
 
-  const [configTextboxValue, setConfigTextbox] = useState({})
+  const [configTextboxValue, setConfigTextbox] = useState({}) // eslint-disable-line
 
   const [loadedDefault, setLoadedDefault] = useState(false)
 
   const [displayPanel, setDisplayPanel] = useState(true)
 
-  const [advancedToggle, setAdvancedToggle] = useState(false)
-
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
-
-  const { filteredPallets, filteredQualitative, isPaletteReversed, paletteName } = useColorPalette(colorPalettes, state)
 
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
@@ -103,6 +96,45 @@ const EditorPanel = props => {
       }
     })
   }
+
+  let specialClasses = []
+  if (legend.specialClasses && legend.specialClasses.length && typeof legend.specialClasses[0] === 'string') {
+    legend.specialClasses.forEach(specialClass => {
+      specialClasses.push({
+        key: state.columns.primary && state.columns.primary.name ? state.columns.primary.name : columnsInData[0],
+        value: specialClass,
+        label: specialClass
+      })
+    })
+    // DEV-3303 - since the above was a repair of bad config - need to backpopulate into the state
+    setState({
+      ...state,
+      legend: {
+        ...state.legend,
+        specialClasses: specialClasses
+      }
+    })
+  } else {
+    specialClasses = legend.specialClasses || []
+  }
+
+  const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
+    <label className='checkbox'>
+      <input
+        type='checkbox'
+        name={fieldName}
+        checked={value}
+        onChange={e => {
+          updateField(section, subsection, fieldName, !value)
+        }}
+        {...attributes}
+      />
+      <span className='edit-label'>
+        {label}
+        {tooltip}
+      </span>
+    </label>
+  ))
 
   const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
     let filterOrder = filter.values
@@ -130,7 +162,7 @@ const EditorPanel = props => {
       if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
         handleEditorChanges('changeLegendDescription', [String(activeFilterValueForDescription), debouncedValue])
       }
-    }, [debouncedValue])
+    }, [debouncedValue]) // eslint-disable-line
 
     const onChange = e => setValue(e.target.value)
 
@@ -580,6 +612,15 @@ const EditorPanel = props => {
           }
         })
         break
+      case 'legendShowSpecialClassesLast':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            showSpecialClassesLast: !state.legend.showSpecialClassesLast
+          }
+        })
+        break
       case 'dynamicDescription':
         setState({
           ...state,
@@ -682,6 +723,15 @@ const EditorPanel = props => {
           }
         })
         break
+      case 'territoriesAlwaysShow':
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            territoriesAlwaysShow: value
+          }
+        })
+        break
       default:
         console.warn(`Did not recognize editor property.`)
         break
@@ -689,7 +739,6 @@ const EditorPanel = props => {
   }
 
   const columnsRequiredChecker = useCallback(() => {
-    console.info('Running columns required check.')
     let columnList = []
 
     // Geo is always required
@@ -707,11 +756,11 @@ const EditorPanel = props => {
       columnList.push('Navigation')
     }
 
-    if ((('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && '' === state.columns.latitude.name) {
+    if (('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && '' === state.columns.latitude.name) {
       columnList.push('Latitude')
     }
 
-    if ((('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && '' === state.columns.longitude.name) {
+    if (('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && '' === state.columns.longitude.name) {
       columnList.push('Longitude')
     }
 
@@ -722,10 +771,9 @@ const EditorPanel = props => {
 
   const editColumn = async (columnName, editTarget, value) => {
     let newSpecialClasses
-
     switch (editTarget) {
       case 'specialClassEdit':
-        newSpecialClasses = Array.from(legend.specialClasses)
+        newSpecialClasses = Array.from(specialClasses)
 
         newSpecialClasses[value.index][value.prop] = value.value
 
@@ -738,7 +786,7 @@ const EditorPanel = props => {
         })
         break
       case 'specialClassDelete':
-        newSpecialClasses = Array.from(legend.specialClasses)
+        newSpecialClasses = Array.from(specialClasses)
 
         newSpecialClasses.splice(value, 1)
 
@@ -751,7 +799,7 @@ const EditorPanel = props => {
         })
         break
       case 'specialClassAdd':
-        newSpecialClasses = legend.specialClasses
+        newSpecialClasses = specialClasses
 
         newSpecialClasses.push(value)
 
@@ -924,11 +972,49 @@ const EditorPanel = props => {
     return strippedState
   }
 
+  const isReversed = state.general.palette.isReversed
+  function filterColorPalettes() {
+    let sequential = []
+    let nonSequential = []
+    for (let paletteName in colorPalettes) {
+      if (!isReversed) {
+        if (paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
+          nonSequential.push(paletteName)
+        }
+        if (!paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
+          sequential.push(paletteName)
+        }
+      }
+      if (isReversed) {
+        if (paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
+          nonSequential.push(paletteName)
+        }
+        if (!paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
+          sequential.push(paletteName)
+        }
+      }
+    }
+
+    return [sequential, nonSequential]
+  }
+  const [sequential, nonSequential] = filterColorPalettes()
+
+  useEffect(() => {
+    let paletteName = ''
+    if (isReversed && !state.color.endsWith('reverse')) {
+      paletteName = state.color + 'reverse'
+    }
+    if (!isReversed && state.color.endsWith('reverse')) {
+      paletteName = state.color.slice(0, -7)
+    }
+    handleEditorChanges('color', paletteName)
+  }, [isReversed])
+
   useEffect(() => {
     setLoadedDefault(state.defaultData)
 
     columnsRequiredChecker()
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   useEffect(() => {
     //If a categorical map is used and the order is either not defined or incorrect, fix it
@@ -940,12 +1026,12 @@ const EditorPanel = props => {
             valid = false
           }
         })
-        let runtimeLegendKeys = runtimeLegend.map(item => item.value);
+        let runtimeLegendKeys = runtimeLegend.map(item => item.value)
         state.legend.categoryValuesOrder.forEach(category => {
           if (runtimeLegendKeys.indexOf(category) === -1) {
-            valid = false;
+            valid = false
           }
-        });
+        })
       } else {
         valid = false
       }
@@ -962,7 +1048,7 @@ const EditorPanel = props => {
         })
       }
     }
-  }, [runtimeLegend])
+  }, [runtimeLegend]) // eslint-disable-line
 
   // if no state choice by default show alabama
   useEffect(() => {
@@ -978,7 +1064,7 @@ const EditorPanel = props => {
         }
       })
     }
-  }, [])
+  }, []) // eslint-disable-line
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -987,7 +1073,7 @@ const EditorPanel = props => {
   ]
 
   columnsInData.map(colName => {
-    columnsOptions.push(
+    return columnsOptions.push(
       <option value={colName} key={colName}>
         {colName}
       </option>
@@ -1006,19 +1092,6 @@ const EditorPanel = props => {
     })
   })
 
-  let specialClasses = []
-  if (legend.specialClasses && legend.specialClasses.length && typeof legend.specialClasses[0] === 'string') {
-    legend.specialClasses.forEach(specialClass => {
-      specialClasses.push({
-        key: state.columns.primary && state.columns.primary.name ? state.columns.primary.name : columnsInData[0],
-        value: specialClass,
-        label: specialClass
-      })
-    })
-  } else {
-    specialClasses = legend.specialClasses || []
-  }
-
   const additionalColumns = Object.keys(state.columns).filter(value => {
     const defaultCols = ['geo', 'navigate', 'primary', 'latitude', 'longitude']
 
@@ -1030,6 +1103,7 @@ const EditorPanel = props => {
 
   const updateField = (section, subsection, fieldName, newValue) => {
     const isArray = Array.isArray(state[section])
+
     let sectionValue = isArray ? [...state[section], newValue] : { ...state[section], [fieldName]: newValue }
 
     if (null !== subsection) {
@@ -1118,6 +1192,7 @@ const EditorPanel = props => {
             value={filter.order}
             onChange={e => {
               changeFilter(index, 'filterOrder', e.target.value)
+              changeFilterActive(index, filter.values[0])
             }}
           >
             {filterOptions.map((option, index) => {
@@ -1188,15 +1263,11 @@ const EditorPanel = props => {
   }
 
   useEffect(() => {
-    if (paletteName) handleEditorChanges('color', paletteName)
-  }, [paletteName]) // dont add handleEditorChanges as a dependency even if it requires
-
-  useEffect(() => {
     const parsedData = convertStateToConfig()
     const formattedData = JSON.stringify(parsedData, undefined, 2)
 
     setConfigTextbox(formattedData)
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   useEffect(() => {
     // Pass up to Editor if needed
@@ -1204,7 +1275,7 @@ const EditorPanel = props => {
       const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
-  }, [state])
+  }, [state]) // eslint-disable-line
 
   let numberOfItemsLimit = 8
 
@@ -1413,9 +1484,11 @@ const EditorPanel = props => {
                 <AccordionItemPanel>
                   <TextField
                     value={general.title}
+                    data-testid='title-input'
                     updateField={updateField}
                     section='general'
                     fieldName='title'
+                    id='title'
                     label='Title'
                     placeholder='Map Title'
                     tooltip={
@@ -1424,11 +1497,21 @@ const EditorPanel = props => {
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
+                          <p>Title is required to set the name of the download file but can be hidden using the option below.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
                   />
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={state.general.showTitle || false}
+                      onChange={event => {
+                        handleEditorChanges('showTitle', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Show Title</span>
+                  </label>
                   <TextField
                     value={general.superTitle || ''}
                     updateField={updateField}
@@ -1501,6 +1584,18 @@ const EditorPanel = props => {
                     }
                   />
                   {'us' === state.general.geoType && <TextField value={general.territoriesLabel} updateField={updateField} section='general' fieldName='territoriesLabel' label='Territories Label' placeholder='Territories' />}
+                  {'us' === state.general.geoType && (
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={general.territoriesAlwaysShow || false}
+                        onChange={event => {
+                          handleEditorChanges('territoriesAlwaysShow', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Show All Territories</span>
+                    </label>
+                  )}
                   {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1687,7 +1782,7 @@ const EditorPanel = props => {
                       </label>
                     </fieldset>
                   )}
-                  {(('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && (
+                  {('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && (
                     <>
                       <label>Latitude Column</label>
                       <select
@@ -1914,35 +2009,42 @@ const EditorPanel = props => {
                           </Tooltip>
                         </span>
                       </label>
-                      {state.legend.additionalCategories && state.legend.additionalCategories.map((val, i) => (
-                        <fieldset className='edit-block' key={val}>
-                          <button
-                            className='remove-column'
-                            onClick={event => {
-                              event.preventDefault()
-                              const updatedAdditionaCategories = [...state.legend.additionalCategories];
-                              updatedAdditionaCategories.splice(i, 1);
-                              updateField('legend', null, 'additionalCategories', updatedAdditionaCategories);
-                            }}
-                          >
-                            Remove
-                          </button>
-                          <label>
-                            <span className='edit-label column-heading'>Category</span>
-                            <TextField value={val} section="legend" subsection={null} fieldName="additionalCategories" updateField={(section, subsection, fieldName, value) => {
-                              const updatedAdditionaCategories = [...state.legend.additionalCategories];
-                              updatedAdditionaCategories[i] = value;
-                              updateField(section, subsection, fieldName, updatedAdditionaCategories)
-                            }} />
-                          </label>
-                        </fieldset>
-                      ))}
+                      {state.legend.additionalCategories &&
+                        state.legend.additionalCategories.map((val, i) => (
+                          <fieldset className='edit-block' key={val}>
+                            <button
+                              className='remove-column'
+                              onClick={event => {
+                                event.preventDefault()
+                                const updatedAdditionaCategories = [...state.legend.additionalCategories]
+                                updatedAdditionaCategories.splice(i, 1)
+                                updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+                              }}
+                            >
+                              Remove
+                            </button>
+                            <label>
+                              <span className='edit-label column-heading'>Category</span>
+                              <TextField
+                                value={val}
+                                section='legend'
+                                subsection={null}
+                                fieldName='additionalCategories'
+                                updateField={(section, subsection, fieldName, value) => {
+                                  const updatedAdditionaCategories = [...state.legend.additionalCategories]
+                                  updatedAdditionaCategories[i] = value
+                                  updateField(section, subsection, fieldName, updatedAdditionaCategories)
+                                }}
+                              />
+                            </label>
+                          </fieldset>
+                        ))}
                       <button
                         className={'btn full-width'}
                         onClick={event => {
                           event.preventDefault()
-                          const updatedAdditionaCategories = [...(state.legend.additionalCategories || [])];
-                          updatedAdditionaCategories.push('');
+                          const updatedAdditionaCategories = [...(state.legend.additionalCategories || [])]
+                          updatedAdditionaCategories.push('')
                           updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
                         }}
                       >
@@ -2025,6 +2127,17 @@ const EditorPanel = props => {
                         <span className='edit-label'>Single Row Legend</span>
                       </label>
                     )}
+                    {/* always show */}
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={legend.showSpecialClassesLast}
+                        onChange={event => {
+                          handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Show Special Classes Last</span>
+                    </label>
                     {'category' !== legend.type && (
                       <label className='checkbox'>
                         <input type='checkbox' checked={legend.separateZero || false} onChange={event => handleEditorChanges('separateZero', event.target.checked)} />
@@ -2232,6 +2345,7 @@ const EditorPanel = props => {
                       updateField={updateField}
                       section='dataTable'
                       fieldName='title'
+                      id='dataTableTitle'
                       label='Data Table Title'
                       placeholder='Data Table'
                       tooltip={
@@ -2245,6 +2359,26 @@ const EditorPanel = props => {
                         </Tooltip>
                       }
                     />
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard}
+                        onChange={event => {
+                          handleEditorChanges('showDataTable', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>
+                        Show Table
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </span>
+                    </label>
                     <TextField
                       value={dataTable.indexLabel || ''}
                       updateField={updateField}
@@ -2282,26 +2416,6 @@ const EditorPanel = props => {
                       }
                       type='textarea'
                     />
-                    <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard}
-                        onChange={event => {
-                          handleEditorChanges('showDataTable', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>
-                        Show Table
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </span>
-                    </label>
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -2443,8 +2557,6 @@ const EditorPanel = props => {
                     <span className='edit-label'>Show Title</span>
                   </label>
 
-
-
                   {'navigation' === state.general.type && (
                     <label className='checkbox'>
                       <input
@@ -2473,10 +2585,10 @@ const EditorPanel = props => {
                     <span className='edit-label'>Map Color Palette</span>
                   </label>
                   {/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
-                  <InputToggle type='3d' section='general' subsection='palette' fieldName='isReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={isPaletteReversed} />
+                  <InputToggle type='3d' section='general' subsection='palette' fieldName='isReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={state.general.palette.isReversed} />
                   <span>Sequential</span>
                   <ul className='color-palette'>
-                    {filteredPallets.map(palette => {
+                    {sequential.map(palette => {
                       const colorOne = {
                         backgroundColor: colorPalettes[palette][2]
                       }
@@ -2507,7 +2619,7 @@ const EditorPanel = props => {
                   </ul>
                   <span>Non-Sequential</span>
                   <ul className='color-palette'>
-                    {filteredQualitative.map(palette => {
+                    {nonSequential.map(palette => {
                       const colorOne = {
                         backgroundColor: colorPalettes[palette][2]
                       }
@@ -2540,7 +2652,7 @@ const EditorPanel = props => {
                       )
                     })}
                   </ul>
-                  {(('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && (
+                  {('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && (
                     <label>
                       Geocode Settings
                       <TextField type='number' value={state.visual.geoCodeCircleSize} section='visual' max='10' fieldName='geoCodeCircleSize' label='Geocode Circle Size' updateField={updateField} />
@@ -2590,21 +2702,21 @@ const EditorPanel = props => {
                     </label>
                   )}
                   {state.general.geoType === 'us' ||
-                    (state.general.geoType === 'us-county' ||
-                      (state.general.geoType === 'world') && (
-                        <label>
-                          <span className='edit-label'>City Style</span>
-                          <select
-                            value={state.visual.cityStyle || false}
-                            onChange={event => {
-                              handleEditorChanges('handleCityStyle', event.target.value)
-                            }}
-                          >
-                            <option value='circle'>Circle</option>
-                            <option value='pin'>Pin</option>
-                          </select>
-                        </label>
-                      ))}
+                    state.general.geoType === 'us-county' ||
+                    (state.general.geoType === 'world' && (
+                      <label>
+                        <span className='edit-label'>City Style</span>
+                        <select
+                          value={state.visual.cityStyle || false}
+                          onChange={event => {
+                            handleEditorChanges('handleCityStyle', event.target.value)
+                          }}
+                        >
+                          <option value='circle'>Circle</option>
+                          <option value='pin'>Pin</option>
+                        </select>
+                      </label>
+                    ))}
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
