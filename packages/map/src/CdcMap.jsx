@@ -228,7 +228,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         // Cities
         if (!uid && 'world-geocode' === state.general.type) {
-          uid = cityKeys.find(key => key === geoName.toUpperCase())
+          uid = cityKeys.find(key => key === geoName?.toUpperCase())
         }
       }
 
@@ -943,7 +943,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
     }
 
-
     toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
     if (('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode' || state.general.type === 'world-geocode') && undefined !== row) {
@@ -1109,7 +1108,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // If world-geocode map zoom to geo point
     if ('world-geocode' === state.general.type) {
-
       let lat = value[state.columns.latitude.name]
       let long = value[state.columns.longitude.name]
 
@@ -1477,9 +1475,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType &&
-              <ReactTooltip id="tooltip" variant="light" float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />
-            }
+            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
@@ -1489,9 +1485,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 </div>
               </header>
             )}
-            {general.introText &&
-              <section className='introText'>{parse(general.introText)}</section>
-            }
+            {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             <Filters />
 
