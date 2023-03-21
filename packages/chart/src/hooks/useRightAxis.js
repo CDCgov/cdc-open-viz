@@ -6,12 +6,14 @@ export default function useRightAxis({ config, yMax = 0, data = [], updateConfig
   const rightSeriesKeys = config.series && config.series.filter(series => series.axis === 'Right').map(key => key.dataKey)
   const { minValue } = useReduceData(config, data)
 
+  console.log("data,minValue",data,minValue)
   const allRightAxisData = rightSeriesKeys => {
     if (!rightSeriesKeys) return [0]
     let rightAxisData = []
     rightSeriesKeys.map((key, index) => {
       return (rightAxisData = [...rightAxisData, ...data.map(item => Number(item[key]))])
     })
+    console.log("rightSeriesKeys,rightAxisData",rightSeriesKeys,rightAxisData)
     return rightAxisData
   }
 
@@ -22,6 +24,6 @@ export default function useRightAxis({ config, yMax = 0, data = [], updateConfig
     domain: [minValue, max],
     range: [yMax, 0]
   })
-
+console.log("USERIGHTAXIS min,max,yScaleRight, hasRightAxis",min,max,yScaleRight, hasRightAxis)
   return { yScaleRight, hasRightAxis }
 }
