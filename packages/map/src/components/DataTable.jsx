@@ -22,76 +22,79 @@ const DataTable = props => {
 
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
-  const customSort = (a, b) => {
-    const digitRegex = /\d+/
+  const customSort = useCallback(
+    (a, b) => {
+      const digitRegex = /\d+/
 
-    const hasNumber = value => digitRegex.test(value)
+      const hasNumber = value => digitRegex.test(value)
 
-    // force null and undefined to the bottom
-    a = a === null || a === undefined ? '' : a
-    b = b === null || b === undefined ? '' : b
+      // force null and undefined to the bottom
+      a = a === null || a === undefined ? '' : a
+      b = b === null || b === undefined ? '' : b
 
-    // convert any strings that are actually numbers to proper data type
-    const aNum = Number(a)
+      // convert any strings that are actually numbers to proper data type
+      const aNum = Number(a)
 
-    if (!Number.isNaN(aNum)) {
-      a = aNum
-    }
+      if (!Number.isNaN(aNum)) {
+        a = aNum
+      }
 
-    const bNum = Number(b)
+      const bNum = Number(b)
 
-    if (!Number.isNaN(bNum)) {
-      b = bNum
-    }
+      if (!Number.isNaN(bNum)) {
+        b = bNum
+      }
 
-    // remove iso code prefixes
-    if (typeof a === 'string') {
-      a = a.replace('us-', '')
-      a = displayGeoName(a)
-    }
+      // remove iso code prefixes
+      if (typeof a === 'string') {
+        a = a.replace('us-', '')
+        a = displayGeoName(a)
+      }
 
-    if (typeof b === 'string') {
-      b = b.replace('us-', '')
-      b = displayGeoName(b)
-    }
+      if (typeof b === 'string') {
+        b = b.replace('us-', '')
+        b = displayGeoName(b)
+      }
 
-    // force any string values to lowercase
-    a = typeof a === 'string' ? a.toLowerCase() : a
-    b = typeof b === 'string' ? b.toLowerCase() : b
+      // force any string values to lowercase
+      a = typeof a === 'string' ? a.toLowerCase() : a
+      b = typeof b === 'string' ? b.toLowerCase() : b
 
-    // If the string contains a number, remove the text from the value and only sort by the number. Only uses the first number it finds.
-    if (typeof a === 'string' && hasNumber(a) === true) {
-      a = a.match(digitRegex)[0]
+      // If the string contains a number, remove the text from the value and only sort by the number. Only uses the first number it finds.
+      if (typeof a === 'string' && hasNumber(a) === true) {
+        a = a.match(digitRegex)[0]
 
-      a = Number(a)
-    }
+        a = Number(a)
+      }
 
-    if (typeof b === 'string' && hasNumber(b) === true) {
-      b = b.match(digitRegex)[0]
+      if (typeof b === 'string' && hasNumber(b) === true) {
+        b = b.match(digitRegex)[0]
 
-      b = Number(b)
-    }
+        b = Number(b)
+      }
 
-    // When comparing a number to a string, always send string to bottom
-    if (typeof a === 'number' && typeof b === 'string') {
-      return 1
-    }
+      // When comparing a number to a string, always send string to bottom
+      if (typeof a === 'number' && typeof b === 'string') {
+        return 1
+      }
 
-    if (typeof b === 'number' && typeof a === 'string') {
-      return -1
-    }
+      if (typeof b === 'number' && typeof a === 'string') {
+        return -1
+      }
 
-    // Return either 1 or -1 to indicate a sort priority
-    if (a > b) {
-      return 1
-    }
-    if (a < b) {
-      return -1
-    }
-    // returning 0, undefined or any falsey value will use subsequent sorts or
-    // the index as a tiebreaker
-    return 0
-  }
+      // Return either 1 or -1 to indicate a sort priority
+      if (a > b) {
+        return 1
+      }
+      if (a < b) {
+        return -1
+      }
+      // returning 0, undefined or any falsey value will use subsequent sorts or
+      // the index as a tiebreaker
+      return 0
+    },
+    [displayGeoName]
+  )
 
   // Optionally wrap cell with anchor if config defines a navigation url
   const getCellAnchor = useCallback(
