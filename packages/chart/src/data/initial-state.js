@@ -25,6 +25,7 @@ export default {
     hideTicks: false,
     size: 50,
     gridLines: false,
+    enablePadding: false,
     min: '',
     max: '',
     labelColor: '#333',
