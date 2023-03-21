@@ -3,7 +3,7 @@
 		"title": "Default County Map",
 		"subtext": "",
 		"territoriesLabel": "Territories",
-		"type": "map",
+		"type": "data",
 		"geoType": "us-county",
 		"headerColor": "theme-blue",
 		"showSidebar": true,

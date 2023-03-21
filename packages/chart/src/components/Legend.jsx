@@ -110,27 +110,16 @@ const Legend = () => {
 
     return uniqeLabels
   }
-  // in small screens update config legend position.
-  useEffect(() => {
-    if (currentViewport === 'sm' || currentViewport === 'xs' || config.legend.position === 'left') {
-      setConfig({ ...config, legend: { ...config.legend, position: 'bottom' } })
-    }
-    setConfig({ ...config, legend: { ...config.legend, position: 'right' } })
-  }, [currentViewport]) // eslint-disable-line
+  const isBottomOrSmallViewport = config.legend.position === 'bottom' || currentViewport === 'sm' || currentViewport === 'xs'
+  const isHorizontal = config.orientation === 'horizontal'
+  const marginTop = isBottomOrSmallViewport && isHorizontal ? `${config.runtime.xAxis.size}px` : '0px'
+  const marginBottom = isBottomOrSmallViewport ? '15px' : '0px'
 
   if (!legend) return null
 
   if (!legend.dynamicLegend)
     return config.visualizationType !== 'Box Plot' ? (
-      // eslint-disable-next-line
-      <aside
-        style={{ marginTop: config.legend.position === 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px', marginBottom: config.legend.position === 'bottom' ? '15px' : '0px' }}
-        id='legend'
-        className={containerClasses.join(' ')}
-        role='region'
-        aria-label='legend'
-        tabIndex={0} // eslint-disable-line
-      >
+      <aside style={{ marginTop, marginBottom }} id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
         {legend.label && <h2>{parse(legend.label)}</h2>}
         {legend.description && <p>{parse(legend.description)}</p>}
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
