@@ -2,6 +2,7 @@ export default {
   general: {
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',
+    title: 'Map Title',
     showTitle: true,
     showSidebar: true,
     showDownloadButton: true,
@@ -9,6 +10,7 @@ export default {
     displayAsHex: false,
     displayStateLabels: false,
     territoriesLabel: 'Territories',
+    territoriesAlwaysShow: false,
     language: 'en',
     geoType: 'single-state',
     geoLabelOverride: '',
@@ -53,6 +55,7 @@ export default {
     unified: false,
     singleColumn: false,
     singleRow: false,
+    showSpecialClassesLast: false,
     dynamicDescription: false,
     type: 'equalnumber',
     numberOfItems: 3,

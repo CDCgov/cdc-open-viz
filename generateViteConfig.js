@@ -5,6 +5,7 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import svgr from 'vite-plugin-svgr' // Svg Support
 import dsv from '@rollup/plugin-dsv' // CSV Support
 import dns from 'dns' // nodeJS
+import * as path from 'path'
 
 // Force load dev server on `localhost` vs 127.0.0.1
 dns.setDefaultResultOrder('verbatim')
@@ -16,24 +17,24 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
     server: { port: 8080 },
     build: {
       commonjsOptions: {
-        include: [/@cdc\/core/, /node_modules/],
+        include: [/@cdc\/core/, /node_modules/]
       },
       sourcemap: false,
       lib: {
         entry: `src/${componentName}.jsx`,
         formats: ['es'],
-        fileName: (format) => `${componentName.toLowerCase()}.js`,
+        fileName: format => `${componentName.toLowerCase()}.js`
       },
       rollupOptions: {
-        external: [ 'react', 'reactDOM' ],
+        external: ['react', 'reactDOM'],
         output: {
           chunkFileNames: `${componentName.toLowerCase()}-[hash].[format].js`,
           globals: {
             react: 'React',
             reactDOM: 'ReactDOM'
-          },
-        },
-      },
+          }
+        }
+      }
     },
     plugins: [
       react(reactOptions),
@@ -43,6 +44,11 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
       cssInjectedByJsPlugin(),
       dsv()
     ],
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: path.resolve(__dirname, 'testing-setup.js')
+    },
     ...configOptions
   }
 
