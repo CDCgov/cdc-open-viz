@@ -24,6 +24,7 @@ export default function useRightAxis({ config, yMax = 0, data = [], updateConfig
     domain: [minValue, max],
     range: [yMax, 0]
   })
+  console.log("## USERIGHTAXIS minValue,max,yMax",minValue,max,yMax)
 console.log("USERIGHTAXIS min,max,yScaleRight, hasRightAxis",min,max,yScaleRight, hasRightAxis)
   return { yScaleRight, hasRightAxis }
 }

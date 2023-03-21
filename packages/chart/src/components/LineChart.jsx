@@ -11,12 +11,17 @@ import ConfigContext from '../ConfigContext'
 
 import useRightAxis from '../hooks/useRightAxis'
 
+import isNumber from '@cdc/core/helpers/isNumber'
+import isNumberLog from '@cdc/core/helpers/isNumberLog'
+
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig, handleLineType } = useContext(ConfigContext)
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
   const cleanedData = cleanData(data, config.xAxis.dataKey)
-  const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
+  const { yScaleRight } = useRightAxis({ config, yMax, cleanedData, updateConfig })
+
+  console.log('LINECHART TOP: cleanedData,yScaleRight', cleanedData, yScaleRight)
 
   const handleAxisFormating = (axis = 'left', label, value) => {
     // if this is an x axis category/date value return without doing any formatting.
@@ -52,7 +57,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
 
                 const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.xAxis.dataKey])) : d[config.runtime.xAxis.dataKey]
                 const yAxisValue = getYAxisData(d, seriesKey)
-
+                console.log('LineChart: d,yAxisValue,seriesKey', d, yAxisValue, seriesKey)
                 const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
                 const labeltype = axis === 'Right' ? 'rightLabel' : 'label'
                 let label = config.runtime.yAxis[labeltype]
@@ -72,18 +77,18 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 return (
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
-                  d[seriesKey] !== null && (
-                    // isNumber(d[seriesKey]) &&
-                    // isNumber(getYAxisData(d, seriesKey)) &&
-                    // isNumber(getXAxisData(d)) &&
-                    // isNumber(yScaleRight(getXAxisData(d))) &&
-                    // isNumber(yScale(getXAxisData(d))) &&
+                  d[seriesKey] !== null &&
+                  isNumber(d[seriesKey]) &&
+                  isNumber(getYAxisData(d, seriesKey)) &&
+                  isNumber(getXAxisData(d)) &&
+                  isNumber(yScaleRight(getXAxisData(d))) &&
+                  isNumber(yScale(getXAxisData(d))) && (
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
                       <Text
                         display={config.labels ? 'block' : 'none'}
                         x={xScale(getXAxisData(d))}
-                        y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))}
+                        y={seriesAxis === 'Right' ? isNumberLog(yScaleRight(getYAxisData(d, seriesKey))) : yScale(getYAxisData(d, seriesKey))}
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         textAnchor='middle'
                       >
@@ -104,19 +109,19 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   )
                 )
               })}
-
+              {console.log('LineChart 5: d,seriesKey', seriesKey)}
               <LinePath
                 curve={allCurves.curveLinear}
                 data={cleanedData}
                 x={d => xScale(getXAxisData(d))}
-                y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
+                y={d => (seriesAxis === 'Right' ? yScale(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                 stroke={
                   colorScale && !config.legend.dynamicLegend
                     ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey)
                     : // is dynamic legend
                     config.legend.dynamicLegend
-                      ? colorPalettes[config.palette][index]
-                      : // fallback
+                    ? colorPalettes[config.palette][index]
+                    : // fallback
                       '#000'
                 }
                 strokeWidth={2}
@@ -127,6 +132,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null && item[config.runtime.seriesLabels[seriesKey]] !== undefined
                 }}
               />
+              {console.log('LineChart 6: d,seriesKey', seriesKey)}
               {config.animate && (
                 <LinePath
                   className='animation'
@@ -145,13 +151,14 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 />
               )}
 
+              {console.log('LineChart 7: d,seriesKey', seriesKey)}
               {/* Render series labels at end if each line if selected in the editor */}
               {config.showLineSeriesLabels &&
                 (config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map(seriesKey => {
                   let lastDatum
-                  for (let i = data.length - 1; i >= 0; i--) {
-                    if (data[i][seriesKey]) {
-                      lastDatum = data[i]
+                  for (let i = cleanedData.length - 1; i >= 0; i--) {
+                    if (cleanedData[i][seriesKey]) {
+                      lastDatum = cleanedData[i]
                       break
                     }
                   }
@@ -167,6 +174,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
             </Group>
           )
         })}
+        {console.log('LineChart 8:')}
         {/* Message when dynamic legend and nothing has been picked */}
         {config.legend.dynamicLegend && seriesHighlight.length === 0 && (
           <Text x={xMax / 2} y={yMax / 2} fill='black' textAnchor='middle' color='black'>
