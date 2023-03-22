@@ -1091,7 +1091,7 @@ const EditorPanel = () => {
                     <AccordionItemButton>Measures</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <h4>Labels for 5-Number Summary</h4>
+                    <h4 style={{ fontSize: '18px' }}>Labels for 5-Number Summary</h4>
 
                     {/* prettier-ignore */}
                     {/* max */}
@@ -1203,7 +1203,7 @@ const EditorPanel = () => {
                       }
                     />
                     <br />
-                    <h4>Labels for Additional Measures</h4>
+                    <h4 style={{ fontSize: '18px' }}>Labels for Additional Measures</h4>
 
                     {/* iqr */}
                     <TextField type='text' value={config.boxplot.labels.iqr} fieldName='iqr' section='boxplot' subsection='labels' label='Interquartile Range' updateField={updateField} />
@@ -1218,7 +1218,7 @@ const EditorPanel = () => {
                     {/* values */}
                     <TextField type='text' value={config.boxplot.labels.values} fieldName='values' section='boxplot' subsection='labels' label='Values' updateField={updateField} />
                     <br />
-                    <h4>Percentages for Quartiles</h4>
+                    <h4 style={{ fontSize: '18px' }}>Percentages for Quartiles</h4>
                     <TextField
                       type='number'
                       value={config.boxplot.firstQuartilePercentage ? config.boxplot.firstQuartilePercentage : 25}
