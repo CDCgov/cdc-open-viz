@@ -1458,9 +1458,11 @@ const EditorPanel = () => {
                         <>
                           <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='update min value' placeholder='Auto' updateField={updateField} />
                           <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
+                          <TextField value={config.xAxis.targetLabel || 'Target'} section='xAxis' fieldName='targetLabel' type='text' label='Target Label' updateField={updateField} />
+                          <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Update target Value' placeholder='Auto' className='number-narrow' updateField={updateField} />
+                          <CheckBox value={config.xAxis.showTargetLabel} section='xAxis' fieldName='showTargetLabel' label='Show target label' updateField={updateField} />
                         </>
                       )}
-                      <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Update target Value' placeholder='Auto' className='number-narrow' updateField={updateField} />
                     </>
                   ) : (
                     config.visualizationType !== 'Pie' && (

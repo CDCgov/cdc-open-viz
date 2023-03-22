@@ -83,6 +83,8 @@ export default {
   },
   xAxis: {
     type: 'categorical',
+    showTargetLabel: true,
+    targetLabel: 'Target',
     hideAxis: false,
     hideLabel: false,
     hideTicks: false,
