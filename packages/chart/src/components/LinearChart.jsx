@@ -323,15 +323,37 @@ export default function LinearChart() {
     if (axis === 'yAxis') {
       tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
       // DEV 3163 - to fix edge case of small numbers with decimals
+      //debugger
+      if (tickCount === undefined) {
+        // then it is set to Auto
+        if (max <= 3) {
+          tickCount = 2
+        } else {
+          tickCount = 4 // same default as standalone components
+        }
+      }
+      console.log('### tickCount, max, axis', tickCount, max, axis)
       if (tickCount > max) {
-        // cap it and round it its not an integer
+        // cap it and round it so its an integer
         tickCount = min < 0 ? Math.round(max) * 2 : Math.round(max)
+        console.log('# ADJUST tickCount, max, axis', tickCount, max, axis)
       }
     }
 
     if (axis === 'xAxis') {
       tickCount = isHorizontal && !numTicks ? undefined : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      if (isHorizontal && tickCount === undefined) {
+        // then it is set to Auto
+        // - check for small numbers situation
+        if (max <= 3) {
+          tickCount = 2
+        } else {
+          tickCount = 4 // same default as standalone components
+        }
+      }
     }
+
+    console.log('##### FINAL max, axis, isHorizontal, tickCount ####', max, axis, isHorizontal, tickCount)
     return tickCount
   }
 
@@ -393,6 +415,7 @@ export default function LinearChart() {
               return (
                 <Group className='left-axis'>
                   {props.ticks.map((tick, i) => {
+                    console.log('###props.ticks', props.ticks)
                     const minY = props.ticks[0].to.y
                     const barMinHeight = 15 // 15 is the min height for bars by default
 
