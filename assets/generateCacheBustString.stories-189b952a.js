@@ -1,8 +1,0 @@
-import{M as i}from"./index-cbaed915.js";import{j as e,a as p,F as c}from"./jsx-runtime-670450c2.js";import{u as a}from"./index-4fb8b842.js";import"./iframe-2f398da2.js";import"../sb-preview/runtime.mjs";import"./index-f1f749bf.js";import"./_commonjsHelpers-042e6b4d.js";import"./index-6e91e324.js";import"./index-d475d2ea.js";import"./index-96c5f47c.js";import"./index-d37d4223.js";import"./index-53833bae.js";import"./index-356e4a49.js";function m(n={}){const{wrapper:o}=Object.assign({},a(),n.components);return o?e(o,{...n,children:e(s,{})}):s();function s(){const t=Object.assign({h1:"h1",p:"p",h3:"h3",pre:"pre",code:"code"},a(),n.components);return p(c,{children:[e(i,{title:"Helpers/CoveHelper/String/generateCacheBustString"}),`
-`,e(t.h1,{children:"generateCacheBustString"}),`
-`,e(t.p,{children:"This function generates a unique identifier based on the current date and time rounded down to the nearest quarter-hour. This can be useful for preventing caching issues when making HTTP requests."}),`
-`,e(t.p,{children:" "}),`
-`,e(t.h3,{children:"Example"}),`
-`,e(t.pre,{children:e(t.code,{className:"language-js",children:`CoveHelper.String.generateCacheBustString(); // "2023-03-21T16:00:00.000Z"
-`})})]})}}const d=()=>{throw new Error("Docs-only story")};d.parameters={docsOnly:!0};const r={title:"Helpers/CoveHelper/String/generateCacheBustString",tags:["stories-mdx"],includeStories:["__page"]};r.parameters=r.parameters||{};r.parameters.docs={...r.parameters.docs||{},page:m};const T=["__page"];export{T as __namedExportsOrder,d as __page,r as default};
-//# sourceMappingURL=generateCacheBustString.stories-189b952a.js.map
