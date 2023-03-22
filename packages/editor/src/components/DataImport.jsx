@@ -505,9 +505,26 @@ export default function DataImport() {
                   filter.orderedValues.map((value, valueIndex) => (
                     <li>
                       {value}
+                      <input
+                        type='text'
+                        value={filter.labels ? filter.labels[value] : undefined}
+                        onChange={e => {
+                          let newFilters = [...config.filters]
+
+                          newFilters[i].labels = newFilters[i].labels || {}
+                          newFilters[i].labels[value] = e.target.value
+
+                          setConfig({ ...config, filters: newFilters })
+                        }}
+                      />
                       <button
                         onClick={() => {
                           let newFilters = [...config.filters]
+
+                          if (newFilters[i].labels) {
+                            delete newFilters[i].labels[newFilters[i].orderedValues[valueIndex]]
+                          }
+
                           newFilters[i].orderedValues.splice(valueIndex, 1)
                           setConfig({ ...config, filters: newFilters })
                         }}
