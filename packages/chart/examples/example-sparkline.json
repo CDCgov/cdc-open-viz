@@ -42,7 +42,7 @@
   "data": [
     {
       "Date": "1/15/2016",
-      "Data 1": "44"
+      "Data 1": "0"
     },
     {
       "Date": "2/15/2016",
@@ -50,7 +50,7 @@
     },
     {
       "Date": "3/15/2016",
-      "Data 1": "40"
+      "Data 1": "50"
     },
     {
       "Date": "4/15/2016",
@@ -69,7 +69,7 @@
   "series": [
     {
       "dataKey": "Data 1",
-      "type": "Line"
+      "type": "Bar"
     }
   ],
   "description": "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups."
