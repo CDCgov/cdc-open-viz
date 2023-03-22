@@ -96,7 +96,7 @@ const Legend = () => {
 
       return [labelBelow, labelAbove]
     }
-    if (config.visualizationType === 'Bar' || config.visualizationSubType === 'regular' || colorCode || config.series?.length === 1) {
+    if (config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && colorCode && config.series?.length === 1) {
       let palette = colorPalettes[config.palette]
 
       while (data.length > palette.length) {
@@ -120,9 +120,8 @@ const Legend = () => {
       })
 
       return uniqeLabels
-    } else {
-      return defaultLabels
     }
+    return defaultLabels
   }
 
   const isBottomOrSmallViewport = config.legend.position === 'bottom' || currentViewport === 'sm' || currentViewport === 'xs'
