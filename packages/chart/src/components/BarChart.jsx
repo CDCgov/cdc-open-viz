@@ -264,7 +264,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             </Text>
                           )}
 
-                          {displayNumbersOnBar && textWidth + 50 < bar.width && (
+                          {displayNumbersOnBar && textWidth < bar.width && (
                             <Text
                               display={displayBar ? 'block' : 'none'}
                               x={bar.x + barStack.bars[bar.index].width / 2} // padding
