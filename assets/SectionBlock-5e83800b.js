@@ -1,2 +1,0 @@
-import{j as p}from"./jsx-runtime-670450c2.js";import{p as n}from"./index-4d501b15.js";const e=({children:o,...s})=>p("fieldset",{className:"cove-section-block",...s,children:o});e.propTypes={children:n.any};e.__docgenInfo={description:"",methods:[],displayName:"SectionBlock",props:{children:{type:{name:"any"},required:!1,description:"Children to appear inside the panel block *"}}};export{e as S};
-//# sourceMappingURL=SectionBlock-5e83800b.js.map

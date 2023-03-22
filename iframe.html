@@ -1,25 +1,33 @@
 <!DOCTYPE html>
 <!--suppress HtmlUnknownTarget -->
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Storybook</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script>
-      window.CONFIG_TYPE = 'PRODUCTION';
-      window.LOGLEVEL = 'info';
-      window.FRAMEWORK_OPTIONS = undefined;
-      window.CHANNEL_OPTIONS = {};
-      window.FEATURES = {"warnOnLegacyHierarchySeparator":true,"buildStoriesJson":false,"storyStoreV7":true,"breakingChangesV7":true,"interactionsDebugger":false,"argTypeTargetsV7":true};
-      window.STORIES = [{"titlePrefix":"","directory":"./_stories","files":"*.mdx","importPathMatcher":"^\\.[\\\\/](?:_stories\\/(?!\\.)(?=.)[^/]*?\\.mdx)$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/*.stories.@(js|jsx|ts|tsx)","importPathMatcher":"^\\.[\\\\/](?:packages(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)_stories\\/(?!\\.)(?=.)[^/]*?\\.stories\\.(js|jsx|ts|tsx))$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/*.mdx","importPathMatcher":"^\\.[\\\\/](?:packages(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)_stories\\/(?!\\.)(?=.)[^/]*?\\.mdx)$"}];
-      window.DOCS_OPTIONS = {"docsMode":true,"disable":false,"defaultName":"Docs","autodocs":"tag"};
-      window.SERVER_CHANNEL_URL = undefined;
-      
-      // We do this so that "module && module.hot" etc. in Storybook source code
-      // doesn't fail (it will simply be disabled)
-      window.module = undefined;
-      </script>
-    <base target="_parent" />
+
+<head>
+  <meta charset="utf-8" />
+  <title>Storybook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="prefetch" href="./sb-common-assets/nunito-sans-regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="prefetch" href="./sb-common-assets/nunito-sans-italic.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="prefetch" href="./sb-common-assets/nunito-sans-bold.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="prefetch" href="./sb-common-assets/nunito-sans-bold-italic.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="./sb-common-assets/fonts.css" />
+
+  <script>
+    window.CONFIG_TYPE = 'PRODUCTION';
+    window.LOGLEVEL = 'info';
+    window.FRAMEWORK_OPTIONS = undefined;
+    window.CHANNEL_OPTIONS = {};
+    window.FEATURES = {"warnOnLegacyHierarchySeparator":true,"buildStoriesJson":false,"storyStoreV7":true,"breakingChangesV7":true,"argTypeTargetsV7":true,"legacyDecoratorFileOrder":false};
+    window.STORIES = [{"titlePrefix":"","directory":"./_stories","files":"*.mdx","importPathMatcher":"^\\.[\\\\/](?:_stories\\/(?!\\.)(?=.)[^/]*?\\.mdx)$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/*.stories.@(js|jsx|ts|tsx)","importPathMatcher":"^\\.[\\\\/](?:packages(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)_stories\\/(?!\\.)(?=.)[^/]*?\\.stories\\.(js|jsx|ts|tsx))$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/*.mdx","importPathMatcher":"^\\.[\\\\/](?:packages(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)_stories\\/(?!\\.)(?=.)[^/]*?\\.mdx)$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/**/*.mdx","importPathMatcher":"^\\.[\\\\/](?:packages(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)_stories(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)(?!\\.)(?=.)[^/]*?\\.mdx)$"}];
+    window.DOCS_OPTIONS = {"docsMode":true,"defaultName":"Docs","autodocs":"tag"};
+    window.SERVER_CHANNEL_URL = undefined;
+
+    // We do this so that "module && module.hot" etc. in Storybook source code
+    // doesn't fail (it will simply be disabled)
+    window.module = undefined;
+  </script>
+  <base target="_parent" />
 
 <style>
   /* While we aren't showing the main block yet, but still preparing, we want everything the user
@@ -351,11 +359,11 @@
 <script>
   window.global = window;
 </script>
-    <script type="module" crossorigin src="./assets/iframe-f75c9c24.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/preload-helper-41c905a7.js">
-  </head>
-  <body>
-    <div class="sb-preparing-story sb-wrapper">
+  <script type="module" crossorigin src="./assets/iframe-a7047431.js"></script>
+</head>
+
+<body>
+  <div class="sb-preparing-story sb-wrapper">
   <div class="sb-loader"></div>
 </div>
 
@@ -443,9 +451,10 @@
   <pre class="sb-errordisplay_code"><code id="error-stack"></code></pre>
 </div>
 
-    <div id="storybook-root"></div>
-    <div id="storybook-docs"></div>
-    
-    
-  </body>
+  <div id="storybook-root"></div>
+  <div id="storybook-docs"></div>
+  
+  
+</body>
+
 </html>
