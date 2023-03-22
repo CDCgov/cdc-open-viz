@@ -50,25 +50,35 @@ const Filters = () => {
       return filters.map((singleFilter, index) => {
         const values = []
 
-        if (!singleFilter.order || singleFilter.order === '') {
-          singleFilter.order = 'asc'
-        }
+        if (singleFilter.orderedValues) {
+          singleFilter.orderedValues.forEach((filterOption, index) => {
+            values.push(
+              <option key={index} value={filterOption}>
+                {singleFilter.labels && singleFilter.labels[filterOption] ? singleFilter.labels[filterOption] : filterOption}
+              </option>
+            )
+          })
+        } else {
+          if (!singleFilter.order || singleFilter.order === '') {
+            singleFilter.order = 'asc'
+          }
 
-        if (singleFilter.order === 'desc') {
-          singleFilter.values = singleFilter.values.sort(sortDesc)
-        }
+          if (singleFilter.order === 'desc') {
+            singleFilter.values = singleFilter.values.sort(sortDesc)
+          }
 
-        if (singleFilter.order === 'asc') {
-          singleFilter.values = singleFilter.values.sort(sortAsc)
-        }
+          if (singleFilter.order === 'asc') {
+            singleFilter.values = singleFilter.values.sort(sortAsc)
+          }
 
-        singleFilter.values.forEach((filterOption, index) => {
-          values.push(
-            <option key={index} value={filterOption}>
-              {filterOption}
-            </option>
-          )
-        })
+          singleFilter.values.forEach((filterOption, index) => {
+            values.push(
+              <option key={index} value={filterOption}>
+                {singleFilter.labels && singleFilter.labels[filterOption] ? singleFilter.labels[filterOption] : filterOption}
+              </option>
+            )
+          })
+        }
 
         return (
           <div className='single-filter' key={index}>
