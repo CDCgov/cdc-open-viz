@@ -47,33 +47,23 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
 
     const toolTip = applyTooltipsToGeo(cityDisplayName, isGeoCodeMap ? geoData : data[city])
 
-
-    // If we need to add a cursor pointer
-    if ((state.columns.navigate && geoData?.[state.columns.navigate.name] && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
-      styles.cursor = 'pointer'
-    }
-
     const radius = state.general.geoType === 'us' && !isGeoCodeMap ? 8 : isGeoCodeMap ? state.visual.geoCodeCircleSize : 4
 
     const additionalProps = {
       fillOpacity: state.general.type === 'bubble' ? 0.4 : 1
     }
 
-    const circle = <circle cx={0} cy={0} r={state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius}
-      title='Click for more information'
-      onClick={() => geoClickHandler(cityDisplayName, geoData)}
-      data-tooltip-id="tooltip"
-      data-tooltip-html={toolTip}
-      {...additionalProps}
-    />
+    const circle = <circle cx={0} cy={0} r={state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius} title='Click for more information' onClick={() => geoClickHandler(cityDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} {...additionalProps} />
 
     const pin = (
-      <path className='marker' d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
+      <path
+        className='marker'
+        d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
         title='Click for more information'
         onClick={() => geoClickHandler(cityDisplayName, geoData)}
         strokeWidth={2}
         stroke={'black'}
-        data-tooltip-id="tooltip"
+        data-tooltip-id='tooltip'
         data-tooltip-html={toolTip}
         {...additionalProps}
       />
@@ -93,7 +83,6 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       needsPointer = true
     }
 
-
     const styles = {
       fill: legendColors[0],
       opacity: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] !== setSharedFilterValue ? 0.5 : 1,
@@ -109,13 +98,13 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       cursor: needsPointer ? 'pointer' : 'default'
     }
 
+    // If we need to add a cursor pointer
+    if ((state.columns.navigate && geoData?.[state.columns.navigate.name] && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+      styles.cursor = 'pointer'
+    }
+
     return (
-      <g
-        key={i}
-        transform={transform}
-        css={styles}
-        className='geo-point'
-      >
+      <g key={i} transform={transform} css={styles} className='geo-point'>
         {state.visual.cityStyle === 'circle' && circle}
         {state.visual.cityStyle === 'pin' && pin}
       </g>
