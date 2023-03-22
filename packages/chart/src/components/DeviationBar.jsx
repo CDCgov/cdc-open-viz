@@ -1,11 +1,10 @@
 import { Line } from '@visx/shape'
 import { Group } from '@visx/group'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import ConfigContext from '../ConfigContext'
 import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import chroma from 'chroma-js'
-import { useEffect } from 'react'
 
 // create function to position text based where bar is located left/or right
 function getTextProps(isLollipopChart, textFits, lollipopShapeSize, fill) {
@@ -39,9 +38,10 @@ function getTextProps(isLollipopChart, textFits, lollipopShapeSize, fill) {
 }
 
 export function DeviationBar({ height, xScale }) {
-  const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig } = useContext(ConfigContext)
+  const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig, parseDate, formatDate } = useContext(ConfigContext)
 
   if (!config || config?.series?.length !== 1 || config.orientation !== 'horizontal') return
+
   const { barStyle, tipRounding, roundingStyle, twoColor } = config
 
   const radius = roundingStyle === 'standard' ? '8px' : roundingStyle === 'shallow' ? '5px' : roundingStyle === 'finger' ? '15px' : '0px'
@@ -49,13 +49,12 @@ export function DeviationBar({ height, xScale }) {
   const isRounded = config.barStyle === 'rounded'
   const target = Number(config.xAxis.target)
   const seriesKey = config.series[0].dataKey
-  const maxVal = xScale.domain()[1]
+  const maxVal = Number(xScale.domain()[1])
   const hasNegativeValues = data.some(d => d[seriesKey] < 0)
-  const shouldShowTargetLine = hasNegativeValues || target > 0
+  const shouldShowTargetLine = hasNegativeValues || target > 0 || xScale.domain()[0] < 0
   const borderWidth = config.barHasBorder === 'true' ? 1 : 0
   const lollipopBarHeight = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5
   const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
-  const lollipopShapeWidth = config.lollipopShape === 'square' ? lollipopShapeSize : lollipopShapeSize / 2
 
   const targetX = Math.max(xScale(0), Math.min(xScale(target), xScale(maxVal * 1.05)))
 
@@ -75,6 +74,38 @@ export function DeviationBar({ height, xScale }) {
 
     return style
   }
+
+  const targetLabel = {
+    calculate: function () {
+      const firstBarValue = data[0][seriesKey]
+      const barPosition = firstBarValue < target ? 'left' : 'right'
+      const label = `${config.xAxis.targetLabel} ${formatNumber(config.xAxis.target || 0, 'left')}`
+      const labelWidth = getTextWidth(label, `bold ${fontSize[config.fontSize]}px sans-serif`)
+      let labelY = config.isLollipopChart ? lollipopBarHeight / 2 : Number(config.barHeight) / 2
+      let paddingX = 0
+      let labelX = 0
+      let showLabel = false
+
+      if (barPosition === 'right') {
+        paddingX = -10
+        showLabel = labelWidth - paddingX < targetX
+        labelX = targetX - labelWidth
+      }
+
+      if (barPosition === 'left') {
+        paddingX = 10
+        showLabel = maxVal - target > labelWidth / 10 + paddingX
+        labelX = targetX
+      }
+
+      this.text = label
+      this.y = labelY
+      this.x = labelX
+      this.padding = paddingX
+      this.showLabel = config.xAxis.showTargetLabel ? showLabel : false
+    }
+  }
+  targetLabel.calculate()
 
   useEffect(() => {
     if (config.barStyle === 'lollipop' && !config.isLollipopChart) {
@@ -103,17 +134,18 @@ export function DeviationBar({ height, xScale }) {
           const totalheight = (barSpace + barHeight + borderWidth) * data.length
           config.heights.horizontal = totalheight
 
-          // text,labels,shapes postiions
+          // text,labels postiions
           const textWidth = getTextWidth(formatNumber(barValue, 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`)
           const textFits = textWidth < barWidth - 6
           const textX = barBaseX
           const textY = barY + barHeight / 2
-          const lollipopCircleX = barBaseX
-          const lollipopCircleY = barY + barHeight / 2
-          const lollipopSquareX = barBaseX
-          const lollipopSquareY = barY - barHeight / 2
-          const borderRadius = applyRadius(barPosition)
 
+          // lollipop shapes
+          const circleX = barBaseX
+          const circleY = barY + barHeight / 2
+          const squareX = barBaseX
+          const squareY = barY - barHeight / 2
+          const borderRadius = applyRadius(barPosition)
           // colors
           const [leftColor, rightColor] = twoColorPalette[twoColor.palette]
           const barColor = { left: leftColor, right: rightColor }
@@ -122,20 +154,35 @@ export function DeviationBar({ height, xScale }) {
 
           let textProps = getTextProps(config.isLollipopChart, textFits, lollipopShapeSize, fill)
 
+          // tooltips
+          const xAxisValue = formatNumber(barValue, 'left')
+          const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[index][config.runtime.originalXAxis.dataKey])) : data[index][config.runtime.originalXAxis.dataKey]
+          let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+          let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+          const tooltip = `<div>
+          ${yAxisTooltip}<br />
+          ${xAxisTooltip}
+            </div>`
+
           return (
             <Group key={`deviation-bar-${config.orientation}-${seriesKey}-${index}`}>
-              <foreignObject x={barX} y={barY} width={barWidth} height={barHeight} style={{ border: `${borderWidth}px solid #333`, backgroundColor: barColor[barPosition], ...borderRadius }} />
+              <foreignObject x={barX} y={barY} width={barWidth} height={barHeight} style={{ border: `${borderWidth}px solid #333`, backgroundColor: barColor[barPosition], ...borderRadius }} data-tooltip-html={tooltip} data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} />
               {config.yAxis.displayNumbersOnBar && (
                 <Text verticalAnchor='middle' x={textX} y={textY} {...textProps[barPosition]}>
                   {formatNumber(d[seriesKey], 'left')}
                 </Text>
               )}
 
-              {config.isLollipopChart && config.lollipopShape === 'circle' && <circle cx={lollipopCircleX} cy={lollipopCircleY} r={lollipopShapeSize / 2} fill={barColor[barPosition]} style={{ filter: 'unset', opacity: 1 }} />}
-              {config.isLollipopChart && config.lollipopShape === 'square' && <rect x={lollipopSquareX} y={lollipopSquareY} width={lollipopShapeSize} height={lollipopShapeSize} fill={barColor[barPosition]} style={{ opacity: 1, filter: 'unset' }}></rect>}
+              {config.isLollipopChart && config.lollipopShape === 'circle' && <circle cx={circleX} cy={circleY} r={lollipopShapeSize / 2} fill={barColor[barPosition]} style={{ filter: 'unset', opacity: 1 }} />}
+              {config.isLollipopChart && config.lollipopShape === 'square' && <rect x={squareX} y={squareY} width={lollipopShapeSize} height={lollipopShapeSize} fill={barColor[barPosition]} style={{ opacity: 1, filter: 'unset' }}></rect>}
             </Group>
           )
         })}
+        {targetLabel.showLabel && (
+          <Text fontWeight='bold' dx={targetLabel.padding} verticalAnchor='middle' x={targetLabel.x} y={targetLabel.y}>
+            {targetLabel.text}
+          </Text>
+        )}
 
         {shouldShowTargetLine && <Line from={{ x: targetX, y: 0 }} to={{ x: targetX, y: height }} stroke='#333' strokeWidth={2} />}
       </Group>
