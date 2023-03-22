@@ -1202,6 +1202,8 @@ const EditorPanel = () => {
                         </Tooltip>
                       }
                     />
+                    <br />
+                    <h4>Labels for Additional Measures</h4>
 
                     {/* iqr */}
                     <TextField type='text' value={config.boxplot.labels.iqr} fieldName='iqr' section='boxplot' subsection='labels' label='Interquartile Range' updateField={updateField} />
