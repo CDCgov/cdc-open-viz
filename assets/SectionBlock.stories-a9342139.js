@@ -1,7 +1,0 @@
-import{M as i,C as l,S as d,A as u}from"./index-d00d5d05.js";import{S as n}from"./SectionBlock-e9ce0bd2.js";import{j as e,a as x,F as h}from"./jsx-runtime-670450c2.js";import{u as m}from"./index-4fb8b842.js";import"./iframe-a7047431.js";import"../sb-preview/runtime.mjs";import"./index-f1f749bf.js";import"./_commonjsHelpers-042e6b4d.js";import"./index-6e91e324.js";import"./index-d475d2ea.js";import"./index-96c5f47c.js";import"./index-d37d4223.js";import"./index-53833bae.js";import"./index-356e4a49.js";import"./index-4d501b15.js";const p=({...t})=>e(n,{...t});function S(t={}){const{wrapper:r}=Object.assign({},m(),t.components);return r?e(r,{...t,children:e(a,{})}):a();function a(){const s=Object.assign({h1:"h1",p:"p"},m(),t.components);return x(h,{children:[e(i,{title:"Components/UI/SectionBlock",component:n}),`
-`,e(s.h1,{children:"Header"}),`
-`,e(s.p,{children:"Content Text"}),`
-`,e(l,{sourceState:"shown",withSource:"open",children:e(d,{name:"Example",children:p.bind({})})}),`
-`,e(u,{story:"Example"})]})}}const c=p.bind({});c.storyName="Example";c.parameters={storySource:{source:`({ ...args
-}) => <SectionBlock {...args} />`}};const o={title:"Components/UI/SectionBlock",component:n,tags:["stories-mdx"],includeStories:["example"]};o.parameters=o.parameters||{};o.parameters.docs={...o.parameters.docs||{},page:S};const X=["Template","example"];export{p as Template,X as __namedExportsOrder,o as default,c as example};
-//# sourceMappingURL=SectionBlock.stories-a9342139.js.map
