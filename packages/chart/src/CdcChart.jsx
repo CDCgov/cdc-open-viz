@@ -661,13 +661,16 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     //
     // DEV 3163 edge case for small numbers with decimals
     // - if roundTo undefined which means it is blank, then do not round
+    console.log('CdcChart axis,commas,abbreviated, num before', axis, commas, abbreviated, num)
     if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
       num = num // eslint-disable-line
       //   } else if (roundTo === undefined) {
       // if you put this in if statement above, commas dont work
       //     num = num // eslint-disable-line
+      console.log('if statement=', num)
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
+      console.log('usingtoLocalString=', num)
     }
     let result = ''
 
