@@ -20,7 +20,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
 
   const handleAxisFormating = (axis = 'left', label, value) => {
     // if this is an x axis category/date value return without doing any formatting.
-    if (label === config.runtime.xAxis.label) return value
+    // if (label === config.runtime.xAxis.label) return value
 
     axis = String(axis).toLocaleLowerCase()
     if (label) {
