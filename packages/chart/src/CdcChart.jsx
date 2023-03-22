@@ -96,7 +96,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       return ariaLabel
     } catch (e) {
-      console.error(e.message) // eslint-disable-line
+      console.error('COVE: ', e.message) // eslint-disable-line
     }
   }
 
@@ -141,7 +141,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
         }
       } catch {
-        console.error(`Cannot parse URL: ${response.dataUrl}`)
+        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`)
         data = []
       }
 
@@ -659,18 +659,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // We can't use commas when we're formatting the dataFormatted number
     // Example: commas -> 12,000; abbreviated -> 12k (correct); abbreviated & commas -> 12 (incorrect)
     //
-    // DEV 3163 edge case for small numbers with decimals
+    // Edge case for small numbers with decimals
     // - if roundTo undefined which means it is blank, then do not round
-    console.log('CdcChart axis,commas,abbreviated, num before', axis, commas, abbreviated, num)
     if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
       num = num // eslint-disable-line
-      //   } else if (roundTo === undefined) {
-      // if you put this in if statement above, commas dont work
-      //     num = num // eslint-disable-line
-      console.log('if statement=', num)
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
-      console.log('usingtoLocalString=', num)
     }
     let result = ''
 
