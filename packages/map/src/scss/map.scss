@@ -225,6 +225,7 @@ header + .map-container.full-border {
 	position: absolute;
 	top: 10px;
 	right: 10px;
+	display: none;
 }
 
 //Region Maps
@@ -309,4 +310,15 @@ header + .map-container.full-border {
   stroke-linejoin: round;
   stroke-linecap: round;
   pointer-events: none;
+}
+
+canvas {
+	width: 100%;
+}
+
+#canvas-tooltip {
+	position: fixed;
+	background-color: white;
+	pointer-events: none;
+	display: none;
 }
