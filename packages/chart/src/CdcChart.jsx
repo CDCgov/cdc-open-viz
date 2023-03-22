@@ -151,9 +151,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       if (data) {
         setStateData(data)
         setExcludedData(data)
+        setFilteredData(filterData(config.filters, data))
       }
 
       updateConfig({ ...config, dataUrl: dataUrlFinal, data })
+      setFilteredData(filterData(config.filters, data))
     }
   }
 
@@ -257,7 +259,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
-        newConfig.filters[index].active = filterValues[0]
+        newConfig.filters[index].active = newConfig.filters[index].active || filterValues[0]
       })
       currentData = filterData(newConfig.filters, newExcludedData)
       setFilteredData(currentData)
@@ -461,12 +463,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Load data when component first mounts
   useEffect(() => {
-    console.log(config)
     loadConfig()
   }, [])
 
   useEffect(() => {
-    console.log('useEffect')
     reloadURLData()
   }, [JSON.stringify(config.filters)])
 

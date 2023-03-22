@@ -4,7 +4,7 @@ import Button from '@cdc/core/components/elements/Button'
 
 const Filters = () => {
   const { config, setConfig, setFilteredData, excludedData, filterData } = useContext(ConfigContext)
-  const [filters, setFilters] = useState(config)
+  const [filters, setFilters] = useState(config.filters)
   const [showApplyButton, setShowApplyButton] = useState(false)
   const buttonText = 'Apply Filters'
   const resetText = 'Reset All'
@@ -38,7 +38,7 @@ const Filters = () => {
   }
 
   const changeFilterActive = (index, value) => {
-    let newFilters = config.filters
+    let newFilters = [...config.filters]
     newFilters[index].active = value
     setFilters(newFilters)
     setShowApplyButton(true)
@@ -46,8 +46,8 @@ const Filters = () => {
 
   // A List of Dropdowns
   const FilterList = () => {
-    if (config.filters) {
-      return config.filters.map((singleFilter, index) => {
+    if (filters) {
+      return filters.map((singleFilter, index) => {
         const values = []
 
         if (!singleFilter.order || singleFilter.order === '') {
@@ -97,7 +97,7 @@ const Filters = () => {
     <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
       <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px' }}>
         <FilterList />
-        {config.filters.length > 0 && (
+        {filters.length > 0 && (
           <div className='filter-section__buttons' style={{ width: '100%' }}>
             <Button onClick={() => handleApplyButton(filters)} disabled={!showApplyButton} style={{ marginRight: '10px' }}>
               {buttonText}
