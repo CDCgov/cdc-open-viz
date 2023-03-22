@@ -1008,7 +1008,7 @@ const EditorPanel = () => {
                                                   {(config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && (
                                                     <>
                                                       <span className='series-list__dropdown'>{typeDropdown}</span>
-                                                      <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>
+                                                      {config.visualizationType === 'Area Chart' && <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
                                                     </>
                                                   )}
                                                   {config.series && config.series.length > 1 && (
