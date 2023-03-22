@@ -348,6 +348,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
 
+    if (newConfig.visualizationType === 'Scatter Plot') {
+      newConfig.xAxis.type = 'continuous'
+    }
+
     setConfig(newConfig)
   }
 
