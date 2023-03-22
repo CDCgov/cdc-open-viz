@@ -7,7 +7,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import useLegendClasses from './../hooks/useLegendClasses'
 
 const Legend = () => {
-  const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
+  const { config, legend, colorScale, seriesHighlight, highlight, twoColorPalette, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
 
@@ -77,35 +77,54 @@ const Legend = () => {
     setDynamicLegendItems([...dynamicLegendItems, JSON.parse(e.target.value)])
   }
 
-  const createLegendLabels = (data, defaultLabels) => {
+  const createLegendLabels = defaultLabels => {
     const colorCode = config.legend?.colorCode
-    if (config.visualizationType !== 'Bar' || config.visualizationSubType !== 'regular' || !colorCode || config.series?.length > 1) {
+    if (config.visualizationType === 'Deviation Bar') {
+      const [belowColor, aboveColor] = twoColorPalette[config.twoColor.palette]
+      const labelBelow = {
+        datum: 'X',
+        index: 0,
+        text: `Below ${config.xAxis.targetLabel}`,
+        value: belowColor
+      }
+      const labelAbove = {
+        datum: 'X',
+        index: 1,
+        text: `Above ${config.xAxis.targetLabel}`,
+        value: aboveColor
+      }
+
+      return [labelBelow, labelAbove]
+    }
+    if (config.visualizationType === 'Bar' || config.visualizationSubType === 'regular' || colorCode || config.series?.length === 1) {
+      let palette = colorPalettes[config.palette]
+
+      while (data.length > palette.length) {
+        palette = palette.concat(palette)
+      }
+      palette = palette.slice(0, data.length)
+      //store uniq values to Set by colorCode
+      const set = new Set()
+
+      data.forEach(d => set.add(d[colorCode]))
+
+      // create labels with uniq values
+      const uniqeLabels = Array.from(set).map((val, i) => {
+        const newLabel = {
+          datum: val,
+          index: i,
+          text: val,
+          value: palette[i]
+        }
+        return newLabel
+      })
+
+      return uniqeLabels
+    } else {
       return defaultLabels
     }
-    let palette = colorPalettes[config.palette]
-
-    while (data.length > palette.length) {
-      palette = palette.concat(palette)
-    }
-    palette = palette.slice(0, data.length)
-    //store uniq values to Set by colorCode
-    const set = new Set()
-
-    data.forEach(d => set.add(d[colorCode]))
-
-    // create labels with uniq values
-    const uniqeLabels = Array.from(set).map((val, i) => {
-      const newLabel = {
-        datum: val,
-        index: i,
-        text: val,
-        value: palette[i]
-      }
-      return newLabel
-    })
-
-    return uniqeLabels
   }
+
   const isBottomOrSmallViewport = config.legend.position === 'bottom' || currentViewport === 'sm' || currentViewport === 'xs'
   const isHorizontal = config.orientation === 'horizontal'
   const marginTop = isBottomOrSmallViewport && isHorizontal ? `${config.runtime.xAxis.size}px` : '0px'
@@ -121,7 +140,7 @@ const Legend = () => {
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => (
             <div className={innerClasses.join(' ')}>
-              {createLegendLabels(data, labels).map((label, i) => {
+              {createLegendLabels(labels).map((label, i) => {
                 let className = 'legend-item'
                 let itemName = label.datum
 
