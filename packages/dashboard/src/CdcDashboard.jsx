@@ -552,7 +552,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                         const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
                         const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
                         const tableLink = (
-                          <a href={`#data-table-${visualizationConfig.dataKey}`} className='margin-href'>
+                          <a href={`#data-table-${visualizationConfig.dataKey}`} className='margin-left-href'>
                             {visualizationConfig.dataKey} (Go to Table)
                           </a>
                         )

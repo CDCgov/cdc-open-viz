@@ -732,7 +732,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   if (!loading) {
     const tableLink = (
-      <a href={`#data-table-${config.dataKey}`} className='margin-href'>
+      <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
         {config.dataKey} (Go to Table)
       </a>
     )
