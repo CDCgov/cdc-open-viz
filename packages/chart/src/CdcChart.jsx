@@ -323,7 +323,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.boxplot.tableData = tableData
     }
 
-    if (newConfig.visualizationType === 'Combo' || ('Area Chart' && newConfig.series)) {
+    if (newConfig.visualizationType === 'Combo' || (newConfig.visualizationType === 'Line' && newConfig.series)) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.series.forEach(series => {
