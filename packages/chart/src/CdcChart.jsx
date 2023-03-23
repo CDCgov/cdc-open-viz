@@ -96,7 +96,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       return ariaLabel
     } catch (e) {
-      console.error(e.message) // eslint-disable-line
+      console.error('COVE: ', e.message) // eslint-disable-line
     }
   }
 
@@ -141,7 +141,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
         }
       } catch {
-        console.error(`Cannot parse URL: ${response.dataUrl}`)
+        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`)
         data = []
       }
 
@@ -624,7 +624,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     let original = num
     let stringFormattingOptions
-
     if (axis === 'left') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.commas ? true : false,
@@ -669,6 +668,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // Use commas also updates bars and the data table
     // We can't use commas when we're formatting the dataFormatted number
     // Example: commas -> 12,000; abbreviated -> 12k (correct); abbreviated & commas -> 12 (incorrect)
+    //
+    // Edge case for small numbers with decimals
+    // - if roundTo undefined which means it is blank, then do not round
     if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
       num = num // eslint-disable-line
     } else {
