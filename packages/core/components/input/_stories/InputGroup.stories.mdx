@@ -5,23 +5,80 @@ import InputText from '../InputText'
 import Icon from '../../ui/Icon'
 
 <Meta
-  title="Components/Input/Group"
+  title="Components/Input/Input Group"
   component={InputGroup}
   parameters={{ options: { isToolshown: true } }}
 />
 
-# Group
+export const Template = ({ ...args }) => (
+  <InputGroup {...args}/>
+)
 
-<Story name="Default">
-  <InputGroup flow="left" label={<><Icon className="mr-1" display="upload"/> There is text here</>}
-              className="mb-2">
-    <InputText type="text" label="bob"/>
+export const Example = {
+  args: {
+    label: <><Icon className="mr-1" display="upload"/> Upload A File</>,
+    labelPosition: "left",
+    children: [ <InputText type="text"/> ]
+  }
+}
+
+# InputGroup Component
+Component that provides a way to group and label multiple input fields, such as text inputs or buttons,
+together within a single container. Also provides the ability to display the label
+either to the left, center, or right of the input fields.
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example"
+         args={{}}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+&nbsp;
+## Transparent Labels
+Using transparent labels sets the default label background color to be transparent, and automatically resizes the input field to fill the remaining space.
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Transparent Labels"
+         parameters={{ docs: { source: { type: 'code' } } }}
+         args={{
+    test: "test"
+  }}>
+    {() => (<>
+      <InputGroup
+        className="mb-2"
+        label={<b>First Name</b>}
+        labelPosition="left"
+        labelTransparent={true}
+      >
+        <InputText type="text"/>
+      </InputGroup>
+      <InputGroup
+        className="mb-2"
+        label={<b>Last Name</b>}
+        labelPosition="right"
+        labelTransparent={true}
+      >
+        <InputText type="text"/>
+      </InputGroup>
+    </>)}
+  </Story>
+</Canvas>
+
+&nbsp;
+## Split Inputs
+You can also place a label between two input fields, such as a username and server input. Use cases may be rare, but the option is available.
+
+<Story name="Split Inputs">
+  <InputGroup
+    className="mb-2"
+    label="@"
+    labelPosition="center"
+  >
+    <InputText type="text" placeholder="User"/>
+    <InputText type="text" placeholder="Server"/>
   </InputGroup>
-  <InputGroup flow="right" label="Test label text" className="mb-2">
-    <InputText type="text"/>
-  </InputGroup>
-  <InputGroup flow="center" label="@" className="mb-2">
-  <InputText type="text" placeholder="User"/>
-  <InputText type="text" placeholder="Server"/>
-</InputGroup>
 </Story>

@@ -2,71 +2,61 @@ import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 
 import Tooltip from '../Tooltip'
 import Icon from '../Icon'
+import parse from 'html-react-parser'
 
 <Meta
   title="Components/UI/Tooltip"
   component={Tooltip}
+  argTypes={{
+    target: {
+      table: {
+        disable: true
+      }
+    },
+    content: {
+      table: {
+        disable: true
+      }
+    },
+  }}
 />
 
-# Tooltip
-Use the Button component to provide users with a method to interface with a major component, or trigger certain actions.
+export const TooltipStory = ({ target, content, ...args }) => (
+  <div className="m-4">
+    <center>
+      <Tooltip {...args}>
+        <Tooltip.Target>
+          {target}
+        </Tooltip.Target>
+        <Tooltip.Content>
+          {parse(content)}
+        </Tooltip.Content>
+      </Tooltip>
+    </center>
+  </div>
+)
 
+# Tooltip Component
+The `<Tooltip>` component is used to display a tooltip when hovering over a specified element. It should normally only be used for one-off tooltip displays.
+
+The inline `tooltip` method for components should be used instead, when available. Most [input components](./?path=/docs/components-input-text--docs) provide `tooltip` - and tooltip related - properties, which automatically handle tooltip setup for you.
+
+&nbsp;
 ## Trigger Type
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Trigger Type">
-    <Tooltip position="right" border={false}>
-      <Tooltip.Target>
-        <Icon display="question" alt="hello"/>
-      </Tooltip.Target>
-      <Tooltip.Content>
-        Hello world! I have a <a href="#">link</a>.
-      </Tooltip.Content>
-    </Tooltip>
-    <Tooltip position="left" trigger="click" border={false}>
-      <Tooltip.Target>
-        <Icon display="question" alt="hello"/>
-      </Tooltip.Target>
-      <Tooltip.Content>
-        Hello world! I have a <a href="#">link</a>.
-      </Tooltip.Content>
-    </Tooltip>
+  <Story name="Default"
+         args={{
+           place: 'top',
+           trigger: 'click',
+           float: false,
+           shadow: true,
+           border: false,
+           target: <Icon display="questionCircle" />,
+           content: 'Hello world! I\'m a tooltip with a <a href="#">link</a>.',
+         }}
+  >
+    {TooltipStory.bind({})}
   </Story>
 </Canvas>
 
-## Positioning
-<Canvas sourceState="shown" withSource="open">
-  <Story name="Position">
-    <Tooltip position="top" trigger="click" border={false}>
-      <Tooltip.Target>
-        <Icon display="question" alt="hello"/>
-      </Tooltip.Target>
-      <Tooltip.Content>
-        Hello world! I have a <a href="#">link</a>.
-      </Tooltip.Content>
-    </Tooltip>
-    <Tooltip position="right" trigger="click" border={'1'} borderColor={'red'}>
-      <Tooltip.Target>
-        <Icon display="question" alt="hello"/>
-      </Tooltip.Target>
-      <Tooltip.Content>
-        Hello world! I have a <a href="#">link</a>.
-      </Tooltip.Content>
-    </Tooltip>
-    <Tooltip position="bottom" trigger="click" shadow={false} border={'2'}>
-      <Tooltip.Target>
-        <Icon display="question" alt="hello"/>
-      </Tooltip.Target>
-      <Tooltip.Content>
-        Hello world! I have a <a href="#">link</a>.
-      </Tooltip.Content>
-    </Tooltip>
-    <Tooltip position="left" trigger="click" border={'2'} borderColor={'blue'}>
-      <Tooltip.Target>
-        <Icon display="question" alt="hello"/>
-      </Tooltip.Target>
-      <Tooltip.Content>
-        Hello world! I have a <a href="#">link</a>.
-      </Tooltip.Content>
-    </Tooltip>
-  </Story>
-</Canvas>
+<ArgsTable story="Default"/>

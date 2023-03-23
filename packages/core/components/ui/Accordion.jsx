@@ -72,6 +72,7 @@ const Accordion = ({ children }) => {
 
 //Create subcomponents as "slots" within component namespace
 Accordion.Section = AccordionSection
+Accordion.Section.displayName = 'Accordion.Section'
 
 Accordion.propTypes = {
   /** Show warning if supplied statement or value is truthy */

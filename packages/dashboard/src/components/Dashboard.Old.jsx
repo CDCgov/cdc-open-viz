@@ -15,7 +15,7 @@ import DashboardContext from '../DashboardContext'
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
-import dataTransform from '@cdc/core/helpers/data/dataTransform'
+import DataTransform from '@cdc/core/helpers/data/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 // Components - Core
@@ -115,7 +115,7 @@ const Dashboard = () => {
   const [ tabSelected, setTabSelected ] = useState(0)
   const [ imageId ] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
-  const transform = new dataTransform()
+  const transform = new DataTransform()
 
   useEffect(() => {
     setViewMode('isDashboard', true)

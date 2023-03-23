@@ -3,6 +3,7 @@ export default {
     '../_stories/*.mdx',
     '../packages/**/_stories/*.stories.@(js|jsx|ts|tsx)',
     '../packages/**/_stories/*.mdx',
+    '../packages/**/_stories/**/*.mdx',
   ],
   "addons": [
     "@storybook/addon-links",

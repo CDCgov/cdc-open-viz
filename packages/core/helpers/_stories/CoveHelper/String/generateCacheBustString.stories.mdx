@@ -1,0 +1,14 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/String/generateCacheBustString"
+/>
+
+# generateCacheBustString
+This function generates a unique identifier based on the current date and time rounded down to the nearest quarter-hour. This can be useful for preventing caching issues when making HTTP requests.
+
+&nbsp;
+### Example
+```js
+CoveHelper.String.generateCacheBustString(); // "2023-03-21T16:00:00.000Z"
+```

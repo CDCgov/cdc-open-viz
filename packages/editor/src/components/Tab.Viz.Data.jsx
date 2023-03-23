@@ -9,7 +9,7 @@ import { useDropzone } from 'react-dropzone'
 import ConfigContext from '../ConfigContext'
 
 // Helpers
-import dataTransform from '@cdc/core/helpers/data/dataTransform'
+import DataTransform from '@cdc/core/helpers/data/DataTransform'
 
 // Components - Core
 import AlertBox from '@cdc/core/components/ui/AlertBox'
@@ -27,11 +27,10 @@ import SampleDataContext from './../samples/SampleDataContext'
 import SampleData from './SampleData'
 import Tabs from './Tabs'
 
-
 const TabVizData = () => {
   const { config, setConfig, errors, setErrors, errorMessages, maxFileSize, setActiveTab, tempConfig, setTempConfig, sharepath } = useContext(ConfigContext)
 
-  const transform = new dataTransform()
+  const transform = new DataTransform()
 
   const [ externalURL, setExternalURL ] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : config.dataUrl || '')
 

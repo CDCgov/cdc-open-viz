@@ -1,19 +1,15 @@
-import React from 'react'
-import CdcWaffleChart from '../CdcWaffleChart'
+import WaffleChart from '../components/WaffleChart'
 
-CdcWaffleChart.displayName = 'WaffleChart'
+// export const Text = {
+//   args: {...},
+// };
 
 export default {
   title: 'Visualizations/Waffle Chart',
-  component: CdcWaffleChart,
-  parameters: {
-    options: {
-      isToolshown: true
-    }
-  }
+  component: WaffleChart
 }
 
-CdcWaffleChart.defaultProps = {
+WaffleChart.defaultProps = {
   orientation: 'horizontal',
   overallFontSize: 'medium',
   invalidComparate: false,
@@ -27,7 +23,7 @@ CdcWaffleChart.defaultProps = {
   theme: 'blue'
 }
 
-const Template = (args) => <CdcWaffleChart configObj={{ ...args }} />
+const Template = (args) => <WaffleChart configObj={{ ...args }} />
 
 export const Primary = Template.bind({})
 Primary.args = {
@@ -161,3 +157,5 @@ Square.args = {
   nodeSpacer: 2,
   theme: 'cyan'
 }
+
+

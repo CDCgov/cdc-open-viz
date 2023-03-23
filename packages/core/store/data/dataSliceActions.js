@@ -1,11 +1,11 @@
 // Helpers
-import dataTransform from '../../helpers/data/dataTransform'
+import DataTransform from '../../helpers/data/DataTransform'
 import fetchAsyncUrl from '../../helpers/fetchAsyncUrl'
 import CoveHelper from '../../helpers/cove'
 
 import Papa from 'papaparse'
 
-const transform = new dataTransform()
+const transform = new DataTransform()
 
 const dataSliceActions = (set, get) => ({
   // Actions --------------------------------------------------------------------------------------------------------------------------------------------------------------

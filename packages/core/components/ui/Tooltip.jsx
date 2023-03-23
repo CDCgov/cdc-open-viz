@@ -2,6 +2,7 @@ import React, { useId } from 'react'
 
 // Third Party
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import PropTypes from 'prop-types'
 
 // Styles
 import 'react-tooltip/dist/react-tooltip.css'
@@ -28,11 +29,18 @@ const Tooltip = (
 
   const uid = 'tooltip-' + useId()
 
+  const tooltipClasses = () => {
+    const classList = ['cove-tooltip__content']
+    if (!float) classList.push('cove-tooltip--animated')
+    if (trigger === 'click') classList.push('cove-tooltip--can-click')
+    if (border) classList.push('cove-tooltip--border')
+    if (shadow) classList.push('cove-tooltip--shadow')
+    return classList.join(' ')
+  }
   const generateTriggerEvent = (trigger) => {
     const eventList = {
       'hover': 'hover',
-      'focus': 'focus',
-      'click': 'click focus'
+      'click': 'click'
     }
     return eventList[trigger]
   }
@@ -44,19 +52,12 @@ const Tooltip = (
          data-tooltip-float={float}
          data-tooltip-place={place}
          data-tooltip-events={generateTriggerEvent(trigger)}
+         /* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */
+         tabIndex={0}
       >
         {tooltipTargetChildren ? tooltipTargetChildren.props.children : null}
       </a>
-      <ReactTooltip id={uid}
-                    className={
-                      'cove-tooltip__content'
-                      + (' place-' + place)
-                      + (!float ? ' cove-tooltip__content--animated' : '')
-                      + (trigger === 'click' ? ' interactive' : '')
-                      + (border ? (' cove-tooltip--border') : '')
-                      + (shadow ? ' has-shadow' : '')
-                    }
-      >
+      <ReactTooltip id={uid} className={tooltipClasses()}>
         {tooltipContentChildren ? tooltipContentChildren.props.children : null}
       </ReactTooltip>
     </span>
@@ -64,6 +65,24 @@ const Tooltip = (
 }
 
 Tooltip.Target = TooltipTarget
+Tooltip.Target.displayName = 'Tooltip.Target'
+
 Tooltip.Content = TooltipContent
+Tooltip.Content.displayName = 'Tooltip.Content'
 
 export default Tooltip
+
+Tooltip.propTypes = {
+  /** Position of the tooltip relative to the tooltip target */
+  place: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
+  /** Set the trigger event of the tooltip */
+  trigger: PropTypes.oneOf(['hover', 'click']),
+  /** Sets the tooltip to follow the cursor movement around the target - for use with `trigger='hover'` */
+  float: PropTypes.bool,
+  /** Display a shadow on the tooltip */
+  shadow: PropTypes.bool,
+  /** Border tooltip */
+  border: PropTypes.bool,
+  /** Style of the tooltip */
+  style: PropTypes.object
+}

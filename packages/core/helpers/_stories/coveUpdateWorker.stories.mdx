@@ -5,4 +5,35 @@ import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 />
 
 # coveUpdateWorker
-Content Text
+The coveUpdateWorker is a config worker used to update COVE config data automatically. It allows for key values to be updated with new values, transferred to new key entries, and/or removed from the config entirely.
+
+&nbsp;
+## Usage
+- The update workers can be found in the `./packages/core/helpers/update` directory. The `coveUpdateWorker` is the main worker, with the `./packages/core/helpers/update/ver/...` directory housing semantically versioned update workers (ie, `4.23.js`, `4.3.js`, etc).
+- Versioned workers can be asyncronously chain-called in the `coveUpdateWorker` in order to step through multiple version updates for a config object.
+- Once a worker processes a config object, it tags the processed config with a supplied version number as a `validated="4.x.x` entry.
+- If a config object is either unversioned (doesn't have a `config.validated` entry), or the current `validated` version is less than the version of the worker, `coveUpdateWorker` automatically calls the next versioned worker.
+
+  **Example:**
+  ```js
+  // For example, an update_4_23 worker might change the theme key
+  // of a config from 'theme-blue' to 'blue', by removing the 'theme-' prefix:
+
+  // Config object provided
+  const genConfig = {
+    title: 'My Config',
+    theme: 'theme-blue',
+    description: 'This is my config',
+    //validated: undefined, <-- config does not have a validated value, so an entry will be set by the 4.23 worker
+  }
+
+  update_4_23(genConfig) // <-- 4.23 worker processes the config
+
+  // New Config object result
+  genConfig = {
+    title: 'My Config',
+    theme: 'blue', //<-- theme key value has been updated
+    description: 'This is my config',
+    validated: '4.23', //<-- config has been marked validated after being processed by the 4.23 worker
+  }
+  ```

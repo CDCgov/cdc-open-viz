@@ -17,15 +17,16 @@ const ModalHeader = () => null
 const ModalContent = () => null
 const ModalFooter = () => null
 
-const Modal = ({
-                 fontTheme = 'dark',
-                 headerBgColor = '#fff',
-                 showDividerTop = true,
-                 showDividerBottom = true,
-                 showClose = true,
-                 children,
-                 override = null
-               }) => {
+const Modal = (
+  {
+    fontTheme = 'dark',
+    headerBgColor = '#fff',
+    showDividerTop = true,
+    showDividerBottom = true,
+    showClose = true,
+    children
+  }
+) => {
 
   // Store Selectors - Access global overlay state
   let { overlay, toggleOverlay } = useStore()
@@ -82,8 +83,13 @@ const Modal = ({
 
 //Create subcomponents as "slots" within component namespace
 Modal.Header = ModalHeader
+Modal.Header.displayName = 'Modal.Header'
+
 Modal.Content = ModalContent
+Modal.Content.displayName = 'Modal.Content'
+
 Modal.Footer = ModalFooter
+Modal.Footer.displayName = 'Modal.Footer'
 
 Modal.propTypes = {
   fontTheme: PropTypes.oneOf([ 'dark', 'light' ]),

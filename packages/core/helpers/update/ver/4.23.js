@@ -1,4 +1,4 @@
-const update_4_23 = config => {
+const update_4_23 = async config => {
   const ver = 4.23
 
   let newConfig = { ...config }

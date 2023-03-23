@@ -1,0 +1,50 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/Data/filterData"
+/>
+
+# filterData
+Function that filters data based on the values defined in `filters`.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.Data.filterData(filters, data)
+```
+
+**Parameters:**
+
+This function takes in two arguments: `filters` and `data`:
+- `filters` is an array of objects where each object contains two properties: `columnName` and `active`:
+  - `columnName` is a string representing the name of a column in data
+  - `active` is a value indicating whether the rows in data with that column value should be included in the filtered result
+- `data` is an array of objects where each object represents a row of data
+&nbsp;
+
+**Returns:**
+
+New array containing only the rows that meet the filter criteria.
+
+&nbsp;
+### Example
+```jsx
+import CoveHelper from '@cdc/core/helpers/CoveHelper'
+
+...
+
+const filters = [
+  { columnName: 'name', active: 'Alice' },
+  { columnName: 'age', active: 30 }
+]
+
+const data = [
+  { name: 'Alice', age: 30, height: 5.6, weight: 130 },
+  { name: 'Bob', age: 40, height: 5.9, weight: 160 },
+  { name: 'Charlie', age: 50, height: 5.11, weight: 180 }
+]
+
+const filteredData = CoveHelper.Data.filterData(filters, data)
+console.log(filteredData)
+// Output: [{ name: 'Alice', age: 30, height: 5.6, weight: 130 }]
+```

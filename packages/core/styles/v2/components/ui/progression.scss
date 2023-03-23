@@ -3,6 +3,7 @@
 //TODO: COVE Refactor - Replace any '.waiting' classes with below
 .cove-splash__waiting {
   display: flex;
+  box-sizing: border-box;
   justify-content: center;
   align-items: center;
   position: absolute;

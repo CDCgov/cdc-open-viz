@@ -2,11 +2,8 @@ import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 
 import useConfigStore from '../../../store/config/visConfigSlice'
 
-import ConfigProxy from '../ConfigProxy'
-
 <Meta
   title="Components/HOC/ConfigProxy"
-  component={ConfigProxy}
 />
 
 # ConfigProxy Component
@@ -56,16 +53,13 @@ const exampleJson = {
 ```
 The `config` value of the `configStore` can then be accessed, and used to reference the config options that were previously defined in the JSON.
 ```jsx
-const { config } = useConfigStore()
 return (
-  <ConfigProxy configObj={...exampleJson}>
     <div className="example-wrapper">
       <h2>{config.title}</h2>
       <p>{config.description}</p>
       <br/>
       <strong>Theme:</strong> {config.theme}
     </div>
-  </ConfigProxy>
 )
 ```
 

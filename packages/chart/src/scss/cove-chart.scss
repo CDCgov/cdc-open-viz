@@ -76,12 +76,17 @@
 
   @at-root {
     .cove-chart__container[legend-display="left"] #{&} {
-      order: -1;
-      margin-right: 2rem;
+      @include containerBreakpoint(md) {
+        order: -1;
+        margin-right: 2rem;
+      }
     }
 
     .cove-chart__container[legend-display="right"] #{&} {
-      margin-left: 2rem;
+
+      @include containerBreakpoint(md) {
+        margin-left: 2rem;
+      }
     }
 
     .cove-chart__container[legend-display="bottom"] #{&} {

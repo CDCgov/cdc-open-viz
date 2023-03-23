@@ -7,15 +7,23 @@ import SplashError from '../SplashError'
   component={SplashError}
 />
 
-# Header
-Content Text
+# SplashError Component
+A splash display to present errors to the user.
 
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Example">
+  <Story name="Example"
+  args={{
+    title: 'Error',
+    message: 'Something went wrong with your component'
+  }}>
     {Template.bind({})}
   </Story>
 </Canvas>
 
 <ArgsTable story="Example"/>
 
-export const Template = ({ ...args }) => <SplashError {...args}/>
+export const Template = ({ ...args }) => (
+  <div style={{ height: '400px' }}>
+    <SplashError {...args}/>
+  </div>
+)

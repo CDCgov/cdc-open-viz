@@ -1,7 +1,6 @@
 import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 
-import useGlobalStore from '../../../store/global/globalSlice'
-
+import useStore from '../../../store/store'
 import Button from '../../element/Button'
 import Modal from '../Modal'
 import Overlay from '../Overlay'
@@ -64,51 +63,65 @@ export const Template = ({ header, content, footer, ...args }) => (
   </Modal>
 )
 
+export const ButtonTemplate = ({ header, content, footer, ...args }) => {
+  const openOverlay = useStore(state => state.openOverlay)
+  return (
+    <Button onClick={
+      () => openOverlay(
+        <Modal {...args}>
+          <Modal.Header>
+            {header}
+          </Modal.Header>
+          <Modal.Content>
+            {content}
+          </Modal.Content>
+        </Modal>
+      )
+    }>
+      Trigger Modal Open
+    </Button>
+  )
+}
+
+
 # Modal Component
 Use the modal component to display content intended to be informative, but temporary. The content
 displayed is usually interactive, often requiring some type of confirmation - or input - from the user.
 
 <br/>
-
-<Story name="Default"
-       args={{
-         header: <>Default Modal Style</>,
-         content: <>This is a modal that uses the default styles, and does not include any customization options.</>,
-         footer: <Button onClick={(e) => e.preventDefault()}>Trigger an Action</Button>,
-         fontTheme: 'dark',
-         headerBgColor: '#fff',
-         showDividerTop: true,
-         showDividerBottom: true,
-         showClose: true
-       }}>
-  {Template.bind({})}
-</Story>
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Default"
+         args={{
+           header: "Default Modal Style",
+           content: "This is a modal that uses the default styles, and does not include any customization options.",
+           footer: <Button onClick={(e) => e.preventDefault()}>Trigger an Action</Button>,
+           fontTheme: 'dark',
+           headerBgColor: '#fff',
+           showDividerTop: true,
+           showDividerBottom: true,
+           showClose: true
+         }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
 
 <ArgsTable story="Default"/>
 
 ## Usage Examples
 Modals can be customized to fix various display requirements, depending on the situation. Below are a few examples highlighting various potential use cases.
 
+
 ### Interaction
 <Canvas>
-  <Story name="Interaction">
-    {() => {
-      const openOverlay = useGlobalStore(state => state.openOverlay)
-
-      return <>
-        <Button onClick={() => openOverlay(<Modal fontTheme={'light'} headerBgColor={'#824c88'}>
-          <Modal.Header>
-            Example Modal
-          </Modal.Header>
-          <Modal.Content>
-            <p>This is a popup modal with general information. This serves as an example of how interaction with the
-              modal is intended to work.</p>
-          </Modal.Content>
-        </Modal>)}>
-          Trigger Modal Open
-        </Button>
-      </>
-    }}
+  <Story name="ButtonTemplate"
+         args={{
+           header: 'Example Modal',
+           content: 'This is a popup modal with general information. This serves as an example of how interaction with the modal is intended to work.',
+           fontTheme: 'light',
+           headerBgColor: '#824c88',
+         }}
+  >
+    {ButtonTemplate.bind({})}
   </Story>
 </Canvas>
 
@@ -118,21 +131,25 @@ Modals can be customized to fix various display requirements, depending on the s
 <Canvas>
   <Story name="BgCloseDisabled">
     {() => {
-      const openOverlay = useGlobalStore(state => state.openOverlay)
+      const openOverlay = useStore(state => state.openOverlay)
 
-      return <>
-        <Button onClick={() => openOverlay(<Modal fontTheme={'light'} headerBgColor={'#824c88'}>
-          <Modal.Header>
-            Example Modal
-          </Modal.Header>
-          <Modal.Content>
-            <p>This is a popup modal with general information. This serves as an example of how interaction with the
-              modal is intended to work.</p>
-          </Modal.Content>
-        </Modal>, true)}>
+      return (
+        <Button onClick={
+          () => openOverlay(
+            <Modal fontTheme={'light'} headerBgColor={'#824c88'}>
+              <Modal.Header>
+                Example Modal
+              </Modal.Header>
+              <Modal.Content>
+                <p>This is a popup modal with general information. This serves as an example of how interaction with the
+                  modal is intended to work.</p>
+              </Modal.Content>
+            </Modal>, true
+          )
+        }>
           Trigger Locked Modal
         </Button>
-      </>
+      )
     }}
   </Story>
 </Canvas>

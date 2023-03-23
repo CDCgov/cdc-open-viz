@@ -12,9 +12,11 @@ export const parameters = {
         'Guides',
         'CSS Systems',
         'Visualizations',
+        'Stores',
         'Components',
         'Helpers',
-        'Stores',
+        ['CoveHelper', 'DataTransform', 'configHelpers', 'coveUpdateWorker', 'validateFipsCodeLength', '*'],
+        'Hooks'
       ],
     },
   },
@@ -27,12 +29,15 @@ export const parameters = {
   },
   docs: {
     theme: previewTheme,
+    source: {
+      excludeDecorators: true,
+    },
   },
 }
 
 export const decorators = [
   (Story) => (
-    <div className="cove">
+    <div className="cove cove-storybook">
       <Story />
     </div>
   ),

@@ -1,0 +1,30 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/Math/roundToPlace"
+/>
+
+# roundToPlace
+This function takes a value and a number of decimal places to round to as input and returns the rounded value.
+If the number of decimal places to round to is not a positive number, or the input value is not a valid number, this function returns undefined.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.Math.roundToPlace(value, roundToPlace)
+```
+
+**Parameters**:
+
+- `value`: The value to be rounded.
+- `roundToPlace`: _(optional)_ The number of decimal places to round to. If not provided, 0 will be used.
+
+&nbsp;
+### Example
+```js
+CoveHelper.Math.roundToPlace(3.14159, 2) // returns 3.14
+CoveHelper.Math.roundToPlace(3.14159) // returns 3
+CoveHelper.Math.roundToPlace('3.14159', 4) // returns 3.1415
+CoveHelper.Math.roundToPlace('abc', 2) // returns undefined
+CoveHelper.Math.roundToPlace(3.14159, -2) // returns undefined
+```

@@ -1,0 +1,16 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/String/convertStringToNumber"
+/>
+
+# convertStringToNumber
+This function takes a string as an argument and attempts to convert it to a number. If the string contains non-numeric characters, it returns the original string.
+
+&nbsp;
+### Example
+```js
+CoveHelper.String.convertStringToNumber("123"); // 123
+CoveHelper.String.convertStringToNumber("123.45"); // 123.45
+CoveHelper.String.convertStringToNumber("foo"); // "foo"
+```

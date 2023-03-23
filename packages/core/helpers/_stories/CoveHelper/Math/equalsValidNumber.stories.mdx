@@ -1,0 +1,31 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/Math/equalsValidNumber"
+/>
+
+# equalsValidNumber
+This function takes a value as input and returns a boolean indicating whether the input is a valid number.
+
+- A valid number is a number that is not `NaN`, or a string that can be converted to a number.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.Math.equalsValidNumber(value)
+```
+
+**Parameters**:
+
+- `value`: The value to check if it is a valid number.
+
+&nbsp;
+### Example
+```js
+CoveHelper.Math.equalsValidNumber(42) // returns true
+CoveHelper.Math.equalsValidNumber("42") // returns true
+CoveHelper.Math.equalsValidNumber("42.5") // returns true
+CoveHelper.Math.equalsValidNumber("42a") // returns false
+CoveHelper.Math.equalsValidNumber(NaN) // returns false
+CoveHelper.Math.equalsValidNumber([]) // returns false
+```

@@ -1,0 +1,37 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/Event/unsubscribe"
+/>
+
+# unsubscribe
+This function removes an event listener for a given event name from the document object. The listener function to be removed should be
+the same as the one added previously using the [subscribe](/?path=/docs/helpers-covehelper-event-subscribe--docs) function.
+
+The function returns the result of the `removeEventListener` method call.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.Event.unsubscribe(eventName, listener);
+```
+
+**Parameters**
+- `eventName`: A string representing the name of the event to remove the listener from.
+- `listener`: A function to be removed from the event listener list.
+
+&nbsp;
+### Example
+In this example, the `handleClick` function is registered as an event listener for the `click` event
+on a button element using the `subscribe` function. The same function is later removed as a listener using the `unsubscribe` function.
+```js
+function handleClick(event) {
+  console.log('Button clicked!', event.target);
+}
+
+const button = document.querySelector('button');
+subscribe('click', handleClick);
+
+// Later, to remove the listener:
+unsubscribe('click', handleClick);
+```

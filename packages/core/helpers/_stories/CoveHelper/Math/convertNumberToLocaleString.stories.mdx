@@ -1,0 +1,29 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/Math/convertNumberToLocaleString"
+/>
+
+# convertNumberToLocaleString
+This function takes a number or a string that can be converted to a number as input and returns a string
+representation of the number in the specified locale format. If the input is not a valid number, this function returns undefined.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.Math.convertNumberToLocaleString(value, locale)
+```
+
+**Parameters**:
+
+- `value`: The number or string to be formatted.
+- `locale`: (optional) The locale format to use. If not provided, `en-US` will be used.
+
+&nbsp;
+### Example
+```js
+CoveHelper.Math.convertNumberToLocaleString(12345.6789) // returns '12,345.679'
+CoveHelper.Math.convertNumberToLocaleString(12345.6789, 'de-DE') // returns '12.345,679'
+CoveHelper.Math.convertNumberToLocaleString('12345.6789') // returns '12,345.679'
+CoveHelper.Math.convertNumberToLocaleString('abc') // returns undefined
+```

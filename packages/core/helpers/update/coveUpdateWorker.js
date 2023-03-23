@@ -4,11 +4,11 @@ import update_4_23 from './ver/4.23'
 
 
 // 4.23.1 ------------------------------------------------------
-const coveUpdateWorker = (config) => {
+const coveUpdateWorker = async (config) => {
   let genConfig = config
 
   // v4.23
-  genConfig = update_4_23(genConfig)
+  genConfig = await update_4_23(genConfig)
 
   return genConfig
 }

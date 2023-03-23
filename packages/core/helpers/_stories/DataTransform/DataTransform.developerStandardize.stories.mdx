@@ -1,0 +1,31 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/DataTransform/developerStandardize"
+/>
+
+# developerStandardize
+Method of the [DataTransform](./?path=/docs/helpers-datatransform-datatransform-class--docs) class. This method performs standardizations based on developer provided description of the data.
+
+&nbsp;
+## Usage
+```js
+developerStandardize(data, description)
+```
+
+**Parameters**
+
+- `data`: An array of data to be standardized.
+- `description`: An object containing a description of the data structure.
+
+**Returns**
+
+The method returns the standardized data if no errors were found, and `undefined` otherwise.
+
+&nbsp;
+## Error handling
+- If the description object is not provided or is invalid, the method returns `undefined`.
+- If the horizontal or series properties are not defined in the description object, the method returns `undefined`.
+- If series is true and horizontal is false and singleRow is not defined, the method returns `undefined`.
+- If horizontal is true, the method performs additional validations on the description object to ensure that it contains the necessary keys.
+- If any errors were found, the method returns `undefined`.

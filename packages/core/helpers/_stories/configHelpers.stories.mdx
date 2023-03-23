@@ -5,4 +5,84 @@ import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 />
 
 # configHelpers
-Content Text
+The configHelpers are used specifically for working with, and updating, COVE config settings inside the Store.
+
+It exports three helper functions: `isConfigEqual`, `setConfigKeyValue`, and `getConfigKeyValue`:
+
+&nbsp;
+## isConfigEqual(a, b)
+A function that takes two arguments, `a` and `b`. Returns `true` if they are equal (have the same key-value pairs), and `false` otherwise.
+
+The comparison is performed using `JSON.stringify` to convert the objects to strings before comparing.
+
+**Parameters:**
+
+  - `a` _(any)_ - The first object to compare.
+  - `b` _(any)_ - The second object to compare.
+
+**Returns:**
+
+`true` if `a` and `b` are equal, `false` otherwise.
+
+**Example:**
+
+```js
+const a = { foo: 'bar' };
+const b = { foo: 'bar' };
+
+isConfigEqual(a, b); // true
+
+// Without the JSON.stringify, a and b are considered different objects due to
+// referential inequality, and would normally return false.
+// However, when converted to JSON strings, a and b become equal, so isConfigEqual returns true.
+```
+
+&nbsp;
+## setConfigKeyValue(configKeyArray, setKeyValue)
+A function that takes two arguments, `configKeyArray` and `setKeyValue`. Returns an object with the provided `configKeyArray` keys, and the final key set to the provided `setKeyValue` value.
+
+**Parameters:**
+
+- `configKeyArray` _(array or string)_ - An array of keys to traverse through the config object or a string for direct child lookup.
+- `setKeyValue` _(any)_ - The value to set the final key to in the returned object.
+
+**Returns:**
+
+An object with keys/subkeys, based on the provided array, and the final key set to the provided value.
+
+**Example:**
+
+```js
+const a = ['foo', 'bar', 'baz'];
+const b = 'qux';
+
+setConfigKeyValue(a, b); // { foo: { bar: { baz: 'qux' } } }
+
+// The above response can then be merged using lodash to either create, or update the config object in the store.
+```
+
+&nbsp;
+## getConfigKeyValue(configKeyArray, objectToParse)
+A function that takes two arguments, `configKeyArray` and `objectToParse`, and returns the value of the final key in the provided array by traversing through the provided object.
+
+If the final key is not found, the function returns `undefined`.
+
+**Parameters:**
+
+- `configKeyArray` _(array or string)_ - An array of keys to traverse through the config object or a string for direct child lookup.
+- `objectToParse` _(object)_ - The object to parse and get the value from.
+
+**Returns:**
+
+The value of the final key in the provided array, by traversing through the provided object, or `undefined` if the key is not found.
+
+**Example:**
+
+```js
+const a = ['foo', 'bar', 'baz'];
+const b = { foo: { bar: { baz: 'qux' } } };
+
+getConfigKeyValue(a, b); // 'qux'
+
+// Returns the value of the final key in the provided array, by traversing through the provided object.
+```

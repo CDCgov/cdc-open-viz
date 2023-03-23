@@ -7,11 +7,14 @@ import Component from '../Component'
   component={Component}
   args={{
     exampleConfig: {
-      theme: "blue",
+      theme: "teal",
       title: "Component Title",
       description: "A small description of the component",
-      tooltip: "This is an <strong>example</strong> tooltip.",
-      visual: {
+      tooltip: {
+        content: "This is an <strong>example</strong> tooltip.",
+        position: "bottom"
+      },
+      componentStyle: {
         background: "default",
         border: "default",
         shadow: true,
@@ -38,28 +41,34 @@ import Component from '../Component'
       description: "[External] Sets a custom theme to be used by the Component for the header bar and borders <br/><br/> `'blue'` `'purple'` `'brown'` `'teal'` `'pink'` `'orange'` `'slate'` `'indigo'` `'cyan'` `'green'` `'amber'`"
     },
     'config.title': {
-      description: "[External] Set a custom title for the component header section <br/><br/> `string`"
+      description: "[External] Set a custom title for the Component header section <br/><br/> `string`"
     },
     'config.description': {
-      description: "[External] Supply a description or subtext for the component's content <br/><br/> `string`"
+      description: "[External] Supply a description or subtext for the Component's content <br/><br/> `string`"
     },
     'config.tooltip': {
-      description: "[External] Add a tooltip to describe the Component; JSX markup can also be supplied <br/><br/> `any`"
+      description: "[External] An object containing component definitions for adding a descriptive tooltip to the Component's header <br/><br/> `any`"
     },
-    'config.visual': {
-      description: "[External] An object containing visual definitions for the component <br/><br/> `object`"
+    'config.tooltip.content': {
+      description: "[External] Provides the content for the Header tooltip; JSX markup can also be supplied <br/><br/> `any`"
     },
-    'config.visual.background': {
-      description: "[External] Set the background display style for the component <br/><br/> `'default'` `'template'` `'none'`"
+    'config.tooltip.position': {
+      description: "[External] Sets the preferred position of the tooltip in the Component's header <br/><br/> `'left'` `'bottom'`"
     },
-    'config.visual.border': {
-      description: "[External] Set the border display style for the component <br/><br/> `'default'` `'template'` `'none'`"
+    'config.componentStyle': {
+      description: "[External] An object containing component style definitions of the Component <br/><br/> `object`"
     },
-    'config.visual.shadow': {
-      description: "[External] Enable/disable the display of the drop-shadow on the Component <br/><br/> `bool`",
+    'config.componentStyle.background': {
+      description: "[External] Set the background display style of the Component <br/><br/> `'default'` `'template'` `'none'`"
     },
-    'config.visual.accent': {
-      description: "[External] Set the position of the accent border display on the Component <br/><br/> `'none'` `'top'` `'right'` `'bottom'` `'left'`",
+    'config.componentStyle.border': {
+      description: "[External] Set the border display style of the Component <br/><br/> `'default'` `'template'` `'none'`"
+    },
+    'config.componentStyle.shadow': {
+      description: "[External] Enable/disable the display of the drop-shadow of the Component <br/><br/> `bool`",
+    },
+    'config.componentStyle.accent': {
+      description: "[External] Set the position of the accent border display of the Component <br/><br/> `'none'` `'top'` `'right'` `'bottom'` `'left'`",
     }
   }}
 />
@@ -83,7 +92,7 @@ Furthermore, the markup and arguments table does appear slightly different; be a
 <ArgsTable story="Example"/>
 
 export const Template = ({ ...args }) => <Component {...args}>
-  <h2>[Component Visualization]</h2>
+  <h2><center>[Component Visualization]</center></h2>
   <br/>
   <p>This section is just an example of how the inner content of a component will be displayed. A visualization,
     and any of it's required/related components will appear in this area.</p>

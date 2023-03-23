@@ -2,12 +2,7 @@
 @import "../../themes/theme-colors";
 
 .cove-guidance-block {
-  display: grid;
-  grid-column-gap: 0;
-  grid-row-gap: 0;
-  grid-template-columns: repeat(8, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-
+  display: flex;
   position: relative;
   padding: .75rem 1rem;
   margin-left: 5px;
@@ -40,13 +35,11 @@
   &:after {
     content: '';
     position: absolute;
-    left: -4px;
-    margin: -4px;
     border-radius: 0.1875rem;
     outline: 2px solid transparent;
     transition: outline 200ms $transition-expo-out;
     pointer-events: none;
-    inset: 0;
+    inset: -4px -4px -4px -8px;
   }
 
   &:focus,
@@ -61,27 +54,30 @@
 
 .cove-guidance-block__icon {
   display: flex;
-  place-content: center;
-  grid-area: 1 / 1 / 3 / 3;
+  align-self: flex-start;
+  max-width: 4rem;
   margin-right: 1rem;
   color: #005eaa;
   aspect-ratio: 1/1;
 
   > svg {
     width: 100%;
-    height: 100%;
     max-width: 100%;
+    height: 100%;
     max-height: 100%;
   }
 }
 
+.cove-guidance-block__content-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .cove-guidance-block__header {
-  grid-area: 1 / 3 / 2 / 9;
   font-size: 1.125rem;
   font-weight: bold;
 }
 
 .cove-guidance-block__content {
-  grid-area: 2 / 3 / 3 / 9;
   font-size: .875rem;
 }

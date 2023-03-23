@@ -102,11 +102,15 @@ const InputCheckbox = memo((
     return classList.join(' ')
   }
 
-  const TooltipLabel = () => (
-    <div className="cove-input__checkbox-group__label">
-      <Label tooltip={tooltip} onClick={onClickHandler}>{label}</Label>
-    </div>
-  )
+  const TooltipLabel = () => {
+    const labelProps = (tooltip && tooltip !== "") && { 'data-has-tooltip': true }
+
+    return (
+      <div className="cove-input__checkbox-group__label" {...labelProps}>
+        <Label tooltip={tooltip} onClick={onClickHandler}>{label}</Label>
+      </div>
+    )
+  }
 
   return (
     <div className={generateWrapperClasses()} flow={labelPosition}>
@@ -136,13 +140,13 @@ const InputCheckbox = memo((
 InputCheckbox.propTypes = {
   label: PropTypes.string,
   labelPosition: PropTypes.oneOf([ 'left', 'right' ]),
+  tooltip: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object
+  ]),
   size: PropTypes.oneOf([ 'small', 'medium', 'large' ]),
   activeColor: PropTypes.string,
   activeCheckColor: PropTypes.string,
-  tooltip: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.string
-  ]),
   value: PropTypes.bool
 }
 

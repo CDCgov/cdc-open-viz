@@ -1,0 +1,25 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/Math/getMode"
+/>
+
+# getMode
+This function takes an array of numbers and returns an array containing the mode(s) of its elements. The mode is the number(s) that appears most frequently in the input array.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.Math.getMode(arr)
+```
+
+**Parameters**:
+
+- `arr`: The array of numbers to be used.
+
+&nbsp;
+### Example
+```js
+CoveHelper.Math.getMode([1, 2, 2, 3, 3, 3]) // returns [3]
+CoveHelper.Math.getMode([1, 2, 2, 3, 3, 3, 4, 4]) // returns [3]
+```

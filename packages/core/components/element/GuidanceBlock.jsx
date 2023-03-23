@@ -39,23 +39,28 @@ const GuidanceBlock = ({ linkTo, icon, target = '_blank', accentColor = '#005eaa
           <Icon display={icon} base/>
         </div>
       )}
-      {guidanceTitleChildren && (
-        <h3 className="cove-guidance-block__header">
-          {guidanceTitleChildren?.props.children}
-        </h3>
-      )}
-      {guidanceContentChildren && (
-        <div className="cove-guidance-block__content">
-          {guidanceContentChildren?.props.children}
-        </div>
-      )}
+      <div className="cove-guidance-block__content-wrapper">
+        {guidanceTitleChildren && (
+          <h3 className="cove-guidance-block__header">
+            {guidanceTitleChildren?.props.children}
+          </h3>
+        )}
+        {guidanceContentChildren && (
+          <div className="cove-guidance-block__content">
+            {guidanceContentChildren?.props.children}
+          </div>
+        )}
+      </div>
     </a>
   </>)
 }
 
 //Create subcomponents as "slots" within component namespace
 GuidanceBlock.Title = GuidanceTitle
+GuidanceBlock.Title.displayName = 'GuidanceBlock.Title'
+
 GuidanceBlock.Content = GuidanceContent
+GuidanceBlock.Content.displayName = 'GuidanceBlock.Content'
 
 GuidanceBlock.propTypes = {
   /** Specify an internal/external link that is opened when users click the Guidance Block */

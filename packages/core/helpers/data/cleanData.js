@@ -23,7 +23,7 @@ export default function cleanData(data, excludeKey, testing = false) {
     let cleanedBar = {}
     Object.keys(d).forEach(function (key) {
       if (key === excludeKey) {
-        // pass thru
+        // pass through
         cleanedBar[key] = d[key]
       } else {
         // remove comma and dollar signs

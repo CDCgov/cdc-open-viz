@@ -10,7 +10,7 @@ import useStore from '@cdc/core/store/store'
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Helpers
-import dataTransform from '@cdc/core/helpers/data/dataTransform'
+import DataTransform from '@cdc/core/helpers/data/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 // Components - Core
@@ -79,7 +79,7 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
   const dataRef = useRef()
   dataRef.current = data
 
-  const transform = new dataTransform()
+  const transform = new DataTransform()
 
   const handleWidgetMove = (item, monitor) => {
     let result = monitor.getDropResult()

@@ -1,0 +1,36 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/Date/parseDate"
+/>
+
+# parseDate
+Function that uses the d3-time-format library to parse a given date string according to a specified format.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.Date.parseDate(format, dateString)
+```
+
+**Parameters:**
+
+- `format`: a string representing the format of the input date string.
+  - If not provided, it defaults to **%Y-%m-%d**, which represents the year, month, and day of the date in a numeric format, separated by hyphens.
+- `dateString`: the date string to be parsed
+
+**Returns:**
+
+The function returns a Date object representing the parsed date string. If the parsing fails, it returns the current date.
+
+&nbsp;
+### Example
+```jsx
+import CoveHelper from '@cdc/core/helpers/CoveHelper'
+
+...
+
+const dateString = '01-Jan-2022';
+const parsedDate = CoveHelper.Date.parseDate('%d-%b-%Y', dateString);
+console.log(parsedDate); // Output: Sat Jan 01 2022 00:00:00 GMT+0000 (Coordinated Universal Time)
+```

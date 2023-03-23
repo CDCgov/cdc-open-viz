@@ -5,6 +5,6 @@ import './storybook-styles.css'
 
 addons.setConfig({
   theme: managerTheme,
-  isToolshown: true,
+  isToolshown: false,
   configureJsx: true
 });

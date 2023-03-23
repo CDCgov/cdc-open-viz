@@ -1,0 +1,25 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/Math/getSum"
+/>
+
+# getSum
+This function takes an array of numbers and returns the sum of all its elements. If the input is valid, the function maps the array elements to numbers, sums them up using the reduce() method, and returns the result.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.Math.getSum(arr);
+```
+
+**Parameters**:
+
+- `arr`: The array of numbers to be summed.
+
+&nbsp;
+### Example
+```js
+CoveHelper.Math.getSum([1, 2, 3]); // returns 6
+CoveHelper.Math.getSum("1,2,3"); // returns undefined
+```

@@ -5,4 +5,85 @@ import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 />
 
 # validateFipsCodeLength
-Content Text
+This function is used to validate the format of FIPS codes in a given input data, which can either be an object or an array.
+
+
+- `object`: checks for the presence of FIPS codes in a specific column, then adds leading zeros to make the code length equal to 5
+- `array`: attempts to identify the column with FIPS codes, then adds leading zeros to the codes to make their length equal to 5
+
+The function returns the input data with the updated FIPS codes.
+
+&nbsp;
+## Syntax
+```js
+validateFipsCodeLength(stateOrData)
+```
+
+**Parameters**
+
+- `stateOrData`: _(object) (array)_ containing the data to be validated.
+
+**Returns**
+
+The function returns an object or an array, depending on the type of data supplied, with the FIPS codes updated to have a length of 5 digits.
+
+&nbsp;
+## Usage
+This function is typically used to ensure that FIPS codes in a data set are in a consistent format with a length of 5 digits, which is required for certain data visualizations and analyses.
+
+```js
+// Example 1: Validating FIPS codes in an object
+const dataObject = {
+  general: {
+    geoType: 'us-county',
+  },
+  columns: {
+    geo: {
+      name: 'FIPS Code'
+    }
+  },
+  data: [
+    { 'FIPS Code': '12' },
+    { 'FIPS Code': '12001' },
+    { 'FIPS Code': '48295' },
+    { 'FIPS Code': '53061' },
+  ]
+};
+const validatedObject = validateFipsCodeLength(dataObject);
+
+// Output:
+// {
+//   general: {
+//     geoType: 'us-county',
+//   },
+//   columns: {
+//     geo: {
+//       name: 'FIPS Code'
+//     }
+//   },
+//   data: [
+//     { 'FIPS Code': '00012' },
+//     { 'FIPS Code': '12001' },
+//     { 'FIPS Code': '48295' },
+//     { 'FIPS Code': '53061' },
+//   ]
+// }
+
+
+// Example 2: Validating FIPS codes in an array
+const dataArray = [
+  { 'County': 'Hillsborough', 'State': 'FL', 'FIPS': '101' },
+  { 'County': 'Sarasota', 'State': 'FL', 'FIPS Codes': '12073' },
+  { 'County': 'Hidalgo', 'State': 'TX', 'fips codes': '48011' },
+  { 'County': 'Adams', 'State': 'WA', 'FIPS Codes': '53001' }
+];
+const validatedArray = validateFipsCodeLength(dataArray);
+
+// Output:
+// [
+//   { 'County': 'Hillsborough', 'State': 'FL', 'FIPS': '00101' },
+//   { 'County': 'Sarasota', 'State': 'FL', 'FIPS Codes': '12073' },
+//   { 'County': 'Hidalgo', 'State': 'TX', 'fips codes': '48011' },
+//   { 'County': 'Adams', 'State': 'WA', 'FIPS Codes': '53001' }
+// ]
+```

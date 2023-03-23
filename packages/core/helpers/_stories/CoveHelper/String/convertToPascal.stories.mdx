@@ -1,0 +1,15 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/String/convertToPascal"
+/>
+
+# convertToPascal
+This function takes a string in kebab-case or snake_case and converts it to PascalCase.
+
+&nbsp;
+### Example
+```js
+CoveHelper.String.convertToPascal("foo-bar-baz"); // "FooBarBaz"
+CoveHelper.String.convertToPascal("foo_bar_baz"); // "FooBarBaz"
+```

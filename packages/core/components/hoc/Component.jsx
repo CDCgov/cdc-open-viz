@@ -17,9 +17,11 @@ import Tooltip from '../ui/Tooltip'
 // Styles
 import '../../styles/v2/components/component.scss'
 
-const Component = ({ className, children, ...attributes }) => {
+const Component = ({ className, children, exampleConfig, ...attributes }) => {
   // Store Selectors
-  const { config } = useVisConfig()
+  let { config } = useVisConfig()
+  if (exampleConfig) config = exampleConfig // Allow for exampleConfig to override default config
+
   const setDimensions = useStore(state => state.setDimensions)
 
   // Observe changes to component container sizes for use with SVG renders
@@ -67,7 +69,7 @@ const Component = ({ className, children, ...attributes }) => {
     <>
       {config.tooltip && config.tooltip.content && config.tooltip.content !== '' && (
         <>
-          <Tooltip place={config.tooltip.position || 'left'}>
+          <Tooltip place={config.tooltip.position || 'bottom'}>
             <Tooltip.Target>
               <Icon display='questionCircle' />
             </Tooltip.Target>
@@ -115,7 +117,7 @@ Component.propTypes = {
     /** Set a custom title for the component; defaults to a `config.title` entry for the component config */
     title: PropTypes.string,
     description: PropTypes.string,
-    visual: PropTypes.shape({
+    componentStyle: PropTypes.shape({
       border: PropTypes.oneOf(['default', 'theme', 'none']),
       background: PropTypes.oneOf(['default', 'theme', 'none']),
       shadow: PropTypes.bool,

@@ -8,7 +8,7 @@ import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // Helpers
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import dataTransform from '@cdc/core/helpers/data/dataTransform'
+import DataTransform from '@cdc/core/helpers/data/DataTransform'
 
 // Components - Core
 import Button from '@cdc/core/components/element/Button'
@@ -26,7 +26,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
   const [ columns, setColumns ] = useState([])
 
-  const transform = new dataTransform()
+  const transform = new DataTransform()
 
   const setTab = index => {
     setTabSelected(index)

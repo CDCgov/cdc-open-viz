@@ -1,0 +1,28 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/DataTransform/autoStandardize"
+/>
+
+# autoStandardize
+Method of the [DataTransform](./?path=/docs/helpers-datatransform-datatransform-class--docs) class. This method performs standardizations that can be completed automatically without user input.
+
+&nbsp;
+## Usage
+```js
+autoStandardize(data)
+```
+
+**Parameters:**
+
+- `data`: An array of data to be standardized.
+
+**Returns:**
+
+The method returns the standardized data if no errors were found, and undefined otherwise.
+
+&nbsp;
+## Error handling
+- If the data is empty, an error message is pushed to the `errorsFound` array.
+- If the data does not have the correct data structure, an error message is pushed to the `errorsFound` array.
+- If any errors were found, the method logs them to the console and returns `undefined`.

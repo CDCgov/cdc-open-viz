@@ -4,11 +4,11 @@
 
 /*// Helpers
 import { cacheBustingString } from '@cdc/core/helpers/coveHelper'
-import dataTransform from '@cdc/core/helpers/dataTransform'
+import DataTransform from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import CoveHelper from '@cdc/core/helpers/cove'
 
-const transform = new dataTransform()
+const transform = new DataTransform()
 
 // Gets filer values from dataset
 const generateValuesForFilter = (columnName, data) => {

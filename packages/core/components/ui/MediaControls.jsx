@@ -124,8 +124,15 @@ const Section = ({ children, className }) => {
 const MediaControls = () => null
 
 MediaControls.Section = Section
+MediaControls.Section.displayName = 'MediaControls.Section'
+
 MediaControls.Link = Link
+MediaControls.Link.displayName = 'MediaControls.Link'
+
 MediaControls.Button = Button
+MediaControls.Button.displayName = 'MediaControls.Button'
+
 MediaControls.generateMedia = generateMedia
+
 
 export default MediaControls

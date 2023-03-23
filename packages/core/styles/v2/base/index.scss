@@ -19,9 +19,11 @@ html:focus-within .cove {
   -webkit-font-smoothing: antialiased;
 
   @import "reset";
-  @import "accessibility";
-
   @import "general";
+}
+
+.cove:not(.cove-storybook) {
+  @import "accessibility";
 }
 
 @import "heading";

@@ -1,35 +1,32 @@
 import { Meta, Story, ArgsTable, Canvas } from '@storybook/blocks';
-
 import InputCheckbox from '../InputCheckbox'
 
 <Meta
   title="Components/Input/Checkbox"
   component={InputCheckbox}
   parameters={{ options: { isToolshown: true } }}
-  argTypes={{
-    label: {
-      control: {
-        type: 'text'
-      }
-    },
-    size: {
-      options: [ 'small', 'medium', 'large' ],
-      control: { type: 'radio' }
-    },
-    activeColor: { control: { type: 'color' } },
-    activeCheckColor: { control: { type: 'color' } }
-  }}
 />
 
-# Checkbox
+export const Template = ({ ...args }) => (
+  <InputCheckbox {...args} />
+)
 
-<Canvas>
-  <Story name="Default">
-    <InputCheckbox value={false} size="small"/>
-    <InputCheckbox value={false}/>
-    <InputCheckbox value={false} size="large"/>
-    <InputCheckbox value={false} size="small" activeColor="#025eaa"/>
-    <InputCheckbox value={false} activeColor="#025eaa"/>
-    <InputCheckbox value={false} size="large" activeColor="#025eaa" activeCheckColor="#fff"/>
+# Checkbox Component
+Component that renders a checkbox input, with an optional label and tooltip. It receives a set of props that can be used to customize its behavior and appearance.
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example"
+         args={{
+           label: 'Use An Option',
+           labelPosition: 'right',
+           size: 'medium',
+           activeColor: '#025eaa',
+           activeCheckColor: '#fff',
+           tooltip: 'This is a tooltip',
+         }}
+  >
+    {Template.bind({})}
   </Story>
 </Canvas>
+
+<ArgsTable story="Example"/>

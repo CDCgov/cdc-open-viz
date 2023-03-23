@@ -165,7 +165,7 @@ InputToggle.propTypes = {
   size: PropTypes.oneOf([ 'small', 'medium', 'large', 'xlarge' ]),
   /** Select the preferred color for the toggle when active */
   activeColor: PropTypes.string,
-  /** Stretch the toggle to fill the width of its container */
+  /** Stretch the toggle and its label to fill the width of its container; Only available when label exists, and **labelPosition** is set to `left` or `right`. */
   stretch: PropTypes.bool,
   // /** Mark the toggle as required; will set error style while value is undefined */
   // required: PropTypes.bool,
