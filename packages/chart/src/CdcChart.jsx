@@ -604,6 +604,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const formatNumber = (num, axis) => {
     // if num is NaN return num
     if (isNaN(num) || !num) return num
+    // Check if the input number is negative
+    const isNegative = num < 0
+
+    // If the input number is negative, take the absolute value
+    if (isNegative) {
+      num = Math.abs(num)
+    }
 
     // destructure dataFormat values
     let {
@@ -701,6 +708,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     if (bottomSuffix && axis === 'bottom') {
       result += bottomSuffix
+    }
+    if (isNegative) {
+      result = '-' + result
     }
 
     return String(result)
