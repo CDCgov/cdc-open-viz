@@ -597,6 +597,13 @@ const EditorPanel = () => {
     }
   }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
 
+  /// temporary force orientation untill we support Vartical deviaton bar
+  useEffect(() => {
+    if (config.visualizationType === 'Deviation Bar') {
+      updateConfig({ ...config, orientation: 'horizontal' })
+    }
+  }, [config.visualizationType])
+
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
     return (
@@ -793,7 +800,7 @@ const EditorPanel = () => {
                   <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
-                  {config.visualizationType === 'Deviation Bar' && <Select value={config.orientation || 'horizontal'} fieldName='orientation' label='Orientation' updateField={updateField} options={['horizontal', 'vertical']} />}
+                  {config.visualizationType === 'Deviation Bar' && <Select label='Orientation' options={['horizontal']} />}
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.barStyle === 'rounded' && <Select value={config.tipRounding || 'top'} fieldName='tipRounding' label='tip rounding' updateField={updateField} options={['top', 'full']} />}
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.barStyle === 'rounded' && (
