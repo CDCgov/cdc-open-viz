@@ -1,7 +1,0 @@
-import{M as c,C as l,S as d,A as h}from"./index-f24d5b78.js";import{S as o}from"./SplashError-5cc7fe2a.js";import{j as e,a as u,F as x}from"./jsx-runtime-670450c2.js";import{u as m}from"./index-4fb8b842.js";import"./iframe-0f1521e3.js";import"../sb-preview/runtime.mjs";import"./index-f1f749bf.js";import"./_commonjsHelpers-042e6b4d.js";import"./index-6e91e324.js";import"./index-d475d2ea.js";import"./index-96c5f47c.js";import"./index-d37d4223.js";import"./index-53833bae.js";import"./index-356e4a49.js";import"./Icon-e6436e69.js";import"./index-4d501b15.js";const p=({...t})=>e(o,{...t});function S(t={}){const{wrapper:n}=Object.assign({},m(),t.components);return n?e(n,{...t,children:e(a,{})}):a();function a(){const s=Object.assign({h1:"h1",p:"p"},m(),t.components);return u(x,{children:[e(c,{title:"Components/UI/SplashError",component:o}),`
-`,e(s.h1,{children:"Header"}),`
-`,e(s.p,{children:"Content Text"}),`
-`,e(l,{sourceState:"shown",withSource:"open",children:e(d,{name:"Example",children:p.bind({})})}),`
-`,e(h,{story:"Example"})]})}}const i=p.bind({});i.storyName="Example";i.parameters={storySource:{source:`({ ...args
-}) => <SplashError {...args} />`}};const r={title:"Components/UI/SplashError",component:o,tags:["stories-mdx"],includeStories:["example"]};r.parameters=r.parameters||{};r.parameters.docs={...r.parameters.docs||{},page:S};const I=["Template","example"];export{p as Template,I as __namedExportsOrder,r as default,i as example};
-//# sourceMappingURL=SplashError.stories-d9991ca9.js.map

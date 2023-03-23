@@ -1,0 +1,7 @@
+import{M as c,C as l,S as d,A as u}from"./index-c4e09ba2.js";import{O as r}from"./Overlay-3c2bc2d1.js";import{j as e,a as x,F as h}from"./jsx-runtime-670450c2.js";import{u as m}from"./index-4fb8b842.js";import"./iframe-4ea23a2e.js";import"../sb-preview/runtime.mjs";import"./index-f1f749bf.js";import"./_commonjsHelpers-042e6b4d.js";import"./index-6e91e324.js";import"./index-d475d2ea.js";import"./index-c46f0053.js";import"./index-d37d4223.js";import"./index-356e4a49.js";import"./store-e4d3035e.js";import"./visConfigSlice-d502a2ab.js";const p=({...t})=>e(r,{...t});function y(t={}){const{wrapper:n}=Object.assign({},m(),t.components);return n?e(n,{...t,children:e(a,{})}):a();function a(){const s=Object.assign({h1:"h1",p:"p"},m(),t.components);return x(h,{children:[e(c,{title:"Components/UI/Overlay",component:r}),`
+`,e(s.h1,{children:"Overlay Component"}),`
+`,e(s.p,{children:"Content Text"}),`
+`,e(l,{sourceState:"shown",withSource:"open",children:e(d,{name:"Example",children:p.bind({})})}),`
+`,e(u,{story:"Example"})]})}}const i=p.bind({});i.storyName="Example";i.parameters={storySource:{source:`({ ...args
+}) => <Overlay {...args} />`}};const o={title:"Components/UI/Overlay",component:r,tags:["stories-mdx"],includeStories:["example"]};o.parameters=o.parameters||{};o.parameters.docs={...o.parameters.docs||{},page:y};const A=["Template","example"];export{p as Template,A as __namedExportsOrder,o as default,i as example};
+//# sourceMappingURL=Overlay.stories-67b0aca2.js.map
