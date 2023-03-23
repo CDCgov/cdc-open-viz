@@ -206,7 +206,7 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, pairedBarPalettes, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
@@ -312,7 +312,6 @@ const EditorPanel = () => {
       })
       return
     }
-
     if (null === section && null === subsection) {
       let updatedConfig = { ...config, [fieldName]: newValue }
       enforceRestrictions(updatedConfig)
@@ -394,7 +393,7 @@ const EditorPanel = () => {
 
   const addNewSeries = seriesKey => {
     let newSeries = config.series ? [...config.series] : []
-    newSeries.push({ dataKey: seriesKey, type: 'Bar' })
+    newSeries.push({ dataKey: seriesKey, type: config.visualizationType })
     updateConfig({ ...config, series: newSeries }) // left axis series keys
   }
 
@@ -514,7 +513,7 @@ const EditorPanel = () => {
   }
 
   const showBarStyleOptions = () => {
-    if (config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked' && (config.orientation === 'horizontal' || config.orientation === 'vertical')) {
+    if ((config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.visualizationSubType !== 'stacked' && (config.orientation === 'horizontal' || config.orientation === 'vertical')) {
       return ['flat', 'rounded', 'lollipop']
     } else {
       return ['flat', 'rounded']
@@ -689,7 +688,7 @@ const EditorPanel = () => {
     if (visualizationType === 'Box Plot') return false
     if (visualizationType === 'Scatter Plot') return false
     if (visualizationType === 'Pie') return false
-    return series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar')
+    return series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar' || series.type === 'Deviation Bar')
   }
 
   const handleSeriesChange = (idx1, idx2) => {
@@ -741,7 +740,7 @@ const EditorPanel = () => {
       case config.visualizationType === 'Combo' && isAllLine && enteredValue && parseFloat(enteredValue) > minVal:
         message = 'Value must be less than ' + minValue
         break
-      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
+      case (config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
         message = 'Value must be less than or equal to 0'
         break
       case enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
@@ -768,7 +767,8 @@ const EditorPanel = () => {
     'Spark Line',
     // 'Area Chart',
     'Scatter Plot',
-    'Box Plot'
+    'Box Plot',
+    'Deviation Bar'
   ]
 
   return (
@@ -791,21 +791,43 @@ const EditorPanel = () => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />
-
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
-                  {config.visualizationType === 'Bar' && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
-                  {config.visualizationType === 'Bar' && config.barStyle === 'rounded' && <Select value={config.tipRounding || 'top'} fieldName='tipRounding' label='tip rounding' updateField={updateField} options={['top', 'full']} />}
-                  {config.visualizationType === 'Bar' && config.barStyle === 'rounded' && <Select value={config.roundingStyle || 'standard'} fieldName='roundingStyle' label='rounding style' updateField={updateField} options={['standard', 'shallow', 'finger']} />}
+                  {config.visualizationType === 'Deviation Bar' && <Select value={config.orientation || 'horizontal'} fieldName='orientation' label='Orientation' updateField={updateField} options={['horizontal', 'vertical']} />}
+                  {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
+                  {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.barStyle === 'rounded' && <Select value={config.tipRounding || 'top'} fieldName='tipRounding' label='tip rounding' updateField={updateField} options={['top', 'full']} />}
+                  {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.barStyle === 'rounded' && (
+                    <Select value={config.roundingStyle || 'standard'} fieldName='roundingStyle' label='rounding style' updateField={updateField} options={['standard', 'shallow', 'finger']} />
+                  )}
                   {config.visualizationType === 'Bar' && config.orientation === 'horizontal' && <Select value={config.yAxis.labelPlacement || 'Below Bar'} section='yAxis' fieldName='labelPlacement' label='Label Placement' updateField={updateField} options={['Below Bar', 'On Date/Category Axis']} />}
-                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar') ? (
+                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') ? (
                     <CheckBox value={config.yAxis.displayNumbersOnBar} section='yAxis' fieldName='displayNumbersOnBar' label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
                   ) : (
                     visHasLabelOnData() && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
                   )}
                   {config.visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
 
-                  <TextField value={config.title} fieldName='title' label='Title' updateField={updateField} />
+                  <TextField
+                    value={config.title || 'Chart Title'}
+                    fieldName='title'
+                    id='title'
+                    label='Title'
+                    placeholder='Chart Title'
+                    //defaultValue='Chart Title'
+                    updateField={updateField}
+                    //onChange={handleTitleChange}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Title is required to set the name of the download file but can be hidden using the option below.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                  <CheckBox value={config.showTitle} fieldName='showTitle' label='Show Title' updateField={updateField} />
                   <TextField
                     value={config.superTitle}
                     updateField={updateField}
@@ -986,7 +1008,7 @@ const EditorPanel = () => {
                                                   {(config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && (
                                                     <>
                                                       <span className='series-list__dropdown'>{typeDropdown}</span>
-                                                      <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>
+                                                      {config.visualizationType === 'Area Chart' && <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
                                                     </>
                                                   )}
                                                   {config.series && config.series.length > 1 && (
@@ -1069,7 +1091,7 @@ const EditorPanel = () => {
                     <AccordionItemButton>Measures</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <h4>Labels for 5-Number Summary</h4>
+                    <h4 style={{ fontSize: '18px' }}>Labels for 5-Number Summary</h4>
 
                     {/* prettier-ignore */}
                     {/* max */}
@@ -1180,12 +1202,14 @@ const EditorPanel = () => {
                         </Tooltip>
                       }
                     />
+                    <br />
+                    <h4 style={{ fontSize: '18px' }}>Labels for Additional Measures</h4>
 
                     {/* iqr */}
                     <TextField type='text' value={config.boxplot.labels.iqr} fieldName='iqr' section='boxplot' subsection='labels' label='Interquartile Range' updateField={updateField} />
 
                     {/* count */}
-                    <TextField type='text' value={config.boxplot.labels.count} fieldName='count' section='boxplot' subsection='labels' label='Count' updateField={updateField} />
+                    <TextField type='text' value={config.boxplot.labels.total} fieldName='total' section='boxplot' subsection='labels' label='Total' updateField={updateField} />
 
                     {/* mean */}
                     <TextField type='text' value={config.boxplot.labels.mean} fieldName='mean' section='boxplot' subsection='labels' label='Mean' updateField={updateField} />
@@ -1194,7 +1218,7 @@ const EditorPanel = () => {
                     {/* values */}
                     <TextField type='text' value={config.boxplot.labels.values} fieldName='values' section='boxplot' subsection='labels' label='Values' updateField={updateField} />
                     <br />
-                    <h4>Percentages for Quartiles</h4>
+                    <h4 style={{ fontSize: '18px' }}>Percentages for Quartiles</h4>
                     <TextField
                       type='number'
                       value={config.boxplot.firstQuartilePercentage ? config.boxplot.firstQuartilePercentage : 25}
@@ -1359,11 +1383,11 @@ const EditorPanel = () => {
                           </Tooltip>
                         }
                       />
-
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                       {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
                       {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
                       {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Display Gridlines' updateField={updateField} />}
+                      <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
                     </>
                   )}
                   <span className='divider-heading'>Number Formatting</span>
@@ -1432,6 +1456,15 @@ const EditorPanel = () => {
                       <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
                       <TextField value={config.xAxis.max} section='xAxis' fieldName='max' label='update max value' type='number' placeholder='Auto' updateField={updateField} />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
+                      {config.visualizationType === 'Deviation Bar' && (
+                        <>
+                          <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='update min value' placeholder='Auto' updateField={updateField} />
+                          <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
+                          <TextField value={config.xAxis.targetLabel || 'Target'} section='xAxis' fieldName='targetLabel' type='text' label='Target Label' updateField={updateField} />
+                          <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Update target Value' placeholder='Auto' className='number-narrow' updateField={updateField} />
+                          <CheckBox value={config.xAxis.showTargetLabel} section='xAxis' fieldName='showTargetLabel' label='Show target label' updateField={updateField} />
+                        </>
+                      )}
                     </>
                   ) : (
                     config.visualizationType !== 'Pie' && (
@@ -1979,7 +2012,6 @@ const EditorPanel = () => {
 
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
                   {visHasBarBorders() && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
-
                   {visCanAnimate() && <CheckBox value={config.animate} fieldName='animate' label='Animate Visualization' updateField={updateField} />}
 
                   {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
@@ -2009,7 +2041,7 @@ const EditorPanel = () => {
                     <span className='edit-label'>Chart Color Palette</span>
                   </label>
                   {/* eslint-enable */}
-                  {config.visualizationType !== 'Paired Bar' && (
+                  {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Deviation Bar' && (
                     <>
                       <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.isPaletteReversed} />
                       <span>Sequential</span>
@@ -2078,18 +2110,17 @@ const EditorPanel = () => {
                       </ul>
                     </>
                   )}
-
-                  {config.visualizationType === 'Paired Bar' && (
+                  {(config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') && (
                     <>
-                      <InputToggle section='pairedBar' fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.pairedBar.isPaletteReversed} />
+                      <InputToggle section='twoColor' fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.twoColor.isPaletteReversed} />
                       <ul className='color-palette'>
                         {twoColorPalettes.map(palette => {
                           const colorOne = {
-                            backgroundColor: pairedBarPalettes[palette][0]
+                            backgroundColor: twoColorPalette[palette][0]
                           }
 
                           const colorTwo = {
-                            backgroundColor: pairedBarPalettes[palette][1]
+                            backgroundColor: twoColorPalette[palette][1]
                           }
 
                           return (
@@ -2098,9 +2129,9 @@ const EditorPanel = () => {
                               key={palette}
                               onClick={e => {
                                 e.preventDefault()
-                                updateConfig({ ...config, pairedBar: { ...config.pairedBar, palette } })
+                                updateConfig({ ...config, twoColor: { ...config.twoColor, palette } })
                               }}
-                              className={config.pairedBar.palette === palette ? 'selected' : ''}
+                              className={config.twoColor.palette === palette ? 'selected' : ''}
                             >
                               <span className='two-color' style={colorOne}></span>
                               <span className='two-color' style={colorTwo}></span>
@@ -2160,6 +2191,25 @@ const EditorPanel = () => {
                   <AccordionItemButton>Data Table</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <TextField
+                    value={config.table.label}
+                    updateField={updateField}
+                    section='table'
+                    fieldName='label'
+                    id='tableLabel'
+                    label='Data Table Title'
+                    placeholder='Data Table'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Label is required for Data Table for 508 Compliance</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <CheckBox
                     value={config.table.show}
                     section='table'
@@ -2204,7 +2254,6 @@ const EditorPanel = () => {
                   <CheckBox value={config.table.download} section='table' fieldName='download' label='Show Download CSV Link' updateField={updateField} />
                   {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
                   {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
-                  <TextField value={config.table.label} section='table' fieldName='label' label='Label' updateField={updateField} />
                   {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
                 </AccordionItemPanel>
               </AccordionItem>

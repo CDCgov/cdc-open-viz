@@ -7,7 +7,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import useLegendClasses from './../hooks/useLegendClasses'
 
 const Legend = () => {
-  const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
+  const { config, legend, colorScale, seriesHighlight, highlight, twoColorPalette, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
 
@@ -77,61 +77,69 @@ const Legend = () => {
     setDynamicLegendItems([...dynamicLegendItems, JSON.parse(e.target.value)])
   }
 
-  const createLegendLabels = (data, defaultLabels) => {
+  const createLegendLabels = defaultLabels => {
     const colorCode = config.legend?.colorCode
-    if (config.visualizationType !== 'Bar' || config.visualizationSubType !== 'regular' || !colorCode || config.series?.length > 1) {
-      return defaultLabels
-    }
-    let palette = colorPalettes[config.palette]
-
-    while (data.length > palette.length) {
-      palette = palette.concat(palette)
-    }
-    palette = palette.slice(0, data.length)
-    //store uniq values to Set by colorCode
-    const set = new Set()
-
-    data.forEach(d => set.add(d[colorCode]))
-
-    // create labels with uniq values
-    const uniqeLabels = Array.from(set).map((val, i) => {
-      const newLabel = {
-        datum: val,
-        index: i,
-        text: val,
-        value: palette[i]
+    if (config.visualizationType === 'Deviation Bar') {
+      const [belowColor, aboveColor] = twoColorPalette[config.twoColor.palette]
+      const labelBelow = {
+        datum: 'X',
+        index: 0,
+        text: `Below ${config.xAxis.targetLabel}`,
+        value: belowColor
       }
-      return newLabel
-    })
+      const labelAbove = {
+        datum: 'X',
+        index: 1,
+        text: `Above ${config.xAxis.targetLabel}`,
+        value: aboveColor
+      }
 
-    return uniqeLabels
-  }
-  // in small screens update config legend position.
-  useEffect(() => {
-    if (currentViewport === 'sm' || currentViewport === 'xs' || config.legend.position === 'left') {
-      setConfig({ ...config, legend: { ...config.legend, position: 'bottom' } })
+      return [labelBelow, labelAbove]
     }
-    setConfig({ ...config, legend: { ...config.legend, position: 'right' } })
-  }, [currentViewport])
+    if (config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && colorCode && config.series?.length === 1) {
+      let palette = colorPalettes[config.palette]
+
+      while (data.length > palette.length) {
+        palette = palette.concat(palette)
+      }
+      palette = palette.slice(0, data.length)
+      //store uniq values to Set by colorCode
+      const set = new Set()
+
+      data.forEach(d => set.add(d[colorCode]))
+
+      // create labels with uniq values
+      const uniqeLabels = Array.from(set).map((val, i) => {
+        const newLabel = {
+          datum: val,
+          index: i,
+          text: val,
+          value: palette[i]
+        }
+        return newLabel
+      })
+
+      return uniqeLabels
+    }
+    return defaultLabels
+  }
+
+  const isBottomOrSmallViewport = config.legend.position === 'bottom' || currentViewport === 'sm' || currentViewport === 'xs'
+  const isHorizontal = config.orientation === 'horizontal'
+  const marginTop = isBottomOrSmallViewport && isHorizontal ? `${config.runtime.xAxis.size}px` : '0px'
+  const marginBottom = isBottomOrSmallViewport ? '15px' : '0px'
 
   if (!legend) return null
 
   if (!legend.dynamicLegend)
     return config.visualizationType !== 'Box Plot' ? (
-      <aside
-        style={{ marginTop: config.legend.position === 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px', marginBottom: config.legend.position === 'bottom' ? '15px' : '0px' }}
-        id='legend'
-        className={containerClasses.join(' ')}
-        role='region'
-        aria-label='legend'
-        tabIndex={0}
-      >
+      <aside style={{ marginTop, marginBottom }} id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
         {legend.label && <h2>{parse(legend.label)}</h2>}
         {legend.description && <p>{parse(legend.description)}</p>}
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => (
             <div className={innerClasses.join(' ')}>
-              {createLegendLabels(data, labels).map((label, i) => {
+              {createLegendLabels(labels).map((label, i) => {
                 let className = 'legend-item'
                 let itemName = label.datum
 
