@@ -25,9 +25,7 @@ import { DeviationBar } from './DeviationBar'
 
 // TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
-
-  //const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, stringFormattingOptions } = useContext(ConfigContext)
 
   let [width] = dimensions
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
@@ -320,7 +318,7 @@ export default function LinearChart() {
     if (axis === 'yAxis') {
       tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
       // to fix edge case of small numbers with decimals
-      if (tickCount === undefined) {
+      if (tickCount === undefined && !config.dataFormat.roundTo) {
         // then it is set to Auto
         if (max <= 3) {
           tickCount = 2
@@ -336,7 +334,7 @@ export default function LinearChart() {
 
     if (axis === 'xAxis') {
       tickCount = isHorizontal && !numTicks ? undefined : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
-      if (isHorizontal && tickCount === undefined) {
+      if (isHorizontal && tickCount === undefined && !config.dataFormat.roundTo) {
         // then it is set to Auto
         // - check for small numbers situation
         if (max <= 3) {
