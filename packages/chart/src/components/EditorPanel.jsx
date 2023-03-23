@@ -234,6 +234,19 @@ const EditorPanel = () => {
     })
   }, [config.visualizationType]) // eslint-disable-line
 
+  // Scatter Plots default date/category axis is 'continuous'
+  useEffect(() => {
+    if (config.visualizationType === 'Scatter Plot' && config.xAxis.type === '') {
+      updateConfig({
+        ...config,
+        xAxis: {
+          ...config.xAxis,
+          type: 'continuous'
+        }
+      })
+    }
+  }, [config.visualizationType, config, updateConfig])
+
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
 
   const filterOptions = [
@@ -1560,7 +1573,7 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['continuous', 'categorical', 'date']} />
+                      <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
                       <Select
                         value={config.xAxis.dataKey || ''}
                         section='xAxis'
