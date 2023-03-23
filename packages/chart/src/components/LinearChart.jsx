@@ -25,7 +25,8 @@ import { DeviationBar } from './DeviationBar'
 
 // TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, stringFormattingOptions } = useContext(ConfigContext)
+
   let [width] = dimensions
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const [animatedChart, setAnimatedChart] = useState(false)
@@ -36,13 +37,14 @@ export default function LinearChart() {
   })
 
   // Make sure the chart is visible if in the editor
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const element = document.querySelector('.isEditor')
     if (element) {
       // parent element is visible
       setAnimatedChart(prevState => true)
     }
-  }) // eslint-disable-line
+  }) /* eslint-disable-line */
 
   // If the chart is in view, set to animate if it has not already played
   useEffect(() => {
@@ -75,12 +77,26 @@ export default function LinearChart() {
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
   const isMinValid = (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
 
+  let max = 0 // need outside the if statement
+  let min = 0
   if (data) {
-    let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
-    let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
+    min = enteredMinValue && isMinValid ? enteredMinValue : minValue
+    max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
     // DEV-3263 - If Confidence Intervals in data, then need to account for increased height in max for YScale
     if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Deviation Bar') {
+      let ciYMax = 0
+      if (config.hasOwnProperty('confidenceKeys')) {
+        let upperCIValues = data.map(function (d) {
+          return d[config.confidenceKeys.upper]
+        })
+        ciYMax = Math.max.apply(Math, upperCIValues)
+        if (ciYMax > max) max = ciYMax // bump up the max
+      }
+    }
+
+    // DEV-3263 - If Confidence Intervals in data, then need to account for increased height in max for YScale
+    if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') {
       let ciYMax = 0
       if (config.hasOwnProperty('confidenceKeys')) {
         let upperCIValues = data.map(function (d) {
@@ -301,10 +317,32 @@ export default function LinearChart() {
 
     if (axis === 'yAxis') {
       tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      // to fix edge case of small numbers with decimals
+      if (tickCount === undefined && !config.dataFormat.roundTo) {
+        // then it is set to Auto
+        if (max <= 3) {
+          tickCount = 2
+        } else {
+          tickCount = 4 // same default as standalone components
+        }
+      }
+      if (tickCount > max) {
+        // cap it and round it so its an integer
+        tickCount = min < 0 ? Math.round(max) * 2 : Math.round(max)
+      }
     }
 
     if (axis === 'xAxis') {
       tickCount = isHorizontal && !numTicks ? undefined : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      if (isHorizontal && tickCount === undefined && !config.dataFormat.roundTo) {
+        // then it is set to Auto
+        // - check for small numbers situation
+        if (max <= 3) {
+          tickCount = 2
+        } else {
+          tickCount = 4 // same default as standalone components
+        }
+      }
     }
     return tickCount
   }
