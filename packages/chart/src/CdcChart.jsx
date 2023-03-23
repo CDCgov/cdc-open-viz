@@ -613,7 +613,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     let original = num
     let stringFormattingOptions
-
     if (axis === 'left') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.commas ? true : false,
