@@ -393,7 +393,7 @@ const EditorPanel = () => {
 
   const addNewSeries = seriesKey => {
     let newSeries = config.series ? [...config.series] : []
-    newSeries.push({ dataKey: seriesKey, type: 'Bar' })
+    newSeries.push({ dataKey: seriesKey, type: config.visualizationType })
     updateConfig({ ...config, series: newSeries }) // left axis series keys
   }
 
