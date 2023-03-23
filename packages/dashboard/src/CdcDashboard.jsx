@@ -335,7 +335,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       setFilteredData(newFilteredData)
     }
 
-    const announceChange = text => { }
+    const announceChange = text => {}
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
       if (!singleFilter.showDropdown) return <></>
@@ -551,7 +551,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
                         const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
                         const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
-                        const tableLink = <a href={`#data-table-${visualizationConfig.dataKey}`}>{visualizationConfig.dataKey} (Go to Table)</a>
+                        const tableLink = (
+                          <a href={`#data-table-${visualizationConfig.dataKey}`} className='margin-href'>
+                            {visualizationConfig.dataKey} (Go to Table)
+                          </a>
+                        )
 
                         return (
                           <React.Fragment key={`vis__${index}__${colIndex}`}>
