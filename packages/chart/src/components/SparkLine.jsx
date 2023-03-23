@@ -129,88 +129,90 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   return (
     <ErrorBoundary component='SparkLine'>
       <svg role='img' aria-label={handleChartAriaLabels(config)} width={width} height={height} className={'sparkline'} tabIndex={0}>
-        {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => (
-          <>
-            <Group
-              className='sparkline-group'
-              height={parentHeight}
-              style={{ height: parentHeight }}
-              top={margin.top}
-              key={`series-${seriesKey}`}
-              opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
-              display={config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
-            >
-              {cleanedData.map((d, dataIndex) => {
-                let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
-                let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${d[config.runtime.xAxis.dataKey]}` : d[config.runtime.xAxis.dataKey]
+        {config.runtime.lineSeriesKeys.length > 0
+          ? config.runtime.lineSeriesKeys
+          : config.runtime.seriesKeys.map((seriesKey, index) => (
+              <>
+                <Group
+                  className='sparkline-group'
+                  height={parentHeight}
+                  style={{ height: parentHeight }}
+                  top={margin.top}
+                  key={`series-${seriesKey}`}
+                  opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
+                  display={config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
+                >
+                  {cleanedData.map((d, dataIndex) => {
+                    let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
+                    let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${d[config.runtime.xAxis.dataKey]}` : d[config.runtime.xAxis.dataKey]
 
-                const tooltip = `<div>
+                    const tooltip = `<div>
 									${yAxisTooltip}<br />
 									${xAxisTooltip}<br />
 									${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''}
 									</div>`
 
-                let circleRadii = 4.5
-                return (
-                  <Group key={`series-${seriesKey}-point-${dataIndex}`}>
-                    <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={yScale(getYAxisData(d, seriesKey))} fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'} textAnchor='middle'>
-                      {formatNumber(d[seriesKey])}
-                    </Text>
+                    let circleRadii = 4.5
+                    return (
+                      <Group key={`series-${seriesKey}-point-${dataIndex}`}>
+                        <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={yScale(getYAxisData(d, seriesKey))} fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'} textAnchor='middle'>
+                          {formatNumber(d[seriesKey])}
+                        </Text>
 
-                    {dataIndex + 1 !== data.length && (config.lineDatapointStyle === 'always show' || config.lineDatapointStyle === 'hover') && (
-                      <circle
-                        key={`${seriesKey}-${dataIndex}`}
-                        r={circleRadii}
-                        cx={xScale(getXAxisData(d))}
-                        cy={yScale(getYAxisData(d, seriesKey))}
-                        fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                        style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
-                        data-tooltip-html={tooltip}
-                        data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                      />
-                    )}
-                  </Group>
-                )
-              })}
-              <LinePath
-                curve={allCurves.curveLinear}
-                data={cleanedData}
-                x={d => xScale(getXAxisData(d))}
-                y={d => yScale(getYAxisData(d, seriesKey))}
-                stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                strokeWidth={2}
-                strokeOpacity={1}
-                shapeRendering='geometricPrecision'
-                markerEnd={`url(#${'arrow'}--${index})`}
-              />
-              <MarkerArrow
-                id={`arrow--${index}`}
-                refX={2}
-                size={6}
-                markerEnd={`url(#${'arrow'}--${index})`}
-                strokeOpacity={1}
-                fillOpacity={1}
-                // stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-              />
-            </Group>
-            <AxisBottom
-              top={yMax + margin.top}
-              hideAxisLine
-              hideTicks
-              scale={xScale}
-              tickValues={handleSparkLineTicks}
-              tickFormat={formatDate}
-              stroke={'black'}
-              tickStroke={'black'}
-              tickLabelProps={() => ({
-                fill: 'black',
-                fontSize: 11,
-                textAnchor: 'middle'
-              })}
-            />
-          </>
-        ))}
+                        {dataIndex + 1 !== data.length && (config.lineDatapointStyle === 'always show' || config.lineDatapointStyle === 'hover') && (
+                          <circle
+                            key={`${seriesKey}-${dataIndex}`}
+                            r={circleRadii}
+                            cx={xScale(getXAxisData(d))}
+                            cy={yScale(getYAxisData(d, seriesKey))}
+                            fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                            style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
+                            data-tooltip-html={tooltip}
+                            data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                          />
+                        )}
+                      </Group>
+                    )
+                  })}
+                  <LinePath
+                    curve={allCurves.curveLinear}
+                    data={cleanedData}
+                    x={d => xScale(getXAxisData(d))}
+                    y={d => yScale(getYAxisData(d, seriesKey))}
+                    stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                    strokeWidth={2}
+                    strokeOpacity={1}
+                    shapeRendering='geometricPrecision'
+                    markerEnd={`url(#${'arrow'}--${index})`}
+                  />
+                  <MarkerArrow
+                    id={`arrow--${index}`}
+                    refX={2}
+                    size={6}
+                    markerEnd={`url(#${'arrow'}--${index})`}
+                    strokeOpacity={1}
+                    fillOpacity={1}
+                    // stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                    fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                  />
+                </Group>
+                <AxisBottom
+                  top={yMax + margin.top}
+                  hideAxisLine
+                  hideTicks
+                  scale={xScale}
+                  tickValues={handleSparkLineTicks}
+                  tickFormat={formatDate}
+                  stroke={'black'}
+                  tickStroke={'black'}
+                  tickLabelProps={() => ({
+                    fill: 'black',
+                    fontSize: 11,
+                    textAnchor: 'middle'
+                  })}
+                />
+              </>
+            ))}
       </svg>
     </ErrorBoundary>
   )

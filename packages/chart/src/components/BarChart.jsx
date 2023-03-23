@@ -264,7 +264,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             </Text>
                           )}
 
-                          {displayNumbersOnBar && textWidth + 50 < bar.width && (
+                          {displayNumbersOnBar && textWidth < bar.width && (
                             <Text
                               display={displayBar ? 'block' : 'none'}
                               x={bar.x + barStack.bars[bar.index].width / 2} // padding
@@ -342,7 +342,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
                       if (config.legend.colorCode && config.series.length === 1) barColor = palette[barGroup.index]
 
-                      let yAxisValue = formatNumber(bar.value)
+                      let yAxisValue = formatNumber(bar.value, 'left')
                       let xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                       if (config.runtime.horizontal) {
@@ -504,11 +504,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         stroke='#333'
                         strokeWidth='px'
                         d={`
-                        M${lowerPos} ${yPos - tickWidth} 
-                        L${lowerPos} ${yPos + tickWidth} 
-                        M${lowerPos} ${yPos} 
-                        L${upperPos} ${yPos} 
-                        M${upperPos} ${yPos - tickWidth} 
+                        M${lowerPos} ${yPos - tickWidth}
+                        L${lowerPos} ${yPos + tickWidth}
+                        M${lowerPos} ${yPos}
+                        L${upperPos} ${yPos}
+                        M${upperPos} ${yPos - tickWidth}
                         L${upperPos} ${yPos + tickWidth} `}
                       />
                     )

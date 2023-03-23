@@ -19,7 +19,7 @@ import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
 import LinearChart from './components/LinearChart'
 
-import { colorPalettesChart as colorPalettes, pairedBarPalettes } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 
@@ -62,7 +62,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   // Destructure items from config for more readable JSX
-  const { legend, title, description, visualizationType } = config
+  let { legend, title, description, visualizationType } = config
+
+  // set defaults on titles if blank
+  if (!title || title === '') title = 'Chart Title'
+  if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
+
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
@@ -289,7 +294,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
             columnMin: Number(q1 - 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo),
-            columnCount: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
+            columnTotal: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
             columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnIqr: Number(iqr).toFixed(newConfig.dataFormat.roundTo),
@@ -318,7 +323,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.boxplot.tableData = tableData
     }
 
-    if (newConfig.visualizationType === 'Combo' || ('Area Chart' && newConfig.series)) {
+    if (newConfig.visualizationType === 'Combo' || (newConfig.visualizationType === 'Line' && newConfig.series)) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.series.forEach(series => {
@@ -331,7 +336,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
     }
 
-    if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
+    if (((newConfig.visualizationType === 'Bar' || newConfig.visualizationType === 'Deviation Bar') && newConfig.orientation === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
       newConfig.runtime.xAxis = newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis
       newConfig.runtime.horizontal = true
@@ -342,6 +347,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
+
+    if (newConfig.visualizationType === 'Scatter Plot') {
+      newConfig.xAxis.type = 'continuous'
+    }
 
     setConfig(newConfig)
   }
@@ -497,8 +506,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime.seriesKeys) {
-      const configPalette = config.visualizationType === 'Paired Bar' ? config.pairedBar.palette : config.palette
-      const allPalettes = { ...colorPalettes, ...pairedBarPalettes }
+      const configPalette = config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar' ? config.twoColor.palette : config.palette
+      const allPalettes = { ...colorPalettes, ...twoColorPalette }
       let palette = config.customColors || allPalettes[configPalette]
       let numberOfKeys = config.runtime.seriesKeys.length
       let newColorScale
@@ -706,7 +715,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     Pie: <PieChart />,
     'Box Plot': <LinearChart />,
     'Area Chart': <LinearChart />,
-    'Scatter Plot': <LinearChart />
+    'Scatter Plot': <LinearChart />,
+    'Deviation Bar': <LinearChart />
   }
 
   const missingRequiredSections = () => {
@@ -743,7 +753,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           <div className='cdc-chart-inner-container'>
             {/* Title */}
 
-            {title && (
+            {title && config.showTitle && (
               <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
                 {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
                 <div>{parse(title)}</div>
@@ -757,7 +767,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
-              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
+              style={{ marginBottom: config.legend.position !== 'bottom' && currentViewport !== 'sm' && currentViewport !== 'xs' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
@@ -842,7 +852,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     isNumber,
     cleanData,
     getTextWidth,
-    pairedBarPalettes
+    twoColorPalette
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
