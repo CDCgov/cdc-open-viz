@@ -38,7 +38,7 @@ export default function PieChart() {
       // parent element is visible
       setAnimatePie(prevState => true)
     }
-  }) // eslint-disable-line
+  })
 
   useEffect(() => {
     if (dataRef?.isIntersecting && config.animate && !animatedPie) {

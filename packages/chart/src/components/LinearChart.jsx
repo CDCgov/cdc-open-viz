@@ -25,10 +25,7 @@ import { DeviationBar } from './DeviationBar'
 
 // TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, cleanData, updateConfig } = useContext(ConfigContext)
-  // Just do this once up front otherwise we end up
-  // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data, config.xAxis.dataKey)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
 
   //const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
 
