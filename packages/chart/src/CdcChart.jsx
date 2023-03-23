@@ -731,7 +731,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let body = <Loading />
 
   if (!loading) {
-    const tableLink = <a href={`#data-table-${config.dataKey}`}>{config.dataKey} (Go to Table)</a>
+    const tableLink = (
+      <a href={`#data-table-${config.dataKey}`} className='margin-href'>
+        {config.dataKey} (Go to Table)
+      </a>
+    )
     body = (
       <>
         {isEditor && <EditorPanel />}

@@ -987,13 +987,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
             // THIS CODE SHOULD NOT ACT ON THE ENTIRE ROW OF KEYS BUT ONLY THE ONE KEY IN THE SPECIAL CLASS
             for (let i = 0; i < state.legend.specialClasses.length; i++) {
-                // DEV-3303 - Special Classes label in HOVERS should only apply to selected special class key
-                // - you have to ALSO check that the key matches - putting here otherwise the if stmt too long
+              // DEV-3303 - Special Classes label in HOVERS should only apply to selected special class key
+              // - you have to ALSO check that the key matches - putting here otherwise the if stmt too long
               if (columnKey === state.legend.specialClasses[i].key) {
-                  if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
-                    value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
-                    break
-                  }
+                if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
+                  value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
+                  break
+                }
               }
             }
           }
@@ -1501,14 +1501,31 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const tabId = handleMapTabbing()
-  
+
   // this only shows in Dashboard config mode and only if Show Table is also set
-  const tableLink = <a href={`#data-table-${config.dataKey}`}>{config.dataKey} (Go to Table)</a>
+  const tableLink = (
+    <a href={`#data-table-${config.dataKey}`} className='margin-href'>
+      {config.dataKey} (Go to Table)
+    </a>
+  )
 
   return (
     <ConfigContext.Provider value={mapProps}>
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
-        {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} changeFilterActive={changeFilterActive} />}
+        {isEditor && (
+          <EditorPanel
+            isDashboard={isDashboard}
+            state={state}
+            setState={setState}
+            loadConfig={loadConfig}
+            setParentConfig={setConfig}
+            setRuntimeFilters={setRuntimeFilters}
+            runtimeFilters={runtimeFilters}
+            runtimeLegend={runtimeLegend}
+            columnsInData={Object.keys(state.data[0])}
+            changeFilterActive={changeFilterActive}
+          />
+        )}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
