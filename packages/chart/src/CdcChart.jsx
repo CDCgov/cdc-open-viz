@@ -294,7 +294,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
             columnMin: Number(q1 - 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo),
-            columnCount: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
+            columnTotal: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
             columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnIqr: Number(iqr).toFixed(newConfig.dataFormat.roundTo),
@@ -323,7 +323,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.boxplot.tableData = tableData
     }
 
-    if (newConfig.visualizationType === 'Combo' || ('Area Chart' && newConfig.series)) {
+    if (newConfig.visualizationType === 'Combo' || (newConfig.visualizationType === 'Line' && newConfig.series)) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.series.forEach(series => {
@@ -347,6 +347,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
+
+    if (newConfig.visualizationType === 'Scatter Plot') {
+      newConfig.xAxis.type = 'continuous'
+    }
 
     setConfig(newConfig)
   }

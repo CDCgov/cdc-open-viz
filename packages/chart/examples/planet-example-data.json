@@ -31,13 +31,13 @@
   },
   {
     "name": "Venus",
-    "Radius": "-50",
+    "Radius": "50",
     "Diameter": "2",
     "distance": "0"
   },
   {
     "name": "Mars",
-    "Radius": "40",
+    "Radius": "-40",
     "Diameter": "1",
     "distance": "0"
   },

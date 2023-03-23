@@ -393,7 +393,7 @@ const EditorPanel = () => {
 
   const addNewSeries = seriesKey => {
     let newSeries = config.series ? [...config.series] : []
-    newSeries.push({ dataKey: seriesKey, type: 'Bar' })
+    newSeries.push({ dataKey: seriesKey, type: config.visualizationType })
     updateConfig({ ...config, series: newSeries }) // left axis series keys
   }
 
@@ -1091,7 +1091,7 @@ const EditorPanel = () => {
                     <AccordionItemButton>Measures</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <h4>Labels for 5-Number Summary</h4>
+                    <h4 style={{ fontSize: '18px' }}>Labels for 5-Number Summary</h4>
 
                     {/* prettier-ignore */}
                     {/* max */}
@@ -1202,12 +1202,14 @@ const EditorPanel = () => {
                         </Tooltip>
                       }
                     />
+                    <br />
+                    <h4 style={{ fontSize: '18px' }}>Labels for Additional Measures</h4>
 
                     {/* iqr */}
                     <TextField type='text' value={config.boxplot.labels.iqr} fieldName='iqr' section='boxplot' subsection='labels' label='Interquartile Range' updateField={updateField} />
 
                     {/* count */}
-                    <TextField type='text' value={config.boxplot.labels.count} fieldName='count' section='boxplot' subsection='labels' label='Count' updateField={updateField} />
+                    <TextField type='text' value={config.boxplot.labels.total} fieldName='total' section='boxplot' subsection='labels' label='Total' updateField={updateField} />
 
                     {/* mean */}
                     <TextField type='text' value={config.boxplot.labels.mean} fieldName='mean' section='boxplot' subsection='labels' label='Mean' updateField={updateField} />
@@ -1216,7 +1218,7 @@ const EditorPanel = () => {
                     {/* values */}
                     <TextField type='text' value={config.boxplot.labels.values} fieldName='values' section='boxplot' subsection='labels' label='Values' updateField={updateField} />
                     <br />
-                    <h4>Percentages for Quartiles</h4>
+                    <h4 style={{ fontSize: '18px' }}>Percentages for Quartiles</h4>
                     <TextField
                       type='number'
                       value={config.boxplot.firstQuartilePercentage ? config.boxplot.firstQuartilePercentage : 25}
@@ -1458,9 +1460,11 @@ const EditorPanel = () => {
                         <>
                           <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='update min value' placeholder='Auto' updateField={updateField} />
                           <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
+                          <TextField value={config.xAxis.targetLabel || 'Target'} section='xAxis' fieldName='targetLabel' type='text' label='Target Label' updateField={updateField} />
+                          <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Update target Value' placeholder='Auto' className='number-narrow' updateField={updateField} />
+                          <CheckBox value={config.xAxis.showTargetLabel} section='xAxis' fieldName='showTargetLabel' label='Show target label' updateField={updateField} />
                         </>
                       )}
-                      <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Update target Value' placeholder='Auto' className='number-narrow' updateField={updateField} />
                     </>
                   ) : (
                     config.visualizationType !== 'Pie' && (
