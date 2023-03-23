@@ -1209,7 +1209,7 @@ const EditorPanel = () => {
                     <TextField type='text' value={config.boxplot.labels.iqr} fieldName='iqr' section='boxplot' subsection='labels' label='Interquartile Range' updateField={updateField} />
 
                     {/* count */}
-                    <TextField type='text' value={config.boxplot.labels.count} fieldName='count' section='boxplot' subsection='labels' label='Count' updateField={updateField} />
+                    <TextField type='text' value={config.boxplot.labels.total} fieldName='total' section='boxplot' subsection='labels' label='Total' updateField={updateField} />
 
                     {/* mean */}
                     <TextField type='text' value={config.boxplot.labels.mean} fieldName='mean' section='boxplot' subsection='labels' label='Mean' updateField={updateField} />
