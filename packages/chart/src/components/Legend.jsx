@@ -174,25 +174,13 @@ const Legend = () => {
         </LegendOrdinal>
       </aside>
     ) : (
-      <aside
-        id='legend'
-        className={containerClasses.join(' ')}
-        role='region'
-        aria-label='legend'
-        tabIndex={0} // eslint-disable-line
-      >
+      <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
         {config.boxplot.legend.displayHowToReadText && <h3>{config.boxplot.legend.howToReadText}</h3>}
       </aside>
     )
   return (
     config.visualizationType !== 'Box Plot' && (
-      <aside
-        id='legend'
-        className={containerClasses.join(' ')}
-        role='region'
-        aria-label='legend'
-        tabIndex={0} // eslint-disable-line
-      >
+      <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
         {legend.label && <h2>{parse(legend.label)}</h2>}
         {legend.description && <p>{parse(legend.description)}</p>}
 

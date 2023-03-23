@@ -15,7 +15,7 @@ import useReduceData from '../hooks/useReduceData'
 import ConfigContext from '../ConfigContext'
 
 export default function SparkLine({ width: parentWidth, height: parentHeight }) {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale, isNumber, handleChartAriaLabels } = useContext(ConfigContext) // eslint-disable-line
+  const { transformedData: data, config, parseDate, formatDate, seriesHighlight, formatNumber, colorScale, handleChartAriaLabels } = useContext(ConfigContext)
   let width = parentWidth
   const { minValue, maxValue } = useReduceData(config, data, ConfigContext)
 
@@ -96,7 +96,6 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
 
       yScale = config.runtime.xAxis.type === 'date' ? scaleLinear({ domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)] }) : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
-      // eslint-disable-next-line
       seriesScale = scalePoint({
         domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
         range: [0, yMax]
