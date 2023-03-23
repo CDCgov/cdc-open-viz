@@ -236,9 +236,8 @@ export default function LinearChart() {
         domain: xAxisDataMapped,
         range: [0, yMax]
       })
-      const maxVal = Number(config.xAxis.target) > max ? Number(config.xAxis.target) : max
       xScale = scaleLinear({
-        domain: [min * leftOffset, maxVal],
+        domain: [min * leftOffset, Math.max(Number(config.xAxis.target), max)],
         range: [0, xMax],
         round: true
       })
