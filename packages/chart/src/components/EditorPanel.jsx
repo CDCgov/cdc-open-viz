@@ -234,6 +234,19 @@ const EditorPanel = () => {
     })
   }, [config.visualizationType]) // eslint-disable-line
 
+  // Scatter Plots default date/category axis is 'continuous'
+  useEffect(() => {
+    if (config.visualizationType === 'Scatter Plot') {
+      updateConfig({
+        ...config,
+        xAxis: {
+          ...config.xAxis,
+          type: 'continuous'
+        }
+      })
+    }
+  }, [])
+
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
 
   const filterOptions = [
@@ -597,6 +610,13 @@ const EditorPanel = () => {
     }
   }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
 
+  /// temporary force orientation untill we support Vartical deviaton bar
+  useEffect(() => {
+    if (config.visualizationType === 'Deviation Bar') {
+      updateConfig({ ...config, orientation: 'horizontal' })
+    }
+  }, [config.visualizationType])
+
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
     return (
@@ -795,7 +815,7 @@ const EditorPanel = () => {
                   <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
-                  {config.visualizationType === 'Deviation Bar' && <Select value={config.orientation || 'horizontal'} fieldName='orientation' label='Orientation' updateField={updateField} options={['horizontal', 'vertical']} />}
+                  {config.visualizationType === 'Deviation Bar' && <Select label='Orientation' options={['horizontal']} />}
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.barStyle === 'rounded' && <Select value={config.tipRounding || 'top'} fieldName='tipRounding' label='tip rounding' updateField={updateField} options={['top', 'full']} />}
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.barStyle === 'rounded' && (
@@ -1456,15 +1476,15 @@ const EditorPanel = () => {
                       <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
                       <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />
                       <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
-                      <TextField value={config.xAxis.max} section='xAxis' fieldName='max' label='update max value' type='number' placeholder='Auto' updateField={updateField} />
+                      <TextField value={config.xAxis.max} section='xAxis' fieldName='max' label='max value' type='number' placeholder='Auto' updateField={updateField} />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
                       {config.visualizationType === 'Deviation Bar' && (
                         <>
-                          <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='update min value' placeholder='Auto' updateField={updateField} />
+                          <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='min value' placeholder='Auto' updateField={updateField} />
                           <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
-                          <TextField value={config.xAxis.targetLabel || 'Target'} section='xAxis' fieldName='targetLabel' type='text' label='Target Label' updateField={updateField} />
-                          <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Update target Value' placeholder='Auto' className='number-narrow' updateField={updateField} />
-                          <CheckBox value={config.xAxis.showTargetLabel} section='xAxis' fieldName='showTargetLabel' label='Show target label' updateField={updateField} />
+                          <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Deviation point' placeholder='Auto' updateField={updateField} />
+                          <TextField value={config.xAxis.targetLabel || 'Target'} section='xAxis' fieldName='targetLabel' type='text' label='Deviation point Label' updateField={updateField} />
+                          <CheckBox value={config.xAxis.showTargetLabel} section='xAxis' fieldName='showTargetLabel' label='Display Deviation point label' updateField={updateField} />
                         </>
                       )}
                     </>
@@ -1474,9 +1494,9 @@ const EditorPanel = () => {
                         <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
                         <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />
                         <CheckBox value={config.yAxis.hideTicks} section='yAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
-                        <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='update max value' placeholder='Auto' updateField={updateField} />
+                        <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='max value' placeholder='Auto' updateField={updateField} />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
-                        <TextField value={config.yAxis.min} section='yAxis' fieldName='min' type='number' label='update min value' placeholder='Auto' updateField={updateField} />
+                        <TextField value={config.yAxis.min} section='yAxis' fieldName='min' type='number' label='min value' placeholder='Auto' updateField={updateField} />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                       </>
                     )
@@ -1555,7 +1575,7 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'date', 'continuous']} />
+                      <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
                       <Select
                         value={config.xAxis.dataKey || ''}
                         section='xAxis'

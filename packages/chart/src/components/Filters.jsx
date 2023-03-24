@@ -3,7 +3,7 @@ import ConfigContext from './../ConfigContext'
 import Button from '@cdc/core/components/elements/Button'
 
 const useFilters = () => {
-  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData, runtimeFilters } = useContext(ConfigContext)
+  const { config, setConfig, setFilteredData, excludedData, filterData } = useContext(ConfigContext)
   const [showApplyButton, setShowApplyButton] = useState(false)
 
   const sortAsc = (a, b) => {
@@ -38,6 +38,7 @@ const useFilters = () => {
     // reset to first item in values array.
     newFilters.map(filter => {
       filter.active = filter.values[0]
+      return null
     })
 
     setFilteredData(filterData(newFilters, excludedData))
