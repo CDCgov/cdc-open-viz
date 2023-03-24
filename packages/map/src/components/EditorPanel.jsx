@@ -119,7 +119,7 @@ const EditorPanel = props => {
   }
 
   const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-    <label className='checkbox'>
+    <label className='checkbox column-heading'>
       <input
         type='checkbox'
         name={fieldName}
@@ -211,7 +211,7 @@ const EditorPanel = props => {
           }
         })
         break
-      
+
       case 'toggleDataUrl':
         setState({
           ...state,
@@ -1019,7 +1019,7 @@ const EditorPanel = props => {
     if (!isReversed && state.color.endsWith('reverse')) {
       paletteName = state.color.slice(0, -7)
     }
-    if(paletteName){
+    if (paletteName) {
       handleEditorChanges('color', paletteName)
     }
   }, [isReversed])
@@ -2362,11 +2362,11 @@ const EditorPanel = props => {
                           handleEditorChanges('showDataTable', event.target.checked)
                         }}
                       />
-                      <span className='edit-label'>
+                      <span className='edit-label column-heading'>
                         Show Data Table
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='question' style={{ marginLeft: '0.5rem', display: 'block', whiteSpace: 'nowrap' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
@@ -2393,26 +2393,6 @@ const EditorPanel = props => {
                         </Tooltip>
                       }
                     />
-                    <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard}
-                        onChange={event => {
-                          handleEditorChanges('showDataTable', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>
-                        Show Table
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </span>
-                    </label>
                     <TextField
                       value={dataTable.indexLabel || ''}
                       updateField={updateField}
@@ -2471,7 +2451,7 @@ const EditorPanel = props => {
                       />
                       <span className='edit-label'>Map loads with data table expanded</span>
                     </label>
-                    {isDashboard &&
+                    {isDashboard && (
                       <label className='checkbox'>
                         <input
                           type='checkbox'
@@ -2482,8 +2462,8 @@ const EditorPanel = props => {
                         />
                         <span className='edit-label'>Show Data Table Name & Link</span>
                       </label>
-                    }
-                    {isDashboard &&
+                    )}
+                    {
                       <label className='checkbox'>
                         <input
                           type='checkbox'

@@ -1505,8 +1505,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // this only shows in Dashboard config mode and only if Show Table is also set
   const tableLink = (
-    <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
-      {config.dataKey} (Go to Table)
+    <a href={`#data-table-${state.general.dataKey}`} className='margin-left-href'>
+      {state.general.dataKey} (Go to Table)
     </a>
   )
 
