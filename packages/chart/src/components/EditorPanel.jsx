@@ -236,7 +236,7 @@ const EditorPanel = () => {
 
   // Scatter Plots default date/category axis is 'continuous'
   useEffect(() => {
-    if (config.visualizationType === 'Scatter Plot' && config.xAxis.type === '') {
+    if (config.visualizationType === 'Scatter Plot') {
       updateConfig({
         ...config,
         xAxis: {
@@ -245,7 +245,7 @@ const EditorPanel = () => {
         }
       })
     }
-  }, [config.visualizationType, config, updateConfig])
+  }, [])
 
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
 
