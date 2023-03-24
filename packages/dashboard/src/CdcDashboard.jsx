@@ -686,6 +686,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               }
 
               let dataFileSourceType = config.datasets[datasetKey]?.dataFileSourceType
+              console.log('dataFileSourceType=', dataFileSourceType)
 
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
