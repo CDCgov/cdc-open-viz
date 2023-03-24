@@ -65,7 +65,7 @@ export default {
       median: 'Median',
       sd: 'Standard Deviation',
       iqr: 'Interquartile Range',
-      count: 'Count',
+      total: 'Total',
       outliers: 'Outliers',
       values: 'Values'
     }
@@ -83,6 +83,8 @@ export default {
   },
   xAxis: {
     type: 'categorical',
+    showTargetLabel: true,
+    targetLabel: 'Target',
     hideAxis: false,
     hideLabel: false,
     hideTicks: false,

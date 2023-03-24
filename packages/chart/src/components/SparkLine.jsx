@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
@@ -15,7 +15,7 @@ import useReduceData from '../hooks/useReduceData'
 import ConfigContext from '../ConfigContext'
 
 export default function SparkLine({ width: parentWidth, height: parentHeight }) {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale, isNumber, handleChartAriaLabels } = useContext(ConfigContext)
+  const { transformedData: data, config, parseDate, formatDate, seriesHighlight, formatNumber, colorScale, handleChartAriaLabels } = useContext(ConfigContext)
   let width = parentWidth
   const { minValue, maxValue } = useReduceData(config, data, ConfigContext)
 
@@ -51,7 +51,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
           cleanedSeries[key] = d[key]
         } else {
           // remove comma and dollar signs
-          let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
+          let tmp = d[key] !== null && d[key] !== '' ? d[key].replace(/[,$]/g, '') : ''
           if (testing) console.log('tmp no comma or $', tmp)
           if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
             cleanedSeries[key] = tmp
@@ -115,6 +115,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
         range: [margin.left, width - margin.right]
       })
 
+      // eslint-disable-next-line
       seriesScale = scalePoint({
         domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
         range: [0, xMax]

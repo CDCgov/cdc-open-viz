@@ -73,7 +73,7 @@ export default function DataTable() {
                     columnThirdQuartile: labels.q3,
                     columnOutliers: labels.outliers,
                     values: labels.values,
-                    columnCount: labels.count,
+                    columnTotal: labels.total,
                     columnSd: 'Standard Deviation',
                     nonOutlierValues: 'Non Outliers'
                   }
@@ -147,7 +147,7 @@ export default function DataTable() {
               if (Number(props.row.id) === 3) return plot.columnMedian
               if (Number(props.row.id) === 4) return plot.columnFirstQuartile
               if (Number(props.row.id) === 5) return plot.columnMin
-              if (Number(props.row.id) === 6) return plot.columnCount
+              if (Number(props.row.id) === 6) return plot.columnTotal
               if (Number(props.row.id) === 7) return plot.columnSd
               if (Number(props.row.id) === 8) return plot.columnMean
               if (Number(props.row.id) === 9) return plot.columnOutliers.length > 0 ? plot.columnOutliers.toString() : '-'
