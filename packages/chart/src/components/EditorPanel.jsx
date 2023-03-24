@@ -771,7 +771,7 @@ const EditorPanel = () => {
     'Deviation Bar'
   ]
 
-  const isLoadedFromUrl = config.dataKey.includes('http://') || config.dataKey.includes('https://')
+  const isLoadedFromUrl = config?.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
 
   return (
     <ErrorBoundary component='EditorPanel'>

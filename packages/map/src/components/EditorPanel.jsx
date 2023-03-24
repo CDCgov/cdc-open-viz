@@ -1326,7 +1326,7 @@ const EditorPanel = props => {
     )
   }
 
-  const isLoadedFromUrl = state.dataKey.includes('http://') || state.dataKey.includes('https://')
+  const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
 
   return (
     <ErrorBoundary component='EditorPanel'>
