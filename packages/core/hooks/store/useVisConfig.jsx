@@ -44,7 +44,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
       const config = dashboardStoredConfig ?? configObj ?? (await fetchAsyncUrl(configUrl))
 
       const resolvedConfig = merge(defaultConfig, config)
-      const processedConfig = { ...coveUpdateWorker(resolvedConfig) }
+      const processedConfig = { ...await coveUpdateWorker(resolvedConfig) }
 
       // Run update worker on config, then set in store
       if (!dashboardStoredConfig) {

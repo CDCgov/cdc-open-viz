@@ -44,7 +44,6 @@ const Component = ({ className, children, exampleConfig, ...attributes }) => {
   const customTitleAttrs = (!config.title || config.title === '') && { 'data-title': false }
   const customBorderAttrs = config.componentStyle?.border !== 'default' && { 'data-border': config.componentStyle?.border }
   const customShadowAttrs = !config.componentStyle?.shadow && { 'data-no-shadow': true }
-
   const customAccentAttrs = () => {
     if (config.componentStyle?.accent === 'none' || (config.componentStyle?.accent === 'top' && config.title)) return {}
     return { 'data-accent': config.componentStyle?.accent }
