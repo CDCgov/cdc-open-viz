@@ -2222,7 +2222,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'block', whiteSpace: 'nowrap' }} />
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement.</p>

@@ -83,7 +83,7 @@ const generateMedia = (state, type, elementToCapture) => {
       console.warn('COVE: pdf downloads disabled')
       break
     default:
-      console.warn("generateMedia param 2 type must be 'image' or 'pdf'")
+      console.warn("COVE: generateMedia param 2 type must be 'image' or 'pdf'")
       break
   }
 }
