@@ -64,7 +64,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
 
-  console.log('config', config, config.dataKey)
   // set defaults on titles if blank
   if (!title || title === '') title = 'Chart Title'
   if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
@@ -743,12 +742,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   if (!loading) {
     const tableLink = (
-      <>
-        {console.log('config', config, config.dataKey)},
-        <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
-          {config.dataKey} (Go to Table)
-        </a>
-      </>
+      <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
+        {config.dataKey} (Go to Table)
+      </a>
     )
     body = (
       <>

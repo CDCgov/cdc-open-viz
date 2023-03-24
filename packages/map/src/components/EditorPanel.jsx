@@ -1326,6 +1326,8 @@ const EditorPanel = props => {
     )
   }
 
+  const isLoadedFromUrl = state.dataKey.includes('http://') || state.dataKey.includes('https://')
+
   return (
     <ErrorBoundary component='EditorPanel'>
       {state?.runtime?.editorErrorMessage.length > 0 && <Error />}
@@ -2463,7 +2465,7 @@ const EditorPanel = props => {
                         <span className='edit-label'>Show Data Table Name & Link</span>
                       </label>
                     )}
-                    {
+                    {isLoadedFromUrl && (
                       <label className='checkbox'>
                         <input
                           type='checkbox'
@@ -2474,7 +2476,7 @@ const EditorPanel = props => {
                         />
                         <span className='edit-label'>Show URL to Automatically Updated Data</span>
                       </label>
-                    }
+                    )}
                     <label className='checkbox'>
                       <input
                         type='checkbox'
