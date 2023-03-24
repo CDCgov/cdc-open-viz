@@ -73,11 +73,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
                   d[seriesKey] !== null && (
-                    // isNumber(d[seriesKey]) &&
-                    // isNumber(getYAxisData(d, seriesKey)) &&
-                    // isNumber(getXAxisData(d)) &&
-                    // isNumber(yScaleRight(getXAxisData(d))) &&
-                    // isNumber(yScale(getXAxisData(d))) &&
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
                       <Text
@@ -87,7 +82,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         textAnchor='middle'
                       >
-                        {formatNumber(d[seriesKey])}
+                        {formatNumber(d[seriesKey], 'left')}
                       </Text>
 
                       <circle

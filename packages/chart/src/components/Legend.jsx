@@ -25,12 +25,14 @@ const Legend = () => {
       let tmp = {}
       colsToKeep.map(col => {
         tmp[col] = isNaN(dataItem[col]) ? dataItem[col] : dataItem[col]
+        return null
       })
       return tmp
     })
 
     colsToKeep.map(col => {
       tmpLabels[col] = col
+      return null
     })
 
     if (dynamicLegendItems.length > 0) {
@@ -43,7 +45,7 @@ const Legend = () => {
         }
       })
     }
-  }, [dynamicLegendItems])
+  }, [dynamicLegendItems]) // eslint-disable-line
 
   useEffect(() => {
     if (dynamicLegendItems.length === 0) {
@@ -53,7 +55,9 @@ const Legend = () => {
       config.runtime.seriesLabelsAll.map(item => {
         resetSeriesNames.map(col => {
           tmpLabels[col] = col
+          return null
         })
+        return null
       })
 
       setConfig({
@@ -65,7 +69,7 @@ const Legend = () => {
         }
       })
     }
-  }, [dynamicLegendItems])
+  }, [dynamicLegendItems]) // eslint-disable-line
 
   const removeDynamicLegendItem = label => {
     let newLegendItems = dynamicLegendItems.filter(item => item.text !== label.text)
@@ -145,7 +149,7 @@ const Legend = () => {
 
                 // Filter excluded data keys from legend
                 if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-                  return
+                  return null
                 }
 
                 if (config.runtime.seriesLabels) {
@@ -217,7 +221,7 @@ const Legend = () => {
 
                     // Filter excluded data keys from legend
                     if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-                      return
+                      return null
                     }
 
                     if (config.runtime.seriesLabels) {
@@ -233,6 +237,7 @@ const Legend = () => {
                       if (listItem.text === label.text) {
                         inDynamicList = true
                       }
+                      return null
                     })
 
                     if (inDynamicList) return true
@@ -262,7 +267,7 @@ const Legend = () => {
 
             // Filter excluded data keys from legend
             if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-              return
+              return null
             }
 
             if (config.runtime.seriesLabels && !config.legend.dynamicLegend) {

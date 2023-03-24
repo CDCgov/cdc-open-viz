@@ -96,7 +96,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       return ariaLabel
     } catch (e) {
-      console.error(e.message) // eslint-disable-line
+      console.error('COVE: ', e.message) // eslint-disable-line
     }
   }
 
@@ -141,7 +141,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
         }
       } catch {
-        console.error(`Cannot parse URL: ${response.dataUrl}`)
+        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`)
         data = []
       }
 
@@ -323,7 +323,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.boxplot.tableData = tableData
     }
 
-    if (newConfig.visualizationType === 'Combo' || (newConfig.visualizationType === 'Line' && newConfig.series)) {
+    if (newConfig.visualizationType === 'Combo' && newConfig.series) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.series.forEach(series => {
@@ -347,10 +347,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
-
-    if (newConfig.visualizationType === 'Scatter Plot') {
-      newConfig.xAxis.type = 'continuous'
-    }
 
     setConfig(newConfig)
   }
@@ -604,6 +600,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const formatNumber = (num, axis) => {
     // if num is NaN return num
     if (isNaN(num) || !num) return num
+    // Check if the input number is negative
+    const isNegative = num < 0
+
+    // If the input number is negative, take the absolute value
+    if (isNegative) {
+      num = Math.abs(num)
+    }
 
     // destructure dataFormat values
     let {
@@ -617,7 +620,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     let original = num
     let stringFormattingOptions
-
     if (axis === 'left') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.commas ? true : false,
@@ -662,6 +664,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // Use commas also updates bars and the data table
     // We can't use commas when we're formatting the dataFormatted number
     // Example: commas -> 12,000; abbreviated -> 12k (correct); abbreviated & commas -> 12 (incorrect)
+    //
+    // Edge case for small numbers with decimals
+    // - if roundTo undefined which means it is blank, then do not round
     if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
       num = num // eslint-disable-line
     } else {
@@ -701,6 +706,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     if (bottomSuffix && axis === 'bottom') {
       result += bottomSuffix
+    }
+    if (isNegative) {
+      result = '-' + result
     }
 
     return String(result)

@@ -94,7 +94,7 @@ export function DeviationBar({ height, xScale }) {
 
       if (barPosition === 'left') {
         paddingX = 10
-        showLabel = maxVal - target > labelWidth / 10 + paddingX
+        showLabel = xScale(maxVal) - targetX > labelWidth + paddingX
         labelX = targetX
       }
 
