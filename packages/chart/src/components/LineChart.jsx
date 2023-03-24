@@ -15,7 +15,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig, handleLineType } = useContext(ConfigContext)
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
-  const cleanedData = data
+  const cleanedData = cleanData(data, config.xAxis.dataKey)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
   const handleAxisFormating = (axis = 'left', label, value) => {
@@ -34,7 +34,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
       <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
         {' '}
         {/* left - expects a number not a string */}
-        {(config.runtime.lineSeriesKeys.length > 0 || config.runtime.seriesKeys).map((seriesKey, index) => {
+        {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {
           let lineType = config.series.filter(item => item.dataKey === seriesKey)[0].type
           const seriesData = config.series.filter(item => item.dataKey === seriesKey)
           const seriesAxis = seriesData[0].axis ? seriesData[0].axis : 'left'
