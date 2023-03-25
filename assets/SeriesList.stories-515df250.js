@@ -1,0 +1,7 @@
+import{M as c,C as l,S as d,A as u}from"./index-2f5af72e.js";import{j as e,a as x,F as h}from"./jsx-runtime-670450c2.js";import"./index-f1f749bf.js";import{u as i}from"./index-4fb8b842.js";import"./iframe-82ea261c.js";import"../sb-preview/runtime.mjs";import"./index-6e91e324.js";import"./index-d475d2ea.js";import"./index-c46f0053.js";import"./_commonjsHelpers-042e6b4d.js";import"./index-d37d4223.js";import"./index-356e4a49.js";const o=({children:t})=>e("div",{className:"cove-series-list",children:t});o.__docgenInfo={description:"",methods:[],displayName:"SeriesList"};const m=({...t})=>e(o,{...t});function S(t={}){const{wrapper:n}=Object.assign({},i(),t.components);return n?e(n,{...t,children:e(r,{})}):r();function r(){const a=Object.assign({h1:"h1",p:"p"},i(),t.components);return x(h,{children:[e(c,{title:"Components/UI/SeriesList",component:o}),`
+`,e(a.h1,{children:"SeriesList Component"}),`
+`,e(a.p,{children:"Content Text"}),`
+`,e(l,{sourceState:"shown",withSource:"open",children:e(d,{name:"Example",children:m.bind({})})}),`
+`,e(u,{story:"Example"})]})}}const p=m.bind({});p.storyName="Example";p.parameters={storySource:{source:`({ ...args
+}) => <SeriesList {...args} />`}};const s={title:"Components/UI/SeriesList",component:o,tags:["stories-mdx"],includeStories:["example"]};s.parameters=s.parameters||{};s.parameters.docs={...s.parameters.docs||{},page:S};const w=["Template","example"];export{m as Template,w as __namedExportsOrder,s as default,p as example};
+//# sourceMappingURL=SeriesList.stories-515df250.js.map
