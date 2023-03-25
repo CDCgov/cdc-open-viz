@@ -6,9 +6,6 @@ import PropTypes from 'prop-types'
 // Store
 import useStore from '../../store/store'
 
-// Helpers
-import CoveHelper from '@cdc/core/helpers/cove'
-
 // Components - Core
 import Editor from '../editor/Editor'
 import Overlay from '../ui/Overlay'
@@ -25,7 +22,7 @@ const View = ({ editorPanels, isPreview, children }) => {
   useEffect(() => {
     const viewportObserver = new ResizeObserver((entries) => {
       const { width } = entries[0].contentRect;
-      setViewport(CoveHelper.General.getViewport(width))
+      setViewport(width)
     });
     viewportObserver.observe(document.documentElement);
     return () => viewportObserver.disconnect();

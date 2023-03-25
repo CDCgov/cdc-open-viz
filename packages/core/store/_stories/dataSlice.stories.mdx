@@ -1,0 +1,121 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Store/Slices/dataSlice"
+/>
+
+export const Template = ({ ...args }) => {
+  return (
+    <div className="example-wrapper">
+    </div>
+  )
+}
+
+# dataSlice
+The **dataSlice** of the COVE store contains the state for data. This includes visualization data, datasets, filtered data, and formatted data.
+
+It also provides a set list of functions that can be used to modify the `data` state:
+
+&nbsp;
+## Structure
+The `dataSlice` structure is as follows:
+
+```json
+{
+  "data": [],
+  "datasets": [],
+  "filteredData": [],
+  "formattedData": [],
+}
+```
+
+- **data**: An array of objects containing the data for the visualization.
+- **datasets**: An array of objects containing multiple sets of data.
+- **filteredData**: An array of objects containing filtered data for a visualization.
+- **formattedData**: An array of the data that has been formatted for use with the visualization.
+
+&nbsp;
+## Functions
+<br/>
+### setData()
+Sets the state's `data` property to the provided value.
+
+**Syntax**
+```javascript
+setData(data)
+```
+
+**Arguments**
+<Story name="setData" argTypes={{
+  data: {
+    description: 'An `[array]` of `{objects}` containing the data for use with a visualization.',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="setData"/>
+
+&nbsp;
+### setDatasets()
+Sets the state's `datasets` property to the provided value.
+
+**Syntax**
+```javascript
+setDatasets(datasets)
+```
+
+**Arguments**
+<Story name="setDatasets" argTypes={{
+  datasets: {
+    description: 'An `[array]` of `{objects}` containing multiple sets of data for use with a visualization.',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="setDatasets"/>
+
+&nbsp;
+### setFilteredData()
+Sets the state's `filteredData` property to the provided value.
+
+**Syntax**
+```javascript
+setFilteredData(filteredData)
+```
+
+**Arguments**
+<Story name="setFilteredData" argTypes={{
+  filteredData: {
+    description: 'An `[array]` of datapoints that have been filtered for use with a visualization.',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="setFilteredData"/>
+
+&nbsp;
+### setFormattedData()
+Sets the state's `formattedData` property to the provided value.
+
+**Syntax**
+```javascript
+setFormattedData(formattedData)
+```
+
+**Arguments**
+<Story name="setFormattedData" argTypes={{
+  formattedData: {
+    description: 'An `[array]` of datapoints that have been formatted for use with a visualization.',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="setFormattedData"/>

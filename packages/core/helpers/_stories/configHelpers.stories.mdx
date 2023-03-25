@@ -10,7 +10,7 @@ The configHelpers are used specifically for working with, and updating, COVE con
 It exports three helper functions: `isConfigEqual`, `setConfigKeyValue`, and `getConfigKeyValue`:
 
 &nbsp;
-## isConfigEqual(a, b)
+## isConfigEqual
 A function that takes two arguments, `a` and `b`. Returns `true` if they are equal (have the same key-value pairs), and `false` otherwise.
 
 The comparison is performed using `JSON.stringify` to convert the objects to strings before comparing.
@@ -38,7 +38,7 @@ isConfigEqual(a, b); // true
 ```
 
 &nbsp;
-## setConfigKeyValue(configKeyArray, setKeyValue)
+## setConfigKeyValue
 A function that takes two arguments, `configKeyArray` and `setKeyValue`. Returns an object with the provided `configKeyArray` keys, and the final key set to the provided `setKeyValue` value.
 
 **Parameters:**
@@ -62,7 +62,7 @@ setConfigKeyValue(a, b); // { foo: { bar: { baz: 'qux' } } }
 ```
 
 &nbsp;
-## getConfigKeyValue(configKeyArray, objectToParse)
+## getConfigKeyValue
 A function that takes two arguments, `configKeyArray` and `objectToParse`, and returns the value of the final key in the provided array by traversing through the provided object.
 
 If the final key is not found, the function returns `undefined`.

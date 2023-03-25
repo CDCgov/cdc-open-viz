@@ -12,7 +12,6 @@ const visConfigSliceActions = (set, get) => ({
     })
   },
   updateVisConfig: (key, config) => {
-    // TODO: CANT USE MERGE HERE, PERSISTING DELETED VISUALIZATIONS AND ROWS IN STATE
     if (key === '__default__') {
       // Dashboard or Visualization Standalone
       set(state => {
@@ -25,16 +24,16 @@ const visConfigSliceActions = (set, get) => ({
       })
     }
   },
-  updateVisConfigField: (key, fieldPayload, setValue, merge = true) => {
+  updateVisConfigField: (key, configKeyArray, setValue, merge = true) => {
     if (key === '__default__') {
       // Dashboard or Visualization Standalone
       if (merge) {
         set(state => {
-          state.visualizations[key] = _merge(state.visualizations[key], setConfigKeyValue(fieldPayload, setValue))
+          state.visualizations[key] = _merge(state.visualizations[key], setConfigKeyValue(configKeyArray, setValue))
         })
       } else {
         set(state => {
-          state.visualizations[key] = { ...state.visualizations[key], ...setConfigKeyValue(fieldPayload, setValue) }
+          state.visualizations[key] = { ...state.visualizations[key], ...setConfigKeyValue(configKeyArray, setValue) }
         })
       }
     } else {
@@ -45,11 +44,11 @@ const visConfigSliceActions = (set, get) => ({
 
       if (merge) {
         set(state => {
-          state.visualizations['__default__'].visualizations[key] = _merge(state.visualizations['__default__'].visualizations[key], setConfigKeyValue(fieldPayload, setValue))
+          state.visualizations['__default__'].visualizations[key] = _merge(state.visualizations['__default__'].visualizations[key], setConfigKeyValue(configKeyArray, setValue))
         })
       } else {
         set(state => {
-          state.visualizations['__default__'].visualizations[key] = { ...state.visualizations['__default__'].visualizations[key], ...setConfigKeyValue(fieldPayload, setValue) }
+          state.visualizations['__default__'].visualizations[key] = { ...state.visualizations['__default__'].visualizations[key], ...setConfigKeyValue(configKeyArray, setValue) }
         })
       }
     }

@@ -1,10 +1,13 @@
+// Helpers
+import CoveHelper from '@cdc/core/helpers/cove'
+
 const globalSliceActions = (set, get) => ({
   // Actions --------------------------------------------------------------------------------------------------------------------------------------------------------------
   setViewMode: (view, value) => set(state => {
     state.viewMode[view] = value
   }),
-  setViewport: (viewport) => set(() => ({
-    viewport: viewport
+  setViewport: (width) => set(() => ({
+    viewport: CoveHelper.General.getViewport(width)
   })),
   setDimensions: (dimensions) => set(() => ({
     dimensions: dimensions

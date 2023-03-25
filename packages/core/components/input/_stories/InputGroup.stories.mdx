@@ -13,14 +13,12 @@ import Icon from '../../ui/Icon'
 export const Template = ({ ...args }) => (
   <InputGroup {...args}/>
 )
-
-export const Example = {
-  args: {
-    label: <><Icon className="mr-1" display="upload"/> Upload A File</>,
-    labelPosition: "left",
-    children: [ <InputText type="text"/> ]
-  }
-}
+export const DoubleTemplate = ({ ...args }) => (
+  <>
+    <InputGroup {...args.setOne }/>
+    <InputGroup {...args.setTwo }/>
+  </>
+)
 
 # InputGroup Component
 Component that provides a way to group and label multiple input fields, such as text inputs or buttons,
@@ -28,8 +26,11 @@ together within a single container. Also provides the ability to display the lab
 either to the left, center, or right of the input fields.
 
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Example"
-         args={{}}
+  <Story name="Example" args={{
+    label: <><Icon className="mr-1" display="upload"/> Upload A File</>,
+    labelPosition: 'left',
+    children: [ <InputText type="text"/> ]
+  }}
   >
     {Template.bind({})}
   </Story>
@@ -41,30 +42,26 @@ either to the left, center, or right of the input fields.
 ## Transparent Labels
 Using transparent labels sets the default label background color to be transparent, and automatically resizes the input field to fill the remaining space.
 
-<Canvas sourceState="shown" withSource="open">
+<Canvas sourceState="hidden">
   <Story name="Transparent Labels"
-         parameters={{ docs: { source: { type: 'code' } } }}
          args={{
-    test: "test"
-  }}>
-    {() => (<>
-      <InputGroup
-        className="mb-2"
-        label={<b>First Name</b>}
-        labelPosition="left"
-        labelTransparent={true}
-      >
-        <InputText type="text"/>
-      </InputGroup>
-      <InputGroup
-        className="mb-2"
-        label={<b>Last Name</b>}
-        labelPosition="right"
-        labelTransparent={true}
-      >
-        <InputText type="text"/>
-      </InputGroup>
-    </>)}
+           setOne: {
+             className: "mb-2",
+             label: <b>First Name</b>,
+             labelPosition: "left",
+             labelTransparent: true,
+             children: [ <InputText type="text"/> ]
+           },
+           setTwo: {
+             className: "mb-2",
+             label: <b>Last Name</b>,
+             labelPosition: "right",
+             labelTransparent: true,
+             children: [ <InputText type="text"/> ]
+           }
+         }}
+  >
+    {DoubleTemplate.bind({})}
   </Story>
 </Canvas>
 
@@ -72,13 +69,18 @@ Using transparent labels sets the default label background color to be transpare
 ## Split Inputs
 You can also place a label between two input fields, such as a username and server input. Use cases may be rare, but the option is available.
 
-<Story name="Split Inputs">
-  <InputGroup
-    className="mb-2"
-    label="@"
-    labelPosition="center"
+<Canvas sourceState="hidden">
+  <Story name="Split Inputs"
+         args={{
+           className: "mb-2",
+           label: "@",
+           labelPosition: "center",
+           children: [
+             <InputText type="text" placeholder="User"/>,
+             <InputText type="text" placeholder="Server"/>
+           ]
+         }}
   >
-    <InputText type="text" placeholder="User"/>
-    <InputText type="text" placeholder="Server"/>
-  </InputGroup>
-</Story>
+    {Template.bind({})}
+  </Story>
+</Canvas>

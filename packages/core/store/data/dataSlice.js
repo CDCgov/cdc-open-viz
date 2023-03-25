@@ -7,6 +7,7 @@ export const dataSlice = (set, get) => ({
   data: [],
   datasets: [],
   filteredData: [],
+  formattedData: [],
 
   ...dataSliceActions(set, get)
 })

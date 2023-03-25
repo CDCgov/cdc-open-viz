@@ -1,0 +1,14 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Store/COVE Store"
+/>
+
+# COVE Store
+COVE uses the [Zustand](https://docs.pmnd.rs/zustand) library for state management. Zustand is a lightweight state management library that uses React hooks.
+
+The store is separated into three separate slices. Each slice has its own reducers and actions:
+
+- **[globalSlice](./?path=/docs/store-slices-globalslice--docs)** - This slice contains global state that is used throughout the application. This includes general data like viewport information, operating system, modal states, and more.
+- **[visConfigSlice](./?path=/docs/store-slices-visconfigslice--docs)** - This slice contains the state for visualization configurations. This includes the current visualization type, configuration settings, and the data. _(This data will likely be moved to the dataSlice - see below.)_
+- **[dataSlice](./?path=/docs/store-slices-dataslice--docs)** - **[ This Slice Is Not Currently In Use! ]** This slice contains the state for data. This includes visualization data, datasets, and filtered data.

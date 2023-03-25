@@ -1,0 +1,192 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Store/Slices/visConfigSlice"
+/>
+
+export const Template = ({ ...args }) => {
+  return (
+    <div className="example-wrapper">
+    </div>
+  )
+}
+
+# visConfigSlice
+The **visConfigSlice** of the COVE store contains the state for visualization configurations. This includes the current visualization type, configuration settings, and the data.
+
+It also provides a set list of functions that can be used to modify a visualization's `config` state:
+
+&nbsp;
+## Structure
+The `visConfigSlice` structure is as follows:
+
+```json
+{
+  "visualizations": {}
+}
+```
+
+- **visualizations**: Depending on the environment, contains either:
+
+  - an individual visualization config
+  - a dashboard config + list of visualization configs
+
+  Furthermore, the root key name for the config is either:
+    - `"__default__"` if the visualization is a standalone visualization, or a dashboard.
+    - The visualization's unique identifier (`visualizationKey`), when nested inside the dashboard's `["__default__"]visualizations[visualizationKey]` entry
+
+&nbsp;
+## Functions
+<br/>
+### addVisConfig()
+This function adds a new visualization configuration to the state.
+
+**Syntax**
+```js
+addVisConfig(key, config)
+```
+
+**Arguments**
+<Story name="addVisConfig" argTypes={{
+  key: {
+    description: 'A `"string"` that represents the unique identifier of the visualization.',
+    control: false,
+  },
+  config: {
+    description: 'An `{object}` that represents the visualization\'s config data.',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="addVisConfig"/>
+
+**Example**
+```js
+addVisConfig('chart-1234', { title: 'My Chart', type: 'bar', data: [1, 2, 3, 4] });
+```
+
+&nbsp;
+### updateVisConfig()
+This function updates an existing visualization configuration in the state.
+
+**Syntax**
+```js
+updateVisConfig(key, config)
+```
+
+**Arguments**
+<Story name="updateVisConfig" argTypes={{
+  key: {
+    description: 'A `"string"` that represents the unique identifier of the visualization. If key is equal to `__default__`, the function updates the configuration of the dashboard or standalone visualization. Otherwise, it updates the configuration of a visualization that is part of a dashboard.',
+    control: false,
+  },
+  config: {
+    description: 'An `{object}` that represents the visualization\'s config data.',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="updateVisConfig"/>
+
+**Example**
+```js
+updateVisConfig('chart-1234', { title: 'My Updated Chart' });
+```
+
+&nbsp;
+### updateVisConfigField()
+This function updates a specific field of a visualization configuration in the state.
+
+**Syntax**
+```js
+updateVisConfigField(key, configKeyArray, setValue, merge = true)
+```
+
+**Arguments**
+<Story name="updateVisConfigField" argTypes={{
+  key: {
+    description: 'A `"string"` that represents the unique identifier of the visualization. If key is equal to `__default__`, the function updates the configuration of the dashboard or standalone visualization. Otherwise, it updates the configuration of a visualization that is part of a dashboard.',
+    control: false,
+  },
+  configKeyArray: {
+    description: 'An `[array]` of strings, or a single `"string"`, that identifies (or traverses to) the key in the config object that you want to update.',
+    control: false,
+  },
+  setValue: {
+    description: 'The value that you want to update the key to.',
+    control: false,
+  },
+  merge: {
+    description: '(Optional) A `boolean`; if `true`, updates the field using a deep merge, instead of a simple assignment. This is useful for updating nested objects, or arrays, without overwriting the entire object.<br/><br/>Default: `true`',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="updateVisConfigField"/>
+
+**Example**
+```js
+updateVisConfigField('chart-1234', ['componentStyle', 'shadow'], false);
+```
+
+&nbsp;
+### removeVisConfig()
+This function removes a visualization configuration from the state.
+
+**Syntax**
+```js
+removeVisConfig(key)
+```
+
+**Arguments**
+<Story name="removeVisConfig" argTypes={{
+  key: {
+    description: 'A `"string"` that represents the unique identifier of the visualization.',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="removeVisConfig"/>
+
+**Example**
+```js
+removeVisConfig('chart-1234');
+```
+
+&nbsp;
+### setMissingRequiredSections()
+This function sets the `missingRequiredSections` property of a visualization configuration in the state.
+
+**Syntax**
+```js
+setMissingRequiredSections(key, value)
+```
+
+**Arguments**
+<Story name="setMissingRequiredSections" argTypes={{
+  key: {
+    description: 'A `"string"` that represents the unique identifier of the visualization.',
+    control: false,
+  },
+  value: {
+    description: 'A `boolean` that indicates whether the configuration is missing a required value or not.',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="setMissingRequiredSections"/>
+
+**Example**
+```js
+setMissingRequiredSections('chart-1234', true);
+```

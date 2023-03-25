@@ -9,17 +9,21 @@ const transform = new DataTransform()
 
 const dataSliceActions = (set, get) => ({
   // Actions --------------------------------------------------------------------------------------------------------------------------------------------------------------
-  setData: value =>
+  setData: data =>
     set(state => {
-      state.data = value
+      state.data = data
     }),
-  setDatasets: value =>
+  setDatasets: datasets =>
     set(state => {
-      state.datasets = value
+      state.datasets = datasets
     }),
-  setFormattedData: value =>
+  setFilteredData: filteredData =>
     set(state => {
-      state.formattedData = value
+      state.filteredData = filteredData
+    }),
+  setFormattedData: formattedData =>
+    set(state => {
+      state.formattedData = formattedData
     }),
   getData: async (visKey, response) => {
     let res = await response

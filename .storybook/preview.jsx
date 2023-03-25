@@ -12,11 +12,12 @@ export const parameters = {
         'Guides',
         'CSS Systems',
         'Visualizations',
-        'Stores',
         'Components',
+        'Store',
+        ['COVE Store', 'Slices', ['globalSlice', 'visConfigSlice', 'dataSlice']],
+        'Hooks',
         'Helpers',
-        ['CoveHelper', 'DataTransform', 'configHelpers', 'coveUpdateWorker', 'validateFipsCodeLength', '*'],
-        'Hooks'
+        ['CoveHelper', 'DataTransform', 'configHelpers', 'coveUpdateWorker', 'validateFipsCodeLength', '*']
       ],
     },
   },

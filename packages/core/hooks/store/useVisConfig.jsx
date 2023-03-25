@@ -28,9 +28,9 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
 
   const finalConfig = useCallback(() => {
     let resolvedConfig = dashboardStoredConfig ?? storedConfig
-    if (!resolvedConfig) {
-      return null
-    }
+
+    // If no resolved config, return null
+    if (!resolvedConfig) return null
 
     if (transformConfig) {
       resolvedConfig = transformConfig(resolvedConfig)
@@ -47,12 +47,12 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
       const processedConfig = { ...await coveUpdateWorker(resolvedConfig) }
 
       // Run update worker on config, then set in store
-      if (!dashboardStoredConfig) {
-        // Doesn't exist in dashboard store, so add it as either the default, or a new visualization
-        addVisConfig(visualizationKey, processedConfig)
-      } else {
+      if (dashboardStoredConfig) {
         // Exists as dashboard store, so update it
         updateVisConfig(visualizationKey, processedConfig)
+      } else {
+        // Doesn't exist in dashboard store, so add it as either the default, or a new visualization
+        addVisConfig(visualizationKey, processedConfig)
       }
 
       // Get initial data off config and put in store
@@ -70,8 +70,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
   }, [ configUrl, defaultConfig, loading, configObj, visualizationKey, storedConfig, dashboardStoredConfig, getData, addVisConfig, updateVisConfig ])
 
   if (loading || !finalConfig()) {
-    console.log('no stored config!')
-    return null
+    return null // No stored config found
   }
 
   const contextValue = { ...finalConfig(), visualizationKey }

@@ -1,0 +1,199 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+<Meta
+  title="Store/Slices/globalSlice"
+/>
+
+export const Template = ({ ...args }) => {
+  return (
+    <div className="example-wrapper">
+    </div>
+  )
+}
+
+# globalSlice
+The **globalSlice** of the COVE store contains global state that is used throughout the application. This includes general data like viewport information, operating system, modal states, and more.
+
+It also provides a set list of functions that can be used to modify the `global` state:
+
+&nbsp;
+## Structure
+The `globalSlice` structure is as follows:
+
+```json
+{
+  "viewMode": {
+    "isEditor": false,
+    "isDashboard": false,
+    "isWizard": false
+  },
+  "os": navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null,
+  "overlay": {
+    "object": null,
+    "show": false,
+    "disableBgClose": false
+  },
+  "viewport": "lg",
+  "dimensions": null
+}
+```
+
+- **viewMode**: An object that contains boolean flags for indicating what state the application is in:
+  - **isEditor**: Defines if the visualization is displayed in its Editor Mode - this value is set by the [\<View/\>](./?path=/docs/components-hoc-view--docs) component when mounted, which checks the URL for the `?editor=true` query parameter.
+  - **isDashboard**: Defines if the user is viewing the Dashboard; this further affects how the `viewMode.isEditor` flag behaves, depending on whether the user is viewing the dashboard, a visualization, or is in preview mode.
+  - **isWizard**: Defines if the user is viewing the visualization Wizard.
+- **os**: A string that represents the user's operating system, either `"Win"`, `"MacOS"`, or `null`.
+- **overlay**: An object that contains the properties of the current overlay:
+  - **object**: The object to in the overlay, such as a modal
+  - **show**: Defines whether to show the overlay
+  - **disableBgClose**: Defines whether to disable the overlay from closing when the user clicks outside of it
+- **viewport**: A string that represents the current viewport size, such as `"lg"` for large screens, `"md"` for medium screens, and so on.
+- **dimensions**: An object that contains the current dimensions of the application.
+
+&nbsp;
+## Functions
+<br/>
+### setViewMode()
+This function sets the viewMode property of the state object for a specific view.
+
+**Syntax**
+```js
+setViewMode(view, value)
+```
+
+**Arguments**
+<Story name="setViewMode" argTypes={{
+  view: {
+    description: 'A `"string"` that represents the name of the `viewMode.xxx` key to set the supplied **value** to.',
+    control: false,
+  },
+  value: {
+    description: 'A `boolean` flag that indicates whether a specific view mode is active or inactive.',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="setViewMode"/>
+
+&nbsp;
+### setViewport()
+This function sets the `viewport` property of the state object.
+
+**Syntax**
+```js
+setViewport(width)
+```
+
+**Arguments**
+<Story name="setViewport" argTypes={{
+  width: {
+    description: 'Takes the `number` value of the current viewport width of the application, measured by px. <br/><br/>Calculates and returns the equivalent `"string"` value by using the [getViewport()](./?path=/docs/helpers-covehelper-general-getviewport--docs) helper.',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="setViewport"/>
+
+&nbsp;
+### setDimensions()
+
+**[ setDimensions() is currently unused and may be deprecated ]**
+
+This function sets the `dimensions` property of the state object defines the width and height dimensions of the visualization component.
+
+**Syntax**
+```js
+setDimensions(dimensions)
+```
+
+**Arguments**
+<Story name="setDimensions" argTypes={{
+  dimensions: {
+    description: 'An `{object}` that represents the current dimensions of the visualization.',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="setDimensions"/>
+
+**Example**
+```js
+setDimensions({ width: 100, height: 100 })
+```
+
+&nbsp;
+### openOverlay()
+This function opens an overlay with the specified object as its content, and updates the overlay property of the state object by:
+- Setting the `overlay.object` property to the provided `{object}`
+- Setting the `overlay.show` property to `true`
+- Setting the `overlay.disableBgClose` property to the provided `boolean` value
+
+**Syntax**
+```js
+openOverlay(object, disableBgClose = false)
+```
+
+**Arguments**
+<Story name="openOverlay" argTypes={{
+  object: {
+    description: 'The `{object}` to be used as the content of the overlay.',
+    control: false,
+  },
+  disableBgClose: {
+    description: '(Optional) A `boolean` flag that indicates whether to disable the closing an overlay by clicking outside of its provided object. <br/> <br/> **Default:** `false`',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="openOverlay"/>
+
+**Example**
+```jsx
+openOverlay(
+  <Modal>
+    <Modal.Header>
+      <Modal.Title>Modal Title</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      <p>Modal body text goes here.</p>
+    </Modal.Body>
+    <Modal.Footer>
+      <Button variant="secondary" onClick={() => toggleOverlay()}>Close</Button>
+    </Modal.Footer>
+  </Modal>, true
+)
+```
+
+&nbsp;
+### toggleOverlay()
+This function toggles the overlay property of the state object by setting the `overlay.show` property to the provided `display` value.
+
+**Syntax**
+```js
+toggleOverlay(display = false)
+```
+
+**Arguments**
+<Story name="toggleOverlay" argTypes={{
+  display: {
+    description: 'A `boolean` flag that indicates whether to show or hide the overlay. <br/><br/> **Default:** `false`',
+    control: false,
+  },
+}}>
+  {Template.bind({})}
+</Story>
+
+<ArgsTable story="toggleOverlay"/>
+
+**Example**
+```jsx
+<Button onClick={() => toggleOverlay(false)}>Close Modal</Button>
+```
