@@ -9,6 +9,7 @@ export const parameters = {
       includeNames: true,
       order: [
         'Introduction',
+        'Contributions',
         'Guides',
         'CSS Systems',
         'Visualizations',

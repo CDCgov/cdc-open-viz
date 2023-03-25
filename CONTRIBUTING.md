@@ -1,6 +1,18 @@
 # Contributing to COVE
 
-Table of Contents
+---
+
+<br/>
+We express our heartfelt gratitude to the following individuals; their invaluable contributions have greatly aided in the growth and improvement of this project. Thank you for your exceptional efforts!
+
+| Name                                                 | Company           |
+|------------------------------------------------------|-------------------|
+| [@jherr](https://github.com/jherr)                   | Blue Collar Coder |
+| [@austin-liminal](https://github.com/austin-liminal) | Liminal Labs      |
+<br/>
+---
+
+**Table of Contents**
 - [Contributing to COVE](#contributing-to-cove)
   - [Introduction](#introduction)
   - [How Can I Contribute?](#how-can-i-contribute)
