@@ -26,23 +26,8 @@ import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS } from '../data/consts'
 
 const EditorPanels = () => {
   // Store Selectors
-  const { config, setMissingRequiredSections } = useVisConfig()
+  const { config } = useVisConfig()
   const { data } = config
-
-  /** Required Sections -------------------------------------------------------------------------- */
-  const requiredSections = [
-    config.dataColumn,
-    config.dataFunction
-  ]
-
-  useEffect(() => {
-    const validateSections = setTimeout(() => {
-      if (requiredSections && config)
-        setMissingRequiredSections(!requiredSections.every(isValid => !!isValid === true))
-    }, 500)
-    return clearTimeout(validateSections)
-  }, [ config ])
-
 
   /** Panels ------------------------------------------------------------------------------------- */
   const panelGeneral = (

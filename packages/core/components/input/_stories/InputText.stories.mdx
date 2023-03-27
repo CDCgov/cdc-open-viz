@@ -3,15 +3,48 @@ import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 import InputText from '../InputText'
 
 <Meta
-  title="Components/Input/Text"
+  title="Components/Input/InputText"
   component={InputText}
   parameters={{ options: { isToolshown: true } }}
 />
 
-# Text Component
+# InputText Component
+Renders an input element for the following input types:
+- `text`
+- `search`
+- `textarea`
+- `number`
+- `date`
 
-<Story name="Default">
-  <InputText label={'Test'}/>
-  <InputText label={'Test 2'} type="textarea"/>
-  <InputText label={'Test 2'} type="number"/>
-</Story>
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Default"
+         args={{
+           label: "Input Label",
+           type: "text",
+           placeholder: "Placeholder Text",
+           tooltip: "This is an example tooltip.",
+           value: "Example Value",
+           required: false,
+         }}
+         argTypes={{
+           configField: {
+             control: {
+               disable: true
+             },
+           },
+           value: {
+             table: {
+               disable: true
+             }
+           }
+         }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Default"/>
+
+export const Template = ({ ...args }) => (
+  <InputText {...args} />
+)

@@ -2,17 +2,13 @@ import { Meta, Story, ArgsTable, Canvas } from '@storybook/blocks';
 import InputCheckbox from '../InputCheckbox'
 
 <Meta
-  title="Components/Input/Checkbox"
+  title="Components/Input/InputCheckbox"
   component={InputCheckbox}
   parameters={{ options: { isToolshown: true } }}
 />
 
-export const Template = ({ ...args }) => (
-  <InputCheckbox {...args} />
-)
-
-# Checkbox Component
-Component that renders a checkbox input, with an optional label and tooltip. It receives a set of props that can be used to customize its behavior and appearance.
+# InputCheckbox Component
+Renders a checkbox input, with an optional label and tooltip.
 
 <Canvas sourceState="shown" withSource="open">
   <Story name="Example"
@@ -22,7 +18,15 @@ Component that renders a checkbox input, with an optional label and tooltip. It 
            size: 'medium',
            activeColor: '#025eaa',
            activeCheckColor: '#fff',
-           tooltip: 'This is a tooltip',
+           tooltip: 'This is an example tooltip.',
+           stretch: false
+         }}
+         argTypes={{
+           configField: {
+             control: {
+               disable: true
+             },
+           }
          }}
   >
     {Template.bind({})}
@@ -30,3 +34,7 @@ Component that renders a checkbox input, with an optional label and tooltip. It 
 </Canvas>
 
 <ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => (
+  <InputCheckbox {...args} />
+)

@@ -57,22 +57,22 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
 
       // Get initial data off config and put in store
       await getData(visualizationKey, processedConfig)
-
       setLoading(false)
     }
 
-    if (loading || storedConfig) {
-      return
-    }
+    // If loading, or stored config already exists, return...
+    if (loading || storedConfig) return
 
+    // Otherwise, start loading
     setLoading(true)
+
     void initConfig()
-  }, [ configUrl, defaultConfig, loading, configObj, visualizationKey, storedConfig, dashboardStoredConfig, getData, addVisConfig, updateVisConfig ])
+  }, [ configObj, configUrl, defaultConfig, loading, visualizationKey, storedConfig, dashboardStoredConfig, getData, addVisConfig, updateVisConfig ])
 
-  if (loading || !finalConfig()) {
-    return null // No stored config found
-  }
+  // No stored config found, so return null
+  if (loading || !finalConfig()) return null
 
+  // Build context value
   const contextValue = { ...finalConfig(), visualizationKey }
 
   return <ConfigContext.Provider value={contextValue}>{children}</ConfigContext.Provider>
@@ -105,6 +105,7 @@ export const useVisConfig = () => {
 
   return {
     config,
+    visualizationKey,
     updateVisConfig,
     updateVisConfigField
   }

@@ -8,14 +8,33 @@ import SectionBlock from '../SectionBlock'
 />
 
 # SectionBlock Component
-Content Text
+Add a blockquote style to a section of text.
 
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Example">
-    {Template.bind({})}
+  <Story name="Example"
+         args={{
+           children: [
+             <p className="mb-2">
+               Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus animi aperiam at eveniet illum incidunt itaque
+               labore nesciunt nihil recusandae rem repellat, rerum, sit tempora temporibus? Doloremque eaque modi veniam.
+             </p>,
+             <p className="mb-2">
+               Amet, assumenda dolore doloremque doloribus eaque eligendi fugit incidunt mollitia nisi nostrum perspiciatis
+               placeat qui quidem temporibus ut. Assumenda dolore eum harum magnam molestiae odit quae rerum suscipit vitae
+               voluptatibus?
+             </p>,
+             <p>
+               Accusantium asperiores aspernatur commodi deserunt, doloremque earum enim et, expedita iste
+               possimus sed sequi sit. Doloremque doloribus, esse est fugit id minima molestiae nesciunt nulla quas soluta? Ea
+               ex, veniam!
+             </p>
+           ]
+         }}
+  >
+
   </Story>
 </Canvas>
 
-<ArgsTable story="Example"/>
-
-export const Template = ({ ...args }) => <SectionBlock {...args}/>
+export const Template = (args) => (
+  <SectionBlock {...args} />
+)

@@ -14,14 +14,14 @@ New icon svgs should adhere to the following guidelines:
 - Should have its paths snapped to 1px increments, with whole number width/height dimensions to reduce subpixel malformations.
 - Should have all ids, classes, inline css, unnecessary markup, and any other extraneous code, completely removed:
 
-  **Markup Example (Bad):**
+  **Markup Example (Bad)**
   ```html
   <?xml version="1.0" encoding="UTF-8"?>
   <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" <style>.cls-1{fill:none;}</style> viewBox="0 0 20.556 20.566">
   ...
   </svg>
   ```
-  **Markup Example (Good):**
+  **Markup Example (Good)**
   ```html
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
   ...
@@ -65,7 +65,7 @@ Once all of the above steps are completed, the new icon should be placed in the 
 
 3. Assign an import name using the following convention: `icon` `KebabToPascal`.
 
-    **Example:** If you've created a file named `icon-square-filled.svg`, your import name should be `iconSquareFilled`.
+    **Example:** If you've created a file named `icon-square-filled.svg`, your import name should be `iconSquareFilled`...
     ```js
     import iconSquareFilled from '../assets/icon-square-filled.svg'
     ```
@@ -73,7 +73,7 @@ Once all of the above steps are completed, the new icon should be placed in the 
 
 4. Add the new icon and its hash to the hash object, maintaining alphabetical order; the `icon` prefix should be removed for the key and converted to camelCase:
 
-    **Example:**
+    **Example**
     ```js
     const iconHash = {
       ...

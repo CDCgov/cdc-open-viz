@@ -104,11 +104,11 @@ const ChartLinearLine = (
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
                   d[seriesKey] !== null && (
-                    // CoveHelper.Math.equalsValidNumber(d[seriesKey]) &&
-                    // CoveHelper.Math.equalsValidNumber(getYAxisData(d, seriesKey)) &&
-                    // CoveHelper.Math.equalsValidNumber(getXAxisData(d)) &&
-                    // CoveHelper.Math.equalsValidNumber(yScaleRight(getXAxisData(d))) &&
-                    // CoveHelper.Math.equalsValidNumber(yScale(getXAxisData(d))) &&
+                    // CoveHelper.Number.equalsValidNumber(d[seriesKey]) &&
+                    // CoveHelper.Number.equalsValidNumber(getYAxisData(d, seriesKey)) &&
+                    // CoveHelper.Number.equalsValidNumber(getXAxisData(d)) &&
+                    // CoveHelper.Number.equalsValidNumber(yScaleRight(getXAxisData(d))) &&
+                    // CoveHelper.Number.equalsValidNumber(yScale(getXAxisData(d))) &&
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
                       <Text
@@ -170,7 +170,7 @@ const ChartLinearLine = (
                   shapeRendering='geometricPrecision'
                   strokeDasharray={lineType ? handleLineType(lineType) : 0}
                   defined={(item, i) => {
-                    return CoveHelper.Math.equalsValidNumber(item[config.runtime.seriesLabels[seriesKey]])
+                    return CoveHelper.Number.equalsValidNumber(item[config.runtime.seriesLabels[seriesKey]])
                   }}
                 />
               )}

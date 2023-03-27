@@ -5,32 +5,30 @@ import InputText from '../InputText'
 import Icon from '../../ui/Icon'
 
 <Meta
-  title="Components/Input/Input Group"
+  title="Components/Input/InputGroup"
   component={InputGroup}
   parameters={{ options: { isToolshown: true } }}
 />
 
-export const Template = ({ ...args }) => (
-  <InputGroup {...args}/>
-)
-export const DoubleTemplate = ({ ...args }) => (
-  <>
-    <InputGroup {...args.setOne }/>
-    <InputGroup {...args.setTwo }/>
-  </>
-)
-
 # InputGroup Component
-Component that provides a way to group and label multiple input fields, such as text inputs or buttons,
-together within a single container. Also provides the ability to display the label
-either to the left, center, or right of the input fields.
+Renders a label, and either one or two input fields. The label's default display is different from normal input labels, and can
+also be set to be transparent. The label can be positioned to the left, center, or right of the provided input fields.
 
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Example" args={{
-    label: <><Icon className="mr-1" display="upload"/> Upload A File</>,
-    labelPosition: 'left',
-    children: [ <InputText type="text"/> ]
-  }}
+  <Story name="Example"
+         args={{
+           label: <><Icon className="mr-1" display="upload"/> Upload A File</>,
+           labelPosition: 'left',
+           labelTransparent: false,
+           children: [ <InputText type="text"/> ]
+         }}
+         argTypes={{
+           children: {
+             table: {
+               disable: true
+             }
+           }
+         }}
   >
     {Template.bind({})}
   </Story>
@@ -84,3 +82,13 @@ You can also place a label between two input fields, such as a username and serv
     {Template.bind({})}
   </Story>
 </Canvas>
+
+export const Template = ({ ...args }) => (
+  <InputGroup {...args}/>
+)
+export const DoubleTemplate = ({ ...args }) => (
+  <>
+    <InputGroup {...args.setOne}/>
+    <InputGroup {...args.setTwo}/>
+  </>
+)

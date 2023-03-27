@@ -24,23 +24,6 @@ const EditorPanels = () => {
   const { config, updateVisConfigField } = useVisConfig()
   const { data } = config
 
-  /** Required Sections -------------------------------------------------------------------------- */
-  const requiredSections = [
-    config.dataColumn,
-    config.dataFunction
-  ]
-
-  const isValid = (value) => {
-    // Do not simplify! This is a boolean check.
-    if (typeof value !== 'undefined' && value) return true
-    return false
-  }
-
-  useEffect(() => {
-    if (requiredSections && config)
-      updateVisConfigField('missingRequiredSections', !requiredSections.every(section => isValid(section) === true))
-  }, [ config ])
-
   /** Component Effects -------------------------------------------------------------------------- */
   useEffect(() => {
     //Verify comparate data type
@@ -71,7 +54,7 @@ const EditorPanels = () => {
   )
 
   const panelData = (
-    <Accordion.Section label="Data" warnIf={!isValid(config.dataColumn) || !isValid(config.dataFunction)}>
+    <Accordion.Section label="Data" warnIf={!CoveHelper.General.isValid(config.dataColumn) || !CoveHelper.General.isValid(config.dataFunction)}>
       <SectionWrapper label="Numerator">
         <InputSelect
           label="Data Column"

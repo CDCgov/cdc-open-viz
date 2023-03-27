@@ -14,3 +14,11 @@
 .sto-4ii5m {
   display: none !important;
 }
+
+.search-result-item--label {
+  color: #a3a3a3 !important;
+}
+
+.search-result-item--label .sto-1xkb16p {
+  color: #005eaa !important;
+}

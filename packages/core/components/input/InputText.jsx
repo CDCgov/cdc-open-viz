@@ -119,17 +119,31 @@ const InputText = (
 }
 
 InputText.propTypes = {
+  /** Add label to the input field */
   label: PropTypes.string,
-  type: PropTypes.oneOf([ 'text', 'search', 'textarea', 'number', 'date' ]),
-  value: PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+  /** Set the input type */
+  type: PropTypes.oneOf([ 'text', 'textarea', 'number', 'date', 'search' ]),
+  /** Add a tooltip to describe the input's usage; JSX markup can also be supplied */
   tooltip: PropTypes.oneOfType([ PropTypes.object, PropTypes.string ]),
+  /** Placeholder text for the input field */
   placeholder: PropTypes.string,
+  /** Mark the input as required; will set error style while value is undefined */
+  required: PropTypes.bool,
+  /** Supply a reference to the config key this input connects to, if any.<br/><br/>
+   * **String**<br/>
+   * `configField="title"` will connect to the `config.title` value.<br/><br/>
+   * **Array**<br/>
+   * `configField={[ 'componentStyle', 'shadow' ]}` will connect to the `config.componentStyle.shadow` value. <br/><br/>
+   * See [setConfigKeyValue](https://cdcgov.github.io/cdc-open-viz/?path=/docs/helpers-confighelpers-setconfigkeyvalue--docs) for more details. */
+  configField: PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
+  /** For `number` type, supply a minimum value allowed for the input */
   min: PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
+  /** For `number` type, supply a maximum value allowed for the input */
   max: PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
-  section: PropTypes.string,
-  subsection: PropTypes.string,
-  fieldName: PropTypes.string,
-  updateConfigField: PropTypes.func
+  /** Additional class to add to the input wrapper */
+  className: PropTypes.string,
+  /** Function to call when the input is changed */
+  onChange: PropTypes.func
 }
 
 export default InputText

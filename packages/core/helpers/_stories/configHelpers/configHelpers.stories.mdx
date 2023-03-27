@@ -1,0 +1,30 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/configHelpers/configHelpers"
+/>
+
+# configHelpers
+configHelpers are used specifically for working with, and updating, COVE configuration settings inside the [store](./?path=/docs/store-cove-store--docs).
+
+&nbsp;
+## Available Exports
+- [isConfigEqual](./?path=/docs/helpers-confighelpers-isconfigequal--docs)
+- [setConfigKeyValue](./?path=/docs/helpers-confighelpers-getconfigkeyvalue--docs)
+- [getConfigKeyValue](./?path=/docs/helpers-confighelpers-setconfigkeyvalue--docs)
+
+&nbsp;
+## Usage
+configHelpers can be used with the following method:
+
+```js
+import { isConfigEqual, getConfigKeyValue, setConfigKeyValue } from '@cdc/core/helpers/configHelpers';
+
+...
+
+isConfigEqual(configOne, configTwo);
+
+getConfigKeyValue("title", configObj);
+
+setConfigKeyValue(['componentStyle', 'border'], true);
+```

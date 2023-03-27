@@ -1,11 +1,11 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/Data/getDataValueOptions"
 />
 
 # getDataValueOptions
-Function that creates a new Set object, iterates over each data object in the input array, and adds the keys of each object to the Set.
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that creates a new Set object, iterates over each data object in the input array, and adds the keys of each object to the Set.
 
 If the input array is empty, returns an empty array.
 
@@ -16,21 +16,15 @@ If the input array is empty, returns an empty array.
 CoveHelper.Data.getDataValueOptions(data)
 ```
 
-**Parameters:**
+## Parameters
+- `data`: Array of data objects.
+<br/>
 
-- `data` - An array of data objects.
-
-**Returns:**
-
-An array of unique column names (keys) found in the input data.
+**Returns:** An array of unique column names (keys) found in the input data.
 
 &nbsp;
-### Example
+## Example
 ```js
-import CoveHelper from '@cdc/core/helpers/CoveHelper'
-
-...
-
 const data = [
   { name: 'Alice', age: 25, city: 'New York' },
   { name: 'Bob', age: 30, city: 'San Francisco' },

@@ -1,0 +1,38 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/Number/equalsValidNumber"
+/>
+
+# equalsValidNumber
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that takes a value as input and returns a boolean indicating whether the input is a valid number.
+
+- A valid number is a number that is not `NaN`, or a string that can be converted to a number.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.Number.equalsValidNumber(value)
+```
+
+## Parameters
+- `value`: Number or string to check if it equates to a valid number.
+<br/>
+
+**Returns:** `true` if the input equates a valid number, `false` otherwise.
+
+&nbsp;
+## Example
+```js
+CoveHelper.Number.equalsValidNumber(42) // true
+
+CoveHelper.Number.equalsValidNumber("42") // true
+
+CoveHelper.Number.equalsValidNumber("42.5") // true
+
+CoveHelper.Number.equalsValidNumber("42a") // false
+
+CoveHelper.Number.equalsValidNumber(NaN) // false
+
+CoveHelper.Number.equalsValidNumber([]) // false
+```

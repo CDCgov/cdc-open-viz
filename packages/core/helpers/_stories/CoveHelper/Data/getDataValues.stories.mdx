@@ -1,11 +1,11 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/Data/getDataValues"
 />
 
 # getDataValues
-Function that iterates over each object in the provided `data`, and pushes the value of the `dataKey` property to the values array. Returns either the values array as is, or a new array created from the Set of unique values using the spread operator.
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that iterates over each object in the provided `data`, and pushes the value of the `dataKey` property to the values array. Returns either the values array as is, or a new array created from the Set of unique values using the spread operator.
 
 &nbsp;
 ## Syntax
@@ -14,23 +14,17 @@ Function that iterates over each object in the provided `data`, and pushes the v
 CoveHelper.Data.getDataValues(data, dataKey, unique = false)
 ```
 
-**Parameters:**
+## Parameters
+- `data`: Array of data objects.
+- `dataKey`: String representing the name of a column in the data.
+- `unique`: _(Optional)_ Boolean flag that defaults to false. If set to `true`, returns only the unique values.
+<br/>
 
-- `data`: Array of data objects
-- `dataKey`: String representing the name of a column in the data
-- `unique`: _(optional)_ Boolean flag that defaults to false. If set to `true`, returns only the unique values.
-
-**Returns:**
-
-An array of values found in the specified `dataKey` column of the provided `data`. If the `unique` flag is set to true, returns only the unique values.
+**Returns:** An array of values found in the specified `dataKey` column of the provided `data`. If the `unique` flag is set to true, returns only the unique values.
 
 &nbsp;
-### Example
+## Example
 ```js
-import CoveHelper from '@cdc/core/helpers/CoveHelper'
-
-...
-
 const data = [
   { name: 'Alice', age: 25, city: 'New York' },
   { name: 'Bob', age: 30, city: 'San Francisco' },

@@ -1,0 +1,40 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/General/isValid"
+/>
+
+# isValid
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that determines whether a given value is considered valid or not.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.General.isValid(value)
+```
+
+## Parameters
+- `value`: The value to be checked.
+<br/>
+
+**Returns:** Boolean value indicating whether the value is valid or not.
+
+&nbsp;
+## Example
+```js
+CoveHelper.General.isValid(0); // false
+
+CoveHelper.General.isValid(""); // false
+
+CoveHelper.General.isValid(null); // false
+
+CoveHelper.General.isValid(undefined); // false
+
+
+
+CoveHelper.General.isValid("Hello, world!"); // true
+
+CoveHelper.General.isValid(123); // true
+
+```
+

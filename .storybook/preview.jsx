@@ -1,7 +1,7 @@
 import React from 'react'
 import { previewTheme } from './coveSbThemes'
 
-import  '../packages/core/styles/v2/main.scss'
+import '../packages/core/styles/v2/main.scss'
 
 export const parameters = {
   options: {
@@ -15,32 +15,32 @@ export const parameters = {
         'Visualizations',
         'Components',
         'Store',
-        ['COVE Store', 'Slices', ['globalSlice', 'visConfigSlice', 'dataSlice']],
+        [ 'COVE Store', 'Slices', [ 'globalSlice', 'visConfigSlice', 'dataSlice' ] ],
         'Hooks',
         'Helpers',
-        ['CoveHelper', 'DataTransform', 'configHelpers', 'coveUpdateWorker', 'validateFipsCodeLength', '*']
-      ],
-    },
+        [ 'configHelpers', [ 'configHelpers', '*' ], 'CoveHelper', 'DataTransform', [ 'DataTransform Class', '*' ], 'coveUpdateWorker', 'validateFipsCodeLength', '*', 'Custom Events' ]
+      ]
+    }
   },
-  actions: { argTypesRegex: "^on[A-Z].*" },
+  actions: { argTypesRegex: '^on[A-Z].*' },
   controls: {
     matchers: {
       color: /(background|color)$/i,
-      date: /Date$/,
-    },
+      date: /Date$/
+    }
   },
   docs: {
     theme: previewTheme,
     source: {
-      excludeDecorators: true,
-    },
-  },
+      excludeDecorators: true
+    }
+  }
 }
 
 export const decorators = [
   (Story) => (
     <div className="cove cove-storybook">
-      <Story />
+      <Story/>
     </div>
-  ),
+  )
 ]

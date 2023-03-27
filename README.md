@@ -107,3 +107,7 @@ Here are some tips and guidelines for creating a new package:
 
 ## Contributions
 COVE development is all done in the public space. We gratefully welcome contributions from the public to assist with addressing bugs or feature enhancements. Please read through our [Contributing section](https://cdcgov.github.io/cdc-open-viz/?path=/docs/contributions--docs) if you are interested in helping out.
+
+<a href="https://github.com/CDCgov/cdc-open-viz/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=CDCgov/cdc-open-viz" />
+</a>

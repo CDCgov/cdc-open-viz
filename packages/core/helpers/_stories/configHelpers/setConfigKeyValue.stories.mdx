@@ -1,0 +1,37 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/configHelpers/setConfigKeyValue"
+/>
+
+# setConfigKeyValue
+A [configHelper](./?path=/docs/helpers-confighelpers-confighelpers--docs) function that returns an object with the provided `configKeyArray` keys, and its final key set to the provided `setKeyValue` value.
+
+&nbsp;
+## Syntax
+```js
+setConfigKeyValue(configKeyArray, setKeyValue)
+```
+
+## Parameters
+- `configKeyArray`: Array of keys to traverse through the config object, or a string for a direct child target.
+- `setKeyValue`: The value to set the final key to in the returned object.
+<br/>
+
+**Returns:** An object with keys/subkeys, based on the provided array, with the final key set to the provided value.
+
+&nbsp;
+## Example
+
+```js
+import { setConfigKeyValue } from '@cdc/core/helpers/configHelpers';
+
+...
+
+const a = ['foo', 'bar', 'baz'];
+const b = 'qux';
+
+setConfigKeyValue(a, b); // { foo: { bar: { baz: 'qux' } } }
+
+// The object returned above can then be merged using lodash to either create, or update the config object in the store.
+```

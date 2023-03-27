@@ -1,11 +1,11 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/Date/formatDate"
 />
 
 # formatDate
-Function that uses the d3-time-format library to format a given date according to a specified format.
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that uses the d3-time-format library to format a given date according to a specified format.
 
 &nbsp;
 ## Syntax
@@ -13,24 +13,20 @@ Function that uses the d3-time-format library to format a given date according t
 CoveHelper.Date.formatDate(format, date)
 ```
 
-**Parameters:**
+## Parameters
+- `format`: String representing the desired format of the output date.
+  - If not provided, it defaults to **%Y-%m-%d**, which represents the year, month, and day of the date in a numeric format, separated by hyphens.
+- `date`: Date object to be formatted.
+<br/>
 
-- `format`: A string representing the desired format of the output date
-  - If not provided, it defaults to **%Y-%m-%d**, which represents the year, month, and day of the date in a numeric format, separated by hyphens
-- `date`: The date object to be formatted
-
-**Returns:**
-
-A formatted string representing the input date according to the specified format.
+**Returns:** A formatted string representing the input date according to the specified format.
 
 &nbsp;
-### Example
+## Example
 ```jsx
-import CoveHelper from '@cdc/core/helpers/CoveHelper'
-
-...
-
 const date = new Date('2022-01-01')
+
 const formattedDate = CoveHelper.Date.formatDate('%d-%b-%Y', date)
-console.log(formattedDate) // Output: '01-Jan-2022'
+
+console.log(formattedDate) // '01-Jan-2022'
 ```

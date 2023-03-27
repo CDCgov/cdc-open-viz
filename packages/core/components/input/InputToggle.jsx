@@ -167,10 +167,17 @@ InputToggle.propTypes = {
   activeColor: PropTypes.string,
   /** Stretch the toggle and its label to fill the width of its container; Only available when label exists, and **labelPosition** is set to `left` or `right`. */
   stretch: PropTypes.bool,
-  // /** Mark the toggle as required; will set error style while value is undefined */
-  // required: PropTypes.bool,
-  /** Current value of the input, usually the current config option value */
-  stateValue: PropTypes.bool
+  /** Supply a reference to the config key this input connects to, if any.<br/><br/>
+   * **String**<br/>
+   * `configField="title"` will connect to the `config.title` value.<br/><br/>
+   * **Array**<br/>
+   * `configField={[ 'componentStyle', 'shadow' ]}` will connect to the `config.componentStyle.shadow` value. <br/><br/>
+   * See [setConfigKeyValue](https://cdcgov.github.io/cdc-open-viz/?path=/docs/helpers-confighelpers-setconfigkeyvalue--docs) for more details. */
+  configField: PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
+  /** Additional class to add to the input wrapper */
+  className: PropTypes.string,
+  /** Function to call when the input is clicked */
+  onClick: PropTypes.func
 }
 
 export default InputToggle

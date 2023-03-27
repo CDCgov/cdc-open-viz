@@ -1,11 +1,11 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/Math/getMedian"
 />
 
 # getMedian
-This function takes an array of numbers and returns the median of all its elements. It first calculates the midpoint index of the array,
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that takes an array of numbers and returns the median of all its elements. It first calculates the midpoint index of the array,
 sorts the array in ascending order, and returns the middle element for odd-length arrays, or the average of the middle two elements for even-length arrays.
 
 &nbsp;
@@ -14,14 +14,18 @@ sorts the array in ascending order, and returns the middle element for odd-lengt
 CoveHelper.Math.getMedian(arr)
 ```
 
-**Parameters**:
+## Parameters
+- `arr`: Array of numbers to be used.
+<br/>
 
-- `arr`: The array of numbers to be used.
+**Returns:** The median of the array, or `undefined` if the array is empty or contains non-numbers.
 
 &nbsp;
-### Example
+## Example
 ```js
-CoveHelper.Math.getMedian([1, 2, 3]); // returns 2
-CoveHelper.Math.getMedian([1, 2, 3, 4]); // returns 2.5
-CoveHelper.Math.getMedian("1,2,3"); // returns undefined
+CoveHelper.Math.getMedian([1, 2, 3]); // 2
+
+CoveHelper.Math.getMedian([1, 2, 3, 4]); // 2.5
+
+CoveHelper.Math.getMedian("1,2,3"); // undefined
 ```

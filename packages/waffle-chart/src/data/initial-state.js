@@ -30,5 +30,5 @@ export default {
     background: 'default',
     shadow: true
   },
-  missingRequiredSections: true //This value should always exist, and should always be true on initial state
+  missingRequiredSections: false //This value should always exist
 }

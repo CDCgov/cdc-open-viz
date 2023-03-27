@@ -1,15 +1,16 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/String/convertToCamel"
 />
 
 # convertToCamel
-This function takes a string in kebab-case or snake_case and converts it to camelCase.
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that takes a string in kebab-case or snake_case and converts it to camelCase.
 
 &nbsp;
-### Example
+## Example
 ```js
 CoveHelper.String.convertToCamel("foo-bar-baz"); // "fooBarBaz"
+
 CoveHelper.String.convertToCamel("foo_bar_baz"); // "fooBarBaz"
 ```

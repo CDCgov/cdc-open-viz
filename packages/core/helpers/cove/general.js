@@ -9,3 +9,9 @@ export function getViewport(size) {
   }
   return output
 }
+
+export function isValid(value) {
+  // Do not simplify! This is a boolean check.
+  if (typeof value !== 'undefined' && value) return true
+  return false
+}

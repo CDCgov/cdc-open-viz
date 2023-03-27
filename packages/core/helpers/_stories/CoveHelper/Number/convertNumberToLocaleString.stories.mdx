@@ -1,0 +1,35 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/Number/convertNumberToLocaleString"
+/>
+
+# convertNumberToLocaleString
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that takes a number or a string that can be converted to a number. Returns a string representation of the number, in the specified locale format.
+
+If the input is not a valid number, this function returns _undefined_.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.Number.convertNumberToLocaleString(value, locale)
+```
+
+## Parameters
+- `value`: Number or string to be formatted.
+- `locale`: _(Optional)_ Locale format string to use. If not provided, `en-US` will be used.
+<br/>
+
+**Returns:** A string representation of the number, in the specified locale format.
+
+&nbsp;
+## Example
+```js
+CoveHelper.Number.convertNumberToLocaleString(12345.6789) // "12,345.679"
+
+CoveHelper.Number.convertNumberToLocaleString(12345.6789, 'de-DE') // "12.345,679"
+
+CoveHelper.Number.convertNumberToLocaleString('12345.6789') // "12,345.679"
+
+CoveHelper.Number.convertNumberToLocaleString('abc') // undefined
+```

@@ -39,10 +39,8 @@ export const TooltipStory = ({ target, content, ...args }) => (
 # Tooltip Component
 The `<Tooltip>` component is used to display a tooltip when hovering over a specified element. It should normally only be used for one-off tooltip displays.
 
-The inline `tooltip` method for components should be used instead, when available. Most [input components](./?path=/docs/components-input-text--docs) provide `tooltip` - and tooltip related - properties, which automatically handle tooltip setup for you.
+When available, the inline `tooltip` property for a component should **always** be used instead. Most [input components](./?path=/docs/components-input-text--docs) provide `tooltip` (and tooltip related) properties, which automatically handle tooltip setup for you.
 
-&nbsp;
-## Trigger Type
 <Canvas sourceState="shown" withSource="open">
   <Story name="Default"
          args={{

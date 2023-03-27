@@ -1,0 +1,36 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/CoveHelper/Number/roundToPlace"
+/>
+
+# roundToPlace
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that takes a value and a number of decimal places to round to as input and returns the rounded value.
+If the number of decimal places to round to is not a positive number, or the input value is not a valid number, this function returns undefined.
+
+&nbsp;
+## Syntax
+```js
+CoveHelper.Number.roundToPlace(value, roundToPlace)
+```
+
+## Parameters
+- `value`: Number or string value to be rounded.
+- `roundToPlace`: _(Optional)_ The number of decimal places to round to. If not provided, `0` will be used.
+<br/>
+
+**Returns:** The rounded value.
+
+&nbsp;
+## Example
+```js
+CoveHelper.Number.roundToPlace(3.14159, 2) // 3.14
+
+CoveHelper.Number.roundToPlace(3.14159) // 3
+
+CoveHelper.Number.roundToPlace('3.14159', 4) // 3.1415
+
+CoveHelper.Number.roundToPlace('abc', 2) // undefined
+
+CoveHelper.Number.roundToPlace(3.14159, -2) // undefined
+```

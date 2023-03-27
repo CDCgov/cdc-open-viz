@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 
 // Third Party
 import parse from 'html-react-parser'
@@ -9,7 +9,7 @@ import useStore from '@cdc/core/store/store'
 // Hooks
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-// Data
+// Constants
 import {
   DATA_FUNCTION_COUNT,
   DATA_FUNCTION_SUM,
@@ -31,9 +31,26 @@ import DataBiteImage from './DataBite.Image'
 // Visualization
 const DataBite = () => {
   // Store Selectors
-  const { config } = useVisConfig()
-  const data = useStore(state => state.data)
+  const { config, visualizationKey } = useVisConfig()
+  const { setMissingRequiredSections } = useStore()
+  const { data } = config
 
+  /** Required Sections -------------------------------------------------------------------------- */
+  const requiredSections = useCallback(() => {
+    return [
+      config.dataColumn,
+      config.dataFunction
+    ]
+  }, [ config ])
+
+  useEffect(() => {
+    if (requiredSections && config) {
+      setMissingRequiredSections(visualizationKey, !requiredSections().every(section => !!CoveHelper.General.isValid(section) === true))
+    }
+  }, [ config, requiredSections, setMissingRequiredSections, visualizationKey ])
+
+
+  /** Vis Functions ------------------------------------------------------------------------------ */
   const calculateDataBite = useCallback((includePrefixSuffix = true) => {
     //If either the column or function aren't set, do not calculate
     if (!config.dataColumn || !config.dataFunction) return ''
@@ -78,13 +95,13 @@ const DataBite = () => {
         dataBite = getColumnCount(numericalData)
         break
       case DATA_FUNCTION_SUM:
-        dataBite = CoveHelper.Math.roundToPlace(CoveHelper.Math.getSum(numericalData), config.dataFormat.roundToPlace)
+        dataBite = CoveHelper.Number.roundToPlace(CoveHelper.Math.getSum(numericalData), config.dataFormat.roundToPlace)
         break
       case DATA_FUNCTION_MEAN:
-        dataBite = CoveHelper.Math.roundToPlace(CoveHelper.Math.getMean(numericalData), config.dataFormat.roundToPlace)
+        dataBite = CoveHelper.Number.roundToPlace(CoveHelper.Math.getMean(numericalData), config.dataFormat.roundToPlace)
         break
       case DATA_FUNCTION_MEDIAN:
-        dataBite = CoveHelper.Math.roundToPlace(CoveHelper.Math.getMedian(numericalData), config.dataFormat.roundToPlace)
+        dataBite = CoveHelper.Number.roundToPlace(CoveHelper.Math.getMedian(numericalData), config.dataFormat.roundToPlace)
         break
       case DATA_FUNCTION_MAX:
         dataBite = Math.max(...numericalData)
@@ -98,11 +115,11 @@ const DataBite = () => {
       case DATA_FUNCTION_RANGE:
         let rangeMin = Math.min(...numericalData)
         let rangeMax = Math.max(...numericalData)
-        rangeMin = CoveHelper.Math.roundToPlace(rangeMin, config.dataFormat.roundToPlace)
-        rangeMax = CoveHelper.Math.roundToPlace(rangeMax, config.dataFormat.roundToPlace)
+        rangeMin = CoveHelper.Number.roundToPlace(rangeMin, config.dataFormat.roundToPlace)
+        rangeMax = CoveHelper.Number.roundToPlace(rangeMax, config.dataFormat.roundToPlace)
         if (config.dataFormat.commas) {
-          rangeMin = CoveHelper.Math.convertNumberToLocaleString(rangeMin)
-          rangeMax = CoveHelper.Math.convertNumberToLocaleString(rangeMax)
+          rangeMin = CoveHelper.Number.convertNumberToLocaleString(rangeMin)
+          rangeMax = CoveHelper.Number.convertNumberToLocaleString(rangeMax)
         }
         dataBite = config.dataFormat.prefix + rangeMin + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + rangeMax + config.dataFormat.suffix
         break
@@ -112,10 +129,10 @@ const DataBite = () => {
 
     // If not the range, then round and format here
     if (config.dataFunction !== DATA_FUNCTION_RANGE) {
-      dataBite = CoveHelper.Math.roundToPlace(dataBite, config.dataFormat.roundToPlace)
+      dataBite = CoveHelper.Number.roundToPlace(dataBite, config.dataFormat.roundToPlace)
 
       if (config.dataFormat.commas) {
-        dataBite = CoveHelper.Math.convertNumberToLocaleString(dataBite)
+        dataBite = CoveHelper.Number.convertNumberToLocaleString(dataBite)
       }
 
       return includePrefixSuffix ? config.dataFormat.prefix + dataBite + config.dataFormat.suffix : dataBite
@@ -135,12 +152,12 @@ const DataBite = () => {
   let isBottom = false
 
   switch (config.bitePosition) {
-    case "left":
-    case "right":
-    case "top":
+    case 'left':
+    case 'right':
+    case 'top':
       isTop = true
       break
-    case "bottom":
+    case 'bottom':
       isBottom = true
       break
     default:

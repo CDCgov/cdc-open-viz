@@ -1,11 +1,11 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/Data/getDataColumns"
 />
 
 # getDataColumns
-Function that maps over each data object in the input array, using Object.keys() to extract the array key for each row, and returns an aggregated array of keys from each.
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that maps over each data object in the input array, using Object.keys() to extract the array key for each row, and returns an aggregated array of keys from each.
 
 &nbsp;
 ## Syntax
@@ -14,21 +14,15 @@ Function that maps over each data object in the input array, using Object.keys()
 CoveHelper.Data.getDataColumns(dataArray)
 ```
 
-**Parameters:**
+## Parameters
+- `dataArray`: Array of data objects
+<br/>
 
-- `dataArray`: array of data objects
-
-**Returns:**
-
-An array of the unique keys in the object columns retrieved.
+**Returns:** An array of the unique keys in the object columns retrieved.
 
 &nbsp;
-### Example
+## Example
 ```js
-import CoveHelper from '@cdc/core/helpers/CoveHelper'
-
-...
-
 const data = [
   { name: 'Alice', age: 25, city: 'New York' },
   { name: 'Bob', age: 30, city: 'San Francisco' },

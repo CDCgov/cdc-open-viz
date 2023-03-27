@@ -1,0 +1,37 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/configHelpers/getConfigKeyValue"
+/>
+
+# getConfigKeyValue
+A [configHelper](./?path=/docs/helpers-confighelpers-confighelpers--docs) function that returns the value of the final key in the provided array by traversing through the provided object.
+
+&nbsp;
+## Syntax
+```js
+getConfigKeyValue(configKeyArray, objectToParse)
+```
+
+## Parameters
+- `configKeyArray`: Array of keys to traverse through the config object, or a string for a direct child lookup.
+- `objectToParse`: Object to parse and get the value from.
+<br/>
+
+**Returns:** The value of the final key in the provided array, by traversing through the provided object, or `undefined` if the key is not found.
+
+&nbsp;
+## Example
+
+```js
+import { getConfigKeyValue } from '@cdc/core/helpers/configHelpers';
+
+...
+
+const a = ['foo', 'bar', 'baz'];
+const b = { foo: { bar: { baz: 'qux' } } };
+
+getConfigKeyValue(a, b); // 'qux'
+
+// Returns the value of the final key in the provided array, by traversing through the provided object.
+```

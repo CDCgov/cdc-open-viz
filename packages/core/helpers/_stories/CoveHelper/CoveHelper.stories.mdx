@@ -1,4 +1,4 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/CoveHelper Class"
@@ -6,7 +6,7 @@ import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 
 # CoveHelper Class
 
-CoveHelper is a helper class that provides a set of methods to help developers more
+CoveHelper is a faux helper class that provides a set of methods to help developers more
 easily access frequently used functions. Functions are organized into several subclasses:
 
 - CoveHelper.**Data**.(fn)
@@ -14,21 +14,25 @@ easily access frequently used functions. Functions are organized into several su
 - CoveHelper.**Event**.(fn)
 - CoveHelper.**General**.(fn)
 - CoveHelper.**Math**.(fn)
+- CoveHelper.**Number**.(fn)
 - CoveHelper.**String**.(fn)
+
+&nbsp;
+## Available Methods (Functions)
+For function details and availability, see the documentation in the corresponding `Helpers/CoveHelper/<Subclass>` directory in the sidebar.
 
 &nbsp;
 ## Usage
 The CoveHelper class can be used with the following method:
 
 ```js
-import CoveHelper from 'cove-helper';
+import CoveHelper from '@cdc/core/helpers/CoveHelper';
 
 ...
 
 const uniqueValues = CoveHelper.Data.getDataValues(data, 'column_name');
+
 const sumOfArr = CoveHelper.Math.getSum([1, 2, 3, 4, 5]);
+
 const formattedDate = CoveHelper.Date.formatDate('2020-01-01', 'MM/DD/YYYY');
 ```
-
-## Functions
-For function details and availability, see the documentation in the corresponding `Helpers/CoveHelper/<Subclass>` directory in the sidebar.

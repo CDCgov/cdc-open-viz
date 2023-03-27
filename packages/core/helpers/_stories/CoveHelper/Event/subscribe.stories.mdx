@@ -1,14 +1,12 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/Event/subscribe"
 />
 
 # subscribe
-This function registers an event listener for a given event name on the document object. When the specified event is triggered,
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that registers an event listener for a given event name on the document object. When the specified event is triggered,
 the listener function will be executed.
-
-The function returns the result of the `addEventListener` method call.
 
 See the [unsubscribe](/?path=/docs/helpers-covehelper-event-unsubscribe--docs) function for removing the event listener.
 
@@ -18,13 +16,15 @@ See the [unsubscribe](/?path=/docs/helpers-covehelper-event-unsubscribe--docs) f
 CoveHelper.Event.subscribe(eventName, listener);
 ```
 
-**Parameters**
+## Parameters
+- `eventName`: String representing the name of the event to listen for.
+- `listener`: Function to be executed when the specified event is triggered.
+<br/>
 
-- `eventName`: A string representing the name of the event to listen for.
-- `listener`: A function to be executed when the specified event is triggered.
+**Returns:** The result of the `addEventListener` method call.
 
 &nbsp;
-### Example
+## Example
 In this example, the `handleClick` function is registered as an event listener for the click event on a button element using the `subscribe` function.
 ```js
 function handleClick(event) {

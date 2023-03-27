@@ -124,22 +124,36 @@ const InputSelect = (
 }
 
 InputSelect.propTypes = {
+  /** Add label to the input field */
   label: PropTypes.string,
-  value: PropTypes.any,
-  options: PropTypes.oneOfType([
-    PropTypes.array,
-    PropTypes.object
-  ]),
-  initial: PropTypes.string,
-  initialDisabled: PropTypes.bool,
-  /** Snap returns to the initial value, regardless of previous selection **/
-  initialSnap: PropTypes.bool,
-  required: PropTypes.bool,
+  /** Add a tooltip to describe the input's usage; JSX markup can also be supplied */
   tooltip: PropTypes.oneOfType([
     PropTypes.object,
     PropTypes.string
   ]),
-  onChange: PropTypes.func
+  /** Supply an array of options, or an object of key/value pairs to use as options */
+  options: PropTypes.oneOfType([
+    PropTypes.array,
+    PropTypes.object
+  ]),
+  /** Prepend a default initial option */
+  initial: PropTypes.string,
+  /** Allow the initial option to display, but disable selection of the initial option */
+  initialDisabled: PropTypes.bool,
+  /** Snap returns to the initial value, regardless of previous selection; helpful when triggering onChange() events
+   * when an option is selected (like adding a filter from a list), and the select is expected to be used multiple times **/
+  initialSnap: PropTypes.bool,
+  /** Mark the input as required; will set error style while value is undefined */
+  required: PropTypes.bool,
+  /** Supply a reference to the config key this input connects to, if any.<br/><br/>
+   * **String**<br/>
+   * `configField="title"` will connect to the `config.title` value.<br/><br/>
+   * **Array**<br/>
+   * `configField={[ 'componentStyle', 'shadow' ]}` will connect to the `config.componentStyle.shadow` value. <br/><br/>
+   * See [setConfigKeyValue](https://cdcgov.github.io/cdc-open-viz/?path=/docs/helpers-confighelpers-setconfigkeyvalue--docs) for more details. */
+  configField: PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
+  /** Function to call when the input is changed */
+  onChange: PropTypes.func,
 }
 
 export default memo(InputSelect)

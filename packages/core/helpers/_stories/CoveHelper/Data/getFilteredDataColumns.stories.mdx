@@ -1,11 +1,11 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/Data/getFilteredDataColumns"
 />
 
 # getFilteredDataColumns
-Function that iterates over a provided array of data and returns an array of filtered column names that are in the provided config object.
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that iterates over a provided array of data and returns an array of filtered column names that are in the provided config object.
 
 &nbsp;
 ## Syntax
@@ -14,24 +14,18 @@ Function that iterates over a provided array of data and returns an array of fil
 CoveHelper.Data.getFilteredDataColumns(config, dataArray)
 ```
 
-**Parameters:**
+## Parameters
+- `config`: Object that may contain two keys: `series` and `confidenceKeys`:
+  - `series`: Array of objects that each contain a dataKey property.
+  - `confidenceKeys`: Object that contains key-value pairs where the keys are column names and the values are boolean values indicating whether the column is a confidence interval.
+- `dataArray`: Array of objects where each object represents a row of data.
+<br/>
 
-- `config` is an object that may contain two keys: `series` and `confidenceKeys`:
-  - `series` is an array of objects that each contain a dataKey property
-  - `confidenceKeys` is an object that contains key-value pairs where the keys are column names and the values are boolean values indicating whether the column is a confidence interval
-- `dataArray` is an array of objects where each object represents a row of data
-
-**Returns:**
-
-An array of filtered data column names from `dataArray`
+**Returns:** An array of filtered data column names from `dataArray`.
 
 &nbsp;
-### Example
+## Example
 ```js
-import CoveHelper from '@cdc/core/helpers/CoveHelper'
-
-...
-
 const config = {
   series: [
     { dataKey: 'name' },

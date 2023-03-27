@@ -1,13 +1,15 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/Math/getMean"
 />
 
 # getMean
-This function takes an array of numbers and returns the mean (average) of all its elements. If the input is valid, the function
-maps the array elements to numbers, removes any zero values if the ignoreZeros parameter is true, calculates the mean
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that takes an array of numbers and returns the mean (average) of all its elements. If the input is valid, the function
+maps the array elements to numbers, calculates the mean
 using the reduce() method, and returns the result.
+
+If `ignoreZeros` is set to `true`, removes any `0` values in the provided array from the calculation.
 
 &nbsp;
 ## Syntax
@@ -15,15 +17,19 @@ using the reduce() method, and returns the result.
 CoveHelper.Math.getMean(arr, ignoreZeros)
 ```
 
-**Parameters**:
+## Parameters
+- `arr`: Array of numbers to be averaged.
+- `ignoreZeros`: Boolean designating whether to ignore zero values when calculating the mean. Default is `false`.
+<br/>
 
-- `arr`: The array of numbers to be averaged.
-- `ignoreZeros`: Whether to ignore zero values when calculating the mean. Default is `false`.
+**Returns:** The mean (average) of the provided array elements, or `undefined` if the input is invalid.
 
 &nbsp;
-### Example
+## Example
 ```js
-CoveHelper.Math.getMean([1, 2, 3]); // returns 2
-CoveHelper.Math.getMean([1, 0, 3], true); // returns 2
-CoveHelper.Math.getMean("1,2,3"); // returns undefined
+CoveHelper.Math.getMean([1, 2, 3]); // 2
+
+CoveHelper.Math.getMean([1, 0, 3], true); // 2
+
+CoveHelper.Math.getMean("1,2,3"); // undefined
 ```

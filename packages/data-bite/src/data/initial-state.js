@@ -28,5 +28,6 @@ export default {
   },
   general: {
     isCompactStyle: false
-  }
+  },
+  missingRequiredSections: false //This value should always exist
 }

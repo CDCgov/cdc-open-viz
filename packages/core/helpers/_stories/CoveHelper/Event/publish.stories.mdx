@@ -1,14 +1,12 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/Event/publish"
 />
 
 # publish
-This function dispatches a custom event with the specified event name and optional data payload. The event can be listened to by any event listener
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that dispatches a custom event with the specified event name and optional data payload. The event can be listened to by any event listener
 registered to the document object, regardless of where the event was dispatched from.
-
-The function returns the result of the `dispatchEvent` method call.
 
 &nbsp;
 ## Syntax
@@ -16,12 +14,15 @@ The function returns the result of the `dispatchEvent` method call.
 CoveHelper.Event.publish(eventName, data);
 ```
 
-**Parameters**
-- `eventName`: A string representing the name of the custom event to dispatch.
-- `data`: Optional data payload to be included with the event. The data can be accessed in the event listener using the detail property of the event object.
+## Parameters
+- `eventName`: String representing the name of the custom event to dispatch.
+- `data`: _(Optional)_ Data payload to be included with the event. The data can be accessed in the event listener using the detail property of the event object.
+<br/>
+
+**Returns:** The result of the `dispatchEvent` method call.
 
 &nbsp;
-### Example
+## Example
 In this example, a custom event named `customEvent` is dispatched with a payload `{ data: 'example' }` from one module.
 
 The event is listened to by a listener function `handleCustomEvent` registered using `subscribe` in another module.

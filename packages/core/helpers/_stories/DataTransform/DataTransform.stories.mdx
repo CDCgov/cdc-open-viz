@@ -1,14 +1,11 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/DataTransform/DataTransform Class"
 />
 
 # DataTransform
-This is a class that contains two methods for standardizing data, autoStandardize and developerStandardize.
-
-* The [autoStandardize](./?path=/docs/helpers-datatransform-autostandardize--docs) method performs standardizations that can be completed automatically without user input.
-* The [developerStandardize](./?path=/docs/helpers-datatransform-developerstandardize--docs) method performs standardizations based on developer provided description of the data.
+The DataTramsform class contains two methods for standardizing data; these standardizations ensure data is properly formatted for visualizations.
 
 &nbsp;
 ## Constructor
@@ -18,6 +15,11 @@ The DataTransform class has a constructor method which sets the following consta
 - `descriptionHeader`: Constant for description header
 - `descriptionRoot`: Constant for description root
 - `descriptionSeriesFilter`: Constant for description series filter
+
+&nbsp;
+## Available Methods
+* [autoStandardize](./?path=/docs/helpers-datatransform-autostandardize--docs) - Performs baseline standardizations.
+* [developerStandardize](./?path=/docs/helpers-datatransform-developerstandardize--docs) - Performs standardizations based on provided descriptions of the data.
 
 
 

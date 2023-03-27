@@ -39,7 +39,7 @@ function useReduceData() {
 
       max = Math.max(...yTotals)
     } else if (config.visualizationType === 'Bar' && config.series && config.series.dataKey) {
-      max = Math.max(...config.data.map(d => (CoveHelper.Math.equalsValidNumber(d[config.series.dataKey]) ? Number(cleanChars(d[config.series.dataKey])) : 0)))
+      max = Math.max(...config.data.map(d => (CoveHelper.Number.equalsValidNumber(d[config.series.dataKey]) ? Number(cleanChars(d[config.series.dataKey])) : 0)))
       //max = Math.max(...data.map(d => Number(d[config.series.dataKey])))
     } else if (config.visualizationType === 'Combo' && config.visualizationSubType === 'stacked' && !isBar) {
       let total = []
@@ -61,14 +61,14 @@ function useReduceData() {
         max = Number(barMax) > Number(lineMax) ? barMax : lineMax
       }
     } else {
-      max = Math.max(...config.data.map(d => Math.max(...config.runtime.seriesKeys.map(key => (CoveHelper.Math.equalsValidNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
+      max = Math.max(...config.data.map(d => Math.max(...config.runtime.seriesKeys.map(key => (CoveHelper.Number.equalsValidNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
     }
     return max
   }
 
   const getMinValueFromData = () => {
     let min
-    const minNumberFromData = Math.min(...config.data.map(d => Math.min(...config.runtime.seriesKeys.map(key => (CoveHelper.Math.equalsValidNumber(d[key]) ? Number(cleanChars(d[key])) : 1000000000)))))
+    const minNumberFromData = Math.min(...config.data.map(d => Math.min(...config.runtime.seriesKeys.map(key => (CoveHelper.Number.equalsValidNumber(d[key]) ? Number(cleanChars(d[key])) : 1000000000)))))
     min = String(minNumberFromData)
     return min
   }

@@ -62,9 +62,15 @@ const visConfigSliceActions = (set, get) => ({
 
   // Actions --------------------------------------------------------------------------------------------------------------------------------------------------------------
   setMissingRequiredSections: (key, value) => {
-    set(state => {
-      state.visualizations[key].missingRequiredSections = value
-    })
+    if (key === '__default__') {
+      set(state => {
+        state.visualizations[key].missingRequiredSections = value
+      })
+    } else {
+      set(state => {
+        state.visualizations['__default__'].visualizations[key].missingRequiredSections = value
+      })
+    }
   }
 })
 

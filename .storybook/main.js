@@ -1,22 +1,23 @@
 export default {
-  "stories": [
+  stories: [
     '../_stories/*.mdx',
     '../packages/**/_stories/*.stories.@(js|jsx|ts|tsx)',
     '../packages/**/_stories/*.mdx',
     '../packages/**/_stories/**/*.mdx',
   ],
-  "addons": [
+  addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
     "@storybook/addon-interactions"
   ],
-  "framework": {
-    "name": "@storybook/react-vite"
+  staticDirs: ['./assets'],
+  framework: {
+    name: "@storybook/react-vite"
   },
-  "core": {
+  core: {
     disableTelemetry: true
   },
-  "docs": {
-    "autodocs": "tag"
+  docs: {
+    autodocs: "tag"
   }
 };

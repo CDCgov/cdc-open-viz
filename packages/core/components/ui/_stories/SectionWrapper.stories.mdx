@@ -1,6 +1,7 @@
 import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 
 import SectionWrapper from '../SectionWrapper'
+import InputText from '../../input/InputText'
 
 <Meta
   title="Components/UI/SectionWrapper"
@@ -8,10 +9,20 @@ import SectionWrapper from '../SectionWrapper'
 />
 
 # SectionWrapper Component
-Content Text
+Add a bordered wrapper to a collection of child elements, with an optional label and tooltip.
 
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Example">
+  <Story name="Example"
+         args={{
+           label: 'SectionWrapper Label',
+           tooltip: 'This is an example tooltip.',
+           children: [
+             <InputText label="Input #1" type="text"/>,
+             <InputText label="Input #2" type="text"/>,
+             <InputText label="Input #3" type="text"/>
+           ]
+         }}
+  >
     {Template.bind({})}
   </Story>
 </Canvas>

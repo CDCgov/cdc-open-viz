@@ -138,16 +138,32 @@ const InputCheckbox = memo((
 })
 
 InputCheckbox.propTypes = {
+  /** Add label to the input field */
   label: PropTypes.string,
+  /** Position the label relative to the checkbox */
   labelPosition: PropTypes.oneOf([ 'left', 'right' ]),
+  /** Select the preferred size of the checkbox */
+  size: PropTypes.oneOf([ 'small', 'medium', 'large' ]),
+  /** Select the preferred color for the checkbox fill when active */
+  activeColor: PropTypes.string,
+  /** Select the preferred color for the checkbox's check when active */
+  activeCheckColor: PropTypes.string,
+  /** Add a tooltip to describe the checkbox's usage; JSX markup can also be supplied */
   tooltip: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.object
   ]),
-  size: PropTypes.oneOf([ 'small', 'medium', 'large' ]),
-  activeColor: PropTypes.string,
-  activeCheckColor: PropTypes.string,
-  value: PropTypes.bool
+  /** Stretch the checkbox and its label to fill the width of its container */
+  stretch: PropTypes.bool,
+  /** Supply a reference to the config key this input connects to, if any.<br/><br/>
+   * **String**<br/>
+   * `configField="title"` will connect to the `config.title` value.<br/><br/>
+   * **Array**<br/>
+   * `configField={[ 'componentStyle', 'shadow' ]}` will connect to the `config.componentStyle.shadow` value. <br/><br/>
+   * See [setConfigKeyValue](https://cdcgov.github.io/cdc-open-viz/?path=/docs/helpers-confighelpers-setconfigkeyvalue--docs) for more details. */
+  configField: PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
+  /** Function to call when the input is clicked */
+  onClick: PropTypes.func
 }
 
 export default InputCheckbox

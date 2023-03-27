@@ -3,6 +3,7 @@ import * as Date from './date'
 import * as Event from './event'
 import * as General from './general'
 import * as Math from './math'
+import * as Number from './number'
 import * as String from './string'
 
 const CoveHelper = {
@@ -11,6 +12,7 @@ const CoveHelper = {
   Event: { ...Event },
   General: { ...General },
   Math: { ...Math },
+  Number: { ...Number },
   String: { ...String }
 }
 

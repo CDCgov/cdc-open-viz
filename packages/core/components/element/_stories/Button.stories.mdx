@@ -1,5 +1,6 @@
-import { useState } from 'react';
 import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import { useState } from 'react'
 
 import Button from '../Button'
 
@@ -39,25 +40,14 @@ The Button component can also serve as a dynamic display for a variety of intera
 This display can be toggled on/off by passing a *boolean* value to the `disabled` property.
 
 <Canvas>
-  <Story name="Loader">
-    {() => {
-      const [ isLoading, setIsLoading ] = useState(false)
-      const loadingHandler = () => {
-        setIsLoading(true)
-        setTimeout(() => {
-          setIsLoading(false)
-        }, 1000)
-        return
-      }
-      return <Button
-        role="loader"
-        disabled={isLoading}
-        loadingText="Saving your changes..."
-        onClick={() => loadingHandler()}
-      >
-        Click To Save
-      </Button>
-    }}
+  <Story name="Loader"
+         args={{
+           role: "loader",
+           loadingText: "Saving your changes...",
+           children: "Click To Save"
+         }}
+  >
+    {Loader.bind({})}
   </Story>
 </Canvas>
 
@@ -120,6 +110,27 @@ You can also add custom hover styles to the button. The `hoverStyle` property wi
 export const Template = ({ ...args }) => (
   <Button {...args}/>
 )
+
+export const Loader = ({ ...args }) => {
+  const [ isLoading, setIsLoading ] = useState(false)
+
+  const loadingHandler = () => {
+    setIsLoading(true)
+    setTimeout(() => {
+      setIsLoading(false)
+    }, 1000)
+    return () => {
+    }
+  }
+
+  return (
+    <Button
+      disabled={isLoading}
+      onClick={() => loadingHandler()}
+      {...args}
+    />
+  )
+}
 
 export const Classes = ({ ...args }) => (
   <>

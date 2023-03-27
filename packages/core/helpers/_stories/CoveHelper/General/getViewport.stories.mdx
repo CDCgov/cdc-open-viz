@@ -1,11 +1,11 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Helpers/CoveHelper/General/getViewport"
 />
 
 # getViewport
-Functipon that returns a string representing the current viewport size category based on a set of predefined breakpoints.
+A [CoveHelper](./?path=/docs/helpers-covehelper-covehelper-class--docs) function that returns a string representing the current viewport size category based on a set of predefined breakpoints.
 
 &nbsp;
 ## Syntax
@@ -13,12 +13,11 @@ Functipon that returns a string representing the current viewport size category 
 CoveHelper.General.getViewport(size)
 ```
 
-**Parameters**:
+## Parameters
+- `size`: Number representing the current viewport size in pixels.
+<br/>
 
-- `size`: A number representing the current viewport size in pixels.
-
-**Returns:**
-Possible return values are:
+**Returns:** Possible return values are:
 - `xxs`: viewport size smaller than 360px
 - `xs`: viewport size between 360px and 480px
 - `sm`: viewport size between 480px and 768px
@@ -27,15 +26,12 @@ Possible return values are:
 - `xl`: viewport size larger than 1170px
 
 &nbsp;
-### Example
+## Example
 ```js
-CoveHelper.General.getViewport(1280);
-// Output: 'xl'
+CoveHelper.General.getViewport(1280); // Output: 'xl'
 
-CoveHelper.General.getViewport(800);
-// Output: 'md'
+CoveHelper.General.getViewport(800); // Output: 'md'
 
-CoveHelper.General.getViewport(500);
-// Output: 'xs'
+CoveHelper.General.getViewport(500); // Output: 'xs'
 ```
 

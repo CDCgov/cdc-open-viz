@@ -363,8 +363,8 @@ const ChartLinearBar = (
                       let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                       let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
 
-                      let barHeight = orientation === 'horizontal' ? config.barHeight : CoveHelper.Math.equalsValidNumber(Math.abs(yScale(bar.value) - yScale(0))) ? Math.abs(yScale(bar.value) - yScale(0)) : 0
-                      let barY = bar.value >= 0 && CoveHelper.Math.equalsValidNumber(bar.value) ? bar.y : yScale(0)
+                      let barHeight = orientation === 'horizontal' ? config.barHeight : CoveHelper.Number.equalsValidNumber(Math.abs(yScale(bar.value) - yScale(0))) ? Math.abs(yScale(bar.value) - yScale(0)) : 0
+                      let barY = bar.value >= 0 && CoveHelper.Number.equalsValidNumber(bar.value) ? bar.y : yScale(0)
                       let barGroupWidth = ((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (config.barThickness || 0.8)
                       let offset = (((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
 

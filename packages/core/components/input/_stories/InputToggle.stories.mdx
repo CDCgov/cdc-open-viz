@@ -2,28 +2,45 @@ import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 import InputToggle from '../InputToggle'
 
 <Meta
-  title="Components/Input/Toggle"
+  title="Components/Input/InputToggle"
   name="Usage"
   component={InputToggle}
   parameters={{ options: { isToolshown: true } }}
 />
 
-export const Template = ({ ...args }) => (
-  <InputToggle {...args} />
-)
+# InputToggle Component
+Renders a toggle input, with an optional label and tooltip.
 
-# Toggle Component
 <Canvas sourceState="shown" withSource="open">
   <Story name="Example"
          args={{
            label: 'Toggle Label',
            labelPosition: 'top',
            toggleType: 'flat',
-           tooltip: 'Example tooltip text...',
+           tooltip: 'This is an example tooltip.',
            size: 'large',
+           stretch: false,
            activeColor: '#39569b',
            value: true
-         }}>
+         }}
+         argTypes={{
+           configField: {
+             control: {
+               disable: true
+             },
+           },
+           value: {
+             table: {
+               disable: true
+             }
+           },
+           stateValue: {
+             table: {
+               disable: true
+             }
+           }
+         }}
+  >
     {Template.bind({})}
   </Story>
 </Canvas>
@@ -71,3 +88,7 @@ export const Template = ({ ...args }) => (
   <InputToggle size="large" toggleType="3d" value={true}/>
   <InputToggle size="xlarge" toggleType="3d" value={true}/>
 </Canvas>
+
+export const Template = ({ ...args }) => (
+  <InputToggle {...args} />
+)

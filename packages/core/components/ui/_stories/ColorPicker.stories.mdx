@@ -11,10 +11,16 @@ import ColorPicker from '../ColorPicker'
 Content Text
 
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Example" args={{
-    label: "Example Theme Color",
-    tooltip: "This is an <strong>example</strong> tooltip"
-  }}>
+  <Story name="Example"
+         args={{
+           label: "Example Theme Color",
+           tooltip: "This is an <strong>example</strong> tooltip",
+           colorTooltip: true,
+         }}
+         argTypes={{
+           colorTooltip: { control: 'boolean' }
+         }}
+  >
     {Template.bind({})}
   </Story>
 </Canvas>

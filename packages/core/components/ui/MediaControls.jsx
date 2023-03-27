@@ -3,8 +3,11 @@ import React from 'react'
 // Third Party
 import html2pdf from 'html2pdf.js'
 import html2canvas from 'html2canvas'
+
+// Hooks
 import { useVisConfig } from '../../hooks/store/useVisConfig'
 
+// Components
 const buttonText = {
   pdf: 'Download PDF',
   image: 'Download Image',
@@ -25,7 +28,7 @@ const saveImageAs = (uri, filename) => {
   }
 }
 
-const generateMedia = (state, type, elementToCapture) => {
+const generateMedia = (config, type, elementToCapture) => {
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
 
@@ -46,7 +49,7 @@ const generateMedia = (state, type, elementToCapture) => {
 
   // Construct filename with timestamp
   const date = new Date()
-  const filename = handleFileName(state)
+  const filename = handleFileName(config)
 
   switch (type) {
     case 'image':
@@ -80,17 +83,18 @@ const generateMedia = (state, type, elementToCapture) => {
 
 // Handles different state theme locations between components
 // Apparently some packages use state.headerColor where others use state.theme
-const handleTheme = state => {
-  if (state?.headerColor) return state.headerColor // ie. maps
-  if (state?.theme) return state.theme // ie. charts
+const handleTheme = config => {
+  if (config?.headerColor) return config.headerColor // ie. maps
+  if (config?.theme) return config.theme // ie. charts
   return 'theme-notFound'
 }
 
 // Download CSV
-const Button = ({ state, text, type, title, elementToCapture }) => {
-  const buttonClasses = ['btn', 'btn-download', `${handleTheme(state)}`]
+const Button = ({ text, type, title, elementToCapture }) => {
+  const { config } = useVisConfig()
+  const buttonClasses = ['btn', 'btn-download', `${handleTheme(config)}`]
   return (
-    <button className={buttonClasses.join(' ')} title={title} onClick={() => generateMedia(state, type, elementToCapture)} style={{ lineHeight: '1.4em' }}>
+    <button className={buttonClasses.join(' ')} title={title} onClick={() => generateMedia(config, type, elementToCapture)} style={{ lineHeight: '1.4em' }}>
       {buttonText[type]}
     </button>
   )
@@ -118,10 +122,15 @@ const Link = () => {
 
 // TODO: convert to standardized COVE section
 const Section = ({ children, className }) => {
-  return <section className={className}>{children}</section>
+  return (
+    <section className={className}>
+      {children}
+    </section>
+  )
 }
 
 const MediaControls = () => null
+MediaControls.displayName = 'MediaControls'
 
 MediaControls.Section = Section
 MediaControls.Section.displayName = 'MediaControls.Section'

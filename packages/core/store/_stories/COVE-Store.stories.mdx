@@ -1,4 +1,4 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta } from '@storybook/blocks';
 
 <Meta
   title="Store/COVE Store"
@@ -6,6 +6,8 @@ import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 
 # COVE Store
 COVE uses the [Zustand](https://docs.pmnd.rs/zustand) library for state management. Zustand is a lightweight state management library that uses React hooks.
+
+Objects are merged using the [immer](https://immerjs.github.io/immer/) library as middleware on Zustand, but can also be used directly by using immer's `produce()` function. This allows for immutable state updates to the store.
 
 The store is separated into three separate slices. Each slice has its own reducers and actions:
 

@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 
 // Third Party
-import parse from 'html-react-parser'
-import { Group } from '@visx/group'
 import { Circle, Bar } from '@visx/shape'
+import { Group } from '@visx/group'
+
+import parse from 'html-react-parser'
 
 // Store
 import useStore from '@cdc/core/store/store'
@@ -34,9 +35,26 @@ import calculateWaffleAnimation from '../helpers/calculateWaffleAnimation'
 // Visualization
 const WaffleChart = () => {
   // Store Selectors
-  const { config } = useVisConfig()
+  const { config, visualizationKey } = useVisConfig()
+  const { setMissingRequiredSections } = useStore()
   const { data } = config
 
+  /** Required Sections -------------------------------------------------------------------------- */
+  const requiredSections = useCallback(() => {
+    return [
+      config.dataColumn,
+      config.dataFunction
+    ]
+  }, [ config ])
+
+  useEffect(() => {
+    if (requiredSections && config) {
+      setMissingRequiredSections(visualizationKey, !requiredSections().every(section => !!CoveHelper.General.isValid(section) === true))
+    }
+  }, [ config, requiredSections, setMissingRequiredSections, visualizationKey ])
+
+
+  /** Vis Functions ------------------------------------------------------------------------------ */
   const calculateData = () => {
     //If either the column or function aren't set, do not calculate
     if (!config?.dataColumn || !config.dataFunction) return ''
@@ -114,9 +132,9 @@ const WaffleChart = () => {
 
     const numerFunctionList = {
       [DATA_FUNCTION_COUNT]: String(numericalData.length),
-      [DATA_FUNCTION_SUM]: String(CoveHelper.Math.roundToPlace(CoveHelper.Math.getSum(numericalData), config.roundToPlace)),
-      [DATA_FUNCTION_MEAN]: String(CoveHelper.Math.roundToPlace(CoveHelper.Math.getMean(numericalData), config.roundToPlace)),
-      [DATA_FUNCTION_MEDIAN]: CoveHelper.Math.roundToPlace(CoveHelper.Math.getMedian(numericalData).toString(), config.roundToPlace),
+      [DATA_FUNCTION_SUM]: String(CoveHelper.Number.roundToPlace(CoveHelper.Math.getSum(numericalData), config.roundToPlace)),
+      [DATA_FUNCTION_MEAN]: String(CoveHelper.Number.roundToPlace(CoveHelper.Math.getMean(numericalData), config.roundToPlace)),
+      [DATA_FUNCTION_MEDIAN]: CoveHelper.Number.roundToPlace(CoveHelper.Math.getMedian(numericalData).toString(), config.roundToPlace),
       [DATA_FUNCTION_MAX]: Math.max(...numericalData).toString(),
       [DATA_FUNCTION_MIN]: Math.min(...numericalData).toString(),
       [DATA_FUNCTION_MODE]: CoveHelper.Math.getMode(numericalData).join(', ')
@@ -129,9 +147,9 @@ const WaffleChart = () => {
 
     const denomFunctionList = {
       [DATA_FUNCTION_COUNT]: String(numericalDenomData.length),
-      [DATA_FUNCTION_SUM]: String(CoveHelper.Math.roundToPlace(CoveHelper.Math.getSum(numericalDenomData), config.roundToPlace)),
-      [DATA_FUNCTION_MEAN]: String(CoveHelper.Math.roundToPlace(CoveHelper.Math.getMean(numericalDenomData), config.roundToPlace)),
-      [DATA_FUNCTION_MEDIAN]: CoveHelper.Math.roundToPlace(CoveHelper.Math.getMedian(numericalDenomData).toString(), config.roundToPlace),
+      [DATA_FUNCTION_SUM]: String(CoveHelper.Number.roundToPlace(CoveHelper.Math.getSum(numericalDenomData), config.roundToPlace)),
+      [DATA_FUNCTION_MEAN]: String(CoveHelper.Number.roundToPlace(CoveHelper.Math.getMean(numericalDenomData), config.roundToPlace)),
+      [DATA_FUNCTION_MEDIAN]: CoveHelper.Number.roundToPlace(CoveHelper.Math.getMedian(numericalDenomData).toString(), config.roundToPlace),
       [DATA_FUNCTION_MAX]: Math.max(...numericalDenomData).toString(),
       [DATA_FUNCTION_MIN]: Math.min(...numericalDenomData).toString(),
       [DATA_FUNCTION_MODE]: CoveHelper.Math.getMode(numericalDenomData).join(', ')
@@ -143,7 +161,7 @@ const WaffleChart = () => {
       waffleDenominator = config.dataDenom > 0 ? config.dataDenom : 100
     }
 
-    return CoveHelper.Math.roundToPlace((waffleNumerator / waffleDenominator) * 100, config.roundToPlace)
+    return CoveHelper.Number.roundToPlace((waffleNumerator / waffleDenominator) * 100, config.roundToPlace)
   }
 
   const setRatio = () => {

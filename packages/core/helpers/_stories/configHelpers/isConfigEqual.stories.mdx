@@ -1,0 +1,40 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta
+  title="Helpers/configHelpers/isConfigEqual"
+/>
+
+# isConfigEqual
+A [configHelper](./?path=/docs/helpers-confighelpers-confighelpers--docs) function that compares two stringified objects, checks if they are the same, then returns the response as a boolean.
+
+The comparison is performed using `JSON.stringify` to convert the objects to strings before comparing.
+
+&nbsp;
+## Syntax
+```js
+isConfigEqual(a, b);
+```
+
+## Parameters
+- `a`: First object to compare.
+- `b`: Second object to compare.
+
+**Returns:** `true` if `a` and `b` are equal, `false` otherwise.
+
+&nbsp;
+## Example
+
+```js
+import { isConfigEqual } from '@cdc/core/helpers/configHelpers';
+
+...
+
+const a = { foo: 'bar' };
+const b = { foo: 'bar' };
+
+isConfigEqual(a, b); // true
+
+// Without the JSON.stringify, a and b are considered different objects due to
+// referential inequality, and would normally return false.
+// However, when converted to JSON strings, a and b become equal, so isConfigEqual returns true.
+```

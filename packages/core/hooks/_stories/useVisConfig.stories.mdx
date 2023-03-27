@@ -1,4 +1,4 @@
-import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import { Meta, Story, ArgsTable } from '@storybook/blocks';
 
 <Meta
   title="Hooks/useVisConfig"
@@ -22,6 +22,12 @@ The `useVisConfig()` hook is used to access and update the configuration data fo
 
 ### **\{ config \} = useVisConfig()**
 Returns the `<VisConfigProvider/>` config values, retrieved from the store.
+
+&nbsp;
+### **\{ visualizationKey \} = useVisConfig()**
+Returns the `visualizationKey` of the current component/visualization. If the component is a:
+  - **standalone visualization**, or **dashboard** - `visualizationKey` returns `__default__`.
+  - **visualization displayed on a dashboard** - `visualizationKey` returns the `UID` assigned to it by the dashboard.
 
 &nbsp;
 ### **\{ updateVisConfig \} = useVisConfig()**
@@ -73,7 +79,7 @@ updateVisConfigField(configKeyArray, setValue, merge = true)
 
 <ArgsTable story="updateVisConfigField"/>
 
-  **Example:**
+  **Example**
 ```js
 config = {
   foo: {

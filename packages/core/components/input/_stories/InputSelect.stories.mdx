@@ -3,16 +3,53 @@ import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 import InputSelect from '../InputSelect'
 
 <Meta
-  title="Components/Input/Select"
+  title="Components/Input/InputSelect"
   component={InputSelect}
 />
 
-# Select Component
-Content Text
+# InputSelect Component
+Renders a select element using the provided options.
 
-## Subheader
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Name">
-    <InputSelect/>
+  <Story name="Example"
+         args={{
+           label: 'Select Label',
+           tooltip: 'This is an example tooltip.',
+           options: {
+             option1: 'Option One',
+             option2: 'Option Two',
+             option3: 'Option Three',
+           },
+           initial: "Select an option",
+           initialDisabled: true,
+           initialSnap: true,
+           required: false,
+           onChange: (e) => alert(e.target.value + ' clicked!')
+         }}
+         argTypes={{
+           configField: {
+             control: {
+               disable: true
+             },
+           },
+           onChange: {
+             control: {
+               disable: true
+             },
+           },
+           value: {
+             table: {
+               disable: true
+             }
+           }
+         }}
+  >
+    {Template.bind({})}
   </Story>
 </Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => (
+  <InputSelect {...args} />
+)
