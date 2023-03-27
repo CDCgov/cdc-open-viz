@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState, useTransition } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, useRef, useTransition } from 'react'
 
 // Third Party
 import { merge } from 'lodash'
@@ -9,6 +9,7 @@ import useStore from '../../store/store'
 // Helpers
 import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
 import fetchAsyncUrl from '../../helpers/fetchAsyncUrl'
+import { isConfigEqual } from '../../helpers/configHelpers'
 
 // Context
 export const ConfigContext = createContext({})
@@ -16,6 +17,9 @@ ConfigContext.displayName = 'VisualizationConfig'
 
 export const VisConfigProvider = ({ visualizationKey = '__default__', config: configObj, configUrl, children, defaultConfig, transformConfig } = {}) => {
   const [ loading, setLoading ] = useState(false)
+
+  const configRef = useRef(configObj)
+  const updateDetected = useRef(false)
 
   // Config Store Selectors
   const addVisConfig = useStore(state => state.addVisConfig)
@@ -40,6 +44,15 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
   }, [ dashboardStoredConfig, storedConfig, transformConfig ])
 
   useEffect(() => {
+    // If the configObj changes externally, trigger a
+    // recycle of the initConfig loader.
+    if (!isConfigEqual(configObj, configRef.current)) {
+      configRef.current = configObj
+      updateDetected.current = true
+    }
+  }, [configObj])
+
+  useEffect(() => {
     async function initConfig() {
       const config = dashboardStoredConfig ?? configObj ?? (await fetchAsyncUrl(configUrl))
 
@@ -57,11 +70,15 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
 
       // Get initial data off config and put in store
       await getData(visualizationKey, processedConfig)
+
+      updateDetected.current = false
       setLoading(false)
     }
 
-    // If loading, or stored config already exists, return...
-    if (loading || storedConfig) return
+    if (!updateDetected.current) { // If no update detected, continue to next check
+      // If loading, or stored config already exists, return early
+      if (loading || storedConfig) return
+    }
 
     // Otherwise, start loading
     setLoading(true)
