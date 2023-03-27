@@ -1,2 +1,0 @@
-import"./jsx-runtime-670450c2.js";import{r as o}from"./index-f1f749bf.js";import{u as a}from"./store-cacab8ef.js";const r=o.createContext({});r.displayName="VisualizationConfig";const V=()=>{const{visualizationKey:i,...u}=o.useContext(r),[,s]=o.useTransition(),e=a(t=>t.updateVisConfig),n=a(t=>t.updateVisConfigField),C=o.useCallback(t=>{s(()=>e(i,t))},[e,i]),c=o.useCallback((t,f,p=!0)=>{s(()=>n(i,t,f,p))},[n,i]);return{config:u,updateVisConfig:C,updateVisConfigField:c}};export{V as u};
-//# sourceMappingURL=useVisConfig-d44c6cfa.js.map

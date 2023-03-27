@@ -1,0 +1,8 @@
+import{M as p}from"./index-a5c7af6f.js";import{j as e,a as s,F as i}from"./jsx-runtime-670450c2.js";import{u as c}from"./index-4fb8b842.js";import"./iframe-9bfe7737.js";import"../sb-preview/runtime.mjs";import"./index-f1f749bf.js";import"./_commonjsHelpers-042e6b4d.js";import"./index-6e91e324.js";import"./index-d475d2ea.js";import"./index-c46f0053.js";import"./index-d37d4223.js";import"./index-356e4a49.js";function l(o={}){const{wrapper:n}=Object.assign({},c(),o.components);return n?e(n,{...o,children:e(a,{})}):a();function a(){const t=Object.assign({h1:"h1",p:"p",a:"a",h2:"h2",pre:"pre",code:"code"},c(),o.components);return s(i,{children:[e(p,{title:"Helpers/CoveHelper/String/convertKebabToTitle"}),`
+`,e(t.h1,{children:"convertKebabToTitle"}),`
+`,s(t.p,{children:["A ",e(t.a,{href:"./?path=/docs/helpers-covehelper-covehelper-class--docs",children:"CoveHelper"})," function that takes a kebab-case string and converts it to a title case string with spaces between each word."]}),`
+`,e(t.p,{children:" "}),`
+`,e(t.h2,{children:"Example"}),`
+`,e(t.pre,{children:e(t.code,{className:"language-js",children:`CoveHelper.String.convertKebabToTitle("foo-bar-baz"); // "Foo Bar Baz"
+`})})]})}}const m=()=>{throw new Error("Docs-only story")};m.parameters={docsOnly:!0};const r={title:"Helpers/CoveHelper/String/convertKebabToTitle",tags:["stories-mdx"],includeStories:["__page"]};r.parameters=r.parameters||{};r.parameters.docs={...r.parameters.docs||{},page:l};const j=["__page"];export{j as __namedExportsOrder,m as __page,r as default};
+//# sourceMappingURL=convertKebabToTitle.stories-06375867.js.map
