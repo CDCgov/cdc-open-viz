@@ -1,28 +1,46 @@
 import { useState, useEffect, memo } from 'react'
 
+// Third Party
 import { jsx } from '@emotion/react'
-import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { geoPath } from 'd3-geo'
 import { feature, mesh } from 'topojson-client'
 import { CustomProjection } from '@visx/geo'
-import colorPalettes from '../../../core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
-import testJSON from '../data/county-map.json'
-import CityList from './CityList'
-import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-// SVG ITEMS
-const WIDTH = 880
-const HEIGHT = 500
-const PADDING = 25
+// Store
+
+// Context
+
+// Data
+import countyMapJSON from '../data/county-map.json'
+
+// Constants
+import { COUNTY_MAP } from '../data/constants'
+
+// Hooks
+
+// Helpers
+
+// Components - Core
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import colorPalettes from '../../../core/data/colorPalettes'
+
+// Components - Local
+import CityList from './CityList'
+
+// Styles
 
 // DATA
-let { features: counties } = feature(testJSON, testJSON.objects.counties)
-let { features: states } = feature(testJSON, testJSON.objects.states)
+let { features: counties } = feature(countyMapJSON, countyMapJSON.objects.counties)
+let { features: states } = feature(countyMapJSON, countyMapJSON.objects.states)
+
+const { WIDTH, HEIGHT, PADDING } = COUNTY_MAP
 
 const SingleStateMap = props => {
   const { config, updateVisConfig } = useVisConfig()
-  const { applyTooltipsToGeo, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, runtimeLegend, generateColorsArray, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
+
+  const { applyTooltipsToGeo, geoClickHandler, applyLegendToRow, displayGeoName, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
 
   const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const cityListProjection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
@@ -33,12 +51,8 @@ const SingleStateMap = props => {
 
   const [translate, setTranslate] = useState()
   const [scale, setScale] = useState()
-  const [strokeWidth, setStrokeWidth] = useState(0.75)
 
-  let mapColorPalette = colorPalettes[config.color] || '#fff'
-  let focusedBorderColor = mapColorPalette[3]
-
-  const path = geoPath().projection(projection)
+  const pathGenerator = geoPath().projection(projection)
 
   // When choosing a state changes...
   useEffect(() => {
@@ -80,11 +94,11 @@ const SingleStateMap = props => {
     let geosJsx = []
 
     const StateOutput = () => {
-      let geo = testJSON.objects.states.geometries.filter(s => {
+      let geo = countyMapJSON.objects.states.geometries.filter(s => {
         return s.id === statePassed.id
       })
 
-      let stateLines = path(mesh(testJSON, geo[0]))
+      let stateLines = pathGenerator(mesh(countyMapJSON, geo[0]))
       return (
         <g className='single-state' style={{ fill: '#E6E6E6' }} stroke={geoStrokeColor} strokeWidth={0.95 / scale}>
           <path tabIndex={-1} className='state-path' d={stateLines} />
@@ -98,7 +112,7 @@ const SingleStateMap = props => {
 
       if (!geoKey) return
 
-      let countyPath = path(county)
+      let countyPath = pathGenerator(county)
 
       let geoData = config.data[county.id]
       let legendColors

@@ -25,12 +25,14 @@ import WorldMap from './WorldMap' // Future: Lazy
 
 // Data
 import { countryCoordinates } from '../data/country-coordinates'
+import { dictionary as dict } from '../data/constants'
 
 import colorPalettes from '@cdc/core/data/colorPalettes'
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
 import MediaControls from '@cdc/core/components/ui/MediaControls'
+import { convertToTitleCase } from '@cdc/core/helpers/cove/string'
 
 // Components - Core
 
@@ -134,33 +136,6 @@ const GeoMap = ({
     }
   }
 
-  // if city has a hyphen then in tooltip it ends up UPPER CASE instead of just regular Upper Case
-  // - this function is used to prevent that and instead give the formatting that is wanted
-  // Example:  Desired city display in tooltip on map: "Inter-Tribal Indian Reservation"
-  // lifted up
-  const titleCase = string => {
-    // if hyphen found, then split, uppercase each word, and put back together
-    if (string.includes('–') || string.includes('-')) {
-      let dashSplit = string.includes('–') ? string.split('–') : string.split('-') // determine hyphen or en dash to split on
-      let splitCharacter = string.includes('–') ? '–' : '-' // print hyphen or en dash later on.
-      let frontSplit = dashSplit[0]
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-        .join(' ')
-      let backSplit = dashSplit[1]
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-        .join(' ')
-      return frontSplit + splitCharacter + backSplit
-    } else {
-      // just return with each word uppercase
-      return string
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-        .join(' ')
-    }
-  }
-
   // This resets all active legend toggles.
   const resetLegendToggles = async () => {
     updateVisConfig(
@@ -182,7 +157,7 @@ const GeoMap = ({
     }
 
     if (countyKeys.includes(value)) {
-      formattedName += ', ' + titleCase(supportedCounties[key])
+      formattedName += ', ' + convertToTitleCase(supportedCounties[key])
     }
 
     return formattedName
@@ -270,33 +245,25 @@ const GeoMap = ({
     let value = key
     // Map to first item in values array which is the preferred label
     if (stateKeys.includes(value)) {
-      value = titleCase(supportedStates[key][0])
+      value = convertToTitleCase(supportedStates[key][0])
     }
 
     if (territoryKeys.includes(value)) {
-      value = titleCase(supportedTerritories[key][0])
+      value = convertToTitleCase(supportedTerritories[key][0])
     }
 
     if (countryKeys.includes(value)) {
-      value = titleCase(supportedCountries[key][0])
+      value = convertToTitleCase(supportedCountries[key][0])
     }
 
     if (countyKeys.includes(value)) {
-      value = titleCase(supportedCounties[key])
-    }
-
-    const dict = {
-      'Washington D.C.': 'District of Columbia',
-      'WASHINGTON DC': 'District of Columbia',
-      DC: 'District of Columbia',
-      'WASHINGTON DC.': 'District of Columbia',
-      Congo: 'Republic of the Congo'
+      value = convertToTitleCase(supportedCounties[key])
     }
 
     if (true === Object.keys(dict).includes(value)) {
       value = dict[value]
     }
-    return titleCase(value)
+    return convertToTitleCase(value)
   }, [])
 
   const displayDataAsText = useCallback(
@@ -475,7 +442,7 @@ const GeoMap = ({
     applyLegendToRow,
     displayGeoName,
     generateColorsArray,
-    titleCase,
+    convertToTitleCase,
     generateRuntimeData,
     setFilteredCountryCode,
     filteredCountryCode,

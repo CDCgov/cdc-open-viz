@@ -7,46 +7,25 @@ import { feature, mesh } from 'topojson-client'
 import { CustomProjection } from '@visx/geo'
 import colorPalettes from '../../../core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
-import testJSON from '../data/county-map.json'
 import { abbrs } from '../data/abbreviations'
 import CityList from './CityList'
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-// Label lines for smaller states/geo labels
-const offsets = {
-  Vermont: [50, -8],
-  'New Hampshire': [34, 5],
-  Massachusetts: [30, -5],
-  'Rhode Island': [28, 4],
-  Connecticut: [35, 16],
-  'New Jersey': [42, 0],
-  Delaware: [33, 0],
-  Maryland: [47, 10],
-  'District of Columbia': [30, 20],
-  'Puerto Rico': [10, -20],
-  'Virgin Islands': [10, -10],
-  Guam: [10, -5],
-  'American Samoa': [10, 0]
-}
+// data
+import { offsets, COUNTY_MAP } from '../data/constants'
+import countyMapJSON from '../data/county-map.json'
 
-// SVG ITEMS
-const WIDTH = 880
-const HEIGHT = 500
-const PADDING = 25
+const { HEIGHT, WIDTH, PADDING, STATE_BORDER, STATE_INACTIVE_FILL } = COUNTY_MAP
 
 // DATA
-let { features: counties } = feature(testJSON, testJSON.objects.counties)
-let { features: states } = feature(testJSON, testJSON.objects.states)
-
-// CONSTANTS
-const STATE_BORDER = '#c0cad4'
-const STATE_INACTIVE_FILL = '#F4F7FA'
+let { features: counties } = feature(countyMapJSON, countyMapJSON.objects.counties)
+let { features: states } = feature(countyMapJSON, countyMapJSON.objects.states)
 
 // CREATE STATE LINES
 const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
 const path = geoPath().projection(projection)
-const stateLines = path(mesh(testJSON, testJSON.objects.states))
-const countyLines = path(mesh(testJSON, testJSON.objects.counties))
+const stateLines = path(mesh(countyMapJSON, countyMapJSON.objects.states))
+const countyLines = path(mesh(countyMapJSON, countyMapJSON.objects.counties))
 
 const CountyMap = props => {
   let mapData = states.concat(counties)
@@ -152,11 +131,11 @@ const CountyMap = props => {
     let svgContainer = document.querySelector('.svg-container')
     svgContainer.setAttribute('data-scaleZoom', newScaleWithHypot)
 
-    const state = testJSON.objects.states.geometries.filter((el, index) => {
+    const state = countyMapJSON.objects.states.geometries.filter((el, index) => {
       return el.id === myState.id
     })
 
-    const focusedStateLine = path(mesh(testJSON, state[0]))
+    const focusedStateLine = path(mesh(countyMapJSON, state[0]))
 
     currentGeoState.style.display = 'none'
 
@@ -225,11 +204,11 @@ const CountyMap = props => {
     let myState = id.substring(0, 2)
     const allStates = document.querySelectorAll('.state path')
 
-    let state = testJSON.objects.states.geometries.filter((el, index) => {
+    let state = countyMapJSON.objects.states.geometries.filter((el, index) => {
       return el.id === myState
     })
 
-    let focusedStateLine = path(mesh(testJSON, state[0]))
+    let focusedStateLine = path(mesh(countyMapJSON, state[0]))
     focusedBorderPath.current.style.display = 'block'
     focusedBorderPath.current.setAttribute('d', focusedStateLine)
     focusedBorderPath.current.setAttribute('stroke', '#000')

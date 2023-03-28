@@ -16,7 +16,7 @@ export const ConfigContext = createContext({})
 ConfigContext.displayName = 'VisualizationConfig'
 
 export const VisConfigProvider = ({ visualizationKey = '__default__', config: configObj, configUrl, children, defaultConfig, transformConfig } = {}) => {
-  const [ loading, setLoading ] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const configRef = useRef(configObj)
   const updateDetected = useRef(false)
@@ -41,7 +41,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
     }
 
     return resolvedConfig
-  }, [ dashboardStoredConfig, storedConfig, transformConfig ])
+  }, [dashboardStoredConfig, storedConfig, transformConfig])
 
   useEffect(() => {
     // If the configObj changes externally, trigger a
@@ -57,7 +57,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
       const config = dashboardStoredConfig ?? configObj ?? (await fetchAsyncUrl(configUrl))
 
       const resolvedConfig = merge(defaultConfig, config)
-      const processedConfig = { ...await coveUpdateWorker(resolvedConfig) }
+      const processedConfig = { ...(await coveUpdateWorker(resolvedConfig)) }
 
       // Run update worker on config, then set in store
       if (dashboardStoredConfig) {
@@ -75,7 +75,8 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
       setLoading(false)
     }
 
-    if (!updateDetected.current) { // If no update detected, continue to next check
+    if (!updateDetected.current) {
+      // If no update detected, continue to next check
       // If loading, or stored config already exists, return early
       if (loading || storedConfig) return
     }
@@ -84,7 +85,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
     setLoading(true)
 
     void initConfig()
-  }, [ configObj, configUrl, defaultConfig, loading, visualizationKey, storedConfig, dashboardStoredConfig, getData, addVisConfig, updateVisConfig ])
+  }, [configObj, configUrl, defaultConfig, loading, visualizationKey, storedConfig, dashboardStoredConfig, getData, addVisConfig, updateVisConfig])
 
   // No stored config found, so return null
   if (loading || !finalConfig()) return null
@@ -98,7 +99,7 @@ export const VisConfigProvider = ({ visualizationKey = '__default__', config: co
 export const useVisConfig = () => {
   const { visualizationKey, ...config } = useContext(ConfigContext)
 
-  const [, startTransition ] = useTransition()
+  const [, startTransition] = useTransition()
 
   // Actions -------------------------------------------------------------------------------------------------------
   const storeUpdateVisConfig = useStore(state => state.updateVisConfig)
@@ -109,14 +110,14 @@ export const useVisConfig = () => {
     updates => {
       startTransition(() => storeUpdateVisConfig(visualizationKey, updates))
     },
-    [ storeUpdateVisConfig, visualizationKey ]
+    [storeUpdateVisConfig, visualizationKey]
   )
 
   const updateVisConfigField = useCallback(
     (fieldPayload, setValue, merge = true) => {
       startTransition(() => storeUpdateVisConfigField(visualizationKey, fieldPayload, setValue, merge))
     },
-    [ storeUpdateVisConfigField, visualizationKey ]
+    [storeUpdateVisConfigField, visualizationKey]
   )
   // ---------------------------------------------------------------------------------------------------------------
 
