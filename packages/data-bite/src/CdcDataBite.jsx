@@ -22,12 +22,12 @@ import './scss/cove-data-bite.scss'
 // Visualization
 const CdcDataBite = visProps => {
   return (
-    <ErrorBoundary component="CdcDataBite">
-      <Suspense fallback={<RenderFallback/>}>
+    <ErrorBoundary component='CdcDataBite'>
+      <Suspense fallback={<RenderFallback />}>
         <VisConfigProvider {...visProps} defaultConfig={defaults}>
-          <View editorPanels={<EditorPanels/>}>
-            <Component className="cove-data-bite">
-              <DataBite/>
+          <View editorPanels={<EditorPanels />} isEditorComponent={visProps.isEditor}>
+            <Component className='cove-data-bite'>
+              <DataBite />
             </Component>
           </View>
         </VisConfigProvider>

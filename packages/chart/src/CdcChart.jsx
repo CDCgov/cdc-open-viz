@@ -29,7 +29,7 @@ const CdcChart = visProps => {
     <ErrorBoundary component='CdcChart'>
       <Suspense fallback={<RenderFallback />}>
         <VisConfigProvider {...visProps} defaultConfig={defaults} transformConfig={transformCdcChartConfig}>
-          <View editorPanels={<EditorPanels />}>
+          <View editorPanels={<EditorPanels />} isEditorComponent={visProps.isEditor}>
             <Component className='cove-chart'>
               <Chart />
             </Component>

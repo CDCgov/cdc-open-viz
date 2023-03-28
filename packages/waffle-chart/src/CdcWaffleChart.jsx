@@ -22,12 +22,12 @@ import './scss/cove-waffle-chart.scss'
 // Visualization
 const CdcWaffleChart = visProps => {
   return (
-    <ErrorBoundary component="CdcWaffleChart">
-      <Suspense fallback={<RenderFallback/>}>
+    <ErrorBoundary component='CdcWaffleChart'>
+      <Suspense fallback={<RenderFallback />}>
         <VisConfigProvider {...visProps} defaultConfig={defaults}>
-          <View editorPanels={<EditorPanels/>}>
-            <Component className="cove-waffle-chart">
-              <WaffleChart/>
+          <View editorPanels={<EditorPanels />} isEditorComponent={visProps.isEditor}>
+            <Component className='cove-waffle-chart'>
+              <WaffleChart />
             </Component>
           </View>
         </VisConfigProvider>

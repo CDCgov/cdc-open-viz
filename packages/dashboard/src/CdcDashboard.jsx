@@ -19,12 +19,12 @@ import RenderFallback from '@cdc/core/components/loader/RenderFallback'
 
 const CdcDashboard = visProps => {
   return (
-    <ErrorBoundary component="CdcDashboard">
-      <Suspense fallback={<RenderFallback/>}>
+    <ErrorBoundary component='CdcDashboard'>
+      <Suspense fallback={<RenderFallback />}>
         <VisConfigProvider {...visProps} defaultConfig={defaults}>
-          <View>
-            <div className="cove">
-              <Dashboard/>
+          <View isEditorComponent={visProps.isEditor}>
+            <div className='cove'>
+              <Dashboard />
             </div>
           </View>
         </VisConfigProvider>

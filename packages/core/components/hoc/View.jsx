@@ -13,7 +13,7 @@ import Overlay from '../ui/Overlay'
 // Styles
 import '../../styles/v2/main.scss'
 
-const View = ({ editorPanels, isPreview, children }) => {
+const View = ({ editorPanels, isPreview, isEditorComponent, children }) => {
   // Global Store Selectors
   const { viewMode, setViewMode, setViewport } = useStore()
 
@@ -29,10 +29,10 @@ const View = ({ editorPanels, isPreview, children }) => {
   }, []);
 
   useEffect(() => {
-    if (winLocation.includes('editor=true')) setViewMode('isEditor', true)
+    if (winLocation.includes('editor=true') || isEditorComponent) setViewMode('isEditor', true)
     return () => {
     }
-  }, [ winLocation, setViewMode ])
+  }, [ winLocation, setViewMode, isEditorComponent ])
 
   const { isEditor, isDashboard, isWizard } = viewMode
 

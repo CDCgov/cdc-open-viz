@@ -22,12 +22,12 @@ import './scss/cove-markup-include.scss'
 // Visualization
 const CdcMarkupInclude = visProps => {
   return (
-    <ErrorBoundary component="CdcMarkupInclude">
-      <Suspense fallback={<RenderFallback/>}>
+    <ErrorBoundary component='CdcMarkupInclude'>
+      <Suspense fallback={<RenderFallback />}>
         <VisConfigProvider {...visProps} defaultConfig={defaults}>
-          <View editorPanels={<EditorPanels/>}>
-            <Component className="cove-markup-include">
-              <MarkupInclude/>
+          <View editorPanels={<EditorPanels />} isEditorComponent={visProps.isEditor}>
+            <Component className='cove-markup-include'>
+              <MarkupInclude />
             </Component>
           </View>
         </VisConfigProvider>

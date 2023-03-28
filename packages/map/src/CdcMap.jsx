@@ -28,7 +28,7 @@ const CdcMap = visProps => {
     <ErrorBoundary component='CdcMap'>
       <Suspense fallback={<RenderFallback />}>
         <VisConfigProvider {...visProps} defaultConfig={defaults} transformConfig={transformCdcMapConfig}>
-          <View editorPanels={<EditorPanels />}>
+          <View editorPanels={<EditorPanels />} isEditorComponent={visProps.isEditor}>
             <Component className='cove-markup-include'>
               <GeoMap />
             </Component>

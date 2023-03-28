@@ -22,12 +22,12 @@ import './scss/cove-filtered-text.scss'
 // Visualization
 const CdcFilteredText = visProps => {
   return (
-    <ErrorBoundary component="CdcFilteredText">
-      <Suspense fallback={<RenderFallback/>}>
+    <ErrorBoundary component='CdcFilteredText'>
+      <Suspense fallback={<RenderFallback />}>
         <VisConfigProvider {...visProps} defaultConfig={defaults}>
-          <View editorPanels={<EditorPanels/>}>
-            <Component className="cove-filtered-text">
-              <FilteredText/>
+          <View editorPanels={<EditorPanels />} isEditorComponent={visProps.isEditor}>
+            <Component className='cove-filtered-text'>
+              <FilteredText />
             </Component>
           </View>
         </VisConfigProvider>
