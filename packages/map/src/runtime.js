@@ -653,53 +653,54 @@ export const generateRuntimeData = (config, filters, hash) => {
 }
 
 export const generateRuntimeFilters = (config, hash) => {
-  const runtimeFilters = produce(config, draft => {
-    // console.log('what is draft even', draft)
-    // if (draft.filters && hash) draft.filters.fromHash = hash
+  // const runtimeFilters = produce(config, draft => {
+  //   // console.log('what is draft even', draft)
+  //   // if (draft.filters && hash) draft.filters.fromHash = hash
 
-    draft.filters = (draft.filters ?? []).map(({ columnName, label, active, values }, idx) => {
-      if (undefined === columnName) return
+  //   // draft.filters = (draft.filters ?? []).map(({ columnName, label, active, values }, idx) => {
+  //   //   if (undefined === columnName) return
 
-      let newFilter = runtimeFilters[idx]
+  //   //   let newFilter = runtimeFilters[idx]
 
-      const sortAsc = (a, b) => {
-        return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
-      }
+  //   //   const sortAsc = (a, b) => {
+  //   //     return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
+  //   //   }
 
-      const sortDesc = (a, b) => {
-        return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
-      }
+  //   //   const sortDesc = (a, b) => {
+  //   //     return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+  //   //   }
 
-      values = getUniqueValues(draft.data, columnName)
+  //   //   values = getUniqueValues(draft.data, columnName)
 
-      if (draft.filters[idx].order === 'asc') {
-        values = values.sort(sortAsc)
-      }
+  //   //   if (draft.filters[idx].order === 'asc') {
+  //   //     values = values.sort(sortAsc)
+  //   //   }
 
-      if (draft.filters[idx].order === 'desc') {
-        values = values.sort(sortDesc)
-      }
+  //   //   if (draft.filters[idx].order === 'desc') {
+  //   //     values = values.sort(sortDesc)
+  //   //   }
 
-      if (draft.filters[idx].order === 'cust') {
-        if (draft.filters[idx]?.values.length > 0) {
-          values = draft.filters[idx].values
-        }
-      }
+  //   //   if (draft.filters[idx].order === 'cust') {
+  //   //     if (draft.filters[idx]?.values.length > 0) {
+  //   //       values = draft.filters[idx].values
+  //   //     }
+  //   //   }
 
-      if (undefined === newFilter) {
-        newFilter = {}
-      }
+  //   //   if (undefined === newFilter) {
+  //   //     newFilter = {}
+  //   //   }
 
-      newFilter.label = label ?? ''
-      newFilter.columnName = columnName
-      newFilter.values = values
-      newFilter.active = active || values[0] // Default to first found value
+  //   //   newFilter.label = label ?? ''
+  //   //   newFilter.columnName = columnName
+  //   //   newFilter.values = values
+  //   //   newFilter.active = active || values[0] // Default to first found value
 
-      draft.filters[idx] = newFilter
-    })
-  })
+  //   //   draft.filters[idx] = newFilter
+  //   // })
+  // })
 
-  return runtimeFilters
+  // return runtimeFilters
+  return
 }
 
 export const transformCdcMapConfig = config => {

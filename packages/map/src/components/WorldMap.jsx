@@ -1,4 +1,4 @@
-import { useEffect, memo } from 'react'
+import { React, useEffect } from 'react'
 
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
@@ -10,21 +10,25 @@ import ZoomableGroup from './ZoomableGroup'
 import Geo from './Geo'
 import CityList from './CityList'
 import BubbleList from './BubbleList'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
 let projection = geoMercator()
 
 const WorldMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedCountries, setState, setRuntimeData, generateRuntimeData, setFilteredCountryCode, position, setPosition, hasZoom, handleMapAriaLabels } = props
+  const { applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedCountries, setState, setRuntimeData, generateRuntimeData, setFilteredCountryCode, setPosition, hasZoom, handleMapAriaLabels } = props
+  const { config } = useVisConfig()
 
-  // TODO Refactor - state should be set together here to avoid rerenders
+  const position = config.mapPosition
+
+  // TODO Refactor - config should be set together here to avoid rerenders
   // Resets to original data & zooms out
-  const handleReset = (state, setState, setRuntimeData, generateRuntimeData) => {
-    let reRun = generateRuntimeData(state)
+  const handleReset = (config, setState, setRuntimeData, generateRuntimeData) => {
+    let reRun = generateRuntimeData(config)
     setRuntimeData(reRun)
     setState({
-      ...state,
+      ...config,
       focusedCountry: false,
       mapPosition: { coordinates: [0, 30], zoom: 1 }
     })
@@ -40,7 +44,7 @@ const WorldMap = props => {
     setPosition(pos => ({ ...pos, zoom: pos.zoom / 1.5 }))
   }
 
-  const ZoomControls = ({ position, setPosition, state, setState, setRuntimeData, generateRuntimeData }) => (
+  const ZoomControls = ({ position, setPosition, config, setState, setRuntimeData, generateRuntimeData }) => (
     <div className='zoom-controls' data-html2canvas-ignore>
       <button onClick={() => handleZoomIn(position, setPosition)} aria-label='Zoom In'>
         <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
@@ -53,18 +57,18 @@ const WorldMap = props => {
           <line x1='5' y1='12' x2='19' y2='12' />
         </svg>
       </button>
-      {state.general.type === 'bubble' && (
-        <button onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} className='reset' aria-label='Reset Zoom and Map Filters'>
+      {config?.general?.type === 'bubble' && (
+        <button onClick={() => handleReset(config, setState, setRuntimeData, generateRuntimeData)} className='reset' aria-label='Reset Zoom and Map Filters'>
           Reset Filters
         </button>
       )}
     </div>
   )
 
-  // TODO Refactor - state should be set together here to avoid rerenders
-  const handleCircleClick = (country, state, setState, setRuntimeData, generateRuntimeData) => {
-    if (!state.general.allowMapZoom) return
-    let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === country[state.columns.geo.name])
+  // TODO Refactor - config should be set together here to avoid rerenders
+  const handleCircleClick = (country, config, setState, setRuntimeData, generateRuntimeData) => {
+    if (!config.general.allowMapZoom) return
+    let newRuntimeData = config.data.filter(item => item[config.columns.geo.name] === country[config.columns.geo.name])
     setFilteredCountryCode(newRuntimeData[0].uid)
   }
 
@@ -89,7 +93,7 @@ const WorldMap = props => {
         legendColors = applyLegendToRow(geoData)
       }
 
-      const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+      const geoStrokeColor = config.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
       let styles = {
         fill: '#E6E6E6',
@@ -99,7 +103,7 @@ const WorldMap = props => {
       const strokeWidth = 0.9
 
       // If a legend applies, return it with appropriate information.
-      if (legendColors && legendColors[0] !== '#000000' && state.general.type !== 'bubble') {
+      if (legendColors && legendColors[0] !== '#000000' && config.general.type !== 'bubble') {
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
@@ -115,33 +119,33 @@ const WorldMap = props => {
         }
 
         // When to add pointer cursor
-        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+        if ((config.columns.navigate && geoData[config.columns.navigate.name]) || config.tooltips.appearanceType === 'click') {
           styles.cursor = 'pointer'
         }
 
         return <Geo key={i + '-geo'} css={styles} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
       }
 
-      // Default return state, just geo with no additional information
+      // Default return config, just geo with no additional information
       return <Geo key={i + '-geo'} stroke={geoStrokeColor} strokeWidth={strokeWidth} css={styles} path={path} />
     })
 
     // Cities
-    geosJsx.push(<CityList projection={projection} key='cities' data={data} state={state} geoClickHandler={geoClickHandler} applyTooltipsToGeo={applyTooltipsToGeo} displayGeoName={displayGeoName} applyLegendToRow={applyLegendToRow} isGeoCodeMap={state.general.type === 'us-geocode'} />)
+    geosJsx.push(<CityList projection={projection} key='cities' data={data} state={config} geoClickHandler={geoClickHandler} applyTooltipsToGeo={applyTooltipsToGeo} displayGeoName={displayGeoName} applyLegendToRow={applyLegendToRow} isGeoCodeMap={config.general.type === 'us-geocode'} />)
 
     // Bubbles
-    if (state.general.type === 'bubble') {
+    if (config.general.type === 'bubble') {
       geosJsx.push(
         <BubbleList
           key='bubbles'
-          data={state.data}
+          data={config.data}
           runtimeData={data}
-          state={state}
+          state={config}
           projection={projection}
           applyLegendToRow={applyLegendToRow}
           applyTooltipsToGeo={applyTooltipsToGeo}
           displayGeoName={displayGeoName}
-          handleCircleClick={country => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData)}
+          handleCircleClick={country => handleCircleClick(country, config, setState, setRuntimeData, generateRuntimeData)}
         />
       )
     }
@@ -152,8 +156,8 @@ const WorldMap = props => {
   return (
     <ErrorBoundary component='WorldMap'>
       {hasZoom ? (
-        <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
-          <rect height={500} width={880} onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} fill='white' />
+        <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(config)}>
+          <rect height={500} width={880} onClick={() => handleReset(config, setState, setRuntimeData, generateRuntimeData)} fill='white' />
           <ZoomableGroup zoom={position.zoom} center={position.coordinates} onMoveEnd={handleMoveEnd} maxZoom={4} projection={projection} width={880} height={500}>
             <Mercator data={world}>{({ features }) => constructGeoJsx(features)}</Mercator>
           </ZoomableGroup>
@@ -165,9 +169,9 @@ const WorldMap = props => {
           </ZoomableGroup>
         </svg>
       )}
-      {(state.general.type === 'data' || (state.general.type === 'bubble' && hasZoom)) && <ZoomControls position={position} setPosition={setPosition} setRuntimeData={setRuntimeData} state={state} setState={setState} generateRuntimeData={generateRuntimeData} />}
+      {(config.general.type === 'data' || (config.general.type === 'bubble' && hasZoom)) && <ZoomControls position={position} setPosition={setPosition} setRuntimeData={setRuntimeData} state={config} setState={setState} generateRuntimeData={generateRuntimeData} />}
     </ErrorBoundary>
   )
 }
 
-export default memo(WorldMap)
+export default WorldMap

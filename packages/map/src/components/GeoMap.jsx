@@ -392,6 +392,10 @@ const GeoMap = ({
   }, [config.general.geoLabelOverride])
 
   useEffect(() => {
+    updateVisConfig({ mapPosition: { coordinates: [0, 30], zoom: 3 } })
+  }, [])
+
+  useEffect(() => {
     try {
       if (filteredCountryCode) {
         const coordinates = countryCoordinates[filteredCountryCode]
