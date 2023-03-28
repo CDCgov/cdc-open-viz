@@ -32,17 +32,15 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const fontSize = { small: 16, medium: 18, large: 20 }
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
-  const applyRadius = (index, isNegative) => {
+  const applyRadius = index => {
     if (index === undefined || index === null || !isRounded) return
     let style = {}
 
     if ((isStacked && index + 1 === stackCount) || !isStacked) {
-      if (isNegative) {
-        // reverse borderRadius to bottom
-        style = isHorizontal ? { borderRadius: `0 ${radius}  ${radius}  0` } : { borderRadius: `0 0 ${radius} ${radius}` }
-      } else {
-        style = isHorizontal ? { borderRadius: `0 ${radius}  ${radius}  0` } : { borderRadius: `${radius} ${radius} 0 0` }
-      }
+      style = isHorizontal ? { borderRadius: `0 ${radius}  ${radius}  0` } : { borderRadius: `${radius} ${radius} 0 0` }
+    }
+    if (!isStacked && index === -1) {
+      style = isHorizontal ? { borderRadius: `${radius} 0  0 ${radius} ` } : { borderRadius: ` 0  0 ${radius} ${radius}` }
     }
     if (tipRounding === 'full' && isStacked && index === 0 && stackCount > 1) {
       style = isHorizontal ? { borderRadius: `${radius} 0 0 ${radius}` } : { borderRadius: `0 0 ${radius} ${radius}` }
@@ -52,7 +50,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     }
     return style
   }
-  // }
 
   const updateBars = defaultBars => {
     // function updates  stacked && regular && lollipop horizontal bars
@@ -148,7 +145,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   // tooltips
                   const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
                   const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
-                  const style = applyRadius(barStack.index, yAxisValue < 0)
+                  const style = applyRadius(barStack.index)
                   let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                   if (!hasMultipleSeries) {
@@ -210,7 +207,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     // tooltips
                     const xAxisValue = formatNumber(data[bar.index][bar.key])
                     const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
-                    const style = applyRadius(barStack.index, yAxisValue < 0)
+                    const style = applyRadius(barStack.index)
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                     let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                     if (!hasMultipleSeries) {
@@ -324,7 +321,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                       let barGroupWidth = ((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (config.barThickness || 0.8)
                       let offset = (((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
-
+                      const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(0)
+                      const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(0))
                       // ! Unsure if this should go back.
                       if (config.isLollipopChart) {
                         offset = (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2 - lollipopBarWidth / 2
@@ -353,16 +351,16 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
                       // check if bar text/value string fits into  each bars.
                       let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                      let textFits = textWidth < bar.y - 5 // minus padding 5
-
+                      let textFits = textWidth < barY - 5 // minus padding 5
                       let labelColor = '#000000'
 
                       // Set label color
                       if (chroma.contrast(labelColor, barColor) < 4.9) {
-                        if (textFits) labelColor = '#FFFFFF'
+                        labelColor = '#FFFFFF'
                       }
-
-                      const style = applyRadius(index, yAxisValue < 0)
+                      // create new Index based on bar value for border Radius
+                      const newIndex = bar.value < 0 ? -1 : index
+                      const style = applyRadius(newIndex)
 
                       let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                       let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -394,9 +392,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             <foreignObject
                               id={`barGroup${barGroup.index}`}
                               key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                              x={config.runtime.horizontal ? 0 : barWidth * bar.index + offset}
+                              x={config.runtime.horizontal ? barX : barWidth * bar.index + offset}
                               y={config.runtime.horizontal ? barWidth * bar.index : barY}
-                              width={config.runtime.horizontal ? bar.y : barWidth}
+                              width={config.runtime.horizontal ? barWidthHorizontal : barWidth}
                               height={isHorizontal && !config.isLollipopChart ? barWidth : isHorizontal && config.isLollipopChart ? lollipopBarWidth : barHeight}
                               style={{
                                 background: config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : barColor,
