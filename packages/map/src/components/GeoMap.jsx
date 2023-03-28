@@ -418,7 +418,7 @@ const GeoMap = ({
   }, [config, container])
 
   // Destructuring for more readable JSX
-  const { general, tooltips, dataTable } = config
+  const { general, tooltips, dataTable, theme } = config
   const { title = '', subtext = '' } = general
 
   // Outer container classes
@@ -487,108 +487,106 @@ const GeoMap = ({
 
   return (
     <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
-      {(general.type === 'navigation' || config.legend) && (
-        <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-          {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
-          {general.title && (
-            <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !config.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
-              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-              <div role='heading' className={`map-title${general.headerColor ? ' theme-' + general.headerColor : ''}`} tabIndex='0' aria-level='2'>
-                <sup>{general.superTitle}</sup>
-                <div>{parse(title)}</div>
-              </div>
-            </header>
-          )}
-          {general.introText && <section className='introText'>{parse(general.introText)}</section>}
-
-          <Filters />
-
-          <div
-            role='button'
-            tabIndex='0'
-            className={mapContainerClasses.join(' ')}
-            onClick={e => closeModal(e)}
-            onKeyDown={e => {
-              if (e.keyCode === 13) {
-                closeModal(e)
-              }
-            }}
-          >
-            <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
-              Skip Over Map Container
-            </a>
-
+      <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
+        {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
+        {title && (
+          <header className={config.general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !config.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
             {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-            <section className='geography-container outline-none' ref={mapSvg} tabIndex='0'>
-              {currentViewport && (
-                <section className='geography-container' ref={mapSvg}>
-                  {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={config.tooltips.capitalizeLabels} content={modal} />}
-                  {'single-state' === general.geoType && <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                  {'us' === general.geoType && 'us-geocode' !== config.general.type && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                  {'us-region' === general.geoType && <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                  {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
-                  {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
-                  {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
-                </section>
-              )}
-            </section>
+            <div role='heading' className={`map-title ${theme ? `theme-${theme}` : ''}`} tabIndex='0' aria-level='2'>
+              <sup>{general.superTitle}</sup>
+              <div>{parse(title)}</div>
+            </div>
+          </header>
+        )}
+        {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
-            {general.showSidebar && 'navigation' !== general.type && (
-              <Sidebar
-                viewport={currentViewport}
-                legend={config.legend}
-                columns={config.columns}
-                sharing={config.sharing}
-                prefix={config.columns.primary.prefix}
-                suffix={config.columns.primary.suffix}
-                resetLegendToggles={resetLegendToggles}
-                changeFilterActive={changeFilterActive}
-                setAccessibleStatus={setAccessibleStatus}
-                displayDataAsText={displayDataAsText}
-              />
+        <Filters />
+
+        <div
+          role='button'
+          tabIndex='0'
+          className={mapContainerClasses.join(' ')}
+          onClick={e => closeModal(e)}
+          onKeyDown={e => {
+            if (e.keyCode === 13) {
+              closeModal(e)
+            }
+          }}
+        >
+          <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
+            Skip Over Map Container
+          </a>
+
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+          <section className='geography-container outline-none' ref={mapSvg} tabIndex='0'>
+            {currentViewport && (
+              <section className='geography-container' ref={mapSvg}>
+                {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={config.tooltips.capitalizeLabels} content={modal} />}
+                {'single-state' === general.geoType && <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                {'us' === general.geoType && 'us-geocode' !== config.general.type && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                {'us-region' === general.geoType && <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
+                {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
+                {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+              </section>
             )}
-          </div>
+          </section>
 
-          {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} options={general} columns={config.columns} navigationHandler={val => navigationHandler(val)} />}
-
-          {link && link}
-
-          {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
-
-          <MediaControls.Section classes={['download-buttons']}>
-            {config.general.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
-            {config.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
-          </MediaControls.Section>
-
-          {config.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && (
-            <DataTable
-              rawData={config.data}
-              navigationHandler={navigationHandler}
-              expandDataTable={general.expandDataTable}
-              headerColor={general.headerColor}
-              columns={config.columns}
-              showDownloadButton={general.showDownloadButton}
-              displayDataAsText={displayDataAsText}
-              displayGeoName={displayGeoName}
-              applyLegendToRow={applyLegendToRow}
-              tableTitle={dataTable.title}
-              indexTitle={dataTable.indexLabel}
-              mapTitle={general.title}
+          {general.showSidebar && 'navigation' !== general.type && (
+            <Sidebar
               viewport={currentViewport}
-              formatLegendLocation={formatLegendLocation}
-              setFilteredCountryCode={setFilteredCountryCode}
-              tabbingId={tabId}
-              showDownloadImgButton={config.general.showDownloadImgButton}
-              showDownloadPdfButton={config.general.showDownloadPdfButton}
-              innerContainerRef={innerContainerRef}
-              outerContainerRef={outerContainerRef}
-              imageRef={imageId}
+              legend={config.legend}
+              columns={config.columns}
+              sharing={config.sharing}
+              prefix={config.columns.primary.prefix}
+              suffix={config.columns.primary.suffix}
+              resetLegendToggles={resetLegendToggles}
+              changeFilterActive={changeFilterActive}
+              setAccessibleStatus={setAccessibleStatus}
+              displayDataAsText={displayDataAsText}
             />
           )}
+        </div>
 
-          {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
-        </section>
-      )}
+        {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} options={general} columns={config.columns} navigationHandler={val => navigationHandler(val)} />}
+
+        {link && link}
+
+        {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+
+        <MediaControls.Section classes={['download-buttons']}>
+          {config.general.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+          {config.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+        </MediaControls.Section>
+
+        {config.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && (
+          <DataTable
+            rawData={config.data}
+            navigationHandler={navigationHandler}
+            expandDataTable={general.expandDataTable}
+            headerColor={general.headerColor}
+            columns={config.columns}
+            showDownloadButton={general.showDownloadButton}
+            displayDataAsText={displayDataAsText}
+            displayGeoName={displayGeoName}
+            applyLegendToRow={applyLegendToRow}
+            tableTitle={dataTable.title}
+            indexTitle={dataTable.indexLabel}
+            mapTitle={general.title}
+            viewport={currentViewport}
+            formatLegendLocation={formatLegendLocation}
+            setFilteredCountryCode={setFilteredCountryCode}
+            tabbingId={tabId}
+            showDownloadImgButton={config.general.showDownloadImgButton}
+            showDownloadPdfButton={config.general.showDownloadPdfButton}
+            innerContainerRef={innerContainerRef}
+            outerContainerRef={outerContainerRef}
+            imageRef={imageId}
+          />
+        )}
+
+        {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
+      </section>
 
       <div aria-live='assertive' className='cdcdataviz-sr-only'>
         {accessibleStatus}

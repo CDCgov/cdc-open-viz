@@ -14,9 +14,10 @@
     // End Temp Radio button fix
   }
 }
-.cdc-open-viz-module {
 
+.cove-editor__panel {
   .geo-buttons {
+    padding-left: 0;
     list-style: none;
     display: flex;
     color: $mediumGray;

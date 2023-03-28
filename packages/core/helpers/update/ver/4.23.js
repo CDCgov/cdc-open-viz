@@ -3,10 +3,17 @@ const update_4_23 = async config => {
 
   let newConfig = { ...config }
 
+  console.log('new config here')
+
   if (!config.validated || config.validated < ver) {
     // Convert theme definition in config to color only
     if (newConfig.theme && newConfig.theme.includes('theme-')) {
       newConfig.theme = newConfig.theme.split('-')[1]
+    }
+
+    // Match map theme props to chart theme props
+    if(newConfig.general.headerColor) {
+      newConfig.theme = newConfig.general.headerColor
     }
 
     // Move old visual config entries into new key

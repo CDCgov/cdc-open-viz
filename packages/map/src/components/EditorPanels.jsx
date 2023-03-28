@@ -186,6 +186,7 @@ const EditorPanels = () => {
         break
       case 'geoType':
         // If we're still working with default data, switch to the world default to show it as an example
+        console.log('loadedDefault', loadedDefault)
         if (true === loadedDefault && 'world' === value) {
           updateVisConfig(worldDefaultConfig)
           break
@@ -599,25 +600,6 @@ const EditorPanels = () => {
     )
   })
 
-  const StateOptionList = () => {
-    const arrOfArrays = Object.entries(supportedStatesFipsCodes)
-
-    let sorted = arrOfArrays.sort((a, b) => {
-      return a[0].localeCompare(b[0])
-    })
-
-    let options = []
-    sorted.forEach(config => {
-      options.push(
-        <option key={config[0]} value={config[1]}>
-          {config[1]}
-        </option>
-      )
-    })
-
-    return options
-  }
-
   const filterValueOptionList = []
 
   if (filters.length > 0) {
@@ -762,6 +744,7 @@ const EditorPanels = () => {
   const panelGeneral = (
     <Accordion.Section label='General'>
       <InputText label='Title' configField={['general', 'title']} placeholder='Map Title' tooltip='For accessibility reasons, you should enter a title even if you are not planning on displaying it.' />
+      <InputCheckbox configField={['general', 'showTitle']} label={'Show Title'} />
 
       <InputText label='Super Title' configField={['general', 'superTitle']} placeholder='Super Title' />
 
@@ -962,7 +945,7 @@ const EditorPanels = () => {
                     updateField={(section, subsection, fieldName, value) => {
                       const updatedAdditionaCategories = [...config.legend.additionalCategories]
                       updatedAdditionaCategories[i] = value
-                      updateField(section, subsection, fieldName, updatedAdditionaCategories)
+                      updateVisConfigField(section, subsection, fieldName, updatedAdditionaCategories)
                     }}
                   />
                 </label>
@@ -974,7 +957,7 @@ const EditorPanels = () => {
               event.preventDefault()
               const updatedAdditionaCategories = [...(config.legend.additionalCategories || [])]
               updatedAdditionaCategories.push('')
-              updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+              updateVisConfigField('legend', null, 'additionalCategories', updatedAdditionaCategories)
             }}
           >
             Add Category
@@ -1303,8 +1286,6 @@ const EditorPanels = () => {
 
   const panelVisual = (
     <Accordion.Section label='Visual'>
-      <InputCheckbox configField={['general', 'showTitle']} label={'Show Title'} />
-
       {'navigation' === config.general.type && <InputCheckbox label='Add border around map' configField={['general', 'fullBorder']} />}
 
       <InputSelect
