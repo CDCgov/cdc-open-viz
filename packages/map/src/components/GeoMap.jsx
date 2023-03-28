@@ -122,15 +122,18 @@ const GeoMap = ({
       }
 
       let hash = hashObj(rowObj)
+      let colors
 
       if (legendMemo.current.has(hash)) {
         let idx = legendMemo.current.get(hash)
         if (config.runtimeLegend[idx]?.disabled) return false
-        return generateColorsArray(config.runtimeLegend[idx]?.color, config.runtimeLegend[idx]?.special)
+        colors = generateColorsArray(config.runtimeLegend[idx]?.color, config.runtimeLegend[idx]?.special)
+        return colors
       }
 
       // Fail state
-      return generateColorsArray()
+      colors = generateColorsArray()
+      return colors
     } catch (e) {
       console.error(e)
     }

@@ -1,4 +1,4 @@
-import { produce } from 'immer'
+import { produce, current } from 'immer'
 import CoveHelper from '@cdc/core/helpers/cove'
 import useStore from '@cdc/core/store/store'
 import * as d3 from 'd3'
@@ -517,7 +517,7 @@ export const generateRuntimeLegend = (config, runtimeData) => {
 
 // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
 // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
-export const addUIDs = (config, fromColumn) => {
+export const addUIDs = (config, fromColumn, debug = true) => {
   const newConfig = produce(config, draft => {
     draft.data.forEach(row => {
       let uid = null
@@ -579,12 +579,18 @@ export const addUIDs = (config, fromColumn) => {
       }
 
       if (uid) {
-        row.uid = uid
+        draft.data[uid] = row
       }
+      // return row
     })
+    draft.data = { ...draft.data }
+    draft.data['fromColumn'] = fromColumn
   })
 
-  // newConfig.data.fromColumn = fromColumn
+  if (debug) {
+    console.log('ADDING UIDS', newConfig)
+  }
+
   return newConfig
 }
 
@@ -642,7 +648,6 @@ export const generateRuntimeData = (config, filters, hash) => {
           result[row.uid] = row
         }
       })
-
       return result
     } catch (e) {
       console.error(e)
@@ -703,7 +708,7 @@ export const generateRuntimeFilters = (config, hash) => {
 }
 
 export const transformCdcMapConfig = config => {
-  let transformedConfig = {...config}
+  let transformedConfig = { ...config }
 
   generateRuntimeFilters(transformedConfig)
   validateFipsCodeLength(transformedConfig)
@@ -713,7 +718,7 @@ export const transformCdcMapConfig = config => {
 
   // If there's a name for the geo, add UIDs
   if (transformedConfig.columns.geo.name || transformedConfig.columns.geo.fips) {
-    addUIDs(transformedConfig, transformedConfig.columns.geo.name || transformedConfig.columns.geo.fips)
+    transformedConfig = addUIDs(transformedConfig, transformedConfig.columns.geo.name || transformedConfig.columns.geo.fips)
   }
 
   if (transformedConfig.dataTable.forceDisplay === undefined) {

@@ -106,62 +106,71 @@ const SingleStateMap = props => {
       )
     }
 
-    const countyOutput = counties.forEach(county => {
-      // Map the name from the geo data with the appropriate key for the processed data
-      let geoKey = county.id
+    const CountyOutput = () => {
+      let temp = []
+      counties.forEach(county => {
+        // Map the name from the geo data with the appropriate key for the processed data
+        let geoKey = county.id
 
-      if (!geoKey) return
+        if (!geoKey) return
 
-      let countyPath = pathGenerator(county)
+        let countyPath = pathGenerator(county)
 
-      let geoData = config.data[county.id]
-      let legendColors
+        let geoData = config.data[county.id]
+        let legendColors
 
-      // Once we receive data for this geographic item, setup variables.
-      if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData)
-      }
+        // Once we receive data for this geographic item, setup variables.
+        if (geoData) {
+          console.log('apply legend to row', geoData)
+          legendColors = applyLegendToRow(geoData)
+        }
 
-      const geoDisplayName = displayGeoName(geoKey)
+        const geoDisplayName = displayGeoName(geoKey)
 
-      // For some reason, these two geos are breaking the display.
-      if (geoDisplayName === 'Franklin City' || geoDisplayName === 'Waynesboro') return null
+        // For some reason, these two geos are breaking the display.
+        if (geoDisplayName === 'Franklin City' || geoDisplayName === 'Waynesboro') return null
 
-      const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
+        const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
-      if (legendColors && legendColors[0] !== '#000000') {
-        let styles = {
-          fill: legendColors[0],
-          cursor: 'default',
-          '&:hover': {
-            fill: legendColors[1]
-          },
-          '&:active': {
-            fill: legendColors[2]
+        console.log('legend colors here', legendColors)
+
+        if (legendColors && legendColors[0] !== '#000000') {
+          let styles = {
+            fill: legendColors[0],
+            cursor: 'default',
+            '&:hover': {
+              fill: legendColors[1]
+            },
+            '&:active': {
+              fill: legendColors[2]
+            }
           }
-        }
 
-        // When to add pointer cursor
-        if ((config.columns.navigate && geoData[config.columns.navigate.name]) || config.tooltips.appearanceType === 'hover') {
-          styles.cursor = 'pointer'
-        }
+          // When to add pointer cursor
+          if ((config.columns.navigate && geoData[config.columns.navigate.name]) || config.tooltips.appearanceType === 'hover') {
+            styles.cursor = 'pointer'
+          }
 
-        return (
-          <g key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[config.columns.geo.name]}`} css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip}>
-            <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
-          </g>
-        )
-      } else {
-        return (
-          <g key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')}`} style={{ fill: '#e6e6e6' }} data-tooltip-id='tooltip' data-tooltip-html={toolTip}>
-            <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
-          </g>
-        )
-      }
-    })
+          console.table('TABLE', { path: countyPath })
+
+          temp.push(
+            <g key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[state.columns.geo.name]}`} css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip}>
+              <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
+            </g>
+          )
+        } else {
+          temp.push(
+            <g key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')}`} style={{ fill: '#e6e6e6' }} data-tooltip-id='tooltip' data-tooltip-html={toolTip}>
+              <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
+            </g>
+          )
+        }
+      })
+      return temp
+    }
 
     geosJsx.push(<StateOutput />)
-    geosJsx.push(countyOutput)
+    geosJsx.push(<CountyOutput />)
     geosJsx.push(
       <CityList
         projection={cityListProjection}
