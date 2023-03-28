@@ -99,8 +99,10 @@ const SingleStateMap = props => {
       })
 
       let stateLines = pathGenerator(mesh(countyMapJSON, geo[0]))
+
+      console.log('geo', geo[0])
       return (
-        <g className='single-state' style={{ fill: '#E6E6E6' }} stroke={geoStrokeColor} strokeWidth={0.95 / scale}>
+        <g className='single-state' style={{ fill: '#E6E6E6' }} stroke={geoStrokeColor} strokeWidth={0.95 / scale} key={geo[0].properties.name}>
           <path tabIndex={-1} className='state-path' d={stateLines} />
         </g>
       )
@@ -121,7 +123,6 @@ const SingleStateMap = props => {
 
         // Once we receive data for this geographic item, setup variables.
         if (geoData) {
-          console.log('apply legend to row', geoData)
           legendColors = applyLegendToRow(geoData)
         }
 
@@ -131,8 +132,6 @@ const SingleStateMap = props => {
         if (geoDisplayName === 'Franklin City' || geoDisplayName === 'Waynesboro') return null
 
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
-
-        console.log('legend colors here', legendColors)
 
         if (legendColors && legendColors[0] !== '#000000') {
           let styles = {
@@ -169,8 +168,8 @@ const SingleStateMap = props => {
       return temp
     }
 
-    geosJsx.push(<StateOutput />)
-    geosJsx.push(<CountyOutput />)
+    geosJsx.push(<StateOutput key='stateOuput' />)
+    geosJsx.push(<CountyOutput key='countyOutput' />)
     geosJsx.push(
       <CityList
         projection={cityListProjection}
@@ -182,6 +181,7 @@ const SingleStateMap = props => {
         setSharedFilterValue={setSharedFilterValue}
         isFilterValueSupported={isFilterValueSupported}
         isGeoCodeMap={config.general.type === 'us-geocode'}
+        key='cityList'
       />
     )
 
