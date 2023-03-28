@@ -452,7 +452,8 @@ const GeoMap = ({
     setSharedFilterValue,
     hasZoom: config.general.allowMapZoom,
     handleMapAriaLabels,
-    innerContainerRef
+    innerContainerRef,
+    data: config.data
   }
 
   const hasDataTable = config.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation'

@@ -20,7 +20,15 @@ export const offsets = {
   'Puerto Rico': [10, -20],
   'Virgin Islands': [10, -10],
   Guam: [10, -5],
-  'American Samoa': [10, 0]
+  'American Samoa': [10, 0],
+  'US-VT': [50, -8],
+  'US-NH': [34, 2],
+  'US-MA': [30, -1],
+  'US-RI': [28, 2],
+  'US-CT': [35, 10],
+  'US-NJ': [42, 1],
+  'US-DE': [33, 0],
+  'US-MD': [47, 10]
 }
 
 // COUNTY MAP SVG ITEMS
@@ -30,4 +38,17 @@ export const COUNTY_MAP = {
   PADDING: 25,
   STATE_BORDER: '#c0cad4',
   STATE_INACTIVE_FILL: '#F4F7FA'
+}
+
+
+export const nudges = {
+  'US-FL': [15, 3],
+  'US-AK': [0, -8],
+  'US-CA': [-10, 0],
+  'US-NY': [5, 0],
+  'US-MI': [13, 20],
+  'US-LA': [-10, -3],
+  'US-HI': [-10, 10],
+  'US-ID': [0, 10],
+  'US-WV': [-2, 2]
 }

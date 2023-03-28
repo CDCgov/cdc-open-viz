@@ -1,16 +1,38 @@
 import React, { useState, useEffect, memo } from 'react'
 
+// Third Party
 import { jsx } from '@emotion/react'
-import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { geoCentroid } from 'd3-geo'
 import { feature } from 'topojson-client'
-import topoJSON from '../data/us-topo.json'
-import hexTopoJSON from '../data/us-hex-topo.json'
 import { AlbersUsa, Mercator } from '@visx/geo'
 import chroma from 'chroma-js'
+
+// Store
+
+// Context
+
+// Data
+import topoJSON from '../data/us-topo.json'
+import hexTopoJSON from '../data/us-hex-topo.json'
+import { supportedCities, supportedStates } from '../data/supported-geos'
+import { offsets, nudges } from '../data/constants'
+
+// Constants
+
+// Hooks
+
+// Helpers
+import { convertToTitleCase } from '@cdc/core/helpers/cove/string'
+
+// Components - Core
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+
+// Components - Local
 import CityList from './CityList'
 import BubbleList from './BubbleList'
-import { supportedCities, supportedStates } from '../data/supported-geos'
+
+// Styles
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -45,31 +67,9 @@ const Rect = ({ label, text, stroke, strokeWidth, textColor, ...props }) => {
   )
 }
 
-const offsets = {
-  'US-VT': [50, -8],
-  'US-NH': [34, 2],
-  'US-MA': [30, -1],
-  'US-RI': [28, 2],
-  'US-CT': [35, 10],
-  'US-NJ': [42, 1],
-  'US-DE': [33, 0],
-  'US-MD': [47, 10]
-}
-
-const nudges = {
-  'US-FL': [15, 3],
-  'US-AK': [0, -8],
-  'US-CA': [-10, 0],
-  'US-NY': [5, 0],
-  'US-MI': [13, 20],
-  'US-LA': [-10, -3],
-  'US-HI': [-10, 10],
-  'US-ID': [0, 10],
-  'US-WV': [-2, 2]
-}
-
 const UsaMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, titleCase, handleCircleClick, setSharedFilterValue, handleMapAriaLabels } = props
+  const { applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, setSharedFilterValue, handleMapAriaLabels } = props
+  const { config } = useVisConfig()
 
   let isFilterValueSupported = false
 
@@ -100,9 +100,9 @@ const UsaMap = props => {
   useEffect(() => {
     setTranslate([455, 250])
     setExtent(null)
-  }, [state.general.geoType])
+  }, [config.general.geoType])
 
-  const isHex = state.general.displayAsHex
+  const isHex = config.general.displayAsHex
 
   const [territoriesData, setTerritoriesData] = useState([])
 
@@ -115,7 +115,7 @@ const UsaMap = props => {
     setTerritoriesData(territoriesList)
   }, [data])
 
-  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+  const geoStrokeColor = config.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const territories = territoriesData.map(territory => {
     const Shape = isHex ? Hexagon : Rect
@@ -148,15 +148,15 @@ const UsaMap = props => {
       let needsPointer = false
 
       // If we need to add a pointer cursor
-      if ((state.columns.navigate && territoryData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+      if ((config.columns.navigate && territoryData[config.columns.navigate.name]) || config.tooltips.appearanceType === 'click') {
         needsPointer = true
       }
 
       styles = {
         color: textColor,
         fill: legendColors[0],
-        opacity: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== territoryData[state.columns.geo.name] ? 0.5 : 1,
-        stroke: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === territoryData[state.columns.geo.name] ? 'rgba(0, 0, 0, 1)' : geoStrokeColor,
+        opacity: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== territoryData[config.columns.geo.name] ? 0.5 : 1,
+        stroke: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === territoryData[config.columns.geo.name] ? 'rgba(0, 0, 0, 1)' : geoStrokeColor,
         cursor: needsPointer ? 'pointer' : 'default',
         '&:hover': {
           fill: legendColors[1]
@@ -166,10 +166,7 @@ const UsaMap = props => {
         }
       }
 
-      return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)}
-                    data-tooltip-id="tooltip"
-                    data-tooltip-html={toolTip}
-      />
+      return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
     }
   })
 
@@ -218,12 +215,12 @@ const UsaMap = props => {
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
-    let showLabel = state.general.displayStateLabels
+    let showLabel = config.general.displayStateLabels
 
     // Order alphabetically. Important for accessibility if ever read out loud.
-    geographies.map(state => {
-      if (!state.feature.properties.iso) return
-      state.feature.properties.name = titleCase(supportedStates[state.feature.properties.iso][0])
+    geographies.map(config => {
+      if (!config.feature.properties.iso) return
+      config.feature.properties.name = convertToTitleCase(supportedStates[config.feature.properties.iso][0])
     })
 
     geographies.sort((a, b) => {
@@ -272,30 +269,26 @@ const UsaMap = props => {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: state.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
-          opacity: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[state.columns.geo.name] ? 0.5 : 1,
-          stroke: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === geoData[state.columns.geo.name] ? 'rgba(0, 0, 0, 1)' : geoStrokeColor,
+          fill: config.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
+          opacity: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[config.columns.geo.name] ? 0.5 : 1,
+          stroke: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === geoData[config.columns.geo.name] ? 'rgba(0, 0, 0, 1)' : geoStrokeColor,
           cursor: 'default',
           '&:hover': {
-            fill: state.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6'
+            fill: config.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6'
           },
           '&:active': {
-            fill: state.general.type !== 'bubble' ? legendColors[2] : '#e6e6e6'
+            fill: config.general.type !== 'bubble' ? legendColors[2] : '#e6e6e6'
           }
         }
 
         // When to add pointer cursor
-        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+        if ((config.columns.navigate && geoData[config.columns.navigate.name]) || config.tooltips.appearanceType === 'click') {
           styles.cursor = 'pointer'
         }
 
         return (
           <g data-name={geoName} key={key}>
-            <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)}
-               id={geoName}
-               data-tooltip-id="tooltip"
-               data-tooltip-html={tooltip}
-               >
+            <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
             </g>
@@ -322,21 +315,20 @@ const UsaMap = props => {
         projection={projection}
         key='cities'
         data={data}
-        state={state}
         geoClickHandler={geoClickHandler}
         applyTooltipsToGeo={applyTooltipsToGeo}
         displayGeoName={displayGeoName}
         applyLegendToRow={applyLegendToRow}
-        titleCase={titleCase}
+        titleCase={convertToTitleCase}
         setSharedFilterValue={setSharedFilterValue}
         isFilterValueSupported={isFilterValueSupported}
-        isGeoCodeMap={state.general.type === 'us-geocode'}
+        isGeoCodeMap={config.general.type === 'us-geocode'}
       />
     )
 
     // Bubbles
-    if (state.general.type === 'bubble') {
-      geosJsx.push(<BubbleList key='bubbles' data={state.data} runtimeData={data} state={state} projection={projection} applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} displayGeoName={displayGeoName} />)
+    if (config.general.type === 'bubble') {
+      geosJsx.push(<BubbleList key='bubbles' data={config.data} runtimeData={data} state={config} projection={projection} applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} displayGeoName={displayGeoName} />)
     }
 
     return geosJsx
@@ -344,8 +336,8 @@ const UsaMap = props => {
 
   return (
     <ErrorBoundary component='UsaMap'>
-      <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
-        {state.general.displayAsHex ? (
+      <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(config)}>
+        {config.general.displayAsHex ? (
           <Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </Mercator>
@@ -357,7 +349,7 @@ const UsaMap = props => {
       </svg>
       {territories.length > 0 && (
         <section className='territories'>
-          <span className='label'>{state.general.territoriesLabel}</span>
+          <span className='label'>{config.general.territoriesLabel}</span>
           {territories}
         </section>
       )}
