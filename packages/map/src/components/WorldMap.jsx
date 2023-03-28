@@ -5,7 +5,7 @@ import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
-import topoJSON from '../data/world-topo.json'
+import topoJSON from '../data/topojson/world.json'
 import ZoomableGroup from './ZoomableGroup'
 import Geo from './Geo'
 import CityList from './CityList'
@@ -119,16 +119,7 @@ const WorldMap = props => {
           styles.cursor = 'pointer'
         }
 
-        return <Geo
-          key={i + '-geo'}
-          css={styles}
-          path={path}
-          stroke={geoStrokeColor}
-          strokeWidth={strokeWidth}
-          onClick={() => geoClickHandler(geoDisplayName, geoData)}
-          data-tooltip-id="tooltip"
-          data-tooltip-html={toolTip}
-        />
+        return <Geo key={i + '-geo'} css={styles} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
       }
 
       // Default return state, just geo with no additional information

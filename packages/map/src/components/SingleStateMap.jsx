@@ -12,10 +12,10 @@ import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 // Context
 
 // Data
-import countyMapJSON from '../data/county-map.json'
+import countyMapJSON from '../data/topojson/usa-county.json'
 
 // Constants
-import { COUNTY_MAP } from '../data/constants'
+import { COUNTY_MAP } from '../data/utils'
 
 // Hooks
 

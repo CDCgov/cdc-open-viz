@@ -24,8 +24,7 @@ import UsaRegionMap from './UsaRegionMap' // Future: Lazy
 import WorldMap from './WorldMap' // Future: Lazy
 
 // Data
-import { countryCoordinates } from '../data/country-coordinates'
-import { dictionary as dict } from '../data/constants'
+import { dictionary as dict, countryCoordinates } from '../data/utils'
 
 import colorPalettes from '@cdc/core/data/colorPalettes'
 

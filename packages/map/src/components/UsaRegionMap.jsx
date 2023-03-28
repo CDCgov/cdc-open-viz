@@ -4,7 +4,7 @@ import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { geoCentroid } from 'd3-geo'
 import { feature } from 'topojson-client'
-import topoJSON from '../data/us-regions-topo-2.json'
+import topoJSON from '../data/topojson/usa-regions.json'
 import { Mercator } from '@visx/geo'
 import chroma from 'chroma-js'
 
@@ -103,17 +103,7 @@ const UsaRegionMap = props => {
         }
       }
 
-      return <Shape
-        key={label}
-        label={label}
-        css={styles}
-        text={styles.color}
-        stroke={geoStrokeColor}
-        strokeWidth={1.5}
-        onClick={() => geoClickHandler(territory, territoryData)}
-        data-tooltip-id="tooltip"
-        data-tooltip-html={toolTip}
-      />
+      return <Shape key={label} label={label} css={styles} text={styles.color} stroke={geoStrokeColor} strokeWidth={1.5} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
     }
   })
 
@@ -220,13 +210,7 @@ const UsaRegionMap = props => {
         // const barFill = barPositive ? "#fff" : "#fff";
 
         return (
-          <g key={key}
-             className='geo-group'
-             css={styles}
-             onClick={() => geoClickHandler(geoDisplayName, geoData)}
-             data-tooltip-id="tooltip"
-             data-tooltip-html={toolTip}
-          >
+          <g key={key} className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip}>
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
             <g id={`region-${index + 1}-label`}>
               <circle fill='#fff' stroke='#999' cx={circleRadius} cy={circleRadius} r={circleRadius} />

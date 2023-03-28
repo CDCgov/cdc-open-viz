@@ -12,10 +12,10 @@ import chroma from 'chroma-js'
 // Context
 
 // Data
-import topoJSON from '../data/us-topo.json'
-import hexTopoJSON from '../data/us-hex-topo.json'
+import topoJSON from '../data/topojson/usa-state.json'
+import hexTopoJSON from '../data/topojson/usa-hex.json'
 import { supportedCities, supportedStates } from '../data/supported-geos'
-import { offsets, nudges } from '../data/constants'
+import { offsets, nudges } from '../data/utils'
 
 // Constants
 

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import { scaleLinear } from 'd3-scale'
-import { countryCoordinates } from '../data/country-coordinates'
-import stateCoordinates from '../data/state-coordinates'
+import { countryCoordinates, stateCoordinates } from '../data/utils'
 
 export const BubbleList = ({ data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, runtimeData, displayGeoName }) => {
   const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
@@ -61,7 +60,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
               }}
               transform={transform}
               style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-              data-tooltip-id="tooltip"
+              data-tooltip-id='tooltip'
               data-tooltip-html={toolTip}
             />
 
@@ -88,7 +87,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 }}
                 transform={transform}
                 style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-                data-tooltip-id="tooltip"
+                data-tooltip-id='tooltip'
                 data-tooltip-html={toolTip}
               />
             )}
@@ -154,7 +153,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
               }}
               transform={transform}
               style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-              data-tooltip-id="tooltip"
+              data-tooltip-id='tooltip'
               data-tooltip-html={toolTip}
             />
             {state.visual.extraBubbleBorder && (
@@ -181,7 +180,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 }}
                 transform={transform}
                 style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-                data-tooltip-id="tooltip"
+                data-tooltip-id='tooltip'
                 data-tooltip-html={toolTip}
               />
             )}

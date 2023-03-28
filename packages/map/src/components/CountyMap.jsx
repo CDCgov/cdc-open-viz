@@ -7,13 +7,13 @@ import { feature, mesh } from 'topojson-client'
 import { CustomProjection } from '@visx/geo'
 import colorPalettes from '../../../core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
-import { abbrs } from '../data/abbreviations'
+import { stateAbbreviations } from '../data/utils'
 import CityList from './CityList'
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 // data
-import { offsets, COUNTY_MAP } from '../data/constants'
-import countyMapJSON from '../data/county-map.json'
+import { offsets, COUNTY_MAP } from '../data/utils'
+import countyMapJSON from '../data/topojson/usa-county.json'
 
 const { HEIGHT, WIDTH, PADDING, STATE_BORDER, STATE_INACTIVE_FILL } = COUNTY_MAP
 
@@ -60,7 +60,7 @@ const CountyMap = props => {
 
   const geoLabel = (geo, projection) => {
     let [x, y] = projection(geoCentroid(geo))
-    let abbr = abbrs[geo.properties.name]
+    let abbr = stateAbbreviations[geo.properties.name]
     if (abbr === 'NJ') x += 3
     if (undefined === abbr) return null
     let [dx, dy] = offsets[geo.properties.name]
