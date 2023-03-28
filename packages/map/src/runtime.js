@@ -517,7 +517,7 @@ export const generateRuntimeLegend = (config, runtimeData) => {
 
 // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
 // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
-export const addUIDs = (config, fromColumn, debug = false) => {
+export const addUIDs = (config, fromColumn, debug = true) => {
   const newConfig = produce(config, draft => {
     draft.data.forEach(row => {
       let uid = null

@@ -100,7 +100,6 @@ const SingleStateMap = props => {
 
       let stateLines = pathGenerator(mesh(countyMapJSON, geo[0]))
 
-      console.log('geo', geo[0])
       return (
         <g className='single-state' style={{ fill: '#E6E6E6' }} stroke={geoStrokeColor} strokeWidth={0.95 / scale} key={geo[0].properties.name}>
           <path tabIndex={-1} className='state-path' d={stateLines} />
