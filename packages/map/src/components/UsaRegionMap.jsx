@@ -1,12 +1,32 @@
 import { useState, useEffect, memo } from 'react'
 
+// Third Party
 import { jsx } from '@emotion/react'
-import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { geoCentroid } from 'd3-geo'
 import { feature } from 'topojson-client'
-import topoJSON from '../data/topojson/usa-regions.json'
 import { Mercator } from '@visx/geo'
 import chroma from 'chroma-js'
+
+// Store
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+
+// Context
+
+// Data
+import topoJSON from '../data/topojson/usa-regions.json'
+
+// Constants
+
+// Hooks
+
+// Helpers
+
+// Components - Core
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+
+// Components - Local
+
+// Styles
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.regions)
 
@@ -28,7 +48,9 @@ const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
 }
 
 const UsaRegionMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, titleCase, handleCircleClick, handleMapAriaLabels } = props
+  const { applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, handleMapAriaLabels } = props
+
+  const { config } = useVisConfig()
 
   // "Choose State" options
   const [extent, setExtent] = useState(null)
@@ -39,9 +61,9 @@ const UsaRegionMap = props => {
   useEffect(() => {
     setTranslate([455, 250])
     setExtent(null)
-  }, [state.general.geoType])
+  }, [config.general.geoType])
 
-  const isHex = state.general.displayAsHex
+  const isHex = config.general.displayAsHex
 
   const [territoriesData, setTerritoriesData] = useState([])
 
@@ -52,9 +74,9 @@ const UsaRegionMap = props => {
     const territoriesList = territoriesKeys.filter(key => data[key])
 
     setTerritoriesData(territoriesList)
-  }, [data])
+  }, [config.data])
 
-  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+  const geoStrokeColor = config.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const territories = territoriesData.map(territory => {
     const Shape = Rect
@@ -87,7 +109,7 @@ const UsaRegionMap = props => {
       let needsPointer = false
 
       // If we need to add a pointer cursor
-      if ((state.columns.navigate && territoryData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+      if ((config.columns.navigate && territoryData[config.columns.navigate.name]) || config.tooltips.appearanceType === 'click') {
         needsPointer = true
       }
 
@@ -135,7 +157,7 @@ const UsaRegionMap = props => {
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
-    let showLabel = state.general.displayStateLabels
+    let showLabel = config.general.displayStateLabels
 
     const geosJsx = geographies.map(({ feature: geo, path = '', index }) => {
       const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
@@ -167,18 +189,18 @@ const UsaRegionMap = props => {
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
-          fill: state.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
+          fill: config.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
           cursor: 'default',
           '&:hover': {
-            fill: state.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6'
+            fill: config.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6'
           },
           '&:active': {
-            fill: state.general.type !== 'bubble' ? legendColors[2] : '#e6e6e6'
+            fill: config.general.type !== 'bubble' ? legendColors[2] : '#e6e6e6'
           }
         }
 
         // When to add pointer cursor
-        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+        if ((config.columns.navigate && geoData[config.columns.navigate.name]) || config.tooltips.appearanceType === 'click') {
           styles.cursor = 'pointer'
         }
 
@@ -202,7 +224,7 @@ const UsaRegionMap = props => {
         const circleRadius = 15
 
         // SIDE CHART EXPERIMENT
-        // const height = state.data[index].Change;
+        // const height = config.data[index].Change;
         // const barHeight = Math.abs(height * 20 );
         // const barPositive = height > 0;
         // const barY = barPositive ? -barHeight + 15 : 15;
@@ -249,7 +271,7 @@ const UsaRegionMap = props => {
         )
       }
 
-      // Default return state, just geo with no additional information
+      // Default return config, just geo with no additional information
       return (
         <g key={key} className='geo-group' css={styles}>
           <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
@@ -262,14 +284,14 @@ const UsaRegionMap = props => {
 
   return (
     <ErrorBoundary component='UsaRegionMap'>
-      <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
+      <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(config)}>
         <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
           {({ features, projection }) => constructGeoJsx(features, projection)}
         </Mercator>
       </svg>
       {territories.length > 0 && (
         <section className='territories'>
-          <span className='label'>{state.general.territoriesLabel}</span>
+          <span className='label'>{config.general.territoriesLabel}</span>
           {territories}
         </section>
       )}
@@ -277,4 +299,4 @@ const UsaRegionMap = props => {
   )
 }
 
-export default memo(UsaRegionMap)
+export default UsaRegionMap
