@@ -530,6 +530,7 @@ export const generateRuntimeLegend = (config, runtimeData) => {
 // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
 export const addUIDs = (config, fromColumn, debug = true) => {
 
+  let rowArray = []
   const newConfig = produce(config, draft => {
 
     const { geoType, type, columns, general } = draft;
@@ -602,15 +603,35 @@ export const addUIDs = (config, fromColumn, debug = true) => {
       if (uid) {
         // debugger
         row.uid = uid
+
+        rowArray.push( current(row) )
       }
 
     })
 
+    // draft.data['fromColumn'] = fromColumn
+
 
   })
 
+  const arrayToObject = (arr) => {
+    const obj = {};
+
+    arr.forEach((item) => {
+      if (item.uid) {
+        obj[item.uid] = item;
+      }
+    });
+
+    return obj;
+  }
+
+  rowArray = arrayToObject(rowArray)
+
+
+
   if (debug) {
-    console.log('ADDING UIDS', newConfig)
+    console.log('NEW STATE', newConfig)
   }
 
   return newConfig
