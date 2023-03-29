@@ -206,7 +206,7 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
@@ -792,6 +792,36 @@ const EditorPanel = () => {
   ]
 
   const isLoadedFromUrl = config?.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
+
+  // if isDebug = true, then try to set the category and data col to reduce clicking
+  const setCategoryAxis = () => {
+    // only for debug mode
+    if (undefined !== isDebug && isDebug && !config?.xAxis?.dataKey) {
+      // then try to set the x axis to appropriate value so we dont have to manually do it
+      let datakeys = getColumns(false)
+      if (datakeys.includes('Date')) return 'Date'
+      if (datakeys.includes('Race')) return 'Race'
+      // add other known Category cols here to extend debug
+    }
+    return ''
+  }
+  const setDataColumn = () => {
+    // only for debug mode
+    if (undefined !== isDebug && isDebug && getColumns(false).length > 0) {
+      // then try to set the x axis to appropriate value so we dont have to manually do it
+      let datacols = getColumns(false).filter(x => x !== 'Date' && x !== 'Race')
+      if (datacols.length > 0) {
+        return datacols[0]
+      }
+    }
+    return ''
+  }
+  if (isDebug && !config.xAxis.dataKey) config.xAxis.dataKey = setCategoryAxis()
+  if (isDebug && config?.series?.length === 0) {
+    let setdatacol = setDataColumn()
+    if (setdatacol !== '') addNewSeries(setdatacol)
+    if (isDebug) console.log('### DEBUG: Chart: Setting default datacol=', setdatacol)
+  }
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -1577,7 +1607,7 @@ const EditorPanel = () => {
                     <>
                       <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
                       <Select
-                        value={config.xAxis.dataKey || ''}
+                        value={config.xAxis.dataKey || setCategoryAxis() || ''}
                         section='xAxis'
                         fieldName='dataKey'
                         label='Data Key'

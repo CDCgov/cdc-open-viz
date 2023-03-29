@@ -127,7 +127,12 @@ const Link = ({ config }) => {
 
 // TODO: convert to standardized COVE section
 const Section = ({ children, classes }) => {
-  return <section className={classes.join(' ')}>{children}</section>
+  //console.log('CoveMedia Section classes=', classes)
+  return (
+    <section className={classes.join(' ')}>
+      <span style={{ border: '1px red solid' }}>{children}</span>
+    </section>
+  )
 }
 
 const CoveMediaControls = () => null
