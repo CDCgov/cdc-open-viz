@@ -101,7 +101,7 @@ const VisualizationsPanel = () => (
   </div>
 )
 
-export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, setConfig: setParentConfig }) {
+export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, isDebug = false, setConfig: setParentConfig }) {
   const [config, setConfig] = useState(configObj ?? {})
   const [data, setData] = useState([])
   const [filteredData, setFilteredData] = useState()
@@ -436,7 +436,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Chart' />
-                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} />
+                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} />
               </>
             )
             break
@@ -444,7 +444,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Map' />
-                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true} />
+                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true} />
               </>
             )
             break
@@ -708,7 +708,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     updateConfig,
     setParentConfig,
     setPreview,
-    outerContainerRef
+    outerContainerRef,
+    isDebug
   }
 
   const dashboardContainerClasses = ['cdc-open-viz-module', 'type-dashboard', `${currentViewport}`]

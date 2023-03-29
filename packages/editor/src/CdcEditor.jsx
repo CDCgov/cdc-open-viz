@@ -19,7 +19,7 @@ import Tabs from './components/Tabs'
 
 import './scss/main.scss'
 
-export default function CdcEditor({ config: configObj = { newViz: true }, hostname, containerEl, sharepath }) {
+export default function CdcEditor({ config: configObj = { newViz: true }, hostname, containerEl, sharepath, isDebug }) {
   const [config, setConfig] = useState(configObj)
   const [tempConfig, setTempConfig] = useState(null)
   const [errors, setErrors] = useState([])
@@ -146,7 +146,8 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
     setGlobalActive,
     tempConfig,
     setTempConfig,
-    sharepath
+    sharepath,
+    isDebug
   }
 
   let configureDisabled = true

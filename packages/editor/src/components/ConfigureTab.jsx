@@ -13,7 +13,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 
 export default function ConfigureTab({ containerEl }) {
-  const { config, setTempConfig, hostname } = useContext(ConfigContext)
+  const { config, setTempConfig, hostname, isDebug } = useContext(ConfigContext)
 
   let { type } = config
 
@@ -21,13 +21,13 @@ export default function ConfigureTab({ containerEl }) {
     case 'map':
       return (
         <ErrorBoundary component='CdcMap'>
-          <CdcMap isEditor={true} config={config} hostname={hostname} setConfig={setTempConfig} containerEl={containerEl} />
+          <CdcMap isEditor={true} isDebug={isDebug} config={config} hostname={hostname} setConfig={setTempConfig} containerEl={containerEl} />
         </ErrorBoundary>
       )
     case 'chart':
       return (
         <ErrorBoundary component='CdcChart'>
-          <CdcChart isEditor={true} config={config} setConfig={setTempConfig} />
+          <CdcChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
         </ErrorBoundary>
       )
     case 'dashboard':

@@ -82,7 +82,7 @@ const hashObj = row => {
 
     return hash
   } catch (e) {
-    console.error(e)
+    console.error('COVE: ', e)
   }
 }
 
@@ -112,7 +112,7 @@ const getUniqueValues = (data, columnName) => {
   return Object.keys(result)
 }
 
-const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
+const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
@@ -145,7 +145,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         })
       }
     } catch (e) {
-      console.error('Failed to set world map zoom.')
+      console.error('COVE: Failed to set world map zoom.')
     }
   }, [filteredCountryCode]) // eslint-disable-line
 
@@ -854,7 +854,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       return result
     } catch (e) {
-      console.error(e)
+      console.error('COVE: ', e)
     }
   })
 
@@ -896,7 +896,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setRuntimeData(newData)
       setRuntimeFilters(filters)
     } catch (e) {
-      console.error(e.message)
+      console.error('COVE: ', e.message)
     }
   }
 
@@ -970,7 +970,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       // Fail state
       return generateColorsArray()
     } catch (e) {
-      console.error(e)
+      console.error('COVE: ', e)
     }
   }
 
@@ -1232,7 +1232,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       return ariaLabel
     } catch (e) {
-      console.error(e.message)
+      console.error('COVE: ', e.message)
     }
   }
 
@@ -1472,7 +1472,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     runtimeFilters,
     setRuntimeFilters,
     innerContainerRef,
-    currentViewport
+    currentViewport,
+    isDebug
   }
 
   if (!mapProps.data || !state.data) return <Loading />
@@ -1516,6 +1517,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         {isEditor && (
           <EditorPanel
             isDashboard={isDashboard}
+            isDebug={isDebug}
             state={state}
             setState={setState}
             loadConfig={loadConfig}

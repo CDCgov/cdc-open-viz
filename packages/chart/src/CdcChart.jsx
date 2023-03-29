@@ -44,7 +44,7 @@ import cleanData from '@cdc/core/helpers/cleanData'
 
 import './scss/main.scss'
 
-export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
+export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
@@ -860,7 +860,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     isNumber,
     cleanData,
     getTextWidth,
-    twoColorPalette
+    twoColorPalette,
+    isDebug
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
@@ -868,6 +869,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   config.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)
   isEditor && classes.push('spacing-wrapper')
   isEditor && classes.push('isEditor')
+  isDebug && classes.push('isDebug')
 
   return (
     <ConfigContext.Provider value={contextValues}>

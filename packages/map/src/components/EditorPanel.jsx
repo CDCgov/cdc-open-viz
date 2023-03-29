@@ -65,7 +65,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend, changeFilterActive } = props
+  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend, changeFilterActive, isDebug } = props
 
   const { general, columns, legend, dataTable, tooltips } = state
 
@@ -509,7 +509,7 @@ const EditorPanel = props => {
             })
             break
           default:
-            console.warn('Map type not set')
+            console.warn('COVE: Map type not set')
             break
         }
         break
@@ -745,7 +745,7 @@ const EditorPanel = props => {
         })
         break
       default:
-        console.warn(`Did not recognize editor property.`)
+        console.warn(`COVE: Did not recognize editor property.`)
         break
     }
   }
@@ -1327,6 +1327,22 @@ const EditorPanel = props => {
   }
 
   const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
+
+  // if isDebug = true, then try to set the Geography Col and Data col to reduce clicking
+  const setGeoColumn = () => {
+    // only for debug mode
+    let geoColFound = columnsInData.includes(state.columns.geo.name)
+    if (undefined !== isDebug && isDebug && !geoColFound) {
+      // then try to set the x axis to appropriate value so we dont have to manually do it
+      let mapcols = columnsInData[0]
+      if (mapcols !== '') editColumn('geo', 'name', mapcols)
+
+      if (!state.columns.hasOwnProperty('primary') || undefined === state.columns.primary.name || '' === state.columns.primary.name || !state.columns.primary.name) {
+        editColumn('primary', 'name', columnsInData[1]) // blindly picks first value col
+      }
+    }
+  }
+  if (isDebug) setGeoColumn()
 
   return (
     <ErrorBoundary component='EditorPanel'>
