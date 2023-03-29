@@ -490,19 +490,11 @@ const EditorPanels = () => {
     }
   }, [])
 
-  const columnsOptions = [
-    <option value='' key={'Select Option'}>
-      - Select Option -
-    </option>
-  ]
+  const columnsOptions = ['- Select Option -']
 
   const columnsInData = Object.keys(config.data[0])
   columnsInData.map(colName => {
-    columnsOptions.push(
-      <option value={colName} key={colName}>
-        {colName}
-      </option>
-    )
+    columnsOptions.push(colName)
   })
 
   let columnsByKey = {}
@@ -1418,6 +1410,7 @@ const EditorPanels = () => {
         {panelAdvanced}
         {PanelGlobal}
       </Accordion>
+      {panelAdvanced}
     </>
   )
 }

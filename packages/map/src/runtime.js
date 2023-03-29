@@ -1,4 +1,4 @@
-import { produce } from 'immer'
+import { produce, current } from 'immer'
 import CoveHelper from '@cdc/core/helpers/cove'
 import useStore from '@cdc/core/store/store'
 import * as d3 from 'd3'
@@ -411,10 +411,10 @@ export const generateRuntimeLegend = (config, runtimeData) => {
               min = 1
             }
 
-            // // in starting position and zero in the data
-            // if((index === config.legend.specialClasses?.length ) && (config.legend.specialClasses.length !== 0)) {
-            //     min = breaks[index]
-            // }
+            // in starting position and zero in the data
+            if((index === config.legend.specialClasses?.length ) && (config.legend.specialClasses.length !== 0)) {
+                min = breaks[index]
+            }
             return min
           }
 
@@ -422,16 +422,16 @@ export const generateRuntimeLegend = (config, runtimeData) => {
             let max = breaks[index + 1] - 1
 
             // check if min and max range are the same
-            // if (min === max + 1) {
-            //     max = breaks[index + 1]
-            // }
+            if (min === max + 1) {
+                max = breaks[index + 1]
+            }
 
             if (index === 0 && config.legend.separateZero) {
               max = 0
             }
-            // if ((index === config.legend.specialClasses.length && config.legend.specialClasses.length !== 0) && !config.legend.separateZero && hasZeroInData) {
-            //     max = 0;
-            // }
+            if ((index === config.legend.specialClasses.length && config.legend.specialClasses.length !== 0) && !config.legend.separateZero && hasZeroInData) {
+                max = 0;
+            }
 
             if (index + 1 === breaks.length) {
               max = domainNums[1]
@@ -510,6 +510,7 @@ export const generateRuntimeLegend = (config, runtimeData) => {
     result.forEach((legendItem, idx) => {
       legendItem.color = applyColorToLegend(idx, specialClasses, result)
     })
+
 
     draft.legend = result
   })
@@ -710,7 +711,9 @@ export const transformCdcMapConfig = config => {
   validateFipsCodeLength(transformedConfig)
 
   const runtimeData = generateRuntimeData(transformedConfig, transformedConfig.filters)
-  generateRuntimeLegend(transformedConfig, runtimeData)
+  transformedConfig = generateRuntimeLegend(transformedConfig, runtimeData)
+
+  console.log('transformedConfig: ', transformedConfig)
 
   // If there's a name for the geo, add UIDs
   if (transformedConfig.columns.geo.name || transformedConfig.columns.geo.fips) {

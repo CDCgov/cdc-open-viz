@@ -142,9 +142,6 @@ const UsaRegionMap = props => {
       textColor = '#202020'
     }
 
-    let x = 0,
-      y = 5
-
     return (
       <g>
         <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />

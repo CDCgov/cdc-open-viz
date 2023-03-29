@@ -13,7 +13,13 @@ const update_4_23 = async config => {
 
     // Match map theme props to chart theme props
     if(newConfig.general.headerColor) {
-      newConfig.theme = newConfig.general.headerColor
+      let theme
+      if(newConfig.general.headerColor.includes('theme-')) {
+        theme = newConfig.headerColor.split('-')[1]
+      } else {
+        theme = newConfig.general.headerColor
+      }
+      newConfig.theme = theme
     }
 
     // Move old visual config entries into new key
