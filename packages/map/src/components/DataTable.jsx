@@ -1,15 +1,23 @@
 import React, { useEffect, useState, useMemo, memo, useCallback } from 'react'
+
+// Third Party
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
-import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon component
-import Icon from '@cdc/core/components/ui/Icon'
-
+// Store
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+// Context
+// Data
+// Constants
+// Hooks
+// Helpers
+// Components - Core
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/element/LegendCircle'
 import MediaControls from '@cdc/core/components/ui/MediaControls'
-
-import Loading from '@cdc/core/components/loader/Loading'
-import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+// Components - Local
+import Icon from '@cdc/core/components/ui/Icon'
+import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon component
+// Styles
 
 const DataTable = props => {
   const { tableTitle, indexTitle, mapTitle, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props

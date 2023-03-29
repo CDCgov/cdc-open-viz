@@ -1,7 +1,18 @@
 import { useEffect, useState } from 'react'
-import { supportedCities } from '../data/supported-geos'
+
+// Third Party
 import { scaleLinear } from 'd3-scale'
+// Store
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+// Context
+// Data
+import { supportedCities } from '../data/supported-geos'
+// Constants
+// Hooks
+// Helpers
+// Components - Core
+// Components - Local
+// Styles
 
 const CityList = ({ geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, projection, titleCase, setSharedFilterValue, isFilterValueSupported, isGeoCodeMap }) => {
   const [citiesData, setCitiesData] = useState({})
@@ -98,7 +109,7 @@ const CityList = ({ geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLe
     }
 
     if (isGeoCodeMap) {
-      let coords = [ Number(geoData?.[config.columns.longitude.name]), Number(geoData?.[config.columns.latitude.name]) ]
+      let coords = [Number(geoData?.[config.columns.longitude.name]), Number(geoData?.[config.columns.latitude.name])]
       transform = `translate(${projection(coords)})`
     }
 

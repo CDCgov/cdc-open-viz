@@ -1,6 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Button from '@cdc/core/components/element/Button'
+
+// Third Party
+// Store
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
+// Context
+// Data
+// Constants
+// Hooks
+// Helpers
+// Components - Core
+import Button from '@cdc/core/components/element/Button'
+// Components - Local
+// Styles
 
 // TODO: Combine Charts/Maps Filters.js files
 const useFilters = () => {

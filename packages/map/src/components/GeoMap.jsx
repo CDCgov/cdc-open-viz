@@ -1,32 +1,25 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import produce from 'immer'
 
-// Third party
+// Third Party
+import produce from 'immer'
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-
-// IE11
-import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
+import 'whatwg-fetch'
 
-// Child Components
-import Filters from './Filters'
-import Modal from './Modal'
-import Sidebar from './Sidebar'
+// Store
+import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
-import CountyMap from './CountyMap' // Future: Lazy
-import DataTable from './DataTable' // Future: Lazy
-import NavigationMenu from './NavigationMenu' // Future: Lazy
-import SingleStateMap from './SingleStateMap' // Future: Lazy
-import UsaMap from './UsaMap' // Future: Lazy
-import UsaRegionMap from './UsaRegionMap' // Future: Lazy
-import WorldMap from './WorldMap' // Future: Lazy
+// Context
 
 // Data
 import { dictionary as dict, countryCoordinates } from '../data/utils'
+import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedStatesFipsCodes, stateFipsToTwoDigit } from '../data/supported-geos'
 
-import colorPalettes from '@cdc/core/data/colorPalettes'
+// Constants
+
+// Hooks
 
 // Helpers
 import CoveHelper from '@cdc/core/helpers/cove'
@@ -34,20 +27,23 @@ import MediaControls from '@cdc/core/components/ui/MediaControls'
 import { convertToTitleCase } from '@cdc/core/helpers/cove/string'
 
 // Components - Core
+import colorPalettes from '@cdc/core/data/colorPalettes'
 
 // Components - Local
-
-// Assets
+import Filters from './Filters'
+import Modal from './Modal'
+import Sidebar from './Sidebar'
+import CountyMap from './CountyMap' // Future: Lazy
+import DataTable from './DataTable' // Future: Lazy
+import NavigationMenu from './NavigationMenu' // Future: Lazy
+import SingleStateMap from './SingleStateMap' // Future: Lazy
+import UsaMap from './UsaMap' // Future: Lazy
+import UsaRegionMap from './UsaRegionMap' // Future: Lazy
+import WorldMap from './WorldMap' // Future: Lazy
 import ExternalIcon from '../images/external-link.svg'
+import { addUIDs, stateKeys, countryKeys, countyKeys, territoryKeys, hashObj, generateRuntimeData } from '../runtime'
 
 // Styles
-
-import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
-
-import { addUIDs, stateKeys, countryKeys, countyKeys, territoryKeys, hashObj, generateRuntimeData } from '../runtime'
-import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedStatesFipsCodes, stateFipsToTwoDigit } from '../data/supported-geos'
-
-// Data props
 
 const generateColorsArray = (color = '#000000', special = false) => {
   let colorObj = chroma(color)
@@ -491,7 +487,7 @@ const GeoMap = ({
         {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
         {title && (
           <header className={config.general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !config.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
-            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+            {/* keep lint error below enabled until resolved. */}
             <div role='heading' className={`map-title ${theme ? `theme-${theme}` : ''}`} tabIndex='0' aria-level='2'>
               <sup>{general.superTitle}</sup>
               <div>{parse(title)}</div>
@@ -532,20 +528,7 @@ const GeoMap = ({
             )}
           </section>
 
-          {general.showSidebar && 'navigation' !== general.type && (
-            <Sidebar
-              viewport={currentViewport}
-              legend={config.legend}
-              columns={config.columns}
-              sharing={config.sharing}
-              prefix={config.columns.primary.prefix}
-              suffix={config.columns.primary.suffix}
-              resetLegendToggles={resetLegendToggles}
-              changeFilterActive={changeFilterActive}
-              setAccessibleStatus={setAccessibleStatus}
-              displayDataAsText={displayDataAsText}
-            />
-          )}
+          {general.showSidebar && 'navigation' !== general.type && <Sidebar viewport={currentViewport} resetLegendToggles={resetLegendToggles} changeFilterActive={changeFilterActive} setAccessibleStatus={setAccessibleStatus} displayDataAsText={displayDataAsText} />}
         </div>
 
         {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} options={general} columns={config.columns} navigationHandler={val => navigationHandler(val)} />}

@@ -1,6 +1,17 @@
 import React, { useEffect } from 'react'
+
+// Third Party
 import { scaleLinear } from 'd3-scale'
+// Store
+// Context
+// Data
 import { countryCoordinates, stateCoordinates } from '../data/utils'
+// Constants
+// Hooks
+// Helpers
+// Components - Core
+// Components - Local
+// Styles
 
 export const BubbleList = ({ data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, runtimeData, displayGeoName }) => {
   const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))

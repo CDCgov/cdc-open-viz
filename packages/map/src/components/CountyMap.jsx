@@ -1,19 +1,27 @@
 import React, { useState, useEffect, memo, useRef } from 'react'
-import Loading from '@cdc/core/components/loader/Loading'
 
-import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
-import { geoCentroid, geoPath } from 'd3-geo'
+// Third Party
 import { feature, mesh } from 'topojson-client'
+import { geoCentroid, geoPath } from 'd3-geo'
 import { CustomProjection } from '@visx/geo'
-import colorPalettes from '../../../core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
-import { stateAbbreviations } from '../data/utils'
-import CityList from './CityList'
+// Store
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
-
-// data
+// Context
+// Data
+import { stateAbbreviations } from '../data/utils'
 import { offsets, COUNTY_MAP } from '../data/utils'
 import countyMapJSON from '../data/topojson/usa-county.json'
+// Constants
+// Hooks
+// Helpers
+// Components - Core
+import Loading from '@cdc/core/components/loader/Loading'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import colorPalettes from '../../../core/data/colorPalettes'
+// Components - Local
+import CityList from './CityList'
+// Styles
 
 const { HEIGHT, WIDTH, PADDING, STATE_BORDER, STATE_INACTIVE_FILL } = COUNTY_MAP
 
