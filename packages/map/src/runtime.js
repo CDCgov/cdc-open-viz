@@ -521,7 +521,7 @@ export const generateRuntimeLegend = (config, runtimeData) => {
     })
 
     // draft.legend = result
-    // draft.runtimeLegend = result
+    draft.runtimeLegend = result
   })
 }
 

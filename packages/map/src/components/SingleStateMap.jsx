@@ -24,7 +24,6 @@ import { COUNTY_MAP } from '../data/utils'
 // Components - Core
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
-import colorPalettes from '../../../core/data/colorPalettes'
 
 // Components - Local
 import CityList from './CityList'

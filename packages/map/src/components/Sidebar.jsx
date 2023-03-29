@@ -7,8 +7,9 @@ import LegendCircle from '@cdc/core/components/element/LegendCircle'
 import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 
 const Sidebar = props => {
-  const { legend, columns, setAccessibleStatus, changeFilterActive, resetLegendToggles, prefix, suffix, viewport, displayDataAsText } = props
+  const { setAccessibleStatus, resetLegendToggles, viewport, displayDataAsText } = props
   const { config, updateVisConfig } = useVisConfig()
+  const { legend, sharing } = config
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -30,7 +31,8 @@ const Sidebar = props => {
   }
 
   // TODO: this very suspicious -- austin
-  const legendList = Object.entries(config.legend).map(([, entry], idx) => {
+  // changed Object.entries(config.legend) to just `legend` here and also changed the legend prop to runtimeLegend
+  const legendList = Object.entries(legend).map(([, entry], idx) => {
     const entryMax = displayDataAsText(entry.max, 'primary')
 
     const entryMin = displayDataAsText(entry.min, 'primary')
