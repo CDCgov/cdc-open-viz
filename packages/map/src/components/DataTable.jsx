@@ -14,7 +14,7 @@ import { useVisConfig } from '@cdc/core/hooks/store/useVisConfig'
 const DataTable = props => {
   const { tableTitle, indexTitle, mapTitle, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
   const { config } = useVisConfig()
-  const { data } = config
+  const { runtimeData: data } = config
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')

@@ -186,7 +186,6 @@ const EditorPanels = () => {
         break
       case 'geoType':
         // If we're still working with default data, switch to the world default to show it as an example
-        console.log('loadedDefault', loadedDefault)
         if (true === loadedDefault && 'world' === value) {
           updateVisConfig(worldDefaultConfig)
           break
@@ -554,7 +553,7 @@ const EditorPanels = () => {
     ]
 
     return (
-      <SectionBlock key={index}>
+      <SectionBlock key={Math.random()}>
         <Button className='cove-button--remove' onClick={() => changeFilter(index, 'remove')}>
           Remove
         </Button>
@@ -736,7 +735,7 @@ const EditorPanels = () => {
   const panelGeneral = (
     <Accordion.Section label='General'>
       <InputText label='Title' configField={['general', 'title']} placeholder='Map Title' tooltip='For accessibility reasons, you should enter a title even if you are not planning on displaying it.' />
-      <InputCheckbox configField={['general', 'showTitle']} label={'Show Title'} />
+      <InputCheckbox configField={['general', 'showTitle']} label={'Show Title'} value={config.general.showTitle} />
 
       <InputText label='Super Title' configField={['general', 'superTitle']} placeholder='Super Title' />
 
@@ -806,7 +805,7 @@ const EditorPanels = () => {
           <Label tooltip="For secondary values such as 'NA', the system can automatically color-code them in shades of gray, one shade for each special class.">Special Classes</Label>
 
           {specialClasses.map((specialClass, i) => (
-            <SectionBlock>
+            <SectionBlock key={Math.random()}>
               <Button className='cove-button--remove' onClick={() => editColumn('primary', 'specialClassDelete', i)}>
                 Remove
               </Button>

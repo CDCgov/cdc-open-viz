@@ -113,16 +113,9 @@ const SingleStateMap = props => {
         // Map the name from the geo data with the appropriate key for the processed data
         let geoKey = county.id
 
-        console.log('geoKey', geoKey)
-        if (!geoKey) return
-
+        if (!geoKey || !config.runtimeData) return
         let countyPath = pathGenerator(county)
-
-        let geoData = config.data[geoKey]
-
-        console.log('geoData', geoKey)
-        console.log('geoData', config.data)
-        console.log('geoData', geoData)
+        let geoData = config.runtimeData[geoKey]
         let legendColors
 
         // Once we receive data for this geographic item, setup variables.

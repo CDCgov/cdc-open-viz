@@ -91,7 +91,7 @@ export const generateRuntimeLegend = (config, runtimeData) => {
       result = []
 
     // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
-    let dataSet = config.legend.unified ? config.data : Object.values(runtimeData)
+    let dataSet = config.legend.unified ? config.data : Object.values(config.runtimeData)
 
     const colorDistributions = {
       1: [1],
@@ -149,75 +149,75 @@ export const generateRuntimeLegend = (config, runtimeData) => {
     let specialClassesHash = {}
 
     // Special classes
-    // if (config.legend.specialClasses.length) {
-    //   if (typeof config.legend.specialClasses[0] === 'object') {
-    //     config.legend.specialClasses.forEach(specialClass => {
-    //       dataSet = dataSet.filter(row => {
-    //         const val = String(row[specialClass.key])
+    if (config.legend.specialClasses) {
+      if (typeof config.legend.specialClasses[0] === 'object') {
+        config.legend.specialClasses.forEach(specialClass => {
+          dataSet = dataSet.filter(row => {
+            const val = String(row[specialClass.key])
 
-    //         if (specialClass.value === val) {
-    //           if (undefined === specialClassesHash[val]) {
-    //             specialClassesHash[val] = true
+            if (specialClass.value === val) {
+              if (undefined === specialClassesHash[val]) {
+                specialClassesHash[val] = true
 
-    //             result.push({
-    //               special: true,
-    //               value: val,
-    //               label: specialClass.label
-    //             })
+                result.push({
+                  special: true,
+                  value: val,
+                  label: specialClass.label
+                })
 
-    //             result[result.length - 1].color = applyColorToLegend(result.length - 1)
+                result[result.length - 1].color = applyColorToLegend(result.length - 1)
 
-    //             specialClasses += 1
-    //           }
+                specialClasses += 1
+              }
 
-    //           let specialColor = ''
+              let specialColor = ''
 
-    //           // color the state if val is in row
-    //           specialColor = result.findIndex(p => p.value === val)
+              // color the state if val is in row
+              specialColor = result.findIndex(p => p.value === val)
 
-    //           newLegendMemo.set(hashObj(row), specialColor)
+              newLegendMemo.set(hashObj(row), specialColor)
 
-    //           return false
-    //         }
+              return false
+            }
 
-    //         return true
-    //       })
-    //     })
-    //   } else {
-    //     dataSet = dataSet.filter(row => {
-    //       const val = row[primaryCol]
+            return true
+          })
+        })
+      } else {
+        dataSet = dataSet.filter(row => {
+          const val = row[primaryCol]
 
-    //       if (config.legend.specialClasses.includes(val)) {
-    //         // apply the special color to the legend
-    //         if (undefined === specialClassesHash[val]) {
-    //           specialClassesHash[val] = true
+          if (config.legend.specialClasses.includes(val)) {
+            // apply the special color to the legend
+            if (undefined === specialClassesHash[val]) {
+              specialClassesHash[val] = true
 
-    //           result.push({
-    //             special: true,
-    //             value: val
-    //           })
+              result.push({
+                special: true,
+                value: val
+              })
 
-    //           result[result.length - 1].color = applyColorToLegend(result.length - 1)
+              result[result.length - 1].color = applyColorToLegend(result.length - 1)
 
-    //           specialClasses += 1
-    //         }
+              specialClasses += 1
+            }
 
-    //         let specialColor = ''
+            let specialColor = ''
 
-    //         // color the state if val is in row
-    //         if (Object.values(row).includes(val)) {
-    //           specialColor = result.findIndex(p => p.value === val)
-    //         }
+            // color the state if val is in row
+            if (Object.values(row).includes(val)) {
+              specialColor = result.findIndex(p => p.value === val)
+            }
 
-    //         newLegendMemo.set(hashObj(row), specialColor)
+            newLegendMemo.set(hashObj(row), specialColor)
 
-    //         return false
-    //       }
+            return false
+          }
 
-    //       return true
-    //     })
-    //   }
-    // }
+          return true
+        })
+      }
+    }
 
     // Category
     if ('category' === type) {
@@ -377,7 +377,6 @@ export const generateRuntimeLegend = (config, runtimeData) => {
 
 
           result[result.length - 1].color = applyColorToLegend(result.length - 1)
-          console.log('result: ', result)
 
           changingNumber -= 1
           numberOfRows -= chunkAmt
@@ -521,16 +520,17 @@ export const generateRuntimeLegend = (config, runtimeData) => {
       legendItem.color = applyColorToLegend(idx, specialClasses, result)
     })
 
-    console.log('draft', result)
-    draft.legend = result
+    // draft.legend = result
+    // draft.runtimeLegend = result
   })
 }
+
 
 // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
 // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
 export const addUIDs = (config, fromColumn, debug = true) => {
 
-  let rowArray = []
+  // let rowArray = []
   const newConfig = produce(config, draft => {
 
     const { geoType, type, columns, general } = draft;
@@ -604,7 +604,7 @@ export const addUIDs = (config, fromColumn, debug = true) => {
         // debugger
         row.uid = uid
 
-        rowArray.push( current(row) )
+        // rowArray.push( current(row) )
       }
 
     })
@@ -614,25 +614,19 @@ export const addUIDs = (config, fromColumn, debug = true) => {
 
   })
 
-  const arrayToObject = (arr) => {
-    const obj = {};
+  // const arrayToObject = (arr) => {
+  //   const obj = {};
 
-    arr.forEach((item) => {
-      if (item.uid) {
-        obj[item.uid] = item;
-      }
-    });
+  //   arr.forEach((item) => {
+  //     if (item.uid) {
+  //       obj[item.uid] = item;
+  //     }
+  //   });
 
-    return obj;
-  }
+  //   return obj;
+  // }
 
-  rowArray = arrayToObject(rowArray)
-
-
-
-  if (debug) {
-    console.log('NEW STATE', newConfig)
-  }
+  // rowArray = arrayToObject(rowArray)
 
   return newConfig
 }
@@ -651,7 +645,6 @@ export const generateRuntimeData = (config, filters, hash) => {
       }
 
       draft.data.forEach(row => {
-        console.log('row', current(row))
         if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
         // When on a single state map filter runtime data by state
@@ -693,6 +686,8 @@ export const generateRuntimeData = (config, filters, hash) => {
         }
       })
 
+      draft.runtimeData = result
+
       return draft
   })
 }
@@ -701,7 +696,6 @@ export const generateRuntimeFilters = (config, hash) => {
   const runtimeFilters = produce(config, draft => {
 
     draft.runtimeChecks = {...config.runtimeChecks, generateRuntimeFilters: true}
-    console.log('what is draft even', draft)
     if (draft.filters && hash) draft.filters.fromHash = hash
 
     draft.filters = (draft.filters ?? []).map(({ columnName, label, active, values }, idx) => {
@@ -760,8 +754,9 @@ export const transformCdcMapConfig = config => {
     transformedConfig = addUIDs(transformedConfig, transformedConfig.columns.geo.name || transformedConfig.columns.geo.fips)
   }
 
-  const runtimeData = generateRuntimeData(transformedConfig, transformedConfig.filters)
-  transformedConfig = generateRuntimeLegend(transformedConfig, runtimeData.data)
+  transformedConfig = generateRuntimeData(transformedConfig, transformedConfig.filters)
+
+  transformedConfig = generateRuntimeLegend(transformedConfig, transformedConfig.runtimeData)
 
   if (transformedConfig.dataTable.forceDisplay === undefined) {
     transformedConfig = {

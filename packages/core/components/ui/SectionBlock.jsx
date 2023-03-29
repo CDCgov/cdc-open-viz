@@ -8,7 +8,7 @@ import '../../styles/v2/components/ui/section-block.scss'
 
 const SectionBlock = ({ children, ...attributes }) => {
   return (
-    <fieldset className="cove-section-block" {...attributes}>
+    <fieldset className='cove-section-block' {...attributes}>
       {children}
     </fieldset>
   )
