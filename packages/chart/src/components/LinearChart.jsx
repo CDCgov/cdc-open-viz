@@ -320,15 +320,15 @@ export default function LinearChart() {
       // to fix edge case of small numbers with decimals
       if (tickCount === undefined && !config.dataFormat.roundTo) {
         // then it is set to Auto
-        if (max <= 3) {
+        if (Number(max) <= 3) {
           tickCount = 2
         } else {
           tickCount = 4 // same default as standalone components
         }
       }
-      if (tickCount > max) {
+      if (Number(tickCount) > Number(max)) {
         // cap it and round it so its an integer
-        tickCount = min < 0 ? Math.round(max) * 2 : Math.round(max)
+        tickCount = Number(min) < 0 ? Math.round(max) * 2 : Math.round(max)
       }
     }
 
