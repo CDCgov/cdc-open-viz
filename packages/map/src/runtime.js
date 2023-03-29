@@ -32,7 +32,8 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const validateFipsCodeLength = config => {
-  return produce(config, draft => {
+  const validate = produce(config, draft => {
+    draft['runtimeChecks'] = {...config.runtimeChecks, validateFipsCodeLength: true}
     if (draft.general.geoType === 'us-county' || draft.general.geoType === 'single-state' || (draft.general.geoType === 'us' && draft.data)) {
       draft.data.forEach(dataPiece => {
         if (dataPiece[draft.columns.geo.name]) {
@@ -44,6 +45,7 @@ const validateFipsCodeLength = config => {
       })
     }
   })
+  return validate
 }
 
 export const hashObj = row => {
@@ -78,6 +80,8 @@ const indexOfIgnoreType = (arr, item) => {
 
 export const generateRuntimeLegend = (config, runtimeData) => {
   return produce(config, draft => {
+    draft['runtimeChecks'] = {...config.runtimeChecks, generateRuntimeLegend: true}
+
     const newLegendMemo = new Map() // Reset memoization
     const primaryCol = config.columns.primary.name,
       isBubble = config.general.type === 'bubble',
@@ -145,75 +149,75 @@ export const generateRuntimeLegend = (config, runtimeData) => {
     let specialClassesHash = {}
 
     // Special classes
-    if (config.legend.specialClasses.length) {
-      if (typeof config.legend.specialClasses[0] === 'object') {
-        config.legend.specialClasses.forEach(specialClass => {
-          dataSet = dataSet.filter(row => {
-            const val = String(row[specialClass.key])
+    // if (config.legend.specialClasses.length) {
+    //   if (typeof config.legend.specialClasses[0] === 'object') {
+    //     config.legend.specialClasses.forEach(specialClass => {
+    //       dataSet = dataSet.filter(row => {
+    //         const val = String(row[specialClass.key])
 
-            if (specialClass.value === val) {
-              if (undefined === specialClassesHash[val]) {
-                specialClassesHash[val] = true
+    //         if (specialClass.value === val) {
+    //           if (undefined === specialClassesHash[val]) {
+    //             specialClassesHash[val] = true
 
-                result.push({
-                  special: true,
-                  value: val,
-                  label: specialClass.label
-                })
+    //             result.push({
+    //               special: true,
+    //               value: val,
+    //               label: specialClass.label
+    //             })
 
-                result[result.length - 1].color = applyColorToLegend(result.length - 1)
+    //             result[result.length - 1].color = applyColorToLegend(result.length - 1)
 
-                specialClasses += 1
-              }
+    //             specialClasses += 1
+    //           }
 
-              let specialColor = ''
+    //           let specialColor = ''
 
-              // color the state if val is in row
-              specialColor = result.findIndex(p => p.value === val)
+    //           // color the state if val is in row
+    //           specialColor = result.findIndex(p => p.value === val)
 
-              newLegendMemo.set(hashObj(row), specialColor)
+    //           newLegendMemo.set(hashObj(row), specialColor)
 
-              return false
-            }
+    //           return false
+    //         }
 
-            return true
-          })
-        })
-      } else {
-        dataSet = dataSet.filter(row => {
-          const val = row[primaryCol]
+    //         return true
+    //       })
+    //     })
+    //   } else {
+    //     dataSet = dataSet.filter(row => {
+    //       const val = row[primaryCol]
 
-          if (config.legend.specialClasses.includes(val)) {
-            // apply the special color to the legend
-            if (undefined === specialClassesHash[val]) {
-              specialClassesHash[val] = true
+    //       if (config.legend.specialClasses.includes(val)) {
+    //         // apply the special color to the legend
+    //         if (undefined === specialClassesHash[val]) {
+    //           specialClassesHash[val] = true
 
-              result.push({
-                special: true,
-                value: val
-              })
+    //           result.push({
+    //             special: true,
+    //             value: val
+    //           })
 
-              result[result.length - 1].color = applyColorToLegend(result.length - 1)
+    //           result[result.length - 1].color = applyColorToLegend(result.length - 1)
 
-              specialClasses += 1
-            }
+    //           specialClasses += 1
+    //         }
 
-            let specialColor = ''
+    //         let specialColor = ''
 
-            // color the state if val is in row
-            if (Object.values(row).includes(val)) {
-              specialColor = result.findIndex(p => p.value === val)
-            }
+    //         // color the state if val is in row
+    //         if (Object.values(row).includes(val)) {
+    //           specialColor = result.findIndex(p => p.value === val)
+    //         }
 
-            newLegendMemo.set(hashObj(row), specialColor)
+    //         newLegendMemo.set(hashObj(row), specialColor)
 
-            return false
-          }
+    //         return false
+    //       }
 
-          return true
-        })
-      }
-    }
+    //       return true
+    //     })
+    //   }
+    // }
 
     // Category
     if ('category' === type) {
@@ -275,10 +279,12 @@ export const generateRuntimeLegend = (config, runtimeData) => {
         }
       })
 
+
       // Add color to new legend item
       for (let i = 0; i < result.length; i++) {
         result[i].color = applyColorToLegend(i)
       }
+
 
       return result
     }
@@ -338,6 +344,7 @@ export const generateRuntimeLegend = (config, runtimeData) => {
       // start work on changing legend functionality
       // FALSE === ignore old version for now.
       if (!config.general.equalNumberOptIn) {
+
         let numberOfRows = dataSet.length
 
         let remainder
@@ -368,7 +375,9 @@ export const generateRuntimeLegend = (config, runtimeData) => {
             max
           })
 
+
           result[result.length - 1].color = applyColorToLegend(result.length - 1)
+          console.log('result: ', result)
 
           changingNumber -= 1
           numberOfRows -= chunkAmt
@@ -443,6 +452,7 @@ export const generateRuntimeLegend = (config, runtimeData) => {
           let min = setMin(index)
           let max = setMax(index, min)
 
+
           result.push({
             min,
             max,
@@ -511,17 +521,27 @@ export const generateRuntimeLegend = (config, runtimeData) => {
       legendItem.color = applyColorToLegend(idx, specialClasses, result)
     })
 
-
+    console.log('draft', result)
     draft.legend = result
   })
 }
 
 // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
 // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
-export const addUIDs = (config, fromColumn) => {
+export const addUIDs = (config, fromColumn, debug = true) => {
+
   const newConfig = produce(config, draft => {
+
+    const { geoType, type, columns, general } = draft;
+    const { geo } = columns;
+
+    // sanity checks
+    draft.runtimeChecks = { ...config.runtimeChecks, addUIDs: true}
+
     draft.data.forEach(row => {
+
       let uid = null
+      let geoName = ''
 
       if (row.uid) row.uid = null // Wipe existing UIDs
 
@@ -580,19 +600,26 @@ export const addUIDs = (config, fromColumn) => {
       }
 
       if (uid) {
+        // debugger
         row.uid = uid
       }
+
     })
+
+
   })
 
-  // newConfig.data.fromColumn = fromColumn
+  if (debug) {
+    console.log('ADDING UIDS', newConfig)
+  }
+
   return newConfig
 }
 
 // Calculates what's going to be displayed on the map and data table at render.
 export const generateRuntimeData = (config, filters, hash) => {
   return produce(config, draft => {
-    try {
+    draft.runtimeChecks = {...config.runtimeChecks, generateRuntimeData: true}
       const result = {}
 
       if (hash) {
@@ -603,6 +630,7 @@ export const generateRuntimeData = (config, filters, hash) => {
       }
 
       draft.data.forEach(row => {
+        console.log('row', current(row))
         if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
         // When on a single state map filter runtime data by state
@@ -644,81 +672,75 @@ export const generateRuntimeData = (config, filters, hash) => {
         }
       })
 
-      return result
-    } catch (e) {
-      console.error(e)
-    }
-
-    return draft
+      return draft
   })
 }
 
 export const generateRuntimeFilters = (config, hash) => {
-  // const runtimeFilters = produce(config, draft => {
-  //   // console.log('what is draft even', draft)
-  //   // if (draft.filters && hash) draft.filters.fromHash = hash
+  const runtimeFilters = produce(config, draft => {
 
-  //   // draft.filters = (draft.filters ?? []).map(({ columnName, label, active, values }, idx) => {
-  //   //   if (undefined === columnName) return
+    draft.runtimeChecks = {...config.runtimeChecks, generateRuntimeFilters: true}
+    console.log('what is draft even', draft)
+    if (draft.filters && hash) draft.filters.fromHash = hash
 
-  //   //   let newFilter = runtimeFilters[idx]
+    draft.filters = (draft.filters ?? []).map(({ columnName, label, active, values }, idx) => {
+      if (undefined === columnName) return
 
-  //   //   const sortAsc = (a, b) => {
-  //   //     return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
-  //   //   }
+      let newFilter = runtimeFilters[idx]
 
-  //   //   const sortDesc = (a, b) => {
-  //   //     return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
-  //   //   }
+      const sortAsc = (a, b) => {
+        return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
+      }
 
-  //   //   values = getUniqueValues(draft.data, columnName)
+      const sortDesc = (a, b) => {
+        return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+      }
 
-  //   //   if (draft.filters[idx].order === 'asc') {
-  //   //     values = values.sort(sortAsc)
-  //   //   }
+      values = getUniqueValues(draft.data, columnName)
 
-  //   //   if (draft.filters[idx].order === 'desc') {
-  //   //     values = values.sort(sortDesc)
-  //   //   }
+      if (draft.filters[idx].order === 'asc') {
+        values = values.sort(sortAsc)
+      }
 
-  //   //   if (draft.filters[idx].order === 'cust') {
-  //   //     if (draft.filters[idx]?.values.length > 0) {
-  //   //       values = draft.filters[idx].values
-  //   //     }
-  //   //   }
+      if (draft.filters[idx].order === 'desc') {
+        values = values.sort(sortDesc)
+      }
 
-  //   //   if (undefined === newFilter) {
-  //   //     newFilter = {}
-  //   //   }
+      if (draft.filters[idx].order === 'cust') {
+        if (draft.filters[idx]?.values.length > 0) {
+          values = draft.filters[idx].values
+        }
+      }
 
-  //   //   newFilter.label = label ?? ''
-  //   //   newFilter.columnName = columnName
-  //   //   newFilter.values = values
-  //   //   newFilter.active = active || values[0] // Default to first found value
+      if (undefined === newFilter) {
+        newFilter = {}
+      }
 
-  //   //   draft.filters[idx] = newFilter
-  //   // })
-  // })
+      newFilter.label = label ?? ''
+      newFilter.columnName = columnName
+      newFilter.values = values
+      newFilter.active = active || values[0] // Default to first found value
 
-  // return runtimeFilters
-  return
+      draft.filters[idx] = newFilter
+    })
+  })
+
+  return runtimeFilters
 }
 
 export const transformCdcMapConfig = config => {
   let transformedConfig = {...config}
 
-  generateRuntimeFilters(transformedConfig)
-  validateFipsCodeLength(transformedConfig)
-
-  const runtimeData = generateRuntimeData(transformedConfig, transformedConfig.filters)
-  transformedConfig = generateRuntimeLegend(transformedConfig, runtimeData)
-
-  console.log('transformedConfig: ', transformedConfig)
+  transformedConfig = generateRuntimeFilters(transformedConfig)
+  transformedConfig = validateFipsCodeLength(transformedConfig)
 
   // If there's a name for the geo, add UIDs
   if (transformedConfig.columns.geo.name || transformedConfig.columns.geo.fips) {
-    addUIDs(transformedConfig, transformedConfig.columns.geo.name || transformedConfig.columns.geo.fips)
+    transformedConfig = addUIDs(transformedConfig, transformedConfig.columns.geo.name || transformedConfig.columns.geo.fips)
   }
+
+  const runtimeData = generateRuntimeData(transformedConfig, transformedConfig.filters)
+  transformedConfig = generateRuntimeLegend(transformedConfig, runtimeData.data)
 
   if (transformedConfig.dataTable.forceDisplay === undefined) {
     transformedConfig = {

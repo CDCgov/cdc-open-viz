@@ -305,9 +305,9 @@ const GeoMap = ({
         }
 
         // Check if it's a special value. If it is not, apply the designated prefix and suffix
-        if (false === config.legend.specialClasses.includes(String(value))) {
-          formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
-        }
+        // if (false === config.legend.specialClasses.includes(String(value))) {
+        //   formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
+        // }
       }
 
       return formattedValue
