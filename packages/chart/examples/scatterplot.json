@@ -48,7 +48,7 @@
   "barHeight": 25,
   "height": 300,
   "xAxis": {
-    "type": "continuous",
+    "type": "",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,

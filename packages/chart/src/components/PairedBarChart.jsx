@@ -72,7 +72,6 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
 				${label}${formatNumber(d[groupTwo.dataKey])}
 			</p>`
   }
-  console.log(config)
 
   return (
     width > 0 && (
