@@ -698,15 +698,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     return result
   })
 
-  const generateRuntimeFilters = useCallback((obj, hash, runtimeFilters) => {
+  const generateRuntimeFilters = (obj, hash, runtimeFilters) => {
     if (undefined === obj.filters || obj.filters.length === 0) return []
 
     let filters = []
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(({ columnName, label, active, values }, idx) => {
-      if (undefined === columnName) return
+    obj?.filters.forEach(({ columnName, label, labels, active, values, type }, idx) => {
 
       let newFilter = runtimeFilters[idx]
 
@@ -718,36 +717,44 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
       }
 
-      values = getUniqueValues(state.data, columnName)
+      if(type !== 'url'){
+        values = getUniqueValues(state.data, columnName)
 
-      if (obj.filters[idx].order === 'asc') {
-        values = values.sort(sortAsc)
-      }
-
-      if (obj.filters[idx].order === 'desc') {
-        values = values.sort(sortDesc)
-      }
-
-      if (obj.filters[idx].order === 'cust') {
-        if (obj.filters[idx]?.values.length > 0) {
-          values = obj.filters[idx].values
+        if (obj.filters[idx].order === 'asc') {
+          values = values.sort(sortAsc)
         }
+
+        if (obj.filters[idx].order === 'desc') {
+          values = values.sort(sortDesc)
+        }
+
+        if (obj.filters[idx].order === 'cust') {
+          if (obj.filters[idx]?.values.length > 0) {
+            values = obj.filters[idx].values
+          }
+        }
+      } else {
+        values = values
       }
 
       if (undefined === newFilter) {
         newFilter = {}
       }
 
+      newFilter.type = type
       newFilter.label = label ?? ''
       newFilter.columnName = columnName
       newFilter.values = values
       newFilter.active = active || values[0] // Default to first found value
+      if(type === 'url' && labels){
+        newFilter.labels = labels
+      }
 
       filters.push(newFilter)
     })
 
     return filters
-  })
+  }
 
   // Calculates what's going to be displayed on the map and data table at render.
   const generateRuntimeData = useCallback((obj, filters, hash, test) => {
@@ -794,8 +801,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         // Filters
         if (filters?.length) {
           for (let i = 0; i < filters.length; i++) {
-            const { columnName, active } = filters[i]
-            if (String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
+            const { columnName, active, type } = filters[i]
+            if (type !== 'url' && String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
           }
         }
 
@@ -1166,6 +1173,66 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }
 
+  const reloadURLData = async () => {
+    if (state.dataUrl) {
+      const dataUrl = new URL(state.dataUrl)
+      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+
+      let isUpdateNeeded = false
+      state.filters.forEach(filter => {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+          qsParams[filter.queryParameter] = filter.active
+          isUpdateNeeded = true
+        }
+      })
+
+      if (!isUpdateNeeded) return
+
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+        .map((param, i) => {
+          let qs = i === 0 ? '?' : '&'
+          qs += param + '='
+          qs += qsParams[param]
+          return qs
+        })
+        .join('')}`
+
+      let data
+
+      try {
+        const regex = /(?:\.([^.]+))?$/
+
+        const ext = regex.exec(dataUrl.pathname)[1]
+        if ('csv' === ext) {
+          data = await fetch(dataUrlFinal)
+            .then(response => response.text())
+            .then(responseText => {
+              const parsedCsv = Papa.parse(responseText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+              })
+              return parsedCsv.data
+            })
+        } else if ('json' === ext) {
+          data = await fetch(dataUrlFinal).then(response => response.json())
+        } else {
+          data = []
+        }
+      } catch {
+        console.error(`Cannot parse URL: ${dataUrlFinal}`)
+        data = []
+      }
+
+      if (state.dataDescription) {
+        data = transform.autoStandardize(data)
+        data = transform.developerStandardize(data, state.dataDescription)
+      }
+
+      setState({ ...state, dataUrl: dataUrlFinal, data })
+    }
+  }
+
   const loadConfig = async configObj => {
     // Set loading flag
     if (!loading) setLoading(true)
@@ -1366,6 +1433,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setRuntimeLegend(legend)
     }
   }, [runtimeData])
+
+  useEffect(() => {
+    reloadURLData()
+  }, [JSON.stringify(state.filters)])
 
   if (config) {
     // eslint-disable-next-line react-hooks/rules-of-hooks

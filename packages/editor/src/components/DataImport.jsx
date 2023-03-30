@@ -562,7 +562,6 @@ export default function DataImport() {
       </button>
     </>
   )
-  console.log(config.filters)
 
   const showDataDesigner = config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot'
 
