@@ -64,8 +64,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
 
-  // set defaults on titles if blank
-  if (!title || title === '') title = 'Chart Title'
+  // set defaults on titles if blank AND only in editor
+  if (isEditor) {
+    if (!title || title === '') title = 'Chart Title'
+  }
+
   if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
 
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
