@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import ConfigContext from './../ConfigContext'
 import Button from '@cdc/core/components/elements/Button'
 
@@ -43,6 +43,12 @@ const Filters = () => {
     setFilters(newFilters)
     setShowApplyButton(true)
   }
+
+  useEffect(() => {
+    if (JSON.stringify(config.filters) !== JSON.stringify(filters)) {
+      setFilters(config.filters)
+    }
+  }, [JSON.stringify(config.filters)])
 
   // A List of Dropdowns
   const FilterList = () => {
