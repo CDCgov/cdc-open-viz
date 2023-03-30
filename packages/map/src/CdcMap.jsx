@@ -1423,9 +1423,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Destructuring for more readable JSX
   const { general, tooltips, dataTable } = state
-  let { title = 'Map Title', subtext = '' } = general
+  let { title, subtext = '' } = general
 
-  if (!title || title === '') title = 'Map Title'
+  // if no title AND in editor then set a default
+  if (isEditor) {
+    if (!title || title === '') title = 'Map Title'
+  }
   if (!dataTable.title || dataTable.title === '') dataTable.title = 'Data Table'
 
   // Outer container classes
