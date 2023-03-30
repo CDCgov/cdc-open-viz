@@ -99,7 +99,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       let isUpdateNeeded = false
       config.filters.forEach(filter => {
-        if (filter.type === 'url' && qsParams[filter.queryParameter] !== filter.active) {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
           qsParams[filter.queryParameter] = filter.active
           isUpdateNeeded = true
         }
