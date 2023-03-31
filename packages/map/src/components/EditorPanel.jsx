@@ -65,7 +65,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend, changeFilterActive, isDebug } = props
+  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend, changeFilterActive, isDebug } = props
 
   const { general, columns, legend, dataTable, tooltips } = state
 
@@ -509,7 +509,7 @@ const EditorPanel = props => {
             })
             break
           default:
-            console.warn('COVE: Map type not set')
+            console.warn('COVE: Map type not set') // eslint-disable-line
             break
         }
         break
@@ -745,7 +745,7 @@ const EditorPanel = props => {
         })
         break
       default:
-        console.warn(`COVE: Did not recognize editor property.`)
+        console.warn(`COVE: Did not recognize editor property.`) // eslint-disable-line
         break
     }
   }

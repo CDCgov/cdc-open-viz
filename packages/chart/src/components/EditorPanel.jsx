@@ -820,7 +820,7 @@ const EditorPanel = () => {
   if (isDebug && config?.series?.length === 0) {
     let setdatacol = setDataColumn()
     if (setdatacol !== '') addNewSeries(setdatacol)
-    if (isDebug) console.log('### DEBUG: Chart: Setting default datacol=', setdatacol)
+    if (isDebug) console.log('### DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
   return (

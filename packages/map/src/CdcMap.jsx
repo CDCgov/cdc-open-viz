@@ -82,7 +82,7 @@ const hashObj = row => {
 
     return hash
   } catch (e) {
-    console.error('COVE: ', e)
+    console.error('COVE: ', e) // eslint-disable-line
   }
 }
 
@@ -145,7 +145,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         })
       }
     } catch (e) {
-      console.error('COVE: Failed to set world map zoom.')
+      console.error('COVE: Failed to set world map zoom.') // eslint-disable-line
     }
   }, [filteredCountryCode]) // eslint-disable-line
 
@@ -810,8 +810,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       addUIDs(obj, obj.columns.geo.name)
       obj.data.forEach(row => {
         if (test) {
-          console.log('object', obj)
-          console.log('row', row)
+          console.log('object', obj) // eslint-disable-line
+          console.log('row', row) // eslint-disable-line
         }
 
         if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
@@ -854,7 +854,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       return result
     } catch (e) {
-      console.error('COVE: ', e)
+      console.error('COVE: ', e) // eslint-disable-line
     }
   })
 
@@ -896,7 +896,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setRuntimeData(newData)
       setRuntimeFilters(filters)
     } catch (e) {
-      console.error('COVE: ', e.message)
+      console.error('COVE: ', e.message) // eslint-disable-line
     }
   }
 
@@ -970,7 +970,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       // Fail state
       return generateColorsArray()
     } catch (e) {
-      console.error('COVE: ', e)
+      console.error('COVE: ', e) // eslint-disable-line
     }
   }
 
@@ -1201,7 +1201,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const handleMapAriaLabels = (state = '', testing = false) => {
-    if (testing) console.log(`handleMapAriaLabels Testing On: ${state}`)
+    if (testing) console.log(`handleMapAriaLabels Testing On: ${state}`) // eslint-disable-line
     try {
       if (!state.general.geoType) throw Error('handleMapAriaLabels: no geoType found in state')
       let ariaLabel = ''
@@ -1232,7 +1232,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       return ariaLabel
     } catch (e) {
-      console.error('COVE: ', e.message)
+      console.error('COVE: ', e.message) // eslint-disable-line
     }
   }
 
