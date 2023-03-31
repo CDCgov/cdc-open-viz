@@ -21,7 +21,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   const cleanedData = cleanData(data, config.xAxis.dataKey)
   const { yScaleRight } = useRightAxis({ config, yMax, cleanedData, updateConfig })
 
-  console.log('LINECHART TOP: cleanedData,yScaleRight', cleanedData, yScaleRight)
+  console.log('LINECHART TOP: cleanedData,yMax', cleanedData, yMax)
 
   const handleAxisFormating = (axis = 'left', label, value) => {
     // if this is an x axis category/date value return without doing any formatting.

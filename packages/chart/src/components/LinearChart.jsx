@@ -33,6 +33,8 @@ export default function LinearChart() {
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, cleanedData)
   const [animatedChart, setAnimatedChart] = useState(false)
 
+  console.log('!!!!!! LinearChart minValue, maxValue', minValue, maxValue)
+
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -64,13 +66,13 @@ export default function LinearChart() {
   const xMax = width - config.runtime.yAxis.size - (config.visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
 
+  console.log('# LinearChart CleanedData before useRightAxis=', cleanedData)
+  console.log('# LinearChart yMax,config', yMax, config)
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, cleanedData, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
-
-  console.log('LINEARCHART: yScaleRight, hasRightAxis', yScaleRight, hasRightAxis)
 
   let xScale
   let yScale
@@ -79,6 +81,8 @@ export default function LinearChart() {
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
   const isMinValid = (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
+
+  console.log(' ### LINEARCHART:  cleanedData, isMaxValid', cleanedData, isMaxValid)
 
   if (cleanedData) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
