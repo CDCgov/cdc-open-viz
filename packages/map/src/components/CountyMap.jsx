@@ -318,7 +318,8 @@ const CountyMap = props => {
           const pixelCoords = projection([data[key][state.columns.longitude.name], data[key][state.columns.latitude.name]])
 
           if (pixelCoords) {
-            context.fillStyle = data[key] !== undefined ? applyLegendToRow(data[key])[0] : '#EEE'
+            const legendValues = data[key] !== undefined ? applyLegendToRow(data[key]) : false
+            context.fillStyle = legendValues ? legendValues[0] : '#EEE'
             context.beginPath()
             context.arc(pixelCoords[0], pixelCoords[1], geoRadius, 0, 2 * Math.PI)
             context.fill()
