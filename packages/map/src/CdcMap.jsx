@@ -285,6 +285,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       result.fromHash = hash
     }
 
+    result.runtimeDataHash = runtimeData.fromHash
+
     // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
 
@@ -1083,6 +1085,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       delete legendItem.disabled
     })
 
+    newLegend.runtimeDataHash = runtimeLegend.runtimeDataHash
+
     setRuntimeLegend(newLegend)
   }
 
@@ -1391,16 +1395,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     })
 
     // Data
-    let newRuntimeData
     if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
       setRuntimeData(newRuntimeData)
-    }
-
-    // Legend
-    if (hashLegend !== runtimeLegend.fromHash && (undefined === runtimeData.init || newRuntimeData)) {
-      const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
-      setRuntimeLegend(legend)
     }
   }, [state]) // eslint-disable-line
 

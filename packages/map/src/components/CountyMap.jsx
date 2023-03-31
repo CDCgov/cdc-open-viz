@@ -55,6 +55,7 @@ function CountyMapChecks(prevState, nextState) {
   const equalBorderColors = prevState.state.general.geoBorderColor === nextState.state.general.geoBorderColor // update when geoborder color changes
   const equalData = prevState.data === nextState.data // update when data changes
   const equalTooltipBehavior = prevState.state.tooltips.appearanceType === nextState.state.tooltips.appearanceType
+  if (nextState.runtimeLegend.runtimeDataHash !== nextState.data.fromHash) return true
   return equalData && equalBorderColors && equalLegend && equalColumnName && equalNavColumn && equalNumberOptIn && equalTooltipBehavior ? true : false
 }
 
@@ -317,7 +318,8 @@ const CountyMap = props => {
           const pixelCoords = projection([data[key][state.columns.longitude.name], data[key][state.columns.latitude.name]])
 
           if (pixelCoords) {
-            context.fillStyle = data[key] !== undefined ? applyLegendToRow(data[key])[0] : '#EEE'
+            const legendValues = data[key] !== undefined ? applyLegendToRow(data[key]) : false
+            context.fillStyle = legendValues ? legendValues[0] : '#EEE'
             context.beginPath()
             context.arc(pixelCoords[0], pixelCoords[1], geoRadius, 0, 2 * Math.PI)
             context.fill()
