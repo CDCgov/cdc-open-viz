@@ -25,7 +25,7 @@ import { DeviationBar } from './DeviationBar'
 
 // TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, stringFormattingOptions } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
 
   let [width] = dimensions
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
