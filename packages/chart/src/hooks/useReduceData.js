@@ -53,7 +53,6 @@ function useReduceData(config, data) {
         const barMax = Math.max(...total)
 
         max = Number(barMax) > Number(lineMax) ? barMax : lineMax
-        console.log("useReduceData: data,linemax,barmax,max",data,lineMax,barMax,max)
       }
     } else {
       max = Math.max(...data.map(d => Math.max(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
