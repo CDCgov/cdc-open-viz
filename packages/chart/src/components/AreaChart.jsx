@@ -19,6 +19,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
 
   // import data from context
   const { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight } = useContext(ConfigContext)
+  const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
 
   // import tooltip helpers
   const { tooltipData, showTooltip } = useTooltip()
@@ -51,6 +52,8 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
 
     if (config.xAxis.type === 'date') {
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
+      if (!x) return
+      console.log('here is the value of x', x)
       const x0 = xScale.invert(x)
       const index = bisectDate(config.data, x0, 1)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
@@ -80,6 +83,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
       let itemsToLoop = [config.runtime.xAxis.dataKey, ...config.runtime.seriesKeys]
 
       itemsToLoop.map(seriesKey => {
+        if (!seriesKey) return
         return Object.entries(yScaleValues[0]).forEach(item => item[0] === seriesKey && seriesToInclude.push(item))
       })
 
@@ -117,11 +121,17 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
     return yScale(d[config.series[index].dataKey])
   }
 
+  let getSeries = () => {
+    if (config.runtime.areaSeriesKeys.length > 0) return config.runtime.areaSeriesKeys
+    if (config.series) return config.series
+    return
+  }
+
   return (
     data && (
       <ErrorBoundary component='AreaChart'>
         <Group className='area-chart' key='area-wrapper' left={config.yAxis.size}>
-          {config.series.map((s, index) => {
+          {getSeries().map((s, index) => {
             let seriesColor = colorPalettesChart[config.palette][index]
             let curveType = allCurves[s.lineType]
             let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
@@ -176,12 +186,13 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                 {tooltipData && (
                   <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition} left={tooltipData.dataXPosition} style={defaultStyles}>
                     <Group x={config.yAxis.size + 10} y={0}>
-                      <ul style={{ listStyle: 'none', paddingLeft: 'unset' }}>
-                        {Object.entries(tooltipData.data).map(item => (
-                          <li>
-                            <TooltipListItem item={item} />
-                          </li>
-                        ))}
+                      <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id}>
+                        {typeof tooltipData === 'object' &&
+                          Object.entries(tooltipData.data).map(item => (
+                            <li style={{ padding: '2.5px 0' }}>
+                              <TooltipListItem item={item} />
+                            </li>
+                          ))}
                       </ul>
                     </Group>
                   </TooltipInPortal>

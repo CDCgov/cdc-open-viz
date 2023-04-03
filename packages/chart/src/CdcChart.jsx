@@ -329,12 +329,26 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
+      newConfig.runtime.areaSeriesKeys = []
+
       newConfig.series.forEach(series => {
+        if (series.type === 'Area Chart') {
+          newConfig.runtime.areaSeriesKeys.push(series)
+        }
         if (series.type === 'Bar') {
           newConfig.runtime.barSeriesKeys.push(series.dataKey)
         }
         if (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') {
           newConfig.runtime.lineSeriesKeys.push(series.dataKey)
+        }
+      })
+    }
+    if (newConfig.visualizationType === 'Area Chart' && newConfig.series) {
+      newConfig.runtime.areaSeriesKeys = []
+
+      newConfig.series.forEach(series => {
+        if (series.type === 'Area Chart') {
+          newConfig.runtime.areaSeriesKeys.push(series)
         }
       })
     }
