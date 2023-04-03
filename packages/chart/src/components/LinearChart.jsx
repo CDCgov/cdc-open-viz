@@ -31,7 +31,7 @@ export default function LinearChart() {
   const cleanedData = cleanData(data, config.xAxis.dataKey)
 
   let [width] = dimensions
-  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, cleanedData)
   const [animatedChart, setAnimatedChart] = useState(false)
 
   const triggerRef = useRef()
@@ -66,7 +66,7 @@ export default function LinearChart() {
   const xMax = width - config.runtime.yAxis.size - (config.visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
 
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, cleanedData, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
@@ -82,7 +82,7 @@ export default function LinearChart() {
 
   let max = 0 // need outside the if statement
   let min = 0
-  if (data) {
+  if (cleanedData) {
     min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
@@ -90,7 +90,7 @@ export default function LinearChart() {
     if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Deviation Bar') {
       let ciYMax = 0
       if (config.hasOwnProperty('confidenceKeys')) {
-        let upperCIValues = data.map(function (d) {
+        let upperCIValues = cleanedData.map(function (d) {
           return d[config.confidenceKeys.upper]
         })
         ciYMax = Math.max.apply(Math, upperCIValues)
@@ -102,7 +102,7 @@ export default function LinearChart() {
     if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') {
       let ciYMax = 0
       if (config.hasOwnProperty('confidenceKeys')) {
-        let upperCIValues = data.map(function (d) {
+        let upperCIValues = cleanedData.map(function (d) {
           return d[config.confidenceKeys.upper]
         })
         ciYMax = Math.max.apply(Math, upperCIValues)
@@ -140,10 +140,10 @@ export default function LinearChart() {
       max += paddingValue
     }
 
-    let xAxisDataMapped = data.map(d => getXAxisData(d))
+    let xAxisDataMapped = cleanedData.map(d => getXAxisData(d))
 
     if (config.isLollipopChart && config.yAxis.displayNumbersOnBar) {
-      const dataKey = data.map(item => item[config.series[0].dataKey])
+      const dataKey = cleanedData.map(item => item[config.series[0].dataKey])
       const maxDataVal = Math.max(...dataKey).toString().length
 
       switch (true) {
@@ -219,11 +219,11 @@ export default function LinearChart() {
       const offset = 1.02 // Offset of the ticks/values from the Axis
       let groupOneMax = Math.max.apply(
         Math,
-        data.map(d => d[config.series[0].dataKey])
+        cleanedData.map(d => d[config.series[0].dataKey])
       )
       let groupTwoMax = Math.max.apply(
         Math,
-        data.map(d => d[config.series[1].dataKey])
+        cleanedData.map(d => d[config.series[1].dataKey])
       )
 
       // group one
@@ -319,7 +319,7 @@ export default function LinearChart() {
     let tickCount = undefined
 
     if (axis === 'yAxis') {
-      tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      tickCount = isHorizontal && !numTicks ? cleanedData.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
       // to fix edge case of small numbers with decimals
       if (tickCount === undefined && !config.dataFormat.roundTo) {
         // then it is set to Auto
