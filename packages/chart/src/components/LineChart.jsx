@@ -23,7 +23,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
 
   const handleAxisFormating = (axis = 'left', label, value) => {
     // if this is an x axis category/date value return without doing any formatting.
-    if (label === config.runtime.xAxis.label) return value
+    // if (label === config.runtime.xAxis.label) return value
 
     axis = String(axis).toLocaleLowerCase()
     if (label) {
@@ -74,12 +74,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 return (
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
-                  d[seriesKey] !== null &&
-                  isNumber(d[seriesKey]) &&
-                  isNumber(getYAxisData(d, seriesKey)) &&
-                  isNumber(getXAxisData(d)) &&
-                  isNumber(yScaleRight(getXAxisData(d))) &&
-                  isNumber(yScale(getXAxisData(d))) && (
+                  d[seriesKey] !== null && (
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
                       <Text
@@ -89,7 +84,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         textAnchor='middle'
                       >
-                        {formatNumber(d[seriesKey])}
+                        {formatNumber(d[seriesKey], 'left')}
                       </Text>
 
                       <circle

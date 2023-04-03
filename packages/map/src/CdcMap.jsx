@@ -167,6 +167,22 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [state.mapPosition, setPosition])
 
+  const generateRuntimeLegendHash = () => {
+    return hashObj({
+      color: state.color,
+      customColors: state.customColors,
+      numberOfItems: state.legend.numberOfItems,
+      type: state.legend.type,
+      separateZero: state.legend.separateZero ?? false,
+      primary: state.columns.primary.name,
+      categoryValuesOrder: state.legend.categoryValuesOrder,
+      specialClasses: state.legend.specialClasses,
+      geoType: state.general.geoType,
+      data: state.data,
+      ...runtimeFilters
+    })
+  }
+
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let newViewport = getViewport(entry.contentRect.width)
@@ -229,7 +245,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         // Cities
         if (!uid && 'world-geocode' === state.general.type) {
-          uid = cityKeys.find(key => key === geoName.toUpperCase())
+          uid = cityKeys.find(key => key === geoName?.toUpperCase())
         }
       }
 
@@ -268,6 +284,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (hash) {
       result.fromHash = hash
     }
+
+    result.runtimeDataHash = runtimeData.fromHash
 
     // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
@@ -464,6 +482,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
 
       legendMemo.current = newLegendMemo
+
+      result.forEach((row, i) => {
+        row.bin = i // set bin number to index
+      })
+
       return result
     }
 
@@ -781,13 +804,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     try {
       const result = {}
 
-      if (hash) {
-        // Adding property this way prevents it from being enumerated
-        Object.defineProperty(result, 'fromHash', {
-          value: hash
-        })
-      }
+      // Adding property this way prevents it from being enumerated
+      Object.defineProperty(result, 'fromHash', {
+        value: hash
+      })
 
+      addUIDs(obj, obj.columns.geo.name)
       obj.data.forEach(row => {
         if (test) {
           console.log('object', obj)
@@ -987,13 +1009,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
             // THIS CODE SHOULD NOT ACT ON THE ENTIRE ROW OF KEYS BUT ONLY THE ONE KEY IN THE SPECIAL CLASS
             for (let i = 0; i < state.legend.specialClasses.length; i++) {
-                // DEV-3303 - Special Classes label in HOVERS should only apply to selected special class key
-                // - you have to ALSO check that the key matches - putting here otherwise the if stmt too long
+              // DEV-3303 - Special Classes label in HOVERS should only apply to selected special class key
+              // - you have to ALSO check that the key matches - putting here otherwise the if stmt too long
               if (columnKey === state.legend.specialClasses[i].key) {
-                  if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
-                    value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
-                    break
-                  }
+                if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
+                  value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
+                  break
+                }
               }
             }
           }
@@ -1062,6 +1084,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     newLegend.forEach(legendItem => {
       delete legendItem.disabled
     })
+
+    newLegend.runtimeDataHash = runtimeLegend.runtimeDataHash
 
     setRuntimeLegend(newLegend)
   }
@@ -1357,62 +1381,32 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
     }
 
-    const hashLegend = hashObj({
-      color: state.color,
-      customColors: state.customColors,
-      numberOfItems: state.legend.numberOfItems,
-      type: state.legend.type,
-      separateZero: state.legend.separateZero ?? false,
-      categoryValuesOrder: state.legend.categoryValuesOrder,
-      specialClasses: state.legend.specialClasses,
-      geoType: state.general.geoType,
-      data: state.data,
-      ...runtimeLegend,
-      ...runtimeFilters
-    })
+    const hashLegend = generateRuntimeLegendHash()
 
     const hashData = hashObj({
+      data: state.data,
       columns: state.columns,
       geoType: state.general.geoType,
       type: state.general.type,
       geo: state.columns.geo.name,
       primary: state.columns.primary.name,
-      data: state.data,
-      ...runtimeFilters,
       mapPosition: state.mapPosition,
       ...runtimeFilters
     })
 
     // Data
-    let newRuntimeData
     if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
       setRuntimeData(newRuntimeData)
     }
-
-    // Legend
-    if (hashLegend !== runtimeLegend.fromHash && (undefined === runtimeData.init || newRuntimeData)) {
-      const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
-      setRuntimeLegend(legend)
-    }
   }, [state]) // eslint-disable-line
 
   useEffect(() => {
-    const hashLegend = hashObj({
-      color: state.color,
-      customColors: state.customColors,
-      numberOfItems: state.legend.numberOfItems,
-      type: state.legend.type,
-      separateZero: state.legend.separateZero ?? false,
-      categoryValuesOrder: state.legend.categoryValuesOrder,
-      specialClasses: state.legend.specialClasses,
-      geoType: state.general.geoType,
-      data: state.data
-    })
+    const hashLegend = generateRuntimeLegendHash()
 
     // Legend - Update when runtimeData does
     if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
-      let legend = generateRuntimeLegend(state, runtimeData)
+      const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
       setRuntimeLegend(legend)
     }
   }, [runtimeData]) // eslint-disable-line
@@ -1426,7 +1420,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Destructuring for more readable JSX
   const { general, tooltips, dataTable } = state
-  const { title = '', subtext = '' } = general
+  let { title, subtext = '' } = general
+
+  // if no title AND in editor then set a default
+  if (isEditor) {
+    if (!title || title === '') title = 'Map Title'
+  }
+  if (!dataTable.title || dataTable.title === '') dataTable.title = 'Data Table'
 
   // Outer container classes
   let outerContainerClasses = ['cdc-open-viz-module', 'cdc-map-outer-container', currentViewport]
@@ -1471,7 +1471,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     handleMapAriaLabels,
     runtimeFilters,
     setRuntimeFilters,
-    innerContainerRef
+    innerContainerRef,
+    currentViewport
   }
 
   if (!mapProps.data || !state.data) return <Loading />
@@ -1505,11 +1506,24 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   return (
     <ConfigContext.Provider value={mapProps}>
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
-        {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} changeFilterActive={changeFilterActive} />}
+        {isEditor && (
+          <EditorPanel
+            isDashboard={isDashboard}
+            state={state}
+            setState={setState}
+            loadConfig={loadConfig}
+            setParentConfig={setConfig}
+            setRuntimeFilters={setRuntimeFilters}
+            runtimeFilters={runtimeFilters}
+            runtimeLegend={runtimeLegend}
+            columnsInData={Object.keys(state.data[0])}
+            changeFilterActive={changeFilterActive}
+          />
+        )}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
-            {state.general.title && (
+            {title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                 <div role='heading' className={'map-title ' + general.headerColor} tabIndex='0' aria-level='2'>

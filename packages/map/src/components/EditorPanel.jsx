@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, memo } from 'react'
 
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
@@ -27,6 +27,7 @@ import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import worldDefaultConfig from '../../examples/default-world.json'
 import usaDefaultConfig from '../../examples/default-usa.json'
 import countyDefaultConfig from '../../examples/default-county.json'
+import useMapLayers from '../hooks/useMapLayers'
 
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -71,16 +72,27 @@ const EditorPanel = props => {
 
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
 
-  const [configTextboxValue, setConfigTextbox] = useState({})  // eslint-disable-line
+  const [configTextboxValue, setConfigTextbox] = useState({}) // eslint-disable-line
 
   const [loadedDefault, setLoadedDefault] = useState(false)
 
   const [displayPanel, setDisplayPanel] = useState(true)
 
-
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
+
+  const {
+    // prettier-ignore
+    MapLayerHandlers: {
+      handleAddLayer,
+      handleMapLayerName,
+      handleMapLayerUrl,
+      handleRemoveLayer,
+      handleMapLayerNamespace,
+      handleMapLayerTooltip
+    }
+  } = useMapLayers(state, setState, false, true)
 
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = [...state.legend.categoryValuesOrder]
@@ -118,6 +130,24 @@ const EditorPanel = props => {
   } else {
     specialClasses = legend.specialClasses || []
   }
+
+  const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
+    <label className='checkbox'>
+      <input
+        type='checkbox'
+        name={fieldName}
+        checked={value}
+        onChange={e => {
+          updateField(section, subsection, fieldName, !value)
+        }}
+        {...attributes}
+      />
+      <span className='edit-label'>
+        {label}
+        {tooltip}
+      </span>
+    </label>
+  ))
 
   const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
     let filterOrder = filter.values
@@ -508,7 +538,8 @@ const EditorPanel = props => {
               ...state,
               general: {
                 ...state.general,
-                geoType: 'us'
+                geoType: 'us',
+                type: state.type === 'us-geocode' ? 'data' : state.type
               },
               dataTable: {
                 ...state.dataTable,
@@ -739,11 +770,11 @@ const EditorPanel = props => {
       columnList.push('Navigation')
     }
 
-    if ((('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && '' === state.columns.latitude.name) {
+    if (('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && '' === state.columns.latitude.name) {
       columnList.push('Latitude')
     }
 
-    if ((('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && '' === state.columns.longitude.name) {
+    if (('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && '' === state.columns.longitude.name) {
       columnList.push('Longitude')
     }
 
@@ -990,7 +1021,9 @@ const EditorPanel = props => {
     if (!isReversed && state.color.endsWith('reverse')) {
       paletteName = state.color.slice(0, -7)
     }
-    handleEditorChanges('color', paletteName)
+    if (paletteName) {
+      handleEditorChanges('color', paletteName)
+    }
   }, [isReversed])
 
   useEffect(() => {
@@ -1086,6 +1119,7 @@ const EditorPanel = props => {
 
   const updateField = (section, subsection, fieldName, newValue) => {
     const isArray = Array.isArray(state[section])
+
     let sectionValue = isArray ? [...state[section], newValue] : { ...state[section], [fieldName]: newValue }
 
     if (null !== subsection) {
@@ -1466,10 +1500,11 @@ const EditorPanel = props => {
                 <AccordionItemPanel>
                   <TextField
                     value={general.title}
-                    data-testid="title-input"
+                    data-testid='title-input'
                     updateField={updateField}
                     section='general'
                     fieldName='title'
+                    id='title'
                     label='Title'
                     placeholder='Map Title'
                     tooltip={
@@ -1478,11 +1513,21 @@ const EditorPanel = props => {
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
+                          <p>Title is required to set the name of the download file but can be hidden using the option below.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
                   />
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={state.general.showTitle || false}
+                      onChange={event => {
+                        handleEditorChanges('showTitle', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Show Title</span>
+                  </label>
                   <TextField
                     value={general.superTitle || ''}
                     updateField={updateField}
@@ -1555,7 +1600,7 @@ const EditorPanel = props => {
                     }
                   />
                   {'us' === state.general.geoType && <TextField value={general.territoriesLabel} updateField={updateField} section='general' fieldName='territoriesLabel' label='Territories Label' placeholder='Territories' />}
-                  {'us' === state.general.geoType &&
+                  {'us' === state.general.geoType && (
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -1566,7 +1611,7 @@ const EditorPanel = props => {
                       />
                       <span className='edit-label'>Show All Territories</span>
                     </label>
-                  }
+                  )}
                   {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1753,7 +1798,7 @@ const EditorPanel = props => {
                       </label>
                     </fieldset>
                   )}
-                  {(('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && (
+                  {('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && (
                     <>
                       <label>Latitude Column</label>
                       <select
@@ -2316,6 +2361,7 @@ const EditorPanel = props => {
                       updateField={updateField}
                       section='dataTable'
                       fieldName='title'
+                      id='dataTableTitle'
                       label='Data Table Title'
                       placeholder='Data Table'
                       tooltip={
@@ -2329,6 +2375,26 @@ const EditorPanel = props => {
                         </Tooltip>
                       }
                     />
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard}
+                        onChange={event => {
+                          handleEditorChanges('showDataTable', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>
+                        Show Table
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </span>
+                    </label>
                     <TextField
                       value={dataTable.indexLabel || ''}
                       updateField={updateField}
@@ -2366,26 +2432,6 @@ const EditorPanel = props => {
                       }
                       type='textarea'
                     />
-                    <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard}
-                        onChange={event => {
-                          handleEditorChanges('showDataTable', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>
-                        Show Table
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </span>
-                    </label>
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -2622,7 +2668,7 @@ const EditorPanel = props => {
                       )
                     })}
                   </ul>
-                  {(('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && (
+                  {('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && (
                     <label>
                       Geocode Settings
                       <TextField type='number' value={state.visual.geoCodeCircleSize} section='visual' max='10' fieldName='geoCodeCircleSize' label='Geocode Circle Size' updateField={updateField} />
@@ -2672,21 +2718,59 @@ const EditorPanel = props => {
                     </label>
                   )}
                   {state.general.geoType === 'us' ||
-                    (state.general.geoType === 'us-county' ||
-                      (state.general.geoType === 'world') && (
-                        <label>
-                          <span className='edit-label'>City Style</span>
-                          <select
-                            value={state.visual.cityStyle || false}
-                            onChange={event => {
-                              handleEditorChanges('handleCityStyle', event.target.value)
-                            }}
-                          >
-                            <option value='circle'>Circle</option>
-                            <option value='pin'>Pin</option>
-                          </select>
-                        </label>
-                      ))}
+                    state.general.geoType === 'us-county' ||
+                    (state.general.geoType === 'world' && (
+                      <label>
+                        <span className='edit-label'>City Style</span>
+                        <select
+                          value={state.visual.cityStyle || false}
+                          onChange={event => {
+                            handleEditorChanges('handleCityStyle', event.target.value)
+                          }}
+                        >
+                          <option value='circle'>Circle</option>
+                          <option value='pin'>Pin</option>
+                        </select>
+                      </label>
+                    ))}
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Custom Map Layers</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  {state.map.layers.length === 0 && <p>There are currently no layers.</p>}
+
+                  {state.map.layers.map((layer, index) => {
+                    return (
+                      <>
+                        <Accordion allowZeroExpanded>
+                          <AccordionItem className='map-layers-list'>
+                            <AccordionItemHeading className='map-layers-list--title'>
+                              <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
+                            </AccordionItemHeading>
+                            <AccordionItemPanel>
+                              <div className='map-layers-panel'>
+                                <label htmlFor='layerName'>Layer Name:</label>
+                                <input type='text' name='layerName' value={layer.name} onChange={e => handleMapLayerName(e, index)} />
+                                <label htmlFor='layerFilename'>File:</label>
+                                <input type='text' name='layerFilename' value={layer.url} onChange={e => handleMapLayerUrl(e, index)} />
+                                <label htmlFor='layerNamespace'>TOPOJSON Namespace:</label>
+                                <input type='text' name='layerNamespace' value={layer.namespace} onChange={e => handleMapLayerNamespace(e, index)} />
+                                <label htmlFor='layerTooltip'>Tooltip:</label>
+                                <textarea name='layerTooltip' value={layer.tooltip} onChange={e => handleMapLayerTooltip(e, index)}></textarea>
+                                <button onClick={e => handleRemoveLayer(e, index)}>Remove Layer</button>
+                              </div>
+                            </AccordionItemPanel>
+                          </AccordionItem>
+                        </Accordion>
+                      </>
+                    )
+                  })}
+                  <button className={'btn full-width'} onClick={handleAddLayer}>
+                    Add Map Layer
+                  </button>
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
