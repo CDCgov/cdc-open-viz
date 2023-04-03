@@ -170,16 +170,13 @@
   "visualizationType": "Area Chart",
   "series": [
     {
-      "dataKey": "Data 1",
-      "type": "Bar"
+      "dataKey": "Data 1"
     },
     {
-      "dataKey": "Data 2",
-      "type": "Bar"
+      "dataKey": "Data 2"
     },
     {
-      "dataKey": "Data 3",
-      "type": "Bar"
+      "dataKey": "Data 3"
     }
   ],
   "description": "This example shows a bar chart created in the visualization editor in WCMS",
