@@ -2,6 +2,7 @@ export default {
   general: {
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',
+    title: '',
     showTitle: true,
     showSidebar: true,
     showDownloadButton: true,
@@ -84,5 +85,8 @@ export default {
     geoCodeCircleSize: 2,
     showBubbleZeros: false
   },
-  mapPosition: { coordinates: [0, 30], zoom: 1 }
+  mapPosition: { coordinates: [0, 30], zoom: 1 },
+  map: {
+    layers: []
+  }
 }

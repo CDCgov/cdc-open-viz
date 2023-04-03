@@ -10,27 +10,10 @@ import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 import Loading from '@cdc/core/components/Loading'
 
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
-  const {
-    state,
-    tableTitle,
-    indexTitle,
-    mapTitle,
-    rawData,
-    runtimeData,
-    headerColor,
-    expandDataTable,
-    columns,
-    displayDataAsText,
-    applyLegendToRow,
-    displayGeoName,
-    navigationHandler,
-    viewport,
-    formatLegendLocation,
-    tabbingId,
-    setFilteredCountryCode,
-  } = props
-  
+  const { state, tableTitle, indexTitle, mapTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
+
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
@@ -174,12 +157,8 @@ const DataTable = props => {
             if (runtimeData) {
               if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
                 for (let i = 0; i < state.legend.specialClasses.length; i++) {
-                  // DEV-3303 - Special Classes label should only apply to selected special class key
-                  // - you have to ALSO check that the column name matches - putting here otherwise the if stmt too long
-                  if (columns[column].name === state.legend.specialClasses[i].key) {
-                    if (String(runtimeData[row][state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
-                      return state.legend.specialClasses[i].label
-                    }
+                  if (String(runtimeData[row][state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
+                    return state.legend.specialClasses[i].label
                   }
                 }
               }
@@ -229,7 +208,7 @@ const DataTable = props => {
     })
 
     return newTableColumns
-  }, [indexTitle, columns, runtimeData, getCellAnchor, displayDataAsText, applyLegendToRow, customSort, displayGeoName, state.legend.specialClasses])   // eslint-disable-line
+  }, [indexTitle, columns, runtimeData, getCellAnchor, displayDataAsText, applyLegendToRow, customSort, displayGeoName, state.legend.specialClasses]) // eslint-disable-line
 
   const tableData = useMemo(
     () =>

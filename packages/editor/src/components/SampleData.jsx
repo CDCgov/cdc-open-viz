@@ -9,6 +9,7 @@ import validGeoPoint from './../samples/valid-geo-point.csv?raw'
 import validScatterPlot from './../samples/valid-scatterplot.csv?raw'
 import validBoxPlotData from './../samples/valid-boxplot.csv?raw'
 import validAreaChart from './../samples/valid-area-chart.json?raw'
+import validWorldGeocodeData from './../samples/valid-world-geocode.json?raw'
 
 // Add additional data to samples
 const sampleData = {
@@ -27,12 +28,12 @@ const sampleData = {
       text: 'Scatter Plot Sample Data',
       fileName: 'valid-scatterplot.csv',
       data: validScatterPlot
-    },
-    {
-      text: 'Area Chart Sample Data',
-      fileName: 'valid-area-chart.json',
-      data: validAreaChart
     }
+    // {
+    //   text: 'Area Chart Sample Data',
+    //   fileName: 'valid-area-chart.json',
+    //   data: validAreaChart
+    // }
   ],
   maps: [
     {
@@ -49,6 +50,11 @@ const sampleData = {
       text: 'United States: Geo Point Sample Data',
       fileName: 'supported-cities.csv',
       data: validGeoPoint
+    },
+    {
+      text: 'World: Geocode Sample Data',
+      fileName: 'valid-world-geocode.json',
+      data: validWorldGeocodeData
     }
   ]
 }

@@ -79,14 +79,34 @@
     "description": "Legend Text",
     "type": "equalnumber",
     "specialClasses": [
-      { "key": "Rate", "value": "*", "label": "*" },
-      { "key": "Rate", "value": "NA", "label": "N/A" }
+      {
+        "key": "Rate",
+        "value": "*",
+        "label": "*"
+      },
+      {
+        "key": "Rate",
+        "value": "NA",
+        "label": "N/A"
+      }
     ],
     "unified": false,
     "singleColumn": false,
     "dynamicDescription": false,
     "descriptions": {},
     "singleRow": false
+  },
+  "map": {
+    "layers": [
+      {
+        "name": "Layer One",
+        "url": "./examples/testing-layer.json"
+      },
+      {
+        "name": "Layer Two",
+        "url": "./examples/testing-layer.json"
+      }
+    ]
   },
   "filters": [],
   "dataTable": {
@@ -109,7 +129,10 @@
     "showBubbleZeros": false
   },
   "mapPosition": {
-    "coordinates": [0, 30],
+    "coordinates": [
+      0,
+      30
+    ],
     "zoom": 1
   },
   "sharing": {
