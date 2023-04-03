@@ -10,6 +10,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import topoJSON from '../data/county-map.json'
 import { formatPrefix } from 'd3'
+import useMapLayers from '../hooks/useMapLayers'
 
 const sortById = (a, b) => {
   if (a.id < b.id) return -1
@@ -63,6 +64,10 @@ const CountyMap = props => {
   const { state, runtimeLegend, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels } = props
 
   const [focus, setFocus] = useState({})
+
+  const pathGenerator = geoPath().projection(geoAlbersUsaTerritories())
+
+  const { featureArray } = useMapLayers(state, '', pathGenerator, false)
 
   useEffect(() => {
     if (containerEl) {
@@ -217,6 +222,9 @@ const CountyMap = props => {
         }
       }
 
+      // todo: current item is a custom map layer
+      // if(currentItem === customMapLayer) show layer.tooltip
+
       let hoveredGeo
       let hoveredGeoIndex
       for (let i = 0; i < runtimeKeys.length; i++) {
@@ -308,6 +316,20 @@ const CountyMap = props => {
         context.beginPath()
         path(mapData[focusIndex])
         context.stroke()
+      }
+
+      // add in custom map layers
+      if (featureArray.length > 0) {
+        featureArray.map(layer => {
+          context.beginPath()
+          path(layer)
+          context.fillStyle = layer.properties.fill
+          context.globalAlpha = layer.properties['fill-opacity']
+          context.strokeStyle = layer.properties['stroke']
+          context.lineWidth = layer.properties['stroke-width']
+          context.fill()
+          context.stroke()
+        })
       }
 
       if (state.general.type === 'us-geocode') {
