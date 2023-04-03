@@ -245,7 +245,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         // Cities
         if (!uid && 'world-geocode' === state.general.type) {
-          uid = cityKeys.find(key => key === geoName.toUpperCase())
+          uid = cityKeys.find(key => key === geoName?.toUpperCase())
         }
       }
 
@@ -284,8 +284,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (hash) {
       result.fromHash = hash
     }
-
-    result.runtimeDataHash = runtimeData.fromHash
 
     // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
@@ -1085,8 +1083,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       delete legendItem.disabled
     })
 
-    newLegend.runtimeDataHash = runtimeLegend.runtimeDataHash
-
     setRuntimeLegend(newLegend)
   }
 
@@ -1384,13 +1380,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     const hashLegend = generateRuntimeLegendHash()
 
     const hashData = hashObj({
+      data: state.data,
       columns: state.columns,
       geoType: state.general.geoType,
       type: state.general.type,
       geo: state.columns.geo.name,
       primary: state.columns.primary.name,
-      data: state.data,
-      ...runtimeFilters,
       mapPosition: state.mapPosition,
       ...runtimeFilters
     })
@@ -1428,9 +1423,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Destructuring for more readable JSX
   const { general, tooltips, dataTable } = state
-  let { title = 'Map Title', subtext = '' } = general
+  let { title, subtext = '' } = general
 
-  if (!title || title === '') title = 'Map Title'
+  // if no title AND in editor then set a default
+  if (isEditor) {
+    if (!title || title === '') title = 'Map Title'
+  }
   if (!dataTable.title || dataTable.title === '') dataTable.title = 'Data Table'
 
   // Outer container classes

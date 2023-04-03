@@ -2,7 +2,7 @@ export default {
   general: {
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',
-    title: 'Map Title',
+    title: '',
     showTitle: true,
     showSidebar: true,
     showDownloadButton: true,

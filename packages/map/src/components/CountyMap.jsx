@@ -56,7 +56,6 @@ function CountyMapChecks(prevState, nextState) {
   const equalBorderColors = prevState.state.general.geoBorderColor === nextState.state.general.geoBorderColor // update when geoborder color changes
   const equalData = prevState.data === nextState.data // update when data changes
   const equalTooltipBehavior = prevState.state.tooltips.appearanceType === nextState.state.tooltips.appearanceType
-  if (nextState.runtimeLegend.runtimeDataHash !== nextState.data.fromHash) return true
   return equalData && equalBorderColors && equalLegend && equalColumnName && equalNavColumn && equalNumberOptIn && equalTooltipBehavior ? true : false
 }
 
@@ -131,7 +130,7 @@ const CountyMap = props => {
       let clickedGeo
       for (let i = 0; i < runtimeKeys.length; i++) {
         const pixelCoords = projection([data[runtimeKeys[i]][state.columns.longitude.name], data[runtimeKeys[i]][state.columns.latitude.name]])
-        if (Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
+        if (pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
           clickedGeo = data[runtimeKeys[i]]
           break
         }
@@ -216,7 +215,7 @@ const CountyMap = props => {
       // Handle geo map hover
       if (!isNaN(currentTooltipIndex)) {
         const pixelCoords = projection([data[runtimeKeys[currentTooltipIndex]][state.columns.longitude.name], data[runtimeKeys[currentTooltipIndex]][state.columns.latitude.name]])
-        if (Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
+        if (pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
           // Who knew pythagorean theorum was useful
           return // The user is still hovering over the previous geo point, don't redraw tooltip
         }
@@ -229,7 +228,7 @@ const CountyMap = props => {
       let hoveredGeoIndex
       for (let i = 0; i < runtimeKeys.length; i++) {
         const pixelCoords = projection([data[runtimeKeys[i]][state.columns.longitude.name], data[runtimeKeys[i]][state.columns.latitude.name]])
-        if (Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
+        if (pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
           hoveredGeo = data[runtimeKeys[i]]
           hoveredGeoIndex = i
           break

@@ -32,7 +32,7 @@ function useReduceData(config, data) {
       }, [])
 
       max = Math.max(...yTotals)
-    } else if (config.visualizationType === 'Bar' && config.series && config.series.dataKey) {
+    } else if ((config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.series && config.series.dataKey) {
       max = Math.max(...data.map(d => (isNumber(d[config.series.dataKey]) ? Number(cleanChars(d[config.series.dataKey])) : 0)))
       //max = Math.max(...data.map(d => Number(d[config.series.dataKey])))
     } else if (config.visualizationType === 'Combo' && config.visualizationSubType === 'stacked' && !isBar) {
