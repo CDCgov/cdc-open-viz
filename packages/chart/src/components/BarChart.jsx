@@ -147,7 +147,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
                   // tooltips
                   const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
-                  const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
+                  const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                   const style = applyRadius(barStack.index, yAxisValue < 0)
                   let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -173,7 +173,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       </style>
                       <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className='stack vertical'>
                         <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barThickness * bar.index + offset} y={bar.y - 5} fill={bar.color} textAnchor='middle'>
-                          {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
+                          {yAxisValue}
                         </Text>
                         <foreignObject
                           key={`bar-stack-${barStack.index}-${bar.index}`}
@@ -208,7 +208,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     config.barHeight = Number(config.barHeight)
                     let labelColor = '#000000'
                     // tooltips
-                    const xAxisValue = formatNumber(data[bar.index][bar.key])
+                    const xAxisValue = formatNumber(data[bar.index][bar.key], 'left')
                     const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
                     const style = applyRadius(barStack.index, yAxisValue < 0)
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
@@ -264,7 +264,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             </Text>
                           )}
 
-                          {displayNumbersOnBar && textWidth + 50 < bar.width && (
+                          {displayNumbersOnBar && textWidth < bar.width && (
                             <Text
                               display={displayBar ? 'block' : 'none'}
                               x={bar.x + barStack.bars[bar.index].width / 2} // padding
@@ -280,7 +280,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 }
                               }}
                             >
-                              {formatNumber(data[bar.index][bar.key])}
+                              {xAxisValue}
                             </Text>
                           )}
                         </Group>
@@ -342,7 +342,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
                       if (config.legend.colorCode && config.series.length === 1) barColor = palette[barGroup.index]
 
-                      let yAxisValue = formatNumber(bar.value)
+                      let yAxisValue = formatNumber(bar.value, 'left')
                       let xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                       if (config.runtime.horizontal) {
@@ -447,7 +447,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             ;
                             {orientation === 'vertical' && (
                               <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
-                                {formatNumber(bar.value)}
+                                {yAxisValue}
                               </Text>
                             )}
                             ;
@@ -504,11 +504,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         stroke='#333'
                         strokeWidth='px'
                         d={`
-                        M${lowerPos} ${yPos - tickWidth} 
-                        L${lowerPos} ${yPos + tickWidth} 
-                        M${lowerPos} ${yPos} 
-                        L${upperPos} ${yPos} 
-                        M${upperPos} ${yPos - tickWidth} 
+                        M${lowerPos} ${yPos - tickWidth}
+                        L${lowerPos} ${yPos + tickWidth}
+                        M${lowerPos} ${yPos}
+                        L${upperPos} ${yPos}
+                        M${upperPos} ${yPos - tickWidth}
                         L${upperPos} ${yPos + tickWidth} `}
                       />
                     )

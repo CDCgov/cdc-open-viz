@@ -538,7 +538,8 @@ const EditorPanel = props => {
               ...state,
               general: {
                 ...state.general,
-                geoType: 'us'
+                geoType: 'us',
+                type: state.type === 'us-geocode' ? 'data' : state.type
               },
               dataTable: {
                 ...state.dataTable,
