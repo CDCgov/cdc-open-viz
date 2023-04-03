@@ -13,8 +13,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   // calling clean several times on same set of data (TT)
   const cleanedData = cleanData(data, config.xAxis.dataKey)
 
-  console.log('Barchart TOP cleanedData', cleanedData)
-
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
