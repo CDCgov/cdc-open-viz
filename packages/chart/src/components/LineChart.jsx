@@ -101,7 +101,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 curve={allCurves.curveLinear}
                 data={cleanedData}
                 x={d => xScale(getXAxisData(d))}
-                y={d => (seriesAxis === 'Right' ? yScale(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
+                y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                 stroke={
                   colorScale && !config.legend.dynamicLegend
                     ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey)
