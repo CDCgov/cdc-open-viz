@@ -66,8 +66,9 @@ const useFilters = props => {
     setShowApplyButton(false)
   }
 
-  const handleReset = () => {
+  const handleReset = e => {
     let newFilters = config.filters
+    e.preventDefault()
 
     // reset to first item in values array.
     newFilters.map(filter => {
