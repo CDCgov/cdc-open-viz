@@ -25,7 +25,7 @@ export default {
     hideGeoColumnInTooltip: false,
     hidePrimaryColumnInTooltip: false
   },
-
+  filterBehavior: 'dropdown',
   type: 'map',
   color: 'pinkpurple',
   columns: {
