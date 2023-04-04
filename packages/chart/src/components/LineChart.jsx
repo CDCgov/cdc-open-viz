@@ -13,10 +13,10 @@ import useRightAxis from '../hooks/useRightAxis'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig } = useContext(ConfigContext)
-  // Just do this once up front otherwise we end up 
+  // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data, config.xAxis.dataKey);
-  const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
+  const cleanedData = cleanData(data, config.xAxis.dataKey)
+  const { yScaleRight } = useRightAxis({ config, yMax, cleanedData, updateConfig })
 
   const handleLineType = lineType => {
     switch (lineType) {
@@ -86,8 +86,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   isNumber(d[seriesKey]) &&
                   isNumber(getYAxisData(d, seriesKey)) &&
                   isNumber(getXAxisData(d)) &&
-                  isNumber(yScaleRight(getXAxisData(d))) &&
-                  isNumber(yScale(getXAxisData(d))) && (
+                  (seriesAxis === 'Right' ? isNumber(yScaleRight(getXAxisData(d))) : isNumber(yScale(getXAxisData(d)))) && (
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
                       <Text
@@ -99,7 +98,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                       >
                         {formatNumber(d[seriesKey])}
                       </Text>
-
                       <circle
                         key={`${seriesKey}-${dataIndex}`}
                         r={circleRadii}
@@ -159,9 +157,9 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               {config.showLineSeriesLabels &&
                 (config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map(seriesKey => {
                   let lastDatum
-                  for (let i = data.length - 1; i >= 0; i--) {
-                    if (data[i][seriesKey]) {
-                      lastDatum = data[i]
+                  for (let i = cleanedData.length - 1; i >= 0; i--) {
+                    if (cleanedData[i][seriesKey]) {
+                      lastDatum = cleanedData[i]
                       break
                     }
                   }
