@@ -118,11 +118,11 @@ export class DataTransform {
           })
         })
 
-        return standardized;
+        return standardized
       }
     } else if (description.series === true && description.singleRow === false) {
       if (description.seriesKey !== undefined && description.xKey !== undefined && (description.valueKey !== undefined || (description.valueKeys !== undefined && description.valueKeys.length > 0))) {
-        if(description.valueKey !== undefined){
+        if(description.valueKeys !== undefined){
           let standardizedMapped = {};
           let standardized = [];
           let valueKeys = description.valueKeys;
@@ -150,7 +150,13 @@ export class DataTransform {
 
               standardizedMapped[uniqueKey][row[description.seriesKey]] = row[valueKey];
             });
-          });
+          })
+
+          Object.keys(standardizedMapped).forEach(key => {
+            if(!description.ignoredKeys || description.ignoredKeys.indexOf(standardizedMapped[key]['**Numeric Value Property**']) === -1){
+              standardized.push(standardizedMapped[key]);
+            }
+          })
 
           return standardized;
         } else {
@@ -178,12 +184,10 @@ export class DataTransform {
           })
 
           Object.keys(standardizedMapped).forEach(key => {
-            if(!description.ignoredKeys || description.ignoredKeys.indexOf(standardizedMapped[key]['**Numeric Value Property**']) === -1){
-              standardized.push(standardizedMapped[key]);
-            }
+            standardized.push(standardizedMapped[key])
           })
 
-          return standardized;
+          return standardized
         }
       } else {
         return undefined;

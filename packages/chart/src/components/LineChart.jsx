@@ -18,20 +18,10 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   const cleanedData = cleanData(data, config.xAxis.dataKey)
   const { yScaleRight } = useRightAxis({ config, yMax, cleanedData, updateConfig })
 
-  const handleLineType = lineType => {
-    switch (lineType) {
-      case 'dashed-sm':
-        return '5 5'
-      case 'dashed-md':
-        return '10 5'
-      case 'dashed-lg':
-        return '15 5'
-      default:
-        return 0
-    }
-  }
-
   const handleAxisFormating = (axis = 'left', label, value) => {
+    // if this is an x axis category/date value return without doing any formatting.
+    // if (label === config.runtime.xAxis.label) return value
+
     axis = String(axis).toLocaleLowerCase()
     if (label) {
       return `${label}: ${formatNumber(value, axis)}`
@@ -96,7 +86,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         textAnchor='middle'
                       >
-                        {formatNumber(d[seriesKey])}
+                        {formatNumber(d[seriesKey], 'left')}
                       </Text>
                       <circle
                         key={`${seriesKey}-${dataIndex}`}
@@ -105,8 +95,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                         cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))}
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
-                        data-tip={tooltip}
-                        data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                        data-tooltip-html={tooltip}
+                        data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
                     </Group>
                   )

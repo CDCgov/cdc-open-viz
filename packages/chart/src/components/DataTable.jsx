@@ -5,16 +5,14 @@ import { Base64 } from 'js-base64'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
+import Icon from '@cdc/core/components/ui/Icon'
 
 import ConfigContext from '../ConfigContext'
 
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext(ConfigContext)
-
-  // Debugging.
-  // if (config.visualizationType === 'Box Plot') return null
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
@@ -56,7 +54,7 @@ export default function DataTable() {
       config.visualizationType === 'Pie'
         ? []
         : config.visualizationType === 'Box Plot'
-          ? [
+        ? [
             {
               Header: 'Measures',
               Cell: props => {
@@ -75,7 +73,7 @@ export default function DataTable() {
                     columnThirdQuartile: labels.q3,
                     columnOutliers: labels.outliers,
                     values: labels.values,
-                    columnCount: labels.count,
+                    columnTotal: labels.total,
                     columnSd: 'Standard Deviation',
                     nonOutlierValues: 'Non Outliers'
                   }
@@ -89,7 +87,7 @@ export default function DataTable() {
               }
             }
           ]
-          : [
+        : [
             {
               Header: '',
               Cell: ({ row }) => {
@@ -104,8 +102,8 @@ export default function DataTable() {
                             ? colorScale(seriesLabel)
                             : // dynamic legend
                             config.legend.dynamicLegend
-                              ? colorPalettes[config.palette][row.index]
-                              : // fallback
+                            ? colorPalettes[config.palette][row.index]
+                            : // fallback
                               '#000'
                         }
                       />
@@ -121,12 +119,13 @@ export default function DataTable() {
       data.forEach((d, index) => {
         const resolveTableHeader = () => {
           if (config.runtime[section].type === 'date') return formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
+          if (config.runtime[section].type === 'continuous') return numberFormatter(d[config.runtime.originalXAxis.dataKey], 'bottom')
           return d[config.runtime.originalXAxis.dataKey]
         }
         const newCol = {
           Header: resolveTableHeader(),
           Cell: ({ row }) => {
-            return <>{numberFormatter(d[row.original])}</>
+            return <>{numberFormatter(d[row.original], 'left')}</>
           },
           id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
           canSort: true
@@ -148,7 +147,7 @@ export default function DataTable() {
               if (Number(props.row.id) === 3) return plot.columnMedian
               if (Number(props.row.id) === 4) return plot.columnFirstQuartile
               if (Number(props.row.id) === 5) return plot.columnMin
-              if (Number(props.row.id) === 6) return plot.columnCount
+              if (Number(props.row.id) === 6) return plot.columnTotal
               if (Number(props.row.id) === 7) return plot.columnSd
               if (Number(props.row.id) === 8) return plot.columnMean
               if (Number(props.row.id) === 9) return plot.columnOutliers.length > 0 ? plot.columnOutliers.toString() : '-'
@@ -161,12 +160,12 @@ export default function DataTable() {
           canSort: false
         }
 
-        newTableColumns.push(newCol)
+        return newTableColumns.push(newCol)
       })
     }
 
     return newTableColumns
-  }, [config, colorScale])
+  }, [config, colorScale]) // eslint-disable-line
 
   // prettier-ignore
   const tableData = useMemo(() => (
@@ -175,7 +174,7 @@ export default function DataTable() {
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])
         : config.runtime.seriesKeys),
-    [config.runtime.seriesKeys])
+    [config.runtime.seriesKeys]) // eslint-disable-line
 
   // Change accessibility label depending on expanded status
   useEffect(() => {
@@ -200,8 +199,13 @@ export default function DataTable() {
     }),
     []
   )
-
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
+
+  // sort continuous x axis scaling for data tables, ie. xAxis should read 1,2,3,4,5
+  if (config.xAxis.type === 'continuous' && headerGroups) {
+    data.sort((a, b) => a[config.xAxis.dataKey] - b[config.xAxis.dataKey])
+  }
+
   return (
     <ErrorBoundary component='DataTable'>
       <CoveMediaControls.Section classes={['download-links']}>
@@ -223,6 +227,7 @@ export default function DataTable() {
             }
           }}
         >
+          <Icon display={tableExpanded ? 'minus' : 'plus'} base />
           {config.table.label}
         </div>
         <div className='table-container' hidden={!tableExpanded} style={{ maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>
@@ -270,7 +275,7 @@ export default function DataTable() {
               })}
             </tbody>
           </table>
-          {config.regions && config.regions.length > 0 ? (
+          {config.regions && config.regions.length > 0 && !config.visualizationType === 'Box Plot' ? (
             <table className='region-table data-table'>
               <caption className='visually-hidden'>Table of the highlighted regions in the visualization</caption>
               <thead>
@@ -282,6 +287,7 @@ export default function DataTable() {
               </thead>
               <tbody>
                 {config.regions.map((region, index) => {
+                  if (config.visualizationType === 'Box Plot') return false
                   if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
                   return (

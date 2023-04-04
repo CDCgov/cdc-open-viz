@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 
 // IE11
-import 'core-js/stable'
+// import 'core-js/stable'
 import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
 
@@ -335,7 +335,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       setFilteredData(newFilteredData)
     }
 
-    const announceChange = text => {}
+    const announceChange = text => { }
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
       if (!singleFilter.showDropdown) return <></>

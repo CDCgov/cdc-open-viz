@@ -1,6 +1,7 @@
 export default {
   type: 'chart',
   title: '',
+  showTitle: true,
   theme: 'theme-blue',
   animate: false,
   fontSize: 'medium',
@@ -24,6 +25,7 @@ export default {
     hideTicks: false,
     size: 50,
     gridLines: false,
+    enablePadding: false,
     min: '',
     max: '',
     labelColor: '#333',
@@ -37,7 +39,8 @@ export default {
     rightAxisTickLabelColor: '#333',
     rightAxisTickColor: '#333',
     numTicks: '',
-    axisPadding: 0
+    axisPadding: 0,
+    tickRotation: 0
   },
   boxplot: {
     plots: [],
@@ -62,7 +65,7 @@ export default {
       median: 'Median',
       sd: 'Standard Deviation',
       iqr: 'Interquartile Range',
-      count: 'Count',
+      total: 'Total',
       outliers: 'Outliers',
       values: 'Values'
     }
@@ -80,6 +83,8 @@ export default {
   },
   xAxis: {
     type: 'categorical',
+    showTargetLabel: true,
+    targetLabel: 'Target',
     hideAxis: false,
     hideLabel: false,
     hideTicks: false,
@@ -92,7 +97,8 @@ export default {
     tickColor: '#333',
     numTicks: '',
     labelOffset: 65,
-    axisPadding: 0
+    axisPadding: 0,
+    target: 0
   },
   table: {
     label: 'Data Table',
@@ -105,7 +111,6 @@ export default {
   orientation: 'vertical',
   legend: {
     behavior: 'isolate',
-    position: 'right',
     singleRow: false,
     colorCode: '',
     reverseLabelOrder: false,
@@ -122,8 +127,20 @@ export default {
   },
   palette: 'qualitative-bold',
   isPaletteReversed: false,
+  twoColor: {
+    palette: 'monochrome-1',
+    isPaletteReversed: false
+  },
   labels: false,
-  dataFormat: { commas: false, prefix: '', suffix: '', abbreviated: false },
+  dataFormat: {
+    commas: false,
+    prefix: '',
+    suffix: '',
+    abbreviated: false,
+    bottomSuffix: '',
+    bottomPrefix: '',
+    bottomAbbreviated: false
+  },
   confidenceKeys: {},
   visual: {
     border: true,

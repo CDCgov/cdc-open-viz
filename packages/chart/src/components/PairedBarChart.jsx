@@ -7,7 +7,7 @@ import { Text } from '@visx/text'
 import ConfigContext from '../ConfigContext'
 import chroma from 'chroma-js'
 
-const PairedBarChart = ({ width, height }) => {
+const PairedBarChart = ({ width, height, originalWidth }) => {
   const { config, colorScale, transformedData: data, formatNumber, seriesHighlight, getTextWidth } = useContext(ConfigContext)
 
   if (!config || config?.series?.length < 2) return
@@ -15,6 +15,7 @@ const PairedBarChart = ({ width, height }) => {
   const borderWidth = config.barHasBorder === 'true' ? 1 : 0
   const halfWidth = width / 2
   const fontSize = { small: 16, medium: 18, large: 20 }
+  const offset = 1.02 // Offset of the left bar from the Axis
 
   const groupOne = {
     parentKey: config.dataDescription.seriesKey,
@@ -39,7 +40,7 @@ const PairedBarChart = ({ width, height }) => {
   }
 
   const xScale = scaleLinear({
-    domain: [0, Math.max(groupOne.max, groupTwo.max)],
+    domain: [0, Math.max(groupOne.max * offset, groupTwo.max * 1.1)],
     range: [0, halfWidth]
   })
 
@@ -54,11 +55,13 @@ const PairedBarChart = ({ width, height }) => {
     groupTwo.labelColor = '#FFFFFF'
   }
 
+  const label = config.yAxis.label ? `${config.yAxis.label}: ` : ''
+
   const dataTipOne = d => {
     return `<p>
 				${config.dataDescription.seriesKey}: ${groupOne.dataKey}<br/>
 				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
-				${config.dataDescription.valueKey}: ${formatNumber(d[groupOne.dataKey])}
+				${label}${formatNumber(d[groupOne.dataKey])}
 			</p>`
   }
 
@@ -66,7 +69,7 @@ const PairedBarChart = ({ width, height }) => {
     return `<p>
 				${config.dataDescription.seriesKey}: ${groupTwo.dataKey}<br/>
 				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
-				${config.dataDescription.valueKey}: ${formatNumber(d[groupTwo.dataKey])}
+				${label}${formatNumber(d[groupTwo.dataKey])}
 			</p>`
   }
 
@@ -81,7 +84,7 @@ const PairedBarChart = ({ width, height }) => {
 				}
 				`}
         </style>
-        <svg id='cdc-visualization__paired-bar-chart' width={width} height={height} viewBox={`0 0 ${width} ${height}`} role='img' tabIndex={0}>
+        <svg id='cdc-visualization__paired-bar-chart' width={originalWidth} height={height} viewBox={`0 0 ${width + Number(config.runtime.yAxis.size)} ${height}`} role='img' tabIndex={0}>
           <Group top={0} left={Number(config.xAxis.size)}>
             {data
               .filter(item => config.series[0].dataKey === groupOne.dataKey)
@@ -111,8 +114,8 @@ const PairedBarChart = ({ width, height }) => {
                         width={xScale(d[config.series[0].dataKey])}
                         height={barHeight}
                         fill={groupOne.color}
-                        data-tip={dataTipOne(d)}
-                        data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                        data-tooltip-html={dataTipOne(d)}
+                        data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                         stroke='#333'
                         strokeWidth={borderWidth}
                         opacity={transparentBar ? 0.5 : 1}
@@ -140,7 +143,7 @@ const PairedBarChart = ({ width, height }) => {
                 const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-                const textWidth = getTextWidth(formatNumber(d[groupOne.dataKey]), `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const textWidth = getTextWidth(formatNumber(d[groupTwo.dataKey]), `normal ${fontSize[config.fontSize]}px sans-serif`)
                 const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
@@ -162,8 +165,8 @@ const PairedBarChart = ({ width, height }) => {
                         width={xScale(d[config.series[1].dataKey])}
                         height={barHeight}
                         fill={groupTwo.color}
-                        data-tip={dataTipTwo(d)}
-                        data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                        data-tooltip-html={dataTipTwo(d)}
+                        data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                         strokeWidth={borderWidth}
                         stroke='#333'
                         opacity={transparentBar ? 0.5 : 1}

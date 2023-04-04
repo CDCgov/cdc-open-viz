@@ -28,7 +28,7 @@ const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
 }
 
 const UsaRegionMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, rebuildTooltips, titleCase, handleCircleClick, handleMapAriaLabels } = props
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, titleCase, handleCircleClick, handleMapAriaLabels } = props
 
   // "Choose State" options
   const [extent, setExtent] = useState(null)
@@ -53,8 +53,6 @@ const UsaRegionMap = props => {
 
     setTerritoriesData(territoriesList)
   }, [data])
-
-  useEffect(() => rebuildTooltips())
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
@@ -105,7 +103,17 @@ const UsaRegionMap = props => {
         }
       }
 
-      return <Shape key={label} label={label} css={styles} text={styles.color} data-tip={toolTip} data-for='tooltip' stroke={geoStrokeColor} strokeWidth={1.5} onClick={() => geoClickHandler(territory, territoryData)} />
+      return <Shape
+        key={label}
+        label={label}
+        css={styles}
+        text={styles.color}
+        stroke={geoStrokeColor}
+        strokeWidth={1.5}
+        onClick={() => geoClickHandler(territory, territoryData)}
+        data-tooltip-id="tooltip"
+        data-tooltip-html={toolTip}
+      />
     }
   })
 
@@ -166,7 +174,7 @@ const UsaRegionMap = props => {
 
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
-        const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
+        const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
           fill: state.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
@@ -212,7 +220,13 @@ const UsaRegionMap = props => {
         // const barFill = barPositive ? "#fff" : "#fff";
 
         return (
-          <g data-for='tooltip' data-tip={tooltip} key={key} className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)}>
+          <g key={key}
+             className='geo-group'
+             css={styles}
+             onClick={() => geoClickHandler(geoDisplayName, geoData)}
+             data-tooltip-id="tooltip"
+             data-tooltip-html={toolTip}
+          >
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
             <g id={`region-${index + 1}-label`}>
               <circle fill='#fff' stroke='#999' cx={circleRadius} cy={circleRadius} r={circleRadius} />

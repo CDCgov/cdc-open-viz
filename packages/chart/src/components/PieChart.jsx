@@ -1,8 +1,8 @@
 import React, { useContext, useState, useEffect, useRef } from 'react'
 import { animated, useTransition, interpolate } from 'react-spring'
-import ReactTooltip from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
-import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie'
+import Pie from '@visx/shape/lib/shapes/Pie'
 import chroma from 'chroma-js'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -20,8 +20,8 @@ const enterUpdateTransition = ({ startAngle, endAngle }) => ({
 export default function PieChart() {
   const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels, cleanData } = useContext(ConfigContext)
 
-  const cleanedData = cleanData(data, config.xAxis.dataKey);
-  
+  const cleanedData = cleanData(data, config.xAxis.dataKey)
+
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
 
@@ -31,11 +31,11 @@ export default function PieChart() {
   })
 
   // Make sure the chart is visible if in the editor
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const element = document.querySelector('.isEditor')
     if (element) {
       // parent element is visible
-      console.log('setAnimation')
       setAnimatePie(prevState => true)
     }
   })
@@ -46,18 +46,15 @@ export default function PieChart() {
         setAnimatePie(true)
       }, 500)
     }
-  }, [dataRef?.isIntersecting, config.animate])
-
+  }, [dataRef?.isIntersecting, config.animate]) // eslint-disable-line
 
   function AnimatedPie({ arcs, path, getKey }) {
-    const transitions = useTransition( arcs, getKey,
-      {
-        from: enterUpdateTransition,
-        enter: enterUpdateTransition,
-        update: enterUpdateTransition,
-        leave: enterUpdateTransition
-      }
-    )
+    const transitions = useTransition(arcs, getKey, {
+      from: enterUpdateTransition,
+      enter: enterUpdateTransition,
+      update: enterUpdateTransition,
+      leave: enterUpdateTransition
+    })
 
     return (
       <>
@@ -81,8 +78,8 @@ export default function PieChart() {
                   })
                 )}
                 fill={colorScale(arc.data[config.runtime.xAxis.dataKey])}
-                data-tip={tooltip}
-                data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                data-tooltip-html={tooltip}
+                data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
               />
             </Group>
           )
@@ -137,11 +134,7 @@ export default function PieChart() {
     } else {
       setFilteredData(undefined)
     }
-  }, [seriesHighlight])
-
-  useEffect(() => {
-    ReactTooltip.rebuild()
-  })
+  }, [seriesHighlight]) // eslint-disable-line
 
   return (
     <ErrorBoundary component='PieChart'>
@@ -153,7 +146,7 @@ export default function PieChart() {
         </Group>
       </svg>
       <div ref={triggerRef} />
-      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
     </ErrorBoundary>
   )
 }
