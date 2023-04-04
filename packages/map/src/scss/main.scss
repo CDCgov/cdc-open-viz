@@ -57,10 +57,10 @@
   }
 
   div.map-title:not(:empty) {
-    margin: 0 !important;
     padding: 0.6em 0.8em;
     border-bottom-width: 3px;
     border-bottom-style: solid;
+    margin: 0 0 1rem 0 !important;
   }
 
   .map-container {
