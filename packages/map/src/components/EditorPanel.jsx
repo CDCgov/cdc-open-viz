@@ -196,12 +196,6 @@ const EditorPanel = props => {
           }
         })
         break
-      case 'hideGeoColumnInTooltip':
-        setState({
-          ...state,
-          [property]: value
-        })
-        break
       case 'hidePrimaryColumnInTooltip':
         setState({
           ...state,
@@ -934,12 +928,12 @@ const EditorPanel = props => {
             valid = false
           }
         })
-        let runtimeLegendKeys = runtimeLegend.map(item => item.value);
+        let runtimeLegendKeys = runtimeLegend.map(item => item.value)
         state.legend.categoryValuesOrder.forEach(category => {
-          if(runtimeLegendKeys.indexOf(category) === -1){
-            valid = false;
+          if (runtimeLegendKeys.indexOf(category) === -1) {
+            valid = false
           }
-        });
+        })
       } else {
         valid = false
       }
@@ -1869,35 +1863,42 @@ const EditorPanel = props => {
                           </Tooltip>
                         </span>
                       </label>
-                      {state.legend.additionalCategories && state.legend.additionalCategories.map((val, i) => (
-                        <fieldset className='edit-block' key={val}>
-                          <button
-                            className='remove-column'
-                            onClick={event => {
-                              event.preventDefault()
-                              const updatedAdditionaCategories = [...state.legend.additionalCategories];
-                              updatedAdditionaCategories.splice(i, 1);
-                              updateField('legend', null, 'additionalCategories', updatedAdditionaCategories);
-                            }}
-                          >
-                            Remove
-                          </button>
-                          <label>
-                            <span className='edit-label column-heading'>Category</span>
-                            <TextField value={val} section="legend" subsection={null} fieldName="additionalCategories" updateField={(section, subsection, fieldName, value) => {
-                              const updatedAdditionaCategories = [...state.legend.additionalCategories];
-                              updatedAdditionaCategories[i] = value;
-                              updateField(section, subsection, fieldName, updatedAdditionaCategories)
-                            }} />
-                          </label>
-                        </fieldset>
-                      ))}
+                      {state.legend.additionalCategories &&
+                        state.legend.additionalCategories.map((val, i) => (
+                          <fieldset className='edit-block' key={val}>
+                            <button
+                              className='remove-column'
+                              onClick={event => {
+                                event.preventDefault()
+                                const updatedAdditionaCategories = [...state.legend.additionalCategories]
+                                updatedAdditionaCategories.splice(i, 1)
+                                updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+                              }}
+                            >
+                              Remove
+                            </button>
+                            <label>
+                              <span className='edit-label column-heading'>Category</span>
+                              <TextField
+                                value={val}
+                                section='legend'
+                                subsection={null}
+                                fieldName='additionalCategories'
+                                updateField={(section, subsection, fieldName, value) => {
+                                  const updatedAdditionaCategories = [...state.legend.additionalCategories]
+                                  updatedAdditionaCategories[i] = value
+                                  updateField(section, subsection, fieldName, updatedAdditionaCategories)
+                                }}
+                              />
+                            </label>
+                          </fieldset>
+                        ))}
                       <button
                         className={'btn full-width'}
                         onClick={event => {
                           event.preventDefault()
-                          const updatedAdditionaCategories = [...(state.legend.additionalCategories || [])];
-                          updatedAdditionaCategories.push('');
+                          const updatedAdditionaCategories = [...(state.legend.additionalCategories || [])]
+                          updatedAdditionaCategories.push('')
                           updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
                         }}
                       >
