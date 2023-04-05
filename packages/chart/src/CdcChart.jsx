@@ -148,14 +148,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         data = transform.developerStandardize(data, config.dataDescription)
       }
 
+      updateConfig({ ...config, dataUrl: dataUrlFinal, data })
+
       if (data) {
         setStateData(data)
         setExcludedData(data)
         setFilteredData(filterData(config.filters, data))
       }
-
-      updateConfig({ ...config, dataUrl: dataUrlFinal, data })
-      setFilteredData(filterData(config.filters, data))
     }
   }
 
