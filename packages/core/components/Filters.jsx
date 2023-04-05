@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import Button from '@cdc/core/components/elements/Button'
 
+// Third Party
+import PropTypes from 'prop-types'
+
 const useFilters = props => {
   const [showApplyButton, setShowApplyButton] = useState(false)
-
   const { config, setConfig, filteredData, setFilteredData, excludedData, filterData } = props
   const { filterBehavior } = config
 
@@ -85,38 +87,62 @@ const useFilters = props => {
     setConfig({ ...config, filters: newFilters })
   }
 
-  return { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset }
-}
-
-const Filters = props => {
-  const { config, filteredData } = props
-  const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset } = useFilters(props)
-  const { filters } = config
-
-  const FILTER_CONFIG = {
+  const filterConstants = {
     buttonText: 'Apply Filters',
     resetText: 'Reset All',
     introText: 'Using the drop-down menu below, make a selection to filter the visualization(s)'
   }
 
-  /**
-   * TODO:
-   * 1) figure out if using onchange or apply behavior
-   */
+  // prettier-ignore
+  return {
+    handleApplyButton,
+    changeFilterActive,
+    announceChange,
+    sortAsc,
+    sortDesc,
+    showApplyButton,
+    handleReset,
+    filterConstants
+  }
+}
+
+const Filters = props => {
+  const { config, filteredData } = props
+
+  // prettier-ignore
+  const {
+    handleApplyButton,
+    changeFilterActive,
+    announceChange,
+    sortAsc,
+    sortDesc,
+    showApplyButton,
+    handleReset,
+    filterConstants
+  } = useFilters(props)
+
+  const { filters } = config
 
   const Filters = props => props.children
 
-  // A List of Dropdowns
-  Filters.List = () => {
-    console.log('filteredData', filteredData)
+  // Exterior Section Wrapper
+  Filters.Section = props => (
+    <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
+      <p>{filterConstants.introText}</p>
+      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px' }}>
+        {props.children}
+      </div>
+    </section>
+  )
+
+  // Each Filter Dropdown
+  Filters.Dropdowns = () => {
     if (config.filters || filteredData) {
       // Here charts is using config.filters where maps is using a runtime value
       let filtersToLoop = config.type === 'map' ? filteredData : config.filters
 
       return filtersToLoop.map((singleFilter, index) => {
         const values = []
-
-        console.log('singleFilter', singleFilter)
 
         if (!singleFilter.order || singleFilter.order === '') {
           singleFilter.order = 'asc'
@@ -160,25 +186,17 @@ const Filters = props => {
     }
   }
 
-  Filters.Section = props => (
-    <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
-      <p>{FILTER_CONFIG.introText}</p>
-      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px' }}>
-        {props.children}
-      </div>
-    </section>
-  )
-
+  // Apply/Reset Buttons
   Filters.Buttons = props => {
     if (config.filterBehavior === 'dropdown') return
     if (!config.filters.length) return
     return (
       <div className='filter-section__buttons' style={{ width: '100%' }}>
         <Button onClick={() => handleApplyButton(filters)} disabled={!showApplyButton} style={{ marginRight: '10px' }}>
-          {FILTER_CONFIG.buttonText}
+          {filterConstants.buttonText}
         </Button>
         <a href='#!' role='button' onClick={handleReset}>
-          {FILTER_CONFIG.resetText}
+          {filterConstants.resetText}
         </a>
       </div>
     )
@@ -188,11 +206,26 @@ const Filters = props => {
   return (
     <Filters>
       <Filters.Section>
-        <Filters.List />
+        <Filters.Dropdowns />
         <Filters.Buttons />
       </Filters.Section>
     </Filters>
   )
+}
+
+Filters.propTypes = {
+  // runtimeFilters in place
+  filteredData: PropTypes.array,
+  // function for updating the runtime filters
+  setFilteredData: PropTypes.func,
+  // the full apps config
+  config: PropTypes.object,
+  // updating function for setting fitlerBehavior
+  setConfig: PropTypes.func,
+  // exclusions
+  excludedData: PropTypes.array,
+  // function for filtering the data
+  filterData: PropTypes.func
 }
 
 export default Filters
