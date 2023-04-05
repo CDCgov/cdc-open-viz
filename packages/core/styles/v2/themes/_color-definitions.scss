@@ -147,6 +147,27 @@ $theme: (
   }
 }
 
+.cdc-open-viz-module {
+  @each $theme-name, $theme-colors in $theme {
+    &.theme-#{$theme-name} {
+      .single-filters--tab .tab--active {
+        border: 1px solid string.unquote(nth($theme-colors, 1));
+        border-top: 3px solid string.unquote(nth($theme-colors, 1));
+        border-bottom: none;
+      }
+
+      .single-filters--tab .tab:not(.tab--active) {
+        border-bottom: 1px solid string.unquote(nth($theme-colors, 1));
+      }
+
+      .single-filters--pill .pill--active {
+        background-color: string.unquote(nth($theme-colors, 1));
+        color: #fff;
+      }
+    }
+  }
+}
+
 $baseColor: #333;
 $blue: #005eaa;
 $lightestGray: #f2f2f2;

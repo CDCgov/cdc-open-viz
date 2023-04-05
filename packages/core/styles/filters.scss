@@ -1,0 +1,41 @@
+.single-filters--tab {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+
+  .tab {
+    width: 25%;
+    min-height: 40px;
+    border: none;
+    padding: 0.5em 0;
+    background: none;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    margin-top: 5px;
+  }
+
+  .tab--active {
+    border-bottom: none;
+  }
+}
+
+.single-filters--pill {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+
+  .pill {
+    border: none;
+    width: 95%;
+    height: 60px;
+    background: none;
+    border-radius: 30px;
+    box-shadow: 0 2px 5px #d3d3d3;
+    vertical-align: middle;
+    margin-bottom: 15px;
+
+    &__wrapper {
+      width: 25%;
+    }
+  }
+}
