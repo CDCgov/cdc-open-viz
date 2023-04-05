@@ -1910,7 +1910,7 @@ const EditorPanel = () => {
                     fieldName='filterBehavior'
                     label='Filter Behavior'
                     updateField={updateField}
-                    options={['dropdown', 'button']}
+                    options={['dropdown', 'button', 'pill', 'tab']}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>

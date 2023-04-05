@@ -141,54 +141,114 @@ const Filters = props => {
       // Here charts is using config.filters where maps is using a runtime value
       let filtersToLoop = config.type === 'map' ? filteredData : config.filters
 
-      return filtersToLoop.map((singleFilter, index) => {
-        const values = []
+      const values = []
+      const pillValues = []
+      const tabValues = []
 
-        if (!singleFilter.order || singleFilter.order === '') {
-          singleFilter.order = 'asc'
-        }
+      // button and dropdown style filters.
+      if (config.filterBehavior === 'button' || config.filterBehavior === 'dropdown') {
+        return filtersToLoop.map((singleFilter, index) => {
+          if (!singleFilter.order || singleFilter.order === '') {
+            singleFilter.order = 'asc'
+          }
 
-        if (singleFilter.order === 'desc') {
-          singleFilter.values = singleFilter.values.sort(sortDesc)
-        }
+          if (singleFilter.order === 'desc') {
+            singleFilter.values = singleFilter.values.sort(sortDesc)
+          }
 
-        if (singleFilter.order === 'asc') {
-          singleFilter.values = singleFilter.values.sort(sortAsc)
-        }
+          if (singleFilter.order === 'asc') {
+            singleFilter.values = singleFilter.values.sort(sortAsc)
+          }
 
-        singleFilter.values.forEach((filterOption, index) => {
-          values.push(
-            <option key={index} value={filterOption}>
-              {filterOption}
-            </option>
+          singleFilter.values.forEach((filterOption, index) => {
+            values.push(
+              <option key={index} value={filterOption}>
+                {filterOption}
+              </option>
+            )
+          })
+
+          return (
+            <div className='single-filter' key={index}>
+              <select
+                id={`filter-${index}`}
+                className='filter-select'
+                data-index='0'
+                value={singleFilter.active}
+                onChange={e => {
+                  changeFilterActive(index, e.target.value)
+                  announceChange(`Filter ${singleFilter.label} value has been changed to ${e.target.value}, please reference the data table to see updated values.`)
+                }}
+              >
+                {values}
+              </select>
+            </div>
           )
         })
+      }
 
-        return (
-          <div className='single-filter' key={index}>
-            <select
-              id={`filter-${index}`}
-              className='filter-select'
-              data-index='0'
-              value={singleFilter.active}
-              onChange={e => {
-                changeFilterActive(index, e.target.value)
-                announceChange(`Filter ${singleFilter.label} value has been changed to ${e.target.value}, please reference the data table to see updated values.`)
-              }}
-            >
-              {values}
-            </select>
-          </div>
-        )
-      })
-    } else {
-      return null
+      // pill filters
+      // TODO: move logic out of each of these for re-use.
+      if (config.filterBehavior === 'pill') {
+        return filtersToLoop.map((singleFilter, index) => {
+          if (!singleFilter.order || singleFilter.order === '') {
+            singleFilter.order = 'asc'
+          }
+
+          if (singleFilter.order === 'desc') {
+            singleFilter.values = singleFilter.values.sort(sortDesc)
+          }
+
+          if (singleFilter.order === 'asc') {
+            singleFilter.values = singleFilter.values.sort(sortAsc)
+          }
+
+          singleFilter.values.forEach((filterOption, index) => {
+            pillValues.push(<button>{filterOption}</button>)
+          })
+
+          return (
+            <div className={`single-filters single-filters--${config.filterBehavior}`} key={index}>
+              {pillValues}
+            </div>
+          )
+        })
+      }
+
+      // tab filters
+      if (config.filterBehavior === 'tab') {
+        return filtersToLoop.map((singleFilter, index) => {
+          if (!singleFilter.order || singleFilter.order === '') {
+            singleFilter.order = 'asc'
+          }
+
+          if (singleFilter.order === 'desc') {
+            singleFilter.values = singleFilter.values.sort(sortDesc)
+          }
+
+          if (singleFilter.order === 'asc') {
+            singleFilter.values = singleFilter.values.sort(sortAsc)
+          }
+
+          singleFilter.values.forEach((filterOption, index) => {
+            const classes = ['tab', index == 0 && 'tab--active']
+
+            tabValues.push(<button className={classes.join(' ')}>{filterOption}</button>)
+          })
+
+          return (
+            <div className={`single-filters single-filters--${config.filterBehavior}`} key={index}>
+              {tabValues}
+            </div>
+          )
+        })
+      }
     }
   }
 
   // Apply/Reset Buttons
   Filters.Buttons = props => {
-    if (config.filterBehavior === 'dropdown') return
+    if (config.filterBehavior !== 'button') return
     if (!config.filters.length) return
     return (
       <div className='filter-section__buttons' style={{ width: '100%' }}>
