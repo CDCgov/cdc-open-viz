@@ -134,14 +134,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   }
 
   const reloadURLData = async () => {
-    if(config.datasets){
-      let newData = {...data}
-      let newDatasets = {...config.datasets}
+    if (config.datasets) {
+      let newData = { ...data }
+      let newDatasets = { ...config.datasets }
       let datasetsNeedsUpdate = false
       let datasetKeys = Object.keys(config.datasets)
-      for(let i = 0; i < datasetKeys.length; i++) {
+      for (let i = 0; i < datasetKeys.length; i++) {
         const dataset = config.datasets[datasetKeys[i]]
-        if(dataset.dataUrl && config.dashboard.sharedFilters){
+        if (dataset.dataUrl && config.dashboard.sharedFilters) {
           const dataUrl = new URL(dataset.dataUrl)
           let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
@@ -155,7 +155,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           })
 
           if (!isUpdateNeeded) return
-          
+
           let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
             .map((param, i) => {
               let qs = i === 0 ? '?' : '&'
@@ -176,15 +176,33 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             }
           }
 
-          newDatasets[datasetKeys[i]].dataUrl = dataUrlFinal;
-          newData[datasetKeys[i]] = newDataset;
-          datasetsNeedsUpdate = true;
+          newDatasets[datasetKeys[i]].dataUrl = dataUrlFinal
+          newData[datasetKeys[i]] = newDataset
+          datasetsNeedsUpdate = true
         }
       }
 
-      if(datasetsNeedsUpdate){
+      if (datasetsNeedsUpdate) {
         setData(newData)
-        setConfig({...config, datasets: newDatasets})
+
+        let newFilteredData = {}
+        let newConfig = { ...config }
+        Object.keys(config.visualizations).forEach(key => {
+          let dataKey = config.visualizations[key].dataKey
+
+          let applicableFilters = config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
+          if (applicableFilters.length > 0) {
+            newFilteredData[key] = filterData(applicableFilters, newData[dataKey])
+          }
+
+          if (newData[dataKey]) {
+            newConfig.visualizations[key].formattedData = newData[dataKey]
+          }
+        })
+        setFilteredData(newFilteredData)
+
+        newConfig.datasets = newDatasets
+        setConfig(newConfig)
       }
     }
   }
@@ -394,7 +412,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       setFilteredData(newFilteredData)
     }
 
-    const announceChange = text => { }
+    const announceChange = text => {}
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
       if (singleFilter.type !== 'url' && !singleFilter.showDropdown) return <></>
@@ -404,7 +422,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       singleFilter.values.forEach((filterOption, index) => {
         values.push(
           <option key={`${singleFilter.key}-option-${index}`} value={filterOption}>
-            {singleFilter.labels ? (singleFilter.labels[filterOption] || filterOption) : filterOption}
+            {singleFilter.labels ? singleFilter.labels[filterOption] || filterOption : filterOption}
           </option>
         )
       })
