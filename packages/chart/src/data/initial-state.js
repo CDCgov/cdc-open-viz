@@ -146,5 +146,6 @@ export default {
     border: true,
     accent: true,
     background: true
-  }
+  },
+  filterBehavior: 'dropdown'
 }

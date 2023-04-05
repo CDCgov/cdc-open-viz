@@ -37,7 +37,7 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 
 // Child Components
 import ConfigContext from './context'
-import Filters from './components/Filters'
+import Filters from '@cdc/core/components/Filters'
 import Modal from './components/Modal'
 import Sidebar from './components/Sidebar'
 
@@ -1534,7 +1534,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             )}
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
-            <Filters />
+            {/* prettier-ignore */}
+            <Filters
+              config={state}
+              setConfig={setState}
+              filteredData={runtimeFilters}
+              setFilteredData={setRuntimeFilters}
+            />
 
             <div
               role='button'
