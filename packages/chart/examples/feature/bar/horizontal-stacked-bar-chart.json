@@ -1,9 +1,13 @@
 {
   "title": "Planet Radius (Bar Example)",
-  "dataUrl": "/examples/planet-example-data.json",
+  "dataUrl": "/examples/feature/__data__/planet-example-data.json",
   "visualizationType": "Bar",
   "visualizationSubType": "stacked",
-  "series": [{ "dataKey": "Radius" }],
+  "series": [
+    {
+      "dataKey": "Radius"
+    }
+  ],
   "fontSize": "medium",
   "dataCutoff": "0.5",
   "orientation": "horizontal",

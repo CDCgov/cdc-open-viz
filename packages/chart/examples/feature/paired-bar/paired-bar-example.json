@@ -1,12 +1,18 @@
 {
   "title": "Paired Bar Chart Example",
-  "dataUrl": "/examples/paired-bar-data.json",
+  "dataUrl": "/examples/feature/paired-bar/paired-bar-data.json",
   "animate": true,
   "animateReplay": true,
   "visualizationType": "Paired Bar",
   "series": [
-    { "dataKey": "Male", "type": "Paired Bar" },
-    { "dataKey": "Female", "type": "Paired Bar" }
+    {
+      "dataKey": "Male",
+      "type": "Paired Bar"
+    },
+    {
+      "dataKey": "Female",
+      "type": "Paired Bar"
+    }
   ],
   "dataFormat": {
     "roundTo": 1,
