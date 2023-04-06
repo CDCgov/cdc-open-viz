@@ -655,7 +655,7 @@ export default function DataImport() {
                         <div>{loadFileFromUrl(externalURL)}</div>
                         <div>{resetButton()}</div>
                       </div>
-                      {config.dataUrl && urlFilters}
+                      {config.dataUrl && (config.type === 'chart' || config.type === 'map') && urlFilters}
                     </>
                   )}
                 </div>
