@@ -541,6 +541,7 @@ export default function DataImport() {
                     let newFilters = [...config.filters]
                     newFilters[i].orderedValues = newFilters[i].orderedValues || []
                     newFilters[i].orderedValues.push(e.target[0].value)
+                    newFilters[i].values = newFilters[i].orderedValues
                     if (!newFilters[i].active) newFilters[i].active = e.target[0].value
                     e.target[0].value = ''
                     setConfig({ ...config, filters: newFilters })
