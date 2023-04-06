@@ -39,7 +39,6 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
     <ErrorBoundary component='BoxPlot'>
       <Group className='boxplot' key={`boxplot-group`}>
         {config.boxplot.plots.map((d, i) => {
-          console.log('d', d)
           const offset = boxWidth - constrainedWidth
           const radius = 4
           return (
