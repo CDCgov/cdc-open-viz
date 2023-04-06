@@ -280,8 +280,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             newConfig.boxplot.thirdQuartilePercentage = 0
           }
 
-          const q1 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
-          const q3 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
+          // const q1 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
+          const q1 = d3.quantileSorted(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
+
+          const q3 = d3.quantileSorted(filteredDataValues, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
           const iqr = q3 - q1
           const lowerBounds = q1 - (q3 - q1) * 1.5
           const upperBounds = q3 + (q3 - q1) * 1.5
@@ -290,13 +292,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
           nonOutliers = nonOutliers.filter(item => !outliers.includes(item))
 
+          console.log('filtered', d3.min([d3.max(data), q1 + 1.5 * iqr]))
+
           plots.push({
             columnCategory: g,
-            columnMax: Number(q3 + 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo),
+            // columnMax: Number(Math.max.apply(null, filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
+            columnMax: d3.min([d3.max(filteredDataValues), q1 + 1.5 * iqr]),
             columnThirdQuartile: Number(q3).toFixed(newConfig.dataFormat.roundTo),
             columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
-            columnMin: Number(q1 - 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo),
+            // columnMin: Number(Math.min.apply(null, filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
+            columnMin: d3.max([d3.min(filteredDataValues), q1 - 1.5 * iqr]),
             columnTotal: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
             columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
@@ -318,6 +324,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       tableData.map(table => {
         delete table.columnIqr
         delete table.nonOutlierValues
+        delete table.columnLowerBounds
+        delete table.columnUpperBounds
         return null // resolve eslint
       })
 

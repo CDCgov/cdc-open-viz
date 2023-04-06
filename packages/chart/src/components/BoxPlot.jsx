@@ -51,8 +51,8 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
               <BoxPlot
                 data-left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
                 key={`box-plot-${i}`}
-                min={Number(d.columnLowerBounds)}
-                max={Number(d.columnUpperBounds)}
+                min={Number(d.columnMin)}
+                max={Number(d.columnMax)}
                 left={Number(xScale(d.columnCategory)) + Number(config.yAxis.size) + offset / 2 + 0.5}
                 firstQuartile={Number(d.columnFirstQuartile)}
                 thirdQuartile={Number(d.columnThirdQuartile)}
