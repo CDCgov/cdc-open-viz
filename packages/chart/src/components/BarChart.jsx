@@ -350,15 +350,35 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         xAxisValue = tempValue
                         barWidth = config.barHeight
                       }
+
+                      const barPosition = bar.value < 0 ? 'below' : 'above'
+                      const textX = barPosition === 'below' ? 0 : 0
+
                       // check if bar text/value string fits into  each bars.
                       let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                      let textFits = textWidth < barY - 5 // minus padding 5
+                      let textFits = textWidth < barWidthHorizontal - 5 // minus padding 5
                       let labelColor = '#000000'
 
                       // Set label color
                       if (chroma.contrast(labelColor, barColor) < 4.9) {
-                        labelColor = '#FFFFFF'
+                        textFits ? (labelColor = '#FFFFFF') : '#000000'
                       }
+
+                      // control text position
+                      let textAnchor = textFits ? 'end' : 'start'
+                      let textAnchorLollipop = 'start'
+                      let textPadding = textFits ? -5 : 5
+                      let textPaddingLollipop = 10
+                      // if bars are negative we change positions of text
+                      if (barPosition === 'below') {
+                        textAnchor = textFits ? 'start' : 'end'
+                        textPadding = textFits ? 5 : -5
+                        if (config.isLollipopChart) {
+                          textAnchorLollipop = 'end'
+                          textPaddingLollipop = -10
+                        }
+                      }
+
                       // create new Index based on bar value for border Radius
                       const newIndex = bar.value < 0 ? -1 : index
                       const style = applyRadius(newIndex)
@@ -413,9 +433,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 x={bar.y}
                                 y={config.barHeight / 2 + config.barHeight * bar.index}
                                 fill={labelColor}
-                                dx={textFits ? -5 : 5}
+                                dx={textPadding}
                                 verticalAnchor='middle'
-                                textAnchor={textFits ? 'end' : 'start'}
+                                textAnchor={textAnchor}
                               >
                                 {xAxisValue}
                               </Text>
@@ -424,10 +444,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             {orientation === 'horizontal' && config.isLollipopChart && displayNumbersOnBar && (
                               <Text
                                 display={displayBar ? 'block' : 'none'}
-                                x={`${bar.y + (config.isLollipopChart ? 15 : 5) + (config.isLollipopChart && barGroup.bars.length === bar.index ? offset : 0)}`} // padding
+                                x={bar.y} // padding
                                 y={0}
                                 fill={'#000000'}
-                                textAnchor='start'
+                                dx={textPaddingLollipop}
+                                textAnchor={textAnchorLollipop}
                                 verticalAnchor='middle'
                                 fontWeight={'normal'}
                               >
