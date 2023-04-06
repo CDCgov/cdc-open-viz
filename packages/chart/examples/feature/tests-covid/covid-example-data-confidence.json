@@ -1,0 +1,32 @@
+[
+  {
+    "Race": "Hispanic or Latino",
+    "Age-adjusted rate": "644000.2",
+    "Lower": "640000.2",
+    "Upper": "650000.2"
+  },
+  {
+    "Race": "Non-Hispanic Black",
+    "Age-adjusted rate": "563000.7",
+    "Lower": "560000.2",
+    "Upper": "570000.2"
+  },
+  {
+    "Race": "Non-Hispanic Asian or Pacific Islander",
+    "Age-adjusted rate": "202000.5",
+    "Lower": "200000.2",
+    "Upper": "210000.2"
+  },
+  {
+    "Race": "Non-Hispanic American Indian or Alaska Native",
+    "Age-adjusted rate": "636000.1",
+    "Lower": "630000.2",
+    "Upper": "740000.2"
+  },
+  {
+    "Race": "Non-Hispanic White",
+    "Age-adjusted rate": "183000.6",
+    "Lower": "180000.2",
+    "Upper": "190000.2"
+  }
+]

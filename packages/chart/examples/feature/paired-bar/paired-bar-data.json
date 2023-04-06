@@ -1,0 +1,16 @@
+[
+  { "Sex": "Male", "Age Group": "<15", "Cases per 100K": "7428" },
+  { "Sex": "Male", "Age Group": "15-24", "Cases per 100K": "5176" },
+  { "Sex": "Male", "Age Group": "25-34", "Cases per 100K": "5624" },
+  { "Sex": "Male", "Age Group": "35-44", "Cases per 100K": "10756.75" },
+  { "Sex": "Male", "Age Group": "45-54", "Cases per 100K": "8259" },
+  { "Sex": "Male", "Age Group": "55-64", "Cases per 100K": "1235" },
+  { "Sex": "Male", "Age Group": "65", "Cases per 100K": "730" },
+  { "Sex": "Female", "Age Group": "<15", "Cases per 100K": "5714" },
+  { "Sex": "Female", "Age Group": "15-24", "Cases per 100K": "3588" },
+  { "Sex": "Female", "Age Group": "25-34", "Cases per 100K": "3410" },
+  { "Sex": "Female", "Age Group": "35-44", "Cases per 100K": "7478" },
+  { "Sex": "Female", "Age Group": "45-54", "Cases per 100K": "5633" },
+  { "Sex": "Female", "Age Group": "55-64", "Cases per 100K": "810" },
+  { "Sex": "Female", "Age Group": "65", "Cases per 100K": "402" }
+]
