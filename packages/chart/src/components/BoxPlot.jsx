@@ -39,6 +39,7 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
     <ErrorBoundary component='BoxPlot'>
       <Group className='boxplot' key={`boxplot-group`}>
         {config.boxplot.plots.map((d, i) => {
+          console.log('d', d)
           const offset = boxWidth - constrainedWidth
           const radius = 4
           return (
@@ -50,8 +51,8 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
               <BoxPlot
                 data-left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
                 key={`box-plot-${i}`}
-                min={Number(d.columnMin)}
-                max={Number(d.columnMax)}
+                min={Number(d.columnLowerBounds)}
+                max={Number(d.columnUpperBounds)}
                 left={Number(xScale(d.columnCategory)) + Number(config.yAxis.size) + offset / 2 + 0.5}
                 firstQuartile={Number(d.columnFirstQuartile)}
                 thirdQuartile={Number(d.columnThirdQuartile)}

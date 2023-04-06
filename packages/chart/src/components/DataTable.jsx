@@ -75,7 +75,9 @@ export default function DataTable() {
                     values: labels.values,
                     columnTotal: labels.total,
                     columnSd: 'Standard Deviation',
-                    nonOutlierValues: 'Non Outliers'
+                    nonOutlierValues: 'Non Outliers',
+                    columnLowerBounds: labels.lowerBounds,
+                    columnUpperBounds: labels.upperBounds
                   }
 
                   let resolvedName = columnLookup[props.row.original[0]]

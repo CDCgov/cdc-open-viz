@@ -301,6 +301,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnIqr: Number(iqr).toFixed(newConfig.dataFormat.roundTo),
+            columnLowerBounds: Number(lowerBounds).toFixed(newConfig.dataFormat.roundTo),
+            columnUpperBounds: Number(upperBounds).toFixed(newConfig.dataFormat.roundTo),
             columnOutliers: outliers,
             values: filteredDataValues,
             nonOutlierValues: nonOutliers
