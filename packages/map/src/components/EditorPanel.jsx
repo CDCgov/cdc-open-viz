@@ -1189,6 +1189,12 @@ const EditorPanel = props => {
           <option key='button' value='button'>
             Button
           </option>
+          <option key='button' value='pill'>
+            Pill
+          </option>
+          <option key='button' value='tab'>
+            Tab
+          </option>
         </select>
 
         <fieldset className='edit-block' key={`filter-${index}`}>
