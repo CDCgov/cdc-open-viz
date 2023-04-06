@@ -121,7 +121,6 @@ const useFilters = props => {
     showApplyButton,
     handleReset,
     filterConstants,
-    handleTabClick
   }
 }
 
@@ -146,7 +145,7 @@ const Filters = props => {
 
   // Exterior Section Wrapper
   Filters.Section = props => (
-    <section className={`filters-section`} style={{ display: 'block' }}>
+    <section className={`filters-section ${config.type === 'map' ? config.general.headerColor : config.theme}`} style={{ display: 'block' }}>
       <p>{filterConstants.introText}</p>
 
       {/* TODO: likely need to wrap this up better. */}
