@@ -101,13 +101,13 @@ const CdcDataBite = props => {
     setLoading(false)
   }
 
-  const calculateDataBite = (includePrefixSuffix= true) => {
+  const calculateDataBite = (includePrefixSuffix = true) => {
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
       return ''
     }
 
-    const applyPrecision = (value) => {
+    const applyPrecision = value => {
       // first validation
       if (value === undefined || value === null) {
         console.error('Enter correct value to "applyPrecision()" function ')
@@ -132,7 +132,7 @@ const CdcDataBite = props => {
     }
 
     // filter null and 0 out from count data
-    const getColumnCount = (arr) => {
+    const getColumnCount = arr => {
       if (config.dataFormat.ignoreZeros) {
         numericalData = numericalData.filter(item => item && item)
         return numericalData.length
@@ -141,14 +141,13 @@ const CdcDataBite = props => {
       }
     }
 
-    const getColumnSum = (arr) => {
+    const getColumnSum = arr => {
       // first validation
       if (arr === undefined || arr === null) {
         console.error('Enter valid value for getColumnSum function ')
         return
       }
       // second validation
-      console.log('arr', arr)
       if (arr.length === 0 || !Array.isArray(arr)) {
         console.error('Arguments are not valid getColumnSum function ')
         return
@@ -163,7 +162,7 @@ const CdcDataBite = props => {
       return applyPrecision(sum)
     }
 
-    const getColumnMean = (arr) => {
+    const getColumnMean = arr => {
       // add default params to escape errors on runtime
       // first validation
       if (arr === undefined || arr === null || !Array.isArray(arr)) {
@@ -220,7 +219,7 @@ const CdcDataBite = props => {
       return applyPrecision(value)
     }
 
-    const applyLocaleString = (value) => {
+    const applyLocaleString = value => {
       if (value === undefined || value === null) return
       if (Number.isNaN(value) || typeof value === 'number') {
         value = String(value)

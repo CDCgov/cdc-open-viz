@@ -82,7 +82,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         textAnchor='middle'
                       >
-                        {formatNumber(d[seriesKey])}
+                        {formatNumber(d[seriesKey], 'left')}
                       </Text>
 
                       <circle

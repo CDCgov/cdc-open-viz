@@ -26,7 +26,10 @@
   "series": [
     { "dataKey": "Data 1", "type": "Bar" },
     { "dataKey": "Data 2", "type": "Bar" },
-    { "dataKey": "Data 3", "type": "Bar" }
+    { "dataKey": "Data 3", "type": "Bar" },
+    { "dataKey": "Data 4", "type": "Bar" },
+    { "dataKey": "Data 5", "type": "Bar" },
+    { "dataKey": "Data 6", "type": "Bar" }
   ],
   "description": "This example shows a bar chart created in the visualization editor in WCMS",
   "dataCutoff": "0"

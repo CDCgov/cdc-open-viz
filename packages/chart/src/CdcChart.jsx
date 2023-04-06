@@ -31,7 +31,7 @@ import DataTable from './components/DataTable'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
-import Filters from './components/Filters'
+import Filters from '@cdc/core/components/Filters'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 // Helpers
@@ -64,8 +64,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
 
-  // set defaults on titles if blank
-  if (!title || title === '') title = 'Chart Title'
+  // set defaults on titles if blank AND only in editor
+  if (isEditor) {
+    if (!title || title === '') title = 'Chart Title'
+  }
+
   if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
 
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
@@ -323,7 +326,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.boxplot.tableData = tableData
     }
 
-    if (newConfig.visualizationType === 'Combo' || (newConfig.visualizationType === 'Line' && newConfig.series)) {
+    if (newConfig.visualizationType === 'Combo' && newConfig.series) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.series.forEach(series => {
@@ -766,11 +769,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            {config.filters && !externalFilters && <Filters />}
+            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} />}
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
-              style={{ marginBottom: config.legend.position !== 'bottom' && currentViewport !== 'sm' && currentViewport !== 'xs' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
+              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
