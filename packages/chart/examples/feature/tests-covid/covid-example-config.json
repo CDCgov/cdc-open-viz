@@ -1,10 +1,14 @@
 {
-  "title": "Case Rate Data",
-  "theme": "theme-blue",
-  "dataUrl": "/examples/case-rate-example-data.json",
+  "title": "Non Configdence Age-adjusted COVID-19-associated hospitalization rates by race and ethnicity — COVID-NET, March 1–December 26, 2020",
+  "theme": "theme-brown",
+  "dataUrl": "/examples/feature/tests-covid/covid-example-data.json",
   "visualizationType": "Bar",
   "visualizationSubType": "horizontal",
-  "series": [],
+  "series": [
+    {
+      "dataKey": "Age-adjusted rate"
+    }
+  ],
   "barThickness": 0.3,
   "height": 300,
   "dataFormat": {
@@ -21,7 +25,7 @@
     "numTicks": 3
   },
   "xAxis": {
-    "dataKey": "",
+    "dataKey": "Race",
     "size": 20,
     "wrap": true
   },
@@ -29,7 +33,7 @@
     "hide": true
   },
   "table": {
-    "label": "",
+    "label": "Age-adjusted COVID-19-associated hospitalization rates by race and ethnicity",
     "expanded": true,
     "download": true
   }
