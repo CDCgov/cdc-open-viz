@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 import * as d3 from 'd3-array'
+import { scaleQuantile } from 'https://cdn.skypack.dev/d3-scale@4'
 
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
@@ -268,6 +269,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           // filter data by group
           let filteredData = newExcludedData ? newExcludedData.filter(item => item[newConfig.xAxis.dataKey] === g) : data.filter(item => item[newConfig.xAxis.dataKey] === g)
           let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
+          let sortedData = filteredDataValues.sort((a, b) => a - b)
           // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
 
           if (!filteredData) throw new Error('boxplots dont have data yet')
@@ -281,18 +283,42 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           }
 
           // const q1 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
-          const q1 = d3.quantileSorted(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
 
-          const q3 = d3.quantileSorted(filteredDataValues, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
+          /** Calculate the 'q' quartile of an array of values
+           *
+           * @arg arr - array of values
+           * @arg q - percentile to calculate (e.g. 95)
+           */
+          function calcQuartile(arr, q) {
+            var data = arr.slice()
+
+            // Work out the position in the array of the percentile point
+            var p = (data.length - 1) * q
+            var b = Math.floor(p)
+
+            // Work out what we rounded off (if anything)
+            var remainder = p - b
+
+            // See whether that data exists directly
+            if (data[b + 1] !== undefined) {
+              return parseFloat(data[b]) + remainder * (parseFloat(data[b + 1]) - parseFloat(data[b]))
+            } else {
+              return parseFloat(data[b])
+            }
+          }
+
+          console.log('q1', calcQuartile(sortedData, 0.25))
+
+          const q1 = d3.quantile(sortedData, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
+          const q3 = d3.quantile(sortedData, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
           const iqr = q3 - q1
           const lowerBounds = q1 - (q3 - q1) * 1.5
           const upperBounds = q3 + (q3 - q1) * 1.5
           const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
           let nonOutliers = filteredDataValues
 
+          console.log('q1', q1)
           nonOutliers = nonOutliers.filter(item => !outliers.includes(item))
-
-          console.log('filtered', d3.min([d3.max(data), q1 + 1.5 * iqr]))
 
           plots.push({
             columnCategory: g,
