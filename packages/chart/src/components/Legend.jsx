@@ -128,7 +128,7 @@ const Legend = () => {
     return defaultLabels
   }
 
-  const isBottomOrSmallViewport = config.legend.position === 'bottom' || currentViewport === 'sm' || currentViewport === 'xs'
+  const isBottomOrSmallViewport = config.legend.position === 'bottom' || currentViewport === 'sm' || currentViewport === 'xs' || currentViewport === 'xxs'
   const isHorizontal = config.orientation === 'horizontal'
   const marginTop = isBottomOrSmallViewport && isHorizontal ? `${config.runtime.xAxis.size}px` : '0px'
   const marginBottom = isBottomOrSmallViewport ? '15px' : '0px'
