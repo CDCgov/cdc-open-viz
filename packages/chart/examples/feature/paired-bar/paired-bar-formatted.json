@@ -1,0 +1,37 @@
+[
+  {
+    "Age Group": "65",
+    "Male": "730",
+    "Female": "402"
+  },
+  {
+    "Age Group": "<15",
+    "Male": "7428",
+    "Female": "5714"
+  },
+  {
+    "Age Group": "15-24",
+    "Male": "5176",
+    "Female": "3588"
+  },
+  {
+    "Age Group": "25-34",
+    "Male": "5624",
+    "Female": "3410"
+  },
+  {
+    "Age Group": "35-44",
+    "Male": "10756",
+    "Female": "7478"
+  },
+  {
+    "Age Group": "45-54",
+    "Male": "8259",
+    "Female": "5633"
+  },
+  {
+    "Age Group": "55-64",
+    "Male": "1235",
+    "Female": "810"
+  }
+]

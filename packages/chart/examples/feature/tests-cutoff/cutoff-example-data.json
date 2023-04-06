@@ -1,0 +1,38 @@
+[
+  {
+    "Category": "Category 1",
+    "Value": "0.05"
+  },
+  {
+    "Category": "Category 2",
+    "Value": "0.1"
+  },
+  {
+    "Category": "Category 3",
+    "Value": "0.2"
+  },
+  {
+    "Category": "Category 4",
+    "Value": "0.4"
+  },
+  {
+    "Category": "Category 5",
+    "Value": "0.3"
+  },
+  {
+    "Category": "Category 6",
+    "Value": null
+  },
+  {
+    "Category": "Category 7",
+    "Value": "0.5"
+  },
+  {
+    "Category": "Category 8",
+    "Value": "0.5"
+  },
+  {
+    "Category": "Category 9",
+    "Value": "0.08"
+  }
+]

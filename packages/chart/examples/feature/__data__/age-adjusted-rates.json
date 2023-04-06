@@ -1,0 +1,1486 @@
+[
+  {
+    "Maine": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 5,
+          "count": 23,
+          "rate": 29.5
+        },
+        {
+          "age": "2",
+          "percent": 16,
+          "count": 74,
+          "rate": 89.3
+        },
+        {
+          "age": "3",
+          "percent": 22,
+          "count": 101,
+          "rate": 130.4
+        },
+        {
+          "age": "4",
+          "percent": 17,
+          "count": 80,
+          "rate": 95.9
+        },
+        {
+          "age": "5",
+          "percent": 10,
+          "count": 48,
+          "rate": 47.3
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 1,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 5,
+          "count": 22,
+          "rate": 27
+        },
+        {
+          "age": "3",
+          "percent": 9,
+          "count": 43,
+          "rate": 54.2
+        },
+        {
+          "age": "4",
+          "percent": 6,
+          "count": 28,
+          "rate": 32.2
+        },
+        {
+          "age": "5",
+          "percent": 6,
+          "count": 28,
+          "rate": 25.7
+        },
+        {
+          "age": "6",
+          "percent": 1,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "United States": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 6,
+          "count": 1036,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 17,
+          "count": 3032,
+          "rate": 12.9
+        },
+        {
+          "age": "3",
+          "percent": 17,
+          "count": 3042,
+          "rate": 14.5
+        },
+        {
+          "age": "4",
+          "percent": 15,
+          "count": 2560,
+          "rate": 12.8
+        },
+        {
+          "age": "5",
+          "percent": 12,
+          "count": 2137,
+          "rate": 10.4
+        },
+        {
+          "age": "6",
+          "percent": 4,
+          "count": 639,
+          "rate": 10
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 2,
+          "count": 355,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 6,
+          "count": 1104,
+          "rate": 10
+        },
+        {
+          "age": "3",
+          "percent": 7,
+          "count": 1287,
+          "rate": 10
+        },
+        {
+          "age": "4",
+          "percent": 6,
+          "count": 1124,
+          "rate": 10
+        },
+        {
+          "age": "5",
+          "percent": 6,
+          "count": 983,
+          "rate": 10
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 273,
+          "rate": 10
+        }
+      ]
+    },
+    "Alaska": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 9,
+          "count": 20,
+          "rate": 30.4
+        },
+        {
+          "age": "2",
+          "percent": 16,
+          "count": 27,
+          "rate": 43.6
+        },
+        {
+          "age": "3",
+          "percent": 14,
+          "count": 25,
+          "rate": 48.8
+        },
+        {
+          "age": "4",
+          "percent": 11,
+          "count": 20,
+          "rate": 45.9
+        },
+        {
+          "age": "5",
+          "percent": 11,
+          "count": 20,
+          "rate": 42.3
+        },
+        {
+          "age": "6",
+          "percent": 3,
+          "count": 20,
+          "rate": 10.5
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 7,
+          "count": 20,
+          "rate": 23.9
+        },
+        {
+          "age": "3",
+          "percent": 10,
+          "count": 20,
+          "rate": 38.4
+        },
+        {
+          "age": "4",
+          "percent": 9,
+          "count": 20,
+          "rate": 40.1
+        },
+        {
+          "age": "5",
+          "percent": 5,
+          "count": 20,
+          "rate": 18.1
+        },
+        {
+          "age": "6",
+          "percent": 1,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "Georgia": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 5,
+          "count": 92,
+          "rate": 12.4
+        },
+        {
+          "age": "2",
+          "percent": 17,
+          "count": 304,
+          "rate": 40.6
+        },
+        {
+          "age": "3",
+          "percent": 19,
+          "count": 338,
+          "rate": 50.2
+        },
+        {
+          "age": "4",
+          "percent": 12,
+          "count": 223,
+          "rate": 33.1
+        },
+        {
+          "age": "5",
+          "percent": 10,
+          "count": 182,
+          "rate": 28.9
+        },
+        {
+          "age": "6",
+          "percent": 3,
+          "count": 58,
+          "rate": 10
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 2,
+          "count": 34,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 7,
+          "count": 124,
+          "rate": 16.4
+        },
+        {
+          "age": "3",
+          "percent": 9,
+          "count": 158,
+          "rate": 21.9
+        },
+        {
+          "age": "4",
+          "percent": 8,
+          "count": 142,
+          "rate": 19.8
+        },
+        {
+          "age": "5",
+          "percent": 7,
+          "count": 120,
+          "rate": 17.3
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 35,
+          "rate": 10
+        }
+      ]
+    },
+    "Connecticut": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 4,
+          "count": 60,
+          "rate": 24.8
+        },
+        {
+          "age": "2",
+          "percent": 18,
+          "count": 242,
+          "rate": 105.5
+        },
+        {
+          "age": "3",
+          "percent": 19,
+          "count": 262,
+          "rate": 123.1
+        },
+        {
+          "age": "4",
+          "percent": 16,
+          "count": 218,
+          "rate": 97.7
+        },
+        {
+          "age": "5",
+          "percent": 15,
+          "count": 202,
+          "rate": 81.7
+        },
+        {
+          "age": "6",
+          "percent": 3,
+          "count": 47,
+          "rate": 16.6
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 2,
+          "count": 22,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 5,
+          "count": 64,
+          "rate": 29.2
+        },
+        {
+          "age": "3",
+          "percent": 6,
+          "count": 89,
+          "rate": 40.6
+        },
+        {
+          "age": "4",
+          "percent": 6,
+          "count": 80,
+          "rate": 33.6
+        },
+        {
+          "age": "5",
+          "percent": 5,
+          "count": 74,
+          "rate": 27.9
+        },
+        {
+          "age": "6",
+          "percent": 1,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "Utah": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 5,
+          "count": 27,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 15,
+          "count": 82,
+          "rate": 33.4
+        },
+        {
+          "age": "3",
+          "percent": 19,
+          "count": 103,
+          "rate": 45
+        },
+        {
+          "age": "4",
+          "percent": 10,
+          "count": 54,
+          "rate": 31.6
+        },
+        {
+          "age": "5",
+          "percent": 9,
+          "count": 48,
+          "rate": 32.1
+        },
+        {
+          "age": "6",
+          "percent": 3,
+          "count": 20,
+          "rate": 10
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 7,
+          "count": 36,
+          "rate": 15.4
+        },
+        {
+          "age": "3",
+          "percent": 12,
+          "count": 64,
+          "rate": 28.9
+        },
+        {
+          "age": "4",
+          "percent": 8,
+          "count": 43,
+          "rate": 25.9
+        },
+        {
+          "age": "5",
+          "percent": 7,
+          "count": 38,
+          "rate": 24.6
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "Arizona": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 12,
+          "count": 297,
+          "rate": 58.6
+        },
+        {
+          "age": "2",
+          "percent": 20,
+          "count": 486,
+          "rate": 90.8
+        },
+        {
+          "age": "3",
+          "percent": 15,
+          "count": 352,
+          "rate": 75.9
+        },
+        {
+          "age": "4",
+          "percent": 14,
+          "count": 324,
+          "rate": 76.1
+        },
+        {
+          "age": "5",
+          "percent": 10,
+          "count": 234,
+          "rate": 54.7
+        },
+        {
+          "age": "6",
+          "percent": 3,
+          "count": 65,
+          "rate": 10.3
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 3,
+          "count": 69,
+          "rate": 14.4
+        },
+        {
+          "age": "2",
+          "percent": 7,
+          "count": 160,
+          "rate": 32.3
+        },
+        {
+          "age": "3",
+          "percent": 6,
+          "count": 146,
+          "rate": 32.4
+        },
+        {
+          "age": "4",
+          "percent": 5,
+          "count": 115,
+          "rate": 26.5
+        },
+        {
+          "age": "5",
+          "percent": 4,
+          "count": 105,
+          "rate": 22.5
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 36,
+          "rate": 10
+        }
+      ]
+    },
+    "Nevada": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 9,
+          "count": 86,
+          "rate": 45.3
+        },
+        {
+          "age": "2",
+          "percent": 15,
+          "count": 138,
+          "rate": 58.4
+        },
+        {
+          "age": "3",
+          "percent": 13,
+          "count": 119,
+          "rate": 55.8
+        },
+        {
+          "age": "4",
+          "percent": 14,
+          "count": 125,
+          "rate": 62.5
+        },
+        {
+          "age": "5",
+          "percent": 12,
+          "count": 110,
+          "rate": 57.1
+        },
+        {
+          "age": "6",
+          "percent": 7,
+          "count": 60,
+          "rate": 24.6
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 3,
+          "count": 27,
+          "rate": 15
+        },
+        {
+          "age": "2",
+          "percent": 4,
+          "count": 41,
+          "rate": 18.2
+        },
+        {
+          "age": "3",
+          "percent": 6,
+          "count": 56,
+          "rate": 27
+        },
+        {
+          "age": "4",
+          "percent": 7,
+          "count": 65,
+          "rate": 33.1
+        },
+        {
+          "age": "5",
+          "percent": 8,
+          "count": 69,
+          "rate": 35.1
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "New Jersey": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 4,
+          "count": 108,
+          "rate": 19.5
+        },
+        {
+          "age": "2",
+          "percent": 18,
+          "count": 522,
+          "rate": 88.9
+        },
+        {
+          "age": "3",
+          "percent": 18,
+          "count": 507,
+          "rate": 89.3
+        },
+        {
+          "age": "4",
+          "percent": 18,
+          "count": 505,
+          "rate": 87.9
+        },
+        {
+          "age": "5",
+          "percent": 14,
+          "count": 389,
+          "rate": 65.9
+        },
+        {
+          "age": "6",
+          "percent": 4,
+          "count": 108,
+          "rate": 16.5
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 1,
+          "count": 34,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 6,
+          "count": 161,
+          "rate": 28.4
+        },
+        {
+          "age": "3",
+          "percent": 6,
+          "count": 160,
+          "rate": 27.9
+        },
+        {
+          "age": "4",
+          "percent": 6,
+          "count": 169,
+          "rate": 28.2
+        },
+        {
+          "age": "5",
+          "percent": 5,
+          "count": 141,
+          "rate": 22.3
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 60,
+          "rate": 10
+        }
+      ]
+    },
+    "South Dakota": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 15,
+          "count": 20,
+          "rate": 14.7
+        },
+        {
+          "age": "2",
+          "percent": 13,
+          "count": 20,
+          "rate": 13.3
+        },
+        {
+          "age": "3",
+          "percent": 18,
+          "count": 20,
+          "rate": 19.6
+        },
+        {
+          "age": "4",
+          "percent": 13,
+          "count": 20,
+          "rate": 16.7
+        },
+        {
+          "age": "5",
+          "percent": 6,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "6",
+          "percent": 0,
+          "count": 20,
+          "rate": 10
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 3,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 5,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "3",
+          "percent": 16,
+          "count": 20,
+          "rate": 19.2
+        },
+        {
+          "age": "4",
+          "percent": 5,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "5",
+          "percent": 6,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "6",
+          "percent": 0,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "Massachusetts": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 3,
+          "count": 71,
+          "rate": 15.4
+        },
+        {
+          "age": "2",
+          "percent": 17,
+          "count": 399,
+          "rate": 79.4
+        },
+        {
+          "age": "3",
+          "percent": 22,
+          "count": 509,
+          "rate": 120.2
+        },
+        {
+          "age": "4",
+          "percent": 15,
+          "count": 352,
+          "rate": 83.4
+        },
+        {
+          "age": "5",
+          "percent": 13,
+          "count": 297,
+          "rate": 65.4
+        },
+        {
+          "age": "6",
+          "percent": 3,
+          "count": 67,
+          "rate": 12.8
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 2,
+          "count": 36,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 7,
+          "count": 157,
+          "rate": 31.8
+        },
+        {
+          "age": "3",
+          "percent": 8,
+          "count": 183,
+          "rate": 42
+        },
+        {
+          "age": "4",
+          "percent": 6,
+          "count": 129,
+          "rate": 28.7
+        },
+        {
+          "age": "5",
+          "percent": 4,
+          "count": 94,
+          "rate": 19.2
+        },
+        {
+          "age": "6",
+          "percent": 1,
+          "count": 21,
+          "rate": 10
+        }
+      ]
+    },
+    "Oklahoma": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 3,
+          "count": 25,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 12,
+          "count": 91,
+          "rate": 32.8
+        },
+        {
+          "age": "3",
+          "percent": 14,
+          "count": 107,
+          "rate": 42.1
+        },
+        {
+          "age": "4",
+          "percent": 16,
+          "count": 122,
+          "rate": 54.3
+        },
+        {
+          "age": "5",
+          "percent": 16,
+          "count": 124,
+          "rate": 52.4
+        },
+        {
+          "age": "6",
+          "percent": 5,
+          "count": 42,
+          "rate": 14.4
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 7,
+          "count": 52,
+          "rate": 19.4
+        },
+        {
+          "age": "3",
+          "percent": 7,
+          "count": 56,
+          "rate": 22.2
+        },
+        {
+          "age": "4",
+          "percent": 8,
+          "count": 66,
+          "rate": 29.1
+        },
+        {
+          "age": "5",
+          "percent": 8,
+          "count": 63,
+          "rate": 24.9
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "New Mexico": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 4,
+          "count": 27,
+          "rate": 18.7
+        },
+        {
+          "age": "2",
+          "percent": 19,
+          "count": 117,
+          "rate": 79.2
+        },
+        {
+          "age": "3",
+          "percent": 20,
+          "count": 123,
+          "rate": 93.5
+        },
+        {
+          "age": "4",
+          "percent": 11,
+          "count": 67,
+          "rate": 58.5
+        },
+        {
+          "age": "5",
+          "percent": 12,
+          "count": 76,
+          "rate": 59
+        },
+        {
+          "age": "6",
+          "percent": 4,
+          "count": 26,
+          "rate": 14.6
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 8,
+          "count": 53,
+          "rate": 38.6
+        },
+        {
+          "age": "3",
+          "percent": 8,
+          "count": 53,
+          "rate": 41.3
+        },
+        {
+          "age": "4",
+          "percent": 6,
+          "count": 40,
+          "rate": 33.8
+        },
+        {
+          "age": "5",
+          "percent": 4,
+          "count": 26,
+          "rate": 18.4
+        },
+        {
+          "age": "6",
+          "percent": 1,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "Minnesota": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 8,
+          "count": 81,
+          "rate": 22.3
+        },
+        {
+          "age": "2",
+          "percent": 21,
+          "count": 199,
+          "rate": 51
+        },
+        {
+          "age": "3",
+          "percent": 13,
+          "count": 121,
+          "rate": 32.2
+        },
+        {
+          "age": "4",
+          "percent": 13,
+          "count": 128,
+          "rate": 38.5
+        },
+        {
+          "age": "5",
+          "percent": 10,
+          "count": 95,
+          "rate": 25.5
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 4,
+          "count": 39,
+          "rate": 11.1
+        },
+        {
+          "age": "2",
+          "percent": 8,
+          "count": 76,
+          "rate": 20.5
+        },
+        {
+          "age": "3",
+          "percent": 8,
+          "count": 79,
+          "rate": 21.7
+        },
+        {
+          "age": "4",
+          "percent": 6,
+          "count": 58,
+          "rate": 17.7
+        },
+        {
+          "age": "5",
+          "percent": 5,
+          "count": 50,
+          "rate": 13.2
+        },
+        {
+          "age": "6",
+          "percent": 1,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "Vermont": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 3,
+          "count": 20,
+          "rate": 13.7
+        },
+        {
+          "age": "2",
+          "percent": 20,
+          "count": 35,
+          "rate": 90.9
+        },
+        {
+          "age": "3",
+          "percent": 16,
+          "count": 28,
+          "rate": 78.4
+        },
+        {
+          "age": "4",
+          "percent": 20,
+          "count": 35,
+          "rate": 93.4
+        },
+        {
+          "age": "5",
+          "percent": 10,
+          "count": 20,
+          "rate": 37.4
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 1,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 8,
+          "count": 20,
+          "rate": 38.1
+        },
+        {
+          "age": "3",
+          "percent": 7,
+          "count": 20,
+          "rate": 35.6
+        },
+        {
+          "age": "4",
+          "percent": 8,
+          "count": 20,
+          "rate": 36.5
+        },
+        {
+          "age": "5",
+          "percent": 6,
+          "count": 20,
+          "rate": 20.7
+        },
+        {
+          "age": "6",
+          "percent": 0,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "Oregon": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 8,
+          "count": 56,
+          "rate": 21.6
+        },
+        {
+          "age": "2",
+          "percent": 17,
+          "count": 117,
+          "rate": 37.7
+        },
+        {
+          "age": "3",
+          "percent": 14,
+          "count": 99,
+          "rate": 33.9
+        },
+        {
+          "age": "4",
+          "percent": 14,
+          "count": 95,
+          "rate": 36.9
+        },
+        {
+          "age": "5",
+          "percent": 11,
+          "count": 76,
+          "rate": 29.6
+        },
+        {
+          "age": "6",
+          "percent": 6,
+          "count": 40,
+          "rate": 11.1
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 6,
+          "count": 39,
+          "rate": 13.1
+        },
+        {
+          "age": "3",
+          "percent": 8,
+          "count": 56,
+          "rate": 19.5
+        },
+        {
+          "age": "4",
+          "percent": 8,
+          "count": 57,
+          "rate": 22.4
+        },
+        {
+          "age": "5",
+          "percent": 5,
+          "count": 32,
+          "rate": 11.6
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "Delaware": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 3,
+          "count": 20,
+          "rate": 23.5
+        },
+        {
+          "age": "2",
+          "percent": 16,
+          "count": 72,
+          "rate": 111
+        },
+        {
+          "age": "3",
+          "percent": 19,
+          "count": 85,
+          "rate": 149.8
+        },
+        {
+          "age": "4",
+          "percent": 14,
+          "count": 64,
+          "rate": 114.8
+        },
+        {
+          "age": "5",
+          "percent": 13,
+          "count": 58,
+          "rate": 88.7
+        },
+        {
+          "age": "6",
+          "percent": 3,
+          "count": 20,
+          "rate": 13.6
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 2,
+          "count": 20,
+          "rate": 18.8
+        },
+        {
+          "age": "2",
+          "percent": 5,
+          "count": 23,
+          "rate": 35.5
+        },
+        {
+          "age": "3",
+          "percent": 10,
+          "count": 46,
+          "rate": 77.8
+        },
+        {
+          "age": "4",
+          "percent": 5,
+          "count": 21,
+          "rate": 34.5
+        },
+        {
+          "age": "5",
+          "percent": 8,
+          "count": 35,
+          "rate": 47.1
+        },
+        {
+          "age": "6",
+          "percent": 1,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    },
+    "DC": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 3,
+          "count": 20,
+          "rate": 35.1
+        },
+        {
+          "age": "2",
+          "percent": 8,
+          "count": 42,
+          "rate": 54.2
+        },
+        {
+          "age": "3",
+          "percent": 11,
+          "count": 57,
+          "rate": 103
+        },
+        {
+          "age": "4",
+          "percent": 16,
+          "count": 82,
+          "rate": 222
+        },
+        {
+          "age": "5",
+          "percent": 23,
+          "count": 119,
+          "rate": 354.7
+        },
+        {
+          "age": "6",
+          "percent": 10,
+          "count": 49,
+          "rate": 133.3
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 1,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 5,
+          "count": 24,
+          "rate": 27.5
+        },
+        {
+          "age": "3",
+          "percent": 3,
+          "count": 20,
+          "rate": 22.5
+        },
+        {
+          "age": "4",
+          "percent": 7,
+          "count": 38,
+          "rate": 102.4
+        },
+        {
+          "age": "5",
+          "percent": 11,
+          "count": 56,
+          "rate": 154.5
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 20,
+          "rate": 18.8
+        }
+      ]
+    },
+    "Mississippi": {
+      "male": [
+        {
+          "age": "1",
+          "percent": 5,
+          "count": 24,
+          "rate": 11.8
+        },
+        {
+          "age": "2",
+          "percent": 16,
+          "count": 77,
+          "rate": 39.8
+        },
+        {
+          "age": "3",
+          "percent": 20,
+          "count": 95,
+          "rate": 53.8
+        },
+        {
+          "age": "4",
+          "percent": 12,
+          "count": 58,
+          "rate": 33.9
+        },
+        {
+          "age": "5",
+          "percent": 8,
+          "count": 38,
+          "rate": 20.9
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        }
+      ],
+      "female": [
+        {
+          "age": "1",
+          "percent": 1,
+          "count": 20,
+          "rate": 10
+        },
+        {
+          "age": "2",
+          "percent": 9,
+          "count": 42,
+          "rate": 21.4
+        },
+        {
+          "age": "3",
+          "percent": 9,
+          "count": 44,
+          "rate": 23.3
+        },
+        {
+          "age": "4",
+          "percent": 8,
+          "count": 40,
+          "rate": 21.6
+        },
+        {
+          "age": "5",
+          "percent": 6,
+          "count": 30,
+          "rate": 14.9
+        },
+        {
+          "age": "6",
+          "percent": 2,
+          "count": 20,
+          "rate": 10
+        }
+      ]
+    }
+  }
+]
