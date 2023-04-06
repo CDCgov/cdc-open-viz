@@ -1,14 +1,20 @@
 {
   "title": "Planet Radius (Combo Example)",
-  "dataUrl": "/examples/planet-example-data-max-increase.json",
+  "dataUrl": "/examples/feature/__data__/planet-example-data-max-increase.json",
   "animate": true,
   "animateReplay": true,
-
   "visualizationType": "Bar",
   "visualizationSubType": "horizontal",
   "isLollipopChart": false,
   "barHasBorder": "true",
-  "series": [{ "dataKey": "Radius" }, { "dataKey": "Diameter" }],
+  "series": [
+    {
+      "dataKey": "Radius"
+    },
+    {
+      "dataKey": "Diameter"
+    }
+  ],
   "fontSize": "small",
   "dataFormat": {
     "roundTo": 1,

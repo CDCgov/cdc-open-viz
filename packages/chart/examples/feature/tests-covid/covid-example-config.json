@@ -1,10 +1,14 @@
 {
   "title": "Non Configdence Age-adjusted COVID-19-associated hospitalization rates by race and ethnicity — COVID-NET, March 1–December 26, 2020",
   "theme": "theme-brown",
-  "dataUrl": "/examples/covid-example-data.json",
+  "dataUrl": "/examples/feature/tests-covid/covid-example-data.json",
   "visualizationType": "Bar",
   "visualizationSubType": "horizontal",
-  "series": [{ "dataKey": "Age-adjusted rate" }],
+  "series": [
+    {
+      "dataKey": "Age-adjusted rate"
+    }
+  ],
   "barThickness": 0.3,
   "height": 300,
   "dataFormat": {
