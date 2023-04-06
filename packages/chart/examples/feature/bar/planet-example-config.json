@@ -1,8 +1,8 @@
 {
   "type": "chart",
-  "title": "Planet Radius (Combo Example)",
+  "title": "Planet Radius (Bar Example)",
   "theme": "theme-blue",
-  "animate": true,
+  "animate": false,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
   "barHasBorder": "false",
@@ -14,8 +14,8 @@
   "roundingStyle": "standard",
   "tipRounding": "top",
   "padding": {
-    "left": 0,
-    "right": 0
+    "left": 5,
+    "right": 5
   },
   "yAxis": {
     "hideAxis": false,
@@ -29,17 +29,18 @@
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "rightHideAxis": false,
+    "rightHideAxis": true,
     "rightAxisSize": 50,
-    "rightLabel": "",
+    "rightLabel": "testing",
     "rightLabelOffsetSize": 0,
     "rightAxisLabelColor": "#333",
     "rightAxisTickLabelColor": "#333",
     "rightAxisTickColor": "#333",
-    "numTicks": "",
+    "numTicks": "11",
     "axisPadding": 0,
     "tickRotation": 0,
-    "label": "Measurement (1000km)"
+    "label": "Measurement (1000km)",
+    "rightSeries": "Diameter"
   },
   "boxplot": {
     "plots": [],
@@ -70,7 +71,7 @@
     }
   },
   "topAxis": {
-    "hasLine": true
+    "hasLine": false
   },
   "isLegendValue": false,
   "barThickness": 0.35,
@@ -78,7 +79,7 @@
   "barSpace": 15,
   "heights": {
     "vertical": 300,
-    "horizontal": 750
+    "horizontal": 405
   },
   "xAxis": {
     "type": "categorical",
@@ -86,7 +87,7 @@
     "hideLabel": false,
     "hideTicks": false,
     "size": 75,
-    "tickRotation": 30,
+    "tickRotation": "0",
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -107,7 +108,7 @@
     "showDownloadUrl": false,
     "show": true
   },
-  "orientation": "vertical",
+  "orientation": "horizontal",
   "legend": {
     "behavior": "isolate",
     "position": "right",
@@ -142,18 +143,14 @@
     "accent": true,
     "background": true
   },
-  "dataUrl": "/examples/planet-example-data.json",
-  "animateReplay": true,
-  "visualizationType": "Combo",
+  "dataUrl": "/examples/feature/__data__/planet-example-data.json",
+  "visualizationType": "Deviation Bar",
   "series": [
     {
       "dataKey": "Radius",
-      "type": "Line",
-      "axis": "Right"
-    },
-    {
-      "dataKey": "Diameter",
-      "type": "Bar"
+      "type": "Deviation Bar",
+      "axis": "Left"
     }
-  ]
+  ],
+  "dataCutoff": "0.5"
 }
