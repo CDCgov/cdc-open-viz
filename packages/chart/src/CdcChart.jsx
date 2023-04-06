@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react'
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 import * as d3 from 'd3-array'
-import { scaleQuantile } from 'https://cdn.skypack.dev/d3-scale@4'
 
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
@@ -269,11 +268,87 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           // filter data by group
           let filteredData = newExcludedData ? newExcludedData.filter(item => item[newConfig.xAxis.dataKey] === g) : data.filter(item => item[newConfig.xAxis.dataKey] === g)
           let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
+
+          // Sort the data for upcoming functions.
           let sortedData = filteredDataValues.sort((a, b) => a - b)
-          // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
+
+          // Get the closest index to the median
+          // Tukey Method or 1-3-1 method.
+          const quartileTukey = (arr, quart) => {
+            const sorted = arr.slice().sort((a, b) => a - b)
+            const n = sorted.length
+            const pos = (n - 1) * quart
+            const base = Math.floor(pos)
+            const fract = pos - base
+            if (fract === 0) {
+              return sorted[base]
+            } else {
+              return sorted[base] + fract * (sorted[base + 1] - sorted[base])
+            }
+          }
+
+          function quartileMinitab(arr, quart) {
+            const sorted = arr.slice().sort((a, b) => a - b)
+            const n = sorted.length
+            const h = (n - 1) * quart + 1
+            const k = Math.floor(h)
+            const d = h - k
+            if (k + 4 < n) {
+              return sorted[k] + d * (sorted[k + 1] - sorted[k]) + 0.5 * (sorted[k + 2] - sorted[k + 1] + sorted[k + 3] - sorted[k + 2]) * d * (d - 1)
+            } else if (k + 3 < n) {
+              return sorted[k] + d * (sorted[k + 1] - sorted[k]) + 0.5 * (sorted[k + 2] - sorted[k + 1] + sorted[k + 2] - sorted[k + 3]) * d * (d - 1)
+            } else if (k + 2 < n) {
+              return sorted[k] + d * (sorted[k + 1] - sorted[k]) + (sorted[k + 2] - sorted[k + 1]) * d
+            } else {
+              return sorted[k] + d * (sorted[k + 1] - sorted[k])
+            }
+          }
+
+          // Moore and McCabe
+          const quartileMcCabe = (arr, quart) => {
+            const sorted = arr.slice().sort((a, b) => a - b)
+            const n = sorted.length
+            const pos = (n - 1) * quart + 1
+            const base = Math.floor(pos) - 1
+            const fract = pos - base - 1
+            if (base + 1 < n) {
+              return (1 - fract) * sorted[base] + fract * sorted[base + 1]
+            } else {
+              return sorted[base]
+            }
+          }
+
+          function quartileInc(arr, quart) {
+            const sorted = arr.slice().sort((a, b) => a - b)
+            const n = sorted.length
+            const index = quart * (n - 1) + 1
+            const loIndex = Math.floor(index)
+            const hiIndex = Math.ceil(index)
+            const loValue = sorted[loIndex - 1]
+            const hiValue = sorted[hiIndex - 1]
+            const q = loValue + (hiValue - loValue) * (index - loIndex)
+            return q
+          }
+
+          let q1Mock = quartileInc(sortedData, 0.25)
+          let q3Mock = quartileInc(sortedData, 0.75)
+
+          // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
+          // The first quartile is the median of the data points to the left of the median.
+          // const q1mock = d3.median([...sortedData].splice(0, middleIndex))
+          // const q3mock = d3.median([...sortedData].splice(middleIndex))
+
+          console.log('all data', sortedData)
+          console.log('true median', d3.median(sortedData))
+          // console.log('closestMedian', middleIndex)
+          // console.log('all of smaller data', [...sortedData].splice(0, middleIndex))
+          // console.log('all of larger data', [...sortedData].splice(0, middleIndex))
+          console.log('q1 mock', q1Mock)
+          console.log('q3 mock', q3Mock)
 
           if (!filteredData) throw new Error('boxplots dont have data yet')
           if (!plots) throw new Error('boxplots dont have plots yet')
+
           if (newConfig.boxplot.firstQuartilePercentage === '') {
             newConfig.boxplot.firstQuartilePercentage = 0
           }
@@ -284,31 +359,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
           // const q1 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
 
-          /** Calculate the 'q' quartile of an array of values
-           *
-           * @arg arr - array of values
-           * @arg q - percentile to calculate (e.g. 95)
-           */
-          function calcQuartile(arr, q) {
-            var data = arr.slice()
-
-            // Work out the position in the array of the percentile point
-            var p = (data.length - 1) * q
-            var b = Math.floor(p)
-
-            // Work out what we rounded off (if anything)
-            var remainder = p - b
-
-            // See whether that data exists directly
-            if (data[b + 1] !== undefined) {
-              return parseFloat(data[b]) + remainder * (parseFloat(data[b + 1]) - parseFloat(data[b]))
-            } else {
-              return parseFloat(data[b])
-            }
-          }
-
-          console.log('q1', calcQuartile(sortedData, 0.25))
-
           const q1 = d3.quantile(sortedData, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
           const q3 = d3.quantile(sortedData, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
           const iqr = q3 - q1
@@ -317,16 +367,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
           let nonOutliers = filteredDataValues
 
-          console.log('q1', q1)
+          console.log('q1-2', q1)
+          // console.log('q1', d3.median(filteredDataValues))
+          // console.log('q1', d3.median(filteredDataValues))
           nonOutliers = nonOutliers.filter(item => !outliers.includes(item))
 
           plots.push({
             columnCategory: g,
+            // columnMax: Number(q3 + 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo), // this is the upper fence
             // columnMax: Number(Math.max.apply(null, filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMax: d3.min([d3.max(filteredDataValues), q1 + 1.5 * iqr]),
             columnThirdQuartile: Number(q3).toFixed(newConfig.dataFormat.roundTo),
             columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
+            // columnMin: Number(q1 - 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo), // this is the lower fence.
             // columnMin: Number(Math.min.apply(null, filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMin: d3.max([d3.min(filteredDataValues), q1 - 1.5 * iqr]),
             columnTotal: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
