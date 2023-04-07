@@ -124,13 +124,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               {config.animate && (
                 <LinePath
                   className='animation'
-<<<<<<< HEAD
-                  curve={allCurves.curveLinear}
-                  data={data}
-=======
                   curve={seriesData.lineType}
-                  data={cleanedData}
->>>>>>> cfa9a19f54dabe00c590d5e564afde15a7a4de25
+                  data={data}
                   x={d => xScale(getXAxisData(d))}
                   y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                   stroke='#fff'
