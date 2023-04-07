@@ -35,41 +35,41 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   const isMaxValid = Number(enteredMaxValue) >= Number(maxValue)
   const isMinValid = Number(enteredMinValue) <= Number(minValue)
 
-  // REMOVE bad data points from the data set
-  // Examples: NA, N/A, "1,234", "anystring"
-  // - if you dont call this on data into LineGroup below, for example
-  // then entire data series are removed because of the defined statement
-  // i.e. if a series has any bad data points the entire series wont plot
-  const cleanData = (data, testing = false) => {
-    let cleanedup = []
-    if (testing) console.log('## Data to clean=', data)
-    data.forEach(function (d, i) {
-      let cleanedSeries = {}
-      Object.keys(d).forEach(function (key) {
-        if (key === 'Date') {
-          // pass thru the dates
-          cleanedSeries[key] = d[key]
-        } else {
-          // remove comma and dollar signs
-          let tmp = d[key] !== null && d[key] !== '' ? d[key].replace(/[,$]/g, '') : ''
-          if (testing) console.log('tmp no comma or $', tmp)
-          if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
-            cleanedSeries[key] = tmp
-          } else {
-            // return nothing to skip bad data point
-            cleanedSeries[key] = '' // returning blank fixes broken chart draw
-          }
-        }
-      })
-      cleanedup.push(cleanedSeries)
-    })
-    if (testing) console.log('## cleanedData =', cleanedup)
-    return cleanedup
-  }
+  // // REMOVE bad data points from the data set
+  // // Examples: NA, N/A, "1,234", "anystring"
+  // // - if you dont call this on data into LineGroup below, for example
+  // // then entire data series are removed because of the defined statement
+  // // i.e. if a series has any bad data points the entire series wont plot
+  // const cleanData = (data, testing = false) => {
+  //   let cleanedup = []
+  //   if (testing) console.log('## Data to clean=', data)
+  //   data.forEach(function (d, i) {
+  //     let cleanedSeries = {}
+  //     Object.keys(d).forEach(function (key) {
+  //       if (key === 'Date') {
+  //         // pass thru the dates
+  //         cleanedSeries[key] = d[key]
+  //       } else {
+  //         // remove comma and dollar signs
+  //         let tmp = d[key] !== null && d[key] !== '' ? d[key].replace(/[,$]/g, '') : ''
+  //         if (testing) console.log('tmp no comma or $', tmp)
+  //         if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
+  //           cleanedSeries[key] = tmp
+  //         } else {
+  //           // return nothing to skip bad data point
+  //           cleanedSeries[key] = '' // returning blank fixes broken chart draw
+  //         }
+  //       }
+  //     })
+  //     cleanedup.push(cleanedSeries)
+  //   })
+  //   if (testing) console.log('## cleanedData =', cleanedup)
+  //   return cleanedup
+  // }
 
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data, config.xAxis.dataKey)
+  const cleanedData = data
 
   if (cleanedData) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
@@ -128,7 +128,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   return (
     <ErrorBoundary component='SparkLine'>
       <svg role='img' aria-label={handleChartAriaLabels(config)} width={width} height={height} className={'sparkline'} tabIndex={0}>
-        {config.runtime.lineSeriesKeys.length > 0
+        {config.runtime.lineSeriesKeys?.length > 0
           ? config.runtime.lineSeriesKeys
           : config.runtime.seriesKeys.map((seriesKey, index) => (
               <>
@@ -201,7 +201,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
                   hideTicks
                   scale={xScale}
                   tickValues={handleSparkLineTicks}
-                  tickFormat={formatDate}
+                  tickFormat={tick => (config.xAxis.type === 'date' ? formatDate(tick) : null)}
                   stroke={'black'}
                   tickStroke={'black'}
                   tickLabelProps={() => ({
