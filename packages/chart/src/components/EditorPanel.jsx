@@ -212,6 +212,14 @@ const EditorPanel = () => {
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
+  const approvedCurveTypes = {
+    Linear: 'curveLinear',
+    Cardinal: 'curveCardinal',
+    Natural: 'curveNatural',
+    'Monotone X': 'curveMonotoneX',
+    Step: 'curveStep'
+  }
+
   // when the visualization type changes we
   // have to update the individual series type & axis details
   // dataKey is unchanged here.
@@ -1045,9 +1053,9 @@ const EditorPanel = () => {
                                             Select
                                           </option>
 
-                                          {Object.keys(allCurves).map(curveName => {
+                                          {Object.keys(approvedCurveTypes).map(curveName => {
                                             return (
-                                              <option key={`curve-option-${curveName}`} value={curveName}>
+                                              <option key={`curve-option-${approvedCurveTypes[curveName]}`} value={approvedCurveTypes[curveName]}>
                                                 {curveName}
                                               </option>
                                             )
