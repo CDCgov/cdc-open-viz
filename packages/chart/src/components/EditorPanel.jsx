@@ -645,10 +645,6 @@ const EditorPanel = () => {
     )
   }, [config]) // eslint-disable-line
 
-  const checkIsLine = type => {
-    return type === ('Line' || 'dashed-sm')
-  }
-
   const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
     let filterOrder = filter.values
     let [movedItem] = filterOrder.splice(idx1, 1)
@@ -1086,7 +1082,7 @@ const EditorPanel = () => {
                                                 <AccordionItem className='series-item series-item--chart'>
                                                   <AccordionItemHeading className='series-item__title'>
                                                     <AccordionItemButton>
-                                                      <Icon display='move' size='15' style={{ cursor: 'default' }} />
+                                                      <Icon display='move' size={15} style={{ cursor: 'default' }} />
                                                       {series.dataKey}
                                                       {config.series && config.series.length > 1 && (
                                                         <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
@@ -1100,10 +1096,10 @@ const EditorPanel = () => {
                                                       {config.visualizationType === 'Combo' && (
                                                         <>
                                                           <span className='series-list__dropdown series-item__dropdown'>{typeDropdown}</span>
-                                                          {hasRightAxis && config.series && (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') && <span className='series-list__dropdown'>{axisDropdown}</span>}
+                                                          {hasRightAxis && config.series && (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') && <span className='series-item__dropdown series-list__dropdown'>{axisDropdown}</span>}
                                                         </>
                                                       )}
-                                                      {series.type === 'Area Chart' && <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
+                                                      {['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type)) && <span className='series-item__dropdown series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
                                                     </div>
                                                   </AccordionItemPanel>
                                                 </AccordionItem>
