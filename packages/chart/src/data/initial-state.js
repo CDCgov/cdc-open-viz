@@ -67,7 +67,9 @@ export default {
       iqr: 'Interquartile Range',
       total: 'Total',
       outliers: 'Outliers',
-      values: 'Values'
+      values: 'Values',
+      lowerBounds: 'Lower Bounds',
+      upperBounds: 'Upper Bounds'
     }
   },
   topAxis: {
