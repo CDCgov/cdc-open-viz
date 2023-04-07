@@ -1,6 +1,7 @@
 {
   "type": "chart",
   "title": "Planet Radius (Bar Example)",
+  "showTitle": true,
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
@@ -10,8 +11,8 @@
   "lollipopShape": "circle",
   "lollipopColorStyle": "two-tone",
   "visualizationSubType": "regular",
-  "barStyle": "",
-  "roundingStyle": "standard",
+  "barStyle": "rounded",
+  "roundingStyle": "finger",
   "tipRounding": "top",
   "padding": {
     "left": 5,
@@ -19,11 +20,12 @@
   },
   "yAxis": {
     "hideAxis": false,
-    "displayNumbersOnBar": false,
+    "displayNumbersOnBar": true,
     "hideLabel": false,
     "hideTicks": false,
     "size": 50,
     "gridLines": false,
+    "enablePadding": false,
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -79,10 +81,12 @@
   "barSpace": 15,
   "heights": {
     "vertical": 300,
-    "horizontal": 405
+    "horizontal": 360
   },
   "xAxis": {
     "type": "categorical",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
@@ -96,6 +100,7 @@
     "numTicks": "",
     "labelOffset": 65,
     "axisPadding": 0,
+    "target": "55",
     "label": "Planet",
     "dataKey": "name"
   },
@@ -111,7 +116,6 @@
   "orientation": "horizontal",
   "legend": {
     "behavior": "isolate",
-    "position": "right",
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
@@ -121,6 +125,7 @@
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
+    "position": "right",
     "hide": false
   },
   "exclusions": {
@@ -129,12 +134,19 @@
   },
   "palette": "qualitative-bold",
   "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "complementary-5reverse",
+    "isPaletteReversed": true
+  },
   "labels": false,
   "dataFormat": {
     "commas": false,
     "prefix": "",
     "suffix": "km",
     "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false,
     "roundTo": 1
   },
   "confidenceKeys": {},
@@ -143,7 +155,7 @@
     "accent": true,
     "background": true
   },
-  "dataUrl": "/examples/planet-example-data.json",
+  "dataUrl": "/examples/feature/deviation/planet-deviation-data.json",
   "visualizationType": "Deviation Bar",
   "series": [
     {
