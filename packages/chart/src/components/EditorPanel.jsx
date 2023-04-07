@@ -937,20 +937,20 @@ const EditorPanel = () => {
                   <AccordionItemPanel>
                     {(!config.series || config.series.length === 0) && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
                     {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
+                    <Select
+                      fieldName='visualizationType'
+                      label='Add Data Series'
+                      initial='Select'
+                      onChange={e => {
+                        if (e.target.value !== '' && e.target.value !== 'Select') {
+                          addNewSeries(e.target.value)
+                        }
+                        e.target.value = ''
+                      }}
+                      options={getColumns()}
+                    />
                     {config.series && config.series.length !== 0 && (
                       <>
-                        <Select
-                          fieldName='visualizationType'
-                          label='Add Data Series'
-                          initial='Select'
-                          onChange={e => {
-                            if (e.target.value !== '' && e.target.value !== 'Select') {
-                              addNewSeries(e.target.value)
-                            }
-                            e.target.value = ''
-                          }}
-                          options={getColumns()}
-                        />
                         <fieldset>
                           <legend className='edit-label float-left'>Displaying</legend>
                           <Tooltip style={{ textTransform: 'none' }}>
