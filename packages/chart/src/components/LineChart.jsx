@@ -9,13 +9,12 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import useRightAxis from '../hooks/useRightAxis'
 import isNumber from '@cdc/core/helpers/isNumber'
+import isNumberLog from '@cdc/core/helpers/isNumberLog'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
-  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig, handleLineType } = useContext(ConfigContext)
-  // Just do this once up front otherwise we end up
-  // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data, config.xAxis.dataKey)
-  const { yScaleRight } = useRightAxis({ config, yMax, cleanedData, updateConfig })
+  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType } = useContext(ConfigContext)
+
+  const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
   const handleAxisFormating = (axis = 'left', label, value) => {
     // if this is an x axis category/date value return without doing any formatting.
@@ -44,7 +43,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
               display={config.legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !config.legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
             >
-              {cleanedData.map((d, dataIndex) => {
+              {data.map((d, dataIndex) => {
                 // Find the series object from the config.series array that has a dataKey matching the seriesKey variable.
                 const series = config.series.find(({ dataKey }) => dataKey === seriesKey)
                 const { axis } = series
@@ -70,7 +69,11 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 return (
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
-                  d[seriesKey] !== null && (
+                  d[seriesKey] !== null &&
+                  isNumber(d[seriesKey]) && (
+                    //isNumber(getYAxisData(d, seriesKey)) &&
+                    //isNumber(getXAxisData(d)) &&
+                    //isNumber(seriesAxis === 'Right' ? isNumber(yScaleRight(getYAxisData(d, seriesKey))) : isNumber(yScale(getYAxisData(d, seriesKey)))) &&
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
                       <Text
@@ -99,7 +102,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               })}
               <LinePath
                 curve={allCurves.curveLinear}
-                data={cleanedData}
+                data={data}
                 x={d => xScale(getXAxisData(d))}
                 y={d => (seriesAxis === 'Right' ? yScale(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                 stroke={
@@ -123,7 +126,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 <LinePath
                   className='animation'
                   curve={allCurves.curveLinear}
-                  data={cleanedData}
+                  data={data}
                   x={d => xScale(getXAxisData(d))}
                   y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                   stroke='#fff'
@@ -140,9 +143,9 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               {config.showLineSeriesLabels &&
                 (config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map(seriesKey => {
                   let lastDatum
-                  for (let i = cleanedData.length - 1; i >= 0; i--) {
-                    if (cleanedData[i][seriesKey]) {
-                      lastDatum = cleanedData[i]
+                  for (let i = data.length - 1; i >= 0; i--) {
+                    if (data[i][seriesKey]) {
+                      lastDatum = data[i]
                       break
                     }
                   }
