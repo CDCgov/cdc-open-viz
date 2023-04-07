@@ -943,6 +943,18 @@ const EditorPanel = () => {
                     {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
                     {config.series && config.series.length !== 0 && (
                       <>
+                        <Select
+                          fieldName='visualizationType'
+                          label='Add Data Series'
+                          initial='Select'
+                          onChange={e => {
+                            if (e.target.value !== '' && e.target.value !== 'Select') {
+                              addNewSeries(e.target.value)
+                            }
+                            e.target.value = ''
+                          }}
+                          options={getColumns()}
+                        />
                         <fieldset>
                           <legend className='edit-label float-left'>Displaying</legend>
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -958,7 +970,7 @@ const EditorPanel = () => {
                         <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
                           <Droppable droppableId='filter_order'>
                             {provided => (
-                              <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
+                              <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
                                 {config.series.map((series, i) => {
                                   if (config.visualizationType === 'Combo' || 'Area Chart') {
                                     let changeType = (i, value) => {
@@ -1067,25 +1079,37 @@ const EditorPanel = () => {
                                     return (
                                       <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
                                         {(provided, snapshot) => (
-                                          <li key={i}>
-                                            <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <div className={`series-list__name ${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
-                                                <div className='series-list__name-text'>{series.dataKey}</div>
-                                              </div>
-                                              {config.visualizationType === 'Combo' && (
-                                                <>
-                                                  <span className='series-list__dropdown'>{typeDropdown}</span>
-                                                  {hasRightAxis && config.series && (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') && <span className='series-list__dropdown'>{axisDropdown}</span>}
-                                                </>
-                                              )}
-                                              {series.type === 'Area Chart' && <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
-                                              {config.series && config.series.length > 1 && (
-                                                <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                                  &#215;
-                                                </button>
-                                              )}
+                                          <>
+                                            <div key={i} className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                              <div className={`series-list__name ${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}></div>
+                                              <Accordion allowZeroExpanded>
+                                                <AccordionItem className='series-item series-item--chart'>
+                                                  <AccordionItemHeading className='series-item__title'>
+                                                    <AccordionItemButton>
+                                                      <Icon display='move' size='15' style={{ cursor: 'default' }} />
+                                                      {series.dataKey}
+                                                      {config.series && config.series.length > 1 && (
+                                                        <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
+                                                          Remove
+                                                        </button>
+                                                      )}
+                                                    </AccordionItemButton>
+                                                  </AccordionItemHeading>
+                                                  <AccordionItemPanel>
+                                                    <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                      {config.visualizationType === 'Combo' && (
+                                                        <>
+                                                          <span className='series-list__dropdown series-item__dropdown'>{typeDropdown}</span>
+                                                          {hasRightAxis && config.series && (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') && <span className='series-list__dropdown'>{axisDropdown}</span>}
+                                                        </>
+                                                      )}
+                                                      {series.type === 'Area Chart' && <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
+                                                    </div>
+                                                  </AccordionItemPanel>
+                                                </AccordionItem>
+                                              </Accordion>
                                             </div>
-                                          </li>
+                                          </>
                                         )}
                                       </Draggable>
                                     )
@@ -1124,19 +1148,6 @@ const EditorPanel = () => {
                         </DragDropContext>
                       </>
                     )}
-
-                    <Select
-                      fieldName='visualizationType'
-                      label='Add Data Series'
-                      initial='Select'
-                      onChange={e => {
-                        if (e.target.value !== '' && e.target.value !== 'Select') {
-                          addNewSeries(e.target.value)
-                        }
-                        e.target.value = ''
-                      }}
-                      options={getColumns()}
-                    />
 
                     {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
                       <>
