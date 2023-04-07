@@ -31,7 +31,7 @@ import DataTable from './components/DataTable'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
-import Filters from './components/Filters'
+import Filters from '@cdc/core/components/Filters'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 // Helpers
@@ -783,11 +783,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            {config.filters && !externalFilters && <Filters />}
+            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} />}
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
-              style={{ marginBottom: config.legend.position !== 'bottom' && currentViewport !== 'sm' && currentViewport !== 'xs' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
+              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}

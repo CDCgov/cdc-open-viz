@@ -1884,6 +1884,25 @@ const EditorPanel = () => {
                   <AccordionItemButton>Filters</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  {/* prettier-ignore */}
+                  <Select
+                    value={config.filterBehavior}
+                    fieldName='filterBehavior'
+                    label='Filter Behavior'
+                    updateField={updateField}
+                    options={['dropdown', 'button']}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>When should the visualization change? Button changes when the user clicks "apply" Dropdown changes immediatly after the dropdown is changed.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    />
+                  <br />
                   {config.filters && (
                     <ul className='filters-list'>
                       {config.filters.map((filter, index) => (
