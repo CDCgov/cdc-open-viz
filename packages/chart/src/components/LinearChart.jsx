@@ -274,8 +274,8 @@ export default function LinearChart() {
       }
 
       // check fences for max/min
-      let lowestFence = Math.min(...config.boxplot.plots.map(item => item.columnMin))
-      let highestFence = Math.max(...config.boxplot.plots.map(item => item.columnMax))
+      let lowestFence = Math.min(...config.boxplot.plots.map(item => item.columnLowerBounds))
+      let highestFence = Math.max(...config.boxplot.plots.map(item => item.columnUpperBounds))
 
       if (lowestFence < min) min = lowestFence
       if (highestFence > max) max = highestFence
