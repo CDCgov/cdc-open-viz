@@ -661,53 +661,6 @@
       opacity: 0.5;
       cursor: auto;
     }
-
-    .map-layers-list {
-      list-style: none;
-
-      $border: 1px solid #ccc;
-
-      @at-root .accordion:first-of-type .map-layers-list--title {
-        border-top: $border;
-      }
-
-      @at-root .accordion:last-of-type .map-layers-list--title {
-        border-bottom: $border;
-      }
-
-      .accordion__button {
-        border-bottom: unset;
-      }
-
-      .accordion__panel {
-        border-left: $border;
-        border-right: $border;
-      }
-
-      label {
-        font-size: 0.8rem;
-        font-weight: normal;
-      }
-
-      .map-layers-list--title {
-        width: 100%;
-        background-color: #f5f5f5;
-        border-right: $border;
-        border-left: $border;
-        display: block;
-        padding: 5px;
-      }
-
-      li {
-        padding: 5px;
-      }
-
-      .map-layers-list--title {
-        font-size: 12px;
-        font-weight: bold;
-        text-transform: uppercase;
-      }
-    }
   }
 
   @include breakpointClass(md) {
