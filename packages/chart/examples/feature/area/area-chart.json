@@ -171,15 +171,15 @@
   "series": [
     {
       "dataKey": "Data 1",
-      "type": "Bar"
+      "type": "Area Chart"
     },
     {
       "dataKey": "Data 2",
-      "type": "Bar"
+      "type": "Area Chart"
     },
     {
       "dataKey": "Data 3",
-      "type": "Bar"
+      "type": "Area Chart"
     }
   ],
   "description": "This example shows a bar chart created in the visualization editor in WCMS",
