@@ -18,7 +18,7 @@
     "right": 5
   },
   "yAxis": {
-    "dataKey": "Value",
+    "dataKey": "value",
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
@@ -60,7 +60,7 @@
     "tickColor": "#333",
     "isLegendValue": false,
     "numTicks": "",
-    "dataKey": "Group_Category",
+    "dataKey": "category one",
     "label": "Groups"
   },
   "table": {
@@ -104,19 +104,19 @@
     "accent": true,
     "background": true
   },
-  "dataUrl": "/examples/feature/boxplot/boxplot-data.json",
+  "dataUrl": "/examples/feature/boxplot/testing.csv",
   "visualizationType": "Box Plot",
   "description": "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.",
   "dataDescription": {
     "horizontal": false,
     "series": false,
     "singleRow": true,
-    "xKey": "Group_Category",
-    "valueKey": "Value"
+    "xKey": "category one",
+    "valueKey": "value"
   },
   "series": [
     {
-      "dataKey": "Value",
+      "dataKey": "value",
       "type": "Bar"
     }
   ]
