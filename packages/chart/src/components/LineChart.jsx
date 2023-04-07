@@ -101,7 +101,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 )
               })}
               <LinePath
-                curve={allCurves.curveLinear}
+                curve={allCurves[seriesData[0].lineType]}
                 data={data}
                 x={d => xScale(getXAxisData(d))}
                 y={d => (seriesAxis === 'Right' ? yScale(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
@@ -116,7 +116,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 }
                 strokeWidth={2}
                 strokeOpacity={1}
-                shapeRendering='geometricPrecision'
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
                 defined={(item, i) => {
                   return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null && item[config.runtime.seriesLabels[seriesKey]] !== undefined
@@ -125,8 +124,13 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               {config.animate && (
                 <LinePath
                   className='animation'
+<<<<<<< HEAD
                   curve={allCurves.curveLinear}
                   data={data}
+=======
+                  curve={seriesData.lineType}
+                  data={cleanedData}
+>>>>>>> cfa9a19f54dabe00c590d5e564afde15a7a4de25
                   x={d => xScale(getXAxisData(d))}
                   y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                   stroke='#fff'

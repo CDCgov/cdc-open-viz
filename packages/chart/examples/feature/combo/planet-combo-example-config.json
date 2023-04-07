@@ -142,7 +142,7 @@
     "accent": true,
     "background": true
   },
-  "dataUrl": "/examples/planet-example-data.json",
+  "dataUrl": "/examples/feature/__data__/planet-example-data.json",
   "animateReplay": true,
   "visualizationType": "Combo",
   "series": [

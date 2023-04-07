@@ -155,7 +155,7 @@
     "accent": true,
     "background": true
   },
-  "dataUrl": "/examples/planet-deviation-data.json",
+  "dataUrl": "/examples/feature/deviation/planet-deviation-data.json",
   "visualizationType": "Deviation Bar",
   "series": [
     {
