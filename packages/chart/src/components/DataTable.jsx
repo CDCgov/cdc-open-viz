@@ -12,9 +12,12 @@ import ConfigContext from '../ConfigContext'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 export default function DataTable() {
-  const { rawData, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
-  let { transformed: data } = useContext(ConfigContext)
-  data = rawData // CSV and Table should use raw data - uncleaned
+  const { rawData, transformed: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
+  //let { transformed: data } = useContext(ConfigContext)
+  //data = rawData // CSV and Table should use raw data - uncleaned
+  console.log('DataTable data=', data)
+
+  if (data === undefined) return
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
