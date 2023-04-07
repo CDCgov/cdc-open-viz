@@ -784,16 +784,16 @@ const EditorPanel = () => {
 
   // prettier-ignore
   const enabledChartTypes = [
-    'Pie',
-    'Line',
-    'Bar',
-    'Combo',
-    'Paired Bar',
-    'Spark Line',
     'Area Chart',
-    'Scatter Plot',
+    'Bar',
     'Box Plot',
-    'Deviation Bar'
+    'Combo',
+    'Deviation Bar',
+    'Line',
+    'Paired Bar',
+    'Pie',
+    'Scatter Plot',
+    'Spark Line'
   ]
 
   return (
