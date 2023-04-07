@@ -323,9 +323,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           const lowerBounds = q1 - (q3 - q1) * 1.5
           const upperBounds = q3 + (q3 - q1) * 1.5
 
-          console.log('lowerBounds', lowerBounds)
-          console.log('upperBounds', upperBounds)
-
           const outliers = sortedData.filter(v => v < lowerBounds || v > upperBounds)
           let nonOutliers = filteredDataValues
 
@@ -352,9 +349,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           console.error('COVE: ', e.message) // eslint-disable-line
         }
       })
-      // console.log('testing', d3.min([d3.max(sortedData), q1 + 1.5 * iqr]))
-
-      console.table('plots', plots[0])
 
       // make deep copy so we can remove some fields for data
       // this appears to be the easiest option instead of running logic against the datatable cell...
