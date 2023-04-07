@@ -40,7 +40,6 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
-import cleanData from '@cdc/core/helpers/cleanData'
 
 import './scss/main.scss'
 
@@ -164,6 +163,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.legend.hide = true
     }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
+
     updateConfig(newConfig, data)
   }
 
@@ -370,7 +370,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return filteredData
   }
 
-  // Gets filer values from dataset
+  // Gets filter values from dataset
   const generateValuesForFilter = (columnName, data = this.state.data) => {
     const values = []
 
@@ -748,6 +748,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return false
   }
 
+  const clean = data => {
+    return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
+  }
+
   // Prevent render if loading
   let body = <Loading />
 
@@ -827,7 +831,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setConfig,
     rawData: stateData ?? {},
     excludedData: excludedData,
-    transformedData: filteredData || excludedData,
+    transformedData: clean(filteredData || excludedData), // do this right before passing to components
     unfilteredData: stateData,
     seriesHighlight,
     colorScale,
@@ -855,7 +859,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     imageId,
     handleLineType,
     isNumber,
-    cleanData,
     getTextWidth,
     twoColorPalette
   }
