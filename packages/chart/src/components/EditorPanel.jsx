@@ -212,6 +212,8 @@ const EditorPanel = () => {
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
+  const filterBehaviorOptions = ['dropdown', 'button', 'pill', 'tab']
+
   // when the visualization type changes we
   // have to update the individual series type & axis details
   // dataKey is unchanged here.
@@ -1904,24 +1906,6 @@ const EditorPanel = () => {
                   <AccordionItemButton>Filters</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {/* prettier-ignore */}
-                  <Select
-                    value={config.filterBehavior}
-                    fieldName='filterBehavior'
-                    label='Filter Behavior'
-                    updateField={updateField}
-                    options={['dropdown', 'button', 'pill', 'tab']}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>When should the visualization change? Button changes when the user clicks "apply" Dropdown changes immediatly after the dropdown is changed.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                    />
                   <br />
                   {config.filters && (
                     <ul className='filters-list'>
@@ -1950,6 +1934,24 @@ const EditorPanel = () => {
                                   {dataKey}
                                 </option>
                               ))}
+                            </select>
+                          </label>
+                          <label>
+                            <span className='edit-label column-heading'>Filter Behavior</span>
+
+                            {/* prettier-ignore */}
+                            <select
+                              value={filter.filterBehavior}
+                              fieldName='filterBehavior'
+                              onChange={e => {
+                                updateFilterProp('filterBehavior', index, e.target.value)
+                              }}
+                              >
+                              {filterBehaviorOptions.map( item => {
+
+                              return (<option value={item}>{item}</option>)
+                              })}
+
                             </select>
                           </label>
                           <label>
