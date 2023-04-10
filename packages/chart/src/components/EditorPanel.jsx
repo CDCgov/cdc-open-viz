@@ -798,8 +798,6 @@ const EditorPanel = () => {
 
   const chartsWithOptions = ['Area Chart', 'Combo', 'Line']
 
-  console.log('chartsWith', chartsWithOptions.includes(config.visualizationType))
-
   return (
     <ErrorBoundary component='EditorPanel'>
       {config.newViz && <Confirm />}
