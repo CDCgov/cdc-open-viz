@@ -37,7 +37,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
 
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
-  let barThickness = xMax / config.data.length
+  let barThickness = xMax / config.data?.length
   let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
   let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
 
