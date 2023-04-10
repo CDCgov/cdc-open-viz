@@ -796,6 +796,8 @@ const EditorPanel = () => {
     'Spark Line'
   ]
 
+  const chartsWithOptions = ['Area Chart', 'Combo', 'Line']
+
   return (
     <ErrorBoundary component='EditorPanel'>
       {config.newViz && <Confirm />}
@@ -1081,7 +1083,7 @@ const EditorPanel = () => {
                                               <Accordion allowZeroExpanded>
                                                 <AccordionItem className='series-item series-item--chart'>
                                                   <AccordionItemHeading className='series-item__title'>
-                                                    <AccordionItemButton>
+                                                    <AccordionItemButton className={chartsWithOptions.includes(config.visualizationType) ? 'accordion__button' : 'accordion__button hide-arrow'}>
                                                       <Icon display='move' size={15} style={{ cursor: 'default' }} />
                                                       {series.dataKey}
                                                       {config.series && config.series.length > 1 && (
@@ -1091,17 +1093,19 @@ const EditorPanel = () => {
                                                       )}
                                                     </AccordionItemButton>
                                                   </AccordionItemHeading>
-                                                  <AccordionItemPanel>
-                                                    <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                      {config.visualizationType === 'Combo' && (
-                                                        <>
-                                                          <span className='series-list__dropdown series-item__dropdown'>{typeDropdown}</span>
-                                                          {hasRightAxis && config.series && (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') && <span className='series-item__dropdown series-list__dropdown'>{axisDropdown}</span>}
-                                                        </>
-                                                      )}
-                                                      {['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type)) && <span className='series-item__dropdown series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
-                                                    </div>
-                                                  </AccordionItemPanel>
+                                                  {chartsWithOptions.includes(config.visualizationType) && (
+                                                    <AccordionItemPanel>
+                                                      <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                        {config.visualizationType === 'Combo' && (
+                                                          <>
+                                                            <span className='series-list__dropdown series-item__dropdown'>{typeDropdown}</span>
+                                                            {hasRightAxis && config.series && (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') && <span className='series-item__dropdown series-list__dropdown'>{axisDropdown}</span>}
+                                                          </>
+                                                        )}
+                                                        {['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type)) && <span className='series-item__dropdown series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
+                                                      </div>
+                                                    </AccordionItemPanel>
+                                                  )}
                                                 </AccordionItem>
                                               </Accordion>
                                             </div>

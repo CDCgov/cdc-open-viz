@@ -92,7 +92,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   return (
     <ErrorBoundary component='SparkLine'>
       <svg role='img' aria-label={handleChartAriaLabels(config)} width={width} height={height} className={'sparkline'} tabIndex={0}>
-        {config.runtime.lineSeriesKeys && config.runtime.lineSeriesKeys.length > 0
+        {config.runtime.lineSeriesKeys?.length > 0
           ? config.runtime.lineSeriesKeys
           : config.runtime.seriesKeys.map((seriesKey, index) => (
               <>
@@ -165,7 +165,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
                   hideTicks
                   scale={xScale}
                   tickValues={handleSparkLineTicks}
-                  tickFormat={formatDate}
+                  tickFormat={tick => (config.xAxis.type === 'date' ? formatDate(tick) : null)}
                   stroke={'black'}
                   tickStroke={'black'}
                   tickLabelProps={() => ({
