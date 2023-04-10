@@ -18,6 +18,7 @@ import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
 import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 import ScatterPlotIcon from '@cdc/core/assets/icon-chart-scatterplot.svg'
 import BoxPlotIcon from '@cdc/core/assets/icon-chart-box-whisker.svg'
+import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
 
 export default function ChooseTab() {
   const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(ConfigContext)
@@ -205,14 +206,14 @@ export default function ChooseTab() {
             <Tooltip.Content>Display a scatter plot</Tooltip.Content>
           </Tooltip>
         </li>
-        {/* <li>
+        <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Area Chart' type='chart' subType='Area Chart' orientation='vertical' icon={<GenericIcon />} />
+              <IconButton label='Area Chart' type='chart' subType='Area Chart' orientation='vertical' icon={<AreaChartIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Display an area chart</Tooltip.Content>
           </Tooltip>
-        </li> */}
+        </li>
       </ul>
 
       <div className='heading-2'>Maps</div>

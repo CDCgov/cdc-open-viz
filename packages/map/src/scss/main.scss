@@ -1,8 +1,8 @@
-@import "@cdc/core/styles/base";
-@import "@cdc/core/styles/heading-colors";
-@import "variables";
-@import "editor-panel";
-@import "filters";
+@import '@cdc/core/styles/base';
+@import '@cdc/core/styles/heading-colors';
+@import 'variables';
+@import 'editor-panel';
+@import 'filters';
 
 .cdc-map-outer-container {
   position: relative;
@@ -20,10 +20,10 @@
 }
 
 .cdc-map-inner-container {
-  @import "./tooltips";
-  @import "./map";
-  @import "./sidebar";
-  @import "./datatable";
+  @import './tooltips';
+  @import './map';
+  @import './sidebar';
+  @import './datatable';
   flex-grow: 1;
   text-rendering: geometricPrecision;
   color: #202020;
@@ -31,8 +31,8 @@
   text-align: left;
   max-width: 100%;
   .btn {
-    padding: .375em .75em;
-    border-radius: .3em;
+    padding: 0.375em 0.75em;
+    border-radius: 0.3em;
   }
 
   header.hidden {
@@ -57,10 +57,10 @@
   }
 
   div.map-title:not(:empty) {
-    margin: 0 !important;
-    padding: .6em .8em;
+    padding: 0.6em 0.8em;
     border-bottom-width: 3px;
     border-bottom-style: solid;
+    margin: 0 0 1rem 0 !important;
   }
 
   .map-container {
@@ -70,13 +70,13 @@
     &.modal-background {
       position: relative;
       &::before {
-        content: " ";
+        content: ' ';
         position: absolute;
         top: 0;
         left: -1em;
         right: -1em;
         bottom: 0;
-        background: rgba(0,0,0,.05);
+        background: rgba(0, 0, 0, 0.05);
         z-index: 7;
       }
       .modal-content {
@@ -102,7 +102,7 @@
           flex-grow: 1;
         }
         .legend-item {
-          margin-right: .75em;
+          margin-right: 0.75em;
           margin-top: 3px;
           flex-shrink: 0;
         }
@@ -113,7 +113,7 @@
           transform: translate(-50%, -120%);
         }
         @include breakpointClass(lg) {
-          font-size: .9em;
+          font-size: 0.9em;
           min-width: 300px;
           .legend-item {
             height: 1.3em;
@@ -149,8 +149,8 @@
   }
 
   p.subtext {
-    font-size: .9em;
-    padding: 0 .8em .8em;
+    font-size: 0.9em;
+    padding: 0 0.8em 0.8em;
     em {
       font-style: italic;
     }
@@ -170,7 +170,7 @@
     min-height: 1em;
     max-width: 1em;
     max-height: 1em;
-    border: rgba(0,0,0,.3) 1px solid;
+    border: rgba(0, 0, 0, 0.3) 1px solid;
   }
 
   .navigation-menu {
@@ -186,7 +186,7 @@
       > div.select-heading {
         font-size: 1.1em;
         font-weight: 600;
-        margin-bottom: .75em;
+        margin-bottom: 0.75em;
       }
     }
     form {
@@ -203,18 +203,17 @@
     input {
       color: #fff;
       font-weight: 700;
-      padding: .4em .65em;
-      font-size: .9em;
+      padding: 0.4em 0.65em;
+      font-size: 0.9em;
       border: 0;
       display: inline-block;
       border-radius: 7px;
-      margin-left: .5em;
+      margin-left: 0.5em;
       cursor: pointer;
     }
   }
 
   [tabIndex]:focus {
-    outline-color: rgb(0, 95, 204)
+    outline-color: rgb(0, 95, 204);
   }
-
 }

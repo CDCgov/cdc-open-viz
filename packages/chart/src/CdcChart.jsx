@@ -31,7 +31,7 @@ import DataTable from './components/DataTable'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
-import Filters from './components/Filters'
+import Filters from '@cdc/core/components/Filters'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 // Helpers
@@ -64,8 +64,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
 
-  // set defaults on titles if blank
-  if (!title || title === '') title = 'Chart Title'
+  // set defaults on titles if blank AND only in editor
+  if (isEditor) {
+    if (!title || title === '') title = 'Chart Title'
+  }
+
   if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
 
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
@@ -255,6 +258,37 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       let tableData = []
       const plots = []
 
+      /**
+       * Calculates the first quartile (q1) and third quartile (q3) from an array of integers or decimals.
+       *
+       * @param {Array} arr - The array of integers or decimals.
+       * @returns {Object} An object containing the q1 and q3 values.
+       */
+      const getQuartiles = arr => {
+        arr.sort((a, b) => a - b)
+
+        // Calculate the index of the median value of the array
+        const medianIndex = Math.floor(arr.length / 2)
+
+        // Check if the length of the array is even or odd
+        const isEvenLength = arr.length % 2 === 0
+
+        // Split the array into two subarrays based on the median index
+        const q1Array = isEvenLength ? arr.slice(0, medianIndex) : arr.slice(0, medianIndex + 1)
+        const q3Array = isEvenLength ? arr.slice(medianIndex) : arr.slice(medianIndex + 1)
+
+        // Calculate the median of the first subarray to get the q1 value
+        const q1Index = Math.floor(q1Array.length / 2)
+        const q1 = isEvenLength ? (q1Array[q1Index - 1] + q1Array[q1Index]) / 2 : q1Array[q1Index]
+
+        // Calculate the median of the second subarray to get the q3 value
+        const q3Index = Math.floor(q3Array.length / 2)
+        const q3 = isEvenLength ? (q3Array[q3Index - 1] + q3Array[q3Index]) / 2 : q3Array[q3Index]
+
+        // Return an object containing the q1 and q3 values
+        return { q1, q3 }
+      }
+
       // group specific statistics
       // prevent re-renders
       if (!groups) return
@@ -265,10 +299,16 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           // filter data by group
           let filteredData = newExcludedData ? newExcludedData.filter(item => item[newConfig.xAxis.dataKey] === g) : data.filter(item => item[newConfig.xAxis.dataKey] === g)
           let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
-          // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
+
+          // Sort the data for upcoming functions.
+          let sortedData = filteredDataValues.sort((a, b) => a - b)
+
+          // ! - Notice d3.quantile doesn't work here, and we had to take a custom route.
+          const quartiles = getQuartiles(sortedData)
 
           if (!filteredData) throw new Error('boxplots dont have data yet')
           if (!plots) throw new Error('boxplots dont have plots yet')
+
           if (newConfig.boxplot.firstQuartilePercentage === '') {
             newConfig.boxplot.firstQuartilePercentage = 0
           }
@@ -277,27 +317,30 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             newConfig.boxplot.thirdQuartilePercentage = 0
           }
 
-          const q1 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
-          const q3 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
+          const q1 = quartiles.q1
+          const q3 = quartiles.q3
           const iqr = q3 - q1
           const lowerBounds = q1 - (q3 - q1) * 1.5
           const upperBounds = q3 + (q3 - q1) * 1.5
-          const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
+
+          const outliers = sortedData.filter(v => v < lowerBounds || v > upperBounds)
           let nonOutliers = filteredDataValues
 
           nonOutliers = nonOutliers.filter(item => !outliers.includes(item))
 
           plots.push({
             columnCategory: g,
-            columnMax: Number(q3 + 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo),
+            columnMax: d3.min([d3.max(filteredDataValues), q1 + 1.5 * iqr]),
             columnThirdQuartile: Number(q3).toFixed(newConfig.dataFormat.roundTo),
             columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
-            columnMin: Number(q1 - 1.5 * iqr).toFixed(newConfig.dataFormat.roundTo),
+            columnMin: d3.max([d3.min(filteredDataValues), q1 - 1.5 * iqr]),
             columnTotal: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
             columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnIqr: Number(iqr).toFixed(newConfig.dataFormat.roundTo),
+            columnLowerBounds: d3.max([d3.min(filteredDataValues), q1 - 1.5 * iqr]),
+            columnUpperBounds: d3.min([d3.max(sortedData), q1 + 1.5 * iqr]),
             columnOutliers: outliers,
             values: filteredDataValues,
             nonOutlierValues: nonOutliers
@@ -313,6 +356,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       tableData.map(table => {
         delete table.columnIqr
         delete table.nonOutlierValues
+        delete table.columnLowerBounds
+        delete table.columnUpperBounds
         return null // resolve eslint
       })
 
@@ -326,12 +371,26 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
+      newConfig.runtime.areaSeriesKeys = []
+
       newConfig.series.forEach(series => {
+        if (series.type === 'Area Chart') {
+          newConfig.runtime.areaSeriesKeys.push(series)
+        }
         if (series.type === 'Bar') {
           newConfig.runtime.barSeriesKeys.push(series.dataKey)
         }
         if (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') {
           newConfig.runtime.lineSeriesKeys.push(series.dataKey)
+        }
+      })
+    }
+    if (newConfig.visualizationType === 'Area Chart' && newConfig.series) {
+      newConfig.runtime.areaSeriesKeys = []
+
+      newConfig.series.forEach(series => {
+        if (series.type === 'Area Chart') {
+          newConfig.runtime.areaSeriesKeys.push(series)
         }
       })
     }
@@ -771,11 +830,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            {config.filters && !externalFilters && <Filters />}
+            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} />}
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
-              style={{ marginBottom: config.legend.position !== 'bottom' && currentViewport !== 'sm' && currentViewport !== 'xs' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
+              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}

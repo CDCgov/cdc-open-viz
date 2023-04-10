@@ -2,20 +2,19 @@
   .cove {
     // Temp Radio button fix
     // Resets User Agent Style, forms.css is overwriting our styles here.
-    input[type="radio"] {
-        background-color: initial !important;
-        cursor: default !important;
-        appearance: auto !important;
-        box-sizing: border-box !important;
-        margin: 3px 3px 0px 5px !important;
-        padding: initial !important;
-        border: initial !important;
+    input[type='radio'] {
+      background-color: initial !important;
+      cursor: default !important;
+      appearance: auto !important;
+      box-sizing: border-box !important;
+      margin: 3px 3px 0px 5px !important;
+      padding: initial !important;
+      border: initial !important;
     }
     // End Temp Radio button fix
   }
 }
 .cdc-open-viz-module {
-
   .geo-buttons {
     list-style: none;
     display: flex;
@@ -24,15 +23,15 @@
       display: block;
       max-width: 80px;
       max-height: 40px;
-      margin: .5em auto;
+      margin: 0.5em auto;
       box-sizing: border-box;
       path {
-        fill: currentColor
+        fill: currentColor;
       }
     }
     button {
       background: transparent;
-      padding: .3em .75em;
+      padding: 0.3em 0.75em;
       display: flex;
       border: $lightGray 1px solid;
       width: 40%;
@@ -41,11 +40,11 @@
       cursor: pointer;
       overflow: hidden;
       flex-direction: column;
-      transition: .2s all;
+      transition: 0.2s all;
       svg {
         display: block;
         height: 25px;
-        margin: .5em auto;
+        margin: 0.5em auto;
         max-width: 100%;
       }
       span {
@@ -53,8 +52,8 @@
         font-size: 1em;
       }
       &:hover {
-        background: #F2F2F2;
-        transition: .2s all;
+        background: #f2f2f2;
+        transition: 0.2s all;
       }
       &.active {
         background: #fff;
@@ -65,7 +64,7 @@
           fill: #005eaa;
         }
         &:before {
-          content: " ";
+          content: ' ';
           width: 5px;
           background: #005eaa;
           left: 0;
@@ -78,36 +77,36 @@
   }
 
   .editor-toggle {
-    background: #F2F2F2;
+    background: #f2f2f2;
     border-radius: 60px;
     color: #000;
     font-size: 1em;
     border: 0;
     position: fixed;
     z-index: 100;
-    transition: .1s background;
+    transition: 0.1s background;
     cursor: pointer;
     width: 25px;
     height: 25px;
     left: 307px;
     top: 10px;
-    box-shadow: rgba(0,0,0,.5) 0 1px 2px;
+    box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
     &:before {
       top: 43%;
       left: 50%;
       transform: translate(-50%, -50%);
       position: absolute;
-      content: "\00ab";
+      content: '\00ab';
     }
     &.collapsed {
       left: 1em;
       margin-left: 0;
       &:before {
-      content: "\00bb";
-     }
+        content: '\00bb';
+      }
     }
     &:hover {
-      background: rgba(255,255,255,1)
+      background: rgba(255, 255, 255, 1);
     }
   }
 
@@ -125,7 +124,7 @@
 
     //TODO: Remove after COVE refactor
     &.cove {
-      @import "@cdc/core/styles/v2/layout/tooltip.scss";
+      @import '@cdc/core/styles/v2/layout/tooltip.scss';
     }
 
     .remove-column {
@@ -140,12 +139,12 @@
     }
     .helper {
       position: relative;
-      opacity: .7;
+      opacity: 0.7;
       cursor: pointer;
       width: 17px;
       height: 17px;
       align-self: center;
-      margin-left: .3rem;
+      margin-left: 0.3rem;
     }
 
     .accordion__heading {
@@ -157,7 +156,7 @@
     }
     .guidance-link {
       margin: 2em 1em 0;
-      padding: .75em 1em;
+      padding: 0.75em 1em;
       align-items: center;
       .heading-3 {
         font-weight: 600;
@@ -174,13 +173,13 @@
       }
     }
     .warning {
-      color: #D8000C;
-      background-color: #FFD2D2;
-      padding: .75em 1em;
+      color: #d8000c;
+      background-color: #ffd2d2;
+      padding: 0.75em 1em;
       margin: 1em 0;
-      font-size: .8em;
-      border: #D8000C 1px solid;
-      border-radius: .4em;
+      font-size: 0.8em;
+      border: #d8000c 1px solid;
+      border-radius: 0.4em;
       strong {
         font-weight: 600;
         display: block;
@@ -189,7 +188,7 @@
     .accordion__button {
       cursor: pointer;
       font-size: 1em;
-      padding: .3em 1em;
+      padding: 0.3em 1em;
       width: 100%;
       text-align: left;
       position: relative;
@@ -209,7 +208,7 @@
       position: absolute;
       top: 50%;
       transform: rotate(-45deg) translateY(-50%);
-      transition: .1s all;
+      transition: 0.1s all;
     }
 
     .accordion__button[aria-expanded='true']::before,
@@ -217,7 +216,7 @@
       top: 45%;
       transform: rotate(45deg) translateY(-50%);
       margin-right: 1.3em;
-      transition: .1s all;
+      transition: 0.1s all;
     }
 
     .accordion__panel {
@@ -225,7 +224,7 @@
       padding: 1em 1.25em 2em;
       animation: fadein 0.2s ease-in;
       span.h5 {
-        font-size: .8em;
+        font-size: 0.8em;
       }
     }
 
@@ -233,7 +232,7 @@
       padding: 0 1em 1em;
       text-align: left;
       p {
-        font-size: .8rem;
+        font-size: 0.8rem;
       }
       .advanced-toggle-link {
         padding-top: 1em;
@@ -248,16 +247,16 @@
           padding-right: 5px;
         }
         &:hover {
-          color: rgba(0,0,0,.7);
+          color: rgba(0, 0, 0, 0.7);
         }
       }
       textarea {
         height: 400px;
         width: 100%;
-        font-size: .9em;
-        padding: .5em;
+        font-size: 0.9em;
+        padding: 0.5em;
         font-family: monospace;
-        box-sizing: border-box
+        box-sizing: border-box;
       }
     }
 
@@ -275,29 +274,29 @@
       background: #565656;
       color: #fff;
       font-size: 1.1em;
-      padding: .6em 1em;
+      padding: 0.6em 1em;
       position: relative;
-      border-bottom:#565656 3px solid;
+      border-bottom: #565656 3px solid;
       z-index: 3;
     }
 
     label {
       text-transform: uppercase;
       display: block;
-      font-size: .8em;
+      font-size: 0.8em;
       font-weight: 600;
       &:not(:first-child) {
         margin-top: 1em;
       }
       span.edit-label {
-        margin-bottom: .3em;
+        margin-bottom: 0.3em;
         display: flex;
       }
       span.column-heading {
         font-size: 1em;
       }
       &.checkbox {
-        margin-top: .5rem;
+        margin-top: 0.5rem;
         display: flex;
 
         input {
@@ -307,7 +306,10 @@
         }
       }
     }
-    input[type="text"], input[role="combobox"], input[type="number"], textarea {
+    input[type='text'],
+    input[role='combobox'],
+    input[type='number'],
+    textarea {
       min-width: 100%;
       max-width: 100%; // Doing this prevents width of textarea from being changed
     }
@@ -324,7 +326,7 @@
       display: flex;
       max-width: 100%;
       padding: 0;
-      margin: .5em 0 0 0;
+      margin: 0.5em 0 0 0;
       list-style: none;
       flex-wrap: wrap;
       li {
@@ -345,7 +347,7 @@
           bottom: 0;
         }
         &.selected {
-          border: rgba(0,0,0, .8) 2px solid;
+          border: rgba(0, 0, 0, 0.8) 2px solid;
         }
         span {
           width: 33.3%;
@@ -375,7 +377,8 @@
           margin-top: 0;
           width: 30%;
           display: inline-block;
-          input[type="text"], input[type="number"] {
+          input[type='text'],
+          input[type='number'] {
             width: 50px;
           }
         }
@@ -389,12 +392,12 @@
     .emove-column {
       float: right;
       text-transform: uppercase;
-      color: #C32B2B;
-      font-size: .7em;
+      color: #c32b2b;
+      font-size: 0.7em;
       line-height: 1.6em;
       border-radius: 5px;
       margin: 0 auto;
-      transition: .1s all;
+      transition: 0.1s all;
       border: 0;
       text-decoration: underline;
       outline: 0;
@@ -405,11 +408,12 @@
     .edit-block {
       padding-left: 1em;
       border-left: rgba(0, 0, 0, 0.2) 4px solid;
-      transition: .2s all;
+      transition: 0.2s all;
       &:not(:first-child) {
         margin-top: 2em;
       }
-      input[type="text"], input[type="number"] {
+      input[type='text'],
+      input[type='number'] {
         font-size: 1em;
       }
       label {
@@ -420,7 +424,7 @@
       }
       &:hover {
         border-left: rgba(0, 0, 0, 0.7) 4px solid;
-        transition: .2s all;
+        transition: 0.2s all;
       }
     }
 
@@ -430,16 +434,16 @@
         padding-left: 2em;
         position: relative;
         &:before {
-          content: " ";
+          content: ' ';
           position: absolute;
           left: 20px;
           top: 0;
           bottom: 0;
           border-left: rgba(0, 0, 0, 0.2) 4px solid;
-          transition: .2s all;
+          transition: 0.2s all;
         }
         &:after {
-          content: " ";
+          content: ' ';
           background: url('../images/inactive-checkmark.svg') no-repeat;
           width: 14px;
           height: 14px;
@@ -449,16 +453,17 @@
           top: 50%;
           transform: translateY(-50%);
           z-index: 40;
-          opacity: .5;
-          transition: .2s opacity;
+          opacity: 0.5;
+          transition: 0.2s opacity;
         }
-        transition: .2s opacity;
+        transition: 0.2s opacity;
         cursor: pointer;
-        opacity: .7;
+        opacity: 0.7;
         &:not(:first-child) {
           margin-top: 1em;
         }
-        input[type="text"], input[type="number"] {
+        input[type='text'],
+        input[type='number'] {
           font-size: 1em;
         }
         label {
@@ -470,11 +475,11 @@
         &:hover {
           &:before {
             border-left: rgba(0, 0, 0, 0.7) 4px solid;
-            transition: .2s all;
+            transition: 0.2s all;
           }
-          &:after{
+          &:after {
             opacity: 1;
-            transition: .2s all;
+            transition: 0.2s all;
           }
         }
         &.active {
@@ -484,10 +489,10 @@
             border-left: rgba(0, 0, 0, 0.7) 4px solid;
           }
           &:after {
-            content: " ";
+            content: ' ';
             background-image: url(../images/active-checkmark.svg);
             opacity: 1;
-            transition: .2s opacity;
+            transition: 0.2s opacity;
           }
         }
       }
@@ -495,7 +500,7 @@
 
     span.subtext {
       display: block;
-      color: rgba(0,0,0,.5);
+      color: rgba(0, 0, 0, 0.5);
       text-transform: none;
       font-weight: normal;
     }
@@ -506,25 +511,25 @@
     .sort-list {
       list-style: none;
       > li {
-        margin-right: .3em;
-        margin-bottom: .3em;
+        margin-right: 0.3em;
+        margin-bottom: 0.3em;
       }
     }
     .sort-list li > div {
       display: block;
       box-sizing: border-box;
-      border: 1px solid #D1D1D1;
+      border: 1px solid #d1d1d1;
       border-radius: 2px;
-      background: #F1F1F1;
-      padding: .4em .6em;
-      font-size: .8em;
-      margin-bottom: .3em;
+      background: #f1f1f1;
+      padding: 0.4em 0.6em;
+      font-size: 0.8em;
+      margin-bottom: 0.3em;
       cursor: move;
       z-index: 999;
     }
 
     .info {
-      font-size: .8em;
+      font-size: 0.8em;
       line-height: 1.4em;
       font-style: italic;
       padding-top: 10px;
@@ -537,12 +542,12 @@
     .react-tags {
       position: relative;
       input.react-tags__search-input {
-        font-size: .8rem;
+        font-size: 0.8rem;
       }
       /* clicking anywhere will focus the input */
       cursor: text;
       span {
-        display: inline
+        display: inline;
       }
     }
 
@@ -557,24 +562,24 @@
     .react-tags__selected-tag {
       display: inline-block;
       box-sizing: border-box;
-      border: 1px solid #D1D1D1;
+      border: 1px solid #d1d1d1;
       border-radius: 2px;
-      background: #F1F1F1;
-      padding: .4em .6em;
-      font-size: .8em;
-      margin-right: .3em;
-      margin-bottom: .3em;
+      background: #f1f1f1;
+      padding: 0.4em 0.6em;
+      font-size: 0.8em;
+      margin-right: 0.3em;
+      margin-bottom: 0.3em;
     }
 
     .react-tags__selected-tag:after {
       content: '\2715';
-      color: #AAA;
+      color: #aaa;
       margin-left: 8px;
     }
 
     .react-tags__selected-tag:hover,
     .react-tags__selected-tag:focus {
-      border-color: #B1B1B1;
+      border-color: #b1b1b1;
     }
 
     .react-tags__search {
@@ -585,12 +590,10 @@
     }
 
     @media screen and (min-width: 30em) {
-
       .react-tags__search {
         /* this will become the offsetParent for suggestions */
         position: relative;
       }
-
     }
 
     .react-tags__search input {
@@ -600,7 +603,7 @@
       /* emove styles and layout from this element */
       margin: 0;
       outline: none;
-      padding: .5em .3em;
+      padding: 0.5em 0.3em;
 
       /* match the font styles */
       font-size: inherit;
@@ -619,11 +622,9 @@
     }
 
     @media screen and (min-width: 30em) {
-
       .react-tags__suggestions {
         width: 240px;
       }
-
     }
 
     .react-tags__suggestions ul {
@@ -631,7 +632,7 @@
       padding: 0;
       list-style: none;
       background: white;
-      border: 1px solid #D1D1D1;
+      border: 1px solid #d1d1d1;
       border-radius: 2px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
@@ -660,7 +661,6 @@
       opacity: 0.5;
       cursor: auto;
     }
-
   }
 
   @include breakpointClass(md) {

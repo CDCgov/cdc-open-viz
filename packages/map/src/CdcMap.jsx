@@ -37,7 +37,7 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 
 // Child Components
 import ConfigContext from './context'
-import Filters from './components/Filters'
+import Filters from '@cdc/core/components/Filters'
 import Modal from './components/Modal'
 import Sidebar from './components/Sidebar'
 
@@ -284,6 +284,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (hash) {
       result.fromHash = hash
     }
+
+    result.runtimeDataHash = runtimeData.fromHash
 
     // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
@@ -1083,6 +1085,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       delete legendItem.disabled
     })
 
+    newLegend.runtimeDataHash = runtimeLegend.runtimeDataHash
+
     setRuntimeLegend(newLegend)
   }
 
@@ -1391,16 +1395,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     })
 
     // Data
-    let newRuntimeData
     if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
       setRuntimeData(newRuntimeData)
-    }
-
-    // Legend
-    if (hashLegend !== runtimeLegend.fromHash && (undefined === runtimeData.init || newRuntimeData)) {
-      const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
-      setRuntimeLegend(legend)
     }
   }, [state]) // eslint-disable-line
 
@@ -1423,9 +1420,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // Destructuring for more readable JSX
   const { general, tooltips, dataTable } = state
-  let { title = 'Map Title', subtext = '' } = general
+  let { title, subtext = '' } = general
 
-  if (!title || title === '') title = 'Map Title'
+  // if no title AND in editor then set a default
+  if (isEditor) {
+    if (!title || title === '') title = 'Map Title'
+  }
   if (!dataTable.title || dataTable.title === '') dataTable.title = 'Data Table'
 
   // Outer container classes
@@ -1543,7 +1543,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             )}
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
-            <Filters />
+            {/* prettier-ignore */}
+            <Filters
+              config={state}
+              setConfig={setState}
+              filteredData={runtimeFilters}
+              setFilteredData={setRuntimeFilters}
+            />
 
             <div
               role='button'
