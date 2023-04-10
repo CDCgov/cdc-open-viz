@@ -888,6 +888,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     rawData: stateData ?? {},
     excludedData: excludedData,
     transformedData: clean(filteredData || excludedData), // do this right before passing to components
+    tableData: filteredData || excludedData, // do not clean table data
     unfilteredData: stateData,
     seriesHighlight,
     colorScale,

@@ -149,7 +149,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   if (!hasMultipleSeries) {
                     yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   }
-                  //debugger
+
                   const tooltip = `<div>
                   ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                   ${yAxisTooltip}<br />

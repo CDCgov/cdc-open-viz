@@ -242,7 +242,7 @@ export class DataTransform {
           // if you get here, then return nothing to skip bad data point
         }
       })
-      if (testing) console.log("cleaned=", cleaned);
+      if (testing) console.log("cleaned=", cleaned)
       cleanedupData.push(cleaned)
     })
     if (testing) console.log('## cleanedData =', cleanedupData)
