@@ -9,7 +9,6 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import useRightAxis from '../hooks/useRightAxis'
 import isNumber from '@cdc/core/helpers/isNumber'
-import isNumberLog from '@cdc/core/helpers/isNumberLog'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType } = useContext(ConfigContext)
@@ -71,9 +70,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   d[seriesKey] !== '' &&
                   d[seriesKey] !== null &&
                   isNumber(d[seriesKey]) && (
-                    //isNumber(getYAxisData(d, seriesKey)) &&
-                    //isNumber(getXAxisData(d)) &&
-                    //isNumber(seriesAxis === 'Right' ? isNumber(yScaleRight(getYAxisData(d, seriesKey))) : isNumber(yScale(getYAxisData(d, seriesKey)))) &&
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
                       <Text
