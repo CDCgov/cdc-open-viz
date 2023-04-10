@@ -1,0 +1,36 @@
+{
+  "title": "Case Rate Data",
+  "theme": "theme-blue",
+  "dataUrl": "/examples/feature/tests-case-rate/case-rate-example-data.json",
+  "visualizationType": "Bar",
+  "visualizationSubType": "horizontal",
+  "series": [],
+  "barThickness": 0.3,
+  "height": 300,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": ""
+  },
+  "padding": {
+    "left": 10,
+    "right": 10
+  },
+  "yAxis": {
+    "gridLines": false,
+    "numTicks": 3
+  },
+  "xAxis": {
+    "dataKey": "",
+    "size": 20,
+    "wrap": true
+  },
+  "legend": {
+    "hide": true
+  },
+  "table": {
+    "label": "",
+    "expanded": true,
+    "download": true
+  }
+}

@@ -7,9 +7,18 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {
   const { config, setConfig } = useContext(ConfigContext)
-  const boxWidth = xScale.bandwidth()
-  const constrainedWidth = Math.min(40, boxWidth)
-  const color_0 = colorPalettesChart[config?.palette][0] ? colorPalettesChart[config?.palette][0] : '#000'
+
+  useEffect(() => {
+    if (config.legend.hide === false) {
+      setConfig({
+        ...config,
+        legend: {
+          ...config.legend,
+          hide: true
+        }
+      })
+    }
+  }, []) // eslint-disable-line
 
   // tooltips
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
@@ -23,17 +32,16 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
     `
   }
 
-  useEffect(() => {
-    if (config.legend.hide === false) {
-      setConfig({
-        ...config,
-        legend: {
-          ...config.legend,
-          hide: true
-        }
-      })
-    }
-  }, []) // eslint-disable-line
+  //  accessors & constants
+  const max = d => Number(d.columnMax)
+  const min = d => Number(d.columnMin)
+  const median = d => Number(d.columnMedian)
+  const thirdQuartile = d => Number(d.columnThirdQuartile)
+  const firstQuartile = d => Number(d.columnFirstQuartile)
+  const fillOpacity = 0.5
+  const boxWidth = xScale.bandwidth()
+  const constrainedWidth = Math.min(40, boxWidth)
+  const color_0 = colorPalettesChart[config?.palette][0] ? colorPalettesChart[config?.palette][0] : '#000'
 
   return (
     <ErrorBoundary component='BoxPlot'>
@@ -50,15 +58,15 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
               <BoxPlot
                 data-left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
                 key={`box-plot-${i}`}
-                min={Number(d.columnMin)}
-                max={Number(d.columnMax)}
+                min={min(d)}
+                max={max(d)}
                 left={Number(xScale(d.columnCategory)) + Number(config.yAxis.size) + offset / 2 + 0.5}
-                firstQuartile={Number(d.columnFirstQuartile)}
-                thirdQuartile={Number(d.columnThirdQuartile)}
-                median={Number(d.columnMedian)}
+                firstQuartile={firstQuartile(d)}
+                thirdQuartile={thirdQuartile(d)}
+                median={median(d)}
                 boxWidth={constrainedWidth}
                 fill={color_0}
-                fillOpacity={0.5}
+                fillOpacity={fillOpacity}
                 stroke='black'
                 valueScale={yScale}
                 outliers={config.boxplot.plotOutlierValues ? d.columnOutliers : []}
