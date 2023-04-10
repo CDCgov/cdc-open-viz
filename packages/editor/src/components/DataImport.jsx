@@ -486,8 +486,27 @@ export default function DataImport() {
           filter.type !== 'url' ? (
             <></>
           ) : (
-            <fieldset className='edit-block'>
+            <fieldset key={filter.key} className='edit-block'>
               <label>
+                <button
+                  onClick={e => {
+                    let newFilters = [...config.filters]
+                    newFilters.splice(i, 1)
+                    setConfig({ ...config, filters: newFilters })
+                  }}
+                >
+                  Remove
+                </button>
+                <span class='edit-label column-heading'>Label</span>{' '}
+                <input
+                  type='text'
+                  defaultValue={filter.label}
+                  onChange={e => {
+                    let newFilters = [...config.filters]
+                    newFilters[i].label = e.target.value
+                    setConfig({ ...config, filters: newFilters })
+                  }}
+                />
                 <span class='edit-label column-heading'>Query string parameter</span>{' '}
                 <input
                   type='text'
@@ -556,7 +575,7 @@ export default function DataImport() {
       <button
         className='btn full-width'
         onClick={() => {
-          setConfig({ ...config, filters: config.filters ? [...config.filters, { type: 'url' }] : [{ type: 'url' }] })
+          setConfig({ ...config, filters: config.filters ? [...config.filters, { type: 'url', key: Date.now() }] : [{ type: 'url', key: Date.now() }] })
         }}
       >
         Add New URL Filter
