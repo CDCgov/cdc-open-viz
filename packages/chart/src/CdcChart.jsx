@@ -43,7 +43,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 
 import './scss/main.scss'
 
-export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
+export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
@@ -83,7 +83,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const handleChartAriaLabels = (state, testing = false) => {
-    if (testing) console.log(`handleChartAriaLabels Testing On:`, state)
+    if (testing) console.log(`handleChartAriaLabels Testing On:`, state) // eslint-disable-line
     try {
       if (!state.visualizationType) throw Error('handleChartAriaLabels: no visualization type found in state')
       let ariaLabel = ''
@@ -143,7 +143,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
         }
       } catch {
-        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`)
+        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`) // eslint-disable-line
         data = []
       }
 
@@ -812,6 +812,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let body = <Loading />
 
   if (!loading) {
+    const tableLink = (
+      <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
+        {config.dataKey} (Go to Table)
+      </a>
+    )
     body = (
       <>
         {isEditor && <EditorPanel />}
@@ -857,7 +862,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
             </div>
             {/* Link */}
-            {link && link}
+            {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
+
             {/* Description */}
             {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
 
@@ -917,7 +923,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     handleLineType,
     isNumber,
     getTextWidth,
-    twoColorPalette
+    twoColorPalette,
+    isDebug
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
