@@ -35,7 +35,7 @@ export default function DataTable() {
     switch (type) {
       case 'download':
         return (
-          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
+          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border margin-sm`}>
             Download Data (CSV)
           </a>
         )
