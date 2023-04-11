@@ -1,38 +1,38 @@
 [
   {
     "name": "Jupiter",
-    "Radius": "10000"
+    "Radius": "100"
   },
   {
     "name": "Saturn",
-    "Radius": "90000"
+    "Radius": "90"
   },
   {
     "name": "Uranus",
-    "Radius": "-80000"
+    "Radius": "95"
   },
   {
     "name": "Neptune",
-    "Radius": "7000"
+    "Radius": "89"
   },
   {
     "name": "Earth",
-    "Radius": "60000"
+    "Radius": "92"
   },
   {
     "name": "Venus",
-    "Radius": "50000"
+    "Radius": "85"
   },
   {
     "name": "Mars",
-    "Radius": "40000"
+    "Radius": "99"
   },
   {
     "name": "Mercury",
-    "Radius": "30000"
+    "Radius": "66"
   },
   {
     "name": "Pluto",
-    "Radius": "20000"
+    "Radius": "79"
   }
 ]
