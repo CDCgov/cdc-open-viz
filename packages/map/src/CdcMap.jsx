@@ -1412,7 +1412,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
       setRuntimeLegend(legend)
     }
-  }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems]) // eslint-disable-line
+  }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses]) // eslint-disable-line
 
   if (config) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
