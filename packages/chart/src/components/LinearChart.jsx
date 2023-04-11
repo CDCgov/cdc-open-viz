@@ -95,7 +95,7 @@ export default function LinearChart() {
       }
     }
 
-    if ((config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
+    if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
       min = 0
     }
     if (config.visualizationType === 'Combo' && isAllLine) {
@@ -106,6 +106,11 @@ export default function LinearChart() {
         const isMinValid = +enteredMinValue < minValue
         min = +enteredMinValue && isMinValid ? enteredMinValue : minValue
       }
+    }
+
+    if (config.visualizationType === 'Deviation Bar' && min > 0) {
+      const isMinValid = Number(enteredMinValue) < Math.min(minValue, Number(config.xAxis.target))
+      min = enteredMinValue && isMinValid ? enteredMinValue : 0
     }
 
     if (config.visualizationType === 'Line') {
@@ -243,7 +248,8 @@ export default function LinearChart() {
       xScale = scaleLinear({
         domain: [min * leftOffset, Math.max(Number(config.xAxis.target), max)],
         range: [0, xMax],
-        round: true
+        round: true,
+        nice: true
       })
     }
     // Handle Box Plots
