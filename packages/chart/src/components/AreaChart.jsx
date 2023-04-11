@@ -18,7 +18,8 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
   const DEBUG = false
 
   // import data from context
-  const { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight } = useContext(ConfigContext)
+  const { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale } = useContext(ConfigContext)
+  const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
 
   // import tooltip helpers
   const { tooltipData, showTooltip } = useTooltip()
@@ -36,7 +37,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
 
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
-  let barThickness = xMax / config.data.length
+  let barThickness = xMax / config.data?.length
   let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
   let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
 
@@ -51,6 +52,8 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
 
     if (config.xAxis.type === 'date') {
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
+      if (!x) return
+      if (!xScale) return
       const x0 = xScale.invert(x)
       const index = bisectDate(config.data, x0, 1)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
@@ -80,6 +83,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
       let itemsToLoop = [config.runtime.xAxis.dataKey, ...config.runtime.seriesKeys]
 
       itemsToLoop.map(seriesKey => {
+        if (!seriesKey) return
         return Object.entries(yScaleValues[0]).forEach(item => item[0] === seriesKey && seriesToInclude.push(item))
       })
 
@@ -121,7 +125,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
     data && (
       <ErrorBoundary component='AreaChart'>
         <Group className='area-chart' key='area-wrapper' left={config.yAxis.size}>
-          {config.series.map((s, index) => {
+          {(config.runtime.areaSeriesKeys || config.runtime.seriesKeys).map((s, index) => {
             let seriesColor = colorPalettesChart[config.palette][index]
             let curveType = allCurves[s.lineType]
             let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
@@ -136,9 +140,18 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                 <LinePath data={data} x={d => handleX(d)} y={d => yScale(d[config.series[index].dataKey])} stroke={seriesColor} strokeWidth={2} strokeOpacity={1} shapeRendering='geometricPrecision' curve={curveType} strokeDasharray={s.type ? handleLineType(s.type) : 0} />
 
                 {/* prettier-ignore */}
-                {/* filled in sections */}
-                <AreaClosed key={'area-chart'} fill={displayArea ? seriesColor : 'transparent'} fillOpacity={transparentArea ? 0.25 : 0.5} data={data} x={d => handleX(d)} y={d => handleY(d, index)} yScale={yScale} curve={curveType} strokeDasharray={s.type ? handleLineType(s.typ) : 0} />
+                <AreaClosed
+                  key={'area-chart'}
+                  fill={ displayArea ? colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
+                  fillOpacity={transparentArea ? 0.25 : 0.5}
+                  data={data} x={d => handleX(d)}
+                  y={d => handleY(d, index)}
+                  yScale={yScale}
+                  curve={curveType}
+                  strokeDasharray={s.type ? handleLineType(s.typ) : 0}
+                  />
 
+                {/* Transparent bar for tooltips */}
                 <Bar x={d => handleX(d)} y={d => yScale(d[config.series[index].dataKey])} yScale={yScale} width={xMax} height={yMax} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}} onMouseMove={e => handleMouseOver(e, data)} />
 
                 {/* circles that appear on hover */}
@@ -154,7 +167,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   />
                 )}
 
-                {/* bars to handle tooltips */}
+                {/* another tool for showing bars during debug mode. */}
                 {DEBUG &&
                   config.data.map((item, index) => {
                     return (
@@ -176,12 +189,13 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                 {tooltipData && (
                   <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition} left={tooltipData.dataXPosition} style={defaultStyles}>
                     <Group x={config.yAxis.size + 10} y={0}>
-                      <ul style={{ listStyle: 'none', paddingLeft: 'unset' }}>
-                        {Object.entries(tooltipData.data).map(item => (
-                          <li>
-                            <TooltipListItem item={item} />
-                          </li>
-                        ))}
+                      <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id}>
+                        {typeof tooltipData === 'object' &&
+                          Object.entries(tooltipData.data).map(item => (
+                            <li style={{ padding: '2.5px 0' }}>
+                              <TooltipListItem item={item} />
+                            </li>
+                          ))}
                       </ul>
                     </Group>
                   </TooltipInPortal>
