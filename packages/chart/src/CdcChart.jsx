@@ -932,7 +932,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   config.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)
   isEditor && classes.push('spacing-wrapper')
   isEditor && classes.push('isEditor')
-  //isDebug && classes.push('isDebug')
 
   return (
     <ConfigContext.Provider value={contextValues}>
