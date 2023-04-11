@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 // cdc
 import ConfigContext from '../ConfigContext'
@@ -20,7 +20,6 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
 
   useEffect(() => {
     setChartPosition(chartRef.current?.getBoundingClientRect())
-    console.log('chart pos', chartRef.current?.getBoundingClientRect())
   }, [chartRef])
 
   // import data from context
@@ -186,7 +185,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                     r={4.5}
                     opacity={1}
                     fillOpacity={1}
-                    fill={seriesColor}
+                    fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000') : 'transparent'}
                     style={{ filter: 'unset', opacity: 1 }}
                   />
                 )}
