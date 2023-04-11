@@ -232,8 +232,8 @@
   }
 
   .tooltip {
-    border: rgba(0,0,0,.3) 1px solid;
-    box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
+    border: rgba(0, 0, 0, 0.3) 1px solid;
+    box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;
     opacity: 1;
     line-height: 1.4em;
     font-size: 1em;
@@ -242,8 +242,8 @@
     z-index: 1;
 
     .react-tooltip-arrow {
-      border-bottom: rgba(0,0,0,.3) 1px solid;
-      border-right: rgba(0,0,0,.3) 1px solid;
+      border-bottom: rgba(0, 0, 0, 0.3) 1px solid;
+      border-right: rgba(0, 0, 0, 0.3) 1px solid;
       backface-visibility: hidden;
     }
   }
@@ -337,8 +337,6 @@
     }
 
     &__wrapper {
-      margin-bottom: 40px;
-
       hr {
         margin-bottom: 20px;
       }

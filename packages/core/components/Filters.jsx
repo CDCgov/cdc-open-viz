@@ -129,7 +129,7 @@ const Filters = props => {
   Filters.Section = props => (
     <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
       <p>{filterConstants.introText}</p>
-      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px' }}>
+      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px', marginBottom: '15px' }}>
         {props.children}
       </div>
     </section>
