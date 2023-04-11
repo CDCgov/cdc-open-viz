@@ -75,7 +75,7 @@ export default function LinearChart() {
 
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
-  const isMinValid = enteredMinValue < Math.min(minValue, config.xAxis.target)
+  const isMinValid = (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
 
   let max = 0 // need outside the if statement
   let min = 0
