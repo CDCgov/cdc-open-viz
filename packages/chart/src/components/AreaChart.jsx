@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useEffect } from 'react'
+import React, { useContext, useCallback, useEffect, useState } from 'react'
 
 // cdc
 import ConfigContext from '../ConfigContext'
@@ -13,9 +13,15 @@ import { useTooltip, useTooltipInPortal, defaultStyles, Tooltip } from '@visx/to
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 
-const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
+const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
   // enable various console logs in the file
   const DEBUG = false
+  const [chartPosition, setChartPosition] = useState(null)
+
+  useEffect(() => {
+    setChartPosition(chartRef.current?.getBoundingClientRect())
+    console.log('chart pos', chartRef.current?.getBoundingClientRect())
+  }, [chartRef])
 
   // import data from context
   const { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale } = useContext(ConfigContext)
@@ -23,9 +29,6 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
 
   // import tooltip helpers
   const { tooltipData, showTooltip } = useTooltip()
-
-  // used for offset on tooltip hover
-  let isEditor = window.location.href.includes('editor=true')
 
   // here we're inside of the svg,
   // it appears we need to use TooltipInPortal.
@@ -75,7 +78,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
     if (config.xAxis.type === 'categorical') {
       yScaleValues = data.filter(d => d[config.xAxis.dataKey] === closestXScaleValue)
     } else {
-      yScaleValues = data.filter(d => d[config.xAxis.dataKey] === formattedDate)
+      yScaleValues = data.filter(d => formatDate(parseDate(d[config.xAxis.dataKey])) === formattedDate)
     }
 
     let seriesToInclude = []
@@ -84,6 +87,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
 
     itemsToLoop.map(seriesKey => {
       if (!seriesKey) return
+      if (!yScaleValues[0]) return
       for (const item of Object.entries(yScaleValues[0])) {
         if (item[0] === seriesKey) {
           seriesToInclude.push(item)
@@ -93,12 +97,13 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
 
     // filter out the series that aren't added to the map.
     seriesToInclude.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series])))
-    let tooltipDataFromSeries = Object.fromEntries(seriesToInclude)
+    if (!seriesToInclude) return
+    let tooltipDataFromSeries = Object.fromEntries(seriesToInclude) ? Object.fromEntries(seriesToInclude) : {}
 
     let tooltipData = {}
     tooltipData.data = tooltipDataFromSeries
-    tooltipData.dataXPosition = isEditor ? 300 + x + 20 : x + 20
-    tooltipData.dataYPosition = y - 20
+    tooltipData.dataXPosition = x + 20
+    tooltipData.dataYPosition = y - 100
 
     let tooltipInformation = {
       tooltipData: tooltipData,
@@ -206,7 +211,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   })}
 
                 {tooltipData && (
-                  <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition} left={tooltipData.dataXPosition + 0} style={defaultStyles}>
+                  <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
                     <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id}>
                       {typeof tooltipData === 'object' &&
                         Object.entries(tooltipData.data).map(item => (
