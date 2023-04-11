@@ -40,7 +40,6 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
-import cleanData from '@cdc/core/helpers/cleanData'
 
 import './scss/main.scss'
 
@@ -164,6 +163,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.legend.hide = true
     }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
+
     updateConfig(newConfig, data)
   }
 
@@ -371,12 +371,26 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
+      newConfig.runtime.areaSeriesKeys = []
+
       newConfig.series.forEach(series => {
+        if (series.type === 'Area Chart') {
+          newConfig.runtime.areaSeriesKeys.push(series)
+        }
         if (series.type === 'Bar') {
           newConfig.runtime.barSeriesKeys.push(series.dataKey)
         }
         if (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') {
           newConfig.runtime.lineSeriesKeys.push(series.dataKey)
+        }
+      })
+    }
+    if (newConfig.visualizationType === 'Area Chart' && newConfig.series) {
+      newConfig.runtime.areaSeriesKeys = []
+
+      newConfig.series.forEach(series => {
+        if (series.type === 'Area Chart') {
+          newConfig.runtime.areaSeriesKeys.push(series)
         }
       })
     }
@@ -412,7 +426,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return filteredData
   }
 
-  // Gets filer values from dataset
+  // Gets filter values from dataset
   const generateValuesForFilter = (columnName, data = this.state.data) => {
     const values = []
 
@@ -790,6 +804,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return false
   }
 
+  const clean = data => {
+    return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
+  }
+
   // Prevent render if loading
   let body = <Loading />
 
@@ -869,7 +887,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setConfig,
     rawData: stateData ?? {},
     excludedData: excludedData,
-    transformedData: filteredData || excludedData,
+    transformedData: clean(filteredData || excludedData), // do this right before passing to components
+    tableData: filteredData || excludedData, // do not clean table data
     unfilteredData: stateData,
     seriesHighlight,
     colorScale,
@@ -897,7 +916,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     imageId,
     handleLineType,
     isNumber,
-    cleanData,
     getTextWidth,
     twoColorPalette
   }

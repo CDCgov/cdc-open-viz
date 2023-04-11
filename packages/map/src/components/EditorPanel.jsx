@@ -2769,8 +2769,8 @@ const EditorPanel = props => {
                     return (
                       <>
                         <Accordion allowZeroExpanded>
-                          <AccordionItem className='map-layers-list'>
-                            <AccordionItemHeading className='map-layers-list--title'>
+                          <AccordionItem className='series-item map-layers-list'>
+                            <AccordionItemHeading className='series-item__title map-layers-list--title'>
                               <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
                             </AccordionItemHeading>
                             <AccordionItemPanel>

@@ -28,12 +28,12 @@ const sampleData = {
       text: 'Scatter Plot Sample Data',
       fileName: 'valid-scatterplot.csv',
       data: validScatterPlot
+    },
+    {
+      text: 'Area Chart Sample Data',
+      fileName: 'valid-area-chart.json',
+      data: validAreaChart
     }
-    // {
-    //   text: 'Area Chart Sample Data',
-    //   fileName: 'valid-area-chart.json',
-    //   data: validAreaChart
-    // }
   ],
   maps: [
     {
