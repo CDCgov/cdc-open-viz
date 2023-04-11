@@ -169,6 +169,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const generateRuntimeLegendHash = () => {
     return hashObj({
+      unified: state.legend.unified ?? false,
+      equalNumberOptIn: state.general.equalNumberOptIn ?? false,
+      specialClassesLast: state.legend.showSpecialClassesLast ?? false,
       color: state.color,
       customColors: state.customColors,
       numberOfItems: state.legend.numberOfItems,
@@ -1409,7 +1412,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
       setRuntimeLegend(legend)
     }
-  }, [runtimeData]) // eslint-disable-line
+  }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems]) // eslint-disable-line
 
   if (config) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
