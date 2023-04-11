@@ -56,7 +56,7 @@ export function DeviationBar({ height, xScale }) {
   const lollipopBarHeight = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5
   const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
 
-  const targetX = Math.max(xScale(0), Math.min(xScale(target), xScale(maxVal * 1.05)))
+  const targetX = Math.max(xScale(0), Math.min(xScale(target), xScale(maxVal)))
 
   const applyRadius = barPosition => {
     if (barPosition === undefined || barPosition === null || barStyle !== 'rounded') return
@@ -122,7 +122,7 @@ export function DeviationBar({ height, xScale }) {
         {data.map((d, index) => {
           const barValue = Number(d[seriesKey])
           const barHeight = config.isLollipopChart ? lollipopBarHeight : Number(config.barHeight)
-          const barSpace = Number(config.barSpace) || 15
+          const barSpace = Number(config.barSpace)
           const barWidth = Math.abs(xScale(barValue) - targetX)
           const barBaseX = xScale(barValue)
           const barX = barValue > target ? targetX : barBaseX
