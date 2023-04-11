@@ -672,6 +672,8 @@ const EditorPanel = () => {
   const visCanAnimate = () => {
     const { visualizationType } = config
     switch (visualizationType) {
+      case 'Area Chart':
+        return false
       case 'Scatter Plot':
         return false
       case 'Box Plot':
@@ -696,6 +698,8 @@ const EditorPanel = () => {
   const visHasLabelOnData = () => {
     const { visualizationType } = config
     switch (visualizationType) {
+      case 'Area Chart':
+        return false
       case 'Box Plot':
         return false
       case 'Pie':
