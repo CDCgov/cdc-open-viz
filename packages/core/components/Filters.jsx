@@ -27,10 +27,7 @@ const useFilters = props => {
 
   const changeFilterActive = (index, value) => {
     let newFilters = config.type === 'map' ? [...filteredData] : [...config.filters]
-    let filterStyle = newFilters[index].filterStyle
     newFilters[index].active = value
-
-    console.log('newFilters', newFilters)
 
     // If this is a button filter type show the button.
     if (config.filterBehavior === 'Apply Button') {
@@ -38,7 +35,7 @@ const useFilters = props => {
     }
 
     // If we're not using the apply button we can set the filters right away.
-    if (filterStyle !== 'button') {
+    if (config.filterBehavior !== 'Apply Button') {
       setConfig({
         ...config,
         filters: newFilters
@@ -47,7 +44,6 @@ const useFilters = props => {
 
     // Used for setting active filter, fromHash breaks the filteredData functionality.
     if (config.type === 'map' && config.filterBehavior !== 'Apply Button') {
-      delete newFilters.fromHash
       setFilteredData(newFilters)
     }
 
@@ -163,6 +159,8 @@ const Filters = props => {
     if (config.filters || filteredData) {
       // Here charts is using config.filters where maps is using a runtime value
       let filtersToLoop = config.type === 'map' ? filteredData : config.filters
+
+      delete filtersToLoop.fromHash
 
       // button and dropdown style filters.
       return filtersToLoop.map((singleFilter, outerIndex) => {

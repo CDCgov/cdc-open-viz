@@ -757,10 +757,10 @@ const EditorPanel = props => {
           }
         })
         break
-      case 'filterStyle':
+      case 'filterBehavior':
         setState({
           ...state,
-          filterStyle: value
+          filterBehavior: value
         })
         break
       default:
@@ -887,6 +887,10 @@ const EditorPanel = props => {
           newFilters.splice(idx, 1)
         }
         break
+      case 'filterStyle':
+        newFilters[idx] = { ...newFilters[idx] }
+        newFilters[idx].filterStyle = value
+        break
       case 'columnName':
         newFilters[idx] = { ...newFilters[idx] }
         newFilters[idx].columnName = value
@@ -935,6 +939,33 @@ const EditorPanel = props => {
         }
       }
     })
+  }
+
+  const MapFilters = () => {
+    return (
+      <>
+        <label>
+          Filter Behavior
+          <select
+            value={state.filterBehavior}
+            onChange={e => {
+              setState({
+                ...state,
+                filterBehavior: e.target.value
+              })
+            }}
+          >
+            <option key='Apply Button' value='Apply Button'>
+              Apply Button
+            </option>
+            <option key='Filter Change' value='Filter Change'>
+              Filter Change
+            </option>
+          </select>
+        </label>
+        {filtersJSX}
+      </>
+    )
   }
 
   const removeAdditionalColumn = columnName => {
@@ -1165,6 +1196,8 @@ const EditorPanel = props => {
 
   const usedFilterColumns = {}
 
+  const filterStyles = ['pill', 'tab', 'dropdown']
+
   const filtersJSX = state.filters.map((filter, index) => {
     if (filter.columnName) {
       usedFilterColumns[filter.columnName] = true
@@ -1187,27 +1220,6 @@ const EditorPanel = props => {
 
     return (
       <>
-        <span className='edit-label column-heading'>Filter Behavior</span>
-        <select
-          value={state.filterBehavior}
-          onChange={event => {
-            handleEditorChanges('filterStyle', event.target.value)
-          }}
-        >
-          <option key='dropdown' value='dropdown'>
-            Dropdown
-          </option>
-          <option key='button' value='button'>
-            Button
-          </option>
-          <option key='button' value='pill'>
-            Pill
-          </option>
-          <option key='button' value='tab'>
-            Tab
-          </option>
-        </select>
-
         <fieldset className='edit-block' key={`filter-${index}`}>
           <button
             className='remove-column'
@@ -1238,6 +1250,24 @@ const EditorPanel = props => {
               }}
             >
               {columnsOptions.filter(({ key }) => undefined === usedFilterColumns[key] || filter.columnName === key)}
+            </select>
+          </label>
+
+          <label>
+            <span className='edit-filterOrder column-heading'>Filter Style</span>
+            <select
+              value={filter.filterStyle}
+              onChange={e => {
+                changeFilter(index, 'filterStyle', e.target.value)
+              }}
+            >
+              {filterStyles.map((option, index) => {
+                return (
+                  <option value={option} key={`filter-${option}--${index}`}>
+                    {option}
+                  </option>
+                )
+              })}
             </select>
           </label>
 
@@ -2393,7 +2423,7 @@ const EditorPanel = props => {
                     <AccordionItemButton>Filters</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    {filtersJSX.length > 0 ? filtersJSX : <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
+                    {filtersJSX.length > 0 ? <MapFilters /> : <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
                     <button
                       className={'btn full-width'}
                       onClick={event => {

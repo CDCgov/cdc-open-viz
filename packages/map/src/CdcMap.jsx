@@ -794,6 +794,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       newFilter.columnName = columnName
       newFilter.values = values
       newFilter.active = active || values[0] // Default to first found value
+      console.log('newFilters', newFilter)
+      newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
 
       filters.push(newFilter)
     })
