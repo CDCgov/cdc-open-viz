@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 
 const useFilters = props => {
   const [showApplyButton, setShowApplyButton] = useState(false)
-  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData } = props
+  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData, isNumber } = props
   const { filterBehavior } = config
 
   // Editor Panel > Filters > Filter Behavior
@@ -29,6 +29,7 @@ const useFilters = props => {
     let newFilters = config.type === 'map' ? [...filteredData] : [...config.filters]
 
     newFilters[index].active = value
+    console.log('newFilters', newFilters[index])
 
     // Used for setting active filter
     if (config.type === 'map') {
@@ -48,17 +49,7 @@ const useFilters = props => {
     }
 
     // Chart dropdown style
-    if (config.type !== 'map' && filterBehavior === 'dropdown') {
-      setFilteredData(filterData(newFilters, excludedData))
-    }
-
-    // Chart Tab style
-    if (config.type !== 'map' && filterBehavior === 'tab') {
-      setFilteredData(filterData(newFilters, excludedData))
-    }
-
-    // Chart Tab style
-    if (config.type !== 'map' && filterBehavior === 'pill') {
+    if (config.type === 'chart') {
       setFilteredData(filterData(newFilters, excludedData))
     }
 
@@ -125,7 +116,7 @@ const useFilters = props => {
 }
 
 const Filters = props => {
-  const { config, filteredData } = props
+  const { config, filteredData, isNumber } = props
 
   // prettier-ignore
   const {
@@ -136,7 +127,7 @@ const Filters = props => {
     sortDesc,
     showApplyButton,
     handleReset,
-    filterConstants,
+    filterConstants
   } = useFilters(props)
 
   const { filters } = config
@@ -170,7 +161,7 @@ const Filters = props => {
   }
 
   // Each Filter Dropdown
-  Filters.Lists = () => {
+  Filters.Group = () => {
     if (config.filters || filteredData) {
       // Here charts is using config.filters where maps is using a runtime value
       let filtersToLoop = config.type === 'map' ? filteredData : config.filters
@@ -192,6 +183,10 @@ const Filters = props => {
         if (singleFilter.order === 'asc') {
           singleFilter.values = singleFilter.values.sort(sortAsc)
         }
+
+        // if (!singleFilter.filterBehavior) {
+        //   singleFilter.filterBehavior = 'dropdown'
+        // }
 
         singleFilter.values.forEach((filterOption, index) => {
           const pillClassList = ['pill', singleFilter.active === filterOption ? 'pill--active' : null, config.theme && config.theme]
@@ -218,31 +213,42 @@ const Filters = props => {
           )
         })
 
-        let DropdownFilters = () => (
-          <div className='single-filter' key={outerIndex}>
-            <select
-              id={`filter-${outerIndex}`}
-              className='filter-select'
-              data-index='0'
-              value={singleFilter.active}
-              onChange={e => {
-                changeFilterActive(outerIndex, e.target.value)
-                announceChange(`Filter ${singleFilter.label} value has been changed to ${e.target.value}, please reference the data table to see updated values.`)
-              }}
-            >
-              {values}
-            </select>
-          </div>
-        )
-
         if (singleFilter.filterBehavior === 'dropdown') {
-          return <DropdownFilters />
+          return (
+            <div className='single-filter' key={outerIndex}>
+              <select
+                id={`filter-${outerIndex}`}
+                className='filter-select'
+                data-index='0'
+                value={singleFilter.active}
+                onChange={e => {
+                  changeFilterActive(outerIndex, isNumber(e.target.value) ? Number(e.target.value) : e.target.value)
+                  announceChange(`Filter ${singleFilter.label} value has been changed to ${e.target.value}, please reference the data table to see updated values.`)
+                }}
+              >
+                {values}
+              </select>
+            </div>
+          )
         }
 
         if (singleFilter.filterBehavior === 'button') {
           return (
             <>
-              <DropdownFilters />
+              <div className='single-filter' key={outerIndex}>
+                <select
+                  id={`filter-${outerIndex}`}
+                  className='filter-select'
+                  data-index='0'
+                  value={singleFilter.active}
+                  onChange={e => {
+                    changeFilterActive(outerIndex, e.target.value)
+                    announceChange(`Filter ${singleFilter.label} value has been changed to ${e.target.value}, please reference the data table to see updated values.`)
+                  }}
+                >
+                  {values}
+                </select>
+              </div>
               <Filters.Buttons filter={singleFilter} />
             </>
           )
@@ -271,7 +277,7 @@ const Filters = props => {
   return (
     <Filters>
       <Filters.Section>
-        <Filters.Lists />
+        <Filters.Group />
       </Filters.Section>
     </Filters>
   )

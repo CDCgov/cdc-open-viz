@@ -270,7 +270,8 @@
       ],
       "active": "1/15/2016",
       "order": "asc",
-      "columnName": "Date"
+      "columnName": "Date",
+      "filterBehavior": "dropdown"
     }
   ]
 }
