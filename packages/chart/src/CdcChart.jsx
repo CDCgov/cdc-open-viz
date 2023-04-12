@@ -105,7 +105,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         }
       })
 
-      if (!isUpdateNeeded) return
+      if ((!config.formattedData || config.formattedData.urlFiltered) && !isUpdateNeeded) return
 
       let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
         .map((param, i) => {
@@ -148,7 +148,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         data = transform.developerStandardize(data, config.dataDescription)
       }
 
-      updateConfig({ ...config, dataUrl: dataUrlFinal, data })
+      Object.assign(data, { urlFiltered: true })
+
+      updateConfig({ ...config, dataUrl: dataUrlFinal, data, formattedData: data })
 
       if (data) {
         setStateData(data)
@@ -164,7 +166,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {}
 
-    if (response.dataUrl) {
+    const urlFilters = response.filters ? (response.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
+
+    if (response.dataUrl && !urlFilters) {
       try {
         const regex = /(?:\.([^.]+))?$/
 
@@ -391,6 +395,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       if (add) filteredData.push(row)
     })
+
     return filteredData
   }
 
