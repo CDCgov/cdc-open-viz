@@ -1,3 +1,29 @@
+section.filters-section {
+  border: 1px solid #c7c7c7;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+div.single-filters {
+  display: flex;
+  flex-wrap: wrap;
+
+  margin: 8px 0;
+  select {
+    width: auto !important;
+  }
+
+  label {
+    width: 100%;
+  }
+}
+
+.single-filters--dropdown {
+  width: auto;
+  display: flex;
+}
+
 .single-filters--tab {
   width: 100%;
   display: flex;

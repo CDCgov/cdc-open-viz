@@ -212,7 +212,7 @@ const EditorPanel = () => {
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
-  const filterBehaviorOptions = ['dropdown', 'button', 'pill', 'tab']
+  const filterStyleOptions = ['dropdown', 'pill', 'tab']
 
   const approvedCurveTypes = {
     Linear: 'curveLinear',
@@ -489,6 +489,16 @@ const EditorPanel = () => {
 
       updateConfig(newExclusionsPayload)
     }
+  }
+
+  const getFilters = () => {
+    let columns = {}
+
+    unfilteredData.forEach(row => {
+      Object.keys(row).forEach(columnName => (columns[columnName] = true))
+    })
+
+    return Object.keys(columns)
   }
 
   const getColumns = (filter = true) => {
@@ -1936,9 +1946,33 @@ const EditorPanel = () => {
                   <AccordionItemButton>Filters</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <br />
+                  {config.filters && (
+                    <>
+                      {/* prettier-ignore */}
+                      <Select
+                        value={config.filterBehavior}
+                        fieldName='filterBehavior'
+                        label='Filter Behavior'
+                        updateField={updateField}
+                        options={['Apply Button', 'Filter Change']}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        />
+                      <br />
+                    </>
+                  )}
                   {config.filters && (
                     <ul className='filters-list'>
+                      {/* Whether filters should apply onChange or Apply Button */}
+
                       {config.filters.map((filter, index) => (
                         <fieldset className='edit-block' key={index}>
                           <button
@@ -1959,7 +1993,7 @@ const EditorPanel = () => {
                               }}
                             >
                               <option value=''>- Select Option -</option>
-                              {getColumns().map((dataKey, index) => (
+                              {getFilters(true).map((dataKey, index) => (
                                 <option value={dataKey} key={index}>
                                   {dataKey}
                                 </option>
@@ -1967,17 +2001,16 @@ const EditorPanel = () => {
                             </select>
                           </label>
                           <label>
-                            <span className='edit-label column-heading'>Filter Behavior</span>
+                            <span className='edit-label column-heading'>Filter Style</span>
 
                             {/* prettier-ignore */}
                             <select
-                              value={filter.filterBehavior}
-                              fieldName='filterBehavior'
+                              value={filter.filterStyle}
                               onChange={e => {
-                                updateFilterProp('filterBehavior', index, e.target.value)
+                                updateFilterProp('filterStyle', index, e.target.value)
                               }}
                               >
-                              {filterBehaviorOptions.map( item => {
+                              {filterStyleOptions.map( item => {
 
                               return (<option value={item}>{item}</option>)
                               })}
