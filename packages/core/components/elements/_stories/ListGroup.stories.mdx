@@ -1,0 +1,29 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import ListGroup from '../ListGroup'
+
+<Meta
+  title="Components/Element/ListGroup-WIP"
+  component={ListGroup}
+/>
+
+# ListGroup Component (WIP)
+
+Used to display a list of items from a pre-populated array that can be acted upon, specifically for removing an item from the initial array.
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example" args={{
+    label: "State Values",
+    canClear: true,
+    options: ['Line', 'Bar', 'Wave'],
+    removeAction: () => alert('Removed'),
+    items: ['test','test2',"test3"],
+    tooltip: "This is an <strong>example</strong> tooltip."
+  }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <ListGroup {...args}/>

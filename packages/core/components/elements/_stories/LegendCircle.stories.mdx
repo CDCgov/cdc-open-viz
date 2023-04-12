@@ -1,0 +1,27 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import LegendCircle from '../LegendCircle'
+
+<Meta
+  title="Components/Element/LegendCircle"
+  component={LegendCircle}
+  argTypes={{
+    fill: {
+      control: { type: 'color' }
+    }
+  }}
+/>
+
+# LegendCircle Component
+Minor component used to populate a circle marker for legend keys.
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example" args={{
+    fill: "green"
+  }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <LegendCircle {...args}/>

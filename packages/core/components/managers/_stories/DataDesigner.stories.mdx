@@ -1,0 +1,34 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import DataDesigner from '../DataDesigner'
+
+<Meta
+  title="Components/Manager/DataDesigner"
+  component={DataDesigner}
+/>
+
+# DataDesigner Component
+A component used to interactively transform the datapoints that have been defined to be used by a visualization.
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example" argTypes={{
+    configureData: {
+      control: false
+    },
+    updateDescriptionProp: {
+      control: false
+    },
+    visualizationKey: {
+      control: false
+    },
+    dataKey: {
+      control: false
+    }
+  }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <DataDesigner {...args}/>

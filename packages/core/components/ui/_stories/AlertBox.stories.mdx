@@ -1,0 +1,25 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import AlertBox from '../AlertBox'
+
+<Meta
+  title="Components/UI/AlertBox"
+  component={AlertBox}
+/>
+
+# AlertBox Component
+A simple alert box wrapper with
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example" args={{
+    type: "basic",
+    inline: false,
+    children: "Example Alert"
+  }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <AlertBox {...args}/>

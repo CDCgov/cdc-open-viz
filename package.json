@@ -10,6 +10,17 @@
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-react": "^7.12.10",
     "@rollup/plugin-dsv": "^3.0.2",
+    "@storybook/addon-docs": "^7.0.0-rc.5",
+    "@storybook/addon-essentials": "^7.0.0-rc.5",
+    "@storybook/addon-interactions": "^7.0.0-rc.5",
+    "@storybook/addon-links": "^7.0.0-rc.5",
+    "@storybook/addons": "^7.0.0-rc.5",
+    "@storybook/blocks": "^7.0.0-rc.5",
+    "@storybook/manager-api": "^7.0.0-rc.5",
+    "@storybook/react": "^7.0.0-rc.5",
+    "@storybook/react-vite": "^7.0.0-rc.5",
+    "@storybook/testing-library": "^0.0.14-next.1",
+    "@storybook/theming": "^7.0.0-rc.5",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/react": "^18.0.26",
@@ -47,6 +58,7 @@
     "react-visibility-sensor": "^5.1.1",
     "resize-observer-polyfill": "^1.5.1",
     "sass": "^1.57.1",
+    "storybook": "^7.0.0-rc.5",
     "use-debounce": "^7.0.1",
     "vite": "^4.0.0",
     "vite-plugin-css-injected-by-js": "^2.4.0",
@@ -66,7 +78,12 @@
     ]
   },
   "scripts": {
-    "publish": "npx lerna publish"
+    "publish": "npx lerna publish",
+    "storybook": "storybook dev -p 6006",
+    "storybook-docs": "storybook dev --docs",
+    "build-storybook": "storybook build",
+    "predeploy": "storybook build --docs --output-dir .storybook_build && touch .storybook_build/.nojekyll",
+    "deploy": "gh-pages -d .storybook_build -t true"
   },
   "dependencies": {
     "@visx/legend": "^3.0.0",

@@ -1,0 +1,37 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import ErrorBoundary from '../ErrorBoundary'
+
+<Meta
+  title="Components/HOC/ErrorBoundary"
+  component={ErrorBoundary}
+/>
+
+# ErrorBoundary Component
+Provides a generic error boundary container for its children. Used to contain any errored component renders. This helps locate where the error originates, and prevent other component rengers from failing as a result.
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example"
+         args={{
+           component: 'Example Child'
+         }}
+         argTypes={{
+           component: {
+             control: 'text'
+           }
+         }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => {
+  const ExampleChild = () => {
+    throw new Error()
+  }
+  return <ErrorBoundary {...args}>
+    <ExampleChild/>
+  </ErrorBoundary>
+}

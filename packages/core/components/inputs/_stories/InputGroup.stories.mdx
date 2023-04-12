@@ -1,0 +1,94 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import InputGroup from '../InputGroup'
+import InputText from '../InputText'
+import Icon from '../../ui/Icon'
+
+<Meta
+  title="Components/Input/InputGroup"
+  component={InputGroup}
+  parameters={{ options: { isToolshown: true } }}
+/>
+
+# InputGroup Component
+Renders a label, and either one or two input fields. The label's default display is different from normal input labels, and can
+also be set to be transparent. The label can be positioned to the left, center, or right of the provided input fields.
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example"
+         args={{
+           label: <><Icon className="mr-1" display="upload"/> Upload A File</>,
+           labelPosition: 'left',
+           labelTransparent: false,
+           children: [ <InputText type="text"/> ]
+         }}
+         argTypes={{
+           children: {
+             table: {
+               disable: true
+             }
+           }
+         }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+&nbsp;
+## Transparent Labels
+Using transparent labels sets the default label background color to be transparent, and automatically resizes the input field to fill the remaining space.
+
+<Canvas sourceState="hidden">
+  <Story name="Transparent Labels"
+         args={{
+           setOne: {
+             className: "mb-2",
+             label: <b>First Name</b>,
+             labelPosition: "left",
+             labelTransparent: true,
+             children: [ <InputText type="text"/> ]
+           },
+           setTwo: {
+             className: "mb-2",
+             label: <b>Last Name</b>,
+             labelPosition: "right",
+             labelTransparent: true,
+             children: [ <InputText type="text"/> ]
+           }
+         }}
+  >
+    {DoubleTemplate.bind({})}
+  </Story>
+</Canvas>
+
+&nbsp;
+## Split Inputs
+You can also place a label between two input fields, such as a username and server input. Use cases may be rare, but the option is available.
+
+<Canvas sourceState="hidden">
+  <Story name="Split Inputs"
+         args={{
+           className: "mb-2",
+           label: "@",
+           labelPosition: "center",
+           children: [
+             <InputText type="text" placeholder="User"/>,
+             <InputText type="text" placeholder="Server"/>
+           ]
+         }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+export const Template = ({ ...args }) => (
+  <InputGroup {...args}/>
+)
+export const DoubleTemplate = ({ ...args }) => (
+  <>
+    <InputGroup {...args.setOne}/>
+    <InputGroup {...args.setTwo}/>
+  </>
+)
