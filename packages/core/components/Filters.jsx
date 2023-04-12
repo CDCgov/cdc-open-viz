@@ -138,9 +138,7 @@ const Filters = props => {
   Filters.Section = props => (
     <section className={`filters-section ${config.type === 'map' ? config.general.headerColor : config.theme}`} style={{ display: 'block' }}>
       <p>{filterConstants.introText}</p>
-
-      {/* TODO: likely need to wrap this up better. */}
-      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px' }}>
+      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px', marginBottom: '15px' }}>
         {props.children}
       </div>
     </section>

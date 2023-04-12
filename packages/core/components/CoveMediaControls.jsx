@@ -83,7 +83,7 @@ const generateMedia = (state, type, elementToCapture) => {
       console.warn('COVE: pdf downloads disabled')
       break
     default:
-      console.warn("generateMedia param 2 type must be 'image' or 'pdf'")
+      console.warn("COVE: generateMedia param 2 type must be 'image' or 'pdf'")
       break
   }
 }
@@ -127,7 +127,11 @@ const Link = ({ config }) => {
 
 // TODO: convert to standardized COVE section
 const Section = ({ children, classes }) => {
-  return <section className={classes.join(' ')}>{children}</section>
+  return (
+    <section className={classes.join(' ')}>
+      <span>{children}</span>
+    </section>
+  )
 }
 
 const CoveMediaControls = () => null

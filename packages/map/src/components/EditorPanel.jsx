@@ -66,7 +66,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend, changeFilterActive } = props
+  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend, changeFilterActive, isDebug } = props
 
   const { general, columns, legend, dataTable, tooltips } = state
 
@@ -132,7 +132,7 @@ const EditorPanel = props => {
   }
 
   const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-    <label className='checkbox'>
+    <label className='checkbox column-heading'>
       <input
         type='checkbox'
         name={fieldName}
@@ -214,6 +214,17 @@ const EditorPanel = props => {
           }
         })
         break
+
+      case 'toggleDataTableLink':
+        setState({
+          ...state,
+          table: {
+            ...state.table,
+            showDataTableLink: value
+          }
+        })
+        break
+
       case 'toggleDataUrl':
         setState({
           ...state,
@@ -511,7 +522,7 @@ const EditorPanel = props => {
             })
             break
           default:
-            console.warn('Map type not set')
+            console.warn('COVE: Map type not set') // eslint-disable-line
             break
         }
         break
@@ -753,7 +764,7 @@ const EditorPanel = props => {
         })
         break
       default:
-        console.warn(`Did not recognize editor property.`)
+        console.warn(`COVE: Did not recognize editor property.`) // eslint-disable-line
         break
     }
   }
@@ -1356,6 +1367,24 @@ const EditorPanel = props => {
       </section>
     )
   }
+
+  const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
+
+  // if isDebug = true, then try to set the Geography Col and Data col to reduce clicking
+  const setGeoColumn = () => {
+    // only for debug mode
+    let geoColFound = columnsInData.includes(state.columns.geo.name)
+    if (undefined !== isDebug && isDebug && !geoColFound) {
+      // then try to set the x axis to appropriate value so we dont have to manually do it
+      let mapcols = columnsInData[0]
+      if (mapcols !== '') editColumn('geo', 'name', mapcols)
+
+      if (!state.columns.hasOwnProperty('primary') || undefined === state.columns.primary.name || '' === state.columns.primary.name || !state.columns.primary.name) {
+        editColumn('primary', 'name', columnsInData[1]) // blindly picks first value col
+      }
+    }
+  }
+  if (isDebug) setGeoColumn()
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -2412,11 +2441,11 @@ const EditorPanel = props => {
                           handleEditorChanges('showDataTable', event.target.checked)
                         }}
                       />
-                      <span className='edit-label'>
-                        Show Table
+                      <span className='edit-label column-heading'>
+                        Show Data Table
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
@@ -2482,16 +2511,30 @@ const EditorPanel = props => {
                       />
                       <span className='edit-label'>Map loads with data table expanded</span>
                     </label>
-                    <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.table.showDownloadUrl}
-                        onChange={event => {
-                          handleEditorChanges('toggleDataUrl', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>Enable Link to Dataset</span>
-                    </label>
+                    {isDashboard && (
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={state.table.showDataTableLink}
+                          onChange={event => {
+                            handleEditorChanges('toggleDataTableLink', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Show Data Table Name & Link</span>
+                      </label>
+                    )}
+                    {isLoadedFromUrl && (
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={state.table.showDownloadUrl}
+                          onChange={event => {
+                            handleEditorChanges('toggleDataUrl', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Show URL to Automatically Updated Data</span>
+                      </label>
+                    )}
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -2500,7 +2543,7 @@ const EditorPanel = props => {
                           handleEditorChanges('toggleDownloadButton', event.target.checked)
                         }}
                       />
-                      <span className='edit-label'>Enable Download CSV Button</span>
+                      <span className='edit-label'>Show Download CSV Link</span>
                     </label>
                     {/* <label className='checkbox'>
                       <input
@@ -2775,8 +2818,8 @@ const EditorPanel = props => {
                     return (
                       <>
                         <Accordion allowZeroExpanded>
-                          <AccordionItem className='map-layers-list'>
-                            <AccordionItemHeading className='map-layers-list--title'>
+                          <AccordionItem className='series-item map-layers-list'>
+                            <AccordionItemHeading className='series-item__title map-layers-list--title'>
                               <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
                             </AccordionItemHeading>
                             <AccordionItemPanel>

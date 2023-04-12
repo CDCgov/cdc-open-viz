@@ -12,7 +12,7 @@ import ConfigContext from '../ConfigContext'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
+  const { rawData, tableData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
@@ -35,7 +35,7 @@ export default function DataTable() {
     switch (type) {
       case 'download':
         return (
-          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
+          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border margin-sm`}>
             Download Data (CSV)
           </a>
         )
@@ -75,7 +75,9 @@ export default function DataTable() {
                     values: labels.values,
                     columnTotal: labels.total,
                     columnSd: 'Standard Deviation',
-                    nonOutlierValues: 'Non Outliers'
+                    nonOutlierValues: 'Non Outliers',
+                    columnLowerBounds: labels.lowerBounds,
+                    columnUpperBounds: labels.upperBounds
                   }
 
                   let resolvedName = columnLookup[props.row.original[0]]

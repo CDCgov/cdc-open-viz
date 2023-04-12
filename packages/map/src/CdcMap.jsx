@@ -82,7 +82,7 @@ const hashObj = row => {
 
     return hash
   } catch (e) {
-    console.error(e)
+    console.error('COVE: ', e) // eslint-disable-line
   }
 }
 
@@ -112,7 +112,7 @@ const getUniqueValues = (data, columnName) => {
   return Object.keys(result)
 }
 
-const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
+const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
@@ -145,7 +145,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         })
       }
     } catch (e) {
-      console.error('Failed to set world map zoom.')
+      console.error('COVE: Failed to set world map zoom.') // eslint-disable-line
     }
   }, [filteredCountryCode]) // eslint-disable-line
 
@@ -169,6 +169,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const generateRuntimeLegendHash = () => {
     return hashObj({
+      unified: state.legend.unified ?? false,
+      equalNumberOptIn: state.general.equalNumberOptIn ?? false,
+      specialClassesLast: state.legend.showSpecialClassesLast ?? false,
       color: state.color,
       customColors: state.customColors,
       numberOfItems: state.legend.numberOfItems,
@@ -812,8 +815,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       addUIDs(obj, obj.columns.geo.name)
       obj.data.forEach(row => {
         if (test) {
-          console.log('object', obj)
-          console.log('row', row)
+          console.log('object', obj) // eslint-disable-line
+          console.log('row', row) // eslint-disable-line
         }
 
         if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
@@ -856,7 +859,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       return result
     } catch (e) {
-      console.error(e)
+      console.error('COVE: ', e) // eslint-disable-line
     }
   })
 
@@ -898,7 +901,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setRuntimeData(newData)
       setRuntimeFilters(filters)
     } catch (e) {
-      console.error(e.message)
+      console.error('COVE: ', e.message) // eslint-disable-line
     }
   }
 
@@ -972,7 +975,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       // Fail state
       return generateColorsArray()
     } catch (e) {
-      console.error(e)
+      console.error('COVE: ', e) // eslint-disable-line
     }
   }
 
@@ -1205,7 +1208,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const handleMapAriaLabels = (state = '', testing = false) => {
-    if (testing) console.log(`handleMapAriaLabels Testing On: ${state}`)
+    if (testing) console.log(`handleMapAriaLabels Testing On: ${state}`) // eslint-disable-line
     try {
       if (!state.general.geoType) throw Error('handleMapAriaLabels: no geoType found in state')
       let ariaLabel = ''
@@ -1236,7 +1239,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       return ariaLabel
     } catch (e) {
-      console.error(e.message)
+      console.error('COVE: ', e.message) // eslint-disable-line
     }
   }
 
@@ -1409,7 +1412,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
       setRuntimeLegend(legend)
     }
-  }, [runtimeData]) // eslint-disable-line
+  }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses]) // eslint-disable-line
 
   if (config) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -1472,7 +1475,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     runtimeFilters,
     setRuntimeFilters,
     innerContainerRef,
-    currentViewport
+    currentViewport,
+    isDebug
   }
 
   if (!mapProps.data || !state.data) return <Loading />
@@ -1503,12 +1507,20 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const tabId = handleMapTabbing()
 
+  // this only shows in Dashboard config mode and only if Show Table is also set
+  const tableLink = (
+    <a href={`#data-table-${state.general.dataKey}`} className='margin-left-href'>
+      {state.general.dataKey} (Go to Table)
+    </a>
+  )
+
   return (
     <ConfigContext.Provider value={mapProps}>
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
         {isEditor && (
           <EditorPanel
             isDashboard={isDashboard}
+            isDebug={isDebug}
             state={state}
             setState={setState}
             loadConfig={loadConfig}
@@ -1594,7 +1606,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
-            {link && link}
+            {/* Link */}
+            {isDashboard && config.dataTable.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 

@@ -75,9 +75,14 @@
       align-items: center;
       justify-content: space-between;
       font-size: 0.9em;
+      position: relative;
 
       &:hover {
         background-color: $lightestGray;
+      }
+
+      div {
+        width: 100%;
       }
 
       .series-list__name {
@@ -132,7 +137,13 @@
       }
 
       .series-list__dropdown {
+        width: 100%;
+        display: block;
         font-size: 0.8em;
+        margin-bottom: 10px;
+        select {
+          width: 100%;
+        }
       }
 
       .series-list__remove {
@@ -140,6 +151,9 @@
         font-size: 1.125rem;
         color: #f00;
         cursor: pointer;
+        position: absolute;
+        top: 5px;
+        right: 5px;
       }
 
       + li {
@@ -150,6 +164,7 @@
 
   .series-list__name-text {
     max-width: 150px;
+    margin-bottom: 10px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
