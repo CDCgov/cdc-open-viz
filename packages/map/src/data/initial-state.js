@@ -1,5 +1,6 @@
 export default {
   general: {
+    filterBehavior: 'apply-button',
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',
     title: '',

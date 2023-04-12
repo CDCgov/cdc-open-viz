@@ -757,10 +757,10 @@ const EditorPanel = props => {
           }
         })
         break
-      case 'filterBehavior':
+      case 'filterStyle':
         setState({
           ...state,
-          filterBehavior: value
+          filterStyle: value
         })
         break
       default:
@@ -1191,7 +1191,7 @@ const EditorPanel = props => {
         <select
           value={state.filterBehavior}
           onChange={event => {
-            handleEditorChanges('filterBehavior', event.target.value)
+            handleEditorChanges('filterStyle', event.target.value)
           }}
         >
           <option key='dropdown' value='dropdown'>
