@@ -1,0 +1,40 @@
+{
+  "title": "Confidence Age-adjusted COVID-19-associated hospitalization rates by race and ethnicity — COVID-NET, March 1–December 26, 2020",
+  "dataUrl": "/examples/feature/tests-covid/covid-example-data-confidence.json",
+  "visualizationType": "Bar",
+  "fontSize": "small",
+  "series": [
+    {
+      "dataKey": "Age-adjusted rate",
+      "label": "Rate"
+    }
+  ],
+  "confidenceKeys": {
+    "lower": "Lower",
+    "upper": "Upper"
+  },
+  "dataFormat": {
+    "commas": false,
+    "prefix": "Lorem",
+    "suffix": "Suffix"
+  },
+  "padding": {
+    "left": 10,
+    "right": 10
+  },
+  "yAxis": {
+    "dataKey": "Age-adjusted rate",
+    "gridLines": true,
+    "numTicks": 3,
+    "size": 80
+  },
+  "xAxis": {
+    "dataKey": "Race",
+    "tickRotation": 20,
+    "size": 130
+  },
+  "table": {
+    "label": "Age-adjusted COVID-19-associated hospitalization rates by race and ethnicity",
+    "expanded": true
+  }
+}
