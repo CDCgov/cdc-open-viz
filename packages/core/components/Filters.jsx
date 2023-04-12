@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 
 const useFilters = props => {
   const [showApplyButton, setShowApplyButton] = useState(false)
-  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData, isNumber } = props
+  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData } = props
   const { filterBehavior } = config
 
   // Editor Panel > Filters > Filter Behavior
@@ -27,34 +27,31 @@ const useFilters = props => {
 
   const changeFilterActive = (index, value) => {
     let newFilters = config.type === 'map' ? [...filteredData] : [...config.filters]
-
+    let filterBehavior = newFilters[index].filterBehavior
     newFilters[index].active = value
-    console.log('newFilters', newFilters[index])
 
-    // Used for setting active filter
-    if (config.type === 'map') {
-      delete newFilters.fromHash
+    // If this is a button filter type show the button.
+    if (filterBehavior === 'button') {
+      setShowApplyButton(true)
     }
 
-    if (filterBehavior === 'dropdown' || filterBehavior === 'tab' || filterBehavior === 'pill') {
+    // If we're not using the apply button we can set the filters right away.
+    if (filterBehavior !== 'button') {
       setConfig({
         ...config,
         filters: newFilters
       })
     }
 
-    // Charts dropdown
+    // Used for setting active filter, fromHash breaks the filteredData functionality.
     if (config.type === 'map') {
+      delete newFilters.fromHash
       setFilteredData(newFilters)
     }
 
-    // Chart dropdown style
-    if (config.type === 'chart') {
+    // If we're on a chart and not using the apply button
+    if (config.type === 'chart' && filterBehavior !== 'button') {
       setFilteredData(filterData(newFilters, excludedData))
-    }
-
-    if (filterBehavior === 'button') {
-      setShowApplyButton(true)
     }
   }
 
@@ -63,7 +60,9 @@ const useFilters = props => {
 
     if (config.type === 'map') {
       setFilteredData(newFilters, excludedData)
-    } else {
+    }
+
+    if (config.type === 'chart') {
       setFilteredData(filterData(newFilters, excludedData))
     }
 
@@ -102,6 +101,10 @@ const useFilters = props => {
     introText: `Using the ${typeLookup[config.filterBehavior]} menu below, make a selection to filter the visualization(s)`
   }
 
+  const getFilterText = filterBehavior => {
+    return `Using the ${typeLookup[filterBehavior]} menu below, make a selection to filter the visualization(s)`
+  }
+
   // prettier-ignore
   return {
     handleApplyButton,
@@ -112,11 +115,12 @@ const useFilters = props => {
     showApplyButton,
     handleReset,
     filterConstants,
+    getFilterText
   }
 }
 
 const Filters = props => {
-  const { config, filteredData, isNumber } = props
+  const { config, filteredData } = props
 
   // prettier-ignore
   const {
@@ -127,17 +131,20 @@ const Filters = props => {
     sortDesc,
     showApplyButton,
     handleReset,
-    filterConstants
+    filterConstants,
+    getFilterText
   } = useFilters(props)
 
   const { filters } = config
 
   const Filters = props => props.children
 
+  const filterSectionClassList = ['filters-section', config.type === 'map' ? config.general.headerColor : config.theme]
+
   // Exterior Section Wrapper
+  // todo: move styles to scss
   Filters.Section = props => (
-    <section className={`filters-section ${config.type === 'map' ? config.general.headerColor : config.theme}`} style={{ display: 'block' }}>
-      <p>{filterConstants.introText}</p>
+    <section className={filterSectionClassList.join(' ')} style={{ display: 'block' }}>
       <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px', marginBottom: '15px' }}>
         {props.children}
       </div>
@@ -182,10 +189,6 @@ const Filters = props => {
           singleFilter.values = singleFilter.values.sort(sortAsc)
         }
 
-        // if (!singleFilter.filterBehavior) {
-        //   singleFilter.filterBehavior = 'dropdown'
-        // }
-
         singleFilter.values.forEach((filterOption, index) => {
           const pillClassList = ['pill', singleFilter.active === filterOption ? 'pill--active' : null, config.theme && config.theme]
           const tabClassList = ['tab', singleFilter.active === filterOption && 'tab--active', config.theme && config.theme]
@@ -211,29 +214,27 @@ const Filters = props => {
           )
         })
 
-        if (singleFilter.filterBehavior === 'dropdown') {
-          return (
-            <div className='single-filter' key={outerIndex}>
+        return (
+          <div className={`single-filters single-filters--${singleFilter.filterBehavior}`} key={outerIndex}>
+            <p style={{ display: 'block', width: '100%' }}>{getFilterText(singleFilter.filterBehavior)}</p>
+            {singleFilter.filterBehavior === 'tab' && tabValues}
+            {singleFilter.filterBehavior === 'pill' && pillValues}
+            {singleFilter.filterBehavior === 'dropdown' && (
               <select
                 id={`filter-${outerIndex}`}
                 className='filter-select'
                 data-index='0'
                 value={singleFilter.active}
                 onChange={e => {
-                  changeFilterActive(outerIndex, isNumber(e.target.value) ? Number(e.target.value) : e.target.value)
+                  changeFilterActive(outerIndex, e.target.value)
                   announceChange(`Filter ${singleFilter.label} value has been changed to ${e.target.value}, please reference the data table to see updated values.`)
                 }}
               >
                 {values}
               </select>
-            </div>
-          )
-        }
-
-        if (singleFilter.filterBehavior === 'button') {
-          return (
-            <>
-              <div className='single-filter' key={outerIndex}>
+            )}
+            {singleFilter.filterBehavior === 'button' && (
+              <>
                 <select
                   id={`filter-${outerIndex}`}
                   className='filter-select'
@@ -246,27 +247,11 @@ const Filters = props => {
                 >
                   {values}
                 </select>
-              </div>
-              <Filters.Buttons filter={singleFilter} />
-            </>
-          )
-        }
-
-        if (singleFilter.filterBehavior === 'pill') {
-          return (
-            <div className={`single-filters single-filters--${singleFilter.filterBehavior}`} key={outerIndex}>
-              {pillValues}
-            </div>
-          )
-        }
-
-        if (singleFilter.filterBehavior === 'tab') {
-          return (
-            <div className={`single-filters single-filters--${singleFilter.filterBehavior}`} key={outerIndex}>
-              {tabValues}
-            </div>
-          )
-        }
+                <Filters.Buttons filter={singleFilter} />
+              </>
+            )}
+          </div>
+        )
       })
     }
   }
