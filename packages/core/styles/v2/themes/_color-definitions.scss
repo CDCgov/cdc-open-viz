@@ -165,6 +165,9 @@ $theme: (
         background-color: string.unquote(nth($theme-colors, 1));
         color: #fff;
       }
+      .filters-section button.cove-button:not([disabled]) {
+        background-color: string.unquote(nth($theme-colors, 1)) !important;
+      }
     }
 
     .theme-#{$theme-name} {
@@ -181,6 +184,14 @@ $theme: (
       .single-filters--pill .pill--active {
         background-color: string.unquote(nth($theme-colors, 1));
         color: #fff;
+      }
+
+      .button__tab-bar--active {
+        outline: 2px solid string.unquote(nth($theme-colors, 1));
+      }
+
+      .filters-section button.cove-button:not([disabled]) {
+        background-color: string.unquote(nth($theme-colors, 1)) !important;
       }
     }
   }

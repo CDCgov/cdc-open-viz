@@ -7,13 +7,6 @@ import PropTypes from 'prop-types'
 const useFilters = props => {
   const [showApplyButton, setShowApplyButton] = useState(false)
   const { config, setConfig, filteredData, setFilteredData, excludedData, filterData } = props
-  const { filterStyle } = config
-
-  // Editor Panel > Filters > Filter Behavior
-  useEffect(() => {
-    if (filterStyle === 'dropdown') setShowApplyButton(false)
-    if (filterStyle === 'button') setShowApplyButton(true)
-  }, [filterStyle])
 
   const sortAsc = (a, b) => {
     return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
@@ -35,12 +28,11 @@ const useFilters = props => {
     }
 
     // If we're not using the apply button we can set the filters right away.
-    if (config.filterBehavior !== 'Apply Button') {
-      setConfig({
-        ...config,
-        filters: newFilters
-      })
-    }
+    // if (config.filterBehavior !== 'Apply Button') {
+    setConfig({
+      ...config,
+      filters: newFilters
+    })
 
     // Used for setting active filter, fromHash breaks the filteredData functionality.
     if (config.type === 'map' && config.filterBehavior !== 'Apply Button') {
@@ -89,8 +81,8 @@ const useFilters = props => {
   const filterConstants = {
     buttonText: 'Apply Filters',
     resetText: 'Reset All',
-    introText: `Using the filters below, make a selection to filter the visualization(s)`,
-    applyText: 'Placeholder text describing that apply button is needed.'
+    introText: `Make a selection from the filters to change the visualization information.`,
+    applyText: 'Select the apply button to update the visualization information.'
   }
 
   // prettier-ignore
@@ -154,6 +146,22 @@ const Filters = props => {
     )
   }
 
+  Filters.TabBar = props => {
+    const { filter: singleFilter, index: outerIndex } = props
+    return (
+      <section className='single-filters__tab-bar'>
+        {singleFilter.values.map(filter => {
+          const buttonClassList = ['button__tab-bar', singleFilter.active === filter ? 'button__tab-bar--active' : '']
+          return (
+            <button className={buttonClassList.join(' ')} key={filter} onClick={e => changeFilterActive(outerIndex, filter)}>
+              {filter}
+            </button>
+          )
+        })}
+      </section>
+    )
+  }
+
   // Each Filter Dropdown
   Filters.Group = () => {
     if (config.filters || filteredData) {
@@ -167,6 +175,8 @@ const Filters = props => {
         const values = []
         const pillValues = []
         const tabValues = []
+        const tabBarValues = []
+
         if (!singleFilter.order || singleFilter.order === '') {
           singleFilter.order = 'asc'
         }
@@ -202,6 +212,8 @@ const Filters = props => {
               {filterOption}
             </button>
           )
+
+          tabBarValues.push(filterOption)
         })
 
         return (
@@ -210,6 +222,7 @@ const Filters = props => {
               {singleFilter.label && <label htmlFor={singleFilter.label}>{singleFilter.label}</label>}
               {singleFilter.filterStyle === 'tab' && tabValues}
               {singleFilter.filterStyle === 'pill' && pillValues}
+              {singleFilter.filterStyle === 'tab bar' && <Filters.TabBar filter={singleFilter} index={outerIndex} />}
               {singleFilter.filterStyle === 'dropdown' && (
                 <select
                   id={`filter-${outerIndex}`}
