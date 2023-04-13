@@ -212,6 +212,8 @@ const EditorPanel = () => {
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
+  const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar']
+
   const approvedCurveTypes = {
     Linear: 'curveLinear',
     Cardinal: 'curveCardinal',
@@ -487,6 +489,16 @@ const EditorPanel = () => {
 
       updateConfig(newExclusionsPayload)
     }
+  }
+
+  const getFilters = () => {
+    let columns = {}
+
+    unfilteredData.forEach(row => {
+      Object.keys(row).forEach(columnName => (columns[columnName] = true))
+    })
+
+    return Object.keys(columns)
   }
 
   const getColumns = (filter = true) => {
@@ -1934,27 +1946,33 @@ const EditorPanel = () => {
                   <AccordionItemButton>Filters</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {/* prettier-ignore */}
-                  <Select
-                    value={config.filterBehavior}
-                    fieldName='filterBehavior'
-                    label='Filter Behavior'
-                    updateField={updateField}
-                    options={['dropdown', 'button']}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>When should the visualization change? Button changes when the user clicks "apply" Dropdown changes immediatly after the dropdown is changed.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                    />
-                  <br />
+                  {config.filters && (
+                    <>
+                      {/* prettier-ignore */}
+                      <Select
+                        value={config.filterBehavior}
+                        fieldName='filterBehavior'
+                        label='Filter Behavior'
+                        updateField={updateField}
+                        options={['Apply Button', 'Filter Change']}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        />
+                      <br />
+                    </>
+                  )}
                   {config.filters && (
                     <ul className='filters-list'>
+                      {/* Whether filters should apply onChange or Apply Button */}
+
                       {config.filters.map((filter, index) => (
                         <fieldset className='edit-block' key={index}>
                           <button
@@ -1975,11 +1993,28 @@ const EditorPanel = () => {
                               }}
                             >
                               <option value=''>- Select Option -</option>
-                              {getColumns().map((dataKey, index) => (
+                              {getFilters(true).map((dataKey, index) => (
                                 <option value={dataKey} key={index}>
                                   {dataKey}
                                 </option>
                               ))}
+                            </select>
+                          </label>
+                          <label>
+                            <span className='edit-label column-heading'>Filter Style</span>
+
+                            {/* prettier-ignore */}
+                            <select
+                              value={filter.filterStyle}
+                              onChange={e => {
+                                updateFilterProp('filterStyle', index, e.target.value)
+                              }}
+                              >
+                              {filterStyleOptions.map( item => {
+
+                              return (<option value={item}>{item}</option>)
+                              })}
+
                             </select>
                           </label>
                           <label>

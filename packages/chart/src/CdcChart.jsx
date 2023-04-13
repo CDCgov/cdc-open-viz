@@ -220,6 +220,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
         newConfig.filters[index].active = filterValues[0]
+        newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
       })
       currentData = filterData(newConfig.filters, newExcludedData)
       setFilteredData(currentData)
@@ -851,7 +852,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} />}
+            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} isNumber={isNumber} />}
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
