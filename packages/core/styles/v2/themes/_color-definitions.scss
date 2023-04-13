@@ -189,8 +189,7 @@ $theme: (
       .button__tab-bar--active {
         outline: 2px solid string.unquote(nth($theme-colors, 1));
       }
-
-      .filters-section button.cove-button:not([disabled]) {
+      .apply:not([disabled]) {
         background-color: string.unquote(nth($theme-colors, 1)) !important;
       }
     }
