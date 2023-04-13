@@ -655,8 +655,26 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return Math.ceil(context.measureText(text).width)
   }
 
+  const abbreviateNumber = num => {
+    let unit = ''
+    let absNum = Math.abs(num)
+
+    if (absNum >= 1e9) {
+      unit = 'B'
+      num = num / 1e9
+    } else if (absNum >= 1e6) {
+      unit = 'M'
+      num = num / 1e6
+    } else if (absNum >= 1e3) {
+      unit = 'K'
+      num = num / 1e3
+    }
+
+    return num + unit
+  }
+
   // Format numeric data based on settings in config
-  const formatNumber = (num, axis) => {
+  const formatNumber = (num, axis, shouldAbbreviate = false) => {
     // if num is NaN return num
     if (isNaN(num) || !num) return num
     // Check if the input number is negative
@@ -671,8 +689,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let {
       dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix, bottomPrefix, bottomSuffix, bottomAbbreviated }
     } = config
-
-    let formatSuffix = format('.2s')
 
     // check if value contains comma and remove it. later will add comma below.
     if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
@@ -726,7 +742,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     //
     // Edge case for small numbers with decimals
     // - if roundTo undefined which means it is blank, then do not round
-    if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
+
+    if ((axis === 'left' && commas && abbreviated && shouldAbbreviate) || (axis === 'bottom' && commas && abbreviated && shouldAbbreviate)) {
       num = num // eslint-disable-line
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
@@ -734,11 +751,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let result = ''
 
     if (abbreviated && axis === 'left') {
-      num = formatSuffix(parseFloat(num)).replace('G', 'B')
+      num = abbreviateNumber(parseFloat(num))
     }
 
     if (bottomAbbreviated && axis === 'bottom') {
-      num = formatSuffix(parseFloat(num)).replace('G', 'B')
+      num = abbreviateNumber(parseFloat(num))
     }
 
     if (prefix && axis === 'left') {
