@@ -13,9 +13,9 @@
   },
   {
     "name": "Uranus",
-    "Radius": "80",
+    "Radius": "100",
     "Diameter": "8",
-    "distance": "0"
+    "distance": "40"
   },
   {
     "name": "Neptune",
@@ -27,7 +27,19 @@
     "name": "Earth",
     "Radius": "60",
     "Diameter": "2",
-    "distance": "0"
+    "distance": "20"
+  },
+  {
+    "name": "Earth",
+    "Radius": "60",
+    "Diameter": "2",
+    "distance": "40"
+  },
+  {
+    "name": "Earth",
+    "Radius": "60",
+    "Diameter": "2",
+    "distance": "60"
   },
   {
     "name": "Venus",
