@@ -750,11 +750,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     let result = ''
 
-    if (abbreviated && axis === 'left') {
+    if (abbreviated && axis === 'left' && shouldAbbreviate) {
       num = abbreviateNumber(parseFloat(num))
     }
 
-    if (bottomAbbreviated && axis === 'bottom') {
+    if (bottomAbbreviated && axis === 'bottom' && shouldAbbreviate) {
       num = abbreviateNumber(parseFloat(num))
     }
 
