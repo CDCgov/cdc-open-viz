@@ -1196,7 +1196,7 @@ const EditorPanel = props => {
 
   const usedFilterColumns = {}
 
-  const filterStyles = ['pill', 'tab', 'dropdown']
+  const filterStyles = ['pill', 'tab', 'dropdown', 'tab bar']
 
   const filtersJSX = state.filters.map((filter, index) => {
     if (filter.columnName) {

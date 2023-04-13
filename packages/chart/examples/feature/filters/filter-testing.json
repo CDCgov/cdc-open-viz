@@ -189,23 +189,10 @@
         "Venus"
       ],
       "active": "Earth",
-      "filterStyle": "pill",
+      "filterStyle": "tab bar",
       "order": "asc",
       "columnName": "name",
       "label": "Pill Label"
-    },
-    {
-      "values": [
-        "0",
-        "20",
-        "40",
-        "60"
-      ],
-      "active": "20",
-      "filterStyle": "dropdown",
-      "order": "asc",
-      "columnName": "distance",
-      "label": "Dropdown Label"
     }
   ]
 }

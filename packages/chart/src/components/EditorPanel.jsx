@@ -212,7 +212,7 @@ const EditorPanel = () => {
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
-  const filterStyleOptions = ['dropdown', 'pill', 'tab']
+  const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar']
 
   const approvedCurveTypes = {
     Linear: 'curveLinear',
