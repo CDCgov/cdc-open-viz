@@ -109,7 +109,7 @@ export default {
     height: '',
     caption: '',
     showDownloadUrl: false,
-    showDataTableLink: true,
+    showDataTableLink: true
   },
   orientation: 'vertical',
   legend: {
@@ -150,5 +150,5 @@ export default {
     accent: true,
     background: true
   },
-  filterBehavior: 'dropdown'
+  filterBehavior: 'Filter Change'
 }
