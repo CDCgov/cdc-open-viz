@@ -291,16 +291,18 @@ export default function LinearChart() {
     }
   }
 
+  const shouldAbbreviate = true
+
   const handleLeftTickFormatting = tick => {
     if (config.runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
-    if (config.orientation === 'vertical') return formatNumber(tick, 'left')
+    if (config.orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
   }
 
   const handleBottomTickFormatting = tick => {
     if (config.runtime.xAxis.type === 'date') return formatDate(tick)
-    if (config.orientation === 'horizontal') return formatNumber(tick, 'left')
-    if (config.xAxis.type === 'continuous') return formatNumber(tick, 'bottom')
+    if (config.orientation === 'horizontal') return formatNumber(tick, 'left', shouldAbbreviate)
+    if (config.xAxis.type === 'continuous') return formatNumber(tick, 'bottom', shouldAbbreviate)
     return tick
   }
 
@@ -569,7 +571,7 @@ export default function LinearChart() {
                           {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                           {!config.runtime.yAxis.hideLabel && (
                             <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
-                              {formatNumber(tick.formattedValue)}
+                              {formatNumber(tick.value, 'left')}
                             </Text>
                           )}
                         </Group>
@@ -602,7 +604,7 @@ export default function LinearChart() {
                             {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                             {!config.runtime.yAxis.hideLabel && (
                               <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
-                                {tick.formattedValue}
+                                {formatNumber(tick.value, 'left')}
                               </Text>
                             )}
                           </Group>
