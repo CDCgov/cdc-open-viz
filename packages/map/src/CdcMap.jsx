@@ -1243,8 +1243,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       ...configObj
     }
 
-    // If a dataUrl property exists, always pull from that.
-    if (newState.dataUrl) {
+    const urlFilters = newState.filters ? (newState.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
+  
+    if (newState.dataUrl && !urlFilters) {
       if (newState.dataUrl[0] === '/') {
         newState.dataUrl = 'http://' + hostname + newState.dataUrl
       }
