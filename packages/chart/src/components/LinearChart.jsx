@@ -154,6 +154,7 @@ export default function LinearChart() {
       if (min < 0) {
         // sets with negative data need more padding on the max
         max *= 1.2
+        min *= 1.2
       } else {
         max *= 1.1
       }
