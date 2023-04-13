@@ -34,6 +34,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
+import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
 
 // Child Components
 import ConfigContext from './context'
@@ -42,7 +43,6 @@ import Modal from './components/Modal'
 import Sidebar from './components/Sidebar'
 
 import CountyMap from './components/CountyMap' // Future: Lazy
-import DataTable from './components/DataTable' // Future: Lazy
 import EditorPanel from './components/EditorPanel' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
 import SingleStateMap from './components/SingleStateMap' // Future: Lazy
