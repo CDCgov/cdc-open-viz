@@ -341,11 +341,13 @@ const CountyMap = props => {
 
           if (pixelCoords) {
             const legendValues = data[key] !== undefined ? applyLegendToRow(data[key]) : false
-            context.fillStyle = legendValues ? legendValues[0] : '#EEE'
-            context.beginPath()
-            context.arc(pixelCoords[0], pixelCoords[1], geoRadius, 0, 2 * Math.PI)
-            context.fill()
-            context.stroke()
+            if (legendValues) {
+              context.fillStyle = legendValues[0]
+              context.beginPath()
+              context.arc(pixelCoords[0], pixelCoords[1], geoRadius, 0, 2 * Math.PI)
+              context.fill()
+              context.stroke()
+            }
           }
         })
       }
