@@ -48,6 +48,13 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
     dashboardConfig.sharedFilters.splice(index, 1)
 
+    // Ensures URL filters refresh after filter removal
+    if(dashboardConfig.datasets){
+      Object.keys(dashboardConfig.datasets).forEach(datasetKey => {
+        delete dashboardConfig.datasets[datasetKey].runtimeDataUrl
+      })
+    }
+
     updateConfig({ ...config, dashboard: dashboardConfig })
 
     overlay?.actions.toggleOverlay()

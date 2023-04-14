@@ -1175,7 +1175,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const reloadURLData = async () => {
     if (state.dataUrl) {
-      const dataUrl = new URL(state.dataUrl)
+      const dataUrl = new URL(state.runtimeDataUrl || state.dataUrl)
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
@@ -1229,7 +1229,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         data = transform.developerStandardize(data, state.dataDescription)
       }
 
-      setState({ ...state, dataUrl: dataUrlFinal, data })
+      setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
     }
   }
 
