@@ -142,7 +142,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       for (let i = 0; i < datasetKeys.length; i++) {
         const dataset = config.datasets[datasetKeys[i]]
         if (dataset.dataUrl && config.dashboard.sharedFilters) {
-          const dataUrl = new URL(dataset.dataUrl)
+          const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl)
           let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
           let isUpdateNeeded = false
@@ -176,7 +176,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             }
           }
 
-          newDatasets[datasetKeys[i]].dataUrl = dataUrlFinal
+          newDatasets[datasetKeys[i]].runtimeDataUrl = dataUrlFinal
           newData[datasetKeys[i]] = newDataset
           datasetsNeedsUpdate = true
         }

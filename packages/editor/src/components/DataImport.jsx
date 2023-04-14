@@ -492,7 +492,7 @@ export default function DataImport() {
                   onClick={e => {
                     let newFilters = [...config.filters]
                     newFilters.splice(i, 1)
-                    setConfig({ ...config, filters: newFilters })
+                    setConfig({ ...config, filters: newFilters, runtimeDataUrl: undefined })
                   }}
                 >
                   Remove

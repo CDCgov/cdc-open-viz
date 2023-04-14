@@ -94,7 +94,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const reloadURLData = async () => {
     if (config.dataUrl) {
-      const dataUrl = new URL(config.dataUrl)
+      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl)
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
@@ -150,7 +150,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       Object.assign(data, { urlFiltered: true })
 
-      updateConfig({ ...config, dataUrl: dataUrlFinal, data, formattedData: data })
+      updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
 
       if (data) {
         setStateData(data)
