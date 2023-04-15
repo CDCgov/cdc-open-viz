@@ -127,13 +127,15 @@ const Filters = props => {
   const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : theme]
 
   // Exterior Section Wrapper
-  Filters.Section = props => (
-    <section className={filterSectionClassList.join(' ')}>
-      <p className='filters-section__intro-text'>{filterConstants.introText}</p>
-      {filterBehavior === 'Apply Button' && <p>{filterConstants.applyText}</p>}
-      <div className='filters-section__wrapper'>{props.children}</div>
-    </section>
-  )
+  Filters.Section = props => {
+    return (
+      <section className={filterSectionClassList.join(' ')}>
+        <p className='filters-section__intro-text'>{filterConstants.introText}</p>
+        {filterBehavior === 'Apply Button' && <p>{filterConstants.applyText}</p>}
+        <div className='filters-section__wrapper'>{props.children}</div>
+      </section>
+    )
+  }
 
   // Apply/Reset Buttons
   Filters.ApplyBehavior = props => {
@@ -261,7 +263,7 @@ const Filters = props => {
     }
   }
 
-  // if (config.filters.length === 0 || props.filteredData.length === 0) return
+  if (visualizationConfig?.filters?.length === 0 || props?.filteredData?.length === 0) return
   return (
     <Filters>
       <Filters.Section>

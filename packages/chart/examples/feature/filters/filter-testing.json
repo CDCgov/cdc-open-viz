@@ -174,25 +174,5 @@
       "type": "Bar",
       "axis": "Left"
     }
-  ],
-  "filters": [
-    {
-      "values": [
-        "Earth",
-        "Jupiter",
-        "Mars",
-        "Mercury",
-        "Neptune",
-        "Pluto",
-        "Saturn",
-        "Uranus",
-        "Venus"
-      ],
-      "active": "Earth",
-      "filterStyle": "tab bar",
-      "order": "asc",
-      "columnName": "name",
-      "label": "Pill Label"
-    }
   ]
 }

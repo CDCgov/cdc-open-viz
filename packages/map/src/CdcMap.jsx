@@ -1549,12 +1549,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
-            <Filters
-              config={state}
-              setConfig={setState}
-              filteredData={runtimeFilters}
-              setFilteredData={setRuntimeFilters}
-            />
+            {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} />}
 
             <div
               role='button'
