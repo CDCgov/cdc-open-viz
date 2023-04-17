@@ -25,7 +25,6 @@ export default {
     hideGeoColumnInTooltip: false,
     hidePrimaryColumnInTooltip: false
   },
-  filterBehavior: 'dropdown',
   type: 'map',
   color: 'pinkpurple',
   columns: {
@@ -67,7 +66,8 @@ export default {
     title: 'Data Table'
   },
   table: {
-    showDownloadUrl: false
+    showDownloadUrl: false,
+    showDataTableLink: true
   },
   tooltips: {
     appearanceType: 'hover',
@@ -88,5 +88,6 @@ export default {
   mapPosition: { coordinates: [0, 30], zoom: 1 },
   map: {
     layers: []
-  }
+  },
+  filterBehavior: 'Apply Button'
 }

@@ -71,7 +71,7 @@ const TextField = memo(({ label, tooltip, section = null, subsection = null, fie
 })
 
 const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-  <label className='checkbox'>
+  <label className='checkbox column-heading'>
     <input
       type='checkbox'
       name={fieldName}
@@ -206,11 +206,13 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
+
+  const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar']
 
   const approvedCurveTypes = {
     Linear: 'curveLinear',
@@ -487,6 +489,16 @@ const EditorPanel = () => {
 
       updateConfig(newExclusionsPayload)
     }
+  }
+
+  const getFilters = () => {
+    let columns = {}
+
+    unfilteredData.forEach(row => {
+      Object.keys(row).forEach(columnName => (columns[columnName] = true))
+    })
+
+    return Object.keys(columns)
   }
 
   const getColumns = (filter = true) => {
@@ -768,10 +780,13 @@ const EditorPanel = () => {
       case config.visualizationType === 'Combo' && isAllLine && enteredValue && parseFloat(enteredValue) > minVal:
         message = 'Value must be less than ' + minValue
         break
-      case (config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
+      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
         message = 'Value must be less than or equal to 0'
         break
-      case enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
+      case config.visualizationType === 'Deviation Bar' && parseFloat(enteredValue) >= Math.min(minVal, config.xAxis.target):
+        message = 'Value must be less than ' + Math.min(minVal, config.xAxis.target)
+        break
+      case config.visualizationType !== 'Deviation Bar' && enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
         message = 'Value must be less than ' + minValue
         break
       default:
@@ -799,6 +814,38 @@ const EditorPanel = () => {
     'Scatter Plot',
     'Spark Line'
   ]
+
+  const isLoadedFromUrl = config?.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
+
+  // if isDebug = true, then try to set the category and data col to reduce clicking
+  const setCategoryAxis = () => {
+    // only for debug mode
+    if (undefined !== isDebug && isDebug && !config?.xAxis?.dataKey) {
+      // then try to set the x axis to appropriate value so we dont have to manually do it
+      let datakeys = getColumns(false)
+      if (datakeys.includes('Date')) return 'Date'
+      if (datakeys.includes('Race')) return 'Race'
+      // add other known Category cols here to extend debug
+    }
+    return ''
+  }
+  const setDataColumn = () => {
+    // only for debug mode
+    if (undefined !== isDebug && isDebug && getColumns(false).length > 0) {
+      // then try to set the x axis to appropriate value so we dont have to manually do it
+      let datacols = getColumns(false).filter(x => x !== 'Date' && x !== 'Race')
+      if (datacols.length > 0) {
+        return datacols[0]
+      }
+    }
+    return ''
+  }
+  if (isDebug && !config.xAxis.dataKey) config.xAxis.dataKey = setCategoryAxis()
+  if (isDebug && config?.series?.length === 0) {
+    let setdatacol = setDataColumn()
+    if (setdatacol !== '') addNewSeries(setdatacol)
+    if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
+  }
 
   const chartsWithOptions = ['Area Chart', 'Combo', 'Line']
 
@@ -1570,7 +1617,7 @@ const EditorPanel = () => {
                     <>
                       <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
                       <Select
-                        value={config.xAxis.dataKey || ''}
+                        value={config.xAxis.dataKey || setCategoryAxis() || ''}
                         section='xAxis'
                         fieldName='dataKey'
                         label='Data Key'
@@ -1899,27 +1946,33 @@ const EditorPanel = () => {
                   <AccordionItemButton>Filters</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {/* prettier-ignore */}
-                  <Select
-                    value={config.filterBehavior}
-                    fieldName='filterBehavior'
-                    label='Filter Behavior'
-                    updateField={updateField}
-                    options={['dropdown', 'button']}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>When should the visualization change? Button changes when the user clicks "apply" Dropdown changes immediatly after the dropdown is changed.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                    />
-                  <br />
+                  {config.filters && (
+                    <>
+                      {/* prettier-ignore */}
+                      <Select
+                        value={config.filterBehavior}
+                        fieldName='filterBehavior'
+                        label='Filter Behavior'
+                        updateField={updateField}
+                        options={['Apply Button', 'Filter Change']}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        />
+                      <br />
+                    </>
+                  )}
                   {config.filters && (
                     <ul className='filters-list'>
+                      {/* Whether filters should apply onChange or Apply Button */}
+
                       {config.filters.map((filter, index) => (
                         <fieldset className='edit-block' key={index}>
                           <button
@@ -1940,11 +1993,28 @@ const EditorPanel = () => {
                               }}
                             >
                               <option value=''>- Select Option -</option>
-                              {getColumns().map((dataKey, index) => (
+                              {getFilters(true).map((dataKey, index) => (
                                 <option value={dataKey} key={index}>
                                   {dataKey}
                                 </option>
                               ))}
+                            </select>
+                          </label>
+                          <label>
+                            <span className='edit-label column-heading'>Filter Style</span>
+
+                            {/* prettier-ignore */}
+                            <select
+                              value={filter.filterStyle}
+                              onChange={e => {
+                                updateFilterProp('filterStyle', index, e.target.value)
+                              }}
+                              >
+                              {filterStyleOptions.map( item => {
+
+                              return (<option value={item}>{item}</option>)
+                              })}
+
                             </select>
                           </label>
                           <label>
@@ -2248,12 +2318,13 @@ const EditorPanel = () => {
                     value={config.table.show}
                     section='table'
                     fieldName='show'
-                    label='Show Table'
+                    label='Show Data Table'
                     updateField={updateField}
+                    className='column-heading'
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement.</p>
@@ -2283,8 +2354,9 @@ const EditorPanel = () => {
                   <CheckBox value={config.table.limitHeight} section='table' fieldName='limitHeight' label='Limit Table Height' updateField={updateField} />
                   {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min='0' max='500' placeholder='Height(px)' updateField={updateField} />}
                   <CheckBox value={config.table.expanded} section='table' fieldName='expanded' label='Expanded by Default' updateField={updateField} />
-                  <CheckBox value={config.table.download} section='table' fieldName='download' label='Display Download Button' updateField={updateField} />
-                  <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Display Link to Dataset' updateField={updateField} />
+                  {isDashboard && <CheckBox value={config.table.showDataTableLink} section='table' fieldName='showDataTableLink' label='Show Data Table Name & Link' updateField={updateField} />}
+                  {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' updateField={updateField} />}
+                  <CheckBox value={config.table.download} section='table' fieldName='download' label='Show Download CSV Link' updateField={updateField} />
                   {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
                   {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
                   {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+
+// CDC
 import Button from '@cdc/core/components/elements/Button'
 
 // Third Party
@@ -6,14 +8,11 @@ import PropTypes from 'prop-types'
 
 const useFilters = props => {
   const [showApplyButton, setShowApplyButton] = useState(false)
-  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData } = props
-  const { filterBehavior } = config
 
-  // Editor Panel > Filters > Filter Behavior
-  useEffect(() => {
-    if (filterBehavior === 'dropdown') setShowApplyButton(false)
-    if (filterBehavior === 'button') setShowApplyButton(true)
-  }, [filterBehavior])
+  // Desconstructing: notice, adding more descriptive visualizationConfig name over config
+  // visualizationConfig feels more robust for all vis types so that its not confused with config/state/etc.
+  const { config: visualizationConfig, setConfig, filteredData, setFilteredData, excludedData, filterData } = props
+  const { filters, type, filterBehavior } = visualizationConfig
 
   const sortAsc = (a, b) => {
     return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
@@ -26,42 +25,40 @@ const useFilters = props => {
   const announceChange = text => {}
 
   const changeFilterActive = (index, value) => {
-    let newFilters = config.type === 'map' ? [...filteredData] : [...config.filters]
+    let newFilters = type === 'map' ? [...filteredData] : [...filters]
     newFilters[index].active = value
 
-    // Used for setting active filter
-    if (config.type === 'map') {
-      delete newFilters.fromHash
+    // If this is a button filter type show the button.
+    if (filterBehavior === 'Apply Button') {
+      setShowApplyButton(true)
     }
 
-    if (filterBehavior === 'dropdown') {
-      setConfig({
-        ...config,
-        filters: newFilters
-      })
-    }
+    // If we're not using the apply button we can set the filters right away.
+    // if (config.filterBehavior !== 'Apply Button') {
+    setConfig({
+      ...visualizationConfig,
+      filters: newFilters
+    })
 
-    // Charts dropdown
-    if (config.type === 'map') {
+    // Used for setting active filter, fromHash breaks the filteredData functionality.
+    if (type === 'map' && filterBehavior !== 'Apply Button') {
       setFilteredData(newFilters)
     }
 
-    // Maps dropdown
-    if (config.type !== 'map' && filterBehavior === 'dropdown') {
+    // If we're on a chart and not using the apply button
+    if (type === 'chart' && filterBehavior !== 'Apply Button') {
       setFilteredData(filterData(newFilters, excludedData))
-    }
-
-    if (filterBehavior === 'button') {
-      setShowApplyButton(true)
     }
   }
 
   const handleApplyButton = newFilters => {
-    setConfig({ ...config, filters: newFilters })
+    setConfig({ ...visualizationConfig, filters: newFilters })
 
-    if (config.type === 'map') {
+    if (type === 'map') {
       setFilteredData(newFilters, excludedData)
-    } else {
+    }
+
+    if (type === 'chart') {
       setFilteredData(filterData(newFilters, excludedData))
     }
 
@@ -69,7 +66,7 @@ const useFilters = props => {
   }
 
   const handleReset = e => {
-    let newFilters = config.filters
+    let newFilters = filters
     e.preventDefault()
 
     // reset to first item in values array.
@@ -78,19 +75,20 @@ const useFilters = props => {
       return null
     })
 
-    if (config.type === 'map') {
+    if (type === 'map') {
       setFilteredData(newFilters, excludedData)
     } else {
       setFilteredData(filterData(newFilters, excludedData))
     }
 
-    setConfig({ ...config, filters: newFilters })
+    setConfig({ ...visualizationConfig, filters: newFilters })
   }
 
   const filterConstants = {
     buttonText: 'Apply Filters',
     resetText: 'Reset All',
-    introText: 'Using the drop-down menu below, make a selection to filter the visualization(s)'
+    introText: `Make a selection from the filters to change the visualization information.`,
+    applyText: 'Select the apply button to update the visualization information.'
   }
 
   // prettier-ignore
@@ -102,13 +100,14 @@ const useFilters = props => {
     sortDesc,
     showApplyButton,
     handleReset,
-    filterConstants
+    filterConstants,
   }
 }
 
 const Filters = props => {
-  const { config, filteredData } = props
+  const { config: visualizationConfig, filteredData } = props
 
+  // useFilters hook provides data and logic for handling various filter functions
   // prettier-ignore
   const {
     handleApplyButton,
@@ -118,81 +117,33 @@ const Filters = props => {
     sortDesc,
     showApplyButton,
     handleReset,
-    filterConstants
+    filterConstants,
   } = useFilters(props)
 
-  const { filters } = config
+  const { filters, type, general, theme, filterBehavior } = visualizationConfig
 
   const Filters = props => props.children
 
+  const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : theme]
+
   // Exterior Section Wrapper
-  Filters.Section = props => (
-    <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
-      <p>{filterConstants.introText}</p>
-      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px', marginBottom: '15px' }}>
-        {props.children}
-      </div>
-    </section>
-  )
-
-  // Each Filter Dropdown
-  Filters.Dropdowns = () => {
-    if (config.filters || filteredData) {
-      // Here charts is using config.filters where maps is using a runtime value
-      let filtersToLoop = config.type === 'map' ? filteredData : config.filters
-
-      return filtersToLoop.map((singleFilter, index) => {
-        const values = []
-
-        if (!singleFilter.order || singleFilter.order === '') {
-          singleFilter.order = 'asc'
-        }
-
-        if (singleFilter.order === 'desc') {
-          singleFilter.values = singleFilter.values.sort(sortDesc)
-        }
-
-        if (singleFilter.order === 'asc') {
-          singleFilter.values = singleFilter.values.sort(sortAsc)
-        }
-
-        singleFilter.values.forEach((filterOption, index) => {
-          values.push(
-            <option key={index} value={filterOption}>
-              {filterOption}
-            </option>
-          )
-        })
-
-        return (
-          <div className='single-filter' key={index}>
-            <select
-              id={`filter-${index}`}
-              className='filter-select'
-              data-index='0'
-              value={singleFilter.active}
-              onChange={e => {
-                changeFilterActive(index, e.target.value)
-                announceChange(`Filter ${singleFilter.label} value has been changed to ${e.target.value}, please reference the data table to see updated values.`)
-              }}
-            >
-              {values}
-            </select>
-          </div>
-        )
-      })
-    } else {
-      return null
-    }
+  Filters.Section = props => {
+    return (
+      <section className={filterSectionClassList.join(' ')}>
+        <p className='filters-section__intro-text'>{filterConstants.introText}</p>
+        {filterBehavior === 'Apply Button' && <p>{filterConstants.applyText}</p>}
+        <div className='filters-section__wrapper'>{props.children}</div>
+      </section>
+    )
   }
 
   // Apply/Reset Buttons
-  Filters.Buttons = props => {
-    if (config.filterBehavior === 'dropdown') return
-    if (!config.filters.length) return
+  Filters.ApplyBehavior = props => {
+    if (filterBehavior !== 'Apply Button') return
+    const applyButtonClasses = [general?.headerColor ? general.headerColor : theme, 'apply']
     return (
-      <div className='filter-section__buttons' style={{ width: '100%' }}>
-        <Button onClick={() => handleApplyButton(filters)} disabled={!showApplyButton} style={{ marginRight: '10px' }}>
+      <div className='filters-section__buttons'>
+        <Button onClick={() => handleApplyButton(filters)} disabled={!showApplyButton} className={applyButtonClasses.join(' ')}>
           {filterConstants.buttonText}
         </Button>
         <a href='#!' role='button' onClick={handleReset}>
@@ -202,12 +153,122 @@ const Filters = props => {
     )
   }
 
-  if (config.filters.length === 0 || props.filteredData.length === 0) return
+  Filters.TabBar = props => {
+    const { filter: singleFilter, index: outerIndex } = props
+    return (
+      <section className='single-filters__tab-bar'>
+        {singleFilter.values.map(filter => {
+          const buttonClassList = ['button__tab-bar', singleFilter.active === filter ? 'button__tab-bar--active' : '']
+          return (
+            <button className={buttonClassList.join(' ')} key={filter} onClick={e => changeFilterActive(outerIndex, filter)}>
+              {filter}
+            </button>
+          )
+        })}
+      </section>
+    )
+  }
+
+  Filters.Pills = props => props.pills
+
+  Filters.Tabs = props => props.tabs
+
+  Filters.Dropdown = props => {
+    const { index: outerIndex, label, active, filters } = props
+    return (
+      <select
+        id={`filter-${outerIndex}`}
+        name={label}
+        className='filter-select'
+        data-index='0'
+        value={active}
+        onChange={e => {
+          changeFilterActive(outerIndex, e.target.value)
+          announceChange(`Filter ${label} value has been changed to ${e.target.value}, please reference the data table to see updated values.`)
+        }}
+      >
+        {filters}
+      </select>
+    )
+  }
+
+  // Resolve Filter Styles
+  Filters.Style = () => {
+    if (filters || filteredData) {
+      // Here charts is using config.filters where maps is using a runtime value
+      let filtersToLoop = type === 'map' ? filteredData : filters
+
+      // Remove fromHash if it exists on filters to loop so we can loop nicely
+      delete filtersToLoop.fromHash
+
+      return filtersToLoop.map((singleFilter, outerIndex) => {
+        const values = []
+        const pillValues = []
+        const tabValues = []
+        const tabBarValues = []
+
+        const { order, active, label, filterStyle } = singleFilter
+
+        if (!order || order === '') {
+          singleFilter.order = 'asc'
+        }
+
+        if (order === 'desc') {
+          singleFilter.values = singleFilter.values.sort(sortDesc)
+        }
+
+        if (order === 'asc') {
+          singleFilter.values = singleFilter.values.sort(sortAsc)
+        }
+
+        singleFilter.values.forEach((filterOption, index) => {
+          const pillClassList = ['pill', active === filterOption ? 'pill--active' : null, theme && theme]
+          const tabClassList = ['tab', active === filterOption && 'tab--active', theme && theme]
+
+          pillValues.push(
+            <div className='pill__wrapper'>
+              <button className={pillClassList.join(' ')} onClick={e => changeFilterActive(outerIndex, filterOption)} name={label}>
+                {filterOption}
+              </button>
+            </div>
+          )
+
+          values.push(
+            <option key={index} value={filterOption}>
+              {filterOption}
+            </option>
+          )
+
+          tabValues.push(
+            <button className={tabClassList.join(' ')} onClick={e => changeFilterActive(outerIndex, filterOption)}>
+              {filterOption}
+            </button>
+          )
+
+          tabBarValues.push(filterOption)
+        })
+
+        return (
+          <div className={`single-filters single-filters--${filterStyle}`} key={outerIndex}>
+            <>
+              {label && <label htmlFor={label}>{label}</label>}
+              {filterStyle === 'tab' && <Filters.Tabs tabs={tabValues} />}
+              {filterStyle === 'pill' && <Filters.Pills pills={pillValues} />}
+              {filterStyle === 'tab bar' && <Filters.TabBar filter={singleFilter} index={outerIndex} />}
+              {filterStyle === 'dropdown' && <Filters.Dropdown index={outerIndex} label={label} active={active} filters={values} />}
+            </>
+          </div>
+        )
+      })
+    }
+  }
+
+  if (visualizationConfig?.filters?.length === 0 || props?.filteredData?.length === 0) return
   return (
     <Filters>
       <Filters.Section>
-        <Filters.Dropdowns />
-        <Filters.Buttons />
+        <Filters.Style />
+        <Filters.ApplyBehavior />
       </Filters.Section>
     </Filters>
   )
