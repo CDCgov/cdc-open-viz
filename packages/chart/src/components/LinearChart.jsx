@@ -95,7 +95,7 @@ export default function LinearChart() {
       }
     }
 
-    if ((config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
+    if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
       min = 0
     }
     if (config.visualizationType === 'Combo' && isAllLine) {
@@ -106,6 +106,11 @@ export default function LinearChart() {
         const isMinValid = +enteredMinValue < minValue
         min = +enteredMinValue && isMinValid ? enteredMinValue : minValue
       }
+    }
+
+    if (config.visualizationType === 'Deviation Bar' && min > 0) {
+      const isMinValid = Number(enteredMinValue) < Math.min(minValue, Number(config.xAxis.target))
+      min = enteredMinValue && isMinValid ? enteredMinValue : 0
     }
 
     if (config.visualizationType === 'Line') {
@@ -149,6 +154,7 @@ export default function LinearChart() {
       if (min < 0) {
         // sets with negative data need more padding on the max
         max *= 1.2
+        min *= 1.2
       } else {
         max *= 1.1
       }
@@ -243,7 +249,8 @@ export default function LinearChart() {
       xScale = scaleLinear({
         domain: [min * leftOffset, Math.max(Number(config.xAxis.target), max)],
         range: [0, xMax],
-        round: true
+        round: true,
+        nice: true
       })
     }
     // Handle Box Plots
@@ -284,16 +291,18 @@ export default function LinearChart() {
     }
   }
 
+  const shouldAbbreviate = true
+
   const handleLeftTickFormatting = tick => {
     if (config.runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
-    if (config.orientation === 'vertical') return formatNumber(tick, 'left')
+    if (config.orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
   }
 
   const handleBottomTickFormatting = tick => {
     if (config.runtime.xAxis.type === 'date') return formatDate(tick)
-    if (config.orientation === 'horizontal') return formatNumber(tick, 'left')
-    if (config.xAxis.type === 'continuous') return formatNumber(tick, 'bottom')
+    if (config.orientation === 'horizontal') return formatNumber(tick, 'left', shouldAbbreviate)
+    if (config.xAxis.type === 'continuous') return formatNumber(tick, 'bottom', shouldAbbreviate)
     return tick
   }
 
@@ -562,7 +571,7 @@ export default function LinearChart() {
                           {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                           {!config.runtime.yAxis.hideLabel && (
                             <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
-                              {formatNumber(tick.formattedValue)}
+                              {formatNumber(tick.value, 'left')}
                             </Text>
                           )}
                         </Group>
@@ -595,7 +604,7 @@ export default function LinearChart() {
                             {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                             {!config.runtime.yAxis.hideLabel && (
                               <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
-                                {tick.formattedValue}
+                                {formatNumber(tick.value, 'left')}
                               </Text>
                             )}
                           </Group>

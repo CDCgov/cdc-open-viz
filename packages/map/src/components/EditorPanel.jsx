@@ -66,7 +66,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend, changeFilterActive } = props
+  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend, changeFilterActive, isDebug } = props
 
   const { general, columns, legend, dataTable, tooltips } = state
 
@@ -132,7 +132,7 @@ const EditorPanel = props => {
   }
 
   const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-    <label className='checkbox'>
+    <label className='checkbox column-heading'>
       <input
         type='checkbox'
         name={fieldName}
@@ -214,6 +214,17 @@ const EditorPanel = props => {
           }
         })
         break
+
+      case 'toggleDataTableLink':
+        setState({
+          ...state,
+          table: {
+            ...state.table,
+            showDataTableLink: value
+          }
+        })
+        break
+
       case 'toggleDataUrl':
         setState({
           ...state,
@@ -511,7 +522,7 @@ const EditorPanel = props => {
             })
             break
           default:
-            console.warn('Map type not set')
+            console.warn('COVE: Map type not set') // eslint-disable-line
             break
         }
         break
@@ -753,7 +764,7 @@ const EditorPanel = props => {
         })
         break
       default:
-        console.warn(`Did not recognize editor property.`)
+        console.warn(`COVE: Did not recognize editor property.`) // eslint-disable-line
         break
     }
   }
@@ -876,6 +887,10 @@ const EditorPanel = props => {
           newFilters.splice(idx, 1)
         }
         break
+      case 'filterStyle':
+        newFilters[idx] = { ...newFilters[idx] }
+        newFilters[idx].filterStyle = value
+        break
       case 'columnName':
         newFilters[idx] = { ...newFilters[idx] }
         newFilters[idx].columnName = value
@@ -924,6 +939,33 @@ const EditorPanel = props => {
         }
       }
     })
+  }
+
+  const MapFilters = () => {
+    return (
+      <>
+        <label>
+          Filter Behavior
+          <select
+            value={state.filterBehavior}
+            onChange={e => {
+              setState({
+                ...state,
+                filterBehavior: e.target.value
+              })
+            }}
+          >
+            <option key='Apply Button' value='Apply Button'>
+              Apply Button
+            </option>
+            <option key='Filter Change' value='Filter Change'>
+              Filter Change
+            </option>
+          </select>
+        </label>
+        {filtersJSX}
+      </>
+    )
   }
 
   const removeAdditionalColumn = columnName => {
@@ -1154,6 +1196,8 @@ const EditorPanel = props => {
 
   const usedFilterColumns = {}
 
+  const filterStyles = ['pill', 'tab', 'dropdown', 'tab bar']
+
   const filtersJSX = state.filters.map((filter, index) => {
     if (filter.columnName) {
       usedFilterColumns[filter.columnName] = true
@@ -1176,21 +1220,6 @@ const EditorPanel = props => {
 
     return (
       <>
-        <span className='edit-label column-heading'>Filter Behavior</span>
-        <select
-          value={state.filterBehavior}
-          onChange={event => {
-            handleEditorChanges('filterBehavior', event.target.value)
-          }}
-        >
-          <option key='dropdown' value='dropdown'>
-            Dropdown
-          </option>
-          <option key='button' value='button'>
-            Button
-          </option>
-        </select>
-
         <fieldset className='edit-block' key={`filter-${index}`}>
           <button
             className='remove-column'
@@ -1221,6 +1250,24 @@ const EditorPanel = props => {
               }}
             >
               {columnsOptions.filter(({ key }) => undefined === usedFilterColumns[key] || filter.columnName === key)}
+            </select>
+          </label>
+
+          <label>
+            <span className='edit-filterOrder column-heading'>Filter Style</span>
+            <select
+              value={filter.filterStyle}
+              onChange={e => {
+                changeFilter(index, 'filterStyle', e.target.value)
+              }}
+            >
+              {filterStyles.map((option, index) => {
+                return (
+                  <option value={option} key={`filter-${option}--${index}`}>
+                    {option}
+                  </option>
+                )
+              })}
             </select>
           </label>
 
@@ -1350,6 +1397,24 @@ const EditorPanel = props => {
       </section>
     )
   }
+
+  const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
+
+  // if isDebug = true, then try to set the Geography Col and Data col to reduce clicking
+  const setGeoColumn = () => {
+    // only for debug mode
+    let geoColFound = columnsInData.includes(state.columns.geo.name)
+    if (undefined !== isDebug && isDebug && !geoColFound) {
+      // then try to set the x axis to appropriate value so we dont have to manually do it
+      let mapcols = columnsInData[0]
+      if (mapcols !== '') editColumn('geo', 'name', mapcols)
+
+      if (!state.columns.hasOwnProperty('primary') || undefined === state.columns.primary.name || '' === state.columns.primary.name || !state.columns.primary.name) {
+        editColumn('primary', 'name', columnsInData[1]) // blindly picks first value col
+      }
+    }
+  }
+  if (isDebug) setGeoColumn()
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -2358,7 +2423,7 @@ const EditorPanel = props => {
                     <AccordionItemButton>Filters</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    {filtersJSX.length > 0 ? filtersJSX : <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
+                    {filtersJSX.length > 0 ? <MapFilters /> : <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
                     <button
                       className={'btn full-width'}
                       onClick={event => {
@@ -2406,11 +2471,11 @@ const EditorPanel = props => {
                           handleEditorChanges('showDataTable', event.target.checked)
                         }}
                       />
-                      <span className='edit-label'>
-                        Show Table
+                      <span className='edit-label column-heading'>
+                        Show Data Table
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
@@ -2476,16 +2541,30 @@ const EditorPanel = props => {
                       />
                       <span className='edit-label'>Map loads with data table expanded</span>
                     </label>
-                    <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.table.showDownloadUrl}
-                        onChange={event => {
-                          handleEditorChanges('toggleDataUrl', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>Enable Link to Dataset</span>
-                    </label>
+                    {isDashboard && (
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={state.table.showDataTableLink}
+                          onChange={event => {
+                            handleEditorChanges('toggleDataTableLink', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Show Data Table Name & Link</span>
+                      </label>
+                    )}
+                    {isLoadedFromUrl && (
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={state.table.showDownloadUrl}
+                          onChange={event => {
+                            handleEditorChanges('toggleDataUrl', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Show URL to Automatically Updated Data</span>
+                      </label>
+                    )}
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -2494,7 +2573,7 @@ const EditorPanel = props => {
                           handleEditorChanges('toggleDownloadButton', event.target.checked)
                         }}
                       />
-                      <span className='edit-label'>Enable Download CSV Button</span>
+                      <span className='edit-label'>Show Download CSV Link</span>
                     </label>
                     {/* <label className='checkbox'>
                       <input

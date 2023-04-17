@@ -75,6 +75,7 @@
     "height": "",
     "caption": "",
     "showDownloadUrl": false,
+    "showDataTableLink": true,
     "show": true,
     "indexLabel": "Region"
   },

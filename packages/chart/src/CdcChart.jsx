@@ -43,7 +43,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 
 import './scss/main.scss'
 
-export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
+export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
@@ -83,7 +83,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const handleChartAriaLabels = (state, testing = false) => {
-    if (testing) console.log(`handleChartAriaLabels Testing On:`, state)
+    if (testing) console.log(`handleChartAriaLabels Testing On:`, state) // eslint-disable-line
     try {
       if (!state.visualizationType) throw Error('handleChartAriaLabels: no visualization type found in state')
       let ariaLabel = ''
@@ -143,7 +143,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
         }
       } catch {
-        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`)
+        console.error(`COVE: Cannot parse URL: ${response.dataUrl}`) // eslint-disable-line
         data = []
       }
 
@@ -220,6 +220,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
         newConfig.filters[index].active = filterValues[0]
+        newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
       })
       currentData = filterData(newConfig.filters, newExcludedData)
       setFilteredData(currentData)
@@ -655,8 +656,26 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return Math.ceil(context.measureText(text).width)
   }
 
+  const abbreviateNumber = num => {
+    let unit = ''
+    let absNum = Math.abs(num)
+
+    if (absNum >= 1e9) {
+      unit = 'B'
+      num = num / 1e9
+    } else if (absNum >= 1e6) {
+      unit = 'M'
+      num = num / 1e6
+    } else if (absNum >= 1e3) {
+      unit = 'K'
+      num = num / 1e3
+    }
+
+    return num + unit
+  }
+
   // Format numeric data based on settings in config
-  const formatNumber = (num, axis) => {
+  const formatNumber = (num, axis, shouldAbbreviate = false) => {
     // if num is NaN return num
     if (isNaN(num) || !num) return num
     // Check if the input number is negative
@@ -671,8 +690,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let {
       dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix, bottomPrefix, bottomSuffix, bottomAbbreviated }
     } = config
-
-    let formatSuffix = format('.2s')
 
     // check if value contains comma and remove it. later will add comma below.
     if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
@@ -726,19 +743,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     //
     // Edge case for small numbers with decimals
     // - if roundTo undefined which means it is blank, then do not round
-    if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
+
+    if ((axis === 'left' && commas && abbreviated && shouldAbbreviate) || (axis === 'bottom' && commas && abbreviated && shouldAbbreviate)) {
       num = num // eslint-disable-line
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
     }
     let result = ''
 
-    if (abbreviated && axis === 'left') {
-      num = formatSuffix(parseFloat(num)).replace('G', 'B')
+    if (abbreviated && axis === 'left' && shouldAbbreviate) {
+      num = abbreviateNumber(parseFloat(num))
     }
 
-    if (bottomAbbreviated && axis === 'bottom') {
-      num = formatSuffix(parseFloat(num)).replace('G', 'B')
+    if (bottomAbbreviated && axis === 'bottom' && shouldAbbreviate) {
+      num = abbreviateNumber(parseFloat(num))
     }
 
     if (prefix && axis === 'left') {
@@ -812,6 +830,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let body = <Loading />
 
   if (!loading) {
+    const tableLink = (
+      <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
+        {config.dataKey} (Go to Table)
+      </a>
+    )
     body = (
       <>
         {isEditor && <EditorPanel />}
@@ -829,7 +852,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} />}
+            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} isNumber={isNumber} />}
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
@@ -857,7 +880,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
             </div>
             {/* Link */}
-            {link && link}
+            {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
+
             {/* Description */}
             {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
 
@@ -917,7 +941,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     handleLineType,
     isNumber,
     getTextWidth,
-    twoColorPalette
+    twoColorPalette,
+    isDebug
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
