@@ -127,6 +127,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
+  const [dimensions, setDimensions] = useState()
 
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
@@ -188,9 +189,17 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
+      let { width, height } = entry.contentRect
       let newViewport = getViewport(entry.contentRect.width)
+      let svgMarginWidth = 32
+      let editorWidth = 350
 
       setCurrentViewport(newViewport)
+
+      if (isEditor) {
+        width = width - editorWidth
+      }
+      setDimensions([width, height])
     }
   })
 
@@ -1553,7 +1562,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
-            {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} />}
+            {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
 
             <div
               role='button'
