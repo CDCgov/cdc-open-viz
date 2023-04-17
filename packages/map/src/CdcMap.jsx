@@ -794,7 +794,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       newFilter.columnName = columnName
       newFilter.values = values
       newFilter.active = active || values[0] // Default to first found value
-      console.log('newFilters', newFilter)
       newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
 
       filters.push(newFilter)
@@ -1403,6 +1402,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
       setRuntimeData(newRuntimeData)
+    } else {
+      if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
+        const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
+        setRuntimeLegend(legend)
+      }
     }
   }, [state]) // eslint-disable-line
 
