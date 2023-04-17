@@ -852,7 +852,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} isNumber={isNumber} />}
+            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} isNumber={isNumber} dimensions={dimensions} />}
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div

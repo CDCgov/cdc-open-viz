@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 // CDC
 import Button from '@cdc/core/components/elements/Button'
@@ -105,7 +105,8 @@ const useFilters = props => {
 }
 
 const Filters = props => {
-  const { config: visualizationConfig, filteredData } = props
+  const { config: visualizationConfig, filteredData, dimensions } = props
+  const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
 
   // useFilters hook provides data and logic for handling various filter functions
   // prettier-ignore
@@ -119,6 +120,14 @@ const Filters = props => {
     handleReset,
     filterConstants,
   } = useFilters(props)
+
+  useEffect(() => {
+    if (dimensions[0] < 768 && filters?.length > 0) {
+      setMobileFilterStyle(true)
+    } else {
+      setMobileFilterStyle(false)
+    }
+  }, [dimensions[0]])
 
   const { filters, type, general, theme, filterBehavior } = visualizationConfig
 
@@ -248,14 +257,16 @@ const Filters = props => {
           tabBarValues.push(filterOption)
         })
 
+        const classList = ['single-filters', mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`]
+
         return (
-          <div className={`single-filters single-filters--${filterStyle}`} key={outerIndex}>
+          <div className={classList.join(' ')} key={outerIndex}>
             <>
               {label && <label htmlFor={label}>{label}</label>}
-              {filterStyle === 'tab' && <Filters.Tabs tabs={tabValues} />}
-              {filterStyle === 'pill' && <Filters.Pills pills={pillValues} />}
-              {filterStyle === 'tab bar' && <Filters.TabBar filter={singleFilter} index={outerIndex} />}
-              {filterStyle === 'dropdown' && <Filters.Dropdown index={outerIndex} label={label} active={active} filters={values} />}
+              {filterStyle === 'tab' && !mobileFilterStyle && <Filters.Tabs tabs={tabValues} />}
+              {filterStyle === 'pill' && !mobileFilterStyle && <Filters.Pills pills={pillValues} />}
+              {filterStyle === 'tab bar' && !mobileFilterStyle && <Filters.TabBar filter={singleFilter} index={outerIndex} />}
+              {(filterStyle === 'dropdown' || mobileFilterStyle) && <Filters.Dropdown index={outerIndex} label={label} active={active} filters={values} />}
             </>
           </div>
         )
