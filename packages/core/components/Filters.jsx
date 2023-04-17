@@ -128,7 +128,7 @@ const Filters = props => {
     } else {
       setMobileFilterStyle(false)
     }
-  }, [dimensions[0]])
+  }, [dimensions])
 
   const { filters, type, general, theme, filterBehavior } = visualizationConfig
 
