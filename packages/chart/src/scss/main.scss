@@ -231,6 +231,10 @@
     }
   }
 
+  .visx-tooltip {
+    z-index: 100000;
+  }
+
   .tooltip {
     border: rgba(0, 0, 0, 0.3) 1px solid;
     box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;

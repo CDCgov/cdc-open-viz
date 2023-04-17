@@ -53,6 +53,10 @@
 @import 'variables';
 @import 'mixins';
 
+body.post-type-cdc_visualization .visx-tooltip {
+  z-index: 1000000;
+}
+
 .cdc-open-viz-module {
   position: relative;
   color: $baseColor;
