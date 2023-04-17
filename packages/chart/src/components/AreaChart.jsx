@@ -19,7 +19,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
   const [chartPosition, setChartPosition] = useState(null)
 
   useEffect(() => {
-    setChartPosition(chartRef.current?.getBoundingClientRect())
+    setChartPosition(chartRef.current.getBoundingClientRect())
   }, [chartRef])
 
   // import data from context
