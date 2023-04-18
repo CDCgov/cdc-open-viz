@@ -12,7 +12,7 @@ import Loading from '@cdc/core/components/Loading'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
-  const { state, tableTitle, indexTitle, mapTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
+  const { config, tableTitle, indexTitle, mapTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
 
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
@@ -164,12 +164,12 @@ const DataTable = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded])
 
-  if (!state.data) return <Loading />
+  if (!config.data) return <Loading />
 
   const rows = Object.keys(runtimeData)
     .filter(row => applyLegendToRow(runtimeData[row]))
     .sort((a, b) => {
-      const sortVal = customSort(runtimeData[a][state.columns[sortBy.column].name], runtimeData[b][state.columns[sortBy.column].name])
+      const sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
       if (!sortBy.asc) return sortVal
       if (sortVal === 0) return 0
       if (sortVal < 0) return 1
@@ -179,8 +179,8 @@ const DataTable = props => {
   return (
     <ErrorBoundary component='DataTable'>
       <CoveMediaControls.Section classes={['download-links']}>
-        <CoveMediaControls.Link config={state} />
-        {state.general.showDownloadButton && <DownloadButton />}
+        <CoveMediaControls.Link config={config} />
+        {config.general.showDownloadButton && <DownloadButton />}
       </CoveMediaControls.Section>
       <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
         <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
@@ -201,9 +201,9 @@ const DataTable = props => {
           <Icon display={expanded ? 'minus' : 'plus'} base />
           {tableTitle}
         </div>
-        <div className='table-container' style={{ maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' }}>
-          <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={state?.data.length ? state.data.length : '-1'}>
-            <caption className='cdcdataviz-sr-only'>{state.dataTable.caption ? state.dataTable.caption : `Datatable showing data for the ${mapLookup[state.general.geoType]} figure.`}</caption>
+        <div className='table-container' style={{ maxHeight: config.dataTable.limitHeight && `${config.dataTable.height}px`, overflowY: 'scroll' }}>
+          <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={config?.data.length ? config.data.length : '-1'}>
+            <caption className='cdcdataviz-sr-only'>{config.dataTable.caption ? config.dataTable.caption : `Datatable showing data for the ${mapLookup[config.general.geoType]} figure.`}</caption>
             <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>
               <tr>
                 {Object.keys(columns)
@@ -257,7 +257,7 @@ const DataTable = props => {
                           const legendColor = applyLegendToRow(rowObj)
 
                           var labelValue
-                          if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
+                          if (config.general.geoType !== 'us-county' || config.general.type === 'us-geocode') {
                             labelValue = displayGeoName(row)
                           } else {
                             labelValue = formatLegendLocation(row)
@@ -272,11 +272,11 @@ const DataTable = props => {
                             </>
                           )
                         } else {
-                          cellValue = displayDataAsText(runtimeData[row][state.columns[column].name], column)
+                          cellValue = displayDataAsText(runtimeData[row][config.columns[column].name], column)
                         }
 
                         return (
-                          <td tabIndex='0' role='gridcell' onClick={e => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}>
+                          <td tabIndex='0' role='gridcell' onClick={e => (config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}>
                             {cellValue}
                           </td>
                         )
