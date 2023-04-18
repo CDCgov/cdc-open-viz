@@ -67,7 +67,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend, changeFilterActive, isDebug } = props
+  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend, changeFilterActive, isDebug, setRuntimeFilters } = props
 
   const { general, columns, legend, dataTable, tooltips } = state
 
@@ -150,26 +150,29 @@ const EditorPanel = props => {
     </label>
   ))
 
+  /**
+   * Re-orders a filter based on two indices and updates the runtime filters array.
+   * @param {number} idx1 - The index of the filter item to move.
+   * @param {number} idx2 - The index to move the item to.
+   * @param {number} filterIndex - The index of the filter item to update in the runtimeFilters array.
+   * @param {object} filter - An object representing the filter to be re-ordered.
+   * TODO: move to useFilter hook and make global for maps, charts, etc.
+   */
   const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
-    // debugger
-    let filterOrder = filter.values
+    // Create a shallow copy of the filter values array & update position of the values
+    let filterOrder = [...filter.values]
     let [movedItem] = filterOrder.splice(idx1, 1)
     filterOrder.splice(idx2, 0, movedItem)
-    let filters = [...runtimeFilters]
-    let filterItem = { ...state.filters[filterIndex] }
 
-    console.log('filter here', filter)
-
-    // Rebuild the filter.
-    filterItem.active = filter.values[0]
-    filterItem.values = filterOrder
+    // Create a shallow copy of the runtimeFilters array and the filter index to make updates.
+    let runtimeFiltersCopy = [...runtimeFilters]
+    let filterItem = { ...runtimeFiltersCopy[filterIndex] }
+    filterItem.active = filterOrder[0]
     filterItem.order = 'cust'
-    filters[filterIndex] = filterItem
 
-    setState({
-      ...state,
-      filters
-    })
+    // Update the filters
+    runtimeFiltersCopy[filterIndex] = filterItem
+    setRuntimeFilters(runtimeFiltersCopy)
   }
 
   const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', ...attributes }) => {
@@ -974,14 +977,6 @@ const EditorPanel = props => {
     )
   }
 
-  const updateFilterProp = (name, index, value) => {
-    let filters = [...state.filters]
-
-    filters[index][name] = value
-
-    setState({ ...state, filters })
-  }
-
   const removeAdditionalColumn = columnName => {
     const newColumns = state.columns
 
@@ -1290,11 +1285,11 @@ const EditorPanel = props => {
           </label>
 
           {filter.order === 'cust' && (
-            <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, runtimeFilters[index])}>
+            <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, state.filters[index])}>
               <Droppable droppableId='filter_order'>
                 {provided => (
                   <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-                    {runtimeFilters[index]?.values.map((value, index) => {
+                    {state.filters[index]?.values.map((value, index) => {
                       return (
                         <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
                           {(provided, snapshot) => (
