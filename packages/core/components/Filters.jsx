@@ -6,6 +6,22 @@ import Button from '@cdc/core/components/elements/Button'
 // Third Party
 import PropTypes from 'prop-types'
 
+export const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar']
+export const filterOrderOptions = [
+  {
+    label: 'Ascending Alphanumeric',
+    value: 'asc'
+  },
+  {
+    label: 'Descending Alphanumeric',
+    value: 'desc'
+  },
+  {
+    label: 'Custom',
+    value: 'cust'
+  }
+]
+
 const useFilters = props => {
   const [showApplyButton, setShowApplyButton] = useState(false)
 
@@ -101,6 +117,7 @@ const useFilters = props => {
     showApplyButton,
     handleReset,
     filterConstants,
+    filterStyleOptions
   }
 }
 
