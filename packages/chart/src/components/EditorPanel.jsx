@@ -18,6 +18,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import * as allCurves from '@visx/curve'
+import { filterStyleOptions } from '@cdc/core/components/Filters'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -211,8 +212,6 @@ const EditorPanel = () => {
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
-
-  const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar']
 
   const approvedCurveTypes = {
     Linear: 'curveLinear',
@@ -2000,23 +1999,22 @@ const EditorPanel = () => {
                               ))}
                             </select>
                           </label>
-                          <label>
+
+                          {/*  COMING SOON: 4.23.5 FILTER STYLES  */}
+                          {/* <label>
                             <span className='edit-label column-heading'>Filter Style</span>
 
-                            {/* prettier-ignore */}
                             <select
                               value={filter.filterStyle}
                               onChange={e => {
                                 updateFilterProp('filterStyle', index, e.target.value)
                               }}
-                              >
-                              {filterStyleOptions.map( item => {
-
-                              return (<option value={item}>{item}</option>)
+                            >
+                              {filterStyleOptions.map(item => {
+                                return <option value={item}>{item}</option>
                               })}
-
                             </select>
-                          </label>
+                          </label> */}
                           <label>
                             <span className='edit-label column-heading'>Label</span>
                             <input
