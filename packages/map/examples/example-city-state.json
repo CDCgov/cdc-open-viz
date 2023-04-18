@@ -140,7 +140,6 @@
   "map": {
     "layers": []
   },
-  "filterBehavior": "Apply Button",
   "sharing": {
     "enabled": false,
     "dataHost": "wcms-wp.cdc.gov",

@@ -730,6 +730,7 @@ const EditorPanel = () => {
     return series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar' || series.type === 'Deviation Bar')
   }
 
+  // TODO: move to useFilters hook
   const handleSeriesChange = (idx1, idx2) => {
     let seriesOrder = config.series
     let [movedItem] = seriesOrder.splice(idx1, 1)
