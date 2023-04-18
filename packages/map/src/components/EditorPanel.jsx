@@ -160,19 +160,25 @@ const EditorPanel = props => {
    */
   const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
     // Create a shallow copy of the filter values array & update position of the values
-    let filterOrder = [...filter.values]
+    let filterOrder = filter.values
     let [movedItem] = filterOrder.splice(idx1, 1)
     filterOrder.splice(idx2, 0, movedItem)
+    let updatedOrder = filterOrder
 
     // Create a shallow copy of the runtimeFilters array and the filter index to make updates.
-    let runtimeFiltersCopy = [...runtimeFilters]
-    let filterItem = { ...runtimeFiltersCopy[filterIndex] }
-    filterItem.active = filterOrder[0]
+    let filtersCopy = [...runtimeFilters]
+    let filterItem = { ...runtimeFilters[filterIndex] }
+    filterItem.active = filter.values[0]
+    filterItem.values = updatedOrder
     filterItem.order = 'cust'
 
     // Update the filters
-    runtimeFiltersCopy[filterIndex] = filterItem
-    setRuntimeFilters(runtimeFiltersCopy)
+    filtersCopy[filterIndex] = filterItem
+    setRuntimeFilters(filtersCopy)
+    setState({
+      ...state,
+      filters: filtersCopy
+    })
   }
 
   const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', ...attributes }) => {
