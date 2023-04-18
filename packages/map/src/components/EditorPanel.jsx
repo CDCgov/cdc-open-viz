@@ -10,6 +10,7 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 // Data
 import colorPalettes from '@cdc/core/data/colorPalettes'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
+import { filterStyleOptions, filterOrderOptions } from '@cdc/core/components/Filters'
 
 // Components - Core
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
@@ -150,11 +151,16 @@ const EditorPanel = props => {
   ))
 
   const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
+    // debugger
     let filterOrder = filter.values
     let [movedItem] = filterOrder.splice(idx1, 1)
     filterOrder.splice(idx2, 0, movedItem)
     let filters = [...runtimeFilters]
-    let filterItem = { ...runtimeFilters[filterIndex] }
+    let filterItem = { ...state.filters[filterIndex] }
+
+    console.log('filter here', filter)
+
+    // Rebuild the filter.
     filterItem.active = filter.values[0]
     filterItem.values = filterOrder
     filterItem.order = 'cust'
@@ -968,6 +974,14 @@ const EditorPanel = props => {
     )
   }
 
+  const updateFilterProp = (name, index, value) => {
+    let filters = [...state.filters]
+
+    filters[index][name] = value
+
+    setState({ ...state, filters })
+  }
+
   const removeAdditionalColumn = columnName => {
     const newColumns = state.columns
 
@@ -1196,27 +1210,10 @@ const EditorPanel = props => {
 
   const usedFilterColumns = {}
 
-  const filterStyles = ['pill', 'tab', 'dropdown', 'tab bar']
-
   const filtersJSX = state.filters.map((filter, index) => {
     if (filter.columnName) {
       usedFilterColumns[filter.columnName] = true
     }
-
-    const filterOptions = [
-      {
-        label: 'Ascending Alphanumeric',
-        value: 'asc'
-      },
-      {
-        label: 'Descending Alphanumeric',
-        value: 'desc'
-      },
-      {
-        label: 'Custom',
-        value: 'cust'
-      }
-    ]
 
     return (
       <>
@@ -1253,7 +1250,9 @@ const EditorPanel = props => {
             </select>
           </label>
 
-          <label>
+          {/* COMING SOON: 4.23.5: FILTER STYLES */}
+
+          {/* <label>
             <span className='edit-filterOrder column-heading'>Filter Style</span>
             <select
               value={filter.filterStyle}
@@ -1261,7 +1260,7 @@ const EditorPanel = props => {
                 changeFilter(index, 'filterStyle', e.target.value)
               }}
             >
-              {filterStyles.map((option, index) => {
+              {filterStyleOptions.map((option, index) => {
                 return (
                   <option value={option} key={`filter-${option}--${index}`}>
                     {option}
@@ -1269,7 +1268,7 @@ const EditorPanel = props => {
                 )
               })}
             </select>
-          </label>
+          </label> */}
 
           <label>
             <span className='edit-filterOrder column-heading'>Filter Order</span>
@@ -1280,7 +1279,7 @@ const EditorPanel = props => {
                 changeFilterActive(index, filter.values[0])
               }}
             >
-              {filterOptions.map((option, index) => {
+              {filterOrderOptions.map((option, index) => {
                 return (
                   <option value={option.value} key={`filter-${index}`}>
                     {option.label}
