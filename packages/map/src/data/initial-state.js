@@ -89,5 +89,5 @@ export default {
   map: {
     layers: []
   },
-  filterBehavior: 'Apply Button'
+  filterBehavior: 'Filter Change'
 }
