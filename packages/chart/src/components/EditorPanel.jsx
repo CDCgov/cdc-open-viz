@@ -803,7 +803,7 @@ const EditorPanel = () => {
 
   // prettier-ignore
   const enabledChartTypes = [
-    'Area Chart',
+    // 'Area Chart',
     'Bar',
     'Box Plot',
     'Combo',
