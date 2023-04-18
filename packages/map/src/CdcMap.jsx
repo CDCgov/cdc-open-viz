@@ -1618,7 +1618,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
             {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
               <DataTable
-                state={state}
+                config={state}
                 rawData={state.data}
                 navigationHandler={navigationHandler}
                 expandDataTable={general.expandDataTable}
