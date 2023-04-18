@@ -2297,6 +2297,7 @@ const EditorPanel = () => {
                       </Tooltip>
                     }
                   />
+                  {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
                   <TextField
                     value={config.table.caption}
                     updateField={updateField}
@@ -2324,7 +2325,6 @@ const EditorPanel = () => {
                   <CheckBox value={config.table.download} section='table' fieldName='download' label='Show Download CSV Link' updateField={updateField} />
                   {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
                   {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
-                  {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
