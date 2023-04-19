@@ -18,7 +18,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import * as allCurves from '@visx/curve'
-import { filterStyleOptions } from '@cdc/core/components/Filters'
+import { useFilters } from '@cdc/core/components/Filters'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -207,11 +207,14 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
+
+  // argument acts as props
+  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config, setConfig: updateConfig, filteredData: data, setFilteredData })
 
   const approvedCurveTypes = {
     Linear: 'curveLinear',
@@ -257,21 +260,6 @@ const EditorPanel = () => {
   }, [])
 
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
-
-  const filterOptions = [
-    {
-      label: 'Ascending Alphanumeric',
-      value: 'asc'
-    },
-    {
-      label: 'Descending Alphanumeric',
-      value: 'desc'
-    },
-    {
-      label: 'Custom',
-      value: 'cust'
-    }
-  ]
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
@@ -656,19 +644,6 @@ const EditorPanel = () => {
     )
   }, [config]) // eslint-disable-line
 
-  const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
-    let filterOrder = filter.values
-    let [movedItem] = filterOrder.splice(idx1, 1)
-    filterOrder.splice(idx2, 0, movedItem)
-    let filters = [...config.filters]
-    let filterItem = { ...config.filters[filterIndex] }
-    filterItem.active = filter.values[0]
-    filterItem.orderedValues = filterOrder
-    filterItem.order = 'cust'
-    filters[filterIndex] = filterItem
-    updateConfig({ ...config, filters })
-  }
-
   const visHasLegend = () => {
     const { visualizationType } = config
 
@@ -730,7 +705,6 @@ const EditorPanel = () => {
     return series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar' || series.type === 'Deviation Bar')
   }
 
-  // TODO: move to useFilters hook
   const handleSeriesChange = (idx1, idx2) => {
     let seriesOrder = config.series
     let [movedItem] = seriesOrder.splice(idx1, 1)
@@ -2030,7 +2004,7 @@ const EditorPanel = () => {
                           <label>
                             <span className='edit-filterOrder column-heading'>Filter Order</span>
                             <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
-                              {filterOptions.map((option, index) => {
+                              {filterOrderOptions.map((option, index) => {
                                 return (
                                   <option value={option.value} key={`filter-${index}`}>
                                     {option.label}
@@ -2040,7 +2014,7 @@ const EditorPanel = () => {
                             </select>
 
                             {filter.order === 'cust' && (
-                              <DragDropContext onDragEnd={({ source, destination }) => handleFilterChange(source.index, destination.index, index, config.filters[index])}>
+                              <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, config.filters[index])}>
                                 <Droppable droppableId='filter_order'>
                                   {provided => (
                                     <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
