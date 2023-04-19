@@ -277,7 +277,7 @@ export default function DataTable() {
               })}
             </tbody>
           </table>
-          {config.regions && config.regions.length > 0 && !config.visualizationType === 'Box Plot' ? (
+          {config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' ? (
             <table className='region-table data-table'>
               <caption className='visually-hidden'>Table of the highlighted regions in the visualization</caption>
               <thead>
