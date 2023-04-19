@@ -18,6 +18,8 @@ import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Icon from '@cdc/core/components/ui/Icon'
 
 import '../scss/data-import.scss'
 
@@ -497,7 +499,17 @@ export default function DataImport() {
                 >
                   Remove
                 </button>
-                <span class='edit-label column-heading'>Label</span>{' '}
+                <span class='edit-label column-heading'>
+                  Label
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ margin: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p style={{ padding: '0.5rem' }}>The label that will appear above the dropdown filter.</p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </span>{' '}
                 <input
                   type='text'
                   defaultValue={filter.label}
@@ -507,7 +519,17 @@ export default function DataImport() {
                     setConfig({ ...config, filters: newFilters })
                   }}
                 />
-                <span class='edit-label column-heading'>Query string parameter</span>{' '}
+                <span class='edit-label column-heading'>
+                  Query string parameter
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ margin: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p style={{ padding: '0.5rem' }}>Name of the query string parameter that will be appended to the URL above with the values provided below.</p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </span>{' '}
                 <input
                   type='text'
                   defaultValue={filter.queryParameter}
@@ -526,6 +548,7 @@ export default function DataImport() {
                       {value}
                       <input
                         type='text'
+                        placeholder='Enter value display name here'
                         value={filter.labels ? filter.labels[value] : undefined}
                         onChange={e => {
                           let newFilters = [...config.filters]
