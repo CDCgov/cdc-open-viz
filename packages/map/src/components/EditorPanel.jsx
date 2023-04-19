@@ -2809,7 +2809,8 @@ const EditorPanel = props => {
                     ))}
                 </AccordionItemPanel>
               </AccordionItem>
-              <AccordionItem>
+              {/* HIDING FOR 4.23.4 */}
+              {/* <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Custom Map Layers</AccordionItemButton>
                 </AccordionItemHeading>
@@ -2846,7 +2847,7 @@ const EditorPanel = props => {
                     Add Map Layer
                   </button>
                 </AccordionItemPanel>
-              </AccordionItem>
+              </AccordionItem> */}
             </Accordion>
           </form>
           <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
