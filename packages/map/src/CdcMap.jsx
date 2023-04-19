@@ -8,6 +8,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 // Third party
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import chroma from 'chroma-js'
+import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
@@ -706,7 +707,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (hash) filters.fromHash = hash
 
     obj?.filters.forEach(({ columnName, label, labels, active, values, type }, idx) => {
-
       let newFilter = runtimeFilters[idx]
 
       const sortAsc = (a, b) => {
@@ -717,7 +717,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
       }
 
-      if(type !== 'url'){
+      if (type !== 'url') {
         values = getUniqueValues(state.data, columnName)
 
         if (obj.filters[idx].order === 'asc') {
@@ -746,7 +746,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       newFilter.columnName = columnName
       newFilter.values = values
       newFilter.active = active || values[0] // Default to first found value
-      if(type === 'url' && labels){
+      if (type === 'url' && labels) {
         newFilter.labels = labels
       }
 
@@ -1219,8 +1219,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         } else {
           data = []
         }
-      } catch {
+      } catch (e) {
         console.error(`Cannot parse URL: ${dataUrlFinal}`)
+        console.log(e)
         data = []
       }
 
@@ -1244,7 +1245,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
 
     const urlFilters = newState.filters ? (newState.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
-  
+
     if (newState.dataUrl && !urlFilters) {
       if (newState.dataUrl[0] === '/') {
         newState.dataUrl = 'http://' + hostname + newState.dataUrl
@@ -1530,9 +1531,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType &&
-              <ReactTooltip id="tooltip" variant="light" float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />
-            }
+            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
@@ -1542,9 +1541,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 </div>
               </header>
             )}
-            {general.introText &&
-              <section className='introText'>{parse(general.introText)}</section>
-            }
+            {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             <Filters />
 
