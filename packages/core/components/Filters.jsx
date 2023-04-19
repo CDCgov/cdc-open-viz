@@ -6,29 +6,67 @@ import Button from '@cdc/core/components/elements/Button'
 // Third Party
 import PropTypes from 'prop-types'
 
-export const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar']
-export const filterOrderOptions = [
-  {
-    label: 'Ascending Alphanumeric',
-    value: 'asc'
-  },
-  {
-    label: 'Descending Alphanumeric',
-    value: 'desc'
-  },
-  {
-    label: 'Custom',
-    value: 'cust'
-  }
-]
-
-const useFilters = props => {
+export const useFilters = props => {
   const [showApplyButton, setShowApplyButton] = useState(false)
 
   // Desconstructing: notice, adding more descriptive visualizationConfig name over config
   // visualizationConfig feels more robust for all vis types so that its not confused with config/state/etc.
   const { config: visualizationConfig, setConfig, filteredData, setFilteredData, excludedData, filterData } = props
-  const { filters, type, filterBehavior } = visualizationConfig
+  const { type, filterBehavior, filters } = visualizationConfig
+
+  const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar']
+
+  const filterOrderOptions = [
+    {
+      label: 'Ascending Alphanumeric',
+      value: 'asc'
+    },
+    {
+      label: 'Descending Alphanumeric',
+      value: 'desc'
+    },
+    {
+      label: 'Custom',
+      value: 'cust'
+    }
+  ]
+
+  /**
+   * Re-orders a filter based on two indices and updates the runtime filters array and filters state
+   * @param {number} idx1 - The index of the original position of the filter value.
+   * @param {number} idx2 - The index of the new position for the filter value.
+   * @param {number} filterIndex - The index of the filter item within the array of filter items.
+   * @param {object} filter - The filter item itself, which contains an array of filter values.
+   * @return {void} None. This function only updates the state of the component.
+   *
+   * @modifies {object} - The filter object passed in as a parameter
+   * @modifies {array} - The filteredData state if visualizationConfig.type equals 'map'
+   * @modifies {object} - The visualizationConfig state
+   */
+  const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
+    // Create a shallow copy of the filter values array & update position of the values
+    const updatedValues = [...filter.values]
+    const [movedItem] = updatedValues.splice(idx1, 1)
+    updatedValues.splice(idx2, 0, movedItem)
+
+    const filtersCopy = visualizationConfig.type === 'chart' ? [...visualizationConfig.filters] : [...filteredData]
+    const filterItem = { ...filtersCopy[filterIndex] }
+
+    // Overwrite filterItem.values since thats what we map through in the editor panel
+    filterItem.values = updatedValues
+    filterItem.orderedValues = updatedValues
+    filterItem.active = updatedValues[0]
+    filterItem.order = 'cust'
+
+    // Update the filters
+    filtersCopy[filterIndex] = filterItem
+
+    if (visualizationConfig.type === 'map') {
+      setFilteredData(filtersCopy)
+    }
+
+    setConfig({ ...visualizationConfig, filters: filtersCopy })
+  }
 
   const sortAsc = (a, b) => {
     return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
@@ -41,11 +79,11 @@ const useFilters = props => {
   const announceChange = text => {}
 
   const changeFilterActive = (index, value) => {
-    let newFilters = type === 'map' ? [...filteredData] : [...filters]
+    let newFilters = type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
     newFilters[index].active = value
 
     // If this is a button filter type show the button.
-    if (filterBehavior === 'Apply Button') {
+    if (visualizationConfig.filterBehavior === 'Apply Button') {
       setShowApplyButton(true)
     }
 
@@ -57,12 +95,12 @@ const useFilters = props => {
     })
 
     // Used for setting active filter, fromHash breaks the filteredData functionality.
-    if (type === 'map' && filterBehavior !== 'Apply Button') {
+    if (visualizationConfig.type === 'map' && visualizationConfig.filterBehavior !== 'Apply Button') {
       setFilteredData(newFilters)
     }
 
     // If we're on a chart and not using the apply button
-    if (type === 'chart' && filterBehavior !== 'Apply Button') {
+    if (visualizationConfig.type === 'chart' && visualizationConfig.filterBehavior !== 'Apply Button') {
       setFilteredData(filterData(newFilters, excludedData))
     }
   }
@@ -117,12 +155,15 @@ const useFilters = props => {
     showApplyButton,
     handleReset,
     filterConstants,
-    filterStyleOptions
+    filterStyleOptions,
+    filterOrderOptions,
+    handleFilterOrder
   }
 }
 
 const Filters = props => {
   const { config: visualizationConfig, filteredData, dimensions } = props
+  const { filters, type, general, theme, filterBehavior } = visualizationConfig
   const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
 
   // useFilters hook provides data and logic for handling various filter functions
@@ -146,8 +187,6 @@ const Filters = props => {
       setMobileFilterStyle(false)
     }
   }, [dimensions])
-
-  const { filters, type, general, theme, filterBehavior } = visualizationConfig
 
   const Filters = props => props.children
 
