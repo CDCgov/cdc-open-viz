@@ -10,7 +10,6 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 // Data
 import colorPalettes from '@cdc/core/data/colorPalettes'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
-import { filterStyleOptions, filterOrderOptions } from '@cdc/core/components/Filters'
 
 // Components - Core
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
@@ -29,6 +28,8 @@ import worldDefaultConfig from '../../examples/default-world.json'
 import usaDefaultConfig from '../../examples/default-usa.json'
 import countyDefaultConfig from '../../examples/default-county.json'
 import useMapLayers from '../hooks/useMapLayers'
+
+import { useFilters } from '@cdc/core/components/Filters'
 
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -80,6 +81,8 @@ const EditorPanel = props => {
   const [displayPanel, setDisplayPanel] = useState(true)
 
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
+
+  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config: state, setConfig: setState, filteredData: runtimeFilters, setFilteredData: setRuntimeFilters })
 
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
@@ -149,37 +152,6 @@ const EditorPanel = props => {
       </span>
     </label>
   ))
-
-  /**
-   * Re-orders a filter based on two indices and updates the runtime filters array.
-   * @param {number} idx1 - The index of the filter item to move.
-   * @param {number} idx2 - The index to move the item to.
-   * @param {number} filterIndex - The index of the filter item to update in the runtimeFilters array.
-   * @param {object} filter - An object representing the filter to be re-ordered.
-   * TODO: move to useFilter hook and make global for maps, charts, etc.
-   */
-  const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
-    // Create a shallow copy of the filter values array & update position of the values
-    let filterOrder = filter.values
-    let [movedItem] = filterOrder.splice(idx1, 1)
-    filterOrder.splice(idx2, 0, movedItem)
-    let updatedOrder = filterOrder
-
-    // Create a shallow copy of the runtimeFilters array and the filter index to make updates.
-    let filtersCopy = [...runtimeFilters]
-    let filterItem = { ...runtimeFilters[filterIndex] }
-    filterItem.active = filter.values[0]
-    filterItem.values = updatedOrder
-    filterItem.order = 'cust'
-
-    // Update the filters
-    filtersCopy[filterIndex] = filterItem
-    setRuntimeFilters(filtersCopy)
-    setState({
-      ...state,
-      filters: filtersCopy
-    })
-  }
 
   const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', ...attributes }) => {
     const [value, setValue] = useState(stateValue)
