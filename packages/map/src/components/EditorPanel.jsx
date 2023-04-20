@@ -886,12 +886,12 @@ const EditorPanel = props => {
       case 'filterOrder':
         if (value === 'desc') {
           newFilters[idx] = { ...runtimeFilters[idx] }
-          delete newFilters[idx].active
+          newFilters[idx].active = newFilters[idx][0]
           newFilters[idx].order = 'desc'
         }
         if (value === 'asc') {
           newFilters[idx] = { ...runtimeFilters[idx] }
-          delete newFilters[idx].active
+          newFilters[idx].active = newFilters[idx][0]
           newFilters[idx].order = 'asc'
         }
         if (value === 'cust') {

@@ -68,18 +68,10 @@ export const useFilters = props => {
     setConfig({ ...visualizationConfig, filters: filtersCopy })
   }
 
-  const sortAsc = (a, b) => {
-    return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
-  }
-
-  const sortDesc = (a, b) => {
-    return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
-  }
-
   const announceChange = text => {}
 
   const changeFilterActive = (index, value) => {
-    let newFilters = type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
+    let newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
     newFilters[index].active = value
 
     // If this is a button filter type show the button.
@@ -88,19 +80,20 @@ export const useFilters = props => {
     }
 
     // If we're not using the apply button we can set the filters right away.
-    // if (config.filterBehavior !== 'Apply Button') {
-    setConfig({
-      ...visualizationConfig,
-      filters: newFilters
-    })
+    if (visualizationConfig.filterBehavior !== 'Apply Button') {
+      setConfig({
+        ...visualizationConfig,
+        filters: newFilters
+      })
+    }
 
     // Used for setting active filter, fromHash breaks the filteredData functionality.
-    if (visualizationConfig.type === 'map' && visualizationConfig.filterBehavior !== 'Apply Button') {
+    if (visualizationConfig.type === 'map' && visualizationConfig.filterBehavior === 'Filter Change') {
       setFilteredData(newFilters)
     }
 
     // If we're on a chart and not using the apply button
-    if (visualizationConfig.type === 'chart' && visualizationConfig.filterBehavior !== 'Apply Button') {
+    if (visualizationConfig.type === 'chart' && visualizationConfig.filterBehavior === 'Filter Change') {
       setFilteredData(filterData(newFilters, excludedData))
     }
   }
@@ -120,13 +113,14 @@ export const useFilters = props => {
   }
 
   const handleReset = e => {
-    let newFilters = filters
+    let newFilters = [...visualizationConfig.filters]
     e.preventDefault()
 
     // reset to first item in values array.
     newFilters.map(filter => {
+      filter = handleSorting(filter)
       filter.active = filter.values[0]
-      return null
+      return filter
     })
 
     if (type === 'map') {
@@ -145,19 +139,43 @@ export const useFilters = props => {
     applyText: 'Select the apply button to update the visualization information.'
   }
 
+  const handleSorting = singleFilter => {
+    const { order } = singleFilter
+
+    const sortAsc = (a, b) => {
+      return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
+    }
+
+    const sortDesc = (a, b) => {
+      return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+    }
+
+    if (!order || order === '') {
+      singleFilter.order = 'asc'
+    }
+
+    if (order === 'desc') {
+      singleFilter.values = singleFilter.values.sort(sortDesc)
+    }
+
+    if (order === 'asc') {
+      singleFilter.values = singleFilter.values.sort(sortAsc)
+    }
+    return singleFilter
+  }
+
   // prettier-ignore
   return {
     handleApplyButton,
     changeFilterActive,
     announceChange,
-    sortAsc,
-    sortDesc,
     showApplyButton,
     handleReset,
     filterConstants,
     filterStyleOptions,
     filterOrderOptions,
-    handleFilterOrder
+    handleFilterOrder,
+    handleSorting
   }
 }
 
@@ -172,11 +190,10 @@ const Filters = props => {
     handleApplyButton,
     changeFilterActive,
     announceChange,
-    sortAsc,
-    sortDesc,
     showApplyButton,
     handleReset,
     filterConstants,
+    handleSorting
   } = useFilters(props)
 
   useEffect(() => {
@@ -196,8 +213,9 @@ const Filters = props => {
   Filters.Section = props => {
     return (
       <section className={filterSectionClassList.join(' ')}>
-        <p className='filters-section__intro-text'>{filterConstants.introText}</p>
-        {filterBehavior === 'Apply Button' && <p>{filterConstants.applyText}</p>}
+        <p className='filters-section__intro-text'>
+          {filterConstants.introText} {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
+        </p>
         <div className='filters-section__wrapper'>{props.children}</div>
       </section>
     )
@@ -273,19 +291,9 @@ const Filters = props => {
         const tabValues = []
         const tabBarValues = []
 
-        const { order, active, label, filterStyle } = singleFilter
+        const { active, label, filterStyle } = singleFilter
 
-        if (!order || order === '') {
-          singleFilter.order = 'asc'
-        }
-
-        if (order === 'desc') {
-          singleFilter.values = singleFilter.values.sort(sortDesc)
-        }
-
-        if (order === 'asc') {
-          singleFilter.values = singleFilter.values.sort(sortAsc)
-        }
+        handleSorting(singleFilter)
 
         singleFilter.values.forEach((filterOption, index) => {
           const pillClassList = ['pill', active === filterOption ? 'pill--active' : null, theme && theme]
