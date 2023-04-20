@@ -129,7 +129,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   const [dimensions, setDimensions] = useState()
 
-  const { changeFilterActive } = useFilters({ config: state, setConfig: setState })
+  const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
@@ -807,6 +807,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       newFilter.label = label ?? ''
       newFilter.columnName = columnName
       newFilter.values = values
+      handleSorting(newFilter)
       newFilter.active = active ?? values[0] // Default to first found value
       newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
 
