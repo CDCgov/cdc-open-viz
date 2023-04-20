@@ -19,6 +19,7 @@ import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import * as allCurves from '@visx/curve'
 import { useFilters } from '@cdc/core/components/Filters'
+import Series from './Series'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -215,14 +216,6 @@ const EditorPanel = () => {
 
   // argument acts as props
   const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config, setConfig: updateConfig, filteredData: data, setFilteredData })
-
-  const approvedCurveTypes = {
-    Linear: 'curveLinear',
-    Cardinal: 'curveCardinal',
-    Natural: 'curveNatural',
-    'Monotone X': 'curveMonotoneX',
-    Step: 'curveStep'
-  }
 
   // when the visualization type changes we
   // have to update the individual series type & axis details
@@ -782,6 +775,7 @@ const EditorPanel = () => {
     'Box Plot',
     'Combo',
     'Deviation Bar',
+    'Forecasting',
     'Line',
     'Paired Bar',
     'Pie',
@@ -821,7 +815,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line']
+  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Forecasting']
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -1005,99 +999,12 @@ const EditorPanel = () => {
                                       updateConfig({ ...config, series })
                                     }
 
-                                    let changeLineType = (i, value) => {
-                                      let series = [...config.series]
-                                      series[i].lineType = value
-                                      updateConfig({ ...config, series })
-                                    }
-
-                                    let typeDropdown = (
-                                      <>
-                                        <label htmlFor='type-dropdown'>Series Type</label>
-                                        <select
-                                          name='type-dropdown'
-                                          value={series.type}
-                                          onChange={event => {
-                                            changeType(i, event.target.value)
-                                          }}
-                                        >
-                                          <option value='' default key='default'>
-                                            Select
-                                          </option>
-                                          {config.visualizationType === 'Combo' && <option value='Bar'>Bar</option>}
-                                          <option value='Line' key='Line'>
-                                            Solid Line
-                                          </option>
-                                          <option value='dashed-sm' key='dashed-sm'>
-                                            Small Dashed
-                                          </option>
-                                          <option value='dashed-md' key='dashed-md'>
-                                            Medium Dashed
-                                          </option>
-                                          <option value='dashed-lg' key='dashed-lg'>
-                                            Large Dashed
-                                          </option>
-                                          <option value='Area Chart' key='Area Chart'>
-                                            Area
-                                          </option>
-                                        </select>
-                                      </>
-                                    )
-
                                     // used for assigning axis
-                                    let changeAxis = (i, value) => {
+                                    const changeAxis = (i, value) => {
                                       let series = [...config.series]
                                       series[i].axis = value
                                       updateConfig({ ...config, series })
                                     }
-
-                                    // assign an axis dropdown
-                                    let axisDropdown = (
-                                      <>
-                                        <label htmlFor='assign-axis'>Assign an axis</label>
-                                        <select
-                                          name='assign-axis'
-                                          value={series.axis}
-                                          onChange={event => {
-                                            changeAxis(i, event.target.value)
-                                          }}
-                                        >
-                                          <option value='Left' default key='left'>
-                                            left
-                                          </option>
-                                          <option value='Right' key='right'>
-                                            right
-                                          </option>
-                                        </select>
-                                      </>
-                                    )
-
-                                    // line type dropdown
-                                    const lineType = (
-                                      <>
-                                        <label htmlFor='line-type'>Line Type</label>
-                                        <select
-                                          name='line-type'
-                                          value={series.lineStyle}
-                                          onChange={event => {
-                                            changeLineType(i, event.target.value)
-                                          }}
-                                          key='lineTypeSelection'
-                                        >
-                                          <option value='' default>
-                                            Select
-                                          </option>
-
-                                          {Object.keys(approvedCurveTypes).map(curveName => {
-                                            return (
-                                              <option key={`curve-option-${approvedCurveTypes[curveName]}`} value={approvedCurveTypes[curveName]}>
-                                                {curveName}
-                                              </option>
-                                            )
-                                          })}
-                                        </select>
-                                      </>
-                                    )
 
                                     return (
                                       <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
@@ -1120,15 +1027,17 @@ const EditorPanel = () => {
                                                   </AccordionItemHeading>
                                                   {chartsWithOptions.includes(config.visualizationType) && (
                                                     <AccordionItemPanel>
-                                                      <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                        {config.visualizationType === 'Combo' && (
-                                                          <>
-                                                            <span className='series-list__dropdown series-item__dropdown'>{typeDropdown}</span>
-                                                            {hasRightAxis && config.series && (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') && <span className='series-item__dropdown series-list__dropdown'>{axisDropdown}</span>}
-                                                          </>
-                                                        )}
-                                                        {['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type)) && <span className='series-item__dropdown series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
-                                                      </div>
+                                                      <Series provided={provided} snapshot={snapshot} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles}>
+                                                        <Series.Settings>
+                                                          <Series.SeriesTypeDropdown changeType={changeType} series={series} config={config} index={i} />
+                                                          {config.visualizationType === 'Combo' && (
+                                                            <>
+                                                              {hasRightAxis && config.series && (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') && <Series.AxisPositionDropdown changeAxis={changeAxis} index={i} series={series} />}
+                                                            </>
+                                                          )}
+                                                          {['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type)) && <Series.LineTypeDropdown config={config} updateConfig={updateConfig} series={series} index={i} />}
+                                                        </Series.Settings>
+                                                      </Series>
                                                     </AccordionItemPanel>
                                                   )}
                                                 </AccordionItem>

@@ -794,6 +794,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Select appropriate chart type
   const chartComponents = {
     'Paired Bar': <LinearChart />,
+    Forecasting: <LinearChart />,
     Bar: <LinearChart />,
     Line: <LinearChart />,
     Combo: <LinearChart />,
