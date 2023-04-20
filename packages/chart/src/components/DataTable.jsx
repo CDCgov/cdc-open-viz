@@ -291,7 +291,6 @@ export default function DataTable() {
                 {config.regions.map((region, index) => {
                   if (config.visualizationType === 'Box Plot') return false
                   if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
-
                   return (
                     <tr key={`row-${region.label}--${index}`}>
                       <td>{region.label}</td>

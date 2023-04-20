@@ -2195,7 +2195,9 @@ const EditorPanel = props => {
                         <span className='edit-label'>Single Row Legend</span>
                       </label>
                     )}
+
                     {/* always show */}
+                    {/*
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -2206,6 +2208,7 @@ const EditorPanel = props => {
                       />
                       <span className='edit-label'>Show Special Classes Last</span>
                     </label>
+                      */}
                     {'category' !== legend.type && (
                       <label className='checkbox'>
                         <input type='checkbox' checked={legend.separateZero || false} onChange={event => handleEditorChanges('separateZero', event.target.checked)} />

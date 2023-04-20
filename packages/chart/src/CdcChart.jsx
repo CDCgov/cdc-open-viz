@@ -28,6 +28,7 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import SparkLine from './components/SparkLine'
 import Legend from './components/Legend'
 import DataTable from './components/DataTable'
+//import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
