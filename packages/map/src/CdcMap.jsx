@@ -37,7 +37,7 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 
 // Child Components
 import ConfigContext from './context'
-import Filters from '@cdc/core/components/Filters'
+import Filters, { useFilters } from '@cdc/core/components/Filters'
 import Modal from './components/Modal'
 import Sidebar from './components/Sidebar'
 
@@ -129,6 +129,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   const [dimensions, setDimensions] = useState()
 
+  const { changeFilterActive } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
@@ -183,7 +184,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       specialClasses: state.legend.specialClasses,
       geoType: state.general.geoType,
       data: state.data,
-      ...runtimeFilters
+      ...runtimeFilters,
+      filters: {
+        ...state.filters
+      }
     })
   }
 
@@ -799,10 +803,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         newFilter = {}
       }
 
+      newFilter.order = obj.filters[idx].order ? obj.filters[idx].order : 'asc'
       newFilter.label = label ?? ''
       newFilter.columnName = columnName
       newFilter.values = values
-      newFilter.active = active || values[0] // Default to first found value
+      newFilter.active = active ?? values[0] // Default to first found value
       newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
 
       filters.push(newFilter)
@@ -885,33 +890,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const closeModal = ({ target }) => {
     if ('string' === typeof target.className && (target.className.includes('modal-close') || target.className.includes('modal-background')) && null !== modal) {
       setModal(null)
-    }
-  }
-
-  const changeFilterActive = async (idx, activeValue) => {
-    // Reset active legend toggles
-    resetLegendToggles()
-
-    try {
-      const isEmpty = obj => {
-        return Object.keys(obj).length === 0
-      }
-
-      let filters = [...runtimeFilters]
-
-      filters[idx] = { ...filters[idx] }
-      filters[idx].active = activeValue
-
-      const newData = generateRuntimeData(state, filters)
-
-      // throw an error if newData is empty
-      if (isEmpty(newData)) throw new Error('Cove Filter Error: No runtime data to set for this filter')
-
-      // set the runtime filters and data
-      setRuntimeData(newData)
-      setRuntimeFilters(filters)
-    } catch (e) {
-      console.error('COVE: ', e.message) // eslint-disable-line
     }
   }
 
