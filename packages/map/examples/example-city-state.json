@@ -99,13 +99,6 @@
     "singleRow": false,
     "showSpecialClassesLast": false
   },
-  "filters": [
-    {
-      "label": "state",
-      "values": [],
-      "columnName": "STATE"
-    }
-  ],
   "dataTable": {
     "title": "Data Table",
     "forceDisplay": true
