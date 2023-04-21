@@ -971,7 +971,7 @@ const EditorPanel = () => {
                       options={getColumns()}
                     />
                     {config.series && config.series.length !== 0 && (
-                      <>
+                      <Series.Wrapper>
                         <fieldset>
                           <legend className='edit-label float-left'>Displaying</legend>
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -983,60 +983,21 @@ const EditorPanel = () => {
                             </Tooltip.Content>
                           </Tooltip>
                         </fieldset>
-
                         {/* TODO: working on combining logic and layout here */}
                         <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
                           <Droppable droppableId='filter_order'>
-                            {provided => (
-                              <Series.List provided={provided}>
-                                {config.series.map((series, i) => {
-                                  if (config.visualizationType === 'Combo' || 'Area Chart') {
-                                    return (
-                                      // prettier-ignore
-                                      <Series.Item
-                                        config={config}
-                                        updateConfig={updateConfig}
-                                        getItemStyle={getItemStyle}
-                                        sortableItemStyles={sortableItemStyles}
-                                        chartsWithOptions={chartsWithOptions}
-                                        series={series}
-                                        index={i}
-                                    />
-                                    )
-                                  }
-
-                                  return (
-                                    <Draggable key={`series.dataKey--${i}`} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
-                                      {(provided, snapshot) => (
-                                        <li
-                                          key={series.dataKey}
-                                          className={snapshot.isDragging ? 'currently-dragging' : ''}
-                                          style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
-                                          ref={provided.innerRef}
-                                          {...provided.draggableProps}
-                                          {...provided.dragHandleProps}
-                                        >
-                                          {/*<div  className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>*/}
-                                          <div className='series-list__name' data-title={series.dataKey}>
-                                            <div className='series-list__name--text'>{series.dataKey}</div>
-                                          </div>
-                                          {config.series && config.series.length > 1 && (
-                                            <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                              &#215;
-                                            </button>
-                                          )}
-                                          {/*</div>*/}
-                                        </li>
-                                      )}
-                                    </Draggable>
-                                  )
-                                })}
-                                {provided.placeholder}
-                              </Series.List>
-                            )}
+                            {/* prettier-ignore */}
+                            {provided => {
+                              return (
+                                <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
+                                  <Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
+                                  {provided.placeholder}
+                                </ul>
+                              )
+                            }}
                           </Droppable>
                         </DragDropContext>
-                      </>
+                      </Series.Wrapper>
                     )}
 
                     {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
