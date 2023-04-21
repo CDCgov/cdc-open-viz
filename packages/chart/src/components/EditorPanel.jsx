@@ -984,68 +984,24 @@ const EditorPanel = () => {
                           </Tooltip>
                         </fieldset>
 
+                        {/* TODO: working on combining logic and layout here */}
                         <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
                           <Droppable droppableId='filter_order'>
                             {provided => (
-                              <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
+                              <Series.List provided={provided}>
                                 {config.series.map((series, i) => {
                                   if (config.visualizationType === 'Combo' || 'Area Chart') {
-                                    let changeType = (i, value) => {
-                                      let series = [...config.series]
-                                      series[i].type = value
-
-                                      series[i].axis = 'Left'
-
-                                      updateConfig({ ...config, series })
-                                    }
-
-                                    // used for assigning axis
-                                    const changeAxis = (i, value) => {
-                                      let series = [...config.series]
-                                      series[i].axis = value
-                                      updateConfig({ ...config, series })
-                                    }
-
                                     return (
-                                      <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
-                                        {(provided, snapshot) => (
-                                          <>
-                                            <div key={i} className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <div className={`series-list__name ${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}></div>
-                                              <Accordion allowZeroExpanded>
-                                                <AccordionItem className='series-item series-item--chart'>
-                                                  <AccordionItemHeading className='series-item__title'>
-                                                    <AccordionItemButton className={chartsWithOptions.includes(config.visualizationType) ? 'accordion__button' : 'accordion__button hide-arrow'}>
-                                                      <Icon display='move' size={15} style={{ cursor: 'default' }} />
-                                                      {series.dataKey}
-                                                      {config.series && config.series.length > 1 && (
-                                                        <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                                          Remove
-                                                        </button>
-                                                      )}
-                                                    </AccordionItemButton>
-                                                  </AccordionItemHeading>
-                                                  {chartsWithOptions.includes(config.visualizationType) && (
-                                                    <AccordionItemPanel>
-                                                      <Series provided={provided} snapshot={snapshot} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles}>
-                                                        <Series.Settings>
-                                                          <Series.SeriesTypeDropdown changeType={changeType} series={series} config={config} index={i} />
-                                                          {config.visualizationType === 'Combo' && (
-                                                            <>
-                                                              {hasRightAxis && config.series && (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') && <Series.AxisPositionDropdown changeAxis={changeAxis} index={i} series={series} />}
-                                                            </>
-                                                          )}
-                                                          {['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type)) && <Series.LineTypeDropdown config={config} updateConfig={updateConfig} series={series} index={i} />}
-                                                        </Series.Settings>
-                                                      </Series>
-                                                    </AccordionItemPanel>
-                                                  )}
-                                                </AccordionItem>
-                                              </Accordion>
-                                            </div>
-                                          </>
-                                        )}
-                                      </Draggable>
+                                      // prettier-ignore
+                                      <Series.Item
+                                        config={config}
+                                        updateConfig={updateConfig}
+                                        getItemStyle={getItemStyle}
+                                        sortableItemStyles={sortableItemStyles}
+                                        chartsWithOptions={chartsWithOptions}
+                                        series={series}
+                                        index={i}
+                                    />
                                     )
                                   }
 
@@ -1076,7 +1032,7 @@ const EditorPanel = () => {
                                   )
                                 })}
                                 {provided.placeholder}
-                              </ul>
+                              </Series.List>
                             )}
                           </Droppable>
                         </DragDropContext>
