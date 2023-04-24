@@ -182,6 +182,28 @@ const Legend = () => {
                   </LegendItem>
                 )
               })}
+              {config.highlightedBarValues.map((bar, i) => {
+                return (
+                  <LegendItem
+                    className={'test'}
+                    tabIndex={0}
+                    key={`legend-quantile-${i}`}
+                    // onKeyPress={e => {
+                    //   if (e.key === 'Enter') {
+                    //     highlight(label)
+                    //   }
+                    // }}
+                    // onClick={() => {
+                    //   highlight(label)
+                    // }}
+                  >
+                    <LegendCircle fill='transparent' borderColor={bar.color} />
+                    <LegendLabel align='left' margin='0 0 0 4px'>
+                      {bar.value}
+                    </LegendLabel>
+                  </LegendItem>
+                )
+              })}
               {seriesHighlight.length > 0 && (
                 <button className={`legend-reset ${config.theme}`} onClick={labels => highlightReset(labels)} tabIndex={0}>
                   Reset
