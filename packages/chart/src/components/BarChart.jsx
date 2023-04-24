@@ -313,6 +313,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     left={config.runtime.horizontal ? 0 : (xMax / barGroups.length) * barGroup.index}
                   >
                     {barGroup.bars.map((bar, index) => {
+                      const getHighlightedBarColorByValue = value => {
+                        const match = config.highlightedBarValues.filter(item => item.value === value)[0]
+                        if (!match.color) return null
+                        console.log('match.color', match.color)
+                        return match.color
+                      }
+                      const highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                       let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                       let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                       let barHeight = orientation === 'horizontal' ? config.barHeight : isNumber(Math.abs(yScale(bar.value) - yScale(0))) ? Math.abs(yScale(bar.value) - yScale(0)) : 0
@@ -417,6 +424,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               style={{
                                 background: config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : barColor,
                                 border: `${config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`,
+                                borderColor: highlightedBarValues.includes(xAxisValue) ? getHighlightedBarColorByValue(xAxisValue) : 'transparent',
+                                borderWidth: highlightedBarValues.includes(xAxisValue) ? '5px' : '0px',
                                 ...style
                               }}
                               opacity={transparentBar ? 0.5 : 1}
