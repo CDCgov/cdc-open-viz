@@ -1822,6 +1822,10 @@ const EditorPanel = () => {
                                     <span className='edit-label column-heading'>Color</span>
                                     <input type='text' value={config.highlightedBarValues[i].color ? config.highlightedBarValues[i].color : ''} onChange={e => handleUpdateHighlightedBarColor(e, i)} />
                                   </label>
+                                  <label>
+                                    <span className='edit-label column-heading'>Legend Label</span>
+                                    <input type='text' value={config.highlightedBarValues[i].legendLabel ? config.highlightedBarValues[i].legendLabel : config.highlightedBarValues[i].value} onChange={e => handleUpdateHighlightedBarColor(e, i)} />
+                                  </label>
                                 </div>
                               </fieldset>
                             ))}
