@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 
 import ConfigContext from '../ConfigContext'
 
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
 
