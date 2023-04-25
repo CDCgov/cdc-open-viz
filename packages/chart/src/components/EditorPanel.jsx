@@ -950,7 +950,7 @@ const EditorPanel = () => {
                 </AccordionItemPanel>
               </AccordionItem>
 
-              {config.visualizationType !== 'Pie' && (
+              {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forecasting' && (
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
@@ -958,47 +958,49 @@ const EditorPanel = () => {
                   <AccordionItemPanel>
                     {(!config.series || config.series.length === 0) && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
                     {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
-                    <Select
-                      fieldName='visualizationType'
-                      label='Add Data Series'
-                      initial='Select'
-                      onChange={e => {
-                        if (e.target.value !== '' && e.target.value !== 'Select') {
-                          addNewSeries(e.target.value)
-                        }
-                        e.target.value = ''
-                      }}
-                      options={getColumns()}
-                    />
-                    {config.series && config.series.length !== 0 && (
-                      <Series.Wrapper>
-                        <fieldset>
-                          <legend className='edit-label float-left'>Displaying</legend>
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </fieldset>
-                        {/* TODO: working on combining logic and layout here */}
-                        <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
-                          <Droppable droppableId='filter_order'>
-                            {/* prettier-ignore */}
-                            {provided => {
-                              return (
-                                <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
-                                  <Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
-                                  {provided.placeholder}
-                                </ul>
-                              )
-                            }}
-                          </Droppable>
-                        </DragDropContext>
-                      </Series.Wrapper>
-                    )}
+                    <>
+                      <Select
+                        fieldName='visualizationType'
+                        label='Add Data Series'
+                        initial='Select'
+                        onChange={e => {
+                          if (e.target.value !== '' && e.target.value !== 'Select') {
+                            addNewSeries(e.target.value)
+                          }
+                          e.target.value = ''
+                        }}
+                        options={getColumns()}
+                      />
+                      {config.series && config.series.length !== 0 && (
+                        <Series.Wrapper>
+                          <fieldset>
+                            <legend className='edit-label float-left'>Displaying</legend>
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </fieldset>
+
+                          <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
+                            <Droppable droppableId='filter_order'>
+                              {/* prettier-ignore */}
+                              {provided => {
+                                return (
+                                  <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
+                                    <Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
+                                    {provided.placeholder}
+                                  </ul>
+                                )
+                              }}
+                            </Droppable>
+                          </DragDropContext>
+                        </Series.Wrapper>
+                      )}
+                    </>
 
                     {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
                       <>
@@ -1012,6 +1014,127 @@ const EditorPanel = () => {
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
+
+              {/* Forecasting Settings */}
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Forecasting Settings</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  {/* bar column */}
+                  <Select
+                    fieldName='forecastingBarColumn'
+                    label='Add Forecasting Bar Column'
+                    required={true}
+                    value={config.forecastingChart.barColumn || ''}
+                    initial={'Select'}
+                    onChange={e => {
+                      if (e.target.value !== '' && e.target.value !== 'Select') {
+                        updateConfig({
+                          ...config,
+                          forecastingChart: {
+                            ...config.forecastingChart,
+                            barColumn: e.target.value,
+                            showBarColumn: true
+                          }
+                        })
+                      }
+                      e.target.value = ''
+                    }}
+                    options={getColumns()}
+                  />
+
+                  <label>
+                    <span class='edit-label'>Forecasting Bar Color</span>
+                    <input
+                      type='text'
+                      value={config.forecastingChart.barColor ?? '#918e90'}
+                      onChange={e => {
+                        e.preventDefault()
+                        updateConfig({
+                          ...config,
+                          forecastingChart: {
+                            ...config.forecastingChart,
+                            barColor: e.target.value
+                          }
+                        })
+                      }}
+                    />
+                  </label>
+
+                  {/* Group Stages, ie. estimate, partial, future */}
+                  <Select
+                    fieldName='forecastingStages'
+                    label='Add Forecasting Stages'
+                    required={true}
+                    value={config.forecastingChart.stages || ''}
+                    initial={'Select'}
+                    onChange={e => {
+                      if (e.target.value !== '' && e.target.value !== 'Select') {
+                        updateConfig({
+                          ...config,
+                          forecastingChart: {
+                            ...config.forecastingChart,
+                            stages: e.target.value
+                          }
+                        })
+                      }
+                      e.target.value = ''
+                    }}
+                    options={getColumns()}
+                  />
+                  <fieldset>
+                    <Accordion allowZeroExpanded>
+                      {config.forecastingChart.confidenceIntervals.map((ciGroup, index) => {
+                        return (
+                          <AccordionItem className='series-item series-item--chart'>
+                            <AccordionItemHeading className='series-item__title'>
+                              <>
+                                <AccordionItemButton className={'accordion__button accordion__button'}>
+                                  Group {index + 1}
+                                  <button
+                                    className='series-list__remove'
+                                    onClick={e => {
+                                      e.preventDefault()
+                                      const copiedCIGroups = [...config.forecastingChart.confidenceIntervals]
+                                      copiedCIGroups.splice(index, 1)
+                                      updateConfig({
+                                        ...config,
+                                        forecastingChart: {
+                                          ...config.forecastingChart,
+                                          confidenceIntervals: copiedCIGroups
+                                        }
+                                      })
+                                    }}
+                                  >
+                                    Remove
+                                  </button>
+                                </AccordionItemButton>
+                              </>
+                            </AccordionItemHeading>
+                            {chartsWithOptions.includes(config.visualizationType) && <AccordionItemPanel></AccordionItemPanel>}
+                          </AccordionItem>
+                        )
+                      })}
+                    </Accordion>
+                    <button
+                      className='btn full-width'
+                      onClick={e => {
+                        e.preventDefault()
+                        updateConfig({
+                          ...config,
+                          forecastingChart: {
+                            ...config.forecastingChart,
+                            confidenceIntervals: [...config.forecastingChart.confidenceIntervals, {}]
+                          }
+                        })
+                      }}
+                    >
+                      Add Confidence Interval Group
+                    </button>
+                  </fieldset>
+                </AccordionItemPanel>
+              </AccordionItem>
 
               {config.visualizationType === 'Box Plot' && (
                 <AccordionItem>

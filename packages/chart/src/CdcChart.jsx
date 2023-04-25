@@ -806,6 +806,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const missingRequiredSections = () => {
+    if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
     if (config.visualizationType === 'Pie') {
       if (undefined === config?.yAxis.dataKey) {
         return true
@@ -893,7 +894,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             </CoveMediaControls.Section>
 
             {/* Data Table */}
-            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}
+            {/* {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />} */}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
             {/* show pdf or image button */}
           </div>

@@ -70,6 +70,7 @@ export default function LinearChart() {
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
+  let xScaleNoPadding
   let xScale
   let yScale
   let seriesScale
@@ -288,6 +289,34 @@ export default function LinearChart() {
         round: true,
         domain: config.boxplot.categories,
         padding: 0.4
+      })
+    }
+
+    if (config.visualizationType === 'Forecasting') {
+      const barDataMapped = data.map(d => d[config.forecastingChart.barColumn])
+      const xColumnName = config.xAxis.dataKey
+
+      yScale = scaleLinear({
+        domain: [Math.min.apply(null, barDataMapped), Math.max.apply(null, barDataMapped)],
+        range: [yMax, 0]
+      })
+
+      const dates = data.map(i => Date.parse(i[xColumnName]))
+
+      const sortedDates = dates.sort(function (a, b) {
+        return a > b
+      })
+
+      xScale = scaleBand({
+        domain: sortedDates,
+        range: [0, xMax],
+        padding: 0.4
+      })
+
+      xScaleNoPadding = scaleBand({
+        domain: sortedDates,
+        range: [0, xMax],
+        padding: 0
       })
     }
   }
@@ -624,7 +653,7 @@ export default function LinearChart() {
             </AxisBottom>
           </>
         )}
-        {config.visualizationType === 'Forecasting' && <Forecasting xScale={xScale} yScale={yScale} width={xMax} height={yMax} chartRef={svgRef} />}
+        {config.visualizationType === 'Forecasting' && <Forecasting xScale={xScale} yScale={yScale} height={height} width={xMax} height={yMax} xScaleNoPadding={xScaleNoPadding} chartRef={svgRef} />}
         {config.visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
         {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
         {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}

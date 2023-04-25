@@ -137,8 +137,11 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
             let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
             let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1
 
-            data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
-
+            if (config.xAxis.type === 'date') {
+              data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
+            } else {
+              data.map(d => xScale(d[config.xAxis.dataKey]))
+            }
             return (
               <React.Fragment key={index}>
                 {/* prettier-ignore */}
