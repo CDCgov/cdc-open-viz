@@ -183,23 +183,28 @@ const Legend = () => {
                 )
               })}
               {config.highlightedBarValues.map((bar, i) => {
+                let className = 'legend-item'
+                let itemName = bar.legendLabel
+                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
+                  className += ' inactive'
+                }
                 return (
                   <LegendItem
-                    className={'test'}
+                    className={className}
                     tabIndex={0}
                     key={`legend-quantile-${i}`}
-                    // onKeyPress={e => {
-                    //   if (e.key === 'Enter') {
-                    //     highlight(label)
-                    //   }
-                    // }}
-                    // onClick={() => {
-                    //   highlight(label)
-                    // }}
+                    onKeyPress={e => {
+                      if (e.key === 'Enter') {
+                        highlight(bar.legendLabel)
+                      }
+                    }}
+                    onClick={() => {
+                      highlight(bar.legendLabel)
+                    }}
                   >
-                    <LegendCircle fill='transparent' borderColor={bar.color} />
+                    <LegendCircle fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />
                     <LegendLabel align='left' margin='0 0 0 4px'>
-                      {bar.legendLabel}
+                      {bar.legendLabel ? bar.legendLabel : bar.value}
                     </LegendLabel>
                   </LegendItem>
                 )
