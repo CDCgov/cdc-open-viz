@@ -1,6 +1,7 @@
 {
   "type": "chart",
-  "title": "Planet Radius (Combo Example)",
+  "title": "Forecasting Chart Example",
+  "showTitle": true,
   "theme": "theme-blue",
   "animate": true,
   "fontSize": "medium",
@@ -22,8 +23,9 @@
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": 50,
+    "size": "100",
     "gridLines": false,
+    "enablePadding": false,
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -39,7 +41,7 @@
     "numTicks": "",
     "axisPadding": 0,
     "tickRotation": 0,
-    "label": "Measurement (1000km)"
+    "label": "Cases by Date of Report"
   },
   "boxplot": {
     "plots": [],
@@ -81,7 +83,9 @@
     "horizontal": 750
   },
   "xAxis": {
-    "type": "categorical",
+    "type": "date",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
@@ -95,8 +99,11 @@
     "numTicks": "",
     "labelOffset": 65,
     "axisPadding": 0,
-    "label": "Planet",
-    "dataKey": "name"
+    "target": 0,
+    "label": "",
+    "dataKey": "date",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y"
   },
   "table": {
     "label": "Data Table",
@@ -105,12 +112,12 @@
     "height": "",
     "caption": "",
     "showDownloadUrl": false,
+    "showDataTableLink": true,
     "show": true
   },
   "orientation": "vertical",
   "legend": {
     "behavior": "isolate",
-    "position": "right",
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
@@ -120,21 +127,29 @@
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
+    "position": "right",
     "hide": false
   },
   "exclusions": {
     "active": false,
     "keys": []
   },
-  "palette": "qualitative-bold",
+  "palette": "sequential-green",
   "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
   "labels": false,
   "dataFormat": {
     "commas": false,
     "prefix": "",
-    "suffix": "km",
+    "suffix": "",
     "abbreviated": false,
-    "roundTo": 1
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false,
+    "roundTo": "0"
   },
   "confidenceKeys": {},
   "visual": {
@@ -142,17 +157,14 @@
     "accent": true,
     "background": true
   },
-  "dataUrl": "/examples/feature/__data__/planet-example-data.json",
+  "filterBehavior": "Filter Change",
+  "dataUrl": "./examples/feature/forecasting/data.csv",
   "animateReplay": true,
   "visualizationType": "Forecasting",
-  "series": [
-    {
-      "dataKey": "Radius",
-      "type": "Area Chart"
-    },
-    {
-      "dataKey": "Diameter",
-      "type": "Area Chart"
-    }
-  ]
+  "forecastingChart": {
+    "showBars": false,
+    "barColumn": "confirm",
+    "confidenceIntervals": [],
+    "stages": "type"
+  }
 }

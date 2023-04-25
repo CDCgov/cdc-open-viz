@@ -150,5 +150,12 @@ export default {
     accent: true,
     background: true
   },
-  filterBehavior: 'Filter Change'
+  filterBehavior: 'Filter Change',
+  forecastingChart: {
+    showBars: false,
+    barColumn: '',
+    barColor: '#918e90',
+    confidenceIntervals: [],
+    stages: ''
+  }
 }
