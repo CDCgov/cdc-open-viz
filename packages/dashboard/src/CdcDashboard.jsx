@@ -119,7 +119,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     let dataset = config.formattedData || config.data
 
     if (config.dataUrl) {
-      dataset = fetchRemoteData(`${config.dataUrl}?v=${cacheBustingString()}`)
+      dataset = await fetchRemoteData(`${config.dataUrl}?v=${cacheBustingString()}`)
 
       if (dataset && config.dataDescription) {
         try {
@@ -145,6 +145,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           datasets[key] = await processData(response.datasets[key])
         })
       )
+
+      Object.keys(newConfig.visualizations).forEach(vizKey => {
+        newConfig.visualizations[vizKey].formattedData = datasets[newConfig.visualizations[vizKey].dataKey]
+      })
+
+      Object.keys(datasets).forEach(key => {
+        newConfig.datasets[key].data = datasets[key]
+      })
     } else {
       let dataKey = newConfig.dataFileName || 'backwards-compatibility'
       datasets[dataKey] = await processData(response)
