@@ -6,10 +6,11 @@ import chroma from 'chroma-js'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
+import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, getTextWidth, parseDate } = useContext(ConfigContext)
-
+  const { HighLightedBarUtils } = useHighlightedBars(config)
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
@@ -324,10 +325,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
                       let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
 
-                      highlightedBarValues = highlightedBarValues.map(dateItem => {
-                        if (!dateItem) return
-                        return formatDate(parseDate(dateItem))
-                      })
+                      highlightedBarValues = HighLightedBarUtils.formatDates(highlightedBarValues)
 
                       let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                       let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
@@ -374,13 +372,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                       // Set label color
                       if (chroma.contrast(labelColor, barColor) < 4.9) {
-                        textFits ? (labelColor = '#FFFFFF') : '#000000'
+                        textFits ? (labelColor = '#FFFFFF') : (labelColor = '#000000')
                       }
 
                       // Set if background is transparent'
-                      if (highlightedBarValues.includes(yAxisValue)) {
-                        labelColor = '#000'
-                      }
+                      labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor)
 
                       // control text position
                       let textAnchor = textFits ? 'end' : 'start'
@@ -460,7 +456,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 {xAxisValue}
                               </Text>
                             )}
-                            ;
                             {orientation === 'horizontal' && config.isLollipopChart && displayNumbersOnBar && (
                               <Text
                                 display={displayBar ? 'block' : 'none'}
@@ -484,13 +479,12 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
                               </Text>
                             )}
-                            ;
+
                             {orientation === 'vertical' && (
                               <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
                                 {yAxisValue}
                               </Text>
                             )}
-                            ;
                             {config.isLollipopChart && config.lollipopShape === 'circle' && (
                               <circle
                                 cx={orientation === 'horizontal' ? bar.y : barWidth * (barGroup.bars.length - bar.index - 1) + (isLabelBelowBar && orientation === 'horizontal' ? 0 : offset) + lollipopShapeSize / 3.5}
