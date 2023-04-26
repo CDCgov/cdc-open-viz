@@ -837,6 +837,44 @@ const EditorPanel = () => {
 
   const chartsWithOptions = ['Area Chart', 'Combo', 'Line']
 
+  const additionalColumns = Object.keys(config.columns).filter(value => {
+    const defaultCols = ['geo', 'navigate', 'primary', 'latitude', 'longitude']
+
+    if (true === defaultCols.includes(value)) {
+      return false
+    }
+    return true
+  })
+
+  const addAdditionalColumn = number => {
+    const columnKey = `additionalColumn${number}`
+
+    updateConfig({
+      ...config,
+      columns: {
+        ...config.columns,
+        [columnKey]: {
+          label: 'New Column',
+          dataTable: false,
+          tooltips: false,
+          prefix: '',
+          suffix: ''
+        }
+      }
+    })
+  }
+
+  const removeAdditionalColumn = columnName => {
+    const newColumns = config.columns
+
+    delete newColumns[columnName]
+
+    updateConfig({
+      ...config,
+      columns: newColumns
+    })
+  }
+
   return (
     <ErrorBoundary component='EditorPanel'>
       {config.newViz && <Confirm />}
@@ -969,7 +1007,6 @@ const EditorPanel = () => {
                   {config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
                 </AccordionItemPanel>
               </AccordionItem>
-
               {config.visualizationType !== 'Pie' && (
                 <AccordionItem>
                   <AccordionItemHeading>
@@ -1200,7 +1237,6 @@ const EditorPanel = () => {
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
-
               {config.visualizationType === 'Box Plot' && (
                 <AccordionItem>
                   <AccordionItemHeading>
@@ -1377,7 +1413,6 @@ const EditorPanel = () => {
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
-
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -1531,7 +1566,6 @@ const EditorPanel = () => {
                   )}
                 </AccordionItemPanel>
               </AccordionItem>
-
               {/* Right Value Axis Settings */}
               {hasRightAxis && (
                 <AccordionItem>
@@ -1592,7 +1626,6 @@ const EditorPanel = () => {
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
-
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -1860,7 +1893,6 @@ const EditorPanel = () => {
                   )}
                 </AccordionItemPanel>
               </AccordionItem>
-
               {config.visualizationType !== 'Pie' && config.visualizationType !== 'Paired Bar' && (
                 <AccordionItem>
                   <AccordionItemHeading>
@@ -1870,8 +1902,168 @@ const EditorPanel = () => {
                     <Regions config={config} updateConfig={updateConfig} />
                   </AccordionItemPanel>
                 </AccordionItem>
-              )}
-
+              )}{' '}
+              {/* Columns */}
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Columns</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  {'navigation' !== config.type && (
+                    <fieldset className='primary-fieldset edit-block'>
+                      <label>
+                        <span className='edit-label'>
+                          Additional Columns
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>You can specify additional columns to display in tooltips and / or the supporting data table.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                      </label>
+                      {additionalColumns.map(val => (
+                        <fieldset className='edit-block' key={val}>
+                          <button
+                            className='remove-column'
+                            onClick={event => {
+                              event.preventDefault()
+                              removeAdditionalColumn(val)
+                            }}
+                          >
+                            Remove
+                          </button>
+                          <label>
+                            <span className='edit-label column-heading'>Column</span>
+                            <select
+                              value={config.columns[val] ? config.columns[val].name : columnsOptions[0]}
+                              onChange={event => {
+                                editColumn(val, 'name', event.target.value)
+                              }}
+                            >
+                              {columnsOptions}
+                            </select>
+                          </label>
+                          <TextField value={columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' updateField={updateField} />
+                          <ul className='column-edit'>
+                            <li className='three-col'>
+                              <TextField value={columns[val].prefix} section='columns' subsection={val} fieldName='prefix' label='Prefix' updateField={updateField} />
+                              <TextField value={columns[val].suffix} section='columns' subsection={val} fieldName='suffix' label='Suffix' updateField={updateField} />
+                              <TextField type='number' value={columns[val].roundToPlace} section='columns' subsection={val} fieldName='roundToPlace' label='Round' updateField={updateField} />
+                            </li>
+                            <li>
+                              <label className='checkbox'>
+                                <input
+                                  type='checkbox'
+                                  checked={config.columns[val].useCommas}
+                                  onChange={event => {
+                                    editColumn(val, 'useCommas', event.target.checked)
+                                  }}
+                                />
+                                <span className='edit-label'>Add Commas to Numbers</span>
+                              </label>
+                            </li>
+                            <li>
+                              <label className='checkbox'>
+                                <input
+                                  type='checkbox'
+                                  checked={config.columns[val].dataTable}
+                                  onChange={event => {
+                                    editColumn(val, 'dataTable', event.target.checked)
+                                  }}
+                                />
+                                <span className='edit-label'>Display in Data Table</span>
+                              </label>
+                            </li>
+                            <li>
+                              <label className='checkbox'>
+                                <input
+                                  type='checkbox'
+                                  checked={config.columns[val].tooltip}
+                                  onChange={event => {
+                                    editColumn(val, 'tooltip', event.target.checked)
+                                  }}
+                                />
+                                <span className='edit-label'>Display in Tooltips</span>
+                              </label>
+                            </li>
+                          </ul>
+                        </fieldset>
+                      ))}
+                      <button
+                        className={'btn full-width'}
+                        onClick={event => {
+                          event.preventDefault()
+                          addAdditionalColumn(additionalColumns.length + 1)
+                        }}
+                      >
+                        Add Column
+                      </button>
+                    </fieldset>
+                  )}
+                  {'category' === config.legend.type && (
+                    <fieldset className='primary-fieldset edit-block'>
+                      <label>
+                        <span className='edit-label'>
+                          Additional Category
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>You can provide additional categories to ensure they appear in the legend</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                      </label>
+                      {config.legend.additionalCategories &&
+                        config.legend.additionalCategories.map((val, i) => (
+                          <fieldset className='edit-block' key={val}>
+                            <button
+                              className='remove-column'
+                              onClick={event => {
+                                event.preventDefault()
+                                const updatedAdditionaCategories = [...config.legend.additionalCategories]
+                                updatedAdditionaCategories.splice(i, 1)
+                                updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+                              }}
+                            >
+                              Remove
+                            </button>
+                            <label>
+                              <span className='edit-label column-heading'>Category</span>
+                              <TextField
+                                value={val}
+                                section='legend'
+                                subsection={null}
+                                fieldName='additionalCategories'
+                                updateField={(section, subsection, fieldName, value) => {
+                                  const updatedAdditionaCategories = [...config.legend.additionalCategories]
+                                  updatedAdditionaCategories[i] = value
+                                  updateField(section, subsection, fieldName, updatedAdditionaCategories)
+                                }}
+                              />
+                            </label>
+                          </fieldset>
+                        ))}
+                      <button
+                        className={'btn full-width'}
+                        onClick={event => {
+                          event.preventDefault()
+                          const updatedAdditionaCategories = [...(config.legend.additionalCategories || [])]
+                          updatedAdditionaCategories.push('')
+                          updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+                        }}
+                      >
+                        Add Category
+                      </button>
+                    </fieldset>
+                  )}
+                </AccordionItemPanel>
+              </AccordionItem>{' '}
+              {/* End Columns */}
               {visHasLegend() && (
                 <AccordionItem>
                   <AccordionItemHeading>
@@ -1928,7 +2120,6 @@ const EditorPanel = () => {
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
-
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Filters</AccordionItemButton>
@@ -2040,7 +2231,6 @@ const EditorPanel = () => {
                   </button>
                 </AccordionItemPanel>
               </AccordionItem>
-
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Visual</AccordionItemButton>
@@ -2254,7 +2444,6 @@ const EditorPanel = () => {
                   )}
                 </AccordionItemPanel>
               </AccordionItem>
-
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Data Table</AccordionItemButton>

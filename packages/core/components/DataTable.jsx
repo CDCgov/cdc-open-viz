@@ -12,14 +12,15 @@ import Loading from '@cdc/core/components/Loading'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
-  const { config, tableTitle, indexTitle, mapTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
-
+  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
+  console.log('props=', props)
+  console.log('runtimeData=', runtimeData)
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
-  const fileName = `${mapTitle || 'data-table'}.csv`
+  const fileName = `${vizTitle || 'data-table'}.csv`
 
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
@@ -167,15 +168,25 @@ const DataTable = props => {
   if (!config.data) return <Loading />
 
   const rows = Object.keys(runtimeData)
-    .filter(row => applyLegendToRow(runtimeData[row]))
+    //.filter(row => applyLegendToRow(runtimeData[row]))
     .sort((a, b) => {
+      console.log('config.columns', config.columns)
       const sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
+      console.log('sortval', sortVal)
       if (!sortBy.asc) return sortVal
       if (sortVal === 0) return 0
       if (sortVal < 0) return 1
       return -1
     })
 
+  const limitHeight = config.type === 'chart' ? { maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' } : { maxHeight: config.dataTable.limitHeight && `${config.dataTable.height}px`, overflowY: 'scroll' }
+  const caption = () => {
+    if (config.type === 'map') {
+      config.dataTable.caption ? config.dataTable.caption : `Data table showing data for the ${mapLookup[config.general.geoType]} figure.`
+    } else {
+      config.table.label ? config.table.label : `Data table showing data for the ${config.type} figure.`
+    }
+  }
   return (
     <ErrorBoundary component='DataTable'>
       <CoveMediaControls.Section classes={['download-links']}>
@@ -201,11 +212,12 @@ const DataTable = props => {
           <Icon display={expanded ? 'minus' : 'plus'} base />
           {tableTitle}
         </div>
-        <div className='table-container' style={{ maxHeight: config.dataTable.limitHeight && `${config.dataTable.height}px`, overflowY: 'scroll' }}>
+        <div className='table-container' style={limitHeight}>
           <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={config?.data.length ? config.data.length : '-1'}>
-            <caption className='cdcdataviz-sr-only'>{config.dataTable.caption ? config.dataTable.caption : `Datatable showing data for the ${mapLookup[config.general.geoType]} figure.`}</caption>
+            <caption className='cdcdataviz-sr-only'>{caption}</caption>
             <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>
               <tr>
+                {console.log('Object,columns', Object, columns)}
                 {Object.keys(columns)
                   .filter(column => columns[column].dataTable === true && columns[column].name)
                   .map(column => {
@@ -254,7 +266,7 @@ const DataTable = props => {
 
                         if (column === 'geo') {
                           const rowObj = runtimeData[row]
-                          const legendColor = applyLegendToRow(rowObj)
+                          const legendColor = 'gray' // applyLegendToRow(rowObj)  (TT)
 
                           var labelValue
                           if (config.general.geoType !== 'us-county' || config.general.type === 'us-geocode') {

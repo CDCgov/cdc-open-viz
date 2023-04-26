@@ -13,6 +13,7 @@ import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
+import chroma from 'chroma-js'
 
 // Primary Components
 import ConfigContext from './ConfigContext'
@@ -27,7 +28,8 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import SparkLine from './components/SparkLine'
 import Legend from './components/Legend'
-import DataTable from './components/DataTable'
+//import DataTable from './components/DataTable'
+import DataTable from '@cdc/core/components/DataTable'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
@@ -42,6 +44,33 @@ import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 
 import './scss/main.scss'
+
+const generateColorsArray = (color = '#000000', special = false) => {
+  let colorObj = chroma(color)
+  let hoverColor = special ? colorObj.brighten(0.5).hex() : colorObj.saturate(1.3).hex()
+
+  return [color, hoverColor, colorObj.darken(0.3).hex()]
+}
+const hashObj = row => {
+  try {
+    if (!row) throw new Error('No row supplied to hashObj')
+
+    let str = JSON.stringify(row)
+    let hash = 0
+
+    if (str.length === 0) return hash
+
+    for (let i = 0; i < str.length; i++) {
+      let char = str.charCodeAt(i)
+      hash = (hash << 5) - hash + char
+      hash = hash & hash
+    }
+
+    return hash
+  } catch (e) {
+    console.error('COVE: ', e) // eslint-disable-line
+  }
+}
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
@@ -59,6 +88,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+
+  console.log('Chart config', config)
 
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
@@ -804,8 +835,43 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return false
   }
 
+  // this is passed DOWN into the various components
+  // then they do a lookup based on the bin number as index into here (TT)
+  const applyLegendToRow = rowObj => {
+    try {
+      if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
+      // Navigation map
+      if ('navigation' === config.type) {
+        let mapColorPalette = colorPalettes[config.color] || colorPalettes['bluegreenreverse']
+        return generateColorsArray(mapColorPalette[3])
+      }
+
+      let hash = hashObj(rowObj)
+
+      if (legendMemo.current.has(hash)) {
+        let idx = legendMemo.current.get(hash)
+        if (runtimeLegend[idx]?.disabled) return false
+
+        // DEV-784 changed to use bin prop to get color instead of idx
+        // bc we re-order legend when showSpecialClassesLast is checked
+        let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
+        return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
+      }
+
+      // Fail state
+      return generateColorsArray()
+    } catch (e) {
+      console.error('COVE: ', e) // eslint-disable-line
+    }
+  }
+
   const clean = data => {
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
+  }
+
+  // required for DataTable
+  const displayGeoName = key => {
+    return key
   }
 
   // Prevent render if loading
@@ -872,9 +938,36 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {config.table.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
               {config.table.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
             </CoveMediaControls.Section>
-
+            {console.log('config.table.expanded', config.table.expanded)}
             {/* Data Table */}
-            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}
+            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
+              <DataTable
+                config={config}
+                rawData={config.data}
+                runtimeData={filteredData || excludedData}
+                //navigationHandler={navigationHandler}
+                expandDataTable={config.table.expanded}
+                //headerColor={general.headerColor}
+                columns={config.columns}
+                showDownloadButton={config.general.showDownloadButton}
+                //runtimeLegend={dynamicLegendItems}
+                //displayDataAsText={displayDataAsText}
+                displayGeoName={displayGeoName}
+                //applyLegendToRow={applyLegendToRow}
+                tableTitle={config.table.label}
+                indexTitle={config.table.indexLabel}
+                vizTitle={title}
+                viewport={currentViewport}
+                //formatLegendLocation={formatLegendLocation}
+                //setFilteredCountryCode={setFilteredCountryCode}
+                tabbingId={handleChartTabbing}
+                showDownloadImgButton={config.showDownloadImgButton}
+                showDownloadPdfButton={config.showDownloadPdfButton}
+                //innerContainerRef={innerContainerRef}
+                outerContainerRef={outerContainerRef}
+                imageRef={imageId}
+              />
+            )}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
             {/* show pdf or image button */}
           </div>
