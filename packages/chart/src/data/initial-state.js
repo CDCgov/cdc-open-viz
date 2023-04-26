@@ -2,6 +2,7 @@ export default {
   type: 'chart',
   title: '',
   showTitle: true,
+  showDownloadMediaButton: false,
   theme: 'theme-blue',
   animate: false,
   fontSize: 'medium',
@@ -14,6 +15,9 @@ export default {
   barStyle: '',
   roundingStyle: 'standard',
   tipRounding: 'top',
+  general: {
+    showDownloadButton: true, 
+  },
   padding: {
     left: 5,
     right: 5
@@ -110,8 +114,31 @@ export default {
     caption: '',
     showDownloadUrl: false,
     showDataTableLink: true,
+    indexLabel: ''
   },
   orientation: 'vertical',
+  color: 'pinkpurple',
+  columns: {
+    geo: {
+      name: 'FIPS Codes',
+      label: 'Location',
+      tooltip: false,
+      dataTable: true
+    },
+    primary: {
+      dataTable: true,
+      tooltip: true,
+      prefix: '',
+      suffix: '',
+      name: '',
+      label: ''
+    },
+    navigate: {
+      name: ''
+    },
+    latitude: { name: '' },
+    longitude: { name: '' }
+  },
   legend: {
     behavior: 'isolate',
     singleRow: false,

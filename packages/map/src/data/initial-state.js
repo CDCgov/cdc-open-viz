@@ -15,7 +15,6 @@ export default {
     geoType: 'single-state',
     geoLabelOverride: '',
     hasRegions: false,
-    expandDataTable: true,
     fullBorder: false,
     type: 'data',
     palette: {
@@ -63,12 +62,16 @@ export default {
     title: 'Legend'
   },
   filters: [],
-  dataTable: {
-    title: 'Data Table'
-  },
   table: {
+    label: 'Data Table',
+    expanded: true,
+    limitHeight: false,
+    height: '',
+    caption: '',
     showDownloadUrl: false,
-    showDataTableLink: true
+    showDataTableLink: true,
+    forceDisplay: false,
+    indexLabel: ''
   },
   tooltips: {
     appearanceType: 'hover',
