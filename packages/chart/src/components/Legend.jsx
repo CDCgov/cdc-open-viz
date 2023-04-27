@@ -204,7 +204,7 @@ const Legend = () => {
                   >
                     <LegendCircle fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />
                     <LegendLabel align='left' margin='0 0 0 4px'>
-                      {bar.legendLabel ? bar.legendLabel : bar.value}
+                      {bar.legendLabel ? bar.legendLabel : ''}
                     </LegendLabel>
                   </LegendItem>
                 )
