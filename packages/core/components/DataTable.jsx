@@ -16,7 +16,13 @@ const DataTable = props => {
   console.log('props=', props)
   console.log('runtimeData=', runtimeData)
   const [expanded, setExpanded] = useState(expandDataTable)
-  const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
+  //const [sortBy, setSortBy] = config.type === 'map' ? useState({ column: 'geo', asc: false }) : useState({ column: 'Date', asc: false })
+  /*   if (config.type === 'map') {
+    const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
+  } else {
+    const [sortBy, setSortBy] = useState({ column: 'date', asc: false })
+  } */
+  const [sortBy, setSortBy] = useState({ column: config.type === 'map' ? 'geo' : 'date', asc: false })
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
