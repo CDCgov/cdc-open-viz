@@ -206,7 +206,9 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, columnsInData = [], colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug } = useContext(ConfigContext)
+
+  const { columns } = config
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
@@ -836,6 +838,32 @@ const EditorPanel = () => {
   }
 
   const chartsWithOptions = ['Area Chart', 'Combo', 'Line']
+
+  const columnsOptions = [
+    <option value='' key={'Select Option'}>
+      - Select Option -
+    </option>
+  ]
+
+  columnsInData.map(colName => {
+    return columnsOptions.push(
+      <option value={colName} key={colName}>
+        {colName}
+      </option>
+    )
+  })
+
+  let columnsByKey = {}
+  config.data.forEach(datum => {
+    Object.keys(datum).forEach(key => {
+      columnsByKey[key] = columnsByKey[key] || []
+      const value = typeof datum[key] === 'number' ? datum[key].toString() : datum[key]
+
+      if (columnsByKey[key].indexOf(value) === -1) {
+        columnsByKey[key].push(value)
+      }
+    })
+  })
 
   const additionalColumns = Object.keys(config.columns).filter(value => {
     const defaultCols = ['geo', 'navigate', 'primary', 'latitude', 'longitude']
@@ -1977,6 +2005,8 @@ const EditorPanel = () => {
                                 <span className='edit-label'>Display in Data Table</span>
                               </label>
                             </li>
+                            {/* disable for now */}
+                            {/*
                             <li>
                               <label className='checkbox'>
                                 <input
@@ -1989,6 +2019,7 @@ const EditorPanel = () => {
                                 <span className='edit-label'>Display in Tooltips</span>
                               </label>
                             </li>
+                                */}
                           </ul>
                         </fieldset>
                       ))}

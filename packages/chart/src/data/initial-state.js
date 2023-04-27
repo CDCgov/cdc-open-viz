@@ -119,25 +119,9 @@ export default {
   orientation: 'vertical',
   color: 'pinkpurple',
   columns: {
-    geo: {
-      name: 'FIPS Codes',
-      label: 'Location',
-      tooltip: false,
-      dataTable: true
-    },
-    primary: {
-      dataTable: true,
-      tooltip: true,
-      prefix: '',
-      suffix: '',
-      name: '',
-      label: ''
-    },
-    navigate: {
+    date: {
       name: ''
-    },
-    latitude: { name: '' },
-    longitude: { name: '' }
+    }
   },
   legend: {
     behavior: 'isolate',
