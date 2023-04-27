@@ -20,6 +20,7 @@ import useRightAxis from '../hooks/useRightAxis'
 import * as allCurves from '@visx/curve'
 import { useFilters } from '@cdc/core/components/Filters'
 import Series from './Series'
+import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -208,7 +209,7 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, rawData } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
@@ -1021,118 +1022,228 @@ const EditorPanel = () => {
                   <AccordionItemButton>Forecasting Settings</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {/* bar column */}
-                  <Select
-                    fieldName='forecastingBarColumn'
-                    label='Add Forecasting Bar Column'
-                    required={true}
-                    value={config.forecastingChart.barColumn || ''}
-                    initial={'Select'}
-                    onChange={e => {
-                      if (e.target.value !== '' && e.target.value !== 'Select') {
-                        updateConfig({
-                          ...config,
-                          forecastingChart: {
-                            ...config.forecastingChart,
-                            barColumn: e.target.value,
-                            showBarColumn: true
-                          }
-                        })
-                      }
-                      e.target.value = ''
-                    }}
-                    options={getColumns()}
-                  />
-
-                  <label>
-                    <span class='edit-label'>Forecasting Bar Color</span>
-                    <input
-                      type='text'
-                      value={config.forecastingChart.barColor ?? '#918e90'}
+                  <div className='edit-block'>
+                    <h3>Forecasting Bar Settings</h3>
+                    {/* bar column */}
+                    <Select
+                      fieldName='forecastingBarColumn'
+                      label='Add Forecasting Bar Column'
+                      required={true}
+                      value={config.forecastingChart.barColumn || ''}
+                      initial={'Select'}
                       onChange={e => {
-                        e.preventDefault()
-                        updateConfig({
-                          ...config,
-                          forecastingChart: {
-                            ...config.forecastingChart,
-                            barColor: e.target.value
-                          }
-                        })
+                        if (e.target.value !== '' && e.target.value !== 'Select') {
+                          updateConfig({
+                            ...config,
+                            forecastingChart: {
+                              ...config.forecastingChart,
+                              barColumn: e.target.value,
+                              showBarColumn: true
+                            }
+                          })
+                        }
+                        e.target.value = ''
                       }}
+                      options={getColumns()}
                     />
-                  </label>
 
-                  {/* Group Stages, ie. estimate, partial, future */}
-                  <Select
-                    fieldName='forecastingStages'
-                    label='Add Forecasting Stages'
-                    required={true}
-                    value={config.forecastingChart.stages || ''}
-                    initial={'Select'}
-                    onChange={e => {
-                      if (e.target.value !== '' && e.target.value !== 'Select') {
-                        updateConfig({
-                          ...config,
-                          forecastingChart: {
-                            ...config.forecastingChart,
-                            stages: e.target.value
-                          }
-                        })
-                      }
-                      e.target.value = ''
-                    }}
-                    options={getColumns()}
-                  />
-                  <fieldset>
-                    <Accordion allowZeroExpanded>
-                      {config.forecastingChart.confidenceIntervals.map((ciGroup, index) => {
+                    <label>
+                      <span class='edit-label'>Forecasting Bar Color</span>
+                      <input
+                        type='text'
+                        value={config.forecastingChart.barColor ?? '#918e90'}
+                        onChange={e => {
+                          e.preventDefault()
+                          updateConfig({
+                            ...config,
+                            forecastingChart: {
+                              ...config.forecastingChart,
+                              barColor: e.target.value
+                            }
+                          })
+                        }}
+                      />
+                    </label>
+
+                    <label className='checkbox column-heading'>
+                      <input
+                        type='checkbox'
+                        name={'forecastingChartShowBars'}
+                        checked={config.forecastingChart.showBars}
+                        onChange={e => {
+                          const prev = config.forecastingChart.showBars
+                          updateConfig({
+                            ...config,
+                            forecastingChart: {
+                              ...config.forecastingChart,
+                              showBars: !prev
+                            }
+                          })
+                        }}
+                      />
+                      <span className='edit-label'>Show Bars</span>
+                    </label>
+                  </div>
+
+                  <div className='edit-block'>
+                    <h3>Forecasting Stage Settings</h3>
+                    {/* Group Stages, ie. estimate, partial, future */}
+                    <Select
+                      fieldName='forecastingStages'
+                      label='Add Forecasting Stages'
+                      required={true}
+                      value={config.forecastingChart.stages || ''}
+                      initial={'Select'}
+                      onChange={e => {
+                        if (e.target.value !== '' && e.target.value !== 'Select') {
+                          let tempGroups = new Set(rawData.map(item => item[e.target.value])) // [estimate, forecast, etc.]
+                          tempGroups = Array.from(tempGroups) // convert set to array
+
+                          console.log('temp', tempGroups)
+                          tempGroups = tempGroups.filter(group => group !== undefined) // removes undefined
+
+                          updateConfig({
+                            ...config,
+                            forecastingChart: {
+                              ...config.forecastingChart,
+                              stages: e.target.value,
+                              groups: tempGroups
+                            }
+                          })
+                        }
+                        e.target.value = ''
+                      }}
+                      options={getColumns()}
+                    />
+
+                    {config.forecastingChart.stages &&
+                      config.forecastingChart !== 'Select' &&
+                      config.forecastingChart.groups &&
+                      config.forecastingChart.groups.map((group, index) => {
                         return (
-                          <AccordionItem className='series-item series-item--chart'>
-                            <AccordionItemHeading className='series-item__title'>
-                              <>
-                                <AccordionItemButton className={'accordion__button accordion__button'}>
-                                  Group {index + 1}
-                                  <button
-                                    className='series-list__remove'
-                                    onClick={e => {
-                                      e.preventDefault()
-                                      const copiedCIGroups = [...config.forecastingChart.confidenceIntervals]
-                                      copiedCIGroups.splice(index, 1)
+                          // prettier-ignore
+                          <fieldset key={`${group}--${index}`}>
+                          <Select
+                            fieldName='forecastingStageColor'
+                            label={`${group} color palette`}
+                            value={config.forecastingChart.colors[index] || ''}
+                            initial={'Select'}
+                            onChange={e => {
+                              if (e.target.value !== '' && e.target.value !== 'Select') {
+                                const colors = [...config.forecastingChart.colors]
+                                colors[index] = e.target.value
+                                updateConfig({
+                                  ...config,
+                                  forecastingChart: {
+                                    ...config.forecastingChart,
+                                    colors
+                                  }
+                                })
+                              }
+                              e.target.value = ''
+                            }}
+                            options={Object.keys(colorPalettesChart)}
+                          />
+                        </fieldset>
+                        )
+                      })}
+                  </div>
+
+                  <div className='edit-block'>
+                    <h3>Confidence Interval Groups</h3>
+                    <fieldset>
+                      <Accordion allowZeroExpanded>
+                        {config.forecastingChart.confidenceIntervals.map((ciGroup, index) => {
+                          return (
+                            <AccordionItem className='series-item series-item--chart'>
+                              <AccordionItemHeading className='series-item__title'>
+                                <>
+                                  <AccordionItemButton className={'accordion__button accordion__button'}>
+                                    Group {index + 1}
+                                    <button
+                                      className='series-list__remove'
+                                      onClick={e => {
+                                        e.preventDefault()
+                                        const copiedCIGroups = [...config.forecastingChart.confidenceIntervals]
+                                        copiedCIGroups.splice(index, 1)
+                                        updateConfig({
+                                          ...config,
+                                          forecastingChart: {
+                                            ...config.forecastingChart,
+                                            confidenceIntervals: copiedCIGroups
+                                          }
+                                        })
+                                      }}
+                                    >
+                                      Remove
+                                    </button>
+                                  </AccordionItemButton>
+                                </>
+                              </AccordionItemHeading>
+                              <AccordionItemPanel>
+                                <Select
+                                  fieldName='forecastingCIGroupLow'
+                                  label='Low Confidence Interval Bound'
+                                  value={config.forecastingChart.confidenceIntervals[index].low || ''}
+                                  initial={'Select'}
+                                  onChange={e => {
+                                    if (e.target.value !== '' && e.target.value !== 'Select') {
+                                      const copiedCI = [...config.forecastingChart.confidenceIntervals]
+                                      copiedCI[index].low = e.target.value
                                       updateConfig({
                                         ...config,
                                         forecastingChart: {
                                           ...config.forecastingChart,
-                                          confidenceIntervals: copiedCIGroups
+                                          confidenceIntervals: copiedCI
                                         }
                                       })
-                                    }}
-                                  >
-                                    Remove
-                                  </button>
-                                </AccordionItemButton>
-                              </>
-                            </AccordionItemHeading>
-                            {chartsWithOptions.includes(config.visualizationType) && <AccordionItemPanel></AccordionItemPanel>}
-                          </AccordionItem>
-                        )
-                      })}
-                    </Accordion>
-                    <button
-                      className='btn full-width'
-                      onClick={e => {
-                        e.preventDefault()
-                        updateConfig({
-                          ...config,
-                          forecastingChart: {
-                            ...config.forecastingChart,
-                            confidenceIntervals: [...config.forecastingChart.confidenceIntervals, {}]
-                          }
-                        })
-                      }}
-                    >
-                      Add Confidence Interval Group
-                    </button>
-                  </fieldset>
+                                    }
+                                  }}
+                                  options={getColumns()}
+                                />
+
+                                <Select
+                                  fieldName='forecastingCIGroupHigh'
+                                  label='High Confidence Interval Bound'
+                                  value={config.forecastingChart.confidenceIntervals[index].high || ''}
+                                  initial={'Select'}
+                                  onChange={e => {
+                                    if (e.target.value !== '' && e.target.value !== 'Select') {
+                                      const copiedCI = [...config.forecastingChart.confidenceIntervals]
+                                      copiedCI[index].high = e.target.value
+                                      updateConfig({
+                                        ...config,
+                                        forecastingChart: {
+                                          ...config.forecastingChart,
+                                          confidenceIntervals: copiedCI
+                                        }
+                                      })
+                                    }
+                                  }}
+                                  options={getColumns()}
+                                />
+                              </AccordionItemPanel>
+                            </AccordionItem>
+                          )
+                        })}
+                      </Accordion>
+                      <button
+                        className='btn full-width'
+                        onClick={e => {
+                          e.preventDefault()
+                          updateConfig({
+                            ...config,
+                            forecastingChart: {
+                              ...config.forecastingChart,
+                              confidenceIntervals: [...config.forecastingChart.confidenceIntervals, {}]
+                            }
+                          })
+                        }}
+                      >
+                        Add Confidence Interval Group
+                      </button>
+                    </fieldset>
+                  </div>
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -1464,6 +1575,106 @@ const EditorPanel = () => {
                       </>
                     )
                   )}
+
+                  <div className='edit-block'>
+                    <h3>Anchors</h3>
+                    {/* anchors */}
+                    {config.visualizationType === 'Forecasting' && (
+                      <>
+                        <Accordion allowZeroExpanded>
+                          {config.yAxis?.anchors?.map((anchor, index) => (
+                            <AccordionItem className='series-item series-item--chart'>
+                              <AccordionItemHeading className='series-item__title'>
+                                <>
+                                  <AccordionItemButton className={'accordion__button accordion__button'}>
+                                    Anchor {index + 1}
+                                    <button
+                                      className='series-list__remove'
+                                      onClick={e => {
+                                        e.preventDefault()
+                                        const copiedAnchorGroups = [...config.yAxis.anchors]
+                                        copiedAnchorGroups.splice(index, 1)
+                                        updateConfig({
+                                          ...config,
+                                          yAxis: {
+                                            ...config.yAxis,
+                                            anchors: copiedAnchorGroups
+                                          }
+                                        })
+                                      }}
+                                    >
+                                      Remove
+                                    </button>
+                                  </AccordionItemButton>
+                                </>
+                              </AccordionItemHeading>
+                              <AccordionItemPanel>
+                                <Select
+                                  fieldName='anchorValue'
+                                  label='y axis anchor point'
+                                  value={config.yAxis.anchors[index].value || ''}
+                                  initial={'Select'}
+                                  onChange={e => {
+                                    if (e.target.value !== '' && e.target.value !== 'Select') {
+                                      const copiedAnchors = [...config.yAxis.anchors]
+                                      copiedAnchors[index].value = e.target.value
+                                      updateConfig({
+                                        ...config,
+                                        yAxis: {
+                                          ...config.yAxis,
+                                          anchors: copiedAnchors
+                                        }
+                                      })
+                                    }
+                                  }}
+                                  options={rawData.map(item => item[config.forecastingChart.barColumn])}
+                                />
+
+                                <Select
+                                  fieldName='anchorValue'
+                                  label='line style'
+                                  value={config.yAxis.anchors[index].lineStyle || ''}
+                                  initial={'Select'}
+                                  onChange={e => {
+                                    if (e.target.value !== '' && e.target.value !== 'Select') {
+                                      const copiedAnchors = [...config.yAxis.anchors]
+                                      copiedAnchors[index].lineStyle = e.target.value
+                                      updateConfig({
+                                        ...config,
+                                        yAxis: {
+                                          ...config.yAxis,
+                                          anchors: copiedAnchors
+                                        }
+                                      })
+                                    }
+                                  }}
+                                  options={['dashed-sm', 'dashed-md', 'dashed-lg', 'Line']}
+                                />
+                              </AccordionItemPanel>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+
+                        <button
+                          className='btn full-width'
+                          onClick={e => {
+                            e.preventDefault()
+                            const anchors = [...config.yAxis.anchors]
+                            anchors.push({})
+                            updateConfig({
+                              ...config,
+                              yAxis: {
+                                ...config.yAxis,
+                                anchors
+                              }
+                            })
+                          }}
+                        >
+                          Add Anchor
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -1793,6 +2004,107 @@ const EditorPanel = () => {
                       )}
                     </>
                   )}
+
+                  {/* anchors */}
+
+                  <div className='edit-block'>
+                    <h3>Anchors</h3>
+                    {config.visualizationType === 'Forecasting' && (
+                      <>
+                        <Accordion allowZeroExpanded>
+                          {config.xAxis?.anchors?.map((anchor, index) => (
+                            <AccordionItem className='series-item series-item--chart'>
+                              <AccordionItemHeading className='series-item__title'>
+                                <>
+                                  <AccordionItemButton className={'accordion__button accordion__button'}>
+                                    Anchor {index + 1}
+                                    <button
+                                      className='series-list__remove'
+                                      onClick={e => {
+                                        e.preventDefault()
+                                        const copiedAnchorGroups = [...config.xAxis.anchors]
+                                        copiedAnchorGroups.splice(index, 1)
+                                        updateConfig({
+                                          ...config,
+                                          xAxis: {
+                                            ...config.xAxis,
+                                            anchors: copiedAnchorGroups
+                                          }
+                                        })
+                                      }}
+                                    >
+                                      Remove
+                                    </button>
+                                  </AccordionItemButton>
+                                </>
+                              </AccordionItemHeading>
+                              <AccordionItemPanel>
+                                <Select
+                                  fieldName='anchorValue'
+                                  label='x axis anchor point'
+                                  value={config.xAxis.anchors[index].value || ''}
+                                  initial={'Select'}
+                                  onChange={e => {
+                                    if (e.target.value !== '' && e.target.value !== 'Select') {
+                                      const copiedAnchors = [...config.xAxis.anchors]
+                                      copiedAnchors[index].value = e.target.value
+                                      updateConfig({
+                                        ...config,
+                                        xAxis: {
+                                          ...config.xAxis,
+                                          anchors: copiedAnchors
+                                        }
+                                      })
+                                    }
+                                  }}
+                                  options={rawData.map(item => item[config.xAxis.dataKey])}
+                                />
+
+                                <Select
+                                  fieldName='anchorValue'
+                                  label='line style'
+                                  value={config.xAxis.anchors[index].lineStyle || ''}
+                                  initial={'Select'}
+                                  onChange={e => {
+                                    if (e.target.value !== '' && e.target.value !== 'Select') {
+                                      const copiedAnchors = [...config.xAxis.anchors]
+                                      copiedAnchors[index].lineStyle = e.target.value
+                                      updateConfig({
+                                        ...config,
+                                        xAxis: {
+                                          ...config.xAxis,
+                                          anchors: copiedAnchors
+                                        }
+                                      })
+                                    }
+                                  }}
+                                  options={['dashed-sm', 'dashed-md', 'dashed-lg', 'Line']}
+                                />
+                              </AccordionItemPanel>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+
+                        <button
+                          className='btn full-width'
+                          onClick={e => {
+                            e.preventDefault()
+                            const anchors = [...config.xAxis.anchors]
+                            anchors.push({})
+                            updateConfig({
+                              ...config,
+                              xAxis: {
+                                ...config.xAxis,
+                                anchors
+                              }
+                            })
+                          }}
+                        >
+                          Add Anchor
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </AccordionItemPanel>
               </AccordionItem>
 

@@ -40,7 +40,8 @@ export default {
     rightAxisTickColor: '#333',
     numTicks: '',
     axisPadding: 0,
-    tickRotation: 0
+    tickRotation: 0,
+    anchors: []
   },
   boxplot: {
     plots: [],
@@ -100,7 +101,8 @@ export default {
     numTicks: '',
     labelOffset: 65,
     axisPadding: 0,
-    target: 0
+    target: 0,
+    anchors: []
   },
   table: {
     label: 'Data Table',
@@ -156,6 +158,7 @@ export default {
     barColumn: '',
     barColor: '#918e90',
     confidenceIntervals: [],
-    stages: ''
+    stages: '',
+    colors: []
   }
 }
