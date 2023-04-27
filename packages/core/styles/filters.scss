@@ -1,0 +1,122 @@
+.filters-section {
+  &__wrapper {
+    flex-wrap: wrap;
+    display: flex;
+    gap: 7px 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  &__intro-text {
+    display: block;
+    width: 100%;
+  }
+
+  &__buttons {
+    width: 100%;
+    .apply {
+      margin-right: 10px;
+    }
+  }
+}
+
+// note the diff of section and no section above.
+// Can't use nested selectors with top level section overwrites
+section.filters-section {
+  // border: 1px solid #c7c7c7;
+  // padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: block !important;
+}
+
+div.single-filters {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 15px 0;
+
+  select {
+    width: auto !important;
+  }
+
+  label {
+    width: 100%;
+  }
+
+  &__tab-bar {
+    &:first-child {
+      border-top-left-radius: 15px;
+      border-bottom-left-radius: 15px;
+    }
+  }
+}
+
+.single-filters--dropdown {
+  width: auto;
+  display: flex;
+}
+
+.single-filters--tab {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+
+  .tab {
+    width: 25%;
+    min-height: 40px;
+    border: none;
+    padding: 0.5em 0;
+    background: none;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    margin-top: 5px;
+  }
+
+  .tab--active {
+    border-bottom: none;
+  }
+}
+
+.single-filters--pill {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+
+  .pill {
+    border: none;
+    width: 95%;
+    height: 60px;
+    background: none;
+    border-radius: 30px;
+    box-shadow: 0 2px 5px #d3d3d3;
+    vertical-align: middle;
+    margin-bottom: 15px;
+    margin-right: 10px;
+    margin-left: 10px;
+    white-space: break-spaces;
+    word-break: break-word;
+
+    &__wrapper {
+      width: 25%;
+    }
+  }
+}
+
+.single-filters__tab-bar {
+  background: #f2f2f2;
+  display: flex !important;
+  flex-wrap: wrap;
+  width: 100%;
+  border-radius: 15px;
+
+  button.button__tab-bar {
+    flex: 1 1 0px;
+    padding: 10px;
+    background: none;
+    transition: background 2s;
+    &--active {
+      background: #fff;
+      border-radius: 15px;
+    }
+  }
+}

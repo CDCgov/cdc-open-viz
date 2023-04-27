@@ -18,6 +18,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import * as allCurves from '@visx/curve'
+import { useFilters } from '@cdc/core/components/Filters'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -71,7 +72,7 @@ const TextField = memo(({ label, tooltip, section = null, subsection = null, fie
 })
 
 const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-  <label className='checkbox'>
+  <label className='checkbox column-heading'>
     <input
       type='checkbox'
       name={fieldName}
@@ -206,11 +207,22 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
+
+  // argument acts as props
+  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config, setConfig: updateConfig, filteredData: data, setFilteredData })
+
+  const approvedCurveTypes = {
+    Linear: 'curveLinear',
+    Cardinal: 'curveCardinal',
+    Natural: 'curveNatural',
+    'Monotone X': 'curveMonotoneX',
+    Step: 'curveStep'
+  }
 
   // when the visualization type changes we
   // have to update the individual series type & axis details
@@ -248,21 +260,6 @@ const EditorPanel = () => {
   }, [])
 
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
-
-  const filterOptions = [
-    {
-      label: 'Ascending Alphanumeric',
-      value: 'asc'
-    },
-    {
-      label: 'Descending Alphanumeric',
-      value: 'desc'
-    },
-    {
-      label: 'Custom',
-      value: 'cust'
-    }
-  ]
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
@@ -481,6 +478,16 @@ const EditorPanel = () => {
     }
   }
 
+  const getFilters = () => {
+    let columns = {}
+
+    unfilteredData.forEach(row => {
+      Object.keys(row).forEach(columnName => (columns[columnName] = true))
+    })
+
+    return Object.keys(columns)
+  }
+
   const getColumns = (filter = true) => {
     let columns = {}
 
@@ -637,23 +644,6 @@ const EditorPanel = () => {
     )
   }, [config]) // eslint-disable-line
 
-  const checkIsLine = type => {
-    return type === ('Line' || 'dashed-sm')
-  }
-
-  const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
-    let filterOrder = filter.values
-    let [movedItem] = filterOrder.splice(idx1, 1)
-    filterOrder.splice(idx2, 0, movedItem)
-    let filters = [...config.filters]
-    let filterItem = { ...config.filters[filterIndex] }
-    filterItem.active = filter.values[0]
-    filterItem.orderedValues = filterOrder
-    filterItem.order = 'cust'
-    filters[filterIndex] = filterItem
-    updateConfig({ ...config, filters })
-  }
-
   const visHasLegend = () => {
     const { visualizationType } = config
 
@@ -668,6 +658,8 @@ const EditorPanel = () => {
   const visCanAnimate = () => {
     const { visualizationType } = config
     switch (visualizationType) {
+      case 'Area Chart':
+        return false
       case 'Scatter Plot':
         return false
       case 'Box Plot':
@@ -692,6 +684,8 @@ const EditorPanel = () => {
   const visHasLabelOnData = () => {
     const { visualizationType } = config
     switch (visualizationType) {
+      case 'Area Chart':
+        return false
       case 'Box Plot':
         return false
       case 'Pie':
@@ -760,10 +754,13 @@ const EditorPanel = () => {
       case config.visualizationType === 'Combo' && isAllLine && enteredValue && parseFloat(enteredValue) > minVal:
         message = 'Value must be less than ' + minValue
         break
-      case (config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
+      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
         message = 'Value must be less than or equal to 0'
         break
-      case enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
+      case config.visualizationType === 'Deviation Bar' && parseFloat(enteredValue) >= Math.min(minVal, config.xAxis.target):
+        message = 'Value must be less than ' + Math.min(minVal, config.xAxis.target)
+        break
+      case config.visualizationType !== 'Deviation Bar' && enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
         message = 'Value must be less than ' + minValue
         break
       default:
@@ -778,18 +775,53 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
+  // prettier-ignore
   const enabledChartTypes = [
-    'Pie',
-    'Line',
-    'Bar',
-    'Combo',
-    'Paired Bar',
-    'Spark Line',
     // 'Area Chart',
-    'Scatter Plot',
+    'Bar',
     'Box Plot',
-    'Deviation Bar'
+    'Combo',
+    'Deviation Bar',
+    'Line',
+    'Paired Bar',
+    'Pie',
+    'Scatter Plot',
+    'Spark Line'
   ]
+
+  const isLoadedFromUrl = config?.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
+
+  // if isDebug = true, then try to set the category and data col to reduce clicking
+  const setCategoryAxis = () => {
+    // only for debug mode
+    if (undefined !== isDebug && isDebug && !config?.xAxis?.dataKey) {
+      // then try to set the x axis to appropriate value so we dont have to manually do it
+      let datakeys = getColumns(false)
+      if (datakeys.includes('Date')) return 'Date'
+      if (datakeys.includes('Race')) return 'Race'
+      // add other known Category cols here to extend debug
+    }
+    return ''
+  }
+  const setDataColumn = () => {
+    // only for debug mode
+    if (undefined !== isDebug && isDebug && getColumns(false).length > 0) {
+      // then try to set the x axis to appropriate value so we dont have to manually do it
+      let datacols = getColumns(false).filter(x => x !== 'Date' && x !== 'Race')
+      if (datacols.length > 0) {
+        return datacols[0]
+      }
+    }
+    return ''
+  }
+  if (isDebug && !config.xAxis.dataKey) config.xAxis.dataKey = setCategoryAxis()
+  if (isDebug && config?.series?.length === 0) {
+    let setdatacol = setDataColumn()
+    if (setdatacol !== '') addNewSeries(setdatacol)
+    if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
+  }
+
+  const chartsWithOptions = ['Area Chart', 'Combo', 'Line']
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -932,6 +964,18 @@ const EditorPanel = () => {
                   <AccordionItemPanel>
                     {(!config.series || config.series.length === 0) && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
                     {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
+                    <Select
+                      fieldName='visualizationType'
+                      label='Add Data Series'
+                      initial='Select'
+                      onChange={e => {
+                        if (e.target.value !== '' && e.target.value !== 'Select') {
+                          addNewSeries(e.target.value)
+                        }
+                        e.target.value = ''
+                      }}
+                      options={getColumns()}
+                    />
                     {config.series && config.series.length !== 0 && (
                       <>
                         <fieldset>
@@ -949,7 +993,7 @@ const EditorPanel = () => {
                         <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
                           <Droppable droppableId='filter_order'>
                             {provided => (
-                              <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
+                              <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
                                 {config.series.map((series, i) => {
                                   if (config.visualizationType === 'Combo' || 'Area Chart') {
                                     let changeType = (i, value) => {
@@ -968,78 +1012,129 @@ const EditorPanel = () => {
                                     }
 
                                     let typeDropdown = (
-                                      <select
-                                        value={series.type}
-                                        onChange={event => {
-                                          changeType(i, event.target.value)
-                                        }}
-                                        style={{ width: '100px', marginRight: '10px' }}
-                                      >
-                                        <option value='' default key='default'>
-                                          Select
-                                        </option>
-                                        {config.visualizationType === 'Combo' && <option value='Bar'>Bar</option>}
-                                        <option value='Line' key='Line'>
-                                          Solid Line
-                                        </option>
-                                        <option value='dashed-sm' key='dashed-sm'>
-                                          Small Dashed
-                                        </option>
-                                        <option value='dashed-md' key='dashed-md'>
-                                          Medium Dashed
-                                        </option>
-                                        <option value='dashed-lg' key='dashed-lg'>
-                                          Large Dashed
-                                        </option>
-                                      </select>
+                                      <>
+                                        <label htmlFor='type-dropdown'>Series Type</label>
+                                        <select
+                                          name='type-dropdown'
+                                          value={series.type}
+                                          onChange={event => {
+                                            changeType(i, event.target.value)
+                                          }}
+                                        >
+                                          <option value='' default key='default'>
+                                            Select
+                                          </option>
+                                          {config.visualizationType === 'Combo' && <option value='Bar'>Bar</option>}
+                                          <option value='Line' key='Line'>
+                                            Solid Line
+                                          </option>
+                                          <option value='dashed-sm' key='dashed-sm'>
+                                            Small Dashed
+                                          </option>
+                                          <option value='dashed-md' key='dashed-md'>
+                                            Medium Dashed
+                                          </option>
+                                          <option value='dashed-lg' key='dashed-lg'>
+                                            Large Dashed
+                                          </option>
+                                          <option value='Area Chart' key='Area Chart'>
+                                            Area
+                                          </option>
+                                        </select>
+                                      </>
                                     )
 
-                                    const lineType = (
-                                      <select
-                                        value={series.lineStyle}
-                                        onChange={event => {
-                                          changeLineType(i, event.target.value)
-                                        }}
-                                        style={{ width: '100px', marginRight: '10px' }}
-                                        key='lineTypeSelection'
-                                      >
-                                        <option value='' default>
-                                          Select
-                                        </option>
+                                    // used for assigning axis
+                                    let changeAxis = (i, value) => {
+                                      let series = [...config.series]
+                                      series[i].axis = value
+                                      updateConfig({ ...config, series })
+                                    }
 
-                                        {Object.keys(allCurves).map(curveName => (
-                                          <option key={`curve-option-${curveName}`} value={curveName}>
-                                            {curveName}
+                                    // assign an axis dropdown
+                                    let axisDropdown = (
+                                      <>
+                                        <label htmlFor='assign-axis'>Assign an axis</label>
+                                        <select
+                                          name='assign-axis'
+                                          value={series.axis}
+                                          onChange={event => {
+                                            changeAxis(i, event.target.value)
+                                          }}
+                                        >
+                                          <option value='Left' default key='left'>
+                                            left
                                           </option>
-                                        ))}
-                                      </select>
+                                          <option value='Right' key='right'>
+                                            right
+                                          </option>
+                                        </select>
+                                      </>
+                                    )
+
+                                    // line type dropdown
+                                    const lineType = (
+                                      <>
+                                        <label htmlFor='line-type'>Line Type</label>
+                                        <select
+                                          name='line-type'
+                                          value={series.lineStyle}
+                                          onChange={event => {
+                                            changeLineType(i, event.target.value)
+                                          }}
+                                          key='lineTypeSelection'
+                                        >
+                                          <option value='' default>
+                                            Select
+                                          </option>
+
+                                          {Object.keys(approvedCurveTypes).map(curveName => {
+                                            return (
+                                              <option key={`curve-option-${approvedCurveTypes[curveName]}`} value={approvedCurveTypes[curveName]}>
+                                                {curveName}
+                                              </option>
+                                            )
+                                          })}
+                                        </select>
+                                      </>
                                     )
 
                                     return (
                                       <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
                                         {(provided, snapshot) => (
-                                          <li key={i}>
-                                            <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
-                                                <div className='series-list__name-text'>{series.dataKey}</div>
-                                              </div>
-                                              <span>
-                                                <>
-                                                  {(config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && (
-                                                    <>
-                                                      <span className='series-list__dropdown'>{typeDropdown}</span>
-                                                      {config.visualizationType === 'Area Chart' && <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
-                                                    </>
+                                          <>
+                                            <div key={i} className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                              <div className={`series-list__name ${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}></div>
+                                              <Accordion allowZeroExpanded>
+                                                <AccordionItem className='series-item series-item--chart'>
+                                                  <AccordionItemHeading className='series-item__title'>
+                                                    <AccordionItemButton className={chartsWithOptions.includes(config.visualizationType) ? 'accordion__button' : 'accordion__button hide-arrow'}>
+                                                      <Icon display='move' size={15} style={{ cursor: 'default' }} />
+                                                      {series.dataKey}
+                                                      {config.series && config.series.length > 1 && (
+                                                        <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
+                                                          Remove
+                                                        </button>
+                                                      )}
+                                                    </AccordionItemButton>
+                                                  </AccordionItemHeading>
+                                                  {chartsWithOptions.includes(config.visualizationType) && (
+                                                    <AccordionItemPanel>
+                                                      <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                        {config.visualizationType === 'Combo' && (
+                                                          <>
+                                                            <span className='series-list__dropdown series-item__dropdown'>{typeDropdown}</span>
+                                                            {hasRightAxis && config.series && (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') && <span className='series-item__dropdown series-list__dropdown'>{axisDropdown}</span>}
+                                                          </>
+                                                        )}
+                                                        {['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type)) && <span className='series-item__dropdown series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
+                                                      </div>
+                                                    </AccordionItemPanel>
                                                   )}
-                                                  {config.series && config.series.length > 1 && (
-                                                    <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                                      &#215;
-                                                    </button>
-                                                  )}
-                                                </>
-                                              </span>
+                                                </AccordionItem>
+                                              </Accordion>
                                             </div>
-                                          </li>
+                                          </>
                                         )}
                                       </Draggable>
                                     )
@@ -1078,19 +1173,6 @@ const EditorPanel = () => {
                         </DragDropContext>
                       </>
                     )}
-
-                    <Select
-                      fieldName='visualizationType'
-                      label='Add Data Series'
-                      initial='Select'
-                      onChange={e => {
-                        if (e.target.value !== '' && e.target.value !== 'Select') {
-                          addNewSeries(e.target.value)
-                        }
-                        e.target.value = ''
-                      }}
-                      options={getColumns()}
-                    />
 
                     {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
                       <>
@@ -1282,72 +1364,6 @@ const EditorPanel = () => {
                 </AccordionItem>
               )}
 
-              {hasRightAxis && config.series && config.visualizationType === 'Combo' && (
-                <AccordionItem>
-                  <AccordionItemHeading>
-                    <AccordionItemButton>Assign Data Series Axis</AccordionItemButton>
-                  </AccordionItemHeading>
-                  <AccordionItemPanel>
-                    <p>Only line series data can be assigned to the right axis. Check the data series section above.</p>
-                    {config.series && config.series.filter(series => checkIsLine(series.type)) && (
-                      <>
-                        <fieldset>
-                          <legend className='edit-label float-left'>Displaying</legend>
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Assign an axis for the series</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </fieldset>
-                        <ul className='series-list'>
-                          {config.series &&
-                            config.series.map((series, i) => {
-                              if (series.type === 'Bar') return false // can't set individual bars atm.
-
-                              let changeAxis = (i, value) => {
-                                let series = [...config.series]
-                                series[i].axis = value
-                                updateConfig({ ...config, series })
-                              }
-
-                              let axisDropdown = (
-                                <select
-                                  value={series.axis}
-                                  onChange={event => {
-                                    changeAxis(i, event.target.value)
-                                  }}
-                                  style={{ width: '100px', marginRight: '10px' }}
-                                >
-                                  <option value='Left' default key='left'>
-                                    left
-                                  </option>
-                                  <option value='Right' key='right'>
-                                    right
-                                  </option>
-                                </select>
-                              )
-
-                              return (
-                                <li key={series.dataKey}>
-                                  <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
-                                    <div className='series-list__name-text'>{series.dataKey}</div>
-                                  </div>
-                                  <span>
-                                    <span className='series-list__dropdown'>{axisDropdown}</span>
-                                  </span>
-                                </li>
-                              )
-                            })}
-                        </ul>
-                      </>
-                    )}
-                  </AccordionItemPanel>
-                </AccordionItem>
-              )}
-
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -1476,10 +1492,10 @@ const EditorPanel = () => {
                       <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
                       <TextField value={config.xAxis.max} section='xAxis' fieldName='max' label='max value' type='number' placeholder='Auto' updateField={updateField} />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
+                      <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='min value' placeholder='Auto' updateField={updateField} />
+                      <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                       {config.visualizationType === 'Deviation Bar' && (
                         <>
-                          <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='min value' placeholder='Auto' updateField={updateField} />
-                          <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                           <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Deviation point' placeholder='Auto' updateField={updateField} />
                           <TextField value={config.xAxis.targetLabel || 'Target'} section='xAxis' fieldName='targetLabel' type='text' label='Deviation point Label' updateField={updateField} />
                           <CheckBox value={config.xAxis.showTargetLabel} section='xAxis' fieldName='showTargetLabel' label='Display Deviation point label' updateField={updateField} />
@@ -1575,7 +1591,7 @@ const EditorPanel = () => {
                     <>
                       <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
                       <Select
-                        value={config.xAxis.dataKey || ''}
+                        value={config.xAxis.dataKey || setCategoryAxis() || ''}
                         section='xAxis'
                         fieldName='dataKey'
                         label='Data Key'
@@ -1905,7 +1921,32 @@ const EditorPanel = () => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   {config.filters && (
+                    <>
+                      {/* prettier-ignore */}
+                      <Select
+                        value={config.filterBehavior}
+                        fieldName='filterBehavior'
+                        label='Filter Behavior'
+                        updateField={updateField}
+                        options={['Apply Button', 'Filter Change']}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        />
+                      <br />
+                    </>
+                  )}
+                  {config.filters && (
                     <ul className='filters-list'>
+                      {/* Whether filters should apply onChange or Apply Button */}
+
                       {config.filters.map((filter, index) => (
                         <fieldset className='edit-block' key={index}>
                           <button
@@ -1926,13 +1967,29 @@ const EditorPanel = () => {
                               }}
                             >
                               <option value=''>- Select Option -</option>
-                              {getColumns().map((dataKey, index) => (
+                              {getFilters(true).map((dataKey, index) => (
                                 <option value={dataKey} key={index}>
                                   {dataKey}
                                 </option>
                               ))}
                             </select>
                           </label>
+
+                          {/*  COMING SOON: 4.23.5 FILTER STYLES  */}
+                          {/* <label>
+                            <span className='edit-label column-heading'>Filter Style</span>
+
+                            <select
+                              value={filter.filterStyle}
+                              onChange={e => {
+                                updateFilterProp('filterStyle', index, e.target.value)
+                              }}
+                            >
+                              {filterStyleOptions.map(item => {
+                                return <option value={item}>{item}</option>
+                              })}
+                            </select>
+                          </label> */}
                           <label>
                             <span className='edit-label column-heading'>Label</span>
                             <input
@@ -1947,7 +2004,7 @@ const EditorPanel = () => {
                           <label>
                             <span className='edit-filterOrder column-heading'>Filter Order</span>
                             <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
-                              {filterOptions.map((option, index) => {
+                              {filterOrderOptions.map((option, index) => {
                                 return (
                                   <option value={option.value} key={`filter-${index}`}>
                                     {option.label}
@@ -1957,7 +2014,7 @@ const EditorPanel = () => {
                             </select>
 
                             {filter.order === 'cust' && (
-                              <DragDropContext onDragEnd={({ source, destination }) => handleFilterChange(source.index, destination.index, index, config.filters[index])}>
+                              <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, config.filters[index])}>
                                 <Droppable droppableId='filter_order'>
                                   {provided => (
                                     <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
@@ -2234,12 +2291,13 @@ const EditorPanel = () => {
                     value={config.table.show}
                     section='table'
                     fieldName='show'
-                    label='Show Table'
+                    label='Show Data Table'
                     updateField={updateField}
+                    className='column-heading'
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement.</p>
@@ -2269,8 +2327,9 @@ const EditorPanel = () => {
                   <CheckBox value={config.table.limitHeight} section='table' fieldName='limitHeight' label='Limit Table Height' updateField={updateField} />
                   {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min='0' max='500' placeholder='Height(px)' updateField={updateField} />}
                   <CheckBox value={config.table.expanded} section='table' fieldName='expanded' label='Expanded by Default' updateField={updateField} />
-                  <CheckBox value={config.table.download} section='table' fieldName='download' label='Display Download Button' updateField={updateField} />
-                  <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Display Link to Dataset' updateField={updateField} />
+                  {isDashboard && <CheckBox value={config.table.showDataTableLink} section='table' fieldName='showDataTableLink' label='Show Data Table Name & Link' updateField={updateField} />}
+                  {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' updateField={updateField} />}
+                  <CheckBox value={config.table.download} section='table' fieldName='download' label='Show Download CSV Link' updateField={updateField} />
                   {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
                   {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
                   {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}

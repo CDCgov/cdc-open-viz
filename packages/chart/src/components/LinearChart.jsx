@@ -25,7 +25,7 @@ import { DeviationBar } from './DeviationBar'
 
 // TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, stringFormattingOptions } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
 
   let [width] = dimensions
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
@@ -83,7 +83,7 @@ export default function LinearChart() {
     min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
-    // DEV-3263 - If Confidence Intervals in data, then need to account for increased height in max for YScale
+    // If Confidence Intervals in data, then need to account for increased height in max for YScale
     if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Deviation Bar') {
       let ciYMax = 0
       if (config.hasOwnProperty('confidenceKeys')) {
@@ -95,19 +95,7 @@ export default function LinearChart() {
       }
     }
 
-    // DEV-3263 - If Confidence Intervals in data, then need to account for increased height in max for YScale
-    if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') {
-      let ciYMax = 0
-      if (config.hasOwnProperty('confidenceKeys')) {
-        let upperCIValues = data.map(function (d) {
-          return d[config.confidenceKeys.upper]
-        })
-        ciYMax = Math.max.apply(Math, upperCIValues)
-        if (ciYMax > max) max = ciYMax // bump up the max
-      }
-    }
-
-    if ((config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
+    if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
       min = 0
     }
     if (config.visualizationType === 'Combo' && isAllLine) {
@@ -118,6 +106,11 @@ export default function LinearChart() {
         const isMinValid = +enteredMinValue < minValue
         min = +enteredMinValue && isMinValid ? enteredMinValue : minValue
       }
+    }
+
+    if (config.visualizationType === 'Deviation Bar' && min > 0) {
+      const isMinValid = Number(enteredMinValue) < Math.min(minValue, Number(config.xAxis.target))
+      min = enteredMinValue && isMinValid ? enteredMinValue : 0
     }
 
     if (config.visualizationType === 'Line') {
@@ -161,6 +154,7 @@ export default function LinearChart() {
       if (min < 0) {
         // sets with negative data need more padding on the max
         max *= 1.2
+        min *= 1.2
       } else {
         max *= 1.1
       }
@@ -168,7 +162,7 @@ export default function LinearChart() {
 
     if (config.runtime.horizontal) {
       xScale = scaleLinear({
-        domain: [min, max],
+        domain: [min * 1.03, max],
         range: [0, xMax]
       })
 
@@ -255,7 +249,8 @@ export default function LinearChart() {
       xScale = scaleLinear({
         domain: [min * leftOffset, Math.max(Number(config.xAxis.target), max)],
         range: [0, xMax],
-        round: true
+        round: true,
+        nice: true
       })
     }
     // Handle Box Plots
@@ -274,8 +269,8 @@ export default function LinearChart() {
       }
 
       // check fences for max/min
-      let lowestFence = Math.min(...config.boxplot.plots.map(item => item.columnMin))
-      let highestFence = Math.max(...config.boxplot.plots.map(item => item.columnMax))
+      let lowestFence = Math.min(...config.boxplot.plots.map(item => item.columnLowerBounds))
+      let highestFence = Math.max(...config.boxplot.plots.map(item => item.columnUpperBounds))
 
       if (lowestFence < min) min = lowestFence
       if (highestFence > max) max = highestFence
@@ -296,16 +291,18 @@ export default function LinearChart() {
     }
   }
 
+  const shouldAbbreviate = true
+
   const handleLeftTickFormatting = tick => {
     if (config.runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
-    if (config.orientation === 'vertical') return formatNumber(tick, 'left')
+    if (config.orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
   }
 
   const handleBottomTickFormatting = tick => {
     if (config.runtime.xAxis.type === 'date') return formatDate(tick)
-    if (config.orientation === 'horizontal') return formatNumber(tick, 'left')
-    if (config.xAxis.type === 'continuous') return formatNumber(tick, 'bottom')
+    if (config.orientation === 'horizontal') return formatNumber(tick, 'left', shouldAbbreviate)
+    if (config.xAxis.type === 'continuous') return formatNumber(tick, 'bottom', shouldAbbreviate)
     return tick
   }
 
@@ -347,11 +344,13 @@ export default function LinearChart() {
     return tickCount
   }
 
+  const svgRef = useRef()
+
   return isNaN(width) ? (
     <></>
   ) : (
     <ErrorBoundary component='LinearChart'>
-      <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
+      <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
         {/* Higlighted regions */}
         {config.regions
           ? config.regions.map(region => {
@@ -457,6 +456,7 @@ export default function LinearChart() {
                   })}
                   {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={config.runtime.horizontal ? { x: 0, y: Number(heightHorizontal) } : props.axisToPoint} stroke='#000' />}
                   {yScale.domain()[0] < 0 && <Line from={{ x: props.axisFromPoint.x, y: yScale(0) }} to={{ x: xMax, y: yScale(0) }} stroke='#333' />}
+                  {config.visualizationType === 'Bar' && config.orientation === 'horizontal' && xScale.domain()[0] < 0 && <Line from={{ x: xScale(0), y: 0 }} to={{ x: xScale(0), y: yMax }} stroke='#333' strokeWidth={2} />}
                   <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
                     {props.label}
                   </Text>
@@ -571,7 +571,7 @@ export default function LinearChart() {
                           {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                           {!config.runtime.yAxis.hideLabel && (
                             <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
-                              {formatNumber(tick.formattedValue)}
+                              {formatNumber(tick.value, 'left')}
                             </Text>
                           )}
                         </Group>
@@ -604,7 +604,7 @@ export default function LinearChart() {
                             {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                             {!config.runtime.yAxis.hideLabel && (
                               <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
-                                {tick.formattedValue}
+                                {formatNumber(tick.value, 'left')}
                               </Text>
                             )}
                           </Group>
@@ -625,11 +625,13 @@ export default function LinearChart() {
         )}
 
         {config.visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
-
-        {/* Paired Bar chart */}
         {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
+        {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
+        {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
+        {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} />}
 
         {/* Bar chart */}
+        {/* TODO: Make this just bar or combo? */}
         {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && config.visualizationType !== 'Deviation Bar' && (
           <>
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
@@ -637,18 +639,12 @@ export default function LinearChart() {
         )}
 
         {/* Line chart */}
+        {/* TODO: Make this just line or combo? */}
         {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && config.visualizationType !== 'Deviation Bar' && (
           <>
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
           </>
         )}
-
-        {/* Scatter Plot chart */}
-        {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
-
-        {/* Box Plot chart */}
-        {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
-        {config.visualizationType === 'Area Chart' && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} />}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />

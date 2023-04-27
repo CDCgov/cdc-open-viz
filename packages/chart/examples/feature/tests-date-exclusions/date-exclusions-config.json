@@ -1,0 +1,62 @@
+{
+  "title": "",
+  "dataUrl": "/examples/feature/tests-date-exclusions/date-exclusions-data.json",
+  "type": "chart",
+  "theme": "theme-blue",
+  "fontSize": "medium",
+  "lineDatapointStyle": "hover",
+  "barHasBorder": "false",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "size": 50,
+    "gridLines": false
+  },
+  "barThickness": 0.35,
+  "height": 300,
+  "xAxis": {
+    "type": "date",
+    "size": 75,
+    "tickRotation": 0,
+    "numTicks": "",
+    "dataKey": "Date",
+    "dateParseFormat": "%m-%d-%Y",
+    "dateDisplayFormat": "%m-%d-%Y"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "show": true
+  },
+  "legend": {
+    "behavior": "isolate",
+    "position": "right"
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "labels": false,
+  "dataDescription": {
+    "horizontal": false,
+    "series": true,
+    "singleRow": false,
+    "seriesKey": "Sex",
+    "xKey": "Date",
+    "valueKey": "Cases per 100K"
+  },
+  "visualizationType": "Line",
+  "series": [
+    {
+      "dataKey": "Male",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Female",
+      "type": "Bar"
+    }
+  ]
+}
