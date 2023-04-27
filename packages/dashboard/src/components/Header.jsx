@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 
 import ConfigContext from '../ConfigContext'
 
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
 
@@ -320,7 +321,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
                 <div className="wrap">
                   <label>
                     <input type='checkbox' defaultChecked={config.table.show} onChange={e => changeConfigValue('table', 'show', e.target.checked)} />
-                    Show Table
+                    Show Data Table(s)
                   </label><br />
 
                   <label>
@@ -351,11 +352,11 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
                 <div className="wrap">
                   <label>
                     <input type='checkbox' defaultChecked={config.table.download} onChange={e => changeConfigValue('table', 'download', e.target.checked)} />
-                    Show CSV Button
+                    Show Download CSV Link
                   </label>
                   <label>
                     <input type='checkbox' defaultChecked={config.table.showDownloadUrl} onChange={e => changeConfigValue('table', 'showDownloadUrl', e.target.checked)} />
-                    Show Link to Dataset
+                    Show URL to Automatically Updated Data
                   </label>
                 </div>
               </>

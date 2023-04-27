@@ -1,0 +1,30 @@
+{
+  "title": "Planet Radius (Pie Example)",
+  "dataUrl": "/examples/feature/tests-non-numerics/planet-example-data-nonnumeric.json",
+  "animate": true,
+  "animateReplay": true,
+  "visualizationType": "Pie",
+  "palette": "qualitative-soft",
+  "aspectRatio": 1,
+  "dataFormat": {
+    "roundTo": 1,
+    "commas": false,
+    "prefix": "",
+    "suffix": "km"
+  },
+  "yAxis": {
+    "label": "Radius",
+    "dataKey": "Radius"
+  },
+  "xAxis": {
+    "label": "Planet",
+    "dataKey": "name"
+  },
+  "legend": {
+    "hide": false
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false
+  }
+}

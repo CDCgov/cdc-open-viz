@@ -61,7 +61,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
     return `<p>
 				${config.dataDescription.seriesKey}: ${groupOne.dataKey}<br/>
 				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
-				${label}${formatNumber(d[groupOne.dataKey])}
+				${label}${formatNumber(d[groupOne.dataKey], 'left')}
 			</p>`
   }
 
@@ -69,7 +69,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
     return `<p>
 				${config.dataDescription.seriesKey}: ${groupTwo.dataKey}<br/>
 				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
-				${label}${formatNumber(d[groupTwo.dataKey])}
+				${label}${formatNumber(d[groupTwo.dataKey], 'left')}
 			</p>`
   }
 
@@ -99,7 +99,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-                const textWidth = getTextWidth(formatNumber(d[groupOne.dataKey]), `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const textWidth = getTextWidth(formatNumber(d[groupOne.dataKey], 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`)
                 const textFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
@@ -123,7 +123,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                       />
                       {config.yAxis.displayNumbersOnBar && displayBar && (
                         <Text textAnchor={textFits ? 'start' : 'end'} dx={textFits ? 5 : -5} verticalAnchor='middle' x={halfWidth - barWidth} y={y + config.barHeight / 2} fill={textFits ? groupOne.labelColor : '#000'}>
-                          {formatNumber(d[groupOne.dataKey])}
+                          {formatNumber(d[groupOne.dataKey], 'left')}
                         </Text>
                       )}
                     </Group>
@@ -143,7 +143,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-                const textWidth = getTextWidth(formatNumber(d[groupTwo.dataKey]), `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const textWidth = getTextWidth(formatNumber(d[groupTwo.dataKey], 'left'), `normal ${fontSize[config.fontSize]}px sans-serif`)
                 const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
@@ -174,7 +174,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                       />
                       {config.yAxis.displayNumbersOnBar && displayBar && (
                         <Text textAnchor={isTextFits ? 'end' : 'start'} dx={isTextFits ? -5 : 5} verticalAnchor='middle' x={halfWidth + barWidth} y={y + config.barHeight / 2} fill={isTextFits ? groupTwo.labelColor : '#000'}>
-                          {formatNumber(d[groupTwo.dataKey])}
+                          {formatNumber(d[groupTwo.dataKey], 'left')}
                         </Text>
                       )}
                     </Group>
