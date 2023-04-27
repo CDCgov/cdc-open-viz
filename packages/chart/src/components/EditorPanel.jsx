@@ -777,7 +777,7 @@ const EditorPanel = () => {
 
   // prettier-ignore
   const enabledChartTypes = [
-    // 'Area Chart',
+    'Area Chart',
     'Bar',
     'Box Plot',
     'Combo',
@@ -1975,8 +1975,7 @@ const EditorPanel = () => {
                             </select>
                           </label>
 
-                          {/*  COMING SOON: 4.23.5 FILTER STYLES  */}
-                          {/* <label>
+                          <label>
                             <span className='edit-label column-heading'>Filter Style</span>
 
                             <select
@@ -1989,7 +1988,7 @@ const EditorPanel = () => {
                                 return <option value={item}>{item}</option>
                               })}
                             </select>
-                          </label> */}
+                          </label>
                           <label>
                             <span className='edit-label column-heading'>Label</span>
                             <input
