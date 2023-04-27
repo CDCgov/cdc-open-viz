@@ -189,6 +189,24 @@
       }
     }
 
+    .url-filters-block {
+      font-size: 12.8px;
+
+      .cove-icon {
+        margin: 0 0.5rem;
+      }
+
+      .url-value-label {
+        margin: 0 1em;
+      }
+
+      label {
+        margin-top: 1em;
+        display: inline-block;
+        width: 100%;
+      }
+    }
+
     .url-source-options,
     .data-source-options {
       display: grid;
