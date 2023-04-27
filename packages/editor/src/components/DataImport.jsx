@@ -488,22 +488,22 @@ export default function DataImport() {
           filter.type !== 'url' ? (
             <></>
           ) : (
-            <fieldset key={filter.key} className='edit-block'>
+            <fieldset key={filter.key} className='edit-block url-filters-block'>
+              <button
+                onClick={e => {
+                  let newFilters = [...config.filters]
+                  newFilters.splice(i, 1)
+                  setConfig({ ...config, filters: newFilters, runtimeDataUrl: undefined })
+                }}
+              >
+                Remove
+              </button>
               <label>
-                <button
-                  onClick={e => {
-                    let newFilters = [...config.filters]
-                    newFilters.splice(i, 1)
-                    setConfig({ ...config, filters: newFilters, runtimeDataUrl: undefined })
-                  }}
-                >
-                  Remove
-                </button>
                 <span class='edit-label column-heading'>
                   Label
                   <Tooltip style={{ textTransform: 'none' }}>
                     <Tooltip.Target>
-                      <Icon display='question' style={{ margin: '0.5rem' }} />
+                      <Icon display='question' />
                     </Tooltip.Target>
                     <Tooltip.Content>
                       <p style={{ padding: '0.5rem' }}>The label that will appear above the dropdown filter.</p>
@@ -519,11 +519,13 @@ export default function DataImport() {
                     setConfig({ ...config, filters: newFilters })
                   }}
                 />
+              </label>
+              <label>
                 <span class='edit-label column-heading'>
                   Query string parameter
                   <Tooltip style={{ textTransform: 'none' }}>
                     <Tooltip.Target>
-                      <Icon display='question' style={{ margin: '0.5rem' }} />
+                      <Icon display='question' />
                     </Tooltip.Target>
                     <Tooltip.Content>
                       <p style={{ padding: '0.5rem' }}>Name of the query string parameter that will be appended to the URL above with the values provided below.</p>
@@ -540,7 +542,9 @@ export default function DataImport() {
                   }}
                 />
               </label>
-              <span class='edit-label column-heading'>Values</span>{' '}
+              <label>
+                <span class='edit-label column-heading'>Values</span>{' '}
+              </label>
               <ul className='value-list'>
                 {filter.orderedValues &&
                   filter.orderedValues.map((value, valueIndex) => (
@@ -550,6 +554,7 @@ export default function DataImport() {
                         type='text'
                         placeholder='Enter value display name here'
                         value={filter.labels ? filter.labels[value] : undefined}
+                        className='url-value-label'
                         onChange={e => {
                           let newFilters = [...config.filters]
 
@@ -590,7 +595,10 @@ export default function DataImport() {
                   }
                 }}
               >
-                <input type='text' /> <button type='submit'>Add New Value</button>
+                <input type='text' placeholder='Enter new value name here' />{' '}
+                <button type='submit' style={{ marginTop: '1em' }}>
+                  Add New Value
+                </button>
               </form>
             </fieldset>
           )
