@@ -29,7 +29,9 @@
       "stateName": "Alabama"
     },
     "showDownloadImgButton": false,
-    "showDownloadPdfButton": false
+    "showDownloadPdfButton": false,
+    "territoriesAlwaysShow": false,
+    "geoLabelOverride": ""
   },
   "type": "map",
   "color": "yelloworangered",
@@ -79,19 +81,31 @@
     "description": "Legend Text",
     "type": "equalnumber",
     "specialClasses": [
-      { "key": "Rate", "value": "*", "label": "*" },
-      { "key": "Rate", "value": "NA", "label": "N/A" }
+      {
+        "key": "Rate",
+        "value": "*",
+        "label": "*"
+      },
+      {
+        "key": "Rate",
+        "value": "NA",
+        "label": "N/A"
+      }
     ],
     "unified": false,
     "singleColumn": false,
     "dynamicDescription": false,
     "descriptions": {},
-    "singleRow": false
+    "singleRow": false,
+    "showSpecialClassesLast": false
   },
-  "filters": [],
   "dataTable": {
     "title": "Data Table",
     "forceDisplay": true
+  },
+  "table": {
+    "showDownloadUrl": false,
+    "showDataTableLink": true
   },
   "tooltips": {
     "appearanceType": "hover",
@@ -106,11 +120,18 @@
     "minBubbleSize": 1,
     "maxBubbleSize": 20,
     "extraBubbleBorder": false,
-    "showBubbleZeros": false
+    "showBubbleZeros": false,
+    "geoCodeCircleSize": 2
   },
   "mapPosition": {
-    "coordinates": [0, 30],
+    "coordinates": [
+      0,
+      30
+    ],
     "zoom": 1
+  },
+  "map": {
+    "layers": []
   },
   "sharing": {
     "enabled": false,
@@ -737,5 +758,6 @@
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     }
-  ]
+  ],
+  "filterStyle": "Filter Changes"
 }

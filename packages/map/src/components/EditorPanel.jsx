@@ -27,6 +27,9 @@ import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import worldDefaultConfig from '../../examples/default-world.json'
 import usaDefaultConfig from '../../examples/default-usa.json'
 import countyDefaultConfig from '../../examples/default-county.json'
+import useMapLayers from '../hooks/useMapLayers'
+
+import { useFilters } from '@cdc/core/components/Filters'
 
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -65,7 +68,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend, changeFilterActive } = props
+  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend, changeFilterActive, isDebug, setRuntimeFilters } = props
 
   const { general, columns, legend, dataTable, tooltips } = state
 
@@ -79,7 +82,21 @@ const EditorPanel = props => {
 
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
 
+  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config: state, setConfig: setState, filteredData: runtimeFilters, setFilteredData: setRuntimeFilters })
+
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
+
+  const {
+    // prettier-ignore
+    MapLayerHandlers: {
+      handleAddLayer,
+      handleMapLayerName,
+      handleMapLayerUrl,
+      handleRemoveLayer,
+      handleMapLayerNamespace,
+      handleMapLayerTooltip
+    }
+  } = useMapLayers(state, setState, false, true)
 
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = [...state.legend.categoryValuesOrder]
@@ -119,7 +136,7 @@ const EditorPanel = props => {
   }
 
   const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-    <label className='checkbox'>
+    <label className='checkbox column-heading'>
       <input
         type='checkbox'
         name={fieldName}
@@ -135,23 +152,6 @@ const EditorPanel = props => {
       </span>
     </label>
   ))
-
-  const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
-    let filterOrder = filter.values
-    let [movedItem] = filterOrder.splice(idx1, 1)
-    filterOrder.splice(idx2, 0, movedItem)
-    let filters = [...runtimeFilters]
-    let filterItem = { ...runtimeFilters[filterIndex] }
-    filterItem.active = filter.values[0]
-    filterItem.values = filterOrder
-    filterItem.order = 'cust'
-    filters[filterIndex] = filterItem
-
-    setState({
-      ...state,
-      filters
-    })
-  }
 
   const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', ...attributes }) => {
     const [value, setValue] = useState(stateValue)
@@ -201,6 +201,17 @@ const EditorPanel = props => {
           }
         })
         break
+
+      case 'toggleDataTableLink':
+        setState({
+          ...state,
+          table: {
+            ...state.table,
+            showDataTableLink: value
+          }
+        })
+        break
+
       case 'toggleDataUrl':
         setState({
           ...state,
@@ -498,7 +509,7 @@ const EditorPanel = props => {
             })
             break
           default:
-            console.warn('Map type not set')
+            console.warn('COVE: Map type not set') // eslint-disable-line
             break
         }
         break
@@ -733,8 +744,14 @@ const EditorPanel = props => {
           }
         })
         break
+      case 'filterBehavior':
+        setState({
+          ...state,
+          filterBehavior: value
+        })
+        break
       default:
-        console.warn(`Did not recognize editor property.`)
+        console.warn(`COVE: Did not recognize editor property.`) // eslint-disable-line
         break
     }
   }
@@ -857,6 +874,10 @@ const EditorPanel = props => {
           newFilters.splice(idx, 1)
         }
         break
+      case 'filterStyle':
+        newFilters[idx] = { ...newFilters[idx] }
+        newFilters[idx].filterStyle = value
+        break
       case 'columnName':
         newFilters[idx] = { ...newFilters[idx] }
         newFilters[idx].columnName = value
@@ -905,6 +926,33 @@ const EditorPanel = props => {
         }
       }
     })
+  }
+
+  const MapFilters = () => {
+    return (
+      <>
+        <label>
+          Filter Behavior
+          <select
+            value={state.filterBehavior}
+            onChange={e => {
+              setState({
+                ...state,
+                filterBehavior: e.target.value
+              })
+            }}
+          >
+            <option key='Apply Button' value='Apply Button'>
+              Apply Button
+            </option>
+            <option key='Filter Change' value='Filter Change'>
+              Filter Change
+            </option>
+          </select>
+        </label>
+        {filtersJSX}
+      </>
+    )
   }
 
   const removeAdditionalColumn = columnName => {
@@ -1008,7 +1056,7 @@ const EditorPanel = props => {
     if (!isReversed && state.color.endsWith('reverse')) {
       paletteName = state.color.slice(0, -7)
     }
-    if(paletteName){
+    if (paletteName) {
       handleEditorChanges('color', paletteName)
     }
   }, [isReversed])
@@ -1140,99 +1188,106 @@ const EditorPanel = props => {
       usedFilterColumns[filter.columnName] = true
     }
 
-    const filterOptions = [
-      {
-        label: 'Ascending Alphanumeric',
-        value: 'asc'
-      },
-      {
-        label: 'Descending Alphanumeric',
-        value: 'desc'
-      },
-      {
-        label: 'Custom',
-        value: 'cust'
-      }
-    ]
-
     return (
-      <fieldset className='edit-block' key={`filter-${index}`}>
-        <button
-          className='remove-column'
-          onClick={e => {
-            e.preventDefault()
-            changeFilter(index, 'remove')
-          }}
-        >
-          Remove
-        </button>
-        <TextField value={state.filters[index].label} section='filters' subsection={index} fieldName='label' label='Label' updateField={updateField} />
-        <label>
-          <span className='edit-label column-heading'>
-            Filter Column
-            <Tooltip style={{ textTransform: 'none' }}>
-              <Tooltip.Target>
-                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <p>Selecting a column will add a dropdown menu below the map legend and allow users to filter based on the values in this column.</p>
-              </Tooltip.Content>
-            </Tooltip>
-          </span>
-          <select
-            value={filter.columnName}
-            onChange={event => {
-              changeFilter(index, 'columnName', event.target.value)
+      <>
+        <fieldset className='edit-block' key={`filter-${index}`}>
+          <button
+            className='remove-column'
+            onClick={e => {
+              e.preventDefault()
+              changeFilter(index, 'remove')
             }}
           >
-            {columnsOptions.filter(({ key }) => undefined === usedFilterColumns[key] || filter.columnName === key)}
-          </select>
-        </label>
+            Remove
+          </button>
+          <TextField value={state.filters[index].label} section='filters' subsection={index} fieldName='label' label='Label' updateField={updateField} />
+          <label>
+            <span className='edit-label column-heading'>
+              Filter Column
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>Selecting a column will add a dropdown menu below the map legend and allow users to filter based on the values in this column.</p>
+                </Tooltip.Content>
+              </Tooltip>
+            </span>
+            <select
+              value={filter.columnName}
+              onChange={event => {
+                changeFilter(index, 'columnName', event.target.value)
+              }}
+            >
+              {columnsOptions.filter(({ key }) => undefined === usedFilterColumns[key] || filter.columnName === key)}
+            </select>
+          </label>
 
-        <label>
-          <span className='edit-filterOrder column-heading'>Filter Order</span>
-          <select
-            value={filter.order}
-            onChange={e => {
-              changeFilter(index, 'filterOrder', e.target.value)
-              changeFilterActive(index, filter.values[0])
-            }}
-          >
-            {filterOptions.map((option, index) => {
-              return (
-                <option value={option.value} key={`filter-${index}`}>
-                  {option.label}
-                </option>
-              )
-            })}
-          </select>
-        </label>
+          {/* COMING SOON: 4.23.5: FILTER STYLES */}
 
-        {filter.order === 'cust' && (
-          <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, runtimeFilters[index])}>
-            <Droppable droppableId='filter_order'>
-              {provided => (
-                <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-                  {runtimeFilters[index]?.values.map((value, index) => {
-                    return (
-                      <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
-                        {(provided, snapshot) => (
-                          <li>
-                            <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                              {value}
-                            </div>
-                          </li>
-                        )}
-                      </Draggable>
-                    )
-                  })}
-                  {provided.placeholder}
-                </ul>
-              )}
-            </Droppable>
-          </DragDropContext>
-        )}
-      </fieldset>
+          {/* <label>
+            <span className='edit-filterOrder column-heading'>Filter Style</span>
+            <select
+              value={filter.filterStyle}
+              onChange={e => {
+                changeFilter(index, 'filterStyle', e.target.value)
+              }}
+            >
+              {filterStyleOptions.map((option, index) => {
+                return (
+                  <option value={option} key={`filter-${option}--${index}`}>
+                    {option}
+                  </option>
+                )
+              })}
+            </select>
+          </label> */}
+
+          <label>
+            <span className='edit-filterOrder column-heading'>Filter Order</span>
+            <select
+              value={filter.order}
+              onChange={e => {
+                changeFilter(index, 'filterOrder', e.target.value)
+                changeFilterActive(index, filter.values[0])
+              }}
+            >
+              {filterOrderOptions.map((option, index) => {
+                return (
+                  <option value={option.value} key={`filter-${index}`}>
+                    {option.label}
+                  </option>
+                )
+              })}
+            </select>
+          </label>
+
+          {filter.order === 'cust' && (
+            <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, state.filters[index])}>
+              <Droppable droppableId='filter_order'>
+                {provided => (
+                  <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
+                    {state.filters[index]?.values.map((value, index) => {
+                      return (
+                        <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
+                          {(provided, snapshot) => (
+                            <li>
+                              <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                {value}
+                              </div>
+                            </li>
+                          )}
+                        </Draggable>
+                      )
+                    })}
+                    {provided.placeholder}
+                  </ul>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
+        </fieldset>
+      </>
     )
   })
 
@@ -1314,6 +1369,24 @@ const EditorPanel = props => {
       </section>
     )
   }
+
+  const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
+
+  // if isDebug = true, then try to set the Geography Col and Data col to reduce clicking
+  const setGeoColumn = () => {
+    // only for debug mode
+    let geoColFound = columnsInData.includes(state.columns.geo.name)
+    if (undefined !== isDebug && isDebug && !geoColFound) {
+      // then try to set the x axis to appropriate value so we dont have to manually do it
+      let mapcols = columnsInData[0]
+      if (mapcols !== '') editColumn('geo', 'name', mapcols)
+
+      if (!state.columns.hasOwnProperty('primary') || undefined === state.columns.primary.name || '' === state.columns.primary.name || !state.columns.primary.name) {
+        editColumn('primary', 'name', columnsInData[1]) // blindly picks first value col
+      }
+    }
+  }
+  if (isDebug) setGeoColumn()
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -2131,6 +2204,7 @@ const EditorPanel = props => {
                       </label>
                     )}
                     {/* always show */}
+                    {/*
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -2140,7 +2214,7 @@ const EditorPanel = props => {
                         }}
                       />
                       <span className='edit-label'>Show Special Classes Last</span>
-                    </label>
+                    </label> */}
                     {'category' !== legend.type && (
                       <label className='checkbox'>
                         <input type='checkbox' checked={legend.separateZero || false} onChange={event => handleEditorChanges('separateZero', event.target.checked)} />
@@ -2158,7 +2232,6 @@ const EditorPanel = props => {
                       </label>
                     )}
                     {/* Temp Checkbox */}
-
                     {state.legend.type === 'equalnumber' && (
                       <label className='checkbox mt-4'>
                         <input
@@ -2322,7 +2395,7 @@ const EditorPanel = props => {
                     <AccordionItemButton>Filters</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    {filtersJSX.length > 0 ? filtersJSX : <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
+                    {filtersJSX.length > 0 ? <MapFilters /> : <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
                     <button
                       className={'btn full-width'}
                       onClick={event => {
@@ -2370,11 +2443,11 @@ const EditorPanel = props => {
                           handleEditorChanges('showDataTable', event.target.checked)
                         }}
                       />
-                      <span className='edit-label'>
-                        Show Table
+                      <span className='edit-label column-heading'>
+                        Show Data Table
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
@@ -2440,16 +2513,30 @@ const EditorPanel = props => {
                       />
                       <span className='edit-label'>Map loads with data table expanded</span>
                     </label>
-                    <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.table.showDownloadUrl}
-                        onChange={event => {
-                          handleEditorChanges('toggleDataUrl', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>Enable Link to Dataset</span>
-                    </label>
+                    {isDashboard && (
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={state.table.showDataTableLink}
+                          onChange={event => {
+                            handleEditorChanges('toggleDataTableLink', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Show Data Table Name & Link</span>
+                      </label>
+                    )}
+                    {isLoadedFromUrl && (
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={state.table.showDownloadUrl}
+                          onChange={event => {
+                            handleEditorChanges('toggleDataUrl', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Show URL to Automatically Updated Data</span>
+                      </label>
+                    )}
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -2458,7 +2545,7 @@ const EditorPanel = props => {
                           handleEditorChanges('toggleDownloadButton', event.target.checked)
                         }}
                       />
-                      <span className='edit-label'>Enable Download CSV Button</span>
+                      <span className='edit-label'>Show Download CSV Link</span>
                     </label>
                     {/* <label className='checkbox'>
                       <input
@@ -2722,6 +2809,45 @@ const EditorPanel = props => {
                     ))}
                 </AccordionItemPanel>
               </AccordionItem>
+              {/* HIDING FOR 4.23.4 */}
+              {/* <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Custom Map Layers</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  {state.map.layers.length === 0 && <p>There are currently no layers.</p>}
+
+                  {state.map.layers.map((layer, index) => {
+                    return (
+                      <>
+                        <Accordion allowZeroExpanded>
+                          <AccordionItem className='series-item map-layers-list'>
+                            <AccordionItemHeading className='series-item__title map-layers-list--title'>
+                              <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
+                            </AccordionItemHeading>
+                            <AccordionItemPanel>
+                              <div className='map-layers-panel'>
+                                <label htmlFor='layerName'>Layer Name:</label>
+                                <input type='text' name='layerName' value={layer.name} onChange={e => handleMapLayerName(e, index)} />
+                                <label htmlFor='layerFilename'>File:</label>
+                                <input type='text' name='layerFilename' value={layer.url} onChange={e => handleMapLayerUrl(e, index)} />
+                                <label htmlFor='layerNamespace'>TOPOJSON Namespace:</label>
+                                <input type='text' name='layerNamespace' value={layer.namespace} onChange={e => handleMapLayerNamespace(e, index)} />
+                                <label htmlFor='layerTooltip'>Tooltip:</label>
+                                <textarea name='layerTooltip' value={layer.tooltip} onChange={e => handleMapLayerTooltip(e, index)}></textarea>
+                                <button onClick={e => handleRemoveLayer(e, index)}>Remove Layer</button>
+                              </div>
+                            </AccordionItemPanel>
+                          </AccordionItem>
+                        </Accordion>
+                      </>
+                    )
+                  })}
+                  <button className={'btn full-width'} onClick={handleAddLayer}>
+                    Add Map Layer
+                  </button>
+                </AccordionItemPanel>
+              </AccordionItem> */}
             </Accordion>
           </form>
           <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
