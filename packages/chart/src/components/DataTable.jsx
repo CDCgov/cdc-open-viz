@@ -12,7 +12,7 @@ import ConfigContext from '../ConfigContext'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
+  const { rawData, tableData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
@@ -35,7 +35,7 @@ export default function DataTable() {
     switch (type) {
       case 'download':
         return (
-          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
+          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border margin-sm`}>
             Download Data (CSV)
           </a>
         )
@@ -75,7 +75,9 @@ export default function DataTable() {
                     values: labels.values,
                     columnTotal: labels.total,
                     columnSd: 'Standard Deviation',
-                    nonOutlierValues: 'Non Outliers'
+                    nonOutlierValues: 'Non Outliers',
+                    columnLowerBounds: labels.lowerBounds,
+                    columnUpperBounds: labels.upperBounds
                   }
 
                   let resolvedName = columnLookup[props.row.original[0]]
@@ -232,8 +234,7 @@ export default function DataTable() {
         </div>
         <div className='table-container' hidden={!tableExpanded} style={{ maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>
           <table className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} {...getTableProps()} aria-rowcount={config?.series?.length ? config?.series?.length : '-1'}>
-            <caption className='cdcdataviz-sr-only'>{config.table.caption ? config.table.caption : ''}</caption>
-            <caption className='visually-hidden'>{config.table.label}</caption>
+            <caption className='cdcdataviz-sr-only visually-hidden'>{config.table.caption ? config.table.caption : config.table.label ? config.table.label : 'Data Table'}</caption>
             <thead>
               {headerGroups.map((headerGroup, index) => (
                 <tr {...headerGroup.getHeaderGroupProps()} key={`headerGroups--${index}`}>
@@ -275,7 +276,7 @@ export default function DataTable() {
               })}
             </tbody>
           </table>
-          {config.regions && config.regions.length > 0 && !config.visualizationType === 'Box Plot' ? (
+          {config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' ? (
             <table className='region-table data-table'>
               <caption className='visually-hidden'>Table of the highlighted regions in the visualization</caption>
               <thead>

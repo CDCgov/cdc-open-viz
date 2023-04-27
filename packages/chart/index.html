@@ -20,44 +20,78 @@
 </head>
 
 <body>
-  <!-- <div class="react-container" data-config="/examples/temp-example-config.json"></div> -->
 
-  <!-- <select id="cove_select">
-      <option value=""">Choose An Option</option>
-      <option value="Non-Hispanic White">Non-Hispanic White</option>
-      <option value="Hispanic or Latino">Test 2</option>
-    </select> -->
+    <!--
+      EXAMPLES:
+        chart/examples/features: different chart types and tests
+        chart/examples/private: an ignored git folder used for addl. troubleshooting.
+        chart/examples/gallery: examples pulled from the cdc data visualization gallery
+        chart/examples/__data__: a folder for storing re-usable fictional datasets
 
-  <!-- <div class="react-container" data-config="/examples/dynamic-legends.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/cutoff-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/covid-confidence-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/planet-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/planet-chart-horizontal-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/planet-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/example-sparkline.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/date-exclusions-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/case-rate-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/example-bar-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/example-sparkline.json"></div>  -->
-  <!-- DATA PRESENTATION GALLERY: https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/bar-chart.html#examples -->
+      GALLERY EXAMPLES ARE FOUND HERE:
+        https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-data-map-cities-states.html
 
-  <div class="react-container" data-config="/examples/gallery/line/line.json"></div>
-   <!-- EDGE CASES -->
-  <!-- <div class="react-container" data-config="/examples/big-small-test-line.json"></div>  -->
-  <!-- <div class="react-container" data-config="/examples/big-small-test-bar.json"></div>  -->
-  <!-- <div class="react-container" data-config="/examples/big-small-test-negative.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/line-chart-max-increase.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/horizontal-chart-max-increase.json"></div> -->
+  -->
 
-  <!-- NONNUMERIC TESTS -->
-  <!-- <div class="react-container" data-config="/examples/planet-pie-example-config-nonnumeric.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/planet-pie-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/example-combo-bar-nonnumeric.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/example-bar-chart-nonnumeric.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/line-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/sparkline-chart-nonnumeric.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/area-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/scatterplot.json"></div> -->
+  <!-- GENERIC CHART TYPES -->
+  <!-- <div class="react-container" data-config="/examples/feature/pie/planet-pie-example-config.json"></div> -->
+  <div class="react-container" data-config="/examples/feature/line/line-chart.json"></div>
+  <!-- <div class="react-container" data-config="/examples/feature/area/area-chart.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/scatterplot/scatterplot.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/deviation/planet-deviation-config.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/boxplot/boxplot.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/combo/planet-combo-example-config.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/paired-bar/paired-bar-example.json"></div> -->
+
+  <!-- BAR -->
+  <!-- <div class="react-container" data-config="/examples/feature/bar/planet-example-config.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/bar/planet-chart-horizontal-example-config.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/bar/example-bar-chart.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-chart-max-increase.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-chart.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-stacked-bar-chart.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/bar/planet-chart-horizontal-example-config.json"></div> -->
+
+  <!-- SPARKLINE -->
+  <!-- <div class="react-container" data-config="/examples/feature/sparkline/example-sparkline.json"></div> -->
+
+  <!-- TESTS FILTERS -->
+<!-- <div class="react-container" data-config="/examples/feature/filters/filter-testing.json"></div> -->
+<!-- <div class="react-container" data-config="/examples/private/dev-bar.json"></div> -->
+
+  <!-- TESTS DATE EXCLUSIONS -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-date-exclusions/date-exclusions-config.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-case-rate/case-rate-example-config.json"></div> -->
+
+   <!-- TESTS BIG SMALL-->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/big-small-test-line.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/big-small-test-bar.json"></div>  -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/big-small-test-negative.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/line-chart-max-increase.json"></div> -->
+
+  <!-- TESTS NONNUMERICS -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/planet-pie-example-config-nonnumeric.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/example-combo-bar-nonnumeric.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/example-bar-chart-nonnumeric.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/sparkline-chart-nonnumeric.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/stacked-vertical-bar-example-nonnumerics.json"></div> -->
+
+  <!-- TESTS CUTOFF -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-cutoff/cutoff-example-config.json"></div> -->
+
+  <!-- TESTS COVID -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-covid/covid-confidence-example-config.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/feature/tests-covid/covid-example-config.json"></div> -->
+
+
+    <!--
+      GALLERY EXAMPLES BELOW THIS LINE...
+        https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-data-map-cities-states.html
+
+    -->
+
+  <!-- GENERIC CHART TYPES  -->
+  <!-- <div class="react-container" data-config="/examples/gallery/paired-bar/paired-bar-chart.json"></div> -->
 
   <!-- HORIZONTAL BAR CHARTS -->
   <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-horizontal/horizontal-bar-chart-with-numbers-on-bar.json"></div> -->
@@ -65,22 +99,12 @@
   <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-horizontal/horizontal-stacked.json"></div> -->
 
   <!-- VERTICAL BAR CHARTS -->
-   <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/combo-line-chart.json"></div> -->
+  <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/combo-line-chart.json"></div> -->
   <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart-categorical.json"></div> -->
   <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart-stacked.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/stacked-vertical-bar-example-nonnumerics.json"></div> -->
   <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart-confidence.json"></div> -->
   <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart-confidence.json"></div>  -->
   <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart.json"></div> -->
-
-  <!-- <div class="react-container" data-config="/examples/area-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/scatterplot.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/box-plot.json"></div> -->
-    <!-- Paired bar Chart  -->
-    <!-- <div class="react-container" data-config="/examples/gallery/paired-bar/paired-bar-chart.json"></div> -->
-
-  <!-- Deviation Bar Chart  -->
-   <!-- <div class="react-container" data-config="/examples/planet-deviation-config.json"></div> -->
 
   <noscript>You need to enable JavaScript to run this app.</noscript>
 </body>

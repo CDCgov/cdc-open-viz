@@ -74,7 +74,8 @@ const Icon = ({ display = null, base, alt = '', size, color, style, ...attribute
   const styles = {
     ...style,
     color: color ? color : null,
-    width: size ? size + 'px' : null
+    width: size ? size + 'px' : null,
+    cursor: display === 'move' ? 'move' : 'default'
   }
 
   return (
