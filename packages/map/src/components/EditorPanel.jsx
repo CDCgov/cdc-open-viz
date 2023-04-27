@@ -1223,9 +1223,7 @@ const EditorPanel = props => {
             </select>
           </label>
 
-          {/* COMING SOON: 4.23.5: FILTER STYLES */}
-
-          {/* <label>
+          <label>
             <span className='edit-filterOrder column-heading'>Filter Style</span>
             <select
               value={filter.filterStyle}
@@ -1241,7 +1239,7 @@ const EditorPanel = props => {
                 )
               })}
             </select>
-          </label> */}
+          </label>
 
           <label>
             <span className='edit-filterOrder column-heading'>Filter Order</span>
@@ -2809,8 +2807,7 @@ const EditorPanel = props => {
                     ))}
                 </AccordionItemPanel>
               </AccordionItem>
-              {/* HIDING FOR 4.23.4 */}
-              {/* <AccordionItem>
+              <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Custom Map Layers</AccordionItemButton>
                 </AccordionItemHeading>
@@ -2847,7 +2844,7 @@ const EditorPanel = props => {
                     Add Map Layer
                   </button>
                 </AccordionItemPanel>
-              </AccordionItem> */}
+              </AccordionItem>
             </Accordion>
           </form>
           <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
