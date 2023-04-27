@@ -26,7 +26,7 @@ import Forecasting from './Forecasting'
 
 // TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType } = useContext(ConfigContext)
 
   let [width] = dimensions
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
@@ -297,7 +297,7 @@ export default function LinearChart() {
       const xColumnName = config.xAxis.dataKey
 
       yScale = scaleLinear({
-        domain: [Math.min.apply(null, barDataMapped), Math.max.apply(null, barDataMapped)],
+        domain: [min, max],
         range: [yMax, 0]
       })
 
@@ -564,15 +564,17 @@ export default function LinearChart() {
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                         {!config.xAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke={config.xAxis.tickColor} />}
                         {!config.xAxis.hideLabel && (
-                          <Text
-                            transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
-                            verticalAnchor='start'
-                            textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
-                            width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
-                            fill={config.xAxis.tickLabelColor}
-                          >
-                            {tick.formattedValue}
-                          </Text>
+                          <>
+                            <Text
+                              transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
+                              verticalAnchor='start'
+                              textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
+                              width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
+                              fill={config.xAxis.tickLabelColor}
+                            >
+                              {tick.formattedValue}
+                            </Text>
+                          </>
                         )}
                       </Group>
                     )
@@ -653,7 +655,7 @@ export default function LinearChart() {
             </AxisBottom>
           </>
         )}
-        {config.visualizationType === 'Forecasting' && <Forecasting xScale={xScale} yScale={yScale} height={height} width={xMax} height={yMax} xScaleNoPadding={xScaleNoPadding} chartRef={svgRef} />}
+        {config.visualizationType === 'Forecasting' && <Forecasting xScale={xScale} yScale={yScale} width={xMax} height={yMax} xScaleNoPadding={xScaleNoPadding} chartRef={svgRef} />}
         {config.visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
         {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
         {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
@@ -661,6 +663,21 @@ export default function LinearChart() {
         {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} />}
         {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />}
         {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />}
+
+        {/* y anchors */}
+        {config.yAxis.anchors &&
+          config.yAxis.anchors.map(anchor => {
+            return <Line strokeDasharray={handleLineType(anchor.lineStyle)} stroke='rgba(0,0,0,1)' className='customAnchor' from={{ x: 0 + config.yAxis.size, y: yScale(anchor.value) }} to={{ x: xMax, y: yScale(anchor.value) }} display={config.runtime.horizontal ? 'none' : 'block'} />
+          })}
+
+        {/* x anchors */}
+        {config.xAxis.anchors &&
+          config.xAxis.anchors.map(anchor => {
+            const anchorPosition = xScale(parseDate(anchor.value))
+            return (
+              <Line strokeDasharray={handleLineType(anchor.lineStyle)} stroke='rgba(0,0,0,1)' className='anchor-x' from={{ x: anchorPosition + Number(config.yAxis.size), y: 0 }} to={{ x: anchorPosition + Number(config.yAxis.size), y: yMax }} display={config.runtime.horizontal ? 'none' : 'block'} />
+            )
+          })}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />

@@ -23,11 +23,11 @@
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "100",
+    "size": "75",
     "gridLines": false,
     "enablePadding": false,
-    "min": "",
-    "max": "",
+    "min": "0",
+    "max": "900",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
@@ -41,6 +41,7 @@
     "numTicks": "",
     "axisPadding": 0,
     "tickRotation": 0,
+    "anchors": [],
     "label": "Cases by Date of Report"
   },
   "boxplot": {
@@ -100,6 +101,12 @@
     "labelOffset": 65,
     "axisPadding": 0,
     "target": 0,
+    "anchors": [
+      {
+        "value": "10/19/2022",
+        "lineStyle": "dashed-md"
+      }
+    ],
     "label": "",
     "dataKey": "date",
     "dateParseFormat": "%m/%d/%Y",
@@ -128,7 +135,7 @@
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "position": "right",
-    "hide": false
+    "hide": true
   },
   "exclusions": {
     "active": false,
@@ -158,13 +165,39 @@
     "background": true
   },
   "filterBehavior": "Filter Change",
-  "dataUrl": "./examples/feature/forecasting/data.csv",
-  "animateReplay": true,
-  "visualizationType": "Forecasting",
   "forecastingChart": {
     "showBars": false,
     "barColumn": "confirm",
-    "confidenceIntervals": [],
-    "stages": "type"
-  }
+    "barColor": "#918e90",
+    "confidenceIntervals": [
+      {
+        "low": "lower_20",
+        "high": "upper_20"
+      },
+      {
+        "low": "lower_50",
+        "high": "upper_50"
+      },
+      {
+        "low": "lower_90",
+        "high": "upper_90"
+      }
+    ],
+    "stages": "type",
+    "colors": [
+      "sequential-greenreverse",
+      "sequential-orange-(MPX)reverse",
+      "sequential-blue-2-(MPX)reverse"
+    ],
+    "groups": [
+      "estimate",
+      "estimate based on partial data",
+      "forecast"
+    ],
+    "showBarColumn": true
+  },
+  "dataUrl": "./examples/feature/forecasting/case_date_example.csv",
+  "animateReplay": true,
+  "visualizationType": "Forecasting",
+  "series": []
 }
