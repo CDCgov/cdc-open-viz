@@ -1,0 +1,789 @@
+{
+  "type": "chart",
+  "title": "",
+  "showTitle": true,
+  "theme": "theme-blue",
+  "animate": true,
+  "fontSize": "small",
+  "lineDatapointStyle": "hover",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "rounded",
+  "roundingStyle": "finger",
+  "tipRounding": "full",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "hideAxis": true,
+    "displayNumbersOnBar": true,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "20",
+    "gridLines": false,
+    "enablePadding": false,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 50,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "",
+    "axisPadding": 0,
+    "tickRotation": 0,
+    "type": "chart",
+    "title": "",
+    "showTitle": true,
+    "theme": "theme-blue",
+    "animate": false,
+    "fontSize": "medium",
+    "lineDatapointStyle": "hover",
+    "barHasBorder": "false",
+    "isLollipopChart": false,
+    "lollipopShape": "circle",
+    "lollipopColorStyle": "two-tone",
+    "visualizationSubType": "regular",
+    "barStyle": "",
+    "roundingStyle": "standard",
+    "tipRounding": "top",
+    "padding": {
+      "left": 5,
+      "right": 5
+    },
+    "yAxis": {
+      "hideAxis": false,
+      "displayNumbersOnBar": false,
+      "hideLabel": false,
+      "hideTicks": false,
+      "size": 50,
+      "gridLines": false,
+      "enablePadding": false,
+      "min": "",
+      "max": "",
+      "labelColor": "#333",
+      "tickLabelColor": "#333",
+      "tickColor": "#333",
+      "rightHideAxis": true,
+      "rightAxisSize": 50,
+      "rightLabel": "",
+      "rightLabelOffsetSize": 0,
+      "rightAxisLabelColor": "#333",
+      "rightAxisTickLabelColor": "#333",
+      "rightAxisTickColor": "#333",
+      "numTicks": "",
+      "axisPadding": 0,
+      "tickRotation": 0
+    },
+    "boxplot": {
+      "plots": [],
+      "borders": "true",
+      "firstQuartilePercentage": 25,
+      "thirdQuartilePercentage": 75,
+      "boxWidthPercentage": 40,
+      "plotOutlierValues": false,
+      "plotNonOutlierValues": true,
+      "legend": {
+        "showHowToReadText": false,
+        "howToReadText": ""
+      },
+      "labels": {
+        "q1": "Lower Quartile",
+        "q2": "q2",
+        "q3": "Upper Quartile",
+        "q4": "q4",
+        "minimum": "Minimum",
+        "maximum": "Maximum",
+        "mean": "Mean",
+        "median": "Median",
+        "sd": "Standard Deviation",
+        "iqr": "Interquartile Range",
+        "total": "Total",
+        "outliers": "Outliers",
+        "values": "Values",
+        "lowerBounds": "Lower Bounds",
+        "upperBounds": "Upper Bounds"
+      }
+    },
+    "topAxis": {
+      "hasLine": false
+    },
+    "isLegendValue": false,
+    "barThickness": 0.35,
+    "barHeight": 25,
+    "barSpace": 15,
+    "heights": {
+      "vertical": 300,
+      "horizontal": 200
+    },
+    "xAxis": {
+      "type": "categorical",
+      "showTargetLabel": true,
+      "targetLabel": "Target",
+      "hideAxis": false,
+      "hideLabel": false,
+      "hideTicks": false,
+      "size": 75,
+      "tickRotation": 0,
+      "min": "",
+      "max": "",
+      "labelColor": "#333",
+      "tickLabelColor": "#333",
+      "tickColor": "#333",
+      "numTicks": "",
+      "labelOffset": 65,
+      "axisPadding": 0,
+      "target": 0,
+      "dataKey": "CIO"
+    },
+    "table": {
+      "label": "Data Table",
+      "expanded": true,
+      "limitHeight": false,
+      "height": "",
+      "caption": "",
+      "showDownloadUrl": false,
+      "showDataTableLink": true,
+      "show": true
+    },
+    "orientation": "horizontal",
+    "legend": {
+      "behavior": "isolate",
+      "singleRow": false,
+      "colorCode": "",
+      "reverseLabelOrder": false,
+      "description": "",
+      "dynamicLegend": false,
+      "dynamicLegendDefaultText": "Show All",
+      "dynamicLegendItemLimit": 5,
+      "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+      "dynamicLegendChartMessage": "Select Options from the Legend"
+    },
+    "exclusions": {
+      "active": false,
+      "keys": []
+    },
+    "palette": "qualitative-bold",
+    "isPaletteReversed": false,
+    "twoColor": {
+      "palette": "monochrome-1",
+      "isPaletteReversed": false
+    },
+    "labels": false,
+    "dataFormat": {
+      "commas": false,
+      "prefix": "",
+      "suffix": "",
+      "abbreviated": false,
+      "bottomSuffix": "",
+      "bottomPrefix": "",
+      "bottomAbbreviated": false
+    },
+    "confidenceKeys": {},
+    "visual": {
+      "border": true,
+      "accent": true,
+      "background": true
+    },
+    "filterBehavior": "Filter Change",
+    "highlightedBarValues": [],
+    "datasets": {},
+    "visualizationType": "Bar",
+    "data": [
+      {
+        "Year": "2019",
+        "CIO": "NCBDDD",
+        "Participation": "30"
+      },
+      {
+        "Year": "2019",
+        "CIO": "NCEZID",
+        "Participation": "40"
+      },
+      {
+        "Year": "2019",
+        "CIO": "OC",
+        "Participation": "50"
+      },
+      {
+        "Year": "2019",
+        "CIO": "NCIRD",
+        "Participation": "60"
+      },
+      {
+        "Year": "2019",
+        "CIO": "2018",
+        "Participation": "55"
+      },
+      {
+        "Year": "2020",
+        "CIO": "NCBDDD",
+        "Participation": "30"
+      },
+      {
+        "Year": "2020",
+        "CIO": "NCEZID",
+        "Participation": "40"
+      },
+      {
+        "Year": "2020",
+        "CIO": "OC",
+        "Participation": "50"
+      },
+      {
+        "Year": "2020",
+        "CIO": "NCIRD",
+        "Participation": "60"
+      },
+      {
+        "Year": "2020",
+        "CIO": "2019",
+        "Participation": "55"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCBDDD",
+        "Participation": "30"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCEZID",
+        "Participation": "40"
+      },
+      {
+        "Year": "2021",
+        "CIO": "OC",
+        "Participation": "50"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCIRD",
+        "Participation": "60"
+      },
+      {
+        "Year": "2021",
+        "CIO": "2020",
+        "Participation": "55"
+      }
+    ],
+    "dataFileName": "CIOs_multi.csv",
+    "dataFileSourceType": "file",
+    "formattedData": [
+      {
+        "Year": "2019",
+        "CIO": "NCBDDD",
+        "Participation": "30"
+      },
+      {
+        "Year": "2019",
+        "CIO": "NCEZID",
+        "Participation": "40"
+      },
+      {
+        "Year": "2019",
+        "CIO": "OC",
+        "Participation": "50"
+      },
+      {
+        "Year": "2019",
+        "CIO": "NCIRD",
+        "Participation": "60"
+      },
+      {
+        "Year": "2019",
+        "CIO": "2018",
+        "Participation": "55"
+      },
+      {
+        "Year": "2020",
+        "CIO": "NCBDDD",
+        "Participation": "30"
+      },
+      {
+        "Year": "2020",
+        "CIO": "NCEZID",
+        "Participation": "40"
+      },
+      {
+        "Year": "2020",
+        "CIO": "OC",
+        "Participation": "50"
+      },
+      {
+        "Year": "2020",
+        "CIO": "NCIRD",
+        "Participation": "60"
+      },
+      {
+        "Year": "2020",
+        "CIO": "2019",
+        "Participation": "55"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCBDDD",
+        "Participation": "30"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCEZID",
+        "Participation": "40"
+      },
+      {
+        "Year": "2021",
+        "CIO": "OC",
+        "Participation": "50"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCIRD",
+        "Participation": "60"
+      },
+      {
+        "Year": "2021",
+        "CIO": "2020",
+        "Participation": "55"
+      }
+    ],
+    "dataDescription": {
+      "horizontal": false,
+      "series": false
+    },
+    "runtime": {
+      "seriesLabels": {
+        "Participation": "Participation"
+      },
+      "seriesLabelsAll": [
+        "Participation"
+      ],
+      "originalXAxis": {
+        "type": "categorical",
+        "showTargetLabel": true,
+        "targetLabel": "Target",
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 75,
+        "tickRotation": 0,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "numTicks": "",
+        "labelOffset": 65,
+        "axisPadding": 0,
+        "target": 0,
+        "dataKey": "CIO"
+      },
+      "seriesKeys": [
+        "Participation"
+      ],
+      "xAxis": {
+        "hideAxis": false,
+        "displayNumbersOnBar": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 50,
+        "gridLines": false,
+        "enablePadding": false,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "rightHideAxis": true,
+        "rightAxisSize": 50,
+        "rightLabel": "",
+        "rightLabelOffsetSize": 0,
+        "rightAxisLabelColor": "#333",
+        "rightAxisTickLabelColor": "#333",
+        "rightAxisTickColor": "#333",
+        "numTicks": "",
+        "axisPadding": 0,
+        "tickRotation": 0
+      },
+      "yAxis": {
+        "type": "categorical",
+        "showTargetLabel": true,
+        "targetLabel": "Target",
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 75,
+        "tickRotation": 0,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "numTicks": "",
+        "labelOffset": 65,
+        "axisPadding": 0,
+        "target": 0,
+        "dataKey": "CIO"
+      },
+      "horizontal": true,
+      "uniqueId": 1682687478394,
+      "editorErrorMessage": ""
+    },
+    "series": [
+      {
+        "dataKey": "Participation",
+        "type": "Bar"
+      }
+    ],
+    "filters": [
+      {
+        "values": [
+          "2019",
+          "2020",
+          "2021"
+        ],
+        "active": "2020",
+        "filterStyle": "dropdown",
+        "columnName": "Year",
+        "order": "asc"
+      }
+    ],
+    "labelPlacement": "On Date/Category Axis"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
+    },
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "total": "Total",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": 0.35,
+  "barHeight": "25",
+  "barSpace": "10",
+  "heights": {
+    "vertical": 300,
+    "horizontal": 175
+  },
+  "xAxis": {
+    "type": "categorical",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "100",
+    "tickRotation": 0,
+    "min": "",
+    "max": "100",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 65,
+    "axisPadding": 0,
+    "target": 0,
+    "dataKey": "CIO"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "show": true
+  },
+  "orientation": "horizontal",
+  "legend": {
+    "behavior": "isolate",
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "hide": false,
+    "showLegendValuesTooltip": false,
+    "position": "bottom"
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "%",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true
+  },
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [
+    {
+      "dataKey": "Participation",
+      "value": "2018",
+      "legendLabel": "Previous Year Participation"
+    },
+    {
+      "dataKey": "Participation",
+      "value": "2019",
+      "legendLabel": "Previous Year Participation"
+    },
+    {
+      "dataKey": "Participation",
+      "value": "2020",
+      "legendLabel": "Previous Year Participation"
+    }
+  ],
+  "datasets": {},
+  "visualizationType": "Bar",
+  "data": [
+    {
+      "Year": "2019",
+      "CIO": "NCBDDD",
+      "Participation": "30"
+    },
+    {
+      "Year": "2019",
+      "CIO": "NCEZID",
+      "Participation": "40"
+    },
+    {
+      "Year": "2019",
+      "CIO": "OC",
+      "Participation": "50"
+    },
+    {
+      "Year": "2019",
+      "CIO": "NCIRD",
+      "Participation": "60"
+    },
+    {
+      "Year": "2019",
+      "CIO": "2018",
+      "Participation": "55"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCBDDD",
+      "Participation": "35"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCEZID",
+      "Participation": "46"
+    },
+    {
+      "Year": "2020",
+      "CIO": "OC",
+      "Participation": "57"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCIRD",
+      "Participation": "65"
+    },
+    {
+      "Year": "2020",
+      "CIO": "2019",
+      "Participation": "60"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCBDDD",
+      "Participation": "20"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCEZID",
+      "Participation": "80"
+    },
+    {
+      "Year": "2021",
+      "CIO": "OC",
+      "Participation": "59"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCIRD",
+      "Participation": "30"
+    },
+    {
+      "Year": "2021",
+      "CIO": "2020",
+      "Participation": "75"
+    }
+  ],
+  "dataFileName": "CIOs_multi.csv",
+  "dataFileSourceType": "file",
+  "formattedData": [
+    {
+      "Year": "2019",
+      "CIO": "NCBDDD",
+      "Participation": "30"
+    },
+    {
+      "Year": "2019",
+      "CIO": "NCEZID",
+      "Participation": "40"
+    },
+    {
+      "Year": "2019",
+      "CIO": "OC",
+      "Participation": "50"
+    },
+    {
+      "Year": "2019",
+      "CIO": "NCIRD",
+      "Participation": "60"
+    },
+    {
+      "Year": "2019",
+      "CIO": "2018",
+      "Participation": "55"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCBDDD",
+      "Participation": "35"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCEZID",
+      "Participation": "46"
+    },
+    {
+      "Year": "2020",
+      "CIO": "OC",
+      "Participation": "57"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCIRD",
+      "Participation": "65"
+    },
+    {
+      "Year": "2020",
+      "CIO": "2019",
+      "Participation": "60"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCBDDD",
+      "Participation": "20"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCEZID",
+      "Participation": "80"
+    },
+    {
+      "Year": "2021",
+      "CIO": "OC",
+      "Participation": "59"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCIRD",
+      "Participation": "30"
+    },
+    {
+      "Year": "2021",
+      "CIO": "2020",
+      "Participation": "75"
+    }
+  ],
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "series": [
+    {
+      "dataKey": "Participation",
+      "type": "Bar"
+    }
+  ],
+  "filters": [
+    {
+      "values": [
+        "2019",
+        "2020",
+        "2021"
+      ],
+      "active": "2019",
+      "filterStyle": "dropdown",
+      "columnName": "Year",
+      "order": "asc"
+    }
+  ],
+  "copyOfHighlightedBarValues": [
+    {
+      "dataKey": "Participation",
+      "value": "2018",
+      "legendLabel": "Previous Year Participation"
+    },
+    {
+      "dataKey": "Participation",
+      "value": "2019",
+      "legendLabel": "Previous Year Participation"
+    },
+    {
+      "dataKey": "Participation",
+      "value": "2020",
+      "legendLabel": "Previous Year Participation"
+    }
+  ]
+}
