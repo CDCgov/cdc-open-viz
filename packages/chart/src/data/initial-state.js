@@ -151,5 +151,5 @@ export default {
     background: true
   },
   filterBehavior: 'Filter Change',
-  highlightedBarValues: [{}, {}]
+  highlightedBarValues: []
 }

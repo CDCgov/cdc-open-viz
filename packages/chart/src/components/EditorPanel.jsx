@@ -826,15 +826,13 @@ const EditorPanel = () => {
 
   // prettier-ignore
   const {
-    highlightedSeries,
-    highlightedSeriesKey,
     highlightedBarValues,
     highlightedSeriesValues,
-    handleAddNewHighlightedBar,
     handleUpdateHighlightedBar,
+    handleAddNewHighlightedBar,
+    handleRemoveHighlightedBar,
     handleUpdateHighlightedBarColor,
-    handleHighlightedBarLegendLabel,
-    handleRemoveHighlightedBar
+    handleHighlightedBarLegendLabel
    } = useHighlightedBars(config, updateConfig)
 
   return (

@@ -1,0 +1,345 @@
+{
+  "type": "chart",
+  "title": "Example Horizontal Bar Chart",
+  "showTitle": true,
+  "theme": "theme-teal",
+  "animate": false,
+  "fontSize": "small",
+  "lineDatapointStyle": "hover",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "horizontal",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 50,
+    "gridLines": false,
+    "enablePadding": false,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 50,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "",
+    "axisPadding": 0,
+    "tickRotation": 0,
+    "type": "chart",
+    "title": "Example Horizontal Bar Chart",
+    "theme": "theme-teal",
+    "fontSize": "small",
+    "lineDatapointStyle": "hover",
+    "barHasBorder": "false",
+    "padding": {
+      "left": 5,
+      "right": 5
+    },
+    "yAxis": {
+      "size": 50,
+      "gridLines": false,
+      "label": "X-Axis Example Label",
+      "numTicks": "10"
+    },
+    "barThickness": "0.7",
+    "height": 560,
+    "xAxis": {
+      "type": "categorical",
+      "size": "0",
+      "tickRotation": 0,
+      "dataKey": "Group",
+      "label": ""
+    },
+    "table": {
+      "label": "Data Table",
+      "expanded": true,
+      "download": false,
+      "show": true
+    },
+    "legend": {
+      "behavior": "isolate",
+      "position": "right",
+      "label": "Type of Data"
+    },
+    "exclusions": {
+      "active": false,
+      "keys": []
+    },
+    "palette": "qualitative-soft",
+    "labels": false,
+    "dataFormat": {},
+    "confidenceKeys": {},
+    "data": [
+      {
+        "Group": "Combined Total of Group A",
+        "Vehicle": "100",
+        "Home": "120",
+        "Work": "140",
+        "Office": "120"
+      },
+      {
+        "Group": "Combined Total of Group B",
+        "Vehicle": "150",
+        "Home": "140",
+        "Work": "100",
+        "Office": "90"
+      },
+      {
+        "Group": "Combined Total of Group C",
+        "Vehicle": "90",
+        "Home": "90",
+        "Work": "80",
+        "Office": "80"
+      },
+      {
+        "Group": "Combined Total of Group D",
+        "Vehicle": "70",
+        "Home": "60",
+        "Work": "50",
+        "Office": "70"
+      }
+    ],
+    "visualizationType": "Bar",
+    "visualizationSubType": "horizontal",
+    "series": [
+      {
+        "dataKey": "Vehicle",
+        "type": "Bar"
+      },
+      {
+        "dataKey": "Home",
+        "type": "Bar"
+      },
+      {
+        "dataKey": "Work",
+        "type": "Bar"
+      },
+      {
+        "dataKey": "Office",
+        "type": "Bar"
+      }
+    ],
+    "description": "This example shows a horizontal bar chart created in the visualization editor in WCMS",
+    "runtime": {
+      "seriesLabels": {
+        "Vehicle": "Vehicle",
+        "Home": "Home",
+        "Work": "Work",
+        "Office": "Office"
+      },
+      "seriesLabelsAll": [
+        "Vehicle",
+        "Home",
+        "Work",
+        "Office"
+      ],
+      "originalXAxis": {
+        "type": "categorical",
+        "size": "0",
+        "tickRotation": 0,
+        "dataKey": "Group",
+        "label": ""
+      },
+      "seriesKeys": [
+        "Vehicle",
+        "Home",
+        "Work",
+        "Office"
+      ],
+      "xAxis": {
+        "size": 50,
+        "gridLines": false,
+        "label": "X-Axis Example Label",
+        "numTicks": "10"
+      },
+      "yAxis": {
+        "type": "categorical",
+        "size": "0",
+        "tickRotation": 0,
+        "dataKey": "Group",
+        "label": ""
+      },
+      "horizontal": true,
+      "uniqueId": 1644353484184,
+      "editorErrorMessage": ""
+    },
+    "barPadding": 40,
+    "barHeight": 25,
+    "labelPlacement": "Below Bar",
+    "label": "Accidents"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
+    },
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "total": "Total",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": "0.7",
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 236.8
+  },
+  "xAxis": {
+    "type": "categorical",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "0",
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 65,
+    "axisPadding": 0,
+    "target": 0,
+    "dataKey": "Group",
+    "label": ""
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "download": false,
+    "show": true
+  },
+  "orientation": "horizontal",
+  "legend": {
+    "behavior": "isolate",
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "position": "right",
+    "label": "Location"
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-soft",
+  "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true
+  },
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "height": 560,
+  "data": [
+    {
+      "Group": "Group A Survey Results",
+      "Vehicle": "100",
+      "Home": "120",
+      "Work": "140",
+      "Office": "120"
+    },
+    {
+      "Group": "Group B Survey Results",
+      "Vehicle": "150",
+      "Home": "140",
+      "Work": "100",
+      "Office": "90"
+    },
+    {
+      "Group": "Group C Survey Results",
+      "Vehicle": "90",
+      "Home": "90",
+      "Work": "80",
+      "Office": "80"
+    },
+    {
+      "Group": "Group D Survey Results",
+      "Vehicle": "70",
+      "Home": "60",
+      "Work": "50",
+      "Office": "70"
+    }
+  ],
+  "visualizationType": "Bar",
+  "series": [
+    {
+      "dataKey": "Vehicle",
+      "type": "Bar"
+    }
+  ],
+  "description": "This example shows a horizontal bar chart created in the visualization editor in WCMS",
+  "barPadding": 40,
+  "dataFileName": "3-CSV_Source_Example_for_Horizontal_Bar_viz - Fixed.csv",
+  "dataFileSourceType": "file"
+}

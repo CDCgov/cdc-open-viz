@@ -4,11 +4,29 @@ import ConfigContext from '../ConfigContext'
 export const useHighlightedBars = (config, updateConfig) => {
   const { formatDate, parseDate } = useContext(ConfigContext)
 
-  if (!config.series) return
-  const highlightedSeries = config.series[0] // only allow single series for highlights
-  const highlightedSeriesKey = config.series[0]?.dataKey
-  const highlightedBarValues = config.highlightedBarValues
-  const highlightedSeriesValues = config.data.map(item => item[config.xAxis.dataKey])
+  let highlightedSeries = [] // only allow single series for highlights
+  let highlightedSeriesKey = ''
+  let highlightedBarValues = []
+  let highlightedSeriesValues = []
+
+  if (config.series?.length > 0 && config.data) {
+    highlightedSeries = config.series[0] // only allow single series for highlights
+    highlightedSeriesKey = config.series[0].dataKey
+    highlightedBarValues = config.highlightedBarValues
+    highlightedSeriesValues = config.data.map(item => item[config.xAxis.dataKey])
+  } else {
+    highlightedSeries = [] // only allow single series for highlights
+    highlightedSeriesKey = ''
+    highlightedBarValues = []
+    highlightedSeriesValues = []
+  }
+
+  console.log({
+    highlightedSeries,
+    highlightedSeriesKey,
+    highlightedBarValues,
+    highlightedSeriesValues
+  })
 
   const handleUpdateHighlightedBar = (e, index) => {
     e.preventDefault()
@@ -73,8 +91,14 @@ export const useHighlightedBars = (config, updateConfig) => {
    * @returns {string} - Returns the font color for the given value.
    */
   HighLightedBarUtils.checkFontColor = (formattedValue, highlightedBarValuesIn, labelColor) => {
-    if (HighLightedBarUtils.formatDates(highlightedBarValuesIn).includes(formattedValue)) {
-      return '#000'
+    if (config.xAxis.type === 'date') {
+      if (HighLightedBarUtils.formatDates(highlightedBarValuesIn).includes(formattedValue)) {
+        return '#000'
+      }
+    } else {
+      if (highlightedBarValuesIn.includes(formattedValue)) {
+        return '#000'
+      }
     }
     return labelColor
   }

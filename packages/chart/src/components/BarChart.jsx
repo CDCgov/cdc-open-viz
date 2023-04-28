@@ -315,9 +315,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   >
                     {barGroup.bars.map((bar, index) => {
                       const getHighlightedBarColorByValue = value => {
-                        const match = config.highlightedBarValues.filter(item => {
+                        const match = config?.highlightedBarValues.filter(item => {
                           if (!item.value) return
-                          return formatDate(parseDate(item.value)) === value
+                          return config.xAxis.type === 'date' ? formatDate(parseDate(item.value)) === value : item.value === value
                         })[0]
 
                         if (!match.color) return `rgba(255, 102, 1)`
@@ -325,7 +325,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
                       let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
 
-                      highlightedBarValues = HighLightedBarUtils.formatDates(highlightedBarValues)
+                      highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.Utils.formatDates(highlightedBarValues) : highlightedBarValues
 
                       let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                       let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
@@ -371,8 +371,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       let labelColor = '#000000'
 
                       // Set label color
-                      if (chroma.contrast(labelColor, barColor) < 4.9) {
-                        textFits ? (labelColor = '#FFFFFF') : (labelColor = '#000000')
+                      if (barColor && labelColor) {
+                        if (chroma.contrast(labelColor, barColor) < 4.9) {
+                          labelColor = textFits ? '#FFFFFF' : '#000000'
+                        }
                       }
 
                       // Set if background is transparent'
@@ -432,7 +434,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               width={config.runtime.horizontal ? barWidthHorizontal : barWidth}
                               height={isHorizontal && !config.isLollipopChart ? barWidth : isHorizontal && config.isLollipopChart ? lollipopBarWidth : barHeight}
                               style={{
-                                background: config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : highlightedBarValues.includes(yAxisValue) ? 'transparent' : barColor,
+                                background: config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : highlightedBarValues?.includes(yAxisValue) ? 'transparent' : barColor,
                                 border: `${config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`,
                                 borderColor: highlightedBarValues.includes(yAxisValue) ? getHighlightedBarColorByValue(yAxisValue) : 'transparent',
                                 borderWidth: highlightedBarValues.includes(yAxisValue) ? '3px' : '0px',

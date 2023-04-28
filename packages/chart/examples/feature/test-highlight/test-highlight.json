@@ -96,11 +96,5 @@
   ],
   "visualizationType": "Bar",
   "orientation": "horizontal",
-  "series": [
-    {
-      "dataKey": "Data 1",
-      "type": "Bar",
-      "highlighted": true
-    }
-  ]
+  "series": []
 }
