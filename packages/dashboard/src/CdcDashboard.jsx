@@ -115,20 +115,27 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
   const transform = new DataTransform()
 
+  const getFormattedData = (data, dataDescription) => {
+    if (data && dataDescription) {
+      try {
+        let formattedData = transform.autoStandardize(data)
+        formattedData = transform.developerStandardize(data, dataDescription)
+        return formattedData
+      } catch (e) {
+        return data
+      }
+    }
+
+    return data
+  }
+
   const processData = async config => {
     let dataset = config.formattedData || config.data
 
     if (config.dataUrl) {
       dataset = await fetchRemoteData(`${config.dataUrl}?v=${cacheBustingString()}`)
 
-      if (dataset && config.dataDescription) {
-        try {
-          dataset = transform.autoStandardize(data)
-          dataset = transform.developerStandardize(data, config.dataDescription)
-        } catch (e) {
-          //Data not able to be standardized, leave as is
-        }
-      }
+      dataset = getFormattedData(dataset, config.dataDescription)
     }
 
     return dataset
@@ -230,7 +237,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       if (applicableFilters.length > 0) {
         const visualization = newConfig.visualizations[visualizationKey]
 
-        newFilteredData[visualizationKey] = filterData(applicableFilters, visualization.formattedData || data[visualization.dataKey])
+        const formattedData = visualization.dataDescription ? getFormattedData(visualization.data, visualization.dataDescription) : undefined
+
+        newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || data[visualization.dataKey])
       }
     })
 
@@ -291,7 +300,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
 
         if (applicableFilters.length > 0) {
-          newFilteredData[visualizationKey] = filterData(applicableFilters, newConfig.visualizations[visualizationKey].formattedData || newConfig.visualizations[visualizationKey].data || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey])
+          const visualization = newConfig.visualizations[visualizationKey]
+
+          const formattedData = getFormattedData(visualization.data, visualization.dataDescription)
+
+          newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || visualization.data || (dataOverride || data)[visualization.dataKey])
         }
       })
     }
@@ -336,7 +349,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       Object.keys(config.visualizations).forEach(key => {
         let applicableFilters = dashboardConfig.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
         if (applicableFilters.length > 0) {
-          newFilteredData[key] = filterData(applicableFilters, config.visualizations[key].formattedData || data[config.visualizations[key].dataKey])
+          const visualization = config.visualizations[key]
+
+          const formattedData = visualization.dataDescription ? getFormattedData(visualization.data, visualization.dataDescription) : undefined
+
+          newFilteredData[key] = filterData(applicableFilters, formattedData || data[config.visualizations[key].dataKey])
         }
       })
 
