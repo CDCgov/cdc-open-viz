@@ -58,6 +58,15 @@
       "Data 6": "200"
     },
     {
+      "Date": "2/15/2016",
+      "Data 1": "140",
+      "Data 2": "190",
+      "Data 3": "240",
+      "Data 4": "160",
+      "Data 5": "260",
+      "Data 6": "100"
+    },
+    {
       "Date": "3/15/2016",
       "Data 1": "50",
       "Data 2": "300",
@@ -95,6 +104,5 @@
     }
   ],
   "visualizationType": "Bar",
-  "orientation": "horizontal",
-  "series": []
+  "orientation": "horizontal"
 }
