@@ -21,13 +21,6 @@ export const useHighlightedBars = (config, updateConfig) => {
     highlightedSeriesValues = []
   }
 
-  console.log({
-    highlightedSeries,
-    highlightedSeriesKey,
-    highlightedBarValues,
-    highlightedSeriesValues
-  })
-
   const handleUpdateHighlightedBar = (e, index) => {
     e.preventDefault()
 
@@ -111,9 +104,28 @@ export const useHighlightedBars = (config, updateConfig) => {
    */
   HighLightedBarUtils.formatDates = highlightedBarValues => {
     return highlightedBarValues.map(dateItem => {
-      if (!dateItem) return null
+      if (!dateItem) return false
       return formatDate(parseDate(dateItem))
     })
+  }
+
+  /**
+   * Finds duplicate objects in an array based on the legendLabel property.
+   *
+   * @param {Array} arr - The array of objects to be checked.
+   * @return {Array} - An array of arrays, each containing objects that have the same legendLabel property.
+   */
+  HighLightedBarUtils.findDuplicates = arr => {
+    const duplicates = {}
+    const result = arr.filter(obj => {
+      const { legendLabel } = obj
+      if (!duplicates[legendLabel]) {
+        duplicates[legendLabel] = true
+        return true
+      }
+      return false
+    })
+    return result
   }
 
   return {
