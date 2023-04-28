@@ -237,7 +237,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       if (applicableFilters.length > 0) {
         const visualization = newConfig.visualizations[visualizationKey]
 
-        const formattedData = getFormattedData(visualization.data, visualization.dataDescription)
+        const formattedData = visualization.dataDescription ? getFormattedData(visualization.data, visualization.dataDescription) : undefined
 
         newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || data[visualization.dataKey])
       }
@@ -351,7 +351,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         if (applicableFilters.length > 0) {
           const visualization = config.visualizations[key]
 
-          const formattedData = getFormattedData(visualization.data, visualization.dataDescription)
+          const formattedData = visualization.dataDescription ? getFormattedData(visualization.data, visualization.dataDescription) : undefined
 
           newFilteredData[key] = filterData(applicableFilters, formattedData || data[config.visualizations[key].dataKey])
         }
