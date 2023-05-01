@@ -120,7 +120,7 @@ export default {
   color: 'pinkpurple',
   columns: {
     date: {
-      name: ''
+      name: 'Date'
     }
   },
   legend: {

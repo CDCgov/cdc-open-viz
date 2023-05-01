@@ -15,16 +15,16 @@ const DataTable = props => {
   const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
   console.log('props=', props)
   console.log('runtimeData=', runtimeData)
+  console.log('rawData=', rawData)
+  console.log('config=', config)
+
   const [expanded, setExpanded] = useState(expandDataTable)
-  //const [sortBy, setSortBy] = config.type === 'map' ? useState({ column: 'geo', asc: false }) : useState({ column: 'Date', asc: false })
-  /*   if (config.type === 'map') {
-    const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
-  } else {
-    const [sortBy, setSortBy] = useState({ column: 'date', asc: false })
-  } */
+
   const [sortBy, setSortBy] = useState({ column: config.type === 'map' ? 'geo' : 'date', asc: false })
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
+
+  const [mapRows, setMapRows] = useState('')
 
   const fileName = `${vizTitle || 'data-table'}.csv`
 
@@ -185,12 +185,205 @@ const DataTable = props => {
       return -1
     })
 
+  function genMapHeader(columns) {
+    return (
+      <tr>
+        {/* console.log('###Object,columns', Object, columns) */}
+        {Object.keys(columns)
+          .filter(column => columns[column].dataTable === true && columns[column].name)
+          .map(column => {
+            let text
+            if (column !== 'geo') {
+              text = columns[column].label ? columns[column].label : columns[column].name
+            } else {
+              text = config.type === 'map' ? indexTitle : config.xAxis.dataKey
+            }
+            if (config.type === 'map' && (text === undefined || text === '')) {
+              text = 'Location'
+            }
+            return (
+              <th
+                key={`col-header-${column}`}
+                tabIndex='0'
+                title={text}
+                role='columnheader'
+                scope='col'
+                onClick={() => {
+                  setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                }}
+                onKeyDown={e => {
+                  if (e.keyCode === 13) {
+                    setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                  }
+                }}
+                className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
+                {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+              >
+                {text}
+                <button>
+                  <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
+                </button>
+              </th>
+            )
+          })}
+      </tr>
+    )
+  }
+
+  function genMapRows(rows) {
+    //console.log('###rows=', rows)
+    const allrows = rows.map(row => {
+      {
+        //console.log('row,columns', row, columns)
+      }
+      return (
+        <tr role='row'>
+          {Object.keys(columns)
+            .filter(column => columns[column].dataTable === true && columns[column].name)
+            .map(column => {
+              let cellValue
+
+              if (column === 'geo') {
+                const rowObj = runtimeData[row]
+                const legendColor = applyLegendToRow(rowObj)
+
+                var labelValue
+                if (config.general.geoType !== 'us-county' || config.general.type === 'us-geocode') {
+                  labelValue = displayGeoName(row)
+                } else {
+                  labelValue = formatLegendLocation(row)
+                }
+
+                labelValue = getCellAnchor(labelValue, rowObj)
+                //console.log('####labelvalue=', labelValue)
+                //console.log('####legendColor[0]=', legendColor[0])
+                cellValue = (
+                  <>
+                    <LegendCircle fill={legendColor[0]} />
+                    {labelValue}
+                  </>
+                )
+              } else {
+                cellValue = displayDataAsText(runtimeData[row][config.columns[column].name], column)
+                //console.log('####cellvalue=', cellValue)
+              }
+
+              return (
+                <td tabIndex='0' role='gridcell' onClick={e => (config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}>
+                  {cellValue}
+                </td>
+              )
+            })}
+        </tr>
+      )
+    })
+    return allrows
+  }
+  function genChartHeader(columns, data) {
+    let dataColumns = Object.keys(data[0]) // get from 1 row
+    return (
+      <tr>
+        {console.log('###genChartHeader columns,keys', columns, Object.keys(data[0]))}
+        {dataColumns
+          //.filter(column => columns[column].dataTable === true && columns[column].name)
+          .map(column => {
+            let text = column === config.xAxis.dataKey ? config.table.indexLabel : column
+            /*             if (column !== 'Date') {
+              text = columns[column].label ? columns[column].label : columns[column].name
+            } else {
+              text = config.xAxis.dataKey
+            }
+            if (config.type === 'chart' && (text === undefined || text === '')) {
+              text = 'Date'
+            } */
+            return (
+              <th
+                key={`col-header-${column}`}
+                tabIndex='0'
+                title={text}
+                role='columnheader'
+                scope='col'
+                onClick={() => {
+                  setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                }}
+                onKeyDown={e => {
+                  if (e.keyCode === 13) {
+                    setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                  }
+                }}
+                className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
+                {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+              >
+                {text}
+                <button>
+                  <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
+                </button>
+              </th>
+            )
+          })}
+      </tr>
+    )
+  }
+
+  function genChartRows(rows) {
+    console.log('###ChartRows=', rows)
+    console.log('config.xAxis.dataKey=', config.xAxis.dataKey)
+    let dataColumns = Object.keys(runtimeData[0]) // get from 1 row
+    const allrows = rows.map(row => {
+      {
+        //console.log('row,columns', row, columns)
+      }
+      return (
+        <tr role='row'>
+          {dataColumns
+            //.filter(column => columns[column].dataTable === true && columns[column].name)
+            .map(column => {
+              let cellValue
+              console.log('###map row=', row)
+              console.log('###map column=', column)
+              if (column === config.xAxis.dataKey) {
+                const rowObj = runtimeData[row]
+                const legendColor = applyLegendToRow(rowObj)
+                console.log('###map rowObj,legendColor', rowObj, legendColor)
+                var labelValue = rowObj[column]
+                /*                 if (config.general.geoType !== 'us-county' || config.general.type === 'us-geocode') {
+                  labelValue = displayGeoName(row)
+                } else {
+                  labelValue = formatLegendLocation(row)
+                } */
+
+                labelValue = getCellAnchor(labelValue, rowObj)
+                console.log('####labelvalue=', labelValue)
+                console.log('####legendColor[0]=', legendColor[row])
+                // no colors on row headers for charts bc it's Date not data
+                // Remove this - <LegendCircle fill={legendColor[row]} />
+                cellValue = <>{labelValue}</>
+              } else {
+                cellValue = displayDataAsText(runtimeData[row][column], column)
+                //cellValue = displayDataAsText(runtimeData[row][config.columns[column].name], column)
+                console.log('####cellvalue=', cellValue)
+              }
+
+              //MAP SPECIFIC- change to CHART specific
+              // onClick = { e => (config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}
+              return (
+                <td tabIndex='0' role='gridcell'>
+                  {cellValue}
+                </td>
+              )
+            })}
+        </tr>
+      )
+    })
+    return allrows
+  }
+
   const limitHeight = config.type === 'chart' ? { maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' } : { maxHeight: config.dataTable.limitHeight && `${config.dataTable.height}px`, overflowY: 'scroll' }
   const caption = () => {
     if (config.type === 'map') {
-      config.dataTable.caption ? config.dataTable.caption : `Data table showing data for the ${mapLookup[config.general.geoType]} figure.`
+      return config.dataTable.caption ? config.dataTable.caption : `Data table showing data for the ${mapLookup[config.general.geoType]} figure.`
     } else {
-      config.table.label ? config.table.label : `Data table showing data for the ${config.type} figure.`
+      return config.table.label ? config.table.label : `Data table showing data for the ${config.type} figure.`
     }
   }
   return (
@@ -221,88 +414,10 @@ const DataTable = props => {
         <div className='table-container' style={limitHeight}>
           <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={config?.data.length ? config.data.length : '-1'}>
             <caption className='cdcdataviz-sr-only'>{caption}</caption>
-            <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>
-              <tr>
-                {console.log('Object,columns', Object, columns)}
-                {Object.keys(columns)
-                  .filter(column => columns[column].dataTable === true && columns[column].name)
-                  .map(column => {
-                    let text
-                    if (column !== 'geo') {
-                      text = columns[column].label ? columns[column].label : columns[column].name
-                    } else {
-                      text = indexTitle || 'Location'
-                    }
-
-                    return (
-                      <th
-                        key={`col-header-${column}`}
-                        tabIndex='0'
-                        title={text}
-                        role='columnheader'
-                        scope='col'
-                        onClick={() => {
-                          setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
-                        }}
-                        onKeyDown={e => {
-                          if (e.keyCode === 13) {
-                            setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
-                          }
-                        }}
-                        className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
-                        {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
-                      >
-                        {text}
-                        <button>
-                          <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
-                        </button>
-                      </th>
-                    )
-                  })}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(row => {
-                return (
-                  <tr role='row'>
-                    {Object.keys(columns)
-                      .filter(column => columns[column].dataTable === true && columns[column].name)
-                      .map(column => {
-                        let cellValue
-
-                        if (column === 'geo') {
-                          const rowObj = runtimeData[row]
-                          const legendColor = 'gray' // applyLegendToRow(rowObj)  (TT)
-
-                          var labelValue
-                          if (config.general.geoType !== 'us-county' || config.general.type === 'us-geocode') {
-                            labelValue = displayGeoName(row)
-                          } else {
-                            labelValue = formatLegendLocation(row)
-                          }
-
-                          labelValue = getCellAnchor(labelValue, rowObj)
-
-                          cellValue = (
-                            <>
-                              <LegendCircle fill={legendColor[0]} />
-                              {labelValue}
-                            </>
-                          )
-                        } else {
-                          cellValue = displayDataAsText(runtimeData[row][config.columns[column].name], column)
-                        }
-
-                        return (
-                          <td tabIndex='0' role='gridcell' onClick={e => (config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}>
-                            {cellValue}
-                          </td>
-                        )
-                      })}
-                  </tr>
-                )
-              })}
-            </tbody>
+            <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{config.type === 'map' ? genMapHeader(columns) : genChartHeader(columns, runtimeData)}</thead>
+            {/*             {console.log('#rows=', rows)}
+            {console.log('#genMapRows(rows)=', genMapRows(rows))} */}
+            <tbody>{config.type === 'map' ? genMapRows(rows) : genChartRows(rows)}</tbody>
           </table>
         </div>
       </section>
