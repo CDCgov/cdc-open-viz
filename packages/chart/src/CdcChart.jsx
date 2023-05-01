@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -89,10 +89,15 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
+  let legendMemo = useRef(new Map()) // map collection
+  let innerContainerRef = useRef()
+
   console.log('Chart config', config)
 
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
+
+  console.log('Chart legend', legend)
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -835,6 +840,50 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return false
   }
 
+  const displayDataAsText = (value, columnName) => {
+    if (value === null || value === '' || value === undefined) {
+      return ''
+    }
+
+    if (typeof value === 'string' && value.length > 0 && config.legend.type === 'equalnumber') {
+      return value
+    }
+
+    let formattedValue = value
+
+    let columnObj = config.columns[columnName]
+
+    if (columnObj) {
+      // If value is a number, apply specific formattings
+      if (Number(value)) {
+        const hasDecimal = columnObj.roundToPlace && (columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null)
+        const decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
+
+        // Rounding
+        if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
+          formattedValue = Number(value).toFixed(decimalPoint)
+        }
+
+        if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
+          // Formats number to string with commas - allows up to 5 decimal places, if rounding is not defined.
+          // Otherwise, uses the rounding value set at 'columnObj.roundToPlace'.
+          formattedValue = Number(value).toLocaleString('en-US', {
+            style: 'decimal',
+            minimumFractionDigits: hasDecimal ? decimalPoint : 0,
+            maximumFractionDigits: hasDecimal ? decimalPoint : 5
+          })
+        }
+      }
+
+      // Check if it's a special value. If it is not, apply the designated prefix and suffix
+      if (false === config.legend.specialClasses.includes(String(value))) {
+        formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
+      }
+    }
+
+    return formattedValue
+  }
+
   // this is passed DOWN into the various components
   // then they do a lookup based on the bin number as index into here (TT)
   const applyLegendToRow = rowObj => {
@@ -950,10 +999,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 //headerColor={general.headerColor}
                 columns={config.columns}
                 showDownloadButton={config.general.showDownloadButton}
-                //runtimeLegend={dynamicLegendItems}
-                //displayDataAsText={displayDataAsText}
+                runtimeLegend={dynamicLegendItems}
+                displayDataAsText={displayDataAsText}
                 displayGeoName={displayGeoName}
-                //applyLegendToRow={applyLegendToRow}
+                applyLegendToRow={applyLegendToRow}
                 tableTitle={config.table.label}
                 indexTitle={config.table.indexLabel}
                 vizTitle={title}
@@ -963,7 +1012,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 tabbingId={handleChartTabbing}
                 showDownloadImgButton={config.showDownloadImgButton}
                 showDownloadPdfButton={config.showDownloadPdfButton}
-                //innerContainerRef={innerContainerRef}
+                innerContainerRef={innerContainerRef}
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
               />
