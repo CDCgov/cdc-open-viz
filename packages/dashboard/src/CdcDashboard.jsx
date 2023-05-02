@@ -595,7 +595,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   }}
                                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                                   isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
                                 />
                               )}
                               {visualizationConfig.type === 'map' && (
@@ -609,7 +609,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                                   setSharedFilterValue={setSharedFilterValue}
                                   isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
                                 />
                               )}
                               {visualizationConfig.type === 'data-bite' && (
@@ -632,7 +632,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                     updateChildConfig(col.widget, newConfig)
                                   }}
                                   isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
                                 />
                               )}
                               {visualizationConfig.type === 'markup-include' && (
