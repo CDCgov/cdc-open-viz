@@ -25,7 +25,8 @@ const iconHash = {
   'single-state': <Icon display='mapAl' base />,
   gear: <Icon display='gear' base />,
   tools: <Icon display='tools' base />,
-  'filtered-text': <Icon display='filtered-text' base />
+  'filtered-text': <Icon display='filtered-text' base />,
+  'filter-dropdowns': <Icon display='filtered-text' base />
 }
 
 const labelHash = {
@@ -40,7 +41,8 @@ const labelHash = {
   'us-county': 'United States (State- or County-Level)',
   world: 'World',
   'single-state': 'U.S. State',
-  'filtered-text': 'filtered-text'
+  'filtered-text': 'Filtered Text',
+  'filter-dropdowns': 'Filter Dropdowns'
 }
 
 const Widget = ({ data = {}, addVisualization, type }) => {
@@ -176,7 +178,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   useEffect(() => {
-    if (data.openModal) {
+    if (data.openModal && type !== 'filter-dropdowns') {
       overlay?.actions.openOverlay(dataDesignerModal(dataRef.current))
 
       visualizations[data.uid].openModal = false
@@ -192,12 +194,12 @@ const Widget = ({ data = {}, addVisualization, type }) => {
         <div className='widget__content'>
           {data.rowIdx !== undefined && (
             <div className='widget-menu'>
-              {((data.dataKey && data.dataDescription && data.formattedData) || type === 'markup-include') && (
+              {((data.dataKey && data.dataDescription && data.formattedData) || type === 'markup-include') && type !== 'filter-dropdowns' && (
                 <button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
                   {iconHash['tools']}
                 </button>
               )}
-              {type !== 'markup-include' && (
+              {type !== 'markup-include' && type !== 'filter-dropdowns' && (
                 <button
                   title='Configure Data'
                   className='btn btn-configure'
@@ -215,7 +217,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
           )}
           {iconHash[type]}
           <span>{labelHash[type]}</span>
-          {data.newViz && (
+          {data.newViz && type !== 'filter-dropdowns'  && (
             <span onClick={editWidget} className='config-needed'>
               Configuration needed
             </span>
