@@ -97,6 +97,7 @@ const VisualizationsPanel = () => (
       <Widget addVisualization={() => addVisualization('waffle-chart', '')} type='waffle-chart' />
       <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
       <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
+      <Widget addVisualization={() => addVisualization('filter-dropdowns', '')} type='filter-dropdowns' />
     </div>
   </div>
 )
@@ -208,6 +209,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         let add = true
 
         filters.forEach(filter => {
+          // eslint-disable-next-line eqeqeq
           if (row[filter.columnName] != filter.active) {
             add = false
           }
@@ -506,6 +508,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               </>
             )
             break
+          case 'filter-dropdowns':
+            body = (
+              <>
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Filter Dropdowns' />
+                <Filters />
+              </>
+            )
+            break
           default:
             body = <></>
             break
@@ -656,6 +666,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   }}
                                   isDashboard={true}
                                 />
+                              )}
+                              {visualizationConfig.type === 'filter-dropdowns' && (
+                                <Filters />
                               )}
                             </div>
                           </React.Fragment>
