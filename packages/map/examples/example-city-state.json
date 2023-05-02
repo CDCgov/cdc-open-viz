@@ -99,13 +99,6 @@
     "singleRow": false,
     "showSpecialClassesLast": false
   },
-  "filters": [
-    {
-      "label": "state",
-      "values": [],
-      "columnName": "STATE"
-    }
-  ],
   "dataTable": {
     "title": "Data Table",
     "forceDisplay": true
@@ -140,7 +133,6 @@
   "map": {
     "layers": []
   },
-  "filterBehavior": "Apply Button",
   "sharing": {
     "enabled": false,
     "dataHost": "wcms-wp.cdc.gov",

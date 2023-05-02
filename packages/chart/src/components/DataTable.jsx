@@ -234,8 +234,7 @@ export default function DataTable() {
         </div>
         <div className='table-container' hidden={!tableExpanded} style={{ maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>
           <table className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} {...getTableProps()} aria-rowcount={config?.series?.length ? config?.series?.length : '-1'}>
-            <caption className='cdcdataviz-sr-only'>{config.table.caption ? config.table.caption : ''}</caption>
-            <caption className='visually-hidden'>{config.table.label}</caption>
+            <caption className='cdcdataviz-sr-only visually-hidden'>{config.table.caption ? config.table.caption : config.table.label ? config.table.label : 'Data Table'}</caption>
             <thead>
               {headerGroups.map((headerGroup, index) => (
                 <tr {...headerGroup.getHeaderGroupProps()} key={`headerGroups--${index}`}>
@@ -277,7 +276,7 @@ export default function DataTable() {
               })}
             </tbody>
           </table>
-          {config.regions && config.regions.length > 0 && !config.visualizationType === 'Box Plot' ? (
+          {config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' ? (
             <table className='region-table data-table'>
               <caption className='visually-hidden'>Table of the highlighted regions in the visualization</caption>
               <thead>

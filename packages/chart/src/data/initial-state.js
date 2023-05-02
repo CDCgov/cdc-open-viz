@@ -151,5 +151,7 @@ export default {
     background: true
   },
   useLogScale: false,
-  filterBehavior: 'Filter Change'
+  filterBehavior: 'Filter Change',
+  highlightedBarValues: [],
+  series: []
 }
