@@ -313,14 +313,15 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     left={config.runtime.horizontal ? 0 : (xMax / barGroups.length) * barGroup.index}
                   >
                     {barGroup.bars.map((bar, index) => {
+                      const scaleVal = config.useLogScale ? 0.1 : 0
                       let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                       let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                      let barHeight = orientation === 'horizontal' ? config.barHeight : isNumber(Math.abs(yScale(bar.value) - yScale(0))) ? Math.abs(yScale(bar.value) - yScale(0)) : 0
+                      let barHeight = orientation === 'horizontal' ? config.barHeight : isNumber(Math.abs(yScale(bar.value) - yScale(scaleVal))) ? Math.abs(yScale(bar.value) - yScale(scaleVal)) : 0
                       let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                       let barGroupWidth = ((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (config.barThickness || 0.8)
                       let offset = (((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
                       const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(0)
-                      const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(0))
+                      const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
                       // ! Unsure if this should go back.
                       if (config.isLollipopChart) {
                         offset = (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2 - lollipopBarWidth / 2

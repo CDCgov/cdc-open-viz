@@ -4,7 +4,7 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
-import { scaleLinear, scalePoint, scaleBand, scaleTime } from '@visx/scale'
+import { scaleLinear, scalePoint, scaleBand, scaleTime, scaleLog } from '@visx/scale'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 
 import CoveScatterPlot from './ScatterPlot'
@@ -35,6 +35,33 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
+
+  const composeXScale = (min, max, xMax) => {
+    // Adjust min value if using logarithmic scale
+    min = config.useLogScale ? min + 0.1 : min
+    // Select the appropriate scale function
+    const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
+    // Return the configured scale function
+    return scaleFunc({
+      domain: [min, max],
+      range: [0, xMax],
+      nice: config.useLogScale,
+      zero: config.useLogScale
+    })
+  }
+  const composeYScale = (min, max, yMax) => {
+    // Adjust min value if using logarithmic scale
+    min = config.useLogScale ? min + 0.1 : min
+    // Select the appropriate scale function
+    const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
+    // Return the configured scale function
+    return scaleFunc({
+      domain: [min, max],
+      range: [yMax, 0],
+      nice: config.useLogScale,
+      zero: config.useLogScale
+    })
+  }
 
   // Make sure the chart is visible if in the editor
   /* eslint-disable react-hooks/exhaustive-deps */
@@ -161,10 +188,7 @@ export default function LinearChart() {
     }
 
     if (config.runtime.horizontal) {
-      xScale = scaleLinear({
-        domain: [min * 1.03, max],
-        range: [0, xMax]
-      })
+      xScale = composeXScale(min * 1.03, max, xMax)
 
       yScale =
         config.runtime.xAxis.type === 'date'
@@ -182,10 +206,7 @@ export default function LinearChart() {
     } else {
       min = min < 0 ? min * 1.11 : min
 
-      yScale = scaleLinear({
-        domain: [min, max],
-        range: [yMax, 0]
-      })
+      yScale = composeYScale(min, max, yMax)
 
       xScale = scalePoint({
         domain: xAxisDataMapped,
@@ -294,12 +315,20 @@ export default function LinearChart() {
   const shouldAbbreviate = true
 
   const handleLeftTickFormatting = tick => {
+    //when logaritmic scale applyed change value of  tick
+    if (config.useLogScale && tick === 0.1) {
+      tick = 0
+    }
     if (config.runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
     if (config.orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
   }
 
   const handleBottomTickFormatting = tick => {
+    // when logaritmic scale applyed change value of  tick
+    if (config.useLogScale && tick === 0.1) {
+      tick = 0
+    }
     if (config.runtime.xAxis.type === 'date') return formatDate(tick)
     if (config.orientation === 'horizontal') return formatNumber(tick, 'left', shouldAbbreviate)
     if (config.xAxis.type === 'continuous') return formatNumber(tick, 'bottom', shouldAbbreviate)
@@ -406,10 +435,13 @@ export default function LinearChart() {
                   {props.ticks.map((tick, i) => {
                     const minY = props.ticks[0].to.y
                     const barMinHeight = 15 // 15 is the min height for bars by default
+                    const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
+                    const tickLength = showTicks === 'block' ? 7 : 0
+                    const to = { x: tick.to.x - tickLength, y: tick.to.y }
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                        {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke={config.yAxis.tickColor} display={config.runtime.horizontal ? 'none' : 'block'} />}
+                        {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={to} stroke={config.yAxis.tickColor} display={config.runtime.horizontal ? 'none' : 'block'} />}
 
                         {config.runtime.yAxis.gridLines ? <Line from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
@@ -440,8 +472,10 @@ export default function LinearChart() {
                           </Text>
                         )}
 
-                        {config.orientation !== 'horizontal' && config.visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel && (
+                        {config.orientation === 'vertical' && config.visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel && (
                           <Text
+                            display={config.useLogScale ? showTicks : 'block'}
+                            dx={config.useLogScale ? -6 : 0}
                             x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                             y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                             verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
@@ -529,12 +563,19 @@ export default function LinearChart() {
               return (
                 <Group className='bottom-axis'>
                   {props.ticks.map((tick, i) => {
+                    // when using LogScale show major ticks values only
+                    const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                     const tickWidth = xMax / props.ticks.length
+                    const tickLength = showTick === 'block' ? 16 : 8
+                    const to = { x: tick.to.x, y: tickLength }
+
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                        {!config.xAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke={config.xAxis.tickColor} />}
+                        {!config.xAxis.hideTicks && <Line from={tick.from} to={to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' ? 1.3 : 1} />}
                         {!config.xAxis.hideLabel && (
                           <Text
+                            dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
+                            display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
                             transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
                             verticalAnchor='start'
                             textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
@@ -625,7 +666,7 @@ export default function LinearChart() {
         )}
 
         {config.visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
-        {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
+        {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} composeXScale={composeXScale} />}
         {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
         {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
         {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} />}
