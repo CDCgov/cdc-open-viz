@@ -125,6 +125,23 @@ const Legend = () => {
 
       return uniqeLabels
     }
+
+    if (config.visualizationType === 'Forecasting') {
+      //store uniq values to Set by colorCode
+
+      const labels = config.forecastingChart.groups.map((group, index) => {
+        let paletteHere = colorPalettes[config.forecastingChart.colors[index]]
+
+        const newLabel = {
+          datum: group,
+          index: index,
+          text: group,
+          value: paletteHere[2]
+        }
+        return newLabel
+      })
+      return labels
+    }
     return defaultLabels
   }
 
@@ -144,8 +161,9 @@ const Legend = () => {
           {labels => (
             <div className={innerClasses.join(' ')}>
               {createLegendLabels(labels).map((label, i) => {
-                let className = 'legend-item'
+                let legendClasses = ['legend-item']
                 let itemName = label.datum
+                let forecastingInactive = seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)
 
                 // Filter excluded data keys from legend
                 if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
@@ -157,13 +175,19 @@ const Legend = () => {
                   itemName = config.runtime.seriesKeys[index]
                 }
 
-                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                  className += ' inactive'
+                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName) && config.visualizationType !== 'Forecasting') {
+                  legendClasses.push('inactive')
+                }
+
+                // ? not sure why this has to be broken apart at the moment.
+                // ? the logic looks equivalent to the line above but only works like this.
+                if (forecastingInactive) {
+                  legendClasses.push('inactive')
                 }
 
                 return (
                   <LegendItem
-                    className={className}
+                    className={legendClasses.join(' ')}
                     tabIndex={0}
                     key={`legend-quantile-${i}`}
                     onKeyPress={e => {
