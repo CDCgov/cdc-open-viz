@@ -10,6 +10,7 @@ import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import CoveScatterPlot from './ScatterPlot'
 import BarChart from './BarChart'
 import LineChart from './LineChart'
+import { DeviationBar } from './DeviationBar'
 import ConfigContext from '../ConfigContext'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
@@ -19,9 +20,10 @@ import CoveAreaChart from './AreaChart'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import '../scss/LinearChart.scss'
 import useReduceData from '../hooks/useReduceData'
+import useScales from '../hooks/useScales'
+import useMinMax from '../hooks/useMinMax'
 import useRightAxis from '../hooks/useRightAxis'
 import useTopAxis from '../hooks/useTopAxis'
-import { DeviationBar } from './DeviationBar'
 
 // TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
@@ -35,33 +37,6 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
-
-  const composeXScale = (min, max, xMax) => {
-    // Adjust min value if using logarithmic scale
-    min = config.useLogScale ? min + 0.1 : min
-    // Select the appropriate scale function
-    const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
-    // Return the configured scale function
-    return scaleFunc({
-      domain: [min, max],
-      range: [0, xMax],
-      nice: config.useLogScale,
-      zero: config.useLogScale
-    })
-  }
-  const composeYScale = (min, max, yMax) => {
-    // Adjust min value if using logarithmic scale
-    min = config.useLogScale ? min + 0.1 : min
-    // Select the appropriate scale function
-    const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
-    // Return the configured scale function
-    return scaleFunc({
-      domain: [min, max],
-      range: [yMax, 0],
-      nice: config.useLogScale,
-      zero: config.useLogScale
-    })
-  }
 
   // Make sure the chart is visible if in the editor
   /* eslint-disable react-hooks/exhaustive-deps */
@@ -95,227 +70,27 @@ export default function LinearChart() {
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
+  const xAxisDataMapped = data.map(d => getXAxisData(d))
 
-  let xScale
-  let yScale
-  let seriesScale
-
-  const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
-  const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
-  const isMinValid = (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
-
-  let max = 0 // need outside the if statement
-  let min = 0
-  if (data) {
-    min = enteredMinValue && isMinValid ? enteredMinValue : minValue
-    max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
-
-    // If Confidence Intervals in data, then need to account for increased height in max for YScale
-    if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Deviation Bar') {
-      let ciYMax = 0
-      if (config.hasOwnProperty('confidenceKeys')) {
-        let upperCIValues = data.map(function (d) {
-          return d[config.confidenceKeys.upper]
-        })
-        ciYMax = Math.max.apply(Math, upperCIValues)
-        if (ciYMax > max) max = ciYMax // bump up the max
-      }
-    }
-
-    if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
-      min = 0
-    }
-    if (config.visualizationType === 'Combo' && isAllLine) {
-      if ((enteredMinValue === undefined || enteredMinValue === null || enteredMinValue === '') && min > 0) {
-        min = 0
-      }
-      if (enteredMinValue) {
-        const isMinValid = +enteredMinValue < minValue
-        min = +enteredMinValue && isMinValid ? enteredMinValue : minValue
-      }
-    }
-
-    if (config.visualizationType === 'Deviation Bar' && min > 0) {
-      const isMinValid = Number(enteredMinValue) < Math.min(minValue, Number(config.xAxis.target))
-      min = enteredMinValue && isMinValid ? enteredMinValue : 0
-    }
-
-    if (config.visualizationType === 'Line') {
-      const isMinValid = enteredMinValue < minValue
-      min = enteredMinValue && isMinValid ? enteredMinValue : minValue
-    }
-    //If data value max wasn't provided, calculate it
-    if (max === Number.MIN_VALUE) {
-      // if all values in data are negative set max = 0
-      max = existPositiveValue ? maxValue : 0
-    }
-
-    //Adds Y Axis data padding if applicable
-    if (config.runtime.yAxis.paddingPercent) {
-      let paddingValue = (max - min) * config.runtime.yAxis.paddingPercent
-      min -= paddingValue
-      max += paddingValue
-    }
-
-    let xAxisDataMapped = data.map(d => getXAxisData(d))
-
-    if (config.isLollipopChart && config.yAxis.displayNumbersOnBar) {
-      const dataKey = data.map(item => item[config.series[0].dataKey])
-      const maxDataVal = Math.max(...dataKey).toString().length
-
-      switch (true) {
-        case maxDataVal > 8 && maxDataVal <= 12:
-          max = max * 1.3
-          break
-        case maxDataVal > 4 && maxDataVal <= 7:
-          max = max * 1.1
-          break
-        default:
-          break
-      }
-    }
-
-    // DEV-3219 - bc some values are going above YScale - adding 10% or 20% factor onto Max
-    // - put the statement up here and it works for both vert and horiz charts of all types
-    if (config.yAxis.enablePadding) {
-      if (min < 0) {
-        // sets with negative data need more padding on the max
-        max *= 1.2
-        min *= 1.2
-      } else {
-        max *= 1.1
-      }
-    }
-
-    if (config.runtime.horizontal) {
-      xScale = composeXScale(min * 1.03, max, xMax)
-
-      yScale =
-        config.runtime.xAxis.type === 'date'
-          ? scaleLinear({
-              domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
-            })
-          : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
-
-      seriesScale = scalePoint({
-        domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
-        range: [0, yMax]
-      })
-
-      yScale.rangeRound([0, yMax])
-    } else {
-      min = min < 0 ? min * 1.11 : min
-
-      yScale = composeYScale(min, max, yMax)
-
-      xScale = scalePoint({
-        domain: xAxisDataMapped,
-        range: [0, xMax],
-        padding: 0.5
-      })
-
-      seriesScale = scalePoint({
-        domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
-        range: [0, xMax]
-      })
-    }
-
-    if (config.visualizationType === 'Area Chart' && config.xAxis.type === 'date') {
-      xScale = scaleTime({
-        domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)],
-        range: [0, xMax]
-      })
-    }
-
-    if (config.visualizationType === 'Paired Bar') {
-      const offset = 1.02 // Offset of the ticks/values from the Axis
-      let groupOneMax = Math.max.apply(
-        Math,
-        data.map(d => d[config.series[0].dataKey])
-      )
-      let groupTwoMax = Math.max.apply(
-        Math,
-        data.map(d => d[config.series[1].dataKey])
-      )
-
-      // group one
-      var g1xScale = scaleLinear({
-        domain: [0, Math.max(groupOneMax, groupTwoMax) * offset],
-        range: [xMax / 2, 0]
-      })
-
-      // group 2
-      var g2xScale = scaleLinear({
-        domain: g1xScale.domain(),
-        range: [xMax / 2, xMax],
-        nice: true
-      })
-    }
-
-    if (config.visualizationType === 'Scatter Plot') {
-      if (config.xAxis.type === 'continuous') {
-        xScale = scaleLinear({
-          domain: [0, Math.max.apply(null, xScale.domain())],
-          range: [0, xMax]
-        })
-      }
-    }
-
-    if (config.visualizationType === 'Deviation Bar') {
-      const leftOffset = config.isLollipopChart ? 1.05 : 1.03
-      yScale = scaleBand({
-        domain: xAxisDataMapped,
-        range: [0, yMax]
-      })
-      xScale = scaleLinear({
-        domain: [min * leftOffset, Math.max(Number(config.xAxis.target), max)],
-        range: [0, xMax],
-        round: true,
-        nice: true
-      })
-    }
-    // Handle Box Plots
-    if (config.visualizationType === 'Box Plot') {
-      const allOutliers = []
-      const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
-
-      // check if outliers are lower
-      if (hasOutliers) {
-        let outlierMin = Math.min(...allOutliers)
-        let outlierMax = Math.max(...allOutliers)
-
-        // check if outliers exceed standard bounds
-        if (outlierMin < min) min = outlierMin
-        if (outlierMax > max) max = outlierMax
-      }
-
-      // check fences for max/min
-      let lowestFence = Math.min(...config.boxplot.plots.map(item => item.columnLowerBounds))
-      let highestFence = Math.max(...config.boxplot.plots.map(item => item.columnUpperBounds))
-
-      if (lowestFence < min) min = lowestFence
-      if (highestFence > max) max = highestFence
-
-      // Set Scales
-      yScale = scaleLinear({
-        range: [yMax, 0],
-        round: true,
-        domain: [min, max]
-      })
-
-      xScale = scaleBand({
-        range: [0, xMax],
-        round: true,
-        domain: config.boxplot.categories,
-        padding: 0.4
-      })
-    }
+  const properties = {
+    data,
+    config,
+    minValue,
+    maxValue,
+    isAllLine,
+    existPositiveValue,
+    xAxisDataMapped,
+    xMax,
+    yMax
   }
+
+  const { min, max } = useMinMax(properties)
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale } = useScales({ ...properties, min, max })
 
   const shouldAbbreviate = true
 
   const handleLeftTickFormatting = tick => {
-    //when logaritmic scale applyed change value of  tick
+    //when logaritmic scale applyed change value of FIRST  tick
     if (config.useLogScale && tick === 0.1) {
       tick = 0
     }
@@ -325,7 +100,7 @@ export default function LinearChart() {
   }
 
   const handleBottomTickFormatting = tick => {
-    // when logaritmic scale applyed change value of  tick
+    // when logaritmic scale applyed change value FIRST  of  tick
     if (config.useLogScale && tick === 0.1) {
       tick = 0
     }
@@ -666,7 +441,7 @@ export default function LinearChart() {
         )}
 
         {config.visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
-        {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} composeXScale={composeXScale} />}
+        {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
         {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
         {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
         {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} />}
