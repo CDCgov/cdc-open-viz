@@ -825,6 +825,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const clean = data => {
+    // cleaning is deleting data we need in forecasting charts.
+    if (config.visualizationType === 'Forecasting') return data
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
   }
 

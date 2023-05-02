@@ -11,13 +11,14 @@ import { Bar, Area } from '@visx/shape'
 import { Group } from '@visx/group'
 
 const Forecasting = ({ xScale, yScale, yMax, xMax, chartRef, width, height, xScaleNoPadding }) => {
-  const { transformedData: data, rawData, config, updateConfig } = useContext(ConfigContext)
+  const { transformedData: data, rawData, config, updateConfig, seriesHighlight } = useContext(ConfigContext)
 
   // columns
   const barColumn = config.forecastingChart.barColumn
   const xColumnName = config.xAxis.dataKey
   const { forecastingChart } = config
   const pallete = colorPalettesChart[config.palette]
+
   return (
     data &&
     config.forecastingChart.groups && (
@@ -44,13 +45,15 @@ const Forecasting = ({ xScale, yScale, yMax, xMax, chartRef, width, height, xSca
           </Group>
 
           {config.forecastingChart.groups.map((group, index) => {
+            let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(group) === -1
+            let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(group) !== -1
             return (
               <Group className={`forecasting-areas`} left={config.yAxis.size}>
                 {forecastingChart.confidenceIntervals.map((ciGroup, ciGroupIndex) => {
                   const palette = colorPalettesChart[config.forecastingChart.colors?.[index]]
 
                   // slice the data
-                  const groupData = rawData.filter(d => d[config.forecastingChart.stages] === group)
+                  const groupData = data.filter(d => d[config.forecastingChart.stages] === group)
 
                   if (!palette) return null
                   return (
@@ -59,8 +62,8 @@ const Forecasting = ({ xScale, yScale, yMax, xMax, chartRef, width, height, xSca
                       <Area
                         curve={curveMonotoneX}
                         data={groupData}
-                        fill={palette[ciGroupIndex]}
-                        fillOpacity={0.5}
+                        fill={displayArea ? palette[ciGroupIndex] : 'transparent'}
+                        opacity={transparentArea ? 0.1 : 0.5}
                         x={d => xScale(Date.parse(d[xColumnName]))}
                         xScale={xScale}
                         y0={d => yScale(d[ciGroup.low])}

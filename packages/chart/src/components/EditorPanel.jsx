@@ -21,6 +21,7 @@ import * as allCurves from '@visx/curve'
 import { useFilters } from '@cdc/core/components/Filters'
 import Series from './Series'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
+import { RepeatableGroup } from '@cdc/core/components/RepeatableGroup'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -1048,7 +1049,7 @@ const EditorPanel = () => {
                     />
 
                     <label>
-                      <span class='edit-label'>Forecasting Bar Color</span>
+                      <span className='edit-label'>Forecasting Bar Color</span>
                       <input
                         type='text'
                         value={config.forecastingChart.barColor ?? '#918e90'}
@@ -2006,7 +2007,6 @@ const EditorPanel = () => {
                   )}
 
                   {/* anchors */}
-
                   <div className='edit-block'>
                     <h3>Anchors</h3>
                     {config.visualizationType === 'Forecasting' && (

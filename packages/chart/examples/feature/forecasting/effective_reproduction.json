@@ -26,8 +26,8 @@
     "size": "75",
     "gridLines": false,
     "enablePadding": false,
-    "min": "0",
-    "max": "900",
+    "min": "",
+    "max": "",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
@@ -42,7 +42,7 @@
     "axisPadding": 0,
     "tickRotation": 0,
     "anchors": [],
-    "label": "Cases by Date of Report"
+    "label": "Effective Reproduction No."
   },
   "boxplot": {
     "plots": [],
@@ -135,7 +135,7 @@
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "position": "right",
-    "hide": false
+    "hide": true
   },
   "exclusions": {
     "active": false,
@@ -185,9 +185,9 @@
     ],
     "stages": "type",
     "colors": [
-      "sequential-greenreverse",
-      "sequential-orange-(MPX)reverse",
-      "sequential-blue-2-(MPX)reverse"
+      "qualitative4reverse",
+      "sequential-bluereverse",
+      "sequential-greenreverse"
     ],
     "groups": [
       "estimate",
@@ -196,8 +196,7 @@
     ],
     "showBarColumn": true
   },
-  "dataUrl": "./examples/feature/forecasting/case_date_example.csv",
+  "dataUrl": "./examples/feature/forecasting/r_data.csv",
   "animateReplay": true,
-  "visualizationType": "Forecasting",
-  "series": []
+  "visualizationType": "Forecasting"
 }
