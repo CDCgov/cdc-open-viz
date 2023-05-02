@@ -129,6 +129,7 @@ const Legend = () => {
     if (config.visualizationType === 'Forecasting') {
       //store uniq values to Set by colorCode
 
+      // loop through each stage/group/area on the chart and create a label
       const labels = config.forecastingChart.groups.map((group, index) => {
         let paletteHere = colorPalettes[config.forecastingChart.colors[index]]
 
@@ -140,6 +141,17 @@ const Legend = () => {
         }
         return newLabel
       })
+
+      // push the bar segment label to the front
+      const barLabel = {
+        datum: config.forecastingChart.barColumn,
+        index: labels.length,
+        text: config.forecastingChart.barColumn,
+        value: config.forecastingChart.barColor
+      }
+
+      labels.unshift(barLabel)
+
       return labels
     }
     return defaultLabels
