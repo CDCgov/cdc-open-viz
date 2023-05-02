@@ -279,16 +279,23 @@ const DataTable = props => {
     })
     return allrows
   }
+
+  const dataSeriesColumns = () => {
+    let tmpSeriesColumns = [config.xAxis.dataKey]
+    config.series.forEach(element => {
+      tmpSeriesColumns.push(element.dataKey)
+    })
+    return tmpSeriesColumns
+  }
+
   function genChartHeader(columns, data) {
-    let dataColumns = Object.keys(data[0]) // get from 1 row
     return (
       <tr>
-        {console.log('###genChartHeader columns,keys', columns, Object.keys(data[0]))}
-        {dataColumns
-          //.filter(column => columns[column].dataTable === true && columns[column].name)
-          .map(column => {
-            let text = column === config.xAxis.dataKey ? config.table.indexLabel : column
-            /*             if (column !== 'Date') {
+        {/*console.log('###genChartHeader columns,keys', columns, dataSeriesColumns())*/}
+        {/* .filter(column => columns[column].dataTable === true && columns[column].name) */}
+        {dataSeriesColumns().map(column => {
+          let text = column === config.xAxis.dataKey ? config.table.indexLabel : column
+          /*             if (column !== 'Date') {
               text = columns[column].label ? columns[column].label : columns[column].name
             } else {
               text = config.xAxis.dataKey
@@ -296,31 +303,31 @@ const DataTable = props => {
             if (config.type === 'chart' && (text === undefined || text === '')) {
               text = 'Date'
             } */
-            return (
-              <th
-                key={`col-header-${column}`}
-                tabIndex='0'
-                title={text}
-                role='columnheader'
-                scope='col'
-                onClick={() => {
+          return (
+            <th
+              key={`col-header-${column}`}
+              tabIndex='0'
+              title={text}
+              role='columnheader'
+              scope='col'
+              onClick={() => {
+                setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+              }}
+              onKeyDown={e => {
+                if (e.keyCode === 13) {
                   setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
-                }}
-                onKeyDown={e => {
-                  if (e.keyCode === 13) {
-                    setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
-                  }
-                }}
-                className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
-                {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
-              >
-                {text}
-                <button>
-                  <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
-                </button>
-              </th>
-            )
-          })}
+                }
+              }}
+              className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
+              {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+            >
+              {text}
+              <button>
+                <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
+              </button>
+            </th>
+          )
+        })}
       </tr>
     )
   }
@@ -335,7 +342,7 @@ const DataTable = props => {
       }
       return (
         <tr role='row'>
-          {dataColumns
+          {dataSeriesColumns()
             //.filter(column => columns[column].dataTable === true && columns[column].name)
             .map(column => {
               let cellValue
@@ -354,14 +361,14 @@ const DataTable = props => {
 
                 labelValue = getCellAnchor(labelValue, rowObj)
                 console.log('####labelvalue=', labelValue)
-                console.log('####legendColor[0]=', legendColor[row])
+                //console.log('####legendColor[0]=', legendColor[row])
                 // no colors on row headers for charts bc it's Date not data
                 // Remove this - <LegendCircle fill={legendColor[row]} />
                 cellValue = <>{labelValue}</>
               } else {
                 cellValue = displayDataAsText(runtimeData[row][column], column)
                 //cellValue = displayDataAsText(runtimeData[row][config.columns[column].name], column)
-                console.log('####cellvalue=', cellValue)
+                //console.log('####cellvalue=', cellValue)
               }
 
               //MAP SPECIFIC- change to CHART specific
