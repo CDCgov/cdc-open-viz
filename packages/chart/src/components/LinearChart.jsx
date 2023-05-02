@@ -4,7 +4,6 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
-import { scaleLinear, scalePoint, scaleBand, scaleTime, scaleLog } from '@visx/scale'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 
 import CoveScatterPlot from './ScatterPlot'
