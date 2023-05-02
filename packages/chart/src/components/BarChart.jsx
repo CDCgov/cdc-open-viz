@@ -6,13 +6,14 @@ import chroma from 'chroma-js'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
+import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, getTextWidth, parseDate } = useContext(ConfigContext)
-
+  const { HighLightedBarUtils } = useHighlightedBars(config)
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
-
+  const barBorderWidth = 1
   const lollipopBarWidth = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5
   const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
 
@@ -25,7 +26,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const tipRounding = config.tipRounding
   const radius = config.roundingStyle === 'standard' ? '8px' : config.roundingStyle === 'shallow' ? '5px' : config.roundingStyle === 'finger' ? '15px' : '0px'
   const stackCount = config.runtime.seriesKeys.length
-  const barBorderWidth = 1
   const fontSize = { small: 16, medium: 18, large: 20 }
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
@@ -314,6 +314,19 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   >
                     {barGroup.bars.map((bar, index) => {
                       const scaleVal = config.useLogScale ? 0.1 : 0
+                      const getHighlightedBarColorByValue = value => {
+                        const match = config?.highlightedBarValues.filter(item => {
+                          if (!item.value) return
+                          return config.xAxis.type === 'date' ? formatDate(parseDate(item.value)) === value : item.value === value
+                        })[0]
+
+                        if (!match?.color) return `rgba(255, 102, 1)`
+                        return match.color
+                      }
+                      let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
+
+                      highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
+
                       let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                       let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                       let barHeight = orientation === 'horizontal' ? config.barHeight : isNumber(Math.abs(yScale(bar.value) - yScale(scaleVal))) ? Math.abs(yScale(bar.value) - yScale(scaleVal)) : 0
@@ -358,9 +371,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       let labelColor = '#000000'
 
                       // Set label color
-                      if (chroma.contrast(labelColor, barColor) < 4.9) {
-                        textFits ? (labelColor = '#FFFFFF') : '#000000'
+                      if (barColor && labelColor) {
+                        if (chroma.contrast(labelColor, barColor) < 4.9) {
+                          labelColor = textFits ? '#FFFFFF' : '#000000'
+                        }
                       }
+
+                      // Set if background is transparent'
+                      labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor)
 
                       // control text position
                       let textAnchor = textFits ? 'end' : 'start'
@@ -396,6 +414,25 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       ${xAxisTooltip}
                         </div>`
 
+                      const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
+                      const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
+                      const isHighlightedBar = highlightedBarValues?.includes(yAxisValue)
+                      const highlightedBarColor = getHighlightedBarColorByValue(yAxisValue)
+
+                      const background = isRegularLollipopColor ? barColor : isTwoToneLollipopColor ? chroma(barColor).brighten(1) : isHighlightedBar ? 'transparent' : barColor
+
+                      const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
+
+                      const borderWidth = isHighlightedBar ? barBorderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
+
+                      const finalStyle = {
+                        background,
+                        borderColor,
+                        borderStyle: 'solid',
+                        borderWidth,
+                        ...style
+                      }
+
                       return (
                         <Group key={`${barGroup.index}--${index}--${orientation}`}>
                           {/* This feels gross but inline transition was not working well*/}
@@ -415,11 +452,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               y={config.runtime.horizontal ? barWidth * bar.index : barY}
                               width={config.runtime.horizontal ? barWidthHorizontal : barWidth}
                               height={isHorizontal && !config.isLollipopChart ? barWidth : isHorizontal && config.isLollipopChart ? lollipopBarWidth : barHeight}
-                              style={{
-                                background: config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : barColor,
-                                border: `${config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`,
-                                ...style
-                              }}
+                              style={finalStyle}
                               opacity={transparentBar ? 0.5 : 1}
                               display={displayBar ? 'block' : 'none'}
                               data-tooltip-html={tooltip}
@@ -438,7 +471,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 {xAxisValue}
                               </Text>
                             )}
-                            ;
                             {orientation === 'horizontal' && config.isLollipopChart && displayNumbersOnBar && (
                               <Text
                                 display={displayBar ? 'block' : 'none'}
@@ -462,13 +494,12 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
                               </Text>
                             )}
-                            ;
+
                             {orientation === 'vertical' && (
                               <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
                                 {yAxisValue}
                               </Text>
                             )}
-                            ;
                             {config.isLollipopChart && config.lollipopShape === 'circle' && (
                               <circle
                                 cx={orientation === 'horizontal' ? bar.y : barWidth * (barGroup.bars.length - bar.index - 1) + (isLabelBelowBar && orientation === 'horizontal' ? 0 : offset) + lollipopShapeSize / 3.5}

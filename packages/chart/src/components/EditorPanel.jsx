@@ -18,6 +18,8 @@ import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import * as allCurves from '@visx/curve'
+import { useFilters } from '@cdc/core/components/Filters'
+import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -206,13 +208,14 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
-  const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar']
+  // argument acts as props
+  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config, setConfig: updateConfig, filteredData: data, setFilteredData })
 
   const approvedCurveTypes = {
     Linear: 'curveLinear',
@@ -258,21 +261,6 @@ const EditorPanel = () => {
   }, [])
 
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
-
-  const filterOptions = [
-    {
-      label: 'Ascending Alphanumeric',
-      value: 'asc'
-    },
-    {
-      label: 'Descending Alphanumeric',
-      value: 'desc'
-    },
-    {
-      label: 'Custom',
-      value: 'cust'
-    }
-  ]
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
@@ -657,19 +645,6 @@ const EditorPanel = () => {
     )
   }, [config]) // eslint-disable-line
 
-  const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
-    let filterOrder = filter.values
-    let [movedItem] = filterOrder.splice(idx1, 1)
-    filterOrder.splice(idx2, 0, movedItem)
-    let filters = [...config.filters]
-    let filterItem = { ...config.filters[filterIndex] }
-    filterItem.active = filter.values[0]
-    filterItem.orderedValues = filterOrder
-    filterItem.order = 'cust'
-    filters[filterIndex] = filterItem
-    updateConfig({ ...config, filters })
-  }
-
   const visHasLegend = () => {
     const { visualizationType } = config
 
@@ -848,6 +823,17 @@ const EditorPanel = () => {
   }
 
   const chartsWithOptions = ['Area Chart', 'Combo', 'Line']
+
+  // prettier-ignore
+  const {
+    highlightedBarValues,
+    highlightedSeriesValues,
+    handleUpdateHighlightedBar,
+    handleAddNewHighlightedBar,
+    handleRemoveHighlightedBar,
+    handleUpdateHighlightedBarColor,
+    handleHighlightedBarLegendLabel
+   } = useHighlightedBars(config, updateConfig)
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -1535,6 +1521,7 @@ const EditorPanel = () => {
                         <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
                         <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />
                         <CheckBox value={config.yAxis.hideTicks} section='yAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
+
                         <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='max value' placeholder='Auto' updateField={updateField} />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
                         <TextField value={config.yAxis.min} section='yAxis' fieldName='min' type='number' label='min value' placeholder='Auto' updateField={updateField} />
@@ -1814,6 +1801,41 @@ const EditorPanel = () => {
                         <>
                           <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
                           <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />
+                          {config.series.length === 1 && (
+                            <>
+                              {/* HIGHLIGHTED BARS */}
+                              <label htmlFor='barHighlight'>Bar Highlighting</label>
+                              {config.series.length === 1 &&
+                                highlightedBarValues.map((highlightedBarValue, i) => (
+                                  <fieldset>
+                                    <div className='edit-block' key={`highlighted-bar-${i}`}>
+                                      <button className='remove-column' onClick={e => handleRemoveHighlightedBar(e, i)}>
+                                        Remove
+                                      </button>
+                                      <p>Highlighted Bar {i + 1}</p>
+                                      <label>
+                                        <span className='edit-label column-heading'>Value</span>
+                                        <select value={config.highlightedBarValues[i].value} onChange={e => handleUpdateHighlightedBar(e, i)}>
+                                          <option value=''>- Select Value -</option>
+                                          {highlightedSeriesValues && [...new Set(highlightedSeriesValues)].sort().map(option => <option key={`special-class-value-option-${i}-${option}`}>{option}</option>)}
+                                        </select>
+                                      </label>
+                                      <label>
+                                        <span className='edit-label column-heading'>Color</span>
+                                        <input type='text' value={config.highlightedBarValues[i].color ? config.highlightedBarValues[i].color : ''} onChange={e => handleUpdateHighlightedBarColor(e, i)} />
+                                      </label>
+                                      <label>
+                                        <span className='edit-label column-heading'>Legend Label</span>
+                                        <input type='text' value={config.highlightedBarValues[i].legendLabel ? config.highlightedBarValues[i].legendLabel : ''} onChange={e => handleHighlightedBarLegendLabel(e, i)} />
+                                      </label>
+                                    </div>
+                                  </fieldset>
+                                ))}
+                              <button className='btn full-width' onClick={e => handleAddNewHighlightedBar(e)}>
+                                Add Highlighted Bar
+                              </button>
+                            </>
+                          )}
                         </>
                       ) : (
                         <>
@@ -2001,21 +2023,19 @@ const EditorPanel = () => {
                               ))}
                             </select>
                           </label>
+
                           <label>
                             <span className='edit-label column-heading'>Filter Style</span>
 
-                            {/* prettier-ignore */}
                             <select
                               value={filter.filterStyle}
                               onChange={e => {
                                 updateFilterProp('filterStyle', index, e.target.value)
                               }}
-                              >
-                              {filterStyleOptions.map( item => {
-
-                              return (<option value={item}>{item}</option>)
+                            >
+                              {filterStyleOptions.map(item => {
+                                return <option value={item}>{item}</option>
                               })}
-
                             </select>
                           </label>
                           <label>
@@ -2032,7 +2052,7 @@ const EditorPanel = () => {
                           <label>
                             <span className='edit-filterOrder column-heading'>Filter Order</span>
                             <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
-                              {filterOptions.map((option, index) => {
+                              {filterOrderOptions.map((option, index) => {
                                 return (
                                   <option value={option.value} key={`filter-${index}`}>
                                     {option.label}
@@ -2042,7 +2062,7 @@ const EditorPanel = () => {
                             </select>
 
                             {filter.order === 'cust' && (
-                              <DragDropContext onDragEnd={({ source, destination }) => handleFilterChange(source.index, destination.index, index, config.filters[index])}>
+                              <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, config.filters[index])}>
                                 <Droppable droppableId='filter_order'>
                                   {provided => (
                                     <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>

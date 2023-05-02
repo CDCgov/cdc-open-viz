@@ -29,6 +29,8 @@ import usaDefaultConfig from '../../examples/default-usa.json'
 import countyDefaultConfig from '../../examples/default-county.json'
 import useMapLayers from '../hooks/useMapLayers'
 
+import { useFilters } from '@cdc/core/components/Filters'
+
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
 
@@ -66,7 +68,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend, changeFilterActive, isDebug } = props
+  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend, changeFilterActive, isDebug, setRuntimeFilters } = props
 
   const { general, columns, legend, dataTable, tooltips } = state
 
@@ -79,6 +81,8 @@ const EditorPanel = props => {
   const [displayPanel, setDisplayPanel] = useState(true)
 
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
+
+  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config: state, setConfig: setState, filteredData: runtimeFilters, setFilteredData: setRuntimeFilters })
 
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
@@ -148,23 +152,6 @@ const EditorPanel = props => {
       </span>
     </label>
   ))
-
-  const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
-    let filterOrder = filter.values
-    let [movedItem] = filterOrder.splice(idx1, 1)
-    filterOrder.splice(idx2, 0, movedItem)
-    let filters = [...runtimeFilters]
-    let filterItem = { ...runtimeFilters[filterIndex] }
-    filterItem.active = filter.values[0]
-    filterItem.values = filterOrder
-    filterItem.order = 'cust'
-    filters[filterIndex] = filterItem
-
-    setState({
-      ...state,
-      filters
-    })
-  }
 
   const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', ...attributes }) => {
     const [value, setValue] = useState(stateValue)
@@ -1196,27 +1183,10 @@ const EditorPanel = props => {
 
   const usedFilterColumns = {}
 
-  const filterStyles = ['pill', 'tab', 'dropdown', 'tab bar']
-
   const filtersJSX = state.filters.map((filter, index) => {
     if (filter.columnName) {
       usedFilterColumns[filter.columnName] = true
     }
-
-    const filterOptions = [
-      {
-        label: 'Ascending Alphanumeric',
-        value: 'asc'
-      },
-      {
-        label: 'Descending Alphanumeric',
-        value: 'desc'
-      },
-      {
-        label: 'Custom',
-        value: 'cust'
-      }
-    ]
 
     return (
       <>
@@ -1261,7 +1231,7 @@ const EditorPanel = props => {
                 changeFilter(index, 'filterStyle', e.target.value)
               }}
             >
-              {filterStyles.map((option, index) => {
+              {filterStyleOptions.map((option, index) => {
                 return (
                   <option value={option} key={`filter-${option}--${index}`}>
                     {option}
@@ -1280,7 +1250,7 @@ const EditorPanel = props => {
                 changeFilterActive(index, filter.values[0])
               }}
             >
-              {filterOptions.map((option, index) => {
+              {filterOrderOptions.map((option, index) => {
                 return (
                   <option value={option.value} key={`filter-${index}`}>
                     {option.label}
@@ -1291,11 +1261,11 @@ const EditorPanel = props => {
           </label>
 
           {filter.order === 'cust' && (
-            <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, runtimeFilters[index])}>
+            <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, state.filters[index])}>
               <Droppable droppableId='filter_order'>
                 {provided => (
                   <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-                    {runtimeFilters[index]?.values.map((value, index) => {
+                    {state.filters[index]?.values.map((value, index) => {
                       return (
                         <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
                           {(provided, snapshot) => (
@@ -2232,6 +2202,7 @@ const EditorPanel = props => {
                       </label>
                     )}
                     {/* always show */}
+                    {/*
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -2241,7 +2212,7 @@ const EditorPanel = props => {
                         }}
                       />
                       <span className='edit-label'>Show Special Classes Last</span>
-                    </label>
+                    </label> */}
                     {'category' !== legend.type && (
                       <label className='checkbox'>
                         <input type='checkbox' checked={legend.separateZero || false} onChange={event => handleEditorChanges('separateZero', event.target.checked)} />
@@ -2259,7 +2230,6 @@ const EditorPanel = props => {
                       </label>
                     )}
                     {/* Temp Checkbox */}
-
                     {state.legend.type === 'equalnumber' && (
                       <label className='checkbox mt-4'>
                         <input

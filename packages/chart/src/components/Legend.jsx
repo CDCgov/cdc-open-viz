@@ -5,6 +5,7 @@ import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 
 import useLegendClasses from './../hooks/useLegendClasses'
+import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 const Legend = () => {
   const { config, legend, colorScale, seriesHighlight, highlight, twoColorPalette, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
@@ -133,6 +134,10 @@ const Legend = () => {
   const marginTop = isBottomOrSmallViewport && isHorizontal ? `${config.runtime.xAxis.size}px` : '0px'
   const marginBottom = isBottomOrSmallViewport ? '15px' : '0px'
 
+  const { HighLightedBarUtils } = useHighlightedBars(config)
+
+  let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
+
   if (!legend) return null
 
   if (!legend.dynamicLegend)
@@ -178,6 +183,38 @@ const Legend = () => {
                     <LegendCircle fill={label.value} />
                     <LegendLabel align='left' margin='0 0 0 4px'>
                       {label.text}
+                    </LegendLabel>
+                  </LegendItem>
+                )
+              })}
+              {highLightedLegendItems.map((bar, i) => {
+                // if duplicates only return first item
+
+                let className = 'legend-item'
+                let itemName = bar.legendLabel
+
+                if (!itemName) return
+                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
+                  className += ' inactive'
+                }
+
+                return (
+                  <LegendItem
+                    className={className}
+                    tabIndex={0}
+                    key={`legend-quantile-${i}`}
+                    onKeyPress={e => {
+                      if (e.key === 'Enter') {
+                        highlight(bar.legendLabel)
+                      }
+                    }}
+                    onClick={() => {
+                      highlight(bar.legendLabel)
+                    }}
+                  >
+                    <LegendCircle fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />
+                    <LegendLabel align='left' margin='0 0 0 4px'>
+                      {bar.legendLabel ? bar.legendLabel : ''}
                     </LegendLabel>
                   </LegendItem>
                 )
