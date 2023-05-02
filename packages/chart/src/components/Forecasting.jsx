@@ -27,6 +27,9 @@ const Forecasting = ({ xScale, yScale, yMax, xMax, chartRef, width, height, xSca
           <Group className='forecasting-bars' key='forecasting-bars' left={config.yAxis.size}>
             {config.forecastingChart.showBars &&
               data.map((bar, barIndex) => {
+                let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.forecastingChart.barColumn) === -1
+                let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.forecastingChart.barColumn) !== -1
+
                 return (
                   // prettier-ignore
                   <Bar
@@ -38,7 +41,9 @@ const Forecasting = ({ xScale, yScale, yMax, xMax, chartRef, width, height, xSca
                   y={yScale(bar[barColumn]) - 1}
                   width={xScale.bandwidth()}
                   height={height - yScale(bar[barColumn])}
-                  fill={forecastingChart.barColor !== '' ? forecastingChart.barColor : '#918e90'}
+                  fill={ displayArea  ? forecastingChart.barColor : 'transparent'}
+                  opacity={transparentArea ? 0 : 1}
+
               />
                 )
               })}

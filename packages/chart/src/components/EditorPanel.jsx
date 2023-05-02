@@ -1100,7 +1100,6 @@ const EditorPanel = () => {
                           let tempGroups = new Set(rawData.map(item => item[e.target.value])) // [estimate, forecast, etc.]
                           tempGroups = Array.from(tempGroups) // convert set to array
 
-                          console.log('temp', tempGroups)
                           tempGroups = tempGroups.filter(group => group !== undefined) // removes undefined
 
                           updateConfig({
