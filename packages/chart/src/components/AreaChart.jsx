@@ -123,8 +123,8 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
     return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])
   }
 
-  const handleY = (d, index) => {
-    return yScale(d[config.series[index].dataKey])
+  const handleY = (d, index, s = undefined) => {
+    return yScale(d[s.dataKey])
   }
 
   return (
@@ -132,7 +132,13 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
       <ErrorBoundary component='AreaChart'>
         <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)}>
           {(config.runtime.areaSeriesKeys || config.runtime.seriesKeys).map((s, index) => {
-            let seriesColor = colorPalettesChart[config.palette][index]
+            let seriesData = data.map(d => {
+              return {
+                [config.xAxis.dataKey]: d[config.xAxis.dataKey],
+                [s.dataKey]: d[s.dataKey]
+              }
+            })
+
             let curveType = allCurves[s.lineType]
             let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
             let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1
@@ -145,10 +151,10 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
               <React.Fragment key={index}>
                 {/* prettier-ignore */}
                 <LinePath
-                  data={data}
+                  data={seriesData}
                   x={d => handleX(d)}
-                  y={d => yScale(d[config.series[index].dataKey])}
-                  stroke={displayArea ? seriesColor : 'transparent'}
+                  y={d => handleY(d, index, s)}
+                  stroke={displayArea ?  colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
                   strokeWidth={2}
                   strokeOpacity={1}
                   shapeRendering='geometricPrecision'
@@ -161,11 +167,12 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                   key={'area-chart'}
                   fill={ displayArea ? colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
                   fillOpacity={transparentArea ? 0.25 : 0.5}
-                  data={data} x={d => handleX(d)}
-                  y={d => handleY(d, index)}
+                  data={seriesData}
+                  x={d => handleX(d)}
+                  y={d => handleY(d, index, s)}
                   yScale={yScale}
                   curve={curveType}
-                  strokeDasharray={s.type ? handleLineType(s.typ) : 0}
+                  strokeDasharray={s.type ? handleLineType(s.type) : 0}
                   />
 
                 {/* Transparent bar for tooltips */}
