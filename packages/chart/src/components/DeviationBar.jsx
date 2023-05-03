@@ -6,38 +6,7 @@ import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import chroma from 'chroma-js'
 
-// create function to position text based where bar is located left/or right
-function getTextProps(isLollipopChart, textFits, lollipopShapeSize, fill) {
-  if (isLollipopChart) {
-    return {
-      right: {
-        textAnchor: 'start',
-        dx: lollipopShapeSize + 6,
-        fill: '#000000'
-      },
-      left: {
-        textAnchor: 'end',
-        dx: -lollipopShapeSize,
-        fill: '#000000'
-      }
-    }
-  } else {
-    return {
-      right: {
-        textAnchor: textFits ? 'end' : 'start',
-        dx: textFits ? -6 : 6,
-        fill: textFits ? fill : '#000000'
-      },
-      left: {
-        textAnchor: textFits ? 'start' : 'end',
-        dx: textFits ? 6 : -6,
-        fill: textFits ? fill : '#000000'
-      }
-    }
-  }
-}
-
-export function DeviationBar({ height, xScale }) {
+export default function DeviationBar({ height, xScale }) {
   const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig, parseDate, formatDate } = useContext(ConfigContext)
 
   if (!config || config?.series?.length !== 1 || config.orientation !== 'horizontal') return
@@ -188,4 +157,35 @@ export function DeviationBar({ height, xScale }) {
       </Group>
     </ErrorBoundary>
   )
+}
+
+// create function to position text based where bar is located left/or right
+function getTextProps(isLollipopChart, textFits, lollipopShapeSize, fill) {
+  if (isLollipopChart) {
+    return {
+      right: {
+        textAnchor: 'start',
+        dx: lollipopShapeSize + 6,
+        fill: '#000000'
+      },
+      left: {
+        textAnchor: 'end',
+        dx: -lollipopShapeSize,
+        fill: '#000000'
+      }
+    }
+  } else {
+    return {
+      right: {
+        textAnchor: textFits ? 'end' : 'start',
+        dx: textFits ? -6 : 6,
+        fill: textFits ? fill : '#000000'
+      },
+      left: {
+        textAnchor: textFits ? 'start' : 'end',
+        dx: textFits ? 6 : -6,
+        fill: textFits ? fill : '#000000'
+      }
+    }
+  }
 }
