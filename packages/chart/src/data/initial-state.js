@@ -85,6 +85,7 @@ export default {
     horizontal: 750
   },
   xAxis: {
+    anchors: [],
     type: 'categorical',
     showTargetLabel: true,
     targetLabel: 'Target',
