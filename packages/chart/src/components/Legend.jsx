@@ -150,7 +150,9 @@ const Legend = () => {
         value: config.forecastingChart.barColor
       }
 
-      labels.unshift(barLabel)
+      if (config.forecastingChart.showBars) {
+        labels.unshift(barLabel)
+      }
 
       return labels
     }
