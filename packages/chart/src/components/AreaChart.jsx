@@ -40,7 +40,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
   if (!data) return
-  let barThickness = xMax / data
+  let barThickness = xMax / data.length
   let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
   let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
 
@@ -55,8 +55,14 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
 
     if (config.xAxis.type === 'date') {
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
+      console.log('x', x)
       if (!x) return
       if (!xScale) return
+      if (xScale(x) === undefined) return
+      if (xScale.invert(x) === undefined) return
+      console.log('xscale', xScale)
+      console.log('xscale at x', xScale(x))
+      console.log('xscale at x inverted', xScale.invert(x))
       const x0 = xScale.invert(x)
       const index = bisectDate(config.data, x0, 1)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
@@ -187,7 +193,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                   />
 
                 {/* circles that appear on hover */}
-                {tooltipData && (
+                {tooltipData && Object.entries(tooltipData.data).length > 0 && (
                   <circle
                     cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
                     cy={yScale(tooltipData.data[s.dataKey])}
@@ -205,12 +211,12 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                     return (
                       <Bar
                         className='bar-here'
-                        x={Number(barThickness * index + offset)}
+                        x={Number(barThickness * index)}
                         y={d => Number(yScale(d[config.series[index].dataKey]))}
                         yScale={yScale}
-                        width={barThicknessAdjusted}
+                        width={Number(barThickness)}
                         height={yMax}
-                        fill={'transparent'}
+                        fill={DEBUG ? 'red' : 'transparent'}
                         fillOpacity={1}
                         style={{ stroke: 'black', strokeWidth: 2 }}
                         onMouseMove={e => handleMouseOver(e, data)}
@@ -218,7 +224,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                     )
                   })}
 
-                {tooltipData && (
+                {tooltipData && Object.entries(tooltipData.data).length > 0 && (
                   <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
                     <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id}>
                       {typeof tooltipData === 'object' &&
