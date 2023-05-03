@@ -40,7 +40,8 @@ export default {
     rightAxisTickColor: '#333',
     numTicks: '',
     axisPadding: 0,
-    tickRotation: 0
+    tickRotation: 0,
+    anchors: []
   },
   boxplot: {
     plots: [],
@@ -84,6 +85,7 @@ export default {
     horizontal: 750
   },
   xAxis: {
+    anchors: [],
     type: 'categorical',
     showTargetLabel: true,
     targetLabel: 'Target',

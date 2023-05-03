@@ -106,14 +106,39 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     switch (lineType) {
       case 'dashed-sm':
         return '5 5'
+      case 'Dashed Small':
+        return '5 5'
       case 'dashed-md':
         return '10 5'
+      case 'Dashed Medium':
+        return '10 5'
       case 'dashed-lg':
+        return '15 5'
+      case 'Dashed Large':
         return '15 5'
       default:
         return 0
     }
   }
+
+  const lineOptions = [
+    {
+      value: 'Dashed Small',
+      key: 'dashed-sm'
+    },
+    {
+      value: 'Dashed Medium',
+      key: 'dashed-md'
+    },
+    {
+      value: 'Dashed Large',
+      key: 'dashed-lg'
+    },
+    {
+      value: 'Solid Line',
+      key: 'solid-line'
+    }
+  ]
 
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
@@ -632,10 +657,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
 
-  const parseDate = dateString => {
+  const parseDate = (dateString, showError = true) => {
     let date = timeParse(config.runtime[section].dateParseFormat)(dateString)
     if (!date) {
-      config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
+      if (showError) {
+        config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
+      }
       return new Date()
     } else {
       return date
@@ -939,6 +966,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     filterData,
     imageId,
     handleLineType,
+    lineOptions,
     isNumber,
     getTextWidth,
     twoColorPalette,
