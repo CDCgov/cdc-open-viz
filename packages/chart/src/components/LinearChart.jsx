@@ -25,7 +25,7 @@ import useRightAxis from '../hooks/useRightAxis'
 import useTopAxis from '../hooks/useTopAxis'
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType } = useContext(ConfigContext)
 
   let [width] = dimensions
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
@@ -459,6 +459,37 @@ export default function LinearChart() {
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
           </>
         )}
+
+        {/* y anchors */}
+        {config.yAxis.anchors &&
+          config.yAxis.anchors.map(anchor => {
+            return (
+              <Line
+                strokeDasharray={handleLineType(anchor.lineStyle)}
+                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                className='customAnchor'
+                from={{ x: 0 + config.yAxis.size, y: yScale(anchor.value) }}
+                to={{ x: width, y: yScale(anchor.value) }}
+                display={config.runtime.horizontal ? 'none' : 'block'}
+              />
+            )
+          })}
+
+        {/* x anchors */}
+        {config.xAxis.anchors &&
+          config.xAxis.anchors.map(anchor => {
+            const anchorPosition = config.xAxis.type === 'date' ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
+            return (
+              <Line
+                strokeDasharray={handleLineType(anchor.lineStyle)}
+                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                className='anchor-x'
+                from={{ x: anchorPosition + Number(config.yAxis.size), y: 0 }}
+                to={{ x: anchorPosition + Number(config.yAxis.size), y: yMax }}
+                display={config.runtime.horizontal ? 'none' : 'block'}
+              />
+            )
+          })}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
