@@ -119,10 +119,15 @@ export default {
   orientation: 'vertical',
   color: 'pinkpurple',
   columns: {
-    date: {
+      date: {
       name: 'Date'
-    }
+    },
   },
+  selected: '', // store column selected in Additional Columns
+  // not used
+  date: {
+      name: 'Date'
+    },
   legend: {
     behavior: 'isolate',
     singleRow: false,

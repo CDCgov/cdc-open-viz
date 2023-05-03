@@ -177,7 +177,10 @@ const DataTable = props => {
     //.filter(row => applyLegendToRow(runtimeData[row]))
     .sort((a, b) => {
       console.log('config.columns', config.columns)
-      const sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
+      let sortVal
+      if (config.columns.length > 0) {
+        sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
+      }
       console.log('sortval', sortVal)
       if (!sortBy.asc) return sortVal
       if (sortVal === 0) return 0
@@ -285,10 +288,25 @@ const DataTable = props => {
     config.series.forEach(element => {
       tmpSeriesColumns.push(element.dataKey)
     })
+    // then add the additional Columns
+    console.log('config.columns=', config.columns)
+    console.log('config.columns.length=', Object.keys(config.columns).length)
+    if (Object.keys(config.columns).length > 1) {
+      Object.values(config.columns).forEach(element => {
+        console.log('element=', element)
+        if (element.name !== config.xAxis.dataKey) {
+          tmpSeriesColumns.push(element.name)
+        }
+      })
+    }
     return tmpSeriesColumns
   }
 
   function genChartHeader(columns, data) {
+    console.log('genChartHeader incoming columns', columns)
+    console.log('genChartHeader incoming config.columns', config.columns)
+    console.log('genChartHeader incoming config', config)
+    console.log('genChartHeader incoming dataSeriesColumns', dataSeriesColumns())
     return (
       <tr>
         {/*console.log('###genChartHeader columns,keys', columns, dataSeriesColumns())*/}
@@ -333,8 +351,8 @@ const DataTable = props => {
   }
 
   function genChartRows(rows) {
-    console.log('###ChartRows=', rows)
-    console.log('config.xAxis.dataKey=', config.xAxis.dataKey)
+    //console.log('###ChartRows=', rows)
+    //console.log('config.xAxis.dataKey=', config.xAxis.dataKey)
     let dataColumns = Object.keys(runtimeData[0]) // get from 1 row
     const allrows = rows.map(row => {
       {
@@ -346,12 +364,12 @@ const DataTable = props => {
             //.filter(column => columns[column].dataTable === true && columns[column].name)
             .map(column => {
               let cellValue
-              console.log('###map row=', row)
-              console.log('###map column=', column)
+              //console.log('###map row=', row)
+              //console.log('###map column=', column)
               if (column === config.xAxis.dataKey) {
                 const rowObj = runtimeData[row]
                 const legendColor = applyLegendToRow(rowObj)
-                console.log('###map rowObj,legendColor', rowObj, legendColor)
+                //console.log('###map rowObj,legendColor', rowObj, legendColor)
                 var labelValue = rowObj[column]
                 /*                 if (config.general.geoType !== 'us-county' || config.general.type === 'us-geocode') {
                   labelValue = displayGeoName(row)
@@ -360,7 +378,7 @@ const DataTable = props => {
                 } */
 
                 labelValue = getCellAnchor(labelValue, rowObj)
-                console.log('####labelvalue=', labelValue)
+                //console.log('####labelvalue=', labelValue)
                 //console.log('####legendColor[0]=', legendColor[row])
                 // no colors on row headers for charts bc it's Date not data
                 // Remove this - <LegendCircle fill={legendColor[row]} />
