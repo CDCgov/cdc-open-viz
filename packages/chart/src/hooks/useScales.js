@@ -1,4 +1,4 @@
-import { scaleBand, scaleLinear, scaleLog, scalePoint } from '@visx/scale'
+import { scaleBand, scaleLinear, scaleLog, scalePoint, scaleTime } from '@visx/scale'
 
 const useScales = properties => {
   const { xAxisDataMapped, xMax, yMax, min, max, config, data } = properties
