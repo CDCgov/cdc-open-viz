@@ -891,7 +891,7 @@ const EditorPanel = () => {
         [columnKey]: {
           name: columnSelected,
           label: columnSelected,
-          dataTable: false,
+          dataTable: true,
           tooltips: false,
           prefix: '',
           suffix: ''
@@ -960,24 +960,6 @@ const EditorPanel = () => {
     updateConfig({
       ...config,
       selected: value
-    })
-  }
-
-  // editColumn is not getting correct column name so adding this
-  // columnname and value are the same when adding a column
-  const addNewColumn = async (columnName, editTarget, value) => {
-    // not using special classes like in map editorpanel so removed those cases
-    //  add the column that is selected
-    let addCol = config.columns.selected
-    updateConfig({
-      ...config,
-      columns: {
-        ...config.columns,
-        [value]: {
-          ...config.columns[value],
-          [editTarget]: value
-        }
-      }
     })
   }
 

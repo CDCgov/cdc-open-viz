@@ -280,9 +280,11 @@ const DataTable = props => {
     })
     // then add the additional Columns
     if (Object.keys(config.columns).length > 1) {
-      Object.values(config.columns).forEach(element => {
-        if (element.name !== config.xAxis.dataKey) {
-          tmpSeriesColumns.push(element.name)
+      Object.keys(config.columns).forEach(function (key) {
+        var value = config.columns[key]
+        // add if not the index AND it is enabled to be added to data table
+        if (value.name !== config.xAxis.dataKey && value.dataTable === true) {
+          tmpSeriesColumns.push(value.name)
         }
       })
     }
@@ -292,7 +294,6 @@ const DataTable = props => {
   function genChartHeader(columns, data) {
     return (
       <tr>
-        {/* .filter(column => columns[column].dataTable === true && columns[column].name) */}
         {dataSeriesColumns().map(column => {
           let text = column === config.xAxis.dataKey ? config.table.indexLabel : column
           return (
