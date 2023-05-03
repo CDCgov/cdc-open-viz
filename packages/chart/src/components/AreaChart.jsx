@@ -46,23 +46,15 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
 
   // Tooltip helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinate = x => {
-    if (config.xAxis.type === 'categorical') {
+    if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
       let eachBand = xScale.step()
       let numerator = x
       const index = Math.floor(Number(numerator) / eachBand)
       return xScale.domain()[index - 1] // fixes off by 1 error
     }
 
-    if (config.xAxis.type === 'date') {
+    if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
-      console.log('x', x)
-      if (!x) return
-      if (!xScale) return
-      if (xScale(x) === undefined) return
-      if (xScale.invert(x) === undefined) return
-      console.log('xscale', xScale)
-      console.log('xscale at x', xScale(x))
-      console.log('xscale at x inverted', xScale.invert(x))
       const x0 = xScale.invert(x)
       const index = bisectDate(config.data, x0, 1)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
