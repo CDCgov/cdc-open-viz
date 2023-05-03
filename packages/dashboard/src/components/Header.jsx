@@ -196,7 +196,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
               <span className='edit-label column-heading'>Set By: </span>
               <select value={filter.setBy} onChange={e => updateFilterProp('setBy', index, e.target.value)}>
                 <option value=''>- Select Option -</option>
-                {Object.keys(config.visualizations).map(vizKey => (
+                {Object.keys(config.visualizations).filter(vizKey => config.visualizations[vizKey].visualizationType !== 'filter-dropdowns').map(vizKey => (
                   <option value={vizKey} key={`set-by-select-item-${vizKey}`}>
                     {config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}
                   </option>
@@ -224,7 +224,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
               <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
                 <option value=''>- Select Option -</option>
                 {Object.keys(config.visualizations)
-                  .filter(vizKey => filter.setBy !== vizKey && (!filter.usedBy || filter.usedBy.indexOf(vizKey) === -1) && !config.visualizations[vizKey].usesSharedFilter)
+                  .filter(vizKey => filter.setBy !== vizKey && (!filter.usedBy || filter.usedBy.indexOf(vizKey) === -1) && !config.visualizations[vizKey].usesSharedFilter && config.visualizations[vizKey].visualizationType !== 'filter-dropdowns')
                   .map(vizKey => (
                     <option value={vizKey} key={`used-by-select-item-${vizKey}`}>
                       {config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}
