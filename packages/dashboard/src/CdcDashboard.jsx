@@ -512,7 +512,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Filter Dropdowns' />
-                <Filters />
+                <div className='cove-dashboard-filters'>
+                  <Filters />
+                </div>
               </>
             )
             break
@@ -668,7 +670,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                 />
                               )}
                               {visualizationConfig.type === 'filter-dropdowns' && (
-                                <Filters />
+                                <div className='cove-dashboard-filters'>
+                                  <Filters />
+                                </div>
                               )}
                             </div>
                           </React.Fragment>
