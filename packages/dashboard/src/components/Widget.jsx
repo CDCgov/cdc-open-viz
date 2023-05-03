@@ -26,7 +26,7 @@ const iconHash = {
   gear: <Icon display='gear' base />,
   tools: <Icon display='tools' base />,
   'filtered-text': <Icon display='filtered-text' base />,
-  'filter-dropdowns': <Icon display='filtered-text' base />
+  'filter-dropdowns': <Icon display='filter-dropdowns' base />
 }
 
 const labelHash = {
