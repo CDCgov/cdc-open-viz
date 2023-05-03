@@ -6,15 +6,15 @@ import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 
-import CoveScatterPlot from './ScatterPlot'
 import BarChart from './BarChart'
-import LineChart from './LineChart'
-import { DeviationBar } from './DeviationBar'
 import ConfigContext from '../ConfigContext'
+import CoveAreaChart from './AreaChart'
+import CoveBoxPlot from './BoxPlot'
+import CoveScatterPlot from './ScatterPlot'
+import DeviationBar from './DeviationBar'
+import LineChart from './LineChart'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
-import CoveBoxPlot from './BoxPlot'
-import CoveAreaChart from './AreaChart'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import '../scss/LinearChart.scss'
@@ -24,7 +24,6 @@ import useMinMax from '../hooks/useMinMax'
 import useRightAxis from '../hooks/useRightAxis'
 import useTopAxis from '../hooks/useTopAxis'
 
-// TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
 
