@@ -40,7 +40,8 @@ export default {
     rightAxisTickColor: '#333',
     numTicks: '',
     axisPadding: 0,
-    tickRotation: 0
+    tickRotation: 0,
+    anchors: []
   },
   boxplot: {
     plots: [],

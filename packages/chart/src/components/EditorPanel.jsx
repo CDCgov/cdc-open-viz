@@ -1529,6 +1529,128 @@ const EditorPanel = () => {
                       </>
                     )
                   )}
+
+                  <div className='edit-block'>
+                    <h3>Anchors</h3>
+                    {/* anchors */}
+                    {config.visualizationType === 'Bar' && (
+                      <>
+                        <Accordion allowZeroExpanded>
+                          {config.yAxis?.anchors?.map((anchor, index) => (
+                            <AccordionItem className='series-item series-item--chart'>
+                              <AccordionItemHeading className='series-item__title'>
+                                <>
+                                  <AccordionItemButton className={'accordion__button accordion__button'}>
+                                    Anchor {index + 1}
+                                    <button
+                                      className='series-list__remove'
+                                      onClick={e => {
+                                        e.preventDefault()
+                                        const copiedAnchorGroups = [...config.yAxis.anchors]
+                                        copiedAnchorGroups.splice(index, 1)
+                                        updateConfig({
+                                          ...config,
+                                          yAxis: {
+                                            ...config.yAxis,
+                                            anchors: copiedAnchorGroups
+                                          }
+                                        })
+                                      }}
+                                    >
+                                      Remove
+                                    </button>
+                                  </AccordionItemButton>
+                                </>
+                              </AccordionItemHeading>
+                              <AccordionItemPanel>
+                                {/* <Select
+                              fieldName='anchorValue'
+                              label='y axis anchor point'
+                              value={config.yAxis.anchors[index].value || ''}
+                              initial={'Select'}
+                              onChange={e => {
+                                if (e.target.value !== '' && e.target.value !== 'Select') {
+                                  const copiedAnchors = [...config.yAxis.anchors]
+                                  copiedAnchors[index].value = e.target.value
+                                  updateConfig({
+                                    ...config,
+                                    yAxis: {
+                                      ...config.yAxis,
+                                      anchors: copiedAnchors
+                                    }
+                                  })
+                                }
+                              }}
+                              options={rawData.map(item => item[config.forecastingChart.barColumn])}
+                            /> */}
+
+                                <label>
+                                  <span>Anchor Value</span>
+                                  <input
+                                    type='text'
+                                    value={config.yAxis.anchors[index].value ? config.yAxis.anchors[index].value : ''}
+                                    onChange={e => {
+                                      e.preventDefault()
+                                      if (e.target.value !== '') {
+                                        const copiedAnchors = [...config.yAxis.anchors]
+                                        copiedAnchors[index].value = e.target.value
+                                        updateConfig({
+                                          ...config,
+                                          yAxis: {
+                                            ...config.yAxis,
+                                            anchors: copiedAnchors
+                                          }
+                                        })
+                                      }
+                                    }}
+                                  />
+                                </label>
+
+                                <Select
+                                  fieldName='anchorValue'
+                                  label='line style'
+                                  value={config.yAxis.anchors[index].lineStyle || ''}
+                                  initial={'Select'}
+                                  onChange={e => {
+                                    if (e.target.value !== '' && e.target.value !== 'Select') {
+                                      const copiedAnchors = [...config.yAxis.anchors]
+                                      copiedAnchors[index].lineStyle = e.target.value
+                                      updateConfig({
+                                        ...config,
+                                        yAxis: {
+                                          ...config.yAxis,
+                                          anchors: copiedAnchors
+                                        }
+                                      })
+                                    }
+                                  }}
+                                  options={['dashed-sm', 'dashed-md', 'dashed-lg', 'Line']}
+                                />
+                              </AccordionItemPanel>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+
+                        <button
+                          className='btn full-width'
+                          onClick={e => {
+                            e.preventDefault()
+                            const anchors = [...config.yAxis.anchors]
+                            anchors.push({})
+                            updateConfig({
+                              ...config,
+                              yAxis: {
+                                ...config.yAxis,
+                                anchors
+                              }
+                            })
+                          }}
+                        >
+                          Add Anchor
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </AccordionItemPanel>
               </AccordionItem>
 
