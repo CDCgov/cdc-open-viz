@@ -92,12 +92,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
 
-  console.log('Chart config', config)
+  if (isDebug) console.log('Chart config', config)
 
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
 
-  console.log('Chart legend', legend)
+  if (isDebug) console.log('Chart legend', legend)
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -987,7 +987,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {config.table.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
               {config.table.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
             </CoveMediaControls.Section>
-            {console.log('config.table.expanded', config.table.expanded)}
             {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
               <DataTable
@@ -1015,6 +1014,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 innerContainerRef={innerContainerRef}
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
+                isDebug={isDebug}
               />
             )}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
