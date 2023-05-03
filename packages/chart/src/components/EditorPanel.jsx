@@ -493,7 +493,6 @@ const EditorPanel = () => {
 
   const getColumns = (filter = true) => {
     let columns = {}
-    //console.log('unfiltereddata=', unfilteredData)
     unfilteredData.forEach(row => {
       Object.keys(row).forEach(columnName => (columns[columnName] = true))
     })
@@ -846,16 +845,11 @@ const EditorPanel = () => {
   ]
 
   if (config.data) {
-    console.log('config.series', config.series)
     Object.keys(config.data[0]).map(colName => {
       // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
-      //console.log('#colName', colName)
-      //console.log('#Object.values(config.series)', Object.values(config.series))
-      //console.log('colname included?', Object.values(config.series).includes(colName))
       const found = config.series.some(el => el.dataKey === colName)
       if (colName !== config.xAxis.dataKey && !found) {
         // if not the index then add it
-        //console.log('PUSH colname', colName)
         return columnsOptions.push(
           <option value={colName} key={colName}>
             {colName}
@@ -887,17 +881,15 @@ const EditorPanel = () => {
     return true
   })
 
-  console.log('additionalColumns', additionalColumns)
   const addAdditionalColumn = number => {
     const columnKey = `additionalColumn${number}`
     const columnSelected = config.selected
-    console.log('###addAdditCol number, colname columnSelected', number, columnSelected)
     updateConfig({
       ...config,
       columns: {
         ...config.columns,
         [columnKey]: {
-          name: columnSelected, // not getting passed in - remove? (TT)
+          name: columnSelected,
           label: columnSelected,
           dataTable: false,
           tooltips: false,
@@ -933,7 +925,6 @@ const EditorPanel = () => {
 
   const editColumn = async (columnName, editTarget, value) => {
     // not using special classes like in map editorpanel so removed those cases
-    console.log('###columnName, editTarget, value', columnName, editTarget, value)
     switch (editTarget) {
       case 'name':
         updateConfig({
@@ -965,23 +956,19 @@ const EditorPanel = () => {
   // need selection to feed into addColumn
   const selectColumn = async (columnName, editTarget, value) => {
     // not using special classes like in map editorpanel so removed those cases
-    console.log('###SELECT columnName, editTarget, value', columnName, editTarget, value)
     // store selection from Additional Columns
     updateConfig({
       ...config,
       selected: value
     })
-    console.log('selectColumn config, value', config, value)
   }
 
   // editColumn is not getting correct column name so adding this
   // columnname and value are the same when adding a column
   const addNewColumn = async (columnName, editTarget, value) => {
     // not using special classes like in map editorpanel so removed those cases
-    console.log('###ADD columnName, editTarget, value', columnName, editTarget, value)
     //  add the column that is selected
     let addCol = config.columns.selected
-    console.log('###addCol=', addCol)
     updateConfig({
       ...config,
       columns: {
