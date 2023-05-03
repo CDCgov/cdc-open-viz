@@ -12,7 +12,7 @@ import Loading from '@cdc/core/components/Loading'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
-  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode, isDebug } = props
+  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, parseDate, formatDate, isDebug } = props
   if (isDebug) console.log('props=', props)
   if (isDebug) console.log('runtimeData=', runtimeData)
   if (isDebug) console.log('rawData=', rawData)
@@ -399,6 +399,37 @@ const DataTable = props => {
             <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{config.type === 'map' ? genMapHeader(columns) : genChartHeader(columns, runtimeData)}</thead>
             <tbody>{config.type === 'map' ? genMapRows(rows) : genChartRows(rows)}</tbody>
           </table>
+
+          {/* REGION Data Table */}
+          {config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' ? (
+            <table className='region-table data-table'>
+              <caption className='visually-hidden'>Table of the highlighted regions in the visualization</caption>
+              <thead>
+                <tr>
+                  <th>Region Name</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {config.regions.map((region, index) => {
+                  if (config.visualizationType === 'Box Plot') return false
+                  if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+                  // region.from and region.to had formatDate(parseDate()) on it
+                  // but they returned undefined - removed both for now (TT)
+                  return (
+                    <tr key={`row-${region.label}--${index}`}>
+                      <td>{region.label}</td>
+                      <td>{region.from}</td>
+                      <td>{region.to}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          ) : (
+            ''
+          )}
         </div>
       </section>
     </ErrorBoundary>
