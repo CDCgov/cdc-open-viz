@@ -30,7 +30,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
   const applyRadius = index => {
-    if (index === undefined || index === null || !isRounded) return
+    if (index === undefined || index === null || !isRounded) return {}
     let style = {}
 
     if ((isStacked && index + 1 === stackCount) || !isStacked) {
