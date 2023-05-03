@@ -150,6 +150,7 @@ export default {
     accent: true,
     background: true
   },
+  useLogScale: false,
   filterBehavior: 'Filter Change',
   highlightedBarValues: [],
   series: []
