@@ -42,10 +42,24 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
   const removeFilter = index => {
     let dashboardConfig = { ...config.dashboard }
+    let visualizations = { ...config.visualizations }
 
     dashboardConfig.sharedFilters.splice(index, 1)
 
-    updateConfig({ ...config, dashboard: dashboardConfig })
+    Object.keys(visualizations).forEach(vizKey => {
+      if(visualizations[vizKey].visualizationType === 'filter-dropdowns' && visualizations[vizKey].hide && visualizations[vizKey].hide.length > 0){
+        if(visualizations[vizKey].hide.indexOf(index) !== -1){
+          visualizations[vizKey].hide.splice(visualizations[vizKey].hide.indexOf(index), 1)
+        }
+        visualizations[vizKey].hide.forEach((hideIndex, i) => {
+          if(hideIndex > index){
+            visualizations[vizKey].hide[i] = hideIndex - 1
+          }
+        })
+      }
+    })
+
+    updateConfig({ ...config, visualizations, dashboard: dashboardConfig })
 
     overlay?.actions.toggleOverlay()
   }
