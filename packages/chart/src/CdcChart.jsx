@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, memo } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -102,6 +102,74 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }
 
+  const reloadURLData = async () => {
+    if (config.dataUrl) {
+      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl)
+      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+
+      let isUpdateNeeded = false
+      config.filters.forEach(filter => {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+          qsParams[filter.queryParameter] = filter.active
+          isUpdateNeeded = true
+        }
+      })
+
+      if ((!config.formattedData || config.formattedData.urlFiltered) && !isUpdateNeeded) return
+
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+        .map((param, i) => {
+          let qs = i === 0 ? '?' : '&'
+          qs += param + '='
+          qs += qsParams[param]
+          return qs
+        })
+        .join('')}`
+
+      let data
+
+      try {
+        const regex = /(?:\.([^.]+))?$/
+
+        const ext = regex.exec(dataUrl.pathname)[1]
+        if ('csv' === ext) {
+          data = await fetch(dataUrlFinal)
+            .then(response => response.text())
+            .then(responseText => {
+              const parsedCsv = Papa.parse(responseText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+              })
+              return parsedCsv.data
+            })
+        } else if ('json' === ext) {
+          data = await fetch(dataUrlFinal).then(response => response.json())
+        } else {
+          data = []
+        }
+      } catch {
+        console.error(`Cannot parse URL: ${dataUrlFinal}`)
+        data = []
+      }
+
+      if (config.dataDescription) {
+        data = transform.autoStandardize(data)
+        data = transform.developerStandardize(data, config.dataDescription)
+      }
+
+      Object.assign(data, { urlFiltered: true })
+
+      updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
+
+      if (data) {
+        setStateData(data)
+        setExcludedData(data)
+        setFilteredData(filterData(config.filters, data))
+      }
+    }
+  }
+
   const handleLineType = lineType => {
     switch (lineType) {
       case 'dashed-sm':
@@ -146,7 +214,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {}
 
-    if (response.dataUrl) {
+    const urlFilters = response.filters ? (response.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
+
+    if (response.dataUrl && !urlFilters) {
       try {
         const regex = /(?:\.([^.]+))?$/
 
@@ -244,7 +314,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
-        newConfig.filters[index].active = filterValues[0]
+
+        newConfig.filters[index].active = newConfig.filters[index].active || filterValues[0]
         newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
       })
       currentData = filterData(newConfig.filters, newExcludedData)
@@ -441,14 +512,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     data.forEach(row => {
       let add = true
-      filters.forEach(filter => {
-        if (row[filter.columnName] !== filter.active) {
-          add = false
-        }
-      })
+      filters
+        .filter(filter => filter.type !== 'url')
+        .forEach(filter => {
+          if (row[filter.columnName] != filter.active) {
+            add = false
+          }
+        })
 
       if (add) filteredData.push(row)
     })
+
     return filteredData
   }
 
@@ -522,6 +596,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   useEffect(() => {
     loadConfig()
   }, []) // eslint-disable-line
+
+  useEffect(() => {
+    reloadURLData()
+  }, [JSON.stringify(config.filters)])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.

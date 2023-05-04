@@ -1184,6 +1184,8 @@ const EditorPanel = props => {
   const usedFilterColumns = {}
 
   const filtersJSX = state.filters.map((filter, index) => {
+    if(filter.type === 'url') return <></>
+    
     if (filter.columnName) {
       usedFilterColumns[filter.columnName] = true
     }
