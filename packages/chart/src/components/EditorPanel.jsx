@@ -17,7 +17,6 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
-import * as allCurves from '@visx/curve'
 import { useFilters } from '@cdc/core/components/Filters'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
@@ -756,9 +755,7 @@ const EditorPanel = () => {
       default:
         message = ''
     }
-    setWarningMsg(function (prevMsg) {
-      return { ...prevMsg, maxMsg: message }
-    })
+    setWarningMsg(prevMsg => ({ ...prevMsg, maxMsg: message }))
   }
 
   const validateMinValue = () => {
@@ -767,27 +764,28 @@ const EditorPanel = () => {
     let message = ''
 
     switch (true) {
+      case config.useLogScale && ['Line', 'Combo', 'Bar'].includes(config.visualizationType) && enteredValue < 0:
+        message = 'Negative numbers are not supported in logarithmic scale'
+        break
       case (config.visualizationType === 'Line' || config.visualizationType === 'Spark Line') && enteredValue && parseFloat(enteredValue) > minVal:
-        message = 'Value must be less than ' + minValue
+        message = 'Value should not exceed ' + minValue
         break
       case config.visualizationType === 'Combo' && isAllLine && enteredValue && parseFloat(enteredValue) > minVal:
-        message = 'Value must be less than ' + minValue
+        message = 'Value should not exceed ' + minValue
         break
       case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
-        message = 'Value must be less than or equal to 0'
+        message = config.useLogScale ? 'Value must be equal to 0' : 'Value must be less than or equal to 0'
         break
       case config.visualizationType === 'Deviation Bar' && parseFloat(enteredValue) >= Math.min(minVal, config.xAxis.target):
         message = 'Value must be less than ' + Math.min(minVal, config.xAxis.target)
         break
       case config.visualizationType !== 'Deviation Bar' && enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
-        message = 'Value must be less than ' + minValue
+        message = 'Value should not exceed ' + minValue
         break
       default:
         message = ''
     }
-    setWarningMsg(function (prevMsg) {
-      return { ...prevMsg, minMsg: message }
-    })
+    setWarningMsg(prevMsg => ({ ...prevMsg, minMsg: message }))
   }
   useEffect(() => {
     validateMinValue()
@@ -1454,7 +1452,7 @@ const EditorPanel = () => {
                       {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
                       {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Display Gridlines' updateField={updateField} />}
                       <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
-                      {config.visualizationSubType === 'regular' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logaritmic scale' updateField={updateField} />}
+                      {config.visualizationSubType === 'regular' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
                     </>
                   )}
                   <span className='divider-heading'>Number Formatting</span>

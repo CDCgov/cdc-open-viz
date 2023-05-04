@@ -27,69 +27,43 @@ import useTopAxis from '../hooks/useTopAxis'
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType } = useContext(ConfigContext)
 
-  let [width] = dimensions
-  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
-  const [animatedChart, setAnimatedChart] = useState(false)
-
-  const triggerRef = useRef()
-  const dataRef = useIntersectionObserver(triggerRef, {
-    freezeOnceVisible: false
-  })
-
-  // Make sure the chart is visible if in the editor
-  /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    const element = document.querySelector('.isEditor')
-    if (element) {
-      // parent element is visible
-      setAnimatedChart(prevState => true)
-    }
-  }) /* eslint-disable-line */
-
-  // If the chart is in view, set to animate if it has not already played
-  useEffect(() => {
-    if (dataRef?.isIntersecting === true && config.animate) {
-      setTimeout(() => {
-        setAnimatedChart(prevState => true)
-      }, 500)
-    }
-  }, [dataRef?.isIntersecting, config.animate])
-
-  if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && (currentViewport === 'lg' || currentViewport === 'md')) {
-    width = width * 0.73
-  }
-  const { horizontal: heightHorizontal } = config.heights
-  const height = config.aspectRatio ? width * config.aspectRatio : config.heights[config.orientation]
-  const xMax = width - config.runtime.yAxis.size - (config.visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
-
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
-  const { hasTopAxis } = useTopAxis(config)
-
+  // getters & functions
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = data.map(d => getXAxisData(d))
 
-  const properties = {
-    data,
-    config,
-    minValue,
-    maxValue,
-    isAllLine,
-    existPositiveValue,
-    xAxisDataMapped,
-    xMax,
-    yMax
+  // configure width
+  let [width] = dimensions
+  if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
+    width = width * 0.73
   }
+  //  configure height , yMax, xMAx
+  const { horizontal: heightHorizontal } = config.heights
+  const isHorizontal = config.orientation === 'horizontal'
+  const shouldAbbreviate = true
+  const height = config.aspectRatio ? width * config.aspectRatio : config.heights[config.orientation]
+  const xMax = width - config.runtime.yAxis.size - (config.visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
+  const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
 
+  // hooks  % states
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
+  const { hasTopAxis } = useTopAxis(config)
+  const [animatedChart, setAnimatedChart] = useState(false)
+  const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
   const { min, max } = useMinMax(properties)
   const { xScale, yScale, seriesScale, g1xScale, g2xScale } = useScales({ ...properties, min, max })
 
-  const shouldAbbreviate = true
+  // refs
+  const triggerRef = useRef()
+  const svgRef = useRef()
+  const dataRef = useIntersectionObserver(triggerRef, {
+    freezeOnceVisible: false
+  })
 
   const handleLeftTickFormatting = tick => {
-    //when logaritmic scale applyed change value of FIRST  tick
     if (config.useLogScale && tick === 0.1) {
+      //when logaritmic scale applyed change value of FIRST  tick
       tick = 0
     }
     if (config.runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
@@ -98,8 +72,8 @@ export default function LinearChart() {
   }
 
   const handleBottomTickFormatting = tick => {
-    // when logaritmic scale applyed change value FIRST  of  tick
     if (config.useLogScale && tick === 0.1) {
+      // when logaritmic scale applyed change value FIRST  of  tick
       tick = 0
     }
     if (config.runtime.xAxis.type === 'date') return formatDate(tick)
@@ -109,8 +83,6 @@ export default function LinearChart() {
   }
 
   const countNumOfTicks = axis => {
-    // function get number of ticks based on bar type & users value
-    const isHorizontal = config.orientation === 'horizontal'
     const { numTicks } = config.runtime[axis]
     let tickCount = undefined
 
@@ -146,7 +118,24 @@ export default function LinearChart() {
     return tickCount
   }
 
-  const svgRef = useRef()
+  // Make sure the chart is visible if in the editor
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    const element = document.querySelector('.isEditor')
+    if (element) {
+      // parent element is visible
+      setAnimatedChart(prevState => true)
+    }
+  }) /* eslint-disable-line */
+
+  // If the chart is in view, set to animate if it has not already played
+  useEffect(() => {
+    if (dataRef?.isIntersecting === true && config.animate) {
+      setTimeout(() => {
+        setAnimatedChart(prevState => true)
+      }, 500)
+    }
+  }, [dataRef?.isIntersecting, config.animate])
 
   return isNaN(width) ? (
     <></>
@@ -344,7 +333,7 @@ export default function LinearChart() {
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                        {!config.xAxis.hideTicks && <Line from={tick.from} to={to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' ? 1.3 : 1} />}
+                        {!config.xAxis.hideTicks && <Line from={tick.from} to={config.orientation === 'horizontal' && config.useLogScale ? to : tick.to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' ? 1.3 : 1} />}
                         {!config.xAxis.hideLabel && (
                           <Text
                             dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}

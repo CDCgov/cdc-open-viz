@@ -7,11 +7,11 @@ const useScales = properties => {
   const isHorizontal = config.orientation === 'horizontal'
 
   //  define scxales
-  let xScale = undefined
-  let yScale = undefined
-  let seriesScale = undefined
-  let g2xScale = undefined
-  let g1xScale = undefined
+  let xScale = null
+  let yScale = null
+  let g2xScale = null
+  let g1xScale = null
+  let seriesScale = null
 
   const scaleTypes = {
     TIME: 'time',
@@ -155,7 +155,7 @@ export default useScales
 /// helper functions
 const composeXScale = ({ min, max, xMax, config }) => {
   // Adjust min value if using logarithmic scale
-  min = config.useLogScale ? min + 0.1 : min
+  min = config.useLogScale && min >= 0 && min < 1 ? min + 0.1 : min
   // Select the appropriate scale function
   const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
   // Return the configured scale function
@@ -170,7 +170,7 @@ const composeXScale = ({ min, max, xMax, config }) => {
 
 const composeYScale = ({ min, max, yMax, config }) => {
   // Adjust min value if using logarithmic scale
-  min = config.useLogScale ? min + 0.1 : min
+  min = config.useLogScale && min >= 0 && min < 1 ? min + 0.1 : min
   // Select the appropriate scale function
   const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
   // Return the configured scale function
