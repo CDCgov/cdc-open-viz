@@ -10,7 +10,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   // do validation bafore applying t0 charts
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
-  const isMinValid = (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
+  const isMinValid = config.useLogScale ? enteredMinValue >= 0 : (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
 
   min = enteredMinValue && isMinValid ? enteredMinValue : minValue
   max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
@@ -34,8 +34,8 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
       min = 0
     }
     if (enteredMinValue) {
-      const isMinValid = +enteredMinValue < minValue
-      min = +enteredMinValue && isMinValid ? enteredMinValue : minValue
+      const isMinValid = config.useLogScale ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
+      min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     }
   }
 
@@ -45,7 +45,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   }
 
   if (config.visualizationType === 'Line') {
-    const isMinValid = enteredMinValue < minValue
+    const isMinValid = config.useLogScale ? enteredMinValue >= 0 : enteredMinValue < minValue
     min = enteredMinValue && isMinValid ? enteredMinValue : minValue
   }
   //If data value max wasn't provided, calculate it
