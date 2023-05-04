@@ -2005,6 +2005,7 @@ const EditorPanel = props => {
                               {columnsOptions}
                             </select>
                           </label>
+                          {console.log('MAP val, columns[val]', val, columns[val])}
                           <TextField value={columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' updateField={updateField} />
                           <ul className='column-edit'>
                             <li className='three-col'>

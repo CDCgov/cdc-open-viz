@@ -308,6 +308,8 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
+    if (isDebug) console.log('#COVE: CHART: EditorPanel: section, subsection, fieldName, newValue', section, subsection, fieldName, newValue)
+
     if (section === 'boxplot' && subsection === 'legend') {
       updateConfig({
         ...config,
@@ -857,19 +859,19 @@ const EditorPanel = () => {
         )
       }
     })
-  }
 
-  let columnsByKey = {}
-  config.data.forEach(datum => {
-    Object.keys(datum).forEach(key => {
-      columnsByKey[key] = columnsByKey[key] || []
-      const value = typeof datum[key] === 'number' ? datum[key].toString() : datum[key]
+    let columnsByKey = {}
+    config.data.forEach(datum => {
+      Object.keys(datum).forEach(key => {
+        columnsByKey[key] = columnsByKey[key] || []
+        const value = typeof datum[key] === 'number' ? datum[key].toString() : datum[key]
 
-      if (columnsByKey[key].indexOf(value) === -1) {
-        columnsByKey[key].push(value)
-      }
+        if (columnsByKey[key].indexOf(value) === -1) {
+          columnsByKey[key].push(value)
+        }
+      })
     })
-  })
+  }
 
   // prevents adding duplicates
   const additionalColumns = Object.keys(config.columns).filter(value => {
@@ -2027,7 +2029,7 @@ const EditorPanel = () => {
                             <span className='edit-label column-heading'>Column</span>
                             <select
                               //value={config.columns[val] ? config.columns[val].name : columnsOptions[0]}
-                              value={config.selected}
+                              value={config.selected !== '' ? config.selected : columnsOptions[0]}
                               onChange={event => {
                                 selectColumn(val, 'name', event.target.value)
                               }}
@@ -2035,6 +2037,8 @@ const EditorPanel = () => {
                               {columnsOptions}
                             </select>
                           </label>
+                          {console.log('#CHART val, columns[val]', val, columns[val])}
+                          {console.log('#CHART config.columns', config.columns)}
                           <TextField value={columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' updateField={updateField} />
                           <ul className='column-edit'>
                             <li className='three-col'>
