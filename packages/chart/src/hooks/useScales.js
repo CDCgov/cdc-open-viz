@@ -13,9 +13,18 @@ const useScales = properties => {
   let g2xScale = undefined
   let g1xScale = undefined
 
+  const scaleTypes = {
+    TIME: 'time',
+    LOG: 'log',
+    POINT: 'point',
+    LINEAR: 'linear',
+    BAND: 'band'
+  }
+
   // handle  Horizontal bars
   if (isHorizontal) {
     xScale = composeXScale({ min: min * 1.03, ...properties })
+    xScale.type = config.useLogScale ? scaleTypes.LOG : scaleTypes.LINEAR
     yScale = getYScaleFunction(xAxisType, xAxisDataMapped)
     yScale.rangeRound([0, yMax])
     seriesScale = composeScalePoint(seriesDomain, [0, yMax])
@@ -24,6 +33,16 @@ const useScales = properties => {
   // handle  Vertical bars
   if (!isHorizontal) {
     xScale = composeScalePoint(xAxisDataMapped, [0, xMax], 0.5)
+    xScale.type = scaleTypes.POINT
+
+    // if (config.visualizationType === 'Bar') {
+    //   xScale = scaleBand({
+    //     domain: xAxisDataMapped,
+    //     range: [0, xMax],
+    //     padding: 0.4
+    //   })
+    //   xScale.type = scaleTypes.BAND
+    // }
     yScale = composeYScale(properties)
     seriesScale = composeScalePoint(seriesDomain, [0, xMax])
   }
@@ -34,6 +53,7 @@ const useScales = properties => {
       domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)],
       range: [0, xMax]
     })
+    xScale.type = scaleTypes.TIME
   }
 
   // handle Deviation bar
@@ -49,6 +69,7 @@ const useScales = properties => {
       round: true,
       nice: true
     })
+    xScale.type = scaleTypes.LINEAR
   }
 
   // handle Scatter plot
@@ -58,6 +79,7 @@ const useScales = properties => {
         domain: [0, Math.max.apply(null, xScale.domain())],
         range: [0, xMax]
       })
+      xScale.type = scaleTypes.LINEAR
     }
   }
 
@@ -96,6 +118,7 @@ const useScales = properties => {
       domain: config.boxplot.categories,
       padding: 0.4
     })
+    xScale.type = scaleTypes.BAND
   }
 
   // handle Paired bar
@@ -140,9 +163,11 @@ const composeXScale = ({ min, max, xMax, config }) => {
     domain: [min, max],
     range: [0, xMax],
     nice: config.useLogScale,
-    zero: config.useLogScale
+    zero: config.useLogScale,
+    type: config.useLogScale ? 'log' : 'linear'
   })
 }
+
 const composeYScale = ({ min, max, yMax, config }) => {
   // Adjust min value if using logarithmic scale
   min = config.useLogScale ? min + 0.1 : min
@@ -171,6 +196,7 @@ const composeScalePoint = (domain, range, padding = 0) => {
   return scalePoint({
     domain: domain,
     range: range,
-    padding: padding
+    padding: padding,
+    type: 'point'
   })
 }
