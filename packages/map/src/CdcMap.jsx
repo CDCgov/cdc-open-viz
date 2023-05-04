@@ -819,7 +819,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     })
 
     return filters
-  }
+  })
 
   // Calculates what's going to be displayed on the map and data table at render.
   // eslint-disable-next-line
