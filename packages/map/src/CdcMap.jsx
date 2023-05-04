@@ -8,6 +8,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 // Third party
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import chroma from 'chroma-js'
+import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
@@ -770,9 +771,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(({ columnName, label, active, values }, idx) => {
-      if (undefined === columnName) return
-
+    obj?.filters.forEach(({ columnName, label, labels, active, values, type }, idx) => {
       let newFilter = runtimeFilters[idx]
 
       const sortAsc = (a, b) => {
@@ -783,20 +782,24 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
       }
 
-      values = getUniqueValues(state.data, columnName)
+      if (type !== 'url') {
+        values = getUniqueValues(state.data, columnName)
 
-      if (obj.filters[idx].order === 'asc') {
-        values = values.sort(sortAsc)
-      }
-
-      if (obj.filters[idx].order === 'desc') {
-        values = values.sort(sortDesc)
-      }
-
-      if (obj.filters[idx].order === 'cust') {
-        if (obj.filters[idx]?.values.length > 0) {
-          values = obj.filters[idx].values
+        if (obj.filters[idx].order === 'asc') {
+          values = values.sort(sortAsc)
         }
+
+        if (obj.filters[idx].order === 'desc') {
+          values = values.sort(sortDesc)
+        }
+
+        if (obj.filters[idx].order === 'cust') {
+          if (obj.filters[idx]?.values.length > 0) {
+            values = obj.filters[idx].values
+          }
+        }
+      } else {
+        values = values
       }
 
       if (undefined === newFilter) {
@@ -804,6 +807,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
 
       newFilter.order = obj.filters[idx].order ? obj.filters[idx].order : 'asc'
+      newFilter.type = type
       newFilter.label = label ?? ''
       newFilter.columnName = columnName
       newFilter.values = values
@@ -862,8 +866,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         // Filters
         if (filters?.length) {
           for (let i = 0; i < filters.length; i++) {
-            const { columnName, active } = filters[i]
-            if (String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
+            const { columnName, active, type } = filters[i]
+            if (type !== 'url' && String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
           }
         }
 
@@ -1232,6 +1236,67 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }
 
+  const reloadURLData = async () => {
+    if (state.dataUrl) {
+      const dataUrl = new URL(state.runtimeDataUrl || state.dataUrl)
+      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+
+      let isUpdateNeeded = false
+      state.filters.forEach(filter => {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+          qsParams[filter.queryParameter] = filter.active
+          isUpdateNeeded = true
+        }
+      })
+
+      if (!isUpdateNeeded) return
+
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+        .map((param, i) => {
+          let qs = i === 0 ? '?' : '&'
+          qs += param + '='
+          qs += qsParams[param]
+          return qs
+        })
+        .join('')}`
+
+      let data
+
+      try {
+        const regex = /(?:\.([^.]+))?$/
+
+        const ext = regex.exec(dataUrl.pathname)[1]
+        if ('csv' === ext) {
+          data = await fetch(dataUrlFinal)
+            .then(response => response.text())
+            .then(responseText => {
+              const parsedCsv = Papa.parse(responseText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+              })
+              return parsedCsv.data
+            })
+        } else if ('json' === ext) {
+          data = await fetch(dataUrlFinal).then(response => response.json())
+        } else {
+          data = []
+        }
+      } catch (e) {
+        console.error(`Cannot parse URL: ${dataUrlFinal}`)
+        console.log(e)
+        data = []
+      }
+
+      if (state.dataDescription) {
+        data = transform.autoStandardize(data)
+        data = transform.developerStandardize(data, state.dataDescription)
+      }
+
+      setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
+    }
+  }
+
   const loadConfig = async configObj => {
     // Set loading flag
     if (!loading) setLoading(true)
@@ -1242,8 +1307,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       ...configObj
     }
 
-    // If a dataUrl property exists, always pull from that.
-    if (newState.dataUrl) {
+    const urlFilters = newState.filters ? (newState.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
+
+    if (newState.dataUrl && !urlFilters) {
       if (newState.dataUrl[0] === '/') {
         newState.dataUrl = 'http://' + hostname + newState.dataUrl
       }
@@ -1407,6 +1473,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setRuntimeLegend(legend)
     }
   }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses]) // eslint-disable-line
+
+  useEffect(() => {
+    reloadURLData()
+  }, [JSON.stringify(state.filters)])
 
   if (config) {
     // eslint-disable-next-line react-hooks/rules-of-hooks

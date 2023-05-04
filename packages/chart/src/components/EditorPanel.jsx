@@ -2268,7 +2268,10 @@ const EditorPanel = () => {
                     <ul className='filters-list'>
                       {/* Whether filters should apply onChange or Apply Button */}
 
-                      {config.filters.map((filter, index) => (
+                      {config.filters.map((filter, index) => {
+                        if(filter.type === 'url') return <></>
+
+                        return (
                         <fieldset className='edit-block' key={index}>
                           <button
                             type='button'
@@ -2359,7 +2362,8 @@ const EditorPanel = () => {
                             )}
                           </label>
                         </fieldset>
-                      ))}
+                        )
+                      })}
                     </ul>
                   )}
                   {!config.filters && <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
