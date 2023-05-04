@@ -16,7 +16,9 @@ import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg'
 import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
 import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
-import GenericIcon from '@cdc/core/assets/icon-info.svg'
+import ScatterPlotIcon from '@cdc/core/assets/icon-chart-scatterplot.svg'
+import BoxPlotIcon from '@cdc/core/assets/icon-chart-box-whisker.svg'
+import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
 
 export default function ChooseTab() {
   const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(ConfigContext)
@@ -184,11 +186,14 @@ export default function ChooseTab() {
             <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
           </Tooltip>
         </li>
+      </ul>
+
+      <ul className='grid cove-temp'>
         {/* temporarily hiding these */}
-        {/* <li>
+        <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Box Plot' type='chart' subType='Box Plot' orientation='vertical' icon={<GenericIcon />} />
+              <IconButton label='Box Plot' type='chart' subType='Box Plot' orientation='vertical' icon={<BoxPlotIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Display a box plot</Tooltip.Content>
           </Tooltip>
@@ -196,11 +201,19 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Scatter Plot' type='chart' subType='Scatter Plot' orientation='vertical' icon={<GenericIcon />} />
+              <IconButton label='Scatter Plot' type='chart' subType='Scatter Plot' orientation='vertical' icon={<ScatterPlotIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Display a scatter plot</Tooltip.Content>
           </Tooltip>
-        </li> */}
+        </li>
+        <li>
+          <Tooltip>
+            <Tooltip.Target>
+              <IconButton label='Area Chart' type='chart' subType='Area Chart' orientation='vertical' icon={<AreaChartIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Display an area chart</Tooltip.Content>
+          </Tooltip>
+        </li>
       </ul>
 
       <div className='heading-2'>Maps</div>

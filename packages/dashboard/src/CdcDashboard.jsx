@@ -100,7 +100,7 @@ const VisualizationsPanel = () => (
   </div>
 )
 
-export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, setConfig: setParentConfig }) {
+export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, isDebug = false, setConfig: setParentConfig }) {
   const [config, setConfig] = useState(configObj ?? {})
   const [data, setData] = useState([])
   const [filteredData, setFilteredData] = useState()
@@ -114,20 +114,27 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
   const transform = new DataTransform()
 
+  const getFormattedData = (data, dataDescription) => {
+    if (data && dataDescription) {
+      try {
+        let formattedData = transform.autoStandardize(data)
+        formattedData = transform.developerStandardize(data, dataDescription)
+        return formattedData
+      } catch (e) {
+        return data
+      }
+    }
+
+    return data
+  }
+
   const processData = async config => {
     let dataset = config.formattedData || config.data
 
     if (config.dataUrl) {
-      dataset = fetchRemoteData(`${config.dataUrl}`)
+      dataset = await fetchRemoteData(`${config.dataUrl}}`)
 
-      if (dataset && config.dataDescription) {
-        try {
-          dataset = transform.autoStandardize(data)
-          dataset = transform.developerStandardize(data, config.dataDescription)
-        } catch (e) {
-          //Data not able to be standardized, leave as is
-        }
-      }
+      dataset = getFormattedData(dataset, config.dataDescription)
     }
 
     return dataset
@@ -218,6 +225,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           datasets[key] = await processData(response.datasets[key])
         })
       )
+
+      Object.keys(newConfig.visualizations).forEach(vizKey => {
+        newConfig.visualizations[vizKey].formattedData = datasets[newConfig.visualizations[vizKey].dataKey]
+      })
+
+      Object.keys(datasets).forEach(key => {
+        newConfig.datasets[key].data = datasets[key]
+      })
     } else {
       let dataKey = newConfig.dataFileName || 'backwards-compatibility'
       datasets[dataKey] = await processData(response)
@@ -266,7 +281,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         let add = true
 
         filters.forEach(filter => {
-          if (filter.type !== 'url' && row[filter.columnName] !== filter.active) {
+          if (filter.type !== 'url' && row[filter.columnName] != filter.active) {
             add = false
           }
         })
@@ -295,7 +310,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       if (applicableFilters.length > 0) {
         const visualization = newConfig.visualizations[visualizationKey]
 
-        newFilteredData[visualizationKey] = filterData(applicableFilters, visualization.formattedData || data[visualization.dataKey])
+        const formattedData = visualization.dataDescription ? getFormattedData(data[visualization.dataKey] || visualization.data, visualization.dataDescription) : undefined
+
+        newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || data[visualization.dataKey])
       }
     })
 
@@ -356,7 +373,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
 
         if (applicableFilters.length > 0) {
-          newFilteredData[visualizationKey] = filterData(applicableFilters, newConfig.visualizations[visualizationKey].formattedData || newConfig.visualizations[visualizationKey].data || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey])
+          const visualization = newConfig.visualizations[visualizationKey]
+
+          const formattedData = getFormattedData(visualization.data, visualization.dataDescription)
+
+          newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || visualization.data || (dataOverride || data)[visualization.dataKey])
         }
       })
     }
@@ -405,7 +426,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       Object.keys(config.visualizations).forEach(key => {
         let applicableFilters = dashboardConfig.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
         if (applicableFilters.length > 0) {
-          newFilteredData[key] = filterData(applicableFilters, config.visualizations[key].formattedData || data[config.visualizations[key].dataKey])
+          const visualization = config.visualizations[key]
+
+          const formattedData = visualization.dataDescription ? getFormattedData(data[config.visualizations[key].dataKey] || visualization.data, visualization.dataDescription) : undefined
+
+          newFilteredData[key] = filterData(applicableFilters, formattedData || data[config.visualizations[key].dataKey])
         }
       })
 
@@ -513,7 +538,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Chart' />
-                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} />
+                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} />
               </>
             )
             break
@@ -521,7 +546,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Map' />
-                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true} />
+                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true} />
               </>
             )
             break
@@ -628,7 +653,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
                         const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
                         const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
-                        const tableLink = <a href={`#data-table-${visualizationConfig.dataKey}`}>{visualizationConfig.dataKey} (Go to Table)</a>
+                        const tableLink = (
+                          <a href={`#data-table-${visualizationConfig.dataKey}`} className='margin-left-href'>
+                            {visualizationConfig.dataKey} (Go to Table)
+                          </a>
+                        )
 
                         return (
                           <React.Fragment key={`vis__${index}__${colIndex}`}>
@@ -643,7 +672,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   }}
                                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                                   isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets ? tableLink : undefined}
+                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
                                 />
                               )}
                               {visualizationConfig.type === 'map' && (
@@ -657,7 +686,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                                   setSharedFilterValue={setSharedFilterValue}
                                   isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets ? tableLink : undefined}
+                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
                                 />
                               )}
                               {visualizationConfig.type === 'data-bite' && (
@@ -680,7 +709,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                     updateChildConfig(col.widget, newConfig)
                                   }}
                                   isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets ? tableLink : undefined}
+                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
                                 />
                               )}
                               {visualizationConfig.type === 'markup-include' && (
@@ -781,7 +810,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     updateConfig,
     setParentConfig,
     setPreview,
-    outerContainerRef
+    outerContainerRef,
+    isDebug
   }
 
   const dashboardContainerClasses = ['cdc-open-viz-module', 'type-dashboard', `${currentViewport}`]

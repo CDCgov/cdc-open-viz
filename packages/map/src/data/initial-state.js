@@ -2,6 +2,7 @@ export default {
   general: {
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',
+    title: '',
     showTitle: true,
     showSidebar: true,
     showDownloadButton: true,
@@ -9,6 +10,7 @@ export default {
     displayAsHex: false,
     displayStateLabels: false,
     territoriesLabel: 'Territories',
+    territoriesAlwaysShow: false,
     language: 'en',
     geoType: 'single-state',
     geoLabelOverride: '',
@@ -23,7 +25,6 @@ export default {
     hideGeoColumnInTooltip: false,
     hidePrimaryColumnInTooltip: false
   },
-
   type: 'map',
   color: 'pinkpurple',
   columns: {
@@ -53,6 +54,7 @@ export default {
     unified: false,
     singleColumn: false,
     singleRow: false,
+    showSpecialClassesLast: false,
     dynamicDescription: false,
     type: 'equalnumber',
     numberOfItems: 3,
@@ -64,7 +66,8 @@ export default {
     title: 'Data Table'
   },
   table: {
-    showDownloadUrl: false
+    showDownloadUrl: false,
+    showDataTableLink: true
   },
   tooltips: {
     appearanceType: 'hover',
@@ -82,5 +85,9 @@ export default {
     geoCodeCircleSize: 2,
     showBubbleZeros: false
   },
-  mapPosition: { coordinates: [0, 30], zoom: 1 }
+  mapPosition: { coordinates: [0, 30], zoom: 1 },
+  map: {
+    layers: []
+  },
+  filterBehavior: 'Filter Change'
 }

@@ -43,7 +43,27 @@ const colorPalettes2 = {
   'sequential-orange-(MPX)': ['#FFEFCF', '#FFD49C', '#F7A866', '#EB7723', '#B95117', '#862B0B'],
   'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32']
 }
+// * ============= Palettes for Paired bar Chart ==========  * //
+export const colorPalettes3 = {
+  'monochrome-1': ['#A6CEE3', '#15017A'],
+  'monochrome-2': ['#C2C0FC', '#15017A'],
+  'monochrome-3': ['#cab2d6', '#6a3d9a'],
+  'monochrome-4': ['#C2C0FC', '#6a3d9a'],
+  'monochrome-5': ['#fedab8', '#bf5b17'],
+  'cool-1': ['#b2df8a', '#1f78b4'],
+  'cool-2': ['#a6cee3', '#33A02C'],
+  'cool-3': ['#C2C0FC', '#386cb0'],
+  'cool-4': ['#33A02c', '#6a3d9a'],
+  'cool-5': ['#a6cee3', '#6a3d9a'],
+  'warm-1': ['#e31a1c', '#fedab8'],
+  'complementary-1': ['#1f78b4', '#e6ab02'],
+  'complementary-2': ['#1f78b4', '#ff7f00'],
+  'complementary-3': ['#6a3d9a', '#ff7f00'],
+  'complementary-4': ['#6a3d9a', '#e6ab02'],
+  'complementary-5': ['#e31a90', '#1b9e77']
+}
 
-export const colorPalettesChart = updatePaletteNames(colorPalettes2) // adds reverse keyword to eact palette
-const colorPalettes = updatePaletteNames(colorPalettesMap) // adds reverse keyword to eact palette
+export const colorPalettesChart = updatePaletteNames(colorPalettes2)
+const colorPalettes = updatePaletteNames(colorPalettesMap)
+export const twoColorPalette = updatePaletteNames(colorPalettes3)
 export default colorPalettes

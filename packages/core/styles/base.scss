@@ -52,6 +52,11 @@
 @import 'reset';
 @import 'variables';
 @import 'mixins';
+@import 'filters';
+
+body.post-type-cdc_visualization .visx-tooltip {
+  z-index: 1000000;
+}
 
 .cdc-open-viz-module {
   position: relative;
@@ -64,6 +69,7 @@
   @import 'data-table';
   @import 'global';
   @import 'button-section';
+  @import 'series-list';
 }
 
 $theme: (

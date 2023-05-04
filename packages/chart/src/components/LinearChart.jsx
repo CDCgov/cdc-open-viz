@@ -4,26 +4,29 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
-import { scaleLinear, scalePoint, scaleBand } from '@visx/scale'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 
-import CoveScatterPlot from './ScatterPlot'
 import BarChart from './BarChart'
-import LineChart from './LineChart'
 import ConfigContext from '../ConfigContext'
+import CoveAreaChart from './AreaChart'
+import CoveBoxPlot from './BoxPlot'
+import CoveScatterPlot from './ScatterPlot'
+import DeviationBar from './DeviationBar'
+import LineChart from './LineChart'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
-import CoveBoxPlot from './BoxPlot'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import '../scss/LinearChart.scss'
 import useReduceData from '../hooks/useReduceData'
+import useScales from '../hooks/useScales'
+import useMinMax from '../hooks/useMinMax'
 import useRightAxis from '../hooks/useRightAxis'
 import useTopAxis from '../hooks/useTopAxis'
 
-// TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType } = useContext(ConfigContext)
+
   let [width] = dimensions
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const [animatedChart, setAnimatedChart] = useState(false)
@@ -32,14 +35,16 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
+
   // Make sure the chart is visible if in the editor
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const element = document.querySelector('.isEditor')
     if (element) {
       // parent element is visible
       setAnimatedChart(prevState => true)
     }
-  })
+  }) /* eslint-disable-line */
 
   // If the chart is in view, set to animate if it has not already played
   useEffect(() => {
@@ -63,148 +68,43 @@ export default function LinearChart() {
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
+  const xAxisDataMapped = data.map(d => getXAxisData(d))
 
-  let xScale
-  let yScale
-  let seriesScale
-
-  const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
-  const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
-  const isMinValid = (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
-
-  if (data) {
-    let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
-    let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
-
-    if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
-      min = 0
-    }
-    if (config.visualizationType === 'Combo' && isAllLine) {
-      if ((enteredMinValue === undefined || enteredMinValue === null || enteredMinValue === '') && min > 0) {
-        min = 0
-      }
-      if (enteredMinValue) {
-        const isMinValid = +enteredMinValue < minValue
-        min = +enteredMinValue && isMinValid ? enteredMinValue : minValue
-      }
-    }
-
-    if (config.visualizationType === 'Line') {
-      const isMinValid = enteredMinValue < minValue
-      min = enteredMinValue && isMinValid ? enteredMinValue : minValue
-    }
-    //If data value max wasn't provided, calculate it
-    if (max === Number.MIN_VALUE) {
-      // if all values in data are negative set max = 0
-      max = existPositiveValue ? maxValue : 0
-    }
-
-    //Adds Y Axis data padding if applicable
-    if (config.runtime.yAxis.paddingPercent) {
-      let paddingValue = (max - min) * config.runtime.yAxis.paddingPercent
-      min -= paddingValue
-      max += paddingValue
-    }
-
-    let xAxisDataMapped = data.map(d => getXAxisData(d))
-
-    if (config.isLollipopChart && config.yAxis.displayNumbersOnBar) {
-      const dataKey = data.map(item => item[config.series[0].dataKey])
-      const maxDataVal = Math.max(...dataKey).toString().length
-
-      switch (true) {
-        case maxDataVal > 8 && maxDataVal <= 12:
-          max = max * 1.3
-          break
-        case maxDataVal > 4 && maxDataVal <= 7:
-          max = max * 1.1
-          break
-      }
-    }
-
-    if (config.runtime.horizontal) {
-      xScale = scaleLinear({
-        domain: [min, max],
-        range: [0, xMax]
-      })
-
-      yScale =
-        config.runtime.xAxis.type === 'date'
-          ? scaleLinear({
-              domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
-            })
-          : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
-
-      seriesScale = scalePoint({
-        domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
-        range: [0, yMax]
-      })
-
-      yScale.rangeRound([0, yMax])
-    } else {
-      min = min < 0 ? min * 1.11 : min
-
-      yScale = scaleLinear({
-        domain: [min, max],
-        range: [yMax, 0]
-      })
-
-      xScale = scalePoint({
-        domain: xAxisDataMapped,
-        range: [0, xMax],
-        padding: 0.5
-      })
-
-      seriesScale = scalePoint({
-        domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
-        range: [0, xMax]
-      })
-    }
-
-    if (config.visualizationType === 'Paired Bar') {
-      const offset = 1.02 // Offset of the ticks/values from the Axis
-      let groupOneMax = Math.max.apply(
-        Math,
-        data.map(d => d[config.series[0].dataKey])
-      )
-      let groupTwoMax = Math.max.apply(
-        Math,
-        data.map(d => d[config.series[1].dataKey])
-      )
-
-      // group one
-      var g1xScale = scaleLinear({
-        domain: [0, Math.max(groupOneMax, groupTwoMax) * offset],
-        range: [xMax / 2, 0]
-      })
-
-      // group 2
-      var g2xScale = scaleLinear({
-        domain: g1xScale.domain(),
-        range: [xMax / 2, xMax],
-        nice: true
-      })
-    }
-
-    if (config.visualizationType === 'Scatter Plot') {
-      if (config.xAxis.type === 'continuous') {
-        xScale = scaleLinear({
-          domain: [0, Math.max.apply(null, xScale.domain())],
-          range: [0, xMax]
-        })
-      }
-    }
+  const properties = {
+    data,
+    config,
+    minValue,
+    maxValue,
+    isAllLine,
+    existPositiveValue,
+    xAxisDataMapped,
+    xMax,
+    yMax
   }
 
+  const { min, max } = useMinMax(properties)
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale } = useScales({ ...properties, min, max })
+
+  const shouldAbbreviate = true
+
   const handleLeftTickFormatting = tick => {
+    //when logaritmic scale applyed change value of FIRST  tick
+    if (config.useLogScale && tick === 0.1) {
+      tick = 0
+    }
     if (config.runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
-    if (config.orientation === 'vertical') return formatNumber(tick, 'left')
+    if (config.orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
   }
 
   const handleBottomTickFormatting = tick => {
+    // when logaritmic scale applyed change value FIRST  of  tick
+    if (config.useLogScale && tick === 0.1) {
+      tick = 0
+    }
     if (config.runtime.xAxis.type === 'date') return formatDate(tick)
-    if (config.orientation === 'horizontal') return formatNumber(tick, 'bottom')
+    if (config.orientation === 'horizontal') return formatNumber(tick, 'left', shouldAbbreviate)
+    if (config.xAxis.type === 'continuous') return formatNumber(tick, 'bottom', shouldAbbreviate)
     return tick
   }
 
@@ -216,70 +116,66 @@ export default function LinearChart() {
 
     if (axis === 'yAxis') {
       tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      // to fix edge case of small numbers with decimals
+      if (tickCount === undefined && !config.dataFormat.roundTo) {
+        // then it is set to Auto
+        if (Number(max) <= 3) {
+          tickCount = 2
+        } else {
+          tickCount = 4 // same default as standalone components
+        }
+      }
+      if (Number(tickCount) > Number(max)) {
+        // cap it and round it so its an integer
+        tickCount = Number(min) < 0 ? Math.round(max) * 2 : Math.round(max)
+      }
     }
 
     if (axis === 'xAxis') {
       tickCount = isHorizontal && !numTicks ? undefined : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      if (isHorizontal && tickCount === undefined && !config.dataFormat.roundTo) {
+        // then it is set to Auto
+        // - check for small numbers situation
+        if (max <= 3) {
+          tickCount = 2
+        } else {
+          tickCount = 4 // same default as standalone components
+        }
+      }
     }
     return tickCount
   }
 
-  // Handle Box Plots
-  if (config.visualizationType === 'Box Plot') {
-    let minYValue
-    let maxYValue
-    let allOutliers = []
-    let allLowerBounds = config.boxplot.plots.map(plot => plot.columnMin)
-    let allUpperBounds = config.boxplot.plots.map(plot => plot.columnMax)
-
-    minYValue = Math.min(...allLowerBounds)
-    maxYValue = Math.max(...allUpperBounds)
-
-    const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
-
-    if (hasOutliers) {
-      let outlierMin = Math.min(...allOutliers)
-      let outlierMax = Math.max(...allOutliers)
-
-      // check if outliers exceed standard bounds
-      if (outlierMin < minYValue) minYValue = outlierMin
-      if (outlierMax > maxYValue) maxYValue = outlierMax
-    }
-
-    const seriesNames = data.map(d => d[config.xAxis.dataKey])
-
-    // Set Scales
-    yScale = scaleLinear({
-      range: [yMax, 0],
-      round: true,
-      domain: [minYValue, maxYValue]
-    })
-
-    xScale = scaleBand({
-      range: [0, xMax],
-      round: true,
-      domain: config.boxplot.categories,
-      padding: 0.4
-    })
-  }
-
-  const handleTick = tick => {
-    return config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick
-  }
+  const svgRef = useRef()
 
   return isNaN(width) ? (
     <></>
   ) : (
     <ErrorBoundary component='LinearChart'>
-      <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
+      <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
         {/* Higlighted regions */}
         {config.regions
           ? config.regions.map(region => {
               if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-              const from = xScale(parseDate(region.from).getTime())
-              const to = xScale(parseDate(region.to).getTime())
-              const width = to - from
+              let from
+              let to
+              let width
+
+              if (config.xAxis.type === 'date') {
+                from = xScale(parseDate(region.from).getTime())
+                to = xScale(parseDate(region.to).getTime())
+                width = to - from
+              }
+
+              if (config.xAxis.type === 'categorical') {
+                from = xScale(region.from)
+                to = xScale(region.to)
+                width = to - from
+              }
+
+              if (!from) return null
+              if (!to) return null
 
               return (
                 <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
@@ -303,7 +199,7 @@ export default function LinearChart() {
 
         {/* Y axis */}
         {config.visualizationType !== 'Spark Line' && (
-          <AxisLeft scale={yScale} left={Number(config.runtime.yAxis.size) - config.yAxis.axisPadding} label={config.runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
+          <AxisLeft scale={yScale} tickLength='6' left={Number(config.runtime.yAxis.size) - config.yAxis.axisPadding} label={config.runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
             {props => {
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
@@ -312,12 +208,15 @@ export default function LinearChart() {
                   {props.ticks.map((tick, i) => {
                     const minY = props.ticks[0].to.y
                     const barMinHeight = 15 // 15 is the min height for bars by default
+                    const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
+                    const tickLength = showTicks === 'block' ? 7 : 0
+                    const to = { x: tick.to.x - tickLength, y: tick.to.y }
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                        {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke={config.yAxis.tickColor} display={config.runtime.horizontal ? 'none' : 'block'} />}
+                        {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={to} stroke={config.yAxis.tickColor} display={config.runtime.horizontal ? 'none' : 'block'} />}
 
-                        {config.runtime.yAxis.gridLines ? <Line from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
+                        {config.runtime.yAxis.gridLines ? <Line display={config.useLogScale && showTicks} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
                         {config.orientation === 'horizontal' && config.visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
                           <Text
@@ -340,9 +239,16 @@ export default function LinearChart() {
                             {tick.formattedValue}
                           </Text>
                         )}
+                        {config.orientation === 'horizontal' && config.visualizationType === 'Deviation Bar' && !config.yAxis.hideLabel && (
+                          <Text transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.to.y - minY + 2 : tick.to.y - minY + Number(config.barHeight) / 2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} textAnchor={'end'} verticalAnchor='middle'>
+                            {tick.formattedValue}
+                          </Text>
+                        )}
 
-                        {config.orientation !== 'horizontal' && config.visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel && (
+                        {config.orientation === 'vertical' && config.visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel && (
                           <Text
+                            display={config.useLogScale ? showTicks : 'block'}
+                            dx={config.useLogScale ? -6 : 0}
                             x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                             y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                             verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
@@ -357,6 +263,7 @@ export default function LinearChart() {
                   })}
                   {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={config.runtime.horizontal ? { x: 0, y: Number(heightHorizontal) } : props.axisToPoint} stroke='#000' />}
                   {yScale.domain()[0] < 0 && <Line from={{ x: props.axisFromPoint.x, y: yScale(0) }} to={{ x: xMax, y: yScale(0) }} stroke='#333' />}
+                  {config.visualizationType === 'Bar' && config.orientation === 'horizontal' && xScale.domain()[0] < 0 && <Line from={{ x: xScale(0), y: 0 }} to={{ x: xScale(0), y: yMax }} stroke='#333' strokeWidth={2} />}
                   <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
                     {props.label}
                   </Text>
@@ -429,12 +336,19 @@ export default function LinearChart() {
               return (
                 <Group className='bottom-axis'>
                   {props.ticks.map((tick, i) => {
+                    // when using LogScale show major ticks values only
+                    const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                     const tickWidth = xMax / props.ticks.length
+                    const tickLength = showTick === 'block' ? 16 : 8
+                    const to = { x: tick.to.x, y: tickLength }
+
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                        {!config.xAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke={config.xAxis.tickColor} />}
+                        {!config.xAxis.hideTicks && <Line from={tick.from} to={to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' ? 1.3 : 1} />}
                         {!config.xAxis.hideLabel && (
                           <Text
+                            dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
+                            display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
                             transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
                             verticalAnchor='start'
                             textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
@@ -471,7 +385,7 @@ export default function LinearChart() {
                           {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                           {!config.runtime.yAxis.hideLabel && (
                             <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
-                              {formatNumber(tick.formattedValue)}
+                              {formatNumber(tick.value, 'left')}
                             </Text>
                           )}
                         </Group>
@@ -504,7 +418,7 @@ export default function LinearChart() {
                             {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                             {!config.runtime.yAxis.hideLabel && (
                               <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
-                                {tick.formattedValue}
+                                {formatNumber(tick.value, 'left')}
                               </Text>
                             )}
                           </Group>
@@ -524,28 +438,58 @@ export default function LinearChart() {
           </>
         )}
 
-        {/* Paired Bar chart */}
+        {config.visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
         {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
+        {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
+        {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
+        {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} />}
 
         {/* Bar chart */}
-        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
+        {/* TODO: Make this just bar or combo? */}
+        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && config.visualizationType !== 'Deviation Bar' && (
           <>
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
           </>
         )}
 
         {/* Line chart */}
-        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
+        {/* TODO: Make this just line or combo? */}
+        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && config.visualizationType !== 'Deviation Bar' && (
           <>
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
           </>
         )}
 
-        {/* Scatter Plot chart */}
-        {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
+        {/* y anchors */}
+        {config.yAxis.anchors &&
+          config.yAxis.anchors.map(anchor => {
+            return (
+              <Line
+                strokeDasharray={handleLineType(anchor.lineStyle)}
+                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                className='customAnchor'
+                from={{ x: 0 + config.yAxis.size, y: yScale(anchor.value) }}
+                to={{ x: width, y: yScale(anchor.value) }}
+                display={config.runtime.horizontal ? 'none' : 'block'}
+              />
+            )
+          })}
 
-        {/* Box Plot chart */}
-        {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
+        {/* x anchors */}
+        {config.xAxis.anchors &&
+          config.xAxis.anchors.map(anchor => {
+            const anchorPosition = config.xAxis.type === 'date' ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
+            return (
+              <Line
+                strokeDasharray={handleLineType(anchor.lineStyle)}
+                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                className='anchor-x'
+                from={{ x: anchorPosition + Number(config.yAxis.size), y: 0 }}
+                to={{ x: anchorPosition + Number(config.yAxis.size), y: yMax }}
+                display={config.runtime.horizontal ? 'none' : 'block'}
+              />
+            )
+          })}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
