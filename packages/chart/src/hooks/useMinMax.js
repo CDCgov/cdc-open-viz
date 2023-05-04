@@ -45,7 +45,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   }
 
   if (config.visualizationType === 'Line') {
-    const isMinValid = config.useLogScale ? enteredMinValue >= 0 : enteredMinValue < minValue
+    const isMinValid = config.useLogScale ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
     min = enteredMinValue && isMinValid ? enteredMinValue : minValue
   }
   //If data value max wasn't provided, calculate it
