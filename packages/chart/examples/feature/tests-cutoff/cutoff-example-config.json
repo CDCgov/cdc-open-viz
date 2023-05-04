@@ -1,0 +1,42 @@
+{
+  "title": "Data Cutoff Example (< 0.1)",
+  "theme": "theme-blue",
+  "dataUrl": "/examples/feature/tests-cutoff/cutoff-example-data.json",
+  "animate": true,
+  "animateReplay": true,
+  "visualizationType": "Line",
+  "series": [
+    {
+      "dataKey": "Value"
+    }
+  ],
+  "barThickness": 0.3,
+  "height": 300,
+  "dataCutoff": "0.1",
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": ""
+  },
+  "padding": {
+    "left": 10,
+    "right": 10
+  },
+  "yAxis": {
+    "label": "Value",
+    "gridLines": false,
+    "size": 70
+  },
+  "xAxis": {
+    "label": "Category",
+    "dataKey": "Category"
+  },
+  "legend": {
+    "hide": true
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "download": true
+  }
+}

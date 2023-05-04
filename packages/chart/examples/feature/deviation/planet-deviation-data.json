@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Jupiter",
+    "Radius": "100"
+  },
+  {
+    "name": "Saturn",
+    "Radius": "90"
+  },
+  {
+    "name": "Uranus",
+    "Radius": "95"
+  },
+  {
+    "name": "Neptune",
+    "Radius": "89"
+  },
+  {
+    "name": "Earth",
+    "Radius": "92"
+  },
+  {
+    "name": "Venus",
+    "Radius": "85"
+  },
+  {
+    "name": "Mars",
+    "Radius": "99"
+  },
+  {
+    "name": "Mercury",
+    "Radius": "66"
+  },
+  {
+    "name": "Pluto",
+    "Radius": "79"
+  }
+]

@@ -1,0 +1,56 @@
+{
+  "title": "Paired Bar Chart Example",
+  "dataUrl": "/examples/feature/paired-bar/paired-bar-data.json",
+  "animate": true,
+  "animateReplay": true,
+  "visualizationType": "Paired Bar",
+  "series": [
+    {
+      "dataKey": "Male",
+      "type": "Paired Bar"
+    },
+    {
+      "dataKey": "Female",
+      "type": "Paired Bar"
+    }
+  ],
+  "dataFormat": {
+    "roundTo": 1,
+    "commas": false,
+    "prefix": "",
+    "suffix": "km"
+  },
+  "padding": {
+    "left": 0,
+    "right": 0
+  },
+  "yAxis": {
+    "label": "Cases per 100K",
+    "tickRotation": 30,
+    "hideAxis": true
+  },
+  "xAxis": {
+    "label": "Age Group",
+    "dataKey": "Age Group",
+    "tickRotation": 30,
+    "hideAxis": true
+  },
+  "legend": {
+    "hideAxis": false
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false
+  },
+  "dataDescription": {
+    "horizontal": false,
+    "series": true,
+    "seriesKey": "Sex",
+    "singleRow": false,
+    "xKey": "Age Group",
+    "valueKey": "Cases per 100K"
+  },
+  "runtime": {
+    "horizontal": true
+  }
+}

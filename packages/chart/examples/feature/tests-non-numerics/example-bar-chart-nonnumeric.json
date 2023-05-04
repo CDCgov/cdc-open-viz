@@ -1,0 +1,36 @@
+{
+  "type": "chart",
+  "title": "Example Bar Chart",
+  "theme": "theme-blue",
+  "fontSize": "medium",
+  "height": 300,
+  "padding": { "left": 5, "right": 5 },
+  "yAxis": { "size": "76", "gridLines": false, "label": "Y Axis Example Label" },
+  "barThickness": "0.6",
+  "xAxis": { "size": "59", "tickRotation": 0, "dataKey": "Date", "label": "X Axis Example Label" },
+  "table": { "label": "Data Type by Date", "expanded": true },
+  "legend": { "behavior": "isolate", "position": "right", "label": "Type of Data" },
+  "palette": "qualitative-bold",
+  "labels": false,
+  "dataFormat": { "suffix": " units" },
+  "confidenceKeys": {},
+  "data": [
+    { "Date": "1/15/2016", "Data 1": "90", "Data 2": "1323.5", "Data 3": "$1,000", "Data 4": "95", "Data 5": "120", "Data 6": "310" },
+    { "Date": "2/15/2016", "Data 1": "NA", "Data 2": "90.3", "Data 3": "240", "Data 4": "60", "Data 5": "160", "Data 6": "200" },
+    { "Date": "3/15/2016", "Data 1": "50", "Data 2": "booo", "Data 3": "290", "Data 4": "100", "Data 5": "200", "Data 6": "250" },
+    { "Date": "4/15/2016", "Data 1": "", "Data 2": "160", "Data 3": "230", "Data 4": "180", "Data 5": "160", "Data 6": "220" },
+    { "Date": "5/15/2016", "Data 1": "", "Data 2": "350", "Data 3": "300", "Data 4": "150", "Data 5": "130", "Data 6": "100" },
+    { "Date": "6/15/2016", "Data 1": "90", "Data 2": "220", "Data 3": "320", "Data 4": "100", "Data 5": "220", "Data 6": "300" }
+  ],
+  "visualizationType": "Bar",
+  "series": [
+    { "dataKey": "Data 1", "type": "Bar" },
+    { "dataKey": "Data 2", "type": "Bar" },
+    { "dataKey": "Data 3", "type": "Bar" },
+    { "dataKey": "Data 4", "type": "Bar" },
+    { "dataKey": "Data 5", "type": "Bar" },
+    { "dataKey": "Data 6", "type": "Bar" }
+  ],
+  "description": "This example shows a bar chart created in the visualization editor in WCMS",
+  "dataCutoff": "0"
+}

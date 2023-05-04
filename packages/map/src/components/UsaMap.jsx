@@ -2,7 +2,7 @@ import React, { useState, useEffect, memo } from 'react'
 
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { geoCentroid } from 'd3-geo'
+import { geoCentroid, geoPath } from 'd3-geo'
 import { feature } from 'topojson-client'
 import topoJSON from '../data/us-topo.json'
 import hexTopoJSON from '../data/us-hex-topo.json'
@@ -11,6 +11,9 @@ import chroma from 'chroma-js'
 import CityList from './CityList'
 import BubbleList from './BubbleList'
 import { supportedCities, supportedStates } from '../data/supported-geos'
+import { geoAlbersUsa } from 'd3-composite-projections'
+
+import useMapLayers from '../hooks/useMapLayers'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -79,6 +82,7 @@ const UsaMap = props => {
         isFilterValueSupported = true
       }
     })
+
     Object.keys(supportedTerritories).forEach(supportedTerritory => {
       if (supportedTerritories[supportedTerritory].indexOf(setSharedFilterValue.toUpperCase()) !== -1) {
         isFilterValueSupported = true
@@ -109,11 +113,15 @@ const UsaMap = props => {
   const territoriesKeys = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
 
   useEffect(() => {
-    // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-    const territoriesList = territoriesKeys.filter(key => data[key])
-
-    setTerritoriesData(territoriesList)
-  }, [data])
+    if (state.general.territoriesAlwaysShow) {
+      // show all Territories whether in the data or not
+      setTerritoriesData(territoriesKeys)
+    } else {
+      // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
+      const territoriesList = territoriesKeys.filter(key => data[key])
+      setTerritoriesData(territoriesList)
+    }
+  }, [data, state.general.territoriesAlwaysShow])
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
@@ -166,10 +174,7 @@ const UsaMap = props => {
         }
       }
 
-      return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)}
-                    data-tooltip-id="tooltip"
-                    data-tooltip-html={toolTip}
-      />
+      return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
     }
   })
 
@@ -215,6 +220,9 @@ const UsaMap = props => {
       </g>
     )
   }
+
+  let pathGenerator = geoPath().projection(geoAlbersUsa().translate(translate))
+  const { pathArray } = useMapLayers(state, '', pathGenerator)
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
@@ -291,11 +299,7 @@ const UsaMap = props => {
 
         return (
           <g data-name={geoName} key={key}>
-            <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)}
-               id={geoName}
-               data-tooltip-id="tooltip"
-               data-tooltip-html={tooltip}
-               >
+            <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
             </g>
@@ -319,18 +323,18 @@ const UsaMap = props => {
     // Cities
     geosJsx.push(
       <CityList
-        projection={projection}
-        key='cities'
-        data={data}
-        state={state}
-        geoClickHandler={geoClickHandler}
-        applyTooltipsToGeo={applyTooltipsToGeo}
-        displayGeoName={displayGeoName}
         applyLegendToRow={applyLegendToRow}
-        titleCase={titleCase}
-        setSharedFilterValue={setSharedFilterValue}
+        applyTooltipsToGeo={applyTooltipsToGeo}
+        data={data}
+        displayGeoName={displayGeoName}
+        geoClickHandler={geoClickHandler}
         isFilterValueSupported={isFilterValueSupported}
         isGeoCodeMap={state.general.type === 'us-geocode'}
+        key='cities'
+        projection={projection}
+        setSharedFilterValue={setSharedFilterValue}
+        state={state}
+        titleCase={titleCase}
       />
     )
 
@@ -339,6 +343,13 @@ const UsaMap = props => {
       geosJsx.push(<BubbleList key='bubbles' data={state.data} runtimeData={data} state={state} projection={projection} applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} displayGeoName={displayGeoName} />)
     }
 
+    // })
+
+    if (pathArray.length > 0) {
+      pathArray.map(layer => {
+        return geosJsx.push(layer)
+      })
+    }
     return geosJsx
   }
 

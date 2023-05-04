@@ -1,0 +1,32 @@
+{
+  "type": "chart",
+  "title": "Example Line Chart",
+  "theme": "theme-green",
+  "fontSize": "medium",
+  "height": "375",
+  "padding": { "left": 5, "right": 5 },
+  "yAxis": { "size": "75", "gridLines": false, "label": "Y-Axis Example Label", "numTicks": "9" },
+  "barThickness": 0.35,
+  "xAxis": { "size": "77", "tickRotation": "25", "dataKey": "Date", "label": "X-Axis Example Label", "type": "date", "dateParseFormat": "%d/%m/%Y", "dateDisplayFormat": "%d/%m/%Y" },
+  "table": { "label": "Data Table", "expanded": true, "download": true },
+  "legend": { "behavior": "isolate", "position": "right", "label": "Type of Data" },
+  "palette": "qualitative-bold",
+  "labels": false,
+  "dataFormat": {},
+  "confidenceKeys": {},
+  "data": [
+    { "Date": "1/15/2016", "Data 1": "900", "Data 2": "1350", "Data 3": "2000", "Data 4": "950", "Data 5": "1200", "Data 6": "1610" },
+    { "Date": "2/15/2016", "Data 1": "600", "Data 2": "1150", "Data 3": "1000", "Data 4": "1350", "Data 5": "200", "Data 6": "610" },
+    { "Date": "3/15/2016", "Data 1": "700", "Data 2": "1550", "Data 3": "1800", "Data 4": "1650", "Data 5": "2000", "Data 6": "1610" },
+    { "Date": "3/15/2016", "Data 1": "300", "Data 2": "550", "Data 3": "800", "Data 4": "650", "Data 5": "2100", "Data 6": "2210" }
+  ],
+  "visualizationType": "Line",
+  "series": [
+    { "dataKey": "Data 1", "type": "Line" },
+    { "dataKey": "Data 2", "type": "Line" },
+    { "dataKey": "Data 3", "type": "Line" },
+    { "dataKey": "Data 4", "type": "Line" },
+    { "dataKey": "Data 5", "type": "Line" },
+    { "dataKey": "Data 6", "type": "Line" }
+  ]
+}

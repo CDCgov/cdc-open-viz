@@ -1,0 +1,76 @@
+{
+  "type": "chart",
+  "title": "Example Spark Line",
+  "theme": "theme-blue",
+  "fontSize": "medium",
+  "height": "375",
+  "compact": true,
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "size": "75",
+    "gridLines": false,
+    "label": "Y-Axis Example Label",
+    "numTicks": "9"
+  },
+  "barThickness": 0.35,
+  "xAxis": {
+    "size": "77",
+    "tickRotation": "25",
+    "dataKey": "Date",
+    "label": "X-Axis Example Label",
+    "type": "date",
+    "dateParseFormat": "%d/%m/%Y",
+    "dateDisplayFormat": "%d/%m/%Y"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "download": true
+  },
+  "legend": {
+    "behavior": "isolate",
+    "position": "right",
+    "label": "Type of Data"
+  },
+  "palette": "qualitative-bold",
+  "labels": false,
+  "dataFormat": {},
+  "confidenceKeys": {},
+  "data": [
+    {
+      "Date": "1/15/2016",
+      "Data 1": "0"
+    },
+    {
+      "Date": "2/15/2016",
+      "Data 1": "25"
+    },
+    {
+      "Date": "3/15/2016",
+      "Data 1": "50"
+    },
+    {
+      "Date": "4/15/2016",
+      "Data 1": "75"
+    },
+    {
+      "Date": "5/15/2016",
+      "Data 1": "100"
+    },
+    {
+      "Date": "6/15/2016",
+      "Data 1": "50"
+    }
+  ],
+  "visualizationType": "Spark Line",
+  "series": [
+    {
+      "dataKey": "Data 1",
+      "type": "Bar"
+    }
+  ],
+  "description": "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups."
+}
