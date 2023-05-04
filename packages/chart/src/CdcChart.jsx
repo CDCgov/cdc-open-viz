@@ -851,7 +851,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     let formattedValue = value
 
-    let columnObj = config.columns[columnName]
+    let columnObj //= config.columns[columnName]
+    // config.columns not an array but a hash of obects
+    if (Object.keys(config.columns).length > 1) {
+      Object.keys(config.columns).forEach(function (key) {
+        var column = config.columns[key]
+        // add if not the index AND it is enabled to be added to data table
+        if (column.name === columnName) {
+          columnObj = column
+        }
+      })
+    }
+
+    //console.log('displayastext config.columns', config.columns)
+    //console.log('displayastext columnname, columnObj', columnName, columnObj)
 
     if (columnObj) {
       // If value is a number, apply specific formattings
@@ -875,10 +888,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         }
       }
 
+      // NOT USING SPECIAL CLASSESS ON CHARTS - delete this??
       // Check if it's a special value. If it is not, apply the designated prefix and suffix
-      if (false === config.legend.specialClasses.includes(String(value))) {
+      /*       if (false === config.legend.specialClasses.includes(String(value))) {
         formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
-      }
+      } */
     }
 
     return formattedValue

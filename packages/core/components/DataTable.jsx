@@ -24,8 +24,6 @@ const DataTable = props => {
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
-  const [mapRows, setMapRows] = useState('')
-
   const fileName = `${vizTitle || 'data-table'}.csv`
 
   // Catch all sorting method used on load by default but also on user click
@@ -368,72 +366,78 @@ const DataTable = props => {
       return config.table.label ? config.table.label : `Data table showing data for the ${config.type} figure.`
     }
   }
-  return (
-    <ErrorBoundary component='DataTable'>
-      <CoveMediaControls.Section classes={['download-links']}>
-        <CoveMediaControls.Link config={config} />
-        {config.general.showDownloadButton && <DownloadButton />}
-      </CoveMediaControls.Section>
-      <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
-        <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
-          Skip Navigation or Skip to Content
-        </a>
-        <div
-          className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
-          onClick={() => {
-            setExpanded(!expanded)
-          }}
-          tabIndex='0'
-          onKeyDown={e => {
-            if (e.keyCode === 13) {
-              setExpanded(!expanded)
-            }
-          }}
-        >
-          <Icon display={expanded ? 'minus' : 'plus'} base />
-          {tableTitle}
-        </div>
-        <div className='table-container' style={limitHeight}>
-          <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={config?.data.length ? config.data.length : '-1'}>
-            <caption className='cdcdataviz-sr-only'>{caption}</caption>
-            <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{config.type === 'map' ? genMapHeader(columns) : genChartHeader(columns, runtimeData)}</thead>
-            <tbody>{config.type === 'map' ? genMapRows(rows) : genChartRows(rows)}</tbody>
-          </table>
 
-          {/* REGION Data Table */}
-          {config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' ? (
-            <table className='region-table data-table'>
-              <caption className='visually-hidden'>Table of the highlighted regions in the visualization</caption>
-              <thead>
-                <tr>
-                  <th>Region Name</th>
-                  <th>Start Date</th>
-                  <th>End Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {config.regions.map((region, index) => {
-                  if (config.visualizationType === 'Box Plot') return false
-                  if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
-                  // region.from and region.to had formatDate(parseDate()) on it
-                  // but they returned undefined - removed both for now (TT)
-                  return (
-                    <tr key={`row-${region.label}--${index}`}>
-                      <td>{region.label}</td>
-                      <td>{region.from}</td>
-                      <td>{region.to}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
+  if (config.visualizationType !== 'Box Plot') {
+    return (
+      <ErrorBoundary component='DataTable'>
+        <CoveMediaControls.Section classes={['download-links']}>
+          <CoveMediaControls.Link config={config} />
+          {config.general.showDownloadButton && <DownloadButton />}
+        </CoveMediaControls.Section>
+        <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+          <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
+            Skip Navigation or Skip to Content
+          </a>
+          <div
+            className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
+            onClick={() => {
+              setExpanded(!expanded)
+            }}
+            tabIndex='0'
+            onKeyDown={e => {
+              if (e.keyCode === 13) {
+                setExpanded(!expanded)
+              }
+            }}
+          >
+            <Icon display={expanded ? 'minus' : 'plus'} base />
+            {tableTitle}
+          </div>
+          <div className='table-container' style={limitHeight}>
+            <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={config?.data.length ? config.data.length : '-1'}>
+              <caption className='cdcdataviz-sr-only'>{caption}</caption>
+              <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{config.type === 'map' ? genMapHeader(columns) : genChartHeader(columns, runtimeData)}</thead>
+              <tbody>{config.type === 'map' ? genMapRows(rows) : genChartRows(rows)}</tbody>
             </table>
-          ) : (
-            ''
-          )}
-        </div>
-      </section>
-    </ErrorBoundary>
-  )
+
+            {/* REGION Data Table */}
+            {config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' ? (
+              <table className='region-table data-table'>
+                <caption className='visually-hidden'>Table of the highlighted regions in the visualization</caption>
+                <thead>
+                  <tr>
+                    <th>Region Name</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {config.regions.map((region, index) => {
+                    if (config.visualizationType === 'Box Plot') return false
+                    if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+                    // region.from and region.to had formatDate(parseDate()) on it
+                    // but they returned undefined - removed both for now (TT)
+                    return (
+                      <tr key={`row-${region.label}--${index}`}>
+                        <td>{region.label}</td>
+                        <td>{region.from}</td>
+                        <td>{region.to}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              ''
+            )}
+          </div>
+        </section>
+      </ErrorBoundary>
+    )
+  } else {
+    console.log('BOX PLOT detected')
+    return <h1>Still working on box plot table</h1>
+  }
 }
 
 export default DataTable
