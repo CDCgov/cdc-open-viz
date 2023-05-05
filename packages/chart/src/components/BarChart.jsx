@@ -416,7 +416,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                       const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                       const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
-                      const isHighlightedBar = highlightedBarValues?.includes(yAxisValue)
+                      const isHighlightedBar = config.orientation === 'vertical' ? highlightedBarValues?.includes(xAxisValue) : highlightedBarValues?.includes(yAxisValue)
                       const highlightedBarColor = getHighlightedBarColorByValue(yAxisValue)
 
                       const background = isRegularLollipopColor ? barColor : isTwoToneLollipopColor ? chroma(barColor).brighten(1) : isHighlightedBar ? 'transparent' : barColor
