@@ -337,6 +337,19 @@ const EditorPanel = () => {
       })
       return
     }
+    if (section === 'columns' && subsection !== '' && fieldName !== '') {
+      updateConfig({
+        ...config,
+        [section]: {
+          ...config[section],
+          [subsection]: {
+            ...config[section][subsection],
+            [fieldName]: newValue
+          }
+        }
+      })
+      return
+    }
     if (null === section && null === subsection) {
       let updatedConfig = { ...config, [fieldName]: newValue }
       enforceRestrictions(updatedConfig)
@@ -883,7 +896,26 @@ const EditorPanel = () => {
     return true
   })
 
+  // just adds a new column but not set to any data yet
   const addAdditionalColumn = number => {
+    const columnKey = `additionalColumn${number}`
+
+    updateConfig({
+      ...config,
+      columns: {
+        ...config.columns,
+        [columnKey]: {
+          label: 'New Column',
+          dataTable: false,
+          tooltips: false,
+          prefix: '',
+          suffix: ''
+        }
+      }
+    })
+  }
+
+  const addAdditionalColumnBAD = number => {
     const columnKey = `additionalColumn${number}`
     const columnSelected = config.selected
     updateConfig({
@@ -925,17 +957,17 @@ const EditorPanel = () => {
     })
   }
 
-  const editColumn = async (columnName, editTarget, value) => {
+  const editColumn = async (addCol, columnName, setval) => {
     // not using special classes like in map editorpanel so removed those cases
-    switch (editTarget) {
+    switch (columnName) {
       case 'name':
         updateConfig({
           ...config,
           columns: {
             ...config.columns,
-            [columnName]: {
-              ...config.columns[columnName],
-              [editTarget]: value
+            [addCol]: {
+              ...config.columns[addCol],
+              [columnName]: setval
             }
           }
         })
@@ -945,9 +977,9 @@ const EditorPanel = () => {
           ...config,
           columns: {
             ...config.columns,
-            [columnName]: {
-              ...config.columns[columnName],
-              [editTarget]: value
+            [addCol]: {
+              ...config.columns[addCol],
+              [columnName]: setval
             }
           }
         })
@@ -2028,23 +2060,22 @@ const EditorPanel = () => {
                           <label>
                             <span className='edit-label column-heading'>Column</span>
                             <select
-                              //value={config.columns[val] ? config.columns[val].name : columnsOptions[0]}
-                              value={config.selected !== '' ? config.selected : columnsOptions[0]}
+                              value={config.columns[val] ? config.columns[val].name : columnsOptions[0]}
+                              //value={config.selected !== '' ? config.selected : columnsOptions[0]}
                               onChange={event => {
-                                selectColumn(val, 'name', event.target.value)
+                                //selectColumn(val, 'name', event.target.value)
+                                editColumn(val, 'name', event.target.value)
                               }}
                             >
                               {columnsOptions}
                             </select>
                           </label>
-                          {console.log('#CHART val, columns[val]', val, columns[val])}
-                          {console.log('#CHART config.columns', config.columns)}
-                          <TextField value={columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' updateField={updateField} />
+                          <TextField value={config.columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' updateField={updateField} />
                           <ul className='column-edit'>
                             <li className='three-col'>
-                              <TextField value={columns[val].prefix} section='columns' subsection={val} fieldName='prefix' label='Prefix' updateField={updateField} />
-                              <TextField value={columns[val].suffix} section='columns' subsection={val} fieldName='suffix' label='Suffix' updateField={updateField} />
-                              <TextField type='number' value={columns[val].roundToPlace} section='columns' subsection={val} fieldName='roundToPlace' label='Round' updateField={updateField} />
+                              <TextField value={config.columns[val].prefix} section='columns' subsection={val} fieldName='prefix' label='Prefix' updateField={updateField} />
+                              <TextField value={config.columns[val].suffix} section='columns' subsection={val} fieldName='suffix' label='Suffix' updateField={updateField} />
+                              <TextField type='number' value={config.columns[val].roundToPlace} section='columns' subsection={val} fieldName='roundToPlace' label='Round' updateField={updateField} />
                             </li>
                             <li>
                               <label className='checkbox'>

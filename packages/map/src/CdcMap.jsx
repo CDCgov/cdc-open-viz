@@ -131,8 +131,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
-  console.log('CdcMap state=', state)
-  //console.log('CdcMap columns', state.columns)
+  if (isDebug) console.log('CdcMap state=', state)
 
   useEffect(() => {
     try {

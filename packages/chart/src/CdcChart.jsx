@@ -840,6 +840,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return false
   }
 
+  // used for Additional Columns
   const displayDataAsText = (value, columnName) => {
     if (value === null || value === '' || value === undefined) {
       return ''
@@ -863,9 +864,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
     }
 
-    //console.log('displayastext config.columns', config.columns)
-    //console.log('displayastext columnname, columnObj', columnName, columnObj)
-
     if (columnObj) {
       // If value is a number, apply specific formattings
       if (Number(value)) {
@@ -888,11 +886,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         }
       }
 
-      // NOT USING SPECIAL CLASSESS ON CHARTS - delete this??
-      // Check if it's a special value. If it is not, apply the designated prefix and suffix
-      /*       if (false === config.legend.specialClasses.includes(String(value))) {
-        formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
-      } */
+      // add prefix and suffix if set
+      formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
     }
 
     return formattedValue

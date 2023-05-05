@@ -289,11 +289,26 @@ const DataTable = props => {
     return tmpSeriesColumns
   }
 
+  const getLabel = name => {
+    let custLabel = ''
+    if (Object.keys(config.columns).length > 1) {
+      Object.keys(config.columns).forEach(function (key) {
+        var tmpColumn = config.columns[key]
+        // add if not the index AND it is enabled to be added to data table
+        if (tmpColumn.name === name) {
+          custLabel = tmpColumn.label
+        }
+      })
+      return custLabel
+    }
+  }
+
   function genChartHeader(columns, data) {
     return (
       <tr>
         {dataSeriesColumns().map(column => {
-          let text = column === config.xAxis.dataKey ? config.table.indexLabel : column
+          let custLabel = getLabel(column) || column
+          let text = column === config.xAxis.dataKey ? config.table.indexLabel : custLabel
           return (
             <th
               key={`col-header-${column}`}
@@ -435,7 +450,7 @@ const DataTable = props => {
       </ErrorBoundary>
     )
   } else {
-    console.log('BOX PLOT detected')
+    console.log('COVE: BOX PLOT detected')
     return <h1>Still working on box plot table</h1>
   }
 }

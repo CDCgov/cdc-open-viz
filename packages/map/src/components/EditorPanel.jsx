@@ -919,6 +919,7 @@ const EditorPanel = props => {
     })
   }
 
+  // just adds a new column but not set to any data yet
   const addAdditionalColumn = number => {
     const columnKey = `additionalColumn${number}`
 
@@ -2005,7 +2006,6 @@ const EditorPanel = props => {
                               {columnsOptions}
                             </select>
                           </label>
-                          {console.log('MAP val, columns[val]', val, columns[val])}
                           <TextField value={columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' updateField={updateField} />
                           <ul className='column-edit'>
                             <li className='three-col'>
@@ -2146,7 +2146,6 @@ const EditorPanel = props => {
                         </select>
                       </label>
                     )}
-                    {console.log('state.general.type', state.general.type)}
                     {'navigation' !== state.general.type && (
                       <label className='checkbox'>
                         <input
