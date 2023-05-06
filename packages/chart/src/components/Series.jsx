@@ -23,9 +23,9 @@ const SeriesWrapper = props => {
     series[index][property] = value
 
     // initialize CI's
-    if (value === 'Forecasting' && !series[index].hasOwnProperty('confidenceIntervals')) {
-      series[index].confidenceIntervals = [{ low: '', high: '' }]
-    }
+    // if (value === 'Forecasting' && !series[index].hasOwnProperty('confidenceIntervals')) {
+    //   series[index].confidenceIntervals = [{ low: '', high: '' }]
+    // }
     updateConfig({ ...config, series })
   }
 
@@ -148,19 +148,19 @@ const SeriesDropdownConfidenceInterval = props => {
       <h3>Confidence Interval Groups</h3>
       <fieldset>
         <Accordion allowZeroExpanded>
-          {series?.confidenceIntervals.map((ciGroup, index) => {
+          {series?.confidenceIntervals?.map((ciGroup, ciIndex) => {
             return (
               <AccordionItem className='series-item series-item--chart'>
                 <AccordionItemHeading className='series-item__title'>
                   <>
                     <AccordionItemButton className={'accordion__button accordion__button'}>
-                      Group {index + 1}
+                      Group {ciIndex + 1}
                       <button
                         className='series-list__remove'
                         onClick={e => {
                           e.preventDefault()
                           const copiedIndex = [...config.series[index].confidenceIntervals]
-                          copiedIndex.splice(index, 1)
+                          copiedIndex.splice(ciIndex, 1)
                           const copyOfSeries = [...config.series] // copy the entire series array
                           copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex] }
                           updateConfig({
@@ -185,7 +185,7 @@ const SeriesDropdownConfidenceInterval = props => {
                       const copiedIndex = [...config.series[index].confidenceIntervals]
                       copiedIndex.low = e.target.value
                       const copyOfSeries = [...config.series] // copy the entire series array
-                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex] }
+                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedIndex }
                       updateConfig({
                         ...config,
                         series: copyOfSeries
@@ -204,7 +204,7 @@ const SeriesDropdownConfidenceInterval = props => {
                       const copiedIndex = [...config.series[index].confidenceIntervals]
                       copiedIndex.high = e.target.value
                       const copyOfSeries = [...config.series] // copy the entire series array
-                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex] }
+                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedIndex }
                       updateConfig({
                         ...config,
                         series: copyOfSeries
