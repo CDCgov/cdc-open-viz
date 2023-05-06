@@ -22,10 +22,6 @@ const SeriesWrapper = props => {
     let series = [...config.series]
     series[index][property] = value
 
-    // initialize CI's
-    // if (value === 'Forecasting' && !series[index].hasOwnProperty('confidenceIntervals')) {
-    //   series[index].confidenceIntervals = [{ low: '', high: '' }]
-    // }
     updateConfig({ ...config, series })
   }
 
@@ -108,6 +104,61 @@ const SeriesDropdownSeriesType = props => {
   )
 }
 
+const SeriesDropdownForecastingStage = props => {
+  const { config } = useContext(ConfigContext)
+  const { updateSeries, getColumns } = useContext(SeriesContext)
+
+  const { index, series } = props
+
+  // Only combo charts are allowed to have different options
+  if (series.type !== 'Forecasting') return
+
+  return (
+    <InputSelect
+      initial='Select an option'
+      initialDisabled
+      initialSnap
+      value={series.stageColumn}
+      label='Forecasting Stage Column'
+      onChange={event => {
+        updateSeries(index, event.target.value, 'stageColumn')
+      }}
+      options={getColumns(false)}
+    />
+  )
+}
+
+const SeriesDropdownForecastingColumn = props => {
+  const { config, rawData } = useContext(ConfigContext)
+  const { updateSeries } = useContext(SeriesContext)
+
+  const { index, series } = props
+
+  // Only combo charts are allowed to have different options
+  if (series.type !== 'Forecasting') return
+  if (!rawData) return
+  if (!series.stageColumn) return
+
+  let tempGroups = new Set(rawData.map(item => item[series.stageColumn])) // [estimate, forecast, etc.]
+  tempGroups = Array.from(tempGroups) // convert set to array
+
+  tempGroups = tempGroups.filter(group => group !== undefined) // removes undefined
+
+  return (
+    <InputSelect
+      initial='Select an option'
+      initialDisabled
+      initialSnap
+      value={series.stageItem}
+      label='Forecasting Item Column'
+      onChange={event => {
+        updateSeries(index, event.target.value, 'stageItem')
+      }}
+      options={tempGroups}
+    />
+  )
+}
+
 const SeriesDropdownAxisPosition = props => {
   const { config } = useContext(ConfigContext)
   const { updateSeries, supportedRightAxisTypes } = useContext(SeriesContext)
@@ -179,10 +230,10 @@ const SeriesDropdownConfidenceInterval = props => {
                     initial='Select an option'
                     initialDisabled
                     initialSnap
-                    value={config.series[index].confidenceIntervals?.low ? config.series[index].confidenceIntervals.low : 'Select'}
+                    value={series.confidenceIntervals[ciIndex]?.low ? series.confidenceIntervals[ciIndex].low : 'Select'}
                     label='Low Confidence Interval'
                     onChange={e => {
-                      const copiedIndex = [...config.series[index].confidenceIntervals]
+                      const copiedIndex = [...config.series.confidenceIntervals[ciIndex]]
                       copiedIndex.low = e.target.value
                       const copyOfSeries = [...config.series] // copy the entire series array
                       copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedIndex }
@@ -373,8 +424,9 @@ const SeriesItem = props => {
                   <Series.Dropdown.SeriesType series={series} index={i} />
                   <Series.Dropdown.AxisPosition series={series} index={i} />
                   <Series.Dropdown.LineType series={series} index={i} />
+                  <Series.Dropdown.ForecastingStage series={series} index={i} />
+                  <Series.Dropdown.ForecastingColumn series={series} index={i} />
                   <Series.Dropdown.ConfidenceInterval series={series} index={i} />
-                  {/* <Series.Dropdown.ForecastingStage series={series} index={i} /> */}
                 </AccordionItemPanel>
               )}
             </AccordionItem>
@@ -398,7 +450,9 @@ const Series = {
     SeriesType: SeriesDropdownSeriesType,
     AxisPosition: SeriesDropdownAxisPosition,
     ConfidenceInterval: SeriesDropdownConfidenceInterval,
-    LineType: SeriesDropdownLineType
+    LineType: SeriesDropdownLineType,
+    ForecastingStage: SeriesDropdownForecastingStage,
+    ForecastingColumn: SeriesDropdownForecastingColumn
   },
   Button: {
     Remove: SeriesButtonRemove
