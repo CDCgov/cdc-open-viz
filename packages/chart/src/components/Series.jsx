@@ -14,15 +14,22 @@ const SeriesContext = React.createContext()
 const SeriesWrapper = props => {
   const { updateConfig, config } = useContext(ConfigContext)
 
+  const { getColumns, selectComponent } = props
+
   const supportedRightAxisTypes = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg']
 
   const updateSeries = (index, value, property) => {
     let series = [...config.series]
     series[index][property] = value
+
+    // initialize CI's
+    if (value === 'Forecasting' && !series[index].hasOwnProperty('confidenceIntervals')) {
+      series[index].confidenceIntervals = [{ low: '', high: '' }]
+    }
     updateConfig({ ...config, series })
   }
 
-  return <SeriesContext.Provider value={{ updateSeries, supportedRightAxisTypes }}>{props.children}</SeriesContext.Provider>
+  return <SeriesContext.Provider value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent }}>{props.children}</SeriesContext.Provider>
 }
 
 const SeriesDropdownLineType = props => {
@@ -30,7 +37,8 @@ const SeriesDropdownLineType = props => {
   const { series, index } = props
 
   // Run a quick test to determine if we should even show this.
-  const supportsLineType = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart', 'Forecasting'].some(item => item.includes(series.type))
+  const supportsLineType = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type))
+
   if (!supportsLineType) return
 
   const changeLineType = (i, value) => {
@@ -93,7 +101,8 @@ const SeriesDropdownSeriesType = props => {
         'dashed-sm': 'Small Dashed',
         'dashed-md': 'Medium Dashed',
         'dashed-lg': 'Large Dashed',
-        'Area Chart': 'Area Chart'
+        'Area Chart': 'Area Chart',
+        Forecasting: 'Forecasting'
       }}
     />
   )
@@ -129,26 +138,167 @@ const SeriesDropdownAxisPosition = props => {
 }
 
 const SeriesDropdownConfidenceInterval = props => {
-  const { config } = useContext(ConfigContext)
-  const { updateSeries } = useContext(SeriesContext)
-
+  const { config, updateConfig } = useContext(ConfigContext)
   const { series, index } = props
-  if (config.visualizationType !== 'Forecasting' || !series) return
+  const { getColumns, selectComponent: Select } = useContext(SeriesContext)
+  if (series.type !== 'Forecasting') return
 
   return (
-    <InputSelect
-      initial='Select an option'
-      initialDisabled
-      value={series.confidenceInterval}
-      initialSnap
-      label='Confidence Interval'
-      onChange={event => {
-        updateSeries(index, event.target.value, 'confidenceInterval')
-      }}
-      options={['25', '50', '95']}
-    />
+    <div className='edit-block'>
+      <h3>Confidence Interval Groups</h3>
+      <fieldset>
+        <Accordion allowZeroExpanded>
+          {series?.confidenceIntervals.map((ciGroup, index) => {
+            return (
+              <AccordionItem className='series-item series-item--chart'>
+                <AccordionItemHeading className='series-item__title'>
+                  <>
+                    <AccordionItemButton className={'accordion__button accordion__button'}>
+                      Group {index + 1}
+                      <button
+                        className='series-list__remove'
+                        onClick={e => {
+                          e.preventDefault()
+                          const copiedIndex = [...config.series[index].confidenceIntervals]
+                          copiedIndex.splice(index, 1)
+                          const copyOfSeries = [...config.series] // copy the entire series array
+                          copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex] }
+                          updateConfig({
+                            ...config,
+                            series: copyOfSeries
+                          })
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </AccordionItemButton>
+                  </>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <InputSelect
+                    initial='Select an option'
+                    initialDisabled
+                    initialSnap
+                    value={config.series[index].confidenceIntervals?.low ? config.series[index].confidenceIntervals.low : 'Select'}
+                    label='Low Confidence Interval'
+                    onChange={e => {
+                      const copiedIndex = [...config.series[index].confidenceIntervals]
+                      copiedIndex.low = e.target.value
+                      const copyOfSeries = [...config.series] // copy the entire series array
+                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex] }
+                      updateConfig({
+                        ...config,
+                        series: copyOfSeries
+                      })
+                    }}
+                    options={['low', 'high']}
+                  />
+
+                  <InputSelect
+                    initial='Select an option'
+                    initialDisabled
+                    initialSnap
+                    value={config.series[index].confidenceIntervals?.high ? config.series[index].confidenceIntervals.high : 'Select'}
+                    label='High Confidence Interval'
+                    onChange={e => {
+                      const copiedIndex = [...config.series[index].confidenceIntervals]
+                      copiedIndex.high = e.target.value
+                      const copyOfSeries = [...config.series] // copy the entire series array
+                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex] }
+                      updateConfig({
+                        ...config,
+                        series: copyOfSeries
+                      })
+                    }}
+                    options={['low', 'high']}
+                  />
+                  {/* <Select
+                    fieldName='forecastingCIGroupLow'
+                    label='Low Confidence Interval Bound'
+                    value={series.confidenceIntervals[index].low || ''}
+                    initial={'Select'}
+                    onChange={e => {
+                      if (e.target.value !== '' && e.target.value !== 'Select') {
+                        const copiedCI = [...config.series.confidenceIntervals]
+                        copiedCI[index].low = e.target.value
+                        updateConfig({
+                          ...config,
+                          series: {
+                            ...config.series,
+                            confidenceIntervals: copiedCI
+                          }
+                        })
+                      }
+                    }}
+                    options={'test'}
+                  /> */}
+
+                  {/* <Select
+                    fieldName='forecastingCIGroupHigh'
+                    label='High Confidence Interval Bound'
+                    value={config.forecastingChart.confidenceIntervals[index].high || ''}
+                    initial={'Select'}
+                    onChange={e => {
+                      if (e.target.value !== '' && e.target.value !== 'Select') {
+                        const copiedCI = [...config.forecastingChart.confidenceIntervals]
+                        copiedCI[index].high = e.target.value
+                        updateConfig({
+                          ...config,
+                          forecastingChart: {
+                            ...config.forecastingChart,
+                            confidenceIntervals: copiedCI
+                          }
+                        })
+                      }
+                    }}
+                    options={'test 2'}
+                  /> */}
+                </AccordionItemPanel>
+              </AccordionItem>
+            )
+          })}
+        </Accordion>
+        <button
+          className='btn full-width'
+          onClick={e => {
+            e.preventDefault()
+            const copiedIndex = [...config.series[index].confidenceIntervals]
+            const copyOfSeries = [...config.series] // copy the entire series array
+            copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex, { high: '', low: '' }] } // update the nested array
+            updateConfig({
+              ...config,
+              series: copyOfSeries
+            })
+          }}
+        >
+          Add Confidence Interval Group
+        </button>
+      </fieldset>
+    </div>
   )
 }
+
+// const SeriesDropdownConfidenceInterval = props => {
+//   const { config } = useContext(ConfigContext)
+//   const { updateSeries } = useContext(SeriesContext)
+
+//   const { series, index } = props
+//   if (series.type !== 'Forecasting') return
+
+//   return (
+//     <InputSelect
+//       initial='Select an option'
+//       initialDisabled
+//       value={series.confidenceInterval}
+//       initialSnap
+//       label='Confidence Interval'
+//       onChange={event => {
+//         updateSeries(index, event.target.value, 'confidenceInterval')
+//       }}
+//       options={['25', '50', '95']}
+//     />
+//   )
+// }
 
 const SeriesButtonRemove = props => {
   const { config, updateConfig } = useContext(ConfigContext)
@@ -224,6 +374,7 @@ const SeriesItem = props => {
                   <Series.Dropdown.AxisPosition series={series} index={i} />
                   <Series.Dropdown.LineType series={series} index={i} />
                   <Series.Dropdown.ConfidenceInterval series={series} index={i} />
+                  {/* <Series.Dropdown.ForecastingStage series={series} index={i} /> */}
                 </AccordionItemPanel>
               )}
             </AccordionItem>
