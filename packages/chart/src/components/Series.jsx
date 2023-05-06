@@ -191,7 +191,7 @@ const SeriesDropdownAxisPosition = props => {
 const SeriesDropdownConfidenceInterval = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const { series, index } = props
-  const { getColumns, selectComponent: Select } = useContext(SeriesContext)
+  const { getColumns } = useContext(SeriesContext)
   if (series.type !== 'Forecasting') return
 
   return (
@@ -230,13 +230,13 @@ const SeriesDropdownConfidenceInterval = props => {
                     initial='Select an option'
                     initialDisabled
                     initialSnap
-                    value={series.confidenceIntervals[ciIndex]?.low ? series.confidenceIntervals[ciIndex].low : 'Select'}
+                    value={config.series[index].confidenceIntervals[ciIndex].low ? config.series[index].confidenceIntervals[ciIndex].low : 'Select'}
                     label='Low Confidence Interval'
                     onChange={e => {
-                      const copiedIndex = [...config.series.confidenceIntervals[ciIndex]]
-                      copiedIndex.low = e.target.value
+                      const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
+                      copiedConfidenceArray[ciIndex].low = e.target.value
                       const copyOfSeries = [...config.series] // copy the entire series array
-                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedIndex }
+                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
                       updateConfig({
                         ...config,
                         series: copyOfSeries
@@ -244,18 +244,17 @@ const SeriesDropdownConfidenceInterval = props => {
                     }}
                     options={['low', 'high']}
                   />
-
                   <InputSelect
                     initial='Select an option'
                     initialDisabled
                     initialSnap
-                    value={config.series[index].confidenceIntervals?.high ? config.series[index].confidenceIntervals.high : 'Select'}
+                    value={config.series[index].confidenceIntervals[ciIndex].high ? config.series[index].confidenceIntervals[ciIndex].high : 'Select'}
                     label='High Confidence Interval'
                     onChange={e => {
-                      const copiedIndex = [...config.series[index].confidenceIntervals]
-                      copiedIndex.high = e.target.value
+                      const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
+                      copiedConfidenceArray[ciIndex].high = e.target.value
                       const copyOfSeries = [...config.series] // copy the entire series array
-                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedIndex }
+                      copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
                       updateConfig({
                         ...config,
                         series: copyOfSeries
@@ -263,47 +262,6 @@ const SeriesDropdownConfidenceInterval = props => {
                     }}
                     options={['low', 'high']}
                   />
-                  {/* <Select
-                    fieldName='forecastingCIGroupLow'
-                    label='Low Confidence Interval Bound'
-                    value={series.confidenceIntervals[index].low || ''}
-                    initial={'Select'}
-                    onChange={e => {
-                      if (e.target.value !== '' && e.target.value !== 'Select') {
-                        const copiedCI = [...config.series.confidenceIntervals]
-                        copiedCI[index].low = e.target.value
-                        updateConfig({
-                          ...config,
-                          series: {
-                            ...config.series,
-                            confidenceIntervals: copiedCI
-                          }
-                        })
-                      }
-                    }}
-                    options={'test'}
-                  /> */}
-
-                  {/* <Select
-                    fieldName='forecastingCIGroupHigh'
-                    label='High Confidence Interval Bound'
-                    value={config.forecastingChart.confidenceIntervals[index].high || ''}
-                    initial={'Select'}
-                    onChange={e => {
-                      if (e.target.value !== '' && e.target.value !== 'Select') {
-                        const copiedCI = [...config.forecastingChart.confidenceIntervals]
-                        copiedCI[index].high = e.target.value
-                        updateConfig({
-                          ...config,
-                          forecastingChart: {
-                            ...config.forecastingChart,
-                            confidenceIntervals: copiedCI
-                          }
-                        })
-                      }
-                    }}
-                    options={'test 2'}
-                  /> */}
                 </AccordionItemPanel>
               </AccordionItem>
             )
