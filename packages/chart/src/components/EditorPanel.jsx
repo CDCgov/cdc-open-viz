@@ -974,7 +974,7 @@ const EditorPanel = () => {
                         options={getColumns()}
                       />
                       {config.series && config.series.length !== 0 && (
-                        <Series.Wrapper values={getColumns} selectComponent={<Select />}>
+                        <Series.Wrapper getColumns={getColumns}>
                           <fieldset>
                             <legend className='edit-label float-left'>Displaying</legend>
                             <Tooltip style={{ textTransform: 'none' }}>
