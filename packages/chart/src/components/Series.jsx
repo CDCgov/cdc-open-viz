@@ -8,6 +8,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { Draggable } from '@hello-pangea/dnd'
+import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 const SeriesContext = React.createContext()
 
@@ -105,7 +106,7 @@ const SeriesDropdownSeriesType = props => {
 }
 
 const SeriesDropdownForecastingStage = props => {
-  const { config } = useContext(ConfigContext)
+  const { config, updateConfig, rawData } = useContext(ConfigContext)
   const { updateSeries, getColumns } = useContext(SeriesContext)
 
   const { index, series } = props
@@ -119,9 +120,26 @@ const SeriesDropdownForecastingStage = props => {
       initialDisabled
       initialSnap
       value={series.stageColumn}
-      label='Forecasting Stage Column'
-      onChange={event => {
-        updateSeries(index, event.target.value, 'stageColumn')
+      label='Add Forecasting Stages'
+      // onChange={event => {
+      //   updateSeries(index, event.target.value, 'stageColumn')
+      // }}
+      onChange={e => {
+        let stageObjects = []
+        let tempGroups = new Set(rawData?.map(item => item[e.target.value])) // [estimate, forecast, etc.]
+        tempGroups = Array.from(tempGroups) // convert set to array
+
+        tempGroups = tempGroups.filter(group => group !== undefined) // removes undefined
+
+        tempGroups.forEach(group => stageObjects.push({ key: group }))
+
+        const copyOfSeries = [...config.series] // copy the entire series array
+        copyOfSeries[index] = { ...copyOfSeries[index], stages: stageObjects, stageColumn: e.target.value }
+
+        updateConfig({
+          ...config,
+          series: copyOfSeries
+        })
       }}
       options={getColumns(false)}
     />
@@ -188,6 +206,41 @@ const SeriesDropdownAxisPosition = props => {
   )
 }
 
+const SeriesDropdownForecastColor = props => {
+  const { config, updateConfig } = useContext(ConfigContext)
+
+  const { index, series } = props
+
+  if (series.type !== 'Forecasting') return
+
+  // Hide AxisPositionDropdown in certain cases.
+  if (config.visualizationType !== 'Combo' || !series) return
+
+  return series.stages.map((stage, stageIndex) => (
+    <InputSelect
+      initial='Select an option'
+      initialDisabled
+      value={config.series?.[index].stages?.[stageIndex].color ? config.series?.[index].stages?.[stageIndex].color : 'Select'}
+      initialSnap
+      label={`${stage.key} Series Color`}
+      onChange={event => {
+        const copyOfSeries = [...config.series] // copy the entire series array
+        const copyOfStages = copyOfSeries[index].stages
+
+        console.log('copy of stages', copyOfStages)
+        copyOfStages[stageIndex].color = event.target.value
+        copyOfSeries[index] = { ...copyOfSeries[index], stages: copyOfStages }
+
+        updateConfig({
+          ...config,
+          series: copyOfSeries
+        })
+      }}
+      options={Object.keys(colorPalettesChart)}
+    />
+  ))
+}
+
 const SeriesDropdownConfidenceInterval = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const { series, index } = props
@@ -242,7 +295,7 @@ const SeriesDropdownConfidenceInterval = props => {
                         series: copyOfSeries
                       })
                     }}
-                    options={['low', 'high']}
+                    options={getColumns()}
                   />
                   <InputSelect
                     initial='Select an option'
@@ -260,7 +313,7 @@ const SeriesDropdownConfidenceInterval = props => {
                         series: copyOfSeries
                       })
                     }}
-                    options={['low', 'high']}
+                    options={getColumns()}
                   />
                 </AccordionItemPanel>
               </AccordionItem>
@@ -286,28 +339,6 @@ const SeriesDropdownConfidenceInterval = props => {
     </div>
   )
 }
-
-// const SeriesDropdownConfidenceInterval = props => {
-//   const { config } = useContext(ConfigContext)
-//   const { updateSeries } = useContext(SeriesContext)
-
-//   const { series, index } = props
-//   if (series.type !== 'Forecasting') return
-
-//   return (
-//     <InputSelect
-//       initial='Select an option'
-//       initialDisabled
-//       value={series.confidenceInterval}
-//       initialSnap
-//       label='Confidence Interval'
-//       onChange={event => {
-//         updateSeries(index, event.target.value, 'confidenceInterval')
-//       }}
-//       options={['25', '50', '95']}
-//     />
-//   )
-// }
 
 const SeriesButtonRemove = props => {
   const { config, updateConfig } = useContext(ConfigContext)
@@ -383,7 +414,8 @@ const SeriesItem = props => {
                   <Series.Dropdown.AxisPosition series={series} index={i} />
                   <Series.Dropdown.LineType series={series} index={i} />
                   <Series.Dropdown.ForecastingStage series={series} index={i} />
-                  <Series.Dropdown.ForecastingColumn series={series} index={i} />
+                  {/* <Series.Dropdown.ForecastingColumn series={series} index={i} /> */}
+                  <Series.Dropdown.ForecastingColor series={series} index={i} />
                   <Series.Dropdown.ConfidenceInterval series={series} index={i} />
                 </AccordionItemPanel>
               )}
@@ -410,7 +442,8 @@ const Series = {
     ConfidenceInterval: SeriesDropdownConfidenceInterval,
     LineType: SeriesDropdownLineType,
     ForecastingStage: SeriesDropdownForecastingStage,
-    ForecastingColumn: SeriesDropdownForecastingColumn
+    ForecastingColumn: SeriesDropdownForecastingColumn,
+    ForecastingColor: SeriesDropdownForecastColor
   },
   Button: {
     Remove: SeriesButtonRemove

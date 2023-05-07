@@ -210,9 +210,36 @@
       "dataKey": "type",
       "type": "Forecasting",
       "axis": "Left",
-      "confidenceIntervals": [],
+      "confidenceIntervals": [
+        {
+          "high": "upper_90",
+          "low": "lower_90"
+        },
+        {
+          "high": "upper_50",
+          "low": "lower_50"
+        },
+        {
+          "high": "upper_20",
+          "low": "lower_20"
+        }
+      ],
       "stageColumn": "type",
-      "stageItem": "estimate"
+      "stageItem": "estimate",
+      "stages": [
+        {
+          "key": "estimate",
+          "color": "sequential-green"
+        },
+        {
+          "key": "estimate based on partial data",
+          "color": "sequential-orange-(MPX)"
+        },
+        {
+          "key": "forecast",
+          "color": "sequential-blue"
+        }
+      ]
     }
   ]
 }

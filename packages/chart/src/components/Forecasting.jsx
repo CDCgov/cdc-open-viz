@@ -19,20 +19,23 @@ const Forecasting = ({ xScale, yScale, yMax, xMax, chartRef, width, height, xSca
   const { forecastingChart } = config
   const pallete = colorPalettesChart[config.palette]
 
+  const TESTING_COMBO = true
+
   return (
     data &&
     config.forecastingChart.groups && (
       <ErrorBoundary component='ForecastingChart'>
         <Group className='forecasting-items' key='forecasting-items'>
-          <Group className='forecasting-bars' key='forecasting-bars' left={config.yAxis.size}>
-            {config.forecastingChart.showBars &&
-              data.map((bar, barIndex) => {
-                let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.forecastingChart.barColumn) === -1
-                let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.forecastingChart.barColumn) !== -1
+          {!TESTING_COMBO && (
+            <Group className='forecasting-bars' key='forecasting-bars' left={config.yAxis.size}>
+              {config.forecastingChart.showBars &&
+                data.map((bar, barIndex) => {
+                  let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.forecastingChart.barColumn) === -1
+                  let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.forecastingChart.barColumn) !== -1
 
-                return (
-                  // prettier-ignore
-                  <Bar
+                  return (
+                    // prettier-ignore
+                    <Bar
                   key={`bar-${barIndex}`}
                   data-date={`${bar[xColumnName]}`}
                   data-value={`${bar[barColumn]}`}
@@ -45,40 +48,79 @@ const Forecasting = ({ xScale, yScale, yMax, xMax, chartRef, width, height, xSca
                   opacity={transparentArea ? 0 : 1}
 
               />
-                )
-              })}
-          </Group>
-
-          {config.forecastingChart.groups.map((group, index) => {
-            let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(group) === -1
-            let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(group) !== -1
-            return (
-              <Group className={`forecasting-areas`} left={config.yAxis.size}>
-                {forecastingChart.confidenceIntervals.map((ciGroup, ciGroupIndex) => {
-                  const palette = colorPalettesChart[config.forecastingChart.colors?.[index]]
-
-                  // slice the data
-                  const groupData = data.filter(d => d[config.forecastingChart.stages] === group)
-
-                  if (!palette) return null
-                  return (
-                    <>
-                      {/* prettier-ignore */}
-                      <Area
-                        curve={curveMonotoneX}
-                        data={groupData}
-                        fill={displayArea ? palette[ciGroupIndex] : 'transparent'}
-                        opacity={transparentArea ? 0.1 : 0.5}
-                        x={d => xScale(Date.parse(d[xColumnName]))}
-                        xScale={xScale}
-                        y0={d => yScale(d[ciGroup.low])}
-                        y1={d => yScale(d[ciGroup.high])}
-                      />
-                    </>
                   )
                 })}
-              </Group>
-            )
+            </Group>
+          )}
+
+          {!TESTING_COMBO &&
+            config.forecastingChart.groups.map((group, index) => {
+              let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(group) === -1
+              let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(group) !== -1
+              return (
+                <Group className={`forecasting-areas`} left={config.yAxis.size}>
+                  {forecastingChart.confidenceIntervals.map((ciGroup, ciGroupIndex) => {
+                    const palette = colorPalettesChart[config.forecastingChart.colors?.[index]]
+
+                    // slice the data
+                    const groupData = data.filter(d => d[config.forecastingChart.stages] === group)
+
+                    if (!palette) return null
+                    return (
+                      <>
+                        {/* prettier-ignore */}
+                        <Area
+                      curve={curveMonotoneX}
+                      data={groupData}
+                      fill={displayArea ? palette[ciGroupIndex] : 'transparent'}
+                      opacity={transparentArea ? 0.1 : 0.5}
+                      x={d => xScale(Date.parse(d[xColumnName]))}
+                      xScale={xScale}
+                      y0={d => yScale(d[ciGroup.low])}
+                      y1={d => yScale(d[ciGroup.high])}
+                    />
+                      </>
+                    )
+                  })}
+                </Group>
+              )
+            })}
+
+          {config.runtime.forecastingSeriesKeys?.map((group, index) => {
+            return group.stages.map((stage, stageIndex) => {
+              console.log('stage', stage)
+              // console.log('GROUP', group)
+              const groupData = rawData.filter(d => d[group.stageColumn] === stage.key)
+              let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(group) === -1
+              let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(group) !== -1
+              return (
+                <Group className={`forecasting-areas-combo`} left={config.yAxis.size}>
+                  {group.confidenceIntervals.map((ciGroup, ciGroupIndex) => {
+                    const palette = colorPalettesChart[stage.color]
+
+                    console.log('palette', palette)
+                    // slice the data
+
+                    if (!palette) return null
+                    return (
+                      <>
+                        {/* prettier-ignore */}
+                        <Area
+                          curve={curveMonotoneX}
+                          data={groupData}
+                          fill={displayArea ? palette[ciGroupIndex] : 'transparent'}
+                          opacity={transparentArea ? 0.1 : 0.5}
+                          x={d => xScale(Date.parse(d[xColumnName]))}
+                          xScale={xScale}
+                          y0={d => yScale(d[ciGroup.low])}
+                          y1={d => yScale(d[ciGroup.high])}
+                        />
+                      </>
+                    )
+                  })}
+                </Group>
+              )
+            })
           })}
         </Group>
       </ErrorBoundary>
