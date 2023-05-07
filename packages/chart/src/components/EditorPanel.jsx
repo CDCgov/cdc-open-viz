@@ -492,10 +492,6 @@ const EditorPanel = () => {
 
     if (filter) {
       Object.keys(columns).forEach(key => {
-        console.log(
-          'testing',
-          config.series.filter(series => series.stageColumn === key)
-        )
         if (
           (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
           (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))

@@ -655,7 +655,6 @@ export default function LinearChart() {
             </AxisBottom>
           </>
         )}
-        {config.visualizationType === 'Forecasting' && <Forecasting xScale={xScale} yScale={yScale} width={xMax} height={yMax} xScaleNoPadding={xScaleNoPadding} chartRef={svgRef} />}
         {config.visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
         {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
         {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
@@ -663,6 +662,7 @@ export default function LinearChart() {
         {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} />}
         {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />}
         {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />}
+        {(config.visualizationType === 'Forecasting' || config.visualizationType === 'Combo') && <Forecasting xScale={xScale} yScale={yScale} width={xMax} height={yMax} xScaleNoPadding={xScaleNoPadding} chartRef={svgRef} />}
 
         {/* y anchors */}
         {config.yAxis.anchors &&

@@ -373,10 +373,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.runtime.areaSeriesKeys = []
+      newConfig.runtime.forecastingSeriesKeys = []
 
       newConfig.series.forEach(series => {
         if (series.type === 'Area Chart') {
           newConfig.runtime.areaSeriesKeys.push(series)
+        }
+        if (series.type === 'Forecasting') {
+          newConfig.runtime.forecastingSeriesKeys.push(series)
         }
         if (series.type === 'Bar') {
           newConfig.runtime.barSeriesKeys.push(series.dataKey)
