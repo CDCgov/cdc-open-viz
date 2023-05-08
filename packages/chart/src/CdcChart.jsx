@@ -840,7 +840,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return false
   }
 
-  // used for Additional Columns
+  // used for Additional Column
   const displayDataAsText = (value, columnName) => {
     if (value === null || value === '' || value === undefined) {
       return ''
