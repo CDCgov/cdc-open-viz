@@ -1184,8 +1184,8 @@ const EditorPanel = props => {
   const usedFilterColumns = {}
 
   const filtersJSX = state.filters.map((filter, index) => {
-    if(filter.type === 'url') return <></>
-    
+    if (filter.type === 'url') return <></>
+
     if (filter.columnName) {
       usedFilterColumns[filter.columnName] = true
     }
@@ -2809,7 +2809,7 @@ const EditorPanel = props => {
                     ))}
                 </AccordionItemPanel>
               </AccordionItem>
-              <AccordionItem>
+              {/* <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Custom Map Layers</AccordionItemButton>
                 </AccordionItemHeading>
@@ -2846,7 +2846,7 @@ const EditorPanel = props => {
                     Add Map Layer
                   </button>
                 </AccordionItemPanel>
-              </AccordionItem>
+              </AccordionItem> */}
             </Accordion>
           </form>
           <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
