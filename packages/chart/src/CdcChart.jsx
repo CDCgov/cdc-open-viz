@@ -28,8 +28,6 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import SparkLine from './components/SparkLine'
 import Legend from './components/Legend'
-//import DataTable from './components/DataTable'
-import DataTable from '@cdc/core/components/DataTable'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
@@ -44,6 +42,9 @@ import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 
 import './scss/main.scss'
+// load both then config below determines which to use
+import DataTable_horiz from './components/DataTable'
+import DataTable_vert from '@cdc/core/components/DataTable'
 
 const generateColorsArray = (color = '#000000', special = false) => {
   let colorObj = chroma(color)
@@ -93,6 +94,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let innerContainerRef = useRef()
 
   if (isDebug) console.log('Chart config', config)
+
+  // set the data table type
+  if (config) {
+  }
+  const DataTable = config?.table?.showVertical ? DataTable_vert : DataTable_horiz
 
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
