@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from 'react'
+import React, { useEffect, useState, memo, useMemo } from 'react'
 
 import Papa from 'papaparse'
 import ExternalIcon from '../assets/external-link.svg' // TODO: Move to Icon component
@@ -13,10 +13,10 @@ import Loading from '@cdc/core/components/Loading'
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
   const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, parseDate, formatDate, isDebug } = props
-  if (isDebug) console.log('props=', props)
-  if (isDebug) console.log('runtimeData=', runtimeData)
-  if (isDebug) console.log('rawData=', rawData)
-  if (isDebug) console.log('config=', config)
+  if (isDebug) console.log('core/DataTable: props=', props)
+  if (isDebug) console.log('core/DataTable: runtimeData=', runtimeData)
+  if (isDebug) console.log('core/DataTable: rawData=', rawData)
+  if (isDebug) console.log('core/DataTable: config=', config)
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
@@ -169,7 +169,8 @@ const DataTable = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded])
 
-  if (!config.data) return <Loading />
+  if (config.visualizationType !== 'Box Plot' && !config.data) return <Loading />
+  if (config.visualizationType === 'Box Plot' && !config.boxplot) return <Loading />
 
   const rows = Object.keys(runtimeData)
     //.filter(row => applyLegendToRow(runtimeData[row]))
@@ -382,7 +383,60 @@ const DataTable = props => {
     }
   }
 
+  // prettier-ignore
+  const tableData = useMemo(() => (
+    config.visualizationType === 'Pie'
+      ? [config.yAxis.dataKey]
+      : config.visualizationType === 'Box Plot'
+        ? Object.entries(config.boxplot.tableData[0])
+        : config.runtime.seriesKeys),
+    [config.runtime.seriesKeys]) // eslint-disable-line
+
   if (config.visualizationType !== 'Box Plot') {
+    function genMapHeader(columns) {
+      return (
+        <tr>
+          {Object.keys(columns)
+            .filter(column => columns[column].dataTable === true && columns[column].name)
+            .map(column => {
+              let text
+              if (column !== 'geo') {
+                text = columns[column].label ? columns[column].label : columns[column].name
+              } else {
+                text = config.type === 'map' ? indexTitle : config.xAxis.dataKey
+              }
+              if (config.type === 'map' && (text === undefined || text === '')) {
+                text = 'Location'
+              }
+              return (
+                <th
+                  key={`col-header-${column}`}
+                  tabIndex='0'
+                  title={text}
+                  role='columnheader'
+                  scope='col'
+                  onClick={() => {
+                    setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                  }}
+                  onKeyDown={e => {
+                    if (e.keyCode === 13) {
+                      setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                    }
+                  }}
+                  className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
+                  {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+                >
+                  {text}
+                  <button>
+                    <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
+                  </button>
+                </th>
+              )
+            })}
+        </tr>
+      )
+    }
+
     return (
       <ErrorBoundary component='DataTable'>
         <CoveMediaControls.Section classes={['download-links']}>
@@ -451,7 +505,136 @@ const DataTable = props => {
     )
   } else {
     console.log('COVE: BOX PLOT detected')
-    return <h1>Still working on box plot table</h1>
+    console.log('table data=', tableData)
+    function genBoxplotHeader(categories) {
+      let columns = ['Measures', ...categories]
+      return (
+        <tr>
+          {columns.map(column => {
+            return (
+              <th key={`col-header-${column}`} tabIndex='0' title={column} role='columnheader' scope='col'>
+                {column}
+              </th>
+            )
+          })}
+        </tr>
+      )
+    }
+    const resolveName = key => {
+      let {
+        boxplot: { labels }
+      } = config
+      const columnLookup = {
+        columnMean: labels.mean,
+        columnMax: labels.maximum,
+        columnMin: labels.minimum,
+        columnIqr: labels.iqr,
+        columnCategory: 'Category',
+        columnMedian: labels.median,
+        columnFirstQuartile: labels.q1,
+        columnThirdQuartile: labels.q3,
+        columnOutliers: labels.outliers,
+        values: labels.values,
+        columnTotal: labels.total,
+        columnSd: 'Standard Deviation',
+        nonOutlierValues: 'Non Outliers',
+        columnLowerBounds: labels.lowerBounds,
+        columnUpperBounds: labels.upperBounds
+      }
+
+      let resolvedName = columnLookup[key]
+
+      return resolvedName
+    }
+    let resolveCell = (rowid, plot) => {
+      console.log('row,plot', rowid, plot)
+      if (Number(rowid) === 0) return true
+      if (Number(rowid) === 1) return plot.columnMax
+      if (Number(rowid) === 2) return plot.columnThirdQuartile
+      if (Number(rowid) === 3) return plot.columnMedian
+      if (Number(rowid) === 4) return plot.columnFirstQuartile
+      if (Number(rowid) === 5) return plot.columnMin
+      if (Number(rowid) === 6) return plot.columnTotal
+      if (Number(rowid) === 7) return plot.columnSd
+      if (Number(rowid) === 8) return plot.columnMean
+      if (Number(rowid) === 9) return plot.columnOutliers.length > 0 ? plot.columnOutliers.toString() : '-'
+      if (Number(rowid) === 10) return plot.values.length > 0 ? plot.values.toString() : '-'
+      return <p>-</p>
+    }
+    function genBoxplotRows(rows) {
+      let dataKeys = rows.map(row => {
+        //Object.keys(rows[0]) // get data keys for each row
+        console.log('keys =', row[0])
+        return row[0]
+      })
+      console.log('dataKeys=', dataKeys)
+      let columns = ['Measures', ...config.boxplot.categories]
+      const allrows = dataKeys.map((rowkey, index) => {
+        console.log('##row=', rowkey)
+        if (index === 0) return '' // we did header column separately
+        let rowClass = `row-Box-Plot--${index}`
+        return (
+          <tr role='row' key={`tbody__tr-${index}`} className={rowClass}>
+            {columns.map((column, colnum) => {
+              let cellValue
+              if (column === 'Measures') {
+                //const rowObj = runtimeData[row]
+                let labelValue = index > 0 ? resolveName(rowkey) : '' //rowObj[column]
+                cellValue = <>{labelValue}</>
+              } else {
+                console.log('index,colnum', index, colnum)
+                cellValue = resolveCell(index, config.boxplot.plots[colnum - 1])
+              }
+
+              console.log('rowClass=', rowClass)
+              return (
+                <td tabIndex='0' key={`tbody__tr__td-${index}`} role='gridcell'>
+                  {cellValue}
+                </td>
+              )
+            })}
+          </tr>
+        )
+      })
+      return allrows
+    }
+    return (
+      <ErrorBoundary component='DataTable'>
+        {/* cove media results in error so disabling for now (TT)
+        <CoveMediaControls.Section classes={['download-links']}>
+          <CoveMediaControls.Link config={config} />
+          {config.general.showDownloadButton && <DownloadButton />}
+        </CoveMediaControls.Section>
+        */}
+        <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+          <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
+            Skip Navigation or Skip to Content
+          </a>
+          <div
+            className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
+            onClick={() => {
+              setExpanded(!expanded)
+            }}
+            tabIndex='0'
+            onKeyDown={e => {
+              if (e.keyCode === 13) {
+                setExpanded(!expanded)
+              }
+            }}
+          >
+            <Icon display={expanded ? 'minus' : 'plus'} base />
+            {tableTitle}
+          </div>
+          <div className='table-container' style={limitHeight}>
+            <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={'11'}>
+              <caption className='cdcdataviz-sr-only'>{caption}</caption>
+              <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{genBoxplotHeader(config.boxplot.categories)}</thead>
+              <tbody>{genBoxplotRows(tableData)}</tbody>
+            </table>
+          </div>
+        </section>
+      </ErrorBoundary>
+    )
   }
 }
 
