@@ -2026,7 +2026,7 @@ const EditorPanel = () => {
                 </AccordionItem>
               )}{' '}
               {/* Columns */}
-              {config.visualizationType !== 'Box Plot' && (
+              {config.visualizationType !== 'Box Plot' && config.table.showVertical && (
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>Columns</AccordionItemButton>
@@ -2616,6 +2616,26 @@ const EditorPanel = () => {
                       </Tooltip>
                     }
                   />
+                  {config.visualizationType !== 'Box Plot' && (
+                    <CheckBox
+                      value={config.table.showVertical}
+                      section='table'
+                      fieldName='showVertical'
+                      label='Show Vertical Data'
+                      updateField={updateField}
+                      className='column-heading'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>This will draw the data table with vertical data instead of horizontal.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  )}
                   {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
                   <TextField
                     value={config.table.caption}

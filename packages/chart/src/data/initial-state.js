@@ -114,7 +114,8 @@ export default {
     caption: '',
     showDownloadUrl: false,
     showDataTableLink: true,
-    indexLabel: ''
+    indexLabel: '',
+    showVertical: false
   },
   orientation: 'vertical',
   color: 'pinkpurple',
