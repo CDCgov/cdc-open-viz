@@ -417,7 +417,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     data.forEach(row => {
       let add = true
       filters.forEach(filter => {
-        if (row[filter.columnName] !== filter.active) {
+        if (row[filter.columnName] != filter.active) {
           add = false
         }
       })
