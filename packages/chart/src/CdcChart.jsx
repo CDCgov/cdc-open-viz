@@ -1002,6 +1002,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {config.table.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
               {config.table.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
             </CoveMediaControls.Section>
+
             {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
               <DataTable
