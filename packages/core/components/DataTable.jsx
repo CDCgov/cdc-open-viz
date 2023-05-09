@@ -202,7 +202,6 @@ const DataTable = props => {
       if (sortVal < 0) return 1
       return -1
     })
-  console.log('## ROWS = ', rows)
 
   function genMapHeader(columns) {
     return (
@@ -315,7 +314,6 @@ const DataTable = props => {
         }
       })
     }
-    console.log('##tmpSeriesCols=', tmpSeriesColumns)
     return tmpSeriesColumns
   }
 
