@@ -886,6 +886,34 @@ const EditorPanel = () => {
     })
   }
 
+  // for pie charts
+  if (!config.data && data) {
+    Object.keys(data[0]).map(colName => {
+      // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
+      const found = data.some(el => el.dataKey === colName)
+      if (colName !== config.xAxis.dataKey && !found) {
+        // if not the index then add it
+        return columnsOptions.push(
+          <option value={colName} key={colName}>
+            {colName}
+          </option>
+        )
+      }
+    })
+
+    let columnsByKey = {}
+    data.forEach(datum => {
+      Object.keys(datum).forEach(key => {
+        columnsByKey[key] = columnsByKey[key] || []
+        const value = typeof datum[key] === 'number' ? datum[key].toString() : datum[key]
+
+        if (columnsByKey[key].indexOf(value) === -1) {
+          columnsByKey[key].push(value)
+        }
+      })
+    })
+  }
+
   // prevents adding duplicates
   const additionalColumns = Object.keys(config.columns).filter(value => {
     const defaultCols = [config.xAxis.dataKey] // ['geo', 'navigate', 'primary', 'latitude', 'longitude']
@@ -913,30 +941,6 @@ const EditorPanel = () => {
         }
       }
     })
-  }
-
-  const addAdditionalColumnBAD = number => {
-    const columnKey = `additionalColumn${number}`
-    const columnSelected = config.selected
-    updateConfig({
-      ...config,
-      columns: {
-        ...config.columns,
-        [columnKey]: {
-          name: columnSelected,
-          label: columnSelected,
-          dataTable: true,
-          tooltips: false,
-          prefix: '',
-          suffix: ''
-        }
-      }
-    })
-    // now clear it from selected
-    /*     updateConfig({
-      ...config,
-      selected: ''
-    }) */
   }
 
   const clearSelectedColumn = () => {
@@ -2574,54 +2578,37 @@ const EditorPanel = () => {
                   )}
                 </AccordionItemPanel>
               </AccordionItem>
-              <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>Data Table</AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <TextField
-                    value={config.table.label}
-                    updateField={updateField}
-                    section='table'
-                    fieldName='label'
-                    id='tableLabel'
-                    label='Data Table Title'
-                    placeholder='Data Table'
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Label is required for Data Table for 508 Compliance</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                  <CheckBox
-                    value={config.table.show}
-                    section='table'
-                    fieldName='show'
-                    label='Show Data Table'
-                    updateField={updateField}
-                    className='column-heading'
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                  {config.visualizationType !== 'Box Plot' && (
-                    <CheckBox
-                      value={config.table.showVertical}
+              {/* Spark Line has no data table */}
+              {config.visualizationType !== 'Spark Line' && (
+                <AccordionItem>
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Data Table</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <TextField
+                      value={config.table.label}
+                      updateField={updateField}
                       section='table'
-                      fieldName='showVertical'
-                      label='Show Vertical Data'
+                      fieldName='label'
+                      id='tableLabel'
+                      label='Data Table Title'
+                      placeholder='Data Table'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Label is required for Data Table for 508 Compliance</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                    <CheckBox
+                      value={config.table.show}
+                      section='table'
+                      fieldName='show'
+                      label='Show Data Table'
                       updateField={updateField}
                       className='column-heading'
                       tooltip={
@@ -2630,42 +2617,62 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>This will draw the data table with vertical data instead of horizontal.</p>
+                            <p>Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement.</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
                     />
-                  )}
-                  {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
-                  <TextField
-                    value={config.table.caption}
-                    updateField={updateField}
-                    section='table'
-                    type='textarea'
-                    fieldName='caption'
-                    label='Data Table Caption'
-                    placeholder=' Data table'
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Enter a description of the data table to be read by screen readers.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                  <CheckBox value={config.table.limitHeight} section='table' fieldName='limitHeight' label='Limit Table Height' updateField={updateField} />
-                  {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min='0' max='500' placeholder='Height(px)' updateField={updateField} />}
-                  <CheckBox value={config.table.expanded} section='table' fieldName='expanded' label='Expanded by Default' updateField={updateField} />
-                  {isDashboard && <CheckBox value={config.table.showDataTableLink} section='table' fieldName='showDataTableLink' label='Show Data Table Name & Link' updateField={updateField} />}
-                  {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' updateField={updateField} />}
-                  <CheckBox value={config.table.download} section='table' fieldName='download' label='Show Download CSV Link' updateField={updateField} />
-                  {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
-                  {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
-                </AccordionItemPanel>
-              </AccordionItem>
+                    {config.visualizationType !== 'Box Plot' && (
+                      <CheckBox
+                        value={config.table.showVertical}
+                        section='table'
+                        fieldName='showVertical'
+                        label='Show Vertical Data'
+                        updateField={updateField}
+                        className='column-heading'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>This will draw the data table with vertical data instead of horizontal.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                    )}
+                    <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />
+                    <TextField
+                      value={config.table.caption}
+                      updateField={updateField}
+                      section='table'
+                      type='textarea'
+                      fieldName='caption'
+                      label='Data Table Caption'
+                      placeholder=' Data table'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Enter a description of the data table to be read by screen readers.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                    <CheckBox value={config.table.limitHeight} section='table' fieldName='limitHeight' label='Limit Table Height' updateField={updateField} />
+                    {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min='0' max='500' placeholder='Height(px)' updateField={updateField} />}
+                    <CheckBox value={config.table.expanded} section='table' fieldName='expanded' label='Expanded by Default' updateField={updateField} />
+                    {isDashboard && <CheckBox value={config.table.showDataTableLink} section='table' fieldName='showDataTableLink' label='Show Data Table Name & Link' updateField={updateField} />}
+                    {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' updateField={updateField} />}
+                    <CheckBox value={config.table.download} section='table' fieldName='download' label='Show Download CSV Link' updateField={updateField} />
+                    {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
+                    {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
+                  </AccordionItemPanel>
+                </AccordionItem>
+              )}
             </Accordion>
           </form>
           {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}

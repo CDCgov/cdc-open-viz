@@ -135,23 +135,27 @@ const DataTable = props => {
   }
 
   const DownloadButton = memo(() => {
-    const csvData = Papa.unparse(rawData)
+    if (rawData !== undefined) {
+      const csvData = Papa.unparse(rawData)
 
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
 
-    const saveBlob = () => {
-      //@ts-ignore
-      if (typeof window.navigator.msSaveBlob === 'function') {
+      const saveBlob = () => {
         //@ts-ignore
-        navigator.msSaveBlob(blob, fileName)
+        if (typeof window.navigator.msSaveBlob === 'function') {
+          //@ts-ignore
+          navigator.msSaveBlob(blob, fileName)
+        }
       }
-    }
 
-    return (
-      <a download={fileName} type='button' onClick={saveBlob} href={URL.createObjectURL(blob)} aria-label='Download this data in a CSV file format.' className={`${headerColor} no-border`} id={`${skipId}`} data-html2canvas-ignore role='button'>
-        Download Data (CSV)
-      </a>
-    )
+      return (
+        <a download={fileName} type='button' onClick={saveBlob} href={URL.createObjectURL(blob)} aria-label='Download this data in a CSV file format.' className={`${headerColor} no-border`} id={`${skipId}`} data-html2canvas-ignore role='button'>
+          Download Data (CSV)
+        </a>
+      )
+    } else {
+      return <></>
+    }
   }, [rawData])
 
   // Change accessibility label depending on expanded status
@@ -169,8 +173,22 @@ const DataTable = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded])
 
-  if (config.visualizationType !== 'Box Plot' && !config.data) return <Loading />
-  if (config.visualizationType === 'Box Plot' && !config.boxplot) return <Loading />
+  //debugger
+
+  switch (config.visualizationType) {
+    case 'Box Plot':
+      if (!config.boxplot) return <Loading />
+      break
+    case 'Combo':
+      if (!config.data) return <Loading />
+      break
+    case 'Line' || 'Bar' || 'Pie' || 'Deviation Bar' || 'Paired Bar':
+      if (!runtimeData) return <Loading />
+      break
+    default:
+      if (!runtimeData) return <Loading />
+      break
+  }
 
   const rows = Object.keys(runtimeData)
     //.filter(row => applyLegendToRow(runtimeData[row]))
@@ -184,6 +202,7 @@ const DataTable = props => {
       if (sortVal < 0) return 1
       return -1
     })
+  console.log('## ROWS = ', rows)
 
   function genMapHeader(columns) {
     return (
@@ -272,11 +291,20 @@ const DataTable = props => {
     return allrows
   }
 
+  //debugger
+
   const dataSeriesColumns = () => {
-    let tmpSeriesColumns = [config.xAxis.dataKey]
-    config.series.forEach(element => {
-      tmpSeriesColumns.push(element.dataKey)
-    })
+    //debugger
+    let tmpSeriesColumns
+    if (config.visualizationType !== 'Pie') {
+      tmpSeriesColumns = [config.xAxis.dataKey] //, ...config.runtime.seriesLabelsAll
+      config.series.forEach(element => {
+        tmpSeriesColumns.push(element.dataKey)
+      })
+    } else {
+      tmpSeriesColumns = [config.xAxis.dataKey, config.yAxis.dataKey] //Object.keys(runtimeData[0])
+    }
+
     // then add the additional Columns
     if (Object.keys(config.columns).length > 1) {
       Object.keys(config.columns).forEach(function (key) {
@@ -287,6 +315,7 @@ const DataTable = props => {
         }
       })
     }
+    console.log('##tmpSeriesCols=', tmpSeriesColumns)
     return tmpSeriesColumns
   }
 
@@ -347,10 +376,11 @@ const DataTable = props => {
           {dataSeriesColumns()
             //.filter(column => columns[column].dataTable === true && columns[column].name)
             .map(column => {
+              //debugger
               let cellValue
               if (column === config.xAxis.dataKey) {
                 const rowObj = runtimeData[row]
-                const legendColor = applyLegendToRow(rowObj)
+                //const legendColor = applyLegendToRow(rowObj)
                 var labelValue = rowObj[column]
                 labelValue = getCellAnchor(labelValue, rowObj)
                 // no colors on row headers for charts bc it's Date not data
@@ -463,7 +493,7 @@ const DataTable = props => {
             {tableTitle}
           </div>
           <div className='table-container' style={limitHeight}>
-            <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={config?.data.length ? config.data.length : '-1'}>
+            <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={config?.data?.length ? config.data.length : '-1'}>
               <caption className='cdcdataviz-sr-only'>{caption}</caption>
               <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{config.type === 'map' ? genMapHeader(columns) : genChartHeader(columns, runtimeData)}</thead>
               <tbody>{config.type === 'map' ? genMapRows(rows) : genChartRows(rows)}</tbody>
