@@ -150,5 +150,6 @@ export default {
     accent: true,
     background: true
   },
-  filterBehavior: 'Filter Change'
+  filterBehavior: 'Filter Change',
+  highlightedBarValues: []
 }

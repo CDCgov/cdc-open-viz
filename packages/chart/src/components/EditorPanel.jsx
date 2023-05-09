@@ -19,6 +19,7 @@ import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import * as allCurves from '@visx/curve'
 import { useFilters } from '@cdc/core/components/Filters'
+import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -822,6 +823,17 @@ const EditorPanel = () => {
   }
 
   const chartsWithOptions = ['Area Chart', 'Combo', 'Line']
+
+  // prettier-ignore
+  const {
+    highlightedBarValues,
+    highlightedSeriesValues,
+    handleUpdateHighlightedBar,
+    handleAddNewHighlightedBar,
+    handleRemoveHighlightedBar,
+    handleUpdateHighlightedBarColor,
+    handleHighlightedBarLegendLabel
+     } = useHighlightedBars(config, updateConfig)
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -1793,6 +1805,42 @@ const EditorPanel = () => {
                           <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
                           <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />
                           <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
+                        </>
+                      )}
+
+                      {config.series?.length === 1 && config.visualizationType === 'Bar' && (
+                        <>
+                          {/* HIGHLIGHTED BARS */}
+                          <label htmlFor='barHighlight'>Bar Highlighting</label>
+                          {config.series.length === 1 &&
+                            highlightedBarValues.map((highlightedBarValue, i) => (
+                              <fieldset>
+                                <div className='edit-block' key={`highlighted-bar-${i}`}>
+                                  <button className='remove-column' onClick={e => handleRemoveHighlightedBar(e, i)}>
+                                    Remove
+                                  </button>
+                                  <p>Highlighted Bar {i + 1}</p>
+                                  <label>
+                                    <span className='edit-label column-heading'>Value</span>
+                                    <select value={config.highlightedBarValues[i].value} onChange={e => handleUpdateHighlightedBar(e, i)}>
+                                      <option value=''>- Select Value -</option>
+                                      {highlightedSeriesValues && [...new Set(highlightedSeriesValues)].sort().map(option => <option key={`special-class-value-option-${i}-${option}`}>{option}</option>)}
+                                    </select>
+                                  </label>
+                                  <label>
+                                    <span className='edit-label column-heading'>Color</span>
+                                    <input type='text' value={config.highlightedBarValues[i].color ? config.highlightedBarValues[i].color : ''} onChange={e => handleUpdateHighlightedBarColor(e, i)} />
+                                  </label>
+                                  <label>
+                                    <span className='edit-label column-heading'>Legend Label</span>
+                                    <input type='text' value={config.highlightedBarValues[i].legendLabel ? config.highlightedBarValues[i].legendLabel : ''} onChange={e => handleHighlightedBarLegendLabel(e, i)} />
+                                  </label>
+                                </div>
+                              </fieldset>
+                            ))}
+                          <button className='btn full-width' onClick={e => handleAddNewHighlightedBar(e)}>
+                            Add Highlighted Bar
+                          </button>
                         </>
                       )}
                     </>
