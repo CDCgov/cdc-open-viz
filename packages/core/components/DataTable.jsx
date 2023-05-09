@@ -504,8 +504,7 @@ const DataTable = props => {
       </ErrorBoundary>
     )
   } else {
-    console.log('COVE: BOX PLOT detected')
-    console.log('table data=', tableData)
+    // Render Data Table for Box Plots
     function genBoxplotHeader(categories) {
       let columns = ['Measures', ...categories]
       return (
@@ -547,7 +546,6 @@ const DataTable = props => {
       return resolvedName
     }
     let resolveCell = (rowid, plot) => {
-      console.log('row,plot', rowid, plot)
       if (Number(rowid) === 0) return true
       if (Number(rowid) === 1) return plot.columnMax
       if (Number(rowid) === 2) return plot.columnThirdQuartile
@@ -562,15 +560,12 @@ const DataTable = props => {
       return <p>-</p>
     }
     function genBoxplotRows(rows) {
+      // get list of data keys for each row
       let dataKeys = rows.map(row => {
-        //Object.keys(rows[0]) // get data keys for each row
-        console.log('keys =', row[0])
         return row[0]
       })
-      console.log('dataKeys=', dataKeys)
       let columns = ['Measures', ...config.boxplot.categories]
       const allrows = dataKeys.map((rowkey, index) => {
-        console.log('##row=', rowkey)
         if (index === 0) return '' // we did header column separately
         let rowClass = `row-Box-Plot--${index}`
         return (
@@ -578,17 +573,13 @@ const DataTable = props => {
             {columns.map((column, colnum) => {
               let cellValue
               if (column === 'Measures') {
-                //const rowObj = runtimeData[row]
-                let labelValue = index > 0 ? resolveName(rowkey) : '' //rowObj[column]
+                let labelValue = index > 0 ? resolveName(rowkey) : ''
                 cellValue = <>{labelValue}</>
               } else {
-                console.log('index,colnum', index, colnum)
                 cellValue = resolveCell(index, config.boxplot.plots[colnum - 1])
               }
-
-              console.log('rowClass=', rowClass)
               return (
-                <td tabIndex='0' key={`tbody__tr__td-${index}`} role='gridcell'>
+                <td tabIndex='0' key={`tbody__tr__td-${index}`} className='boxplot-td' role='gridcell'>
                   {cellValue}
                 </td>
               )
