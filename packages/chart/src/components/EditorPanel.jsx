@@ -1989,6 +1989,42 @@ const EditorPanel = () => {
                           <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
                         </>
                       )}
+
+                      {config.series?.length === 1 && config.visualizationType === 'Bar' && (
+                        <>
+                          {/* HIGHLIGHTED BARS */}
+                          <label htmlFor='barHighlight'>Bar Highlighting</label>
+                          {config.series.length === 1 &&
+                            highlightedBarValues.map((highlightedBarValue, i) => (
+                              <fieldset>
+                                <div className='edit-block' key={`highlighted-bar-${i}`}>
+                                  <button className='remove-column' onClick={e => handleRemoveHighlightedBar(e, i)}>
+                                    Remove
+                                  </button>
+                                  <p>Highlighted Bar {i + 1}</p>
+                                  <label>
+                                    <span className='edit-label column-heading'>Value</span>
+                                    <select value={config.highlightedBarValues[i].value} onChange={e => handleUpdateHighlightedBar(e, i)}>
+                                      <option value=''>- Select Value -</option>
+                                      {highlightedSeriesValues && [...new Set(highlightedSeriesValues)].sort().map(option => <option key={`special-class-value-option-${i}-${option}`}>{option}</option>)}
+                                    </select>
+                                  </label>
+                                  <label>
+                                    <span className='edit-label column-heading'>Color</span>
+                                    <input type='text' value={config.highlightedBarValues[i].color ? config.highlightedBarValues[i].color : ''} onChange={e => handleUpdateHighlightedBarColor(e, i)} />
+                                  </label>
+                                  <label>
+                                    <span className='edit-label column-heading'>Legend Label</span>
+                                    <input type='text' value={config.highlightedBarValues[i].legendLabel ? config.highlightedBarValues[i].legendLabel : ''} onChange={e => handleHighlightedBarLegendLabel(e, i)} />
+                                  </label>
+                                </div>
+                              </fieldset>
+                            ))}
+                          <button className='btn full-width' onClick={e => handleAddNewHighlightedBar(e)}>
+                            Add Highlighted Bar
+                          </button>
+                        </>
+                      )}
                     </>
                   )}
 
@@ -2269,99 +2305,99 @@ const EditorPanel = () => {
                       {/* Whether filters should apply onChange or Apply Button */}
 
                       {config.filters.map((filter, index) => {
-                        if(filter.type === 'url') return <></>
+                        if (filter.type === 'url') return <></>
 
                         return (
-                        <fieldset className='edit-block' key={index}>
-                          <button
-                            type='button'
-                            className='remove-column'
-                            onClick={() => {
-                              removeFilter(index)
-                            }}
-                          >
-                            Remove
-                          </button>
-                          <label>
-                            <span className='edit-label column-heading'>Filter</span>
-                            <select
-                              value={filter.columnName}
-                              onChange={e => {
-                                updateFilterProp('columnName', index, e.target.value)
+                          <fieldset className='edit-block' key={index}>
+                            <button
+                              type='button'
+                              className='remove-column'
+                              onClick={() => {
+                                removeFilter(index)
                               }}
                             >
-                              <option value=''>- Select Option -</option>
-                              {getFilters(true).map((dataKey, index) => (
-                                <option value={dataKey} key={index}>
-                                  {dataKey}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-
-                          <label>
-                            <span className='edit-label column-heading'>Filter Style</span>
-
-                            <select
-                              value={filter.filterStyle}
-                              onChange={e => {
-                                updateFilterProp('filterStyle', index, e.target.value)
-                              }}
-                            >
-                              {filterStyleOptions.map(item => {
-                                return <option value={item}>{item}</option>
-                              })}
-                            </select>
-                          </label>
-                          <label>
-                            <span className='edit-label column-heading'>Label</span>
-                            <input
-                              type='text'
-                              value={filter.label}
-                              onChange={e => {
-                                updateFilterProp('label', index, e.target.value)
-                              }}
-                            />
-                          </label>
-
-                          <label>
-                            <span className='edit-filterOrder column-heading'>Filter Order</span>
-                            <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
-                              {filterOrderOptions.map((option, index) => {
-                                return (
-                                  <option value={option.value} key={`filter-${index}`}>
-                                    {option.label}
+                              Remove
+                            </button>
+                            <label>
+                              <span className='edit-label column-heading'>Filter</span>
+                              <select
+                                value={filter.columnName}
+                                onChange={e => {
+                                  updateFilterProp('columnName', index, e.target.value)
+                                }}
+                              >
+                                <option value=''>- Select Option -</option>
+                                {getFilters(true).map((dataKey, index) => (
+                                  <option value={dataKey} key={index}>
+                                    {dataKey}
                                   </option>
-                                )
-                              })}
-                            </select>
+                                ))}
+                              </select>
+                            </label>
 
-                            {filter.order === 'cust' && (
-                              <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, config.filters[index])}>
-                                <Droppable droppableId='filter_order'>
-                                  {provided => (
-                                    <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-                                      {config.filters[index]?.values.map((value, index) => {
-                                        return (
-                                          <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
-                                            {(provided, snapshot) => (
-                                              <li>
-                                                <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                  {value}
-                                                </div>
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        )
-                                      })}
-                                      {provided.placeholder}
-                                    </ul>
-                                  )}
-                                </Droppable>
-                              </DragDropContext>
-                            )}
-                          </label>
-                        </fieldset>
+                            <label>
+                              <span className='edit-label column-heading'>Filter Style</span>
+
+                              <select
+                                value={filter.filterStyle}
+                                onChange={e => {
+                                  updateFilterProp('filterStyle', index, e.target.value)
+                                }}
+                              >
+                                {filterStyleOptions.map(item => {
+                                  return <option value={item}>{item}</option>
+                                })}
+                              </select>
+                            </label>
+                            <label>
+                              <span className='edit-label column-heading'>Label</span>
+                              <input
+                                type='text'
+                                value={filter.label}
+                                onChange={e => {
+                                  updateFilterProp('label', index, e.target.value)
+                                }}
+                              />
+                            </label>
+
+                            <label>
+                              <span className='edit-filterOrder column-heading'>Filter Order</span>
+                              <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
+                                {filterOrderOptions.map((option, index) => {
+                                  return (
+                                    <option value={option.value} key={`filter-${index}`}>
+                                      {option.label}
+                                    </option>
+                                  )
+                                })}
+                              </select>
+
+                              {filter.order === 'cust' && (
+                                <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, config.filters[index])}>
+                                  <Droppable droppableId='filter_order'>
+                                    {provided => (
+                                      <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
+                                        {config.filters[index]?.values.map((value, index) => {
+                                          return (
+                                            <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
+                                              {(provided, snapshot) => (
+                                                <li>
+                                                  <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                    {value}
+                                                  </div>
+                                                </li>
+                                              )}
+                                            </Draggable>
+                                          )
+                                        })}
+                                        {provided.placeholder}
+                                      </ul>
+                                    )}
+                                  </Droppable>
+                                </DragDropContext>
+                              )}
+                            </label>
+                          </fieldset>
                         )
                       })}
                     </ul>

@@ -187,9 +187,9 @@ const Legend = () => {
                   </LegendItem>
                 )
               })}
+
               {highLightedLegendItems.map((bar, i) => {
                 // if duplicates only return first item
-
                 let className = 'legend-item'
                 let itemName = bar.legendLabel
 
@@ -197,7 +197,6 @@ const Legend = () => {
                 if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
                   className += ' inactive'
                 }
-
                 return (
                   <LegendItem
                     className={className}
@@ -212,9 +211,9 @@ const Legend = () => {
                       highlight(bar.legendLabel)
                     }}
                   >
-                    <LegendCircle fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />
+                    <LegendCircle fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />{' '}
                     <LegendLabel align='left' margin='0 0 0 4px'>
-                      {bar.legendLabel ? bar.legendLabel : ''}
+                      {bar.legendLabel ? bar.legendLabel : bar.value}
                     </LegendLabel>
                   </LegendItem>
                 )
