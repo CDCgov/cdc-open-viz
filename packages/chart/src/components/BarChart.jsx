@@ -6,10 +6,11 @@ import chroma from 'chroma-js'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
+import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, getTextWidth, parseDate } = useContext(ConfigContext)
-
+  const { HighLightedBarUtils } = useHighlightedBars(config)
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
@@ -313,6 +314,19 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     left={config.runtime.horizontal ? 0 : (xMax / barGroups.length) * barGroup.index}
                   >
                     {barGroup.bars.map((bar, index) => {
+                      const getHighlightedBarColorByValue = value => {
+                        const match = config?.highlightedBarValues.filter(item => {
+                          if (!item.value) return
+                          return config.xAxis.type === 'date' ? formatDate(parseDate(item.value)) === value : item.value === value
+                        })[0]
+
+                        if (!match?.color) return `rgba(255, 102, 1)`
+                        return match.color
+                      }
+                      let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
+
+                      highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
+
                       let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                       let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                       let barHeight = orientation === 'horizontal' ? config.barHeight : isNumber(Math.abs(yScale(bar.value) - yScale(0))) ? Math.abs(yScale(bar.value) - yScale(0)) : 0
@@ -357,9 +371,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       let labelColor = '#000000'
 
                       // Set label color
-                      if (chroma.contrast(labelColor, barColor) < 4.9) {
-                        textFits ? (labelColor = '#FFFFFF') : '#000000'
+                      if (barColor && labelColor) {
+                        if (chroma.contrast(labelColor, barColor) < 4.9) {
+                          labelColor = textFits ? '#FFFFFF' : '#000000'
+                        }
                       }
+
+                      // Set if background is transparent'
+                      labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor)
 
                       // control text position
                       let textAnchor = textFits ? 'end' : 'start'
@@ -395,6 +414,25 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       ${xAxisTooltip}
                         </div>`
 
+                      const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
+                      const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
+                      const isHighlightedBar = config.orientation === 'vertical' ? highlightedBarValues?.includes(xAxisValue) : highlightedBarValues?.includes(yAxisValue)
+                      const highlightedBarColor = getHighlightedBarColorByValue(yAxisValue)
+
+                      const background = isRegularLollipopColor ? barColor : isTwoToneLollipopColor ? chroma(barColor).brighten(1) : isHighlightedBar ? 'transparent' : barColor
+
+                      const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
+
+                      const borderWidth = isHighlightedBar ? barBorderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
+
+                      const finalStyle = {
+                        background,
+                        borderColor,
+                        borderStyle: 'solid',
+                        borderWidth,
+                        ...style
+                      }
+
                       return (
                         <Group key={`${barGroup.index}--${index}--${orientation}`}>
                           {/* This feels gross but inline transition was not working well*/}
@@ -414,11 +452,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               y={config.runtime.horizontal ? barWidth * bar.index : barY}
                               width={config.runtime.horizontal ? barWidthHorizontal : barWidth}
                               height={isHorizontal && !config.isLollipopChart ? barWidth : isHorizontal && config.isLollipopChart ? lollipopBarWidth : barHeight}
-                              style={{
-                                background: config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : barColor,
-                                border: `${config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`,
-                                ...style
-                              }}
+                              style={finalStyle}
                               opacity={transparentBar ? 0.5 : 1}
                               display={displayBar ? 'block' : 'none'}
                               data-tooltip-html={tooltip}
