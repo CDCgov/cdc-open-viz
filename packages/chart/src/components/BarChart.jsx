@@ -167,7 +167,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       `}
                       </style>
                       <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className='stack vertical'>
-                        <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barThickness * bar.index + offset} y={bar.y - 5} fill={bar.color} textAnchor='middle'>
+                        <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barThickness * bar.index + offset} y={bar.y - 5} fill={'#000'} textAnchor='middle'>
                           {yAxisValue}
                         </Text>
                         <foreignObject
@@ -496,7 +496,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             )}
 
                             {orientation === 'vertical' && (
-                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
+                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={labelColor} textAnchor='middle'>
                                 {yAxisValue}
                               </Text>
                             )}
