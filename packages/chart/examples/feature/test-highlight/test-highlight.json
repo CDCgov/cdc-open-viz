@@ -1,0 +1,100 @@
+{
+  "type": "chart",
+  "title": "Example Line Chart",
+  "theme": "theme-green",
+  "fontSize": "medium",
+  "height": "375",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "size": "75",
+    "gridLines": false,
+    "label": "Y-Axis Example Label",
+    "numTicks": "9"
+  },
+  "barThickness": 0.35,
+  "xAxis": {
+    "size": "77",
+    "tickRotation": "25",
+    "dataKey": "Date",
+    "label": "X-Axis Example Label",
+    "type": "date",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "download": true
+  },
+  "legend": {
+    "behavior": "isolate",
+    "position": "right",
+    "label": "Type of Data"
+  },
+  "palette": "qualitative-bold",
+  "labels": false,
+  "dataFormat": {},
+  "confidenceKeys": {},
+  "data": [
+    {
+      "Date": "1/15/2016",
+      "Data 1": "foo",
+      "Data 2": "135",
+      "Data 3": "300",
+      "Data 4": "95",
+      "Data 5": "120",
+      "Data 6": "310"
+    },
+    {
+      "Date": "2/15/2016",
+      "Data 1": "40",
+      "Data 2": "90",
+      "Data 3": "240",
+      "Data 4": "60",
+      "Data 5": "160",
+      "Data 6": "200"
+    },
+    {
+      "Date": "3/15/2016",
+      "Data 1": "50",
+      "Data 2": "300",
+      "Data 3": "290",
+      "Data 4": "100",
+      "Data 5": "200",
+      "Data 6": "250"
+    },
+    {
+      "Date": "4/15/2016",
+      "Data 1": "120",
+      "Data 2": "160",
+      "Data 3": "230",
+      "Data 4": "180",
+      "Data 5": "160",
+      "Data 6": "220"
+    },
+    {
+      "Date": "5/15/2016",
+      "Data 1": "80",
+      "Data 2": "350",
+      "Data 3": "300",
+      "Data 4": "150",
+      "Data 5": "130",
+      "Data 6": "100"
+    },
+    {
+      "Date": "6/15/2016",
+      "Data 1": "90",
+      "Data 2": "220",
+      "Data 3": "320",
+      "Data 4": "100",
+      "Data 5": "220",
+      "Data 6": "300"
+    }
+  ],
+  "visualizationType": "Bar",
+  "orientation": "horizontal",
+  "series": []
+}

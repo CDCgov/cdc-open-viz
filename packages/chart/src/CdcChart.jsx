@@ -144,18 +144,111 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }
 
+  const reloadURLData = async () => {
+    if (config.dataUrl) {
+      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl)
+      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+
+      let isUpdateNeeded = false
+      config.filters.forEach(filter => {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+          qsParams[filter.queryParameter] = filter.active
+          isUpdateNeeded = true
+        }
+      })
+
+      if ((!config.formattedData || config.formattedData.urlFiltered) && !isUpdateNeeded) return
+
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+        .map((param, i) => {
+          let qs = i === 0 ? '?' : '&'
+          qs += param + '='
+          qs += qsParams[param]
+          return qs
+        })
+        .join('')}`
+
+      let data
+
+      try {
+        const regex = /(?:\.([^.]+))?$/
+
+        const ext = regex.exec(dataUrl.pathname)[1]
+        if ('csv' === ext) {
+          data = await fetch(dataUrlFinal)
+            .then(response => response.text())
+            .then(responseText => {
+              const parsedCsv = Papa.parse(responseText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+              })
+              return parsedCsv.data
+            })
+        } else if ('json' === ext) {
+          data = await fetch(dataUrlFinal).then(response => response.json())
+        } else {
+          data = []
+        }
+      } catch {
+        console.error(`Cannot parse URL: ${dataUrlFinal}`)
+        data = []
+      }
+
+      if (config.dataDescription) {
+        data = transform.autoStandardize(data)
+        data = transform.developerStandardize(data, config.dataDescription)
+      }
+
+      Object.assign(data, { urlFiltered: true })
+
+      updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
+
+      if (data) {
+        setStateData(data)
+        setExcludedData(data)
+        setFilteredData(filterData(config.filters, data))
+      }
+    }
+  }
+
   const handleLineType = lineType => {
     switch (lineType) {
       case 'dashed-sm':
         return '5 5'
+      case 'Dashed Small':
+        return '5 5'
       case 'dashed-md':
         return '10 5'
+      case 'Dashed Medium':
+        return '10 5'
       case 'dashed-lg':
+        return '15 5'
+      case 'Dashed Large':
         return '15 5'
       default:
         return 0
     }
   }
+
+  const lineOptions = [
+    {
+      value: 'Dashed Small',
+      key: 'dashed-sm'
+    },
+    {
+      value: 'Dashed Medium',
+      key: 'dashed-md'
+    },
+    {
+      value: 'Dashed Large',
+      key: 'dashed-lg'
+    },
+    {
+      value: 'Solid Line',
+      key: 'solid-line'
+    }
+  ]
 
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
@@ -163,7 +256,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {}
 
-    if (response.dataUrl) {
+    const urlFilters = response.filters ? (response.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
+
+    if (response.dataUrl && !urlFilters) {
       try {
         const regex = /(?:\.([^.]+))?$/
 
@@ -261,7 +356,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
-        newConfig.filters[index].active = filterValues[0]
+
+        newConfig.filters[index].active = newConfig.filters[index].active || filterValues[0]
+        newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
       })
       currentData = filterData(newConfig.filters, newExcludedData)
       setFilteredData(currentData)
@@ -457,14 +554,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     data.forEach(row => {
       let add = true
-      filters.forEach(filter => {
-        if (row[filter.columnName] !== filter.active) {
-          add = false
-        }
-      })
+      filters
+        .filter(filter => filter.type !== 'url')
+        .forEach(filter => {
+          if (row[filter.columnName] != filter.active) {
+            add = false
+          }
+        })
 
       if (add) filteredData.push(row)
     })
+
     return filteredData
   }
 
@@ -538,6 +638,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   useEffect(() => {
     loadConfig()
   }, []) // eslint-disable-line
+
+  useEffect(() => {
+    reloadURLData()
+  }, [JSON.stringify(config.filters)])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
@@ -673,10 +777,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
 
-  const parseDate = dateString => {
+  const parseDate = (dateString, showError = true) => {
     let date = timeParse(config.runtime[section].dateParseFormat)(dateString)
     if (!date) {
-      config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
+      if (showError) {
+        config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
+      }
       return new Date()
     } else {
       return date
@@ -697,8 +803,26 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return Math.ceil(context.measureText(text).width)
   }
 
+  const abbreviateNumber = num => {
+    let unit = ''
+    let absNum = Math.abs(num)
+
+    if (absNum >= 1e9) {
+      unit = 'B'
+      num = num / 1e9
+    } else if (absNum >= 1e6) {
+      unit = 'M'
+      num = num / 1e6
+    } else if (absNum >= 1e3) {
+      unit = 'K'
+      num = num / 1e3
+    }
+
+    return num + unit
+  }
+
   // Format numeric data based on settings in config
-  const formatNumber = (num, axis) => {
+  const formatNumber = (num, axis, shouldAbbreviate = false) => {
     // if num is NaN return num
     if (isNaN(num) || !num) return num
     // Check if the input number is negative
@@ -713,8 +837,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let {
       dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix, bottomPrefix, bottomSuffix, bottomAbbreviated }
     } = config
-
-    let formatSuffix = format('.2s')
 
     // check if value contains comma and remove it. later will add comma below.
     if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
@@ -768,19 +890,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     //
     // Edge case for small numbers with decimals
     // - if roundTo undefined which means it is blank, then do not round
-    if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
+
+    if ((axis === 'left' && commas && abbreviated && shouldAbbreviate) || (axis === 'bottom' && commas && abbreviated && shouldAbbreviate)) {
       num = num // eslint-disable-line
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
     }
     let result = ''
 
-    if (abbreviated && axis === 'left') {
-      num = formatSuffix(parseFloat(num)).replace('G', 'B')
+    if (abbreviated && axis === 'left' && shouldAbbreviate) {
+      num = abbreviateNumber(parseFloat(num))
     }
 
-    if (bottomAbbreviated && axis === 'bottom') {
-      num = formatSuffix(parseFloat(num)).replace('G', 'B')
+    if (bottomAbbreviated && axis === 'bottom' && shouldAbbreviate) {
+      num = abbreviateNumber(parseFloat(num))
     }
 
     if (prefix && axis === 'left') {
@@ -964,7 +1087,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} />}
+            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} isNumber={isNumber} dimensions={dimensions} />}
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
@@ -1079,6 +1202,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     filterData,
     imageId,
     handleLineType,
+    lineOptions,
     isNumber,
     getTextWidth,
     twoColorPalette,

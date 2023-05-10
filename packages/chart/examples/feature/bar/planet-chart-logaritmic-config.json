@@ -1,29 +1,29 @@
 {
   "type": "chart",
-  "title": "Combo Bar-Line Chart",
+  "title": "Planet Radius (Combo Example)",
   "showTitle": true,
-  "theme": "theme-purple",
-  "animate": true,
-  "fontSize": "medium",
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "small",
   "lineDatapointStyle": "hover",
-  "barHasBorder": "false",
+  "barHasBorder": "true",
   "isLollipopChart": false,
   "lollipopShape": "circle",
   "lollipopColorStyle": "two-tone",
   "visualizationSubType": "regular",
-  "barStyle": "",
+  "barStyle": "flat",
   "roundingStyle": "standard",
   "tipRounding": "top",
   "padding": {
-    "left": 5,
-    "right": 5
+    "left": 0,
+    "right": 0
   },
   "yAxis": {
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "68",
+    "size": "123",
     "gridLines": true,
     "enablePadding": false,
     "min": "",
@@ -41,7 +41,8 @@
     "numTicks": "",
     "axisPadding": 0,
     "tickRotation": 0,
-    "label": "Y-Axis Label Example"
+    "label": "Measurement (1000km)",
+    "labelPlacement": "On Date/Category Axis"
   },
   "boxplot": {
     "plots": [],
@@ -68,7 +69,9 @@
       "iqr": "Interquartile Range",
       "total": "Total",
       "outliers": "Outliers",
-      "values": "Values"
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
     }
   },
   "topAxis": {
@@ -83,14 +86,14 @@
     "horizontal": 750
   },
   "xAxis": {
-    "type": "date",
+    "type": "categorical",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "78",
-    "tickRotation": "25",
+    "size": 75,
+    "tickRotation": 0,
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -100,24 +103,22 @@
     "labelOffset": 65,
     "axisPadding": 0,
     "target": 0,
-    "dataKey": "Date",
-    "label": "X-Axis Example Label",
-    "dateParseFormat": "%d/%m/%Y",
-    "dateDisplayFormat": "%d/%m/%Y"
+    "label": "Planet",
+    "dataKey": "name"
   },
   "table": {
     "label": "Data Table",
-    "expanded": true,
+    "expanded": false,
     "limitHeight": false,
     "height": "",
     "caption": "",
     "showDownloadUrl": false,
-    "download": true,
+    "showDataTableLink": true,
     "show": true
   },
   "orientation": "vertical",
   "legend": {
-    "behavior": "highlight",
+    "behavior": "isolate",
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
@@ -126,29 +127,28 @@
     "dynamicLegendDefaultText": "Show All",
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
-    "dynamicLegendChartMessage": "Select Options from the Legend",
-    "position": "right",
-    "label": "Data Type"
+    "dynamicLegendChartMessage": "Select Options from the Legend"
   },
   "exclusions": {
     "active": false,
     "keys": []
   },
-  "palette": "qualitative-soft",
+  "palette": "qualitative3",
   "isPaletteReversed": false,
   "twoColor": {
     "palette": "monochrome-1",
     "isPaletteReversed": false
   },
-  "labels": false,
+  "labels": true,
   "dataFormat": {
     "commas": false,
     "prefix": "",
     "suffix": "",
-    "abbreviated": false,
+    "abbreviated": true,
     "bottomSuffix": "",
     "bottomPrefix": "",
-    "bottomAbbreviated": false
+    "bottomAbbreviated": false,
+    "roundTo": 1
   },
   "confidenceKeys": {},
   "visual": {
@@ -156,122 +156,15 @@
     "accent": true,
     "background": true
   },
-  "height": "332",
-  "data": [
-    {
-      "Date": "1/15/2016",
-      "Data 1": "$1,000",
-      "Data 2": "110",
-      "Data 3": "100",
-      "Data 4": "90",
-      "Monthly-Goal": "100"
-    },
-    {
-      "Date": "2/15/2016",
-      "Data 1": "100",
-      "Data 2": "110",
-      "Data 3": "100",
-      "Data 4": "100",
-      "Monthly-Goal": "100"
-    },
-    {
-      "Date": "3/15/2016",
-      "Data 1": "80",
-      "Data 2": "90",
-      "Data 3": "100",
-      "Data 4": "120",
-      "Monthly-Goal": "110"
-    },
-    {
-      "Date": "4/15/2016",
-      "Data 1": "80",
-      "Data 2": "90",
-      "Data 3": "110",
-      "Data 4": "120",
-      "Monthly-Goal": "110"
-    },
-    {
-      "Date": "5/15/2016",
-      "Data 1": "70",
-      "Data 2": "90",
-      "Data 3": "110",
-      "Data 4": "130",
-      "Monthly-Goal": "120"
-    },
-    {
-      "Date": "6/15/2016",
-      "Data 1": "100",
-      "Data 2": "120",
-      "Data 3": "120",
-      "Data 4": "130",
-      "Monthly-Goal": "120"
-    },
-    {
-      "Date": "7/15/2016",
-      "Data 1": "110",
-      "Data 2": "140",
-      "Data 3": "120",
-      "Data 4": "130",
-      "Monthly-Goal": "130"
-    },
-    {
-      "Date": "8/15/2016",
-      "Data 1": "110",
-      "Data 2": "130",
-      "Data 3": "120",
-      "Data 4": "140",
-      "Monthly-Goal": "130"
-    },
-    {
-      "Date": "9/15/2016",
-      "Data 1": "120",
-      "Data 2": "130",
-      "Data 3": "120",
-      "Data 4": "150",
-      "Monthly-Goal": "140"
-    }
-  ],
-  "visualizationType": "Combo",
+  "useLogScale": true,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "Data 1",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Data 2",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Data 3",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Data 4",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Monthly-Goal",
-      "type": "dashed-md",
-      "axis": "Left"
+      "dataKey": "Radius",
+      "type": "Line"
     }
   ],
-  "filters": [
-    {
-      "values": [
-        "1/15/2016",
-        "2/15/2016",
-        "3/15/2016",
-        "4/15/2016",
-        "5/15/2016",
-        "6/15/2016",
-        "7/15/2016",
-        "8/15/2016",
-        "9/15/2016"
-      ],
-      "active": "1/15/2016",
-      "order": "asc",
-      "columnName": "Date",
-      "filterBehavior": "dropdown"
-    }
-  ]
+  "dataUrl": "/examples/feature/__data__/planet-logaritmic-data.json",
+  "visualizationType": "Bar"
 }
