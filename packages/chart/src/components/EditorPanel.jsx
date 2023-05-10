@@ -859,10 +859,10 @@ const EditorPanel = () => {
     </option>
   ]
 
-  if (config.data) {
+  if (config.data && config.series) {
     Object.keys(config.data[0]).map(colName => {
       // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
-      const found = config.series.some(el => el.dataKey === colName)
+      const found = config?.series.some(el => el.dataKey === colName)
       if (colName !== config.xAxis.dataKey && !found) {
         // if not the index then add it
         return columnsOptions.push(

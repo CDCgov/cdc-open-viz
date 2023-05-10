@@ -2467,7 +2467,7 @@ const EditorPanel = props => {
                       }
                     />
                     <TextField
-                      value={table.caption}
+                      value={state.table.caption}
                       updateField={updateField}
                       section='table'
                       fieldName='caption'
