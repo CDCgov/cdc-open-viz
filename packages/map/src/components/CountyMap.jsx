@@ -235,7 +235,7 @@ const CountyMap = props => {
         }
       }
 
-      if (hoveredGeo) {
+      if (hoveredGeo && applyLegendToRow(hoveredGeo)) {
         tooltipRef.current.style.display = 'block'
         tooltipRef.current.style.top = e.clientY + 'px'
         tooltipRef.current.style.left = e.clientX + 'px'
