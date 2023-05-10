@@ -173,8 +173,6 @@ const DataTable = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded])
 
-  //debugger
-
   switch (config.visualizationType) {
     case 'Box Plot':
       if (!config.boxplot) return <Loading />
@@ -202,7 +200,7 @@ const DataTable = props => {
       if (sortVal < 0) return 1
       return -1
     })
-
+  /* 
   function genMapHeader(columns) {
     return (
       <tr>
@@ -245,7 +243,7 @@ const DataTable = props => {
           })}
       </tr>
     )
-  }
+  } */
 
   function genMapRows(rows) {
     const allrows = rows.map(row => {
@@ -290,10 +288,7 @@ const DataTable = props => {
     return allrows
   }
 
-  //debugger
-
   const dataSeriesColumns = () => {
-    //debugger
     let tmpSeriesColumns
     if (config.visualizationType !== 'Pie') {
       tmpSeriesColumns = [config.xAxis.dataKey] //, ...config.runtime.seriesLabelsAll
@@ -374,7 +369,6 @@ const DataTable = props => {
           {dataSeriesColumns()
             //.filter(column => columns[column].dataTable === true && columns[column].name)
             .map(column => {
-              //debugger
               let cellValue
               if (column === config.xAxis.dataKey) {
                 const rowObj = runtimeData[row]
@@ -402,14 +396,18 @@ const DataTable = props => {
     return allrows
   }
 
-  const limitHeight = config.type === 'chart' ? { maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' } : { maxHeight: config.dataTable.limitHeight && `${config.dataTable.height}px`, overflowY: 'scroll' }
-  const caption = () => {
-    if (config.type === 'map') {
-      return config.dataTable.caption ? config.dataTable.caption : `Data table showing data for the ${mapLookup[config.general.geoType]} figure.`
-    } else {
-      return config.table.label ? config.table.label : `Data table showing data for the ${config.type} figure.`
-    }
+  const limitHeight = {
+    maxHeight: config.table.limitHeight && `${config.table.height}px`,
+    overflowY: 'scroll'
   }
+
+  const caption = useMemo(() => {
+    if (config.type === 'map') {
+      return config.table.caption ? config.table.caption : `Data table showing data for the ${mapLookup[config.general.geoType]} figure.`
+    } else {
+      return config.table.caption ? config.table.caption : `Data table showing data for the ${config.type} figure.`
+    }
+  }, [config.table.caption])
 
   // prettier-ignore
   const tableData = useMemo(() => (
