@@ -17,7 +17,8 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
-import * as allCurves from '@visx/curve'
+import { useFilters } from '@cdc/core/components/Filters'
+import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -206,13 +207,16 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, columnsInData = [], colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, columnsInData = [], colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, lineOptions } = useContext(ConfigContext)
 
   const { columns } = config
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
+
+  // argument acts as props
+  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config, setConfig: updateConfig, filteredData: data, setFilteredData })
 
   const approvedCurveTypes = {
     Linear: 'curveLinear',
@@ -258,21 +262,6 @@ const EditorPanel = () => {
   }, [])
 
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
-
-  const filterOptions = [
-    {
-      label: 'Ascending Alphanumeric',
-      value: 'asc'
-    },
-    {
-      label: 'Descending Alphanumeric',
-      value: 'desc'
-    },
-    {
-      label: 'Custom',
-      value: 'cust'
-    }
-  ]
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
@@ -506,6 +495,16 @@ const EditorPanel = () => {
     }
   }
 
+  const getFilters = () => {
+    let columns = {}
+
+    unfilteredData.forEach(row => {
+      Object.keys(row).forEach(columnName => (columns[columnName] = true))
+    })
+
+    return Object.keys(columns)
+  }
+
   const getColumns = (filter = true) => {
     let columns = {}
     unfilteredData.forEach(row => {
@@ -661,19 +660,6 @@ const EditorPanel = () => {
     )
   }, [config]) // eslint-disable-line
 
-  const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
-    let filterOrder = filter.values
-    let [movedItem] = filterOrder.splice(idx1, 1)
-    filterOrder.splice(idx2, 0, movedItem)
-    let filters = [...config.filters]
-    let filterItem = { ...config.filters[filterIndex] }
-    filterItem.active = filter.values[0]
-    filterItem.orderedValues = filterOrder
-    filterItem.order = 'cust'
-    filters[filterIndex] = filterItem
-    updateConfig({ ...config, filters })
-  }
-
   const visHasLegend = () => {
     const { visualizationType } = config
 
@@ -727,6 +713,24 @@ const EditorPanel = () => {
     }
   }
 
+  const visHasAnchors = () => {
+    const { visualizationType } = config
+    switch (visualizationType) {
+      case 'Area Chart':
+        return true
+      case 'Combo':
+        return true
+      case 'Line':
+        return true
+      case 'Bar':
+        return true
+      case 'Scatter Plot':
+        return true
+      default:
+        return false
+    }
+  }
+
   const visHasBarBorders = () => {
     const { series, visualizationType } = config
     if (visualizationType === 'Box Plot') return false
@@ -767,9 +771,7 @@ const EditorPanel = () => {
       default:
         message = ''
     }
-    setWarningMsg(function (prevMsg) {
-      return { ...prevMsg, maxMsg: message }
-    })
+    setWarningMsg(prevMsg => ({ ...prevMsg, maxMsg: message }))
   }
 
   const validateMinValue = () => {
@@ -778,27 +780,28 @@ const EditorPanel = () => {
     let message = ''
 
     switch (true) {
+      case config.useLogScale && ['Line', 'Combo', 'Bar'].includes(config.visualizationType) && enteredValue < 0:
+        message = 'Negative numbers are not supported in logarithmic scale'
+        break
       case (config.visualizationType === 'Line' || config.visualizationType === 'Spark Line') && enteredValue && parseFloat(enteredValue) > minVal:
-        message = 'Value must be less than ' + minValue
+        message = 'Value should not exceed ' + minValue
         break
       case config.visualizationType === 'Combo' && isAllLine && enteredValue && parseFloat(enteredValue) > minVal:
-        message = 'Value must be less than ' + minValue
+        message = 'Value should not exceed ' + minValue
         break
       case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
-        message = 'Value must be less than or equal to 0'
+        message = config.useLogScale ? 'Value must be equal to 0' : 'Value must be less than or equal to 0'
         break
       case config.visualizationType === 'Deviation Bar' && parseFloat(enteredValue) >= Math.min(minVal, config.xAxis.target):
         message = 'Value must be less than ' + Math.min(minVal, config.xAxis.target)
         break
       case config.visualizationType !== 'Deviation Bar' && enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
-        message = 'Value must be less than ' + minValue
+        message = 'Value should not exceed ' + minValue
         break
       default:
         message = ''
     }
-    setWarningMsg(function (prevMsg) {
-      return { ...prevMsg, minMsg: message }
-    })
+    setWarningMsg(prevMsg => ({ ...prevMsg, minMsg: message }))
   }
   useEffect(() => {
     validateMinValue()
@@ -1000,6 +1003,16 @@ const EditorPanel = () => {
       selected: value
     })
   }
+  // prettier-ignore
+  const {
+    highlightedBarValues,
+    highlightedSeriesValues,
+    handleUpdateHighlightedBar,
+    handleAddNewHighlightedBar,
+    handleRemoveHighlightedBar,
+    handleUpdateHighlightedBarColor,
+    handleHighlightedBarLegendLabel
+   } = useHighlightedBars(config, updateConfig)
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -1599,6 +1612,7 @@ const EditorPanel = () => {
                       {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
                       {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Display Gridlines' updateField={updateField} />}
                       <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
+                      {config.visualizationSubType === 'regular' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
                     </>
                   )}
                   <span className='divider-heading'>Number Formatting</span>
@@ -1683,12 +1697,142 @@ const EditorPanel = () => {
                         <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
                         <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />
                         <CheckBox value={config.yAxis.hideTicks} section='yAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
+
                         <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='max value' placeholder='Auto' updateField={updateField} />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
                         <TextField value={config.yAxis.min} section='yAxis' fieldName='min' type='number' label='min value' placeholder='Auto' updateField={updateField} />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                       </>
                     )
+                  )}
+
+                  {/* anchors */}
+                  {visHasAnchors() && (
+                    <div className='edit-block'>
+                      <h3>Anchors</h3>
+                      <Accordion allowZeroExpanded>
+                        {config.yAxis?.anchors?.map((anchor, index) => (
+                          <AccordionItem className='series-item series-item--chart'>
+                            <AccordionItemHeading className='series-item__title'>
+                              <>
+                                <AccordionItemButton className={'accordion__button accordion__button'}>
+                                  Anchor {index + 1}
+                                  <button
+                                    className='series-list__remove'
+                                    onClick={e => {
+                                      e.preventDefault()
+                                      const copiedAnchorGroups = [...config.yAxis.anchors]
+                                      copiedAnchorGroups.splice(index, 1)
+                                      updateConfig({
+                                        ...config,
+                                        yAxis: {
+                                          ...config.yAxis,
+                                          anchors: copiedAnchorGroups
+                                        }
+                                      })
+                                    }}
+                                  >
+                                    Remove
+                                  </button>
+                                </AccordionItemButton>
+                              </>
+                            </AccordionItemHeading>
+                            <AccordionItemPanel>
+                              <label>
+                                <span>Anchor Value</span>
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>Enter the value as its shown in the data column</p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                                <input
+                                  type='text'
+                                  value={config.yAxis.anchors[index].value ? config.yAxis.anchors[index].value : ''}
+                                  onChange={e => {
+                                    e.preventDefault()
+                                    if (e.target.value !== '') {
+                                      const copiedAnchors = [...config.yAxis.anchors]
+                                      copiedAnchors[index].value = e.target.value
+                                      updateConfig({
+                                        ...config,
+                                        yAxis: {
+                                          ...config.yAxis,
+                                          anchors: copiedAnchors
+                                        }
+                                      })
+                                    }
+                                  }}
+                                />
+                              </label>
+
+                              <label>
+                                <span>Anchor Color</span>
+                                <input
+                                  type='text'
+                                  value={config.yAxis.anchors[index].color ? config.yAxis.anchors[index].color : ''}
+                                  onChange={e => {
+                                    e.preventDefault()
+                                    const copiedAnchors = [...config.yAxis.anchors]
+                                    copiedAnchors[index].color = e.target.value
+                                    updateConfig({
+                                      ...config,
+                                      yAxis: {
+                                        ...config.yAxis,
+                                        anchors: copiedAnchors
+                                      }
+                                    })
+                                  }}
+                                />
+                              </label>
+
+                              <label>
+                                Anchor Line Style
+                                <select
+                                  value={config.yAxis.anchors[index].lineStyle || ''}
+                                  onChange={e => {
+                                    const copiedAnchors = [...config.yAxis.anchors]
+                                    copiedAnchors[index].lineStyle = e.target.value
+                                    updateConfig({
+                                      ...config,
+                                      yAxis: {
+                                        ...config.yAxis,
+                                        anchors: copiedAnchors
+                                      }
+                                    })
+                                  }}
+                                >
+                                  <option>Select</option>
+                                  {lineOptions.map(line => (
+                                    <option key={line.key}>{line.value}</option>
+                                  ))}
+                                </select>
+                              </label>
+                            </AccordionItemPanel>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+
+                      <button
+                        className='btn full-width'
+                        onClick={e => {
+                          e.preventDefault()
+                          const anchors = [...config.yAxis.anchors]
+                          anchors.push({})
+                          updateConfig({
+                            ...config,
+                            yAxis: {
+                              ...config.yAxis,
+                              anchors
+                            }
+                          })
+                        }}
+                      >
+                        Add Anchor
+                      </button>
+                    </div>
                   )}
                 </AccordionItemPanel>
               </AccordionItem>
@@ -1968,6 +2112,42 @@ const EditorPanel = () => {
                           <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
                         </>
                       )}
+
+                      {config.series?.length === 1 && config.visualizationType === 'Bar' && (
+                        <>
+                          {/* HIGHLIGHTED BARS */}
+                          <label htmlFor='barHighlight'>Bar Highlighting</label>
+                          {config.series.length === 1 &&
+                            highlightedBarValues.map((highlightedBarValue, i) => (
+                              <fieldset>
+                                <div className='edit-block' key={`highlighted-bar-${i}`}>
+                                  <button className='remove-column' onClick={e => handleRemoveHighlightedBar(e, i)}>
+                                    Remove
+                                  </button>
+                                  <p>Highlighted Bar {i + 1}</p>
+                                  <label>
+                                    <span className='edit-label column-heading'>Value</span>
+                                    <select value={config.highlightedBarValues[i].value} onChange={e => handleUpdateHighlightedBar(e, i)}>
+                                      <option value=''>- Select Value -</option>
+                                      {highlightedSeriesValues && [...new Set(highlightedSeriesValues)].sort().map(option => <option key={`special-class-value-option-${i}-${option}`}>{option}</option>)}
+                                    </select>
+                                  </label>
+                                  <label>
+                                    <span className='edit-label column-heading'>Color</span>
+                                    <input type='text' value={config.highlightedBarValues[i].color ? config.highlightedBarValues[i].color : ''} onChange={e => handleUpdateHighlightedBarColor(e, i)} />
+                                  </label>
+                                  <label>
+                                    <span className='edit-label column-heading'>Legend Label</span>
+                                    <input type='text' value={config.highlightedBarValues[i].legendLabel ? config.highlightedBarValues[i].legendLabel : ''} onChange={e => handleHighlightedBarLegendLabel(e, i)} />
+                                  </label>
+                                </div>
+                              </fieldset>
+                            ))}
+                          <button className='btn full-width' onClick={e => handleAddNewHighlightedBar(e)}>
+                            Add Highlighted Bar
+                          </button>
+                        </>
+                      )}
                     </>
                   )}
 
@@ -2016,6 +2196,133 @@ const EditorPanel = () => {
                         </>
                       )}
                     </>
+                  )}
+
+                  {/* anchors */}
+                  {visHasAnchors() && (
+                    <div className='edit-block'>
+                      <h3>Anchors</h3>
+                      <Accordion allowZeroExpanded>
+                        {config.xAxis?.anchors?.map((anchor, index) => (
+                          <AccordionItem className='series-item series-item--chart'>
+                            <AccordionItemHeading className='series-item__title'>
+                              <>
+                                <AccordionItemButton className={'accordion__button accordion__button'}>
+                                  Anchor {index + 1}
+                                  <button
+                                    className='series-list__remove'
+                                    onClick={e => {
+                                      e.preventDefault()
+                                      const copiedAnchorGroups = [...config.xAxis.anchors]
+                                      copiedAnchorGroups.splice(index, 1)
+                                      updateConfig({
+                                        ...config,
+                                        xAxis: {
+                                          ...config.yAxis,
+                                          anchors: copiedAnchorGroups
+                                        }
+                                      })
+                                    }}
+                                  >
+                                    Remove
+                                  </button>
+                                </AccordionItemButton>
+                              </>
+                            </AccordionItemHeading>
+                            <AccordionItemPanel>
+                              <label>
+                                <span>Anchor Value</span>
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>Enter the value as its shown in the data column</p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                                <input
+                                  type='text'
+                                  value={config.xAxis.anchors[index].value ? config.xAxis.anchors[index].value : ''}
+                                  onChange={e => {
+                                    e.preventDefault()
+                                    const copiedAnchors = [...config.xAxis.anchors]
+                                    copiedAnchors[index].value = e.target.value
+                                    updateConfig({
+                                      ...config,
+                                      xAxis: {
+                                        ...config.xAxis,
+                                        anchors: copiedAnchors
+                                      }
+                                    })
+                                  }}
+                                />
+                              </label>
+
+                              <label>
+                                <span>Anchor Color</span>
+                                <input
+                                  type='text'
+                                  value={config.xAxis.anchors[index].color ? config.xAxis.anchors[index].color : ''}
+                                  onChange={e => {
+                                    e.preventDefault()
+                                    const copiedAnchors = [...config.xAxis.anchors]
+                                    copiedAnchors[index].color = e.target.value
+                                    updateConfig({
+                                      ...config,
+                                      xAxis: {
+                                        ...config.xAxis,
+                                        anchors: copiedAnchors
+                                      }
+                                    })
+                                  }}
+                                />
+                              </label>
+
+                              <label>
+                                Anchor Line Style
+                                <select
+                                  value={config.xAxis.anchors[index].lineStyle || ''}
+                                  onChange={e => {
+                                    const copiedAnchors = [...config.xAxis.anchors]
+                                    copiedAnchors[index].lineStyle = e.target.value
+                                    updateConfig({
+                                      ...config,
+                                      xAxis: {
+                                        ...config.xAxis,
+                                        anchors: copiedAnchors
+                                      }
+                                    })
+                                  }}
+                                >
+                                  <option>Select</option>
+                                  {lineOptions.map(line => (
+                                    <option key={line.key}>{line.value}</option>
+                                  ))}
+                                </select>
+                              </label>
+                            </AccordionItemPanel>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+
+                      <button
+                        className='btn full-width'
+                        onClick={e => {
+                          e.preventDefault()
+                          const anchors = [...config.xAxis.anchors]
+                          anchors.push({})
+                          updateConfig({
+                            ...config,
+                            xAxis: {
+                              ...config.xAxis,
+                              anchors
+                            }
+                          })
+                        }}
+                      >
+                        Add Anchor
+                      </button>
+                    </div>
                   )}
                 </AccordionItemPanel>
               </AccordionItem>
@@ -2259,104 +2566,129 @@ const EditorPanel = () => {
                   <AccordionItemButton>Filters</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {/* prettier-ignore */}
-                  <Select
-                    value={config.filterBehavior}
-                    fieldName='filterBehavior'
-                    label='Filter Behavior'
-                    updateField={updateField}
-                    options={['dropdown', 'button']}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>When should the visualization change? Button changes when the user clicks "apply" Dropdown changes immediatly after the dropdown is changed.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                    />
-                  <br />
+                  {config.filters && (
+                    <>
+                      {/* prettier-ignore */}
+                      <Select
+                        value={config.filterBehavior}
+                        fieldName='filterBehavior'
+                        label='Filter Behavior'
+                        updateField={updateField}
+                        options={['Apply Button', 'Filter Change']}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        />
+                      <br />
+                    </>
+                  )}
                   {config.filters && (
                     <ul className='filters-list'>
-                      {config.filters.map((filter, index) => (
-                        <fieldset className='edit-block' key={index}>
-                          <button
-                            type='button'
-                            className='remove-column'
-                            onClick={() => {
-                              removeFilter(index)
-                            }}
-                          >
-                            Remove
-                          </button>
-                          <label>
-                            <span className='edit-label column-heading'>Filter</span>
-                            <select
-                              value={filter.columnName}
-                              onChange={e => {
-                                updateFilterProp('columnName', index, e.target.value)
+                      {/* Whether filters should apply onChange or Apply Button */}
+
+                      {config.filters.map((filter, index) => {
+                        if (filter.type === 'url') return <></>
+
+                        return (
+                          <fieldset className='edit-block' key={index}>
+                            <button
+                              type='button'
+                              className='remove-column'
+                              onClick={() => {
+                                removeFilter(index)
                               }}
                             >
-                              <option value=''>- Select Option -</option>
-                              {getColumns().map((dataKey, index) => (
-                                <option value={dataKey} key={index}>
-                                  {dataKey}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-                          <label>
-                            <span className='edit-label column-heading'>Label</span>
-                            <input
-                              type='text'
-                              value={filter.label}
-                              onChange={e => {
-                                updateFilterProp('label', index, e.target.value)
-                              }}
-                            />
-                          </label>
-
-                          <label>
-                            <span className='edit-filterOrder column-heading'>Filter Order</span>
-                            <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
-                              {filterOptions.map((option, index) => {
-                                return (
-                                  <option value={option.value} key={`filter-${index}`}>
-                                    {option.label}
+                              Remove
+                            </button>
+                            <label>
+                              <span className='edit-label column-heading'>Filter</span>
+                              <select
+                                value={filter.columnName}
+                                onChange={e => {
+                                  updateFilterProp('columnName', index, e.target.value)
+                                }}
+                              >
+                                <option value=''>- Select Option -</option>
+                                {getFilters(true).map((dataKey, index) => (
+                                  <option value={dataKey} key={index}>
+                                    {dataKey}
                                   </option>
-                                )
-                              })}
-                            </select>
+                                ))}
+                              </select>
+                            </label>
 
-                            {filter.order === 'cust' && (
-                              <DragDropContext onDragEnd={({ source, destination }) => handleFilterChange(source.index, destination.index, index, config.filters[index])}>
-                                <Droppable droppableId='filter_order'>
-                                  {provided => (
-                                    <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-                                      {config.filters[index]?.values.map((value, index) => {
-                                        return (
-                                          <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
-                                            {(provided, snapshot) => (
-                                              <li>
-                                                <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                  {value}
-                                                </div>
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        )
-                                      })}
-                                      {provided.placeholder}
-                                    </ul>
-                                  )}
-                                </Droppable>
-                              </DragDropContext>
-                            )}
-                          </label>
-                        </fieldset>
-                      ))}
+                            <label>
+                              <span className='edit-label column-heading'>Filter Style</span>
+
+                              <select
+                                value={filter.filterStyle}
+                                onChange={e => {
+                                  updateFilterProp('filterStyle', index, e.target.value)
+                                }}
+                              >
+                                {filterStyleOptions.map(item => {
+                                  return <option value={item}>{item}</option>
+                                })}
+                              </select>
+                            </label>
+                            <label>
+                              <span className='edit-label column-heading'>Label</span>
+                              <input
+                                type='text'
+                                value={filter.label}
+                                onChange={e => {
+                                  updateFilterProp('label', index, e.target.value)
+                                }}
+                              />
+                            </label>
+
+                            <label>
+                              <span className='edit-filterOrder column-heading'>Filter Order</span>
+                              <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
+                                {filterOrderOptions.map((option, index) => {
+                                  return (
+                                    <option value={option.value} key={`filter-${index}`}>
+                                      {option.label}
+                                    </option>
+                                  )
+                                })}
+                              </select>
+
+                              {filter.order === 'cust' && (
+                                <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, config.filters[index])}>
+                                  <Droppable droppableId='filter_order'>
+                                    {provided => (
+                                      <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
+                                        {config.filters[index]?.values.map((value, index) => {
+                                          return (
+                                            <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
+                                              {(provided, snapshot) => (
+                                                <li>
+                                                  <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                    {value}
+                                                  </div>
+                                                </li>
+                                              )}
+                                            </Draggable>
+                                          )
+                                        })}
+                                        {provided.placeholder}
+                                      </ul>
+                                    )}
+                                  </Droppable>
+                                </DragDropContext>
+                              )}
+                            </label>
+                          </fieldset>
+                        )
+                      })}
                     </ul>
                   )}
                   {!config.filters && <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}

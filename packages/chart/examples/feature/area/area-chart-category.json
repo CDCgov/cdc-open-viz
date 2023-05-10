@@ -1,9 +1,9 @@
 {
   "type": "chart",
-  "title": "Combo Bar-Line Chart",
+  "title": "Example Area Chart",
   "showTitle": true,
-  "theme": "theme-purple",
-  "animate": true,
+  "theme": "theme-blue",
+  "animate": false,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
   "barHasBorder": "false",
@@ -23,8 +23,8 @@
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "68",
-    "gridLines": true,
+    "size": "150",
+    "gridLines": false,
     "enablePadding": false,
     "min": "",
     "max": "",
@@ -32,7 +32,7 @@
     "tickLabelColor": "#333",
     "tickColor": "#333",
     "rightHideAxis": true,
-    "rightAxisSize": 50,
+    "rightAxisSize": 0,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
     "rightAxisLabelColor": "#333",
@@ -41,7 +41,8 @@
     "numTicks": "",
     "axisPadding": 0,
     "tickRotation": 0,
-    "label": "Y-Axis Label Example"
+    "isLegendValue": false,
+    "label": "Y Axis Example Label"
   },
   "boxplot": {
     "plots": [],
@@ -68,7 +69,9 @@
       "iqr": "Interquartile Range",
       "total": "Total",
       "outliers": "Outliers",
-      "values": "Values"
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
     }
   },
   "topAxis": {
@@ -77,7 +80,7 @@
   "isLegendValue": false,
   "barThickness": 0.35,
   "barHeight": 25,
-  "barSpace": 15,
+  "barSpace": 20,
   "heights": {
     "vertical": 300,
     "horizontal": 750
@@ -89,35 +92,37 @@
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "78",
-    "tickRotation": "25",
+    "size": "50",
+    "tickRotation": 0,
     "min": "",
     "max": "",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "numTicks": "",
+    "numTicks": "9",
     "labelOffset": 65,
     "axisPadding": 0,
     "target": 0,
+    "isLegendValue": false,
     "dataKey": "Date",
-    "label": "X-Axis Example Label",
-    "dateParseFormat": "%d/%m/%Y",
-    "dateDisplayFormat": "%d/%m/%Y"
+    "label": "X Axis Example Label",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y"
   },
   "table": {
-    "label": "Data Table",
-    "expanded": true,
+    "label": "Data Type by Date",
+    "expanded": false,
     "limitHeight": false,
     "height": "",
     "caption": "",
-    "showDownloadUrl": false,
-    "download": true,
-    "show": true
+    "showDownloadUrl": true,
+    "showDataTableLink": true,
+    "show": true,
+    "download": true
   },
   "orientation": "vertical",
   "legend": {
-    "behavior": "highlight",
+    "behavior": "isolate",
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
@@ -128,13 +133,13 @@
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "position": "right",
-    "label": "Data Type"
+    "label": "Type of Data"
   },
   "exclusions": {
-    "active": false,
+    "active": true,
     "keys": []
   },
-  "palette": "qualitative-soft",
+  "palette": "qualitative-bold",
   "isPaletteReversed": false,
   "twoColor": {
     "palette": "monochrome-1",
@@ -142,13 +147,14 @@
   },
   "labels": false,
   "dataFormat": {
-    "commas": false,
+    "commas": true,
     "prefix": "",
-    "suffix": "",
-    "abbreviated": false,
+    "suffix": " units",
+    "abbreviated": true,
     "bottomSuffix": "",
     "bottomPrefix": "",
-    "bottomAbbreviated": false
+    "bottomAbbreviated": false,
+    "useFormat": true
   },
   "confidenceKeys": {},
   "visual": {
@@ -156,122 +162,79 @@
     "accent": true,
     "background": true
   },
-  "height": "332",
-  "data": [
-    {
-      "Date": "1/15/2016",
-      "Data 1": "$1,000",
-      "Data 2": "110",
-      "Data 3": "100",
-      "Data 4": "90",
-      "Monthly-Goal": "100"
-    },
-    {
-      "Date": "2/15/2016",
-      "Data 1": "100",
-      "Data 2": "110",
-      "Data 3": "100",
-      "Data 4": "100",
-      "Monthly-Goal": "100"
-    },
-    {
-      "Date": "3/15/2016",
-      "Data 1": "80",
-      "Data 2": "90",
-      "Data 3": "100",
-      "Data 4": "120",
-      "Monthly-Goal": "110"
-    },
-    {
-      "Date": "4/15/2016",
-      "Data 1": "80",
-      "Data 2": "90",
-      "Data 3": "110",
-      "Data 4": "120",
-      "Monthly-Goal": "110"
-    },
-    {
-      "Date": "5/15/2016",
-      "Data 1": "70",
-      "Data 2": "90",
-      "Data 3": "110",
-      "Data 4": "130",
-      "Monthly-Goal": "120"
-    },
-    {
-      "Date": "6/15/2016",
-      "Data 1": "100",
-      "Data 2": "120",
-      "Data 3": "120",
-      "Data 4": "130",
-      "Monthly-Goal": "120"
-    },
-    {
-      "Date": "7/15/2016",
-      "Data 1": "110",
-      "Data 2": "140",
-      "Data 3": "120",
-      "Data 4": "130",
-      "Monthly-Goal": "130"
-    },
-    {
-      "Date": "8/15/2016",
-      "Data 1": "110",
-      "Data 2": "130",
-      "Data 3": "120",
-      "Data 4": "140",
-      "Monthly-Goal": "130"
-    },
-    {
-      "Date": "9/15/2016",
-      "Data 1": "120",
-      "Data 2": "130",
-      "Data 3": "120",
-      "Data 4": "150",
-      "Monthly-Goal": "140"
-    }
-  ],
-  "visualizationType": "Combo",
+  "filterBehavior": "dropdown",
+  "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "Data 1",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Data 2",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Data 3",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Data 4",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Monthly-Goal",
-      "type": "dashed-md",
-      "axis": "Left"
+      "dataKey": "Radius",
+      "type": "Area Chart"
     }
   ],
-  "filters": [
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "dataFileName": "valid-area-chart.json",
+  "dataFileSourceType": "file",
+  "formattedData": [
     {
-      "values": [
-        "1/15/2016",
-        "2/15/2016",
-        "3/15/2016",
-        "4/15/2016",
-        "5/15/2016",
-        "6/15/2016",
-        "7/15/2016",
-        "8/15/2016",
-        "9/15/2016"
-      ],
-      "active": "1/15/2016",
-      "order": "asc",
-      "columnName": "Date",
-      "filterBehavior": "dropdown"
+      "Data 1": "900",
+      "Data 2": "135",
+      "Data 3": "300",
+      "Data 4": "95",
+      "Data 5": "120",
+      "Data 6": "310",
+      "Date": "1/15/2016"
+    },
+    {
+      "Data 1": "4000",
+      "Data 2": "90",
+      "Data 3": "240",
+      "Data 4": "60",
+      "Data 5": "160",
+      "Data 6": "2000",
+      "Date": "2/15/2016"
+    },
+    {
+      "Data 1": "500",
+      "Data 2": "300",
+      "Data 3": "290",
+      "Data 4": "100",
+      "Data 5": "200",
+      "Data 6": "250",
+      "Date": "3/15/2016"
+    },
+    {
+      "Data 1": "1200",
+      "Data 2": "160",
+      "Data 3": "230",
+      "Data 4": "180",
+      "Data 5": "160",
+      "Data 6": "220",
+      "Date": "4/15/2016"
+    },
+    {
+      "Data 1": "8000",
+      "Data 2": "350",
+      "Data 3": "300",
+      "Data 4": "150",
+      "Data 5": "130",
+      "Data 6": "100",
+      "Date": "5/15/2016"
+    },
+    {
+      "Data 1": "9000",
+      "Data 2": "220",
+      "Data 3": "320",
+      "Data 4": "100",
+      "Data 5": "220",
+      "Data 6": "300",
+      "Date": "6/15/2016"
     }
-  ]
+  ],
+  "height": 300,
+  "dataUrl": "/examples/feature/__data__/planet-example-data-max-increase.json",
+  "visualizationType": "Area Chart",
+  "description": "This example shows a bar chart created in the visualization editor in WCMS",
+  "dataCutoff": "0"
 }

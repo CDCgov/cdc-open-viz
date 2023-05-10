@@ -1,8 +1,8 @@
 {
   "type": "chart",
-  "title": "Combo Bar-Line Chart",
+  "title": "Forecasting Chart Example",
   "showTitle": true,
-  "theme": "theme-purple",
+  "theme": "theme-blue",
   "animate": true,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
@@ -15,23 +15,23 @@
   "roundingStyle": "standard",
   "tipRounding": "top",
   "padding": {
-    "left": 5,
-    "right": 5
+    "left": 0,
+    "right": 0
   },
   "yAxis": {
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "68",
-    "gridLines": true,
+    "size": "75",
+    "gridLines": false,
     "enablePadding": false,
     "min": "",
     "max": "",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "rightHideAxis": true,
+    "rightHideAxis": false,
     "rightAxisSize": 50,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
@@ -41,7 +41,8 @@
     "numTicks": "",
     "axisPadding": 0,
     "tickRotation": 0,
-    "label": "Y-Axis Label Example"
+    "anchors": [],
+    "label": "Effective Reproduction No."
   },
   "boxplot": {
     "plots": [],
@@ -66,13 +67,13 @@
       "median": "Median",
       "sd": "Standard Deviation",
       "iqr": "Interquartile Range",
-      "total": "Total",
+      "count": "Count",
       "outliers": "Outliers",
       "values": "Values"
     }
   },
   "topAxis": {
-    "hasLine": false
+    "hasLine": true
   },
   "isLegendValue": false,
   "barThickness": 0.35,
@@ -89,8 +90,8 @@
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "78",
-    "tickRotation": "25",
+    "size": 75,
+    "tickRotation": 30,
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -100,24 +101,30 @@
     "labelOffset": 65,
     "axisPadding": 0,
     "target": 0,
-    "dataKey": "Date",
-    "label": "X-Axis Example Label",
-    "dateParseFormat": "%d/%m/%Y",
-    "dateDisplayFormat": "%d/%m/%Y"
+    "anchors": [
+      {
+        "value": "10/19/2022",
+        "lineStyle": "dashed-md"
+      }
+    ],
+    "label": "",
+    "dataKey": "date",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y"
   },
   "table": {
     "label": "Data Table",
-    "expanded": true,
+    "expanded": false,
     "limitHeight": false,
     "height": "",
     "caption": "",
     "showDownloadUrl": false,
-    "download": true,
+    "showDataTableLink": true,
     "show": true
   },
   "orientation": "vertical",
   "legend": {
-    "behavior": "highlight",
+    "behavior": "isolate",
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
@@ -128,13 +135,13 @@
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "position": "right",
-    "label": "Data Type"
+    "hide": true
   },
   "exclusions": {
     "active": false,
     "keys": []
   },
-  "palette": "qualitative-soft",
+  "palette": "sequential-green",
   "isPaletteReversed": false,
   "twoColor": {
     "palette": "monochrome-1",
@@ -148,7 +155,8 @@
     "abbreviated": false,
     "bottomSuffix": "",
     "bottomPrefix": "",
-    "bottomAbbreviated": false
+    "bottomAbbreviated": false,
+    "roundTo": "0"
   },
   "confidenceKeys": {},
   "visual": {
@@ -156,122 +164,39 @@
     "accent": true,
     "background": true
   },
-  "height": "332",
-  "data": [
-    {
-      "Date": "1/15/2016",
-      "Data 1": "$1,000",
-      "Data 2": "110",
-      "Data 3": "100",
-      "Data 4": "90",
-      "Monthly-Goal": "100"
-    },
-    {
-      "Date": "2/15/2016",
-      "Data 1": "100",
-      "Data 2": "110",
-      "Data 3": "100",
-      "Data 4": "100",
-      "Monthly-Goal": "100"
-    },
-    {
-      "Date": "3/15/2016",
-      "Data 1": "80",
-      "Data 2": "90",
-      "Data 3": "100",
-      "Data 4": "120",
-      "Monthly-Goal": "110"
-    },
-    {
-      "Date": "4/15/2016",
-      "Data 1": "80",
-      "Data 2": "90",
-      "Data 3": "110",
-      "Data 4": "120",
-      "Monthly-Goal": "110"
-    },
-    {
-      "Date": "5/15/2016",
-      "Data 1": "70",
-      "Data 2": "90",
-      "Data 3": "110",
-      "Data 4": "130",
-      "Monthly-Goal": "120"
-    },
-    {
-      "Date": "6/15/2016",
-      "Data 1": "100",
-      "Data 2": "120",
-      "Data 3": "120",
-      "Data 4": "130",
-      "Monthly-Goal": "120"
-    },
-    {
-      "Date": "7/15/2016",
-      "Data 1": "110",
-      "Data 2": "140",
-      "Data 3": "120",
-      "Data 4": "130",
-      "Monthly-Goal": "130"
-    },
-    {
-      "Date": "8/15/2016",
-      "Data 1": "110",
-      "Data 2": "130",
-      "Data 3": "120",
-      "Data 4": "140",
-      "Monthly-Goal": "130"
-    },
-    {
-      "Date": "9/15/2016",
-      "Data 1": "120",
-      "Data 2": "130",
-      "Data 3": "120",
-      "Data 4": "150",
-      "Monthly-Goal": "140"
-    }
-  ],
-  "visualizationType": "Combo",
-  "series": [
-    {
-      "dataKey": "Data 1",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Data 2",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Data 3",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Data 4",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "Monthly-Goal",
-      "type": "dashed-md",
-      "axis": "Left"
-    }
-  ],
-  "filters": [
-    {
-      "values": [
-        "1/15/2016",
-        "2/15/2016",
-        "3/15/2016",
-        "4/15/2016",
-        "5/15/2016",
-        "6/15/2016",
-        "7/15/2016",
-        "8/15/2016",
-        "9/15/2016"
-      ],
-      "active": "1/15/2016",
-      "order": "asc",
-      "columnName": "Date",
-      "filterBehavior": "dropdown"
-    }
-  ]
+  "filterBehavior": "Filter Change",
+  "forecastingChart": {
+    "showBars": false,
+    "barColumn": "confirm",
+    "barColor": "#918e90",
+    "confidenceIntervals": [
+      {
+        "low": "lower_20",
+        "high": "upper_20"
+      },
+      {
+        "low": "lower_50",
+        "high": "upper_50"
+      },
+      {
+        "low": "lower_90",
+        "high": "upper_90"
+      }
+    ],
+    "stages": "type",
+    "colors": [
+      "qualitative4reverse",
+      "sequential-bluereverse",
+      "sequential-greenreverse"
+    ],
+    "groups": [
+      "estimate",
+      "estimate based on partial data",
+      "forecast"
+    ],
+    "showBarColumn": true
+  },
+  "dataUrl": "./examples/feature/forecasting/r_data.csv",
+  "animateReplay": true,
+  "visualizationType": "Forecasting"
 }

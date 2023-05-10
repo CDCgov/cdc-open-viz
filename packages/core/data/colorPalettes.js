@@ -51,16 +51,16 @@ export const colorPalettes3 = {
   'monochrome-4': ['#C2C0FC', '#6a3d9a'],
   'monochrome-5': ['#fedab8', '#bf5b17'],
   'cool-1': ['#b2df8a', '#1f78b4'],
-  'cool-2': ['#a6cee3', '#33A02C'],
+  'cool-2': ['#a6cee3', '#72D66B'],
   'cool-3': ['#C2C0FC', '#386cb0'],
-  'cool-4': ['#33A02c', '#6a3d9a'],
+  'cool-4': ['#72D66B', '#6a3d9a'],
   'cool-5': ['#a6cee3', '#6a3d9a'],
   'warm-1': ['#e31a1c', '#fedab8'],
   'complementary-1': ['#1f78b4', '#e6ab02'],
   'complementary-2': ['#1f78b4', '#ff7f00'],
   'complementary-3': ['#6a3d9a', '#ff7f00'],
   'complementary-4': ['#6a3d9a', '#e6ab02'],
-  'complementary-5': ['#e31a90', '#1b9e77']
+  'complementary-5': ['#df168c', '#1EB386']
 }
 
 export const colorPalettesChart = updatePaletteNames(colorPalettes2)

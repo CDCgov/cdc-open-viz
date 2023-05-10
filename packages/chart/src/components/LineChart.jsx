@@ -8,7 +8,6 @@ import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import useRightAxis from '../hooks/useRightAxis'
-import isNumber from '@cdc/core/helpers/isNumber'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType } = useContext(ConfigContext)

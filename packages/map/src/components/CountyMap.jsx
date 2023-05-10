@@ -56,7 +56,6 @@ function CountyMapChecks(prevState, nextState) {
   const equalBorderColors = prevState.state.general.geoBorderColor === nextState.state.general.geoBorderColor // update when geoborder color changes
   const equalData = prevState.data === nextState.data // update when data changes
   const equalTooltipBehavior = prevState.state.tooltips.appearanceType === nextState.state.tooltips.appearanceType
-  if (nextState.runtimeLegend.runtimeDataHash !== nextState.data.fromHash) return true
   return equalData && equalBorderColors && equalLegend && equalColumnName && equalNavColumn && equalNumberOptIn && equalTooltipBehavior ? true : false
 }
 
@@ -341,11 +340,13 @@ const CountyMap = props => {
 
           if (pixelCoords) {
             const legendValues = data[key] !== undefined ? applyLegendToRow(data[key]) : false
-            context.fillStyle = legendValues ? legendValues[0] : '#EEE'
-            context.beginPath()
-            context.arc(pixelCoords[0], pixelCoords[1], geoRadius, 0, 2 * Math.PI)
-            context.fill()
-            context.stroke()
+            if (legendValues) {
+              context.fillStyle = legendValues[0]
+              context.beginPath()
+              context.arc(pixelCoords[0], pixelCoords[1], geoRadius, 0, 2 * Math.PI)
+              context.fill()
+              context.stroke()
+            }
           }
         })
       }

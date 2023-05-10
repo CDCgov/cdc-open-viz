@@ -8,6 +8,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 // Third party
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import chroma from 'chroma-js'
+import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
@@ -38,7 +39,7 @@ import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
 
 // Child Components
 import ConfigContext from './context'
-import Filters from '@cdc/core/components/Filters'
+import Filters, { useFilters } from '@cdc/core/components/Filters'
 import Modal from './components/Modal'
 import Sidebar from './components/Sidebar'
 
@@ -127,7 +128,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
+  const [dimensions, setDimensions] = useState()
 
+  const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
@@ -184,15 +187,26 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       specialClasses: state.legend.specialClasses,
       geoType: state.general.geoType,
       data: state.data,
-      ...runtimeFilters
+      ...runtimeFilters,
+      filters: {
+        ...state.filters
+      }
     })
   }
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
+      let { width, height } = entry.contentRect
       let newViewport = getViewport(entry.contentRect.width)
+      let svgMarginWidth = 32
+      let editorWidth = 350
 
       setCurrentViewport(newViewport)
+
+      if (isEditor) {
+        width = width - editorWidth
+      }
+      setDimensions([width, height])
     }
   })
 
@@ -759,9 +773,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(({ columnName, label, active, values }, idx) => {
-      if (undefined === columnName) return
-
+    obj?.filters.forEach(({ columnName, label, labels, active, values, type }, idx) => {
       let newFilter = runtimeFilters[idx]
 
       const sortAsc = (a, b) => {
@@ -772,30 +784,38 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
       }
 
-      values = getUniqueValues(state.data, columnName)
+      if (type !== 'url') {
+        values = getUniqueValues(state.data, columnName)
 
-      if (obj.filters[idx].order === 'asc') {
-        values = values.sort(sortAsc)
-      }
-
-      if (obj.filters[idx].order === 'desc') {
-        values = values.sort(sortDesc)
-      }
-
-      if (obj.filters[idx].order === 'cust') {
-        if (obj.filters[idx]?.values.length > 0) {
-          values = obj.filters[idx].values
+        if (obj.filters[idx].order === 'asc') {
+          values = values.sort(sortAsc)
         }
+
+        if (obj.filters[idx].order === 'desc') {
+          values = values.sort(sortDesc)
+        }
+
+        if (obj.filters[idx].order === 'cust') {
+          if (obj.filters[idx]?.values.length > 0) {
+            values = obj.filters[idx].values
+          }
+        }
+      } else {
+        values = values
       }
 
       if (undefined === newFilter) {
         newFilter = {}
       }
 
+      newFilter.order = obj.filters[idx].order ? obj.filters[idx].order : 'asc'
+      newFilter.type = type
       newFilter.label = label ?? ''
       newFilter.columnName = columnName
       newFilter.values = values
-      newFilter.active = active || values[0] // Default to first found value
+      handleSorting(newFilter)
+      newFilter.active = active ?? values[0] // Default to first found value
+      newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
 
       filters.push(newFilter)
     })
@@ -848,8 +868,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         // Filters
         if (filters?.length) {
           for (let i = 0; i < filters.length; i++) {
-            const { columnName, active } = filters[i]
-            if (String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
+            const { columnName, active, type } = filters[i]
+            if (type !== 'url' && String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
           }
         }
 
@@ -877,33 +897,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const closeModal = ({ target }) => {
     if ('string' === typeof target.className && (target.className.includes('modal-close') || target.className.includes('modal-background')) && null !== modal) {
       setModal(null)
-    }
-  }
-
-  const changeFilterActive = async (idx, activeValue) => {
-    // Reset active legend toggles
-    resetLegendToggles()
-
-    try {
-      const isEmpty = obj => {
-        return Object.keys(obj).length === 0
-      }
-
-      let filters = [...runtimeFilters]
-
-      filters[idx] = { ...filters[idx] }
-      filters[idx].active = activeValue
-
-      const newData = generateRuntimeData(state, filters)
-
-      // throw an error if newData is empty
-      if (isEmpty(newData)) throw new Error('Cove Filter Error: No runtime data to set for this filter')
-
-      // set the runtime filters and data
-      setRuntimeData(newData)
-      setRuntimeFilters(filters)
-    } catch (e) {
-      console.error('COVE: ', e.message) // eslint-disable-line
     }
   }
 
@@ -1245,6 +1238,67 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }
 
+  const reloadURLData = async () => {
+    if (state.dataUrl) {
+      const dataUrl = new URL(state.runtimeDataUrl || state.dataUrl)
+      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+
+      let isUpdateNeeded = false
+      state.filters.forEach(filter => {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+          qsParams[filter.queryParameter] = filter.active
+          isUpdateNeeded = true
+        }
+      })
+
+      if (!isUpdateNeeded) return
+
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+        .map((param, i) => {
+          let qs = i === 0 ? '?' : '&'
+          qs += param + '='
+          qs += qsParams[param]
+          return qs
+        })
+        .join('')}`
+
+      let data
+
+      try {
+        const regex = /(?:\.([^.]+))?$/
+
+        const ext = regex.exec(dataUrl.pathname)[1]
+        if ('csv' === ext) {
+          data = await fetch(dataUrlFinal)
+            .then(response => response.text())
+            .then(responseText => {
+              const parsedCsv = Papa.parse(responseText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+              })
+              return parsedCsv.data
+            })
+        } else if ('json' === ext) {
+          data = await fetch(dataUrlFinal).then(response => response.json())
+        } else {
+          data = []
+        }
+      } catch (e) {
+        console.error(`Cannot parse URL: ${dataUrlFinal}`)
+        console.log(e)
+        data = []
+      }
+
+      if (state.dataDescription) {
+        data = transform.autoStandardize(data)
+        data = transform.developerStandardize(data, state.dataDescription)
+      }
+
+      setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
+    }
+  }
+
   const loadConfig = async configObj => {
     // Set loading flag
     if (!loading) setLoading(true)
@@ -1255,8 +1309,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       ...configObj
     }
 
-    // If a dataUrl property exists, always pull from that.
-    if (newState.dataUrl) {
+    const urlFilters = newState.filters ? (newState.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
+
+    if (newState.dataUrl && !urlFilters) {
       if (newState.dataUrl[0] === '/') {
         newState.dataUrl = 'http://' + hostname + newState.dataUrl
       }
@@ -1403,6 +1458,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
       setRuntimeData(newRuntimeData)
+    } else {
+      if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
+        const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
+        setRuntimeLegend(legend)
+      }
     }
   }, [state]) // eslint-disable-line
 
@@ -1415,6 +1475,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setRuntimeLegend(legend)
     }
   }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses]) // eslint-disable-line
+
+  useEffect(() => {
+    reloadURLData()
+  }, [JSON.stringify(state.filters)])
 
   if (config) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -1549,12 +1613,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
-            <Filters
-              config={state}
-              setConfig={setState}
-              filteredData={runtimeFilters}
-              setFilteredData={setRuntimeFilters}
-            />
+            {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
 
             <div
               role='button'
