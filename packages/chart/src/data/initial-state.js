@@ -16,7 +16,7 @@ export default {
   roundingStyle: 'standard',
   tipRounding: 'top',
   general: {
-    showDownloadButton: true, 
+    showDownloadButton: true
   },
   padding: {
     left: 5,
@@ -122,9 +122,9 @@ export default {
   orientation: 'vertical',
   color: 'pinkpurple',
   columns: {
-      additionalColumn1: {  // starter column
+    additionalColumn1: {
       name: ''
-    },
+    }
   },
   legend: {
     behavior: 'isolate',

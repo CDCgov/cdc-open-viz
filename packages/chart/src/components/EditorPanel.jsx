@@ -209,8 +209,6 @@ const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal',
 const EditorPanel = () => {
   const { config, updateConfig, transformedData: data, loading, columnsInData = [], colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, lineOptions } = useContext(ConfigContext)
 
-  const { columns } = config
-
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
