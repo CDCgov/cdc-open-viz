@@ -134,7 +134,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
-  if (isDebug) console.log('CdcMap state=', state)
+  if (isDebug) console.log('CdcMap state=', state) // eslint-disable-line
 
   useEffect(() => {
     try {
@@ -198,7 +198,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     for (let entry of entries) {
       let { width, height } = entry.contentRect
       let newViewport = getViewport(entry.contentRect.width)
-      let svgMarginWidth = 32
       let editorWidth = 350
 
       setCurrentViewport(newViewport)
@@ -1285,8 +1284,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           data = []
         }
       } catch (e) {
-        console.error(`Cannot parse URL: ${dataUrlFinal}`)
-        console.log(e)
+        console.error(`Cannot parse URL: ${dataUrlFinal}`) // eslint-disable-line
+        console.log(e) // eslint-disable-line
         data = []
       }
 
