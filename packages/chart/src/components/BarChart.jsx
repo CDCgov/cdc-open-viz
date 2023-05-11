@@ -363,7 +363,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
 
                       const barPosition = bar.value < 0 ? 'below' : 'above'
-                      const textX = barPosition === 'below' ? 0 : 0
 
                       // check if bar text/value string fits into  each bars.
                       let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
@@ -417,7 +416,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                       const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
                       const isHighlightedBar = config.orientation === 'vertical' ? highlightedBarValues?.includes(xAxisValue) : highlightedBarValues?.includes(yAxisValue)
-                      const highlightedBarColor = getHighlightedBarColorByValue(yAxisValue)
+                      const highlightedBarColor = config.orientation === 'vertical' ? getHighlightedBarColorByValue(xAxisValue) : getHighlightedBarColorByValue(yAxisValue)
 
                       const background = isRegularLollipopColor ? barColor : isTwoToneLollipopColor ? chroma(barColor).brighten(1) : isHighlightedBar ? 'transparent' : barColor
 
