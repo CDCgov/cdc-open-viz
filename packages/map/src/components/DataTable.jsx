@@ -125,7 +125,6 @@ const DataTable = props => {
   )
 
   const DownloadButton = memo(() => {
-    debugger
     let csvData
     if (state.general.type === 'bubble') {
       // Just Unparse
