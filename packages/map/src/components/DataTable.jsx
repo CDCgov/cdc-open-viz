@@ -194,7 +194,7 @@ const DataTable = props => {
             } else {
               labelValue = formatLegendLocation(row.original)
             }
-            //console.log('labelValu', labelValue)
+
             labelValue = getCellAnchor(labelValue, rowObj)
 
             const cellMarkup = (
