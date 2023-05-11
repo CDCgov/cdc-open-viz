@@ -95,9 +95,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   if (isDebug) console.log('Chart config', config)
 
-  // set the data table type
-  if (config) {
-  }
   const DataTable = config?.table?.showVertical ? DataTable_vert : DataTable_horiz
 
   // Destructure items from config for more readable JSX
