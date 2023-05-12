@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -9,10 +9,10 @@ import * as d3 from 'd3-array'
 import { scaleOrdinal } from '@visx/scale'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
-import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
+import chroma from 'chroma-js'
 
 // Primary Components
 import ConfigContext from './ConfigContext'
@@ -27,7 +27,6 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import SparkLine from './components/SparkLine'
 import Legend from './components/Legend'
-import DataTable from './components/DataTable'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
@@ -42,6 +41,36 @@ import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 
 import './scss/main.scss'
+// load both then config below determines which to use
+import DataTable_horiz from './components/DataTable'
+import DataTable_vert from '@cdc/core/components/DataTable'
+
+const generateColorsArray = (color = '#000000', special = false) => {
+  let colorObj = chroma(color)
+  let hoverColor = special ? colorObj.brighten(0.5).hex() : colorObj.saturate(1.3).hex()
+
+  return [color, hoverColor, colorObj.darken(0.3).hex()]
+}
+const hashObj = row => {
+  try {
+    if (!row) throw new Error('No row supplied to hashObj')
+
+    let str = JSON.stringify(row)
+    let hash = 0
+
+    if (str.length === 0) return hash
+
+    for (let i = 0; i < str.length; i++) {
+      let char = str.charCodeAt(i)
+      hash = (hash << 5) - hash + char
+      hash = hash & hash
+    }
+
+    return hash
+  } catch (e) {
+    console.error('COVE: ', e) // eslint-disable-line
+  }
+}
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
@@ -60,8 +89,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
+  let legendMemo = useRef(new Map()) // map collection
+  let innerContainerRef = useRef()
+
+  if (isDebug) console.log('Chart config', config)
+
+  const DataTable = config?.table?.showVertical ? DataTable_vert : DataTable_horiz
+
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
+
+  if (isDebug) console.log('Chart legend', legend)
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -927,8 +965,96 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return false
   }
 
+  // used for Additional Column
+  const displayDataAsText = (value, columnName) => {
+    if (value === null || value === '' || value === undefined) {
+      return ''
+    }
+
+    if (typeof value === 'string' && value.length > 0 && config.legend.type === 'equalnumber') {
+      return value
+    }
+
+    let formattedValue = value
+
+    let columnObj //= config.columns[columnName]
+    // config.columns not an array but a hash of obects
+    if (Object.keys(config.columns).length > 1) {
+      Object.keys(config.columns).forEach(function (key) {
+        var column = config.columns[key]
+        // add if not the index AND it is enabled to be added to data table
+        if (column.name === columnName) {
+          columnObj = column
+        }
+      })
+    }
+
+    if (columnObj) {
+      // If value is a number, apply specific formattings
+      if (Number(value)) {
+        const hasDecimal = columnObj.roundToPlace && (columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null)
+        const decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
+
+        // Rounding
+        if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
+          formattedValue = Number(value).toFixed(decimalPoint)
+        }
+
+        if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
+          // Formats number to string with commas - allows up to 5 decimal places, if rounding is not defined.
+          // Otherwise, uses the rounding value set at 'columnObj.roundToPlace'.
+          formattedValue = Number(value).toLocaleString('en-US', {
+            style: 'decimal',
+            minimumFractionDigits: hasDecimal ? decimalPoint : 0,
+            maximumFractionDigits: hasDecimal ? decimalPoint : 5
+          })
+        }
+      }
+
+      // add prefix and suffix if set
+      formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
+    }
+
+    return formattedValue
+  }
+
+  // this is passed DOWN into the various components
+  // then they do a lookup based on the bin number as index into here (TT)
+  const applyLegendToRow = rowObj => {
+    try {
+      if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
+      // Navigation map
+      if ('navigation' === config.type) {
+        let mapColorPalette = colorPalettes[config.color] || colorPalettes['bluegreenreverse']
+        return generateColorsArray(mapColorPalette[3])
+      }
+
+      let hash = hashObj(rowObj)
+
+      if (legendMemo.current.has(hash)) {
+        let idx = legendMemo.current.get(hash)
+        if (runtimeLegend[idx]?.disabled) return false
+
+        // DEV-784 changed to use bin prop to get color instead of idx
+        // bc we re-order legend when showSpecialClassesLast is checked
+        let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
+        return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
+      }
+
+      // Fail state
+      return generateColorsArray()
+    } catch (e) {
+      console.error('COVE: ', e) // eslint-disable-line
+    }
+  }
+
   const clean = data => {
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
+  }
+
+  // required for DataTable
+  const displayGeoName = key => {
+    return key
   }
 
   // Prevent render if loading
@@ -997,7 +1123,35 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             </CoveMediaControls.Section>
 
             {/* Data Table */}
-            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}
+            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
+              <DataTable
+                config={config}
+                rawData={config.data}
+                runtimeData={filteredData || excludedData}
+                //navigationHandler={navigationHandler}
+                expandDataTable={config.table.expanded}
+                //headerColor={general.headerColor}
+                columns={config.columns}
+                showDownloadButton={config.general.showDownloadButton}
+                runtimeLegend={dynamicLegendItems}
+                displayDataAsText={displayDataAsText}
+                displayGeoName={displayGeoName}
+                applyLegendToRow={applyLegendToRow}
+                tableTitle={config.table.label}
+                indexTitle={config.table.indexLabel}
+                vizTitle={title}
+                viewport={currentViewport}
+                parseDate={parseDate}
+                formatDate={formatDate}
+                tabbingId={handleChartTabbing}
+                showDownloadImgButton={config.showDownloadImgButton}
+                showDownloadPdfButton={config.showDownloadPdfButton}
+                innerContainerRef={innerContainerRef}
+                outerContainerRef={outerContainerRef}
+                imageRef={imageId}
+                isDebug={isDebug}
+              />
+            )}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
             {/* show pdf or image button */}
           </div>
