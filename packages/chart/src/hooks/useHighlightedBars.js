@@ -21,6 +21,16 @@ export const useHighlightedBars = (config, updateConfig) => {
     highlightedSeriesValues = []
   }
 
+  const handleUpdateHighlightedBorderWidth = (e, index) => {
+    const copyOfHighlightedBarValues = [...config.highlightedBarValues]
+    copyOfHighlightedBarValues[index].borderWidth = e.target.value
+
+    updateConfig({
+      ...config,
+      highlightedBarValues: copyOfHighlightedBarValues
+    })
+  }
+
   const handleUpdateHighlightedBar = (e, index) => {
     e.preventDefault()
 
@@ -138,6 +148,7 @@ export const useHighlightedBars = (config, updateConfig) => {
     handleAddNewHighlightedBar,
     handleRemoveHighlightedBar,
     handleUpdateHighlightedBarColor,
-    handleHighlightedBarLegendLabel
+    handleHighlightedBarLegendLabel,
+    handleUpdateHighlightedBorderWidth
   }
 }
