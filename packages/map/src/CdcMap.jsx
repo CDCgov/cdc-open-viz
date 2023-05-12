@@ -35,6 +35,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
+import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
 
 // Child Components
 import ConfigContext from './context'
@@ -43,7 +44,6 @@ import Modal from './components/Modal'
 import Sidebar from './components/Sidebar'
 
 import CountyMap from './components/CountyMap' // Future: Lazy
-import DataTable from './components/DataTable' // Future: Lazy
 import EditorPanel from './components/EditorPanel' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
 import SingleStateMap from './components/SingleStateMap' // Future: Lazy
@@ -134,6 +134,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
+  if (isDebug) console.log('CdcMap state=', state) // eslint-disable-line
+
   useEffect(() => {
     try {
       if (filteredCountryCode) {
@@ -196,7 +198,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     for (let entry of entries) {
       let { width, height } = entry.contentRect
       let newViewport = getViewport(entry.contentRect.width)
-      let svgMarginWidth = 32
       let editorWidth = 350
 
       setCurrentViewport(newViewport)
@@ -1286,8 +1287,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           data = []
         }
       } catch (e) {
-        console.error(`Cannot parse URL: ${dataUrlFinal}`)
-        console.log(e)
+        console.error(`Cannot parse URL: ${dataUrlFinal}`) // eslint-disable-line
+        console.log(e) // eslint-disable-line
         data = []
       }
 
@@ -1351,8 +1352,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       addUIDs(newState, newState.columns.geo.name || newState.columns.geo.fips)
     }
 
-    if (newState.dataTable.forceDisplay === undefined) {
-      newState.dataTable.forceDisplay = !isDashboard
+    if (newState.table.forceDisplay === undefined) {
+      newState.table.forceDisplay = !isDashboard
     }
 
     validateFipsCodeLength(newState)
@@ -1407,16 +1408,16 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // DEV-769 make "Data Table" both a required field and default value
   useEffect(() => {
-    if (state.dataTable?.title === '' || state.dataTable?.title === undefined) {
+    if (state.table?.label === '' || state.table?.label === undefined) {
       setState({
         ...state,
-        dataTable: {
-          ...state.dataTable,
+        table: {
+          ...state.table,
           title: 'Data Table'
         }
       })
     }
-  }, [state.dataTable]) // eslint-disable-line
+  }, [state.table]) // eslint-disable-line
 
   // When geo label override changes
   // - redo the tooltips
@@ -1489,14 +1490,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   // Destructuring for more readable JSX
-  const { general, tooltips, dataTable } = state
+  const { general, tooltips, table } = state
   let { title, subtext = '' } = general
 
   // if no title AND in editor then set a default
   if (isEditor) {
     if (!title || title === '') title = 'Map Title'
   }
-  if (!dataTable.title || dataTable.title === '') dataTable.title = 'Data Table'
+  if (!table.label || table.label === '') table.label = 'Data Table'
 
   // Outer container classes
   let outerContainerClasses = ['cdc-open-viz-module', 'cdc-map-outer-container', currentViewport]
@@ -1548,7 +1549,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   if (!mapProps.data || !state.data) return <Loading />
 
-  const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading
+  const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading
 
   const handleMapTabbing = () => {
     let tabbingID
@@ -1669,7 +1670,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
             {/* Link */}
-            {isDashboard && config.dataTable.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+            {isDashboard && config.table.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
@@ -1678,12 +1679,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               {state.general.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
             </CoveMediaControls.Section>
 
-            {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
+            {state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading && (
               <DataTable
-                state={state}
+                config={state}
                 rawData={state.data}
                 navigationHandler={navigationHandler}
-                expandDataTable={general.expandDataTable}
+                expandDataTable={table.expanded}
                 headerColor={general.headerColor}
                 columns={state.columns}
                 showDownloadButton={general.showDownloadButton}
@@ -1692,9 +1693,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 displayDataAsText={displayDataAsText}
                 displayGeoName={displayGeoName}
                 applyLegendToRow={applyLegendToRow}
-                tableTitle={dataTable.title}
-                indexTitle={dataTable.indexLabel}
-                mapTitle={general.title}
+                tableTitle={table.label}
+                indexTitle={table.indexLabel}
+                vizTitle={general.title}
                 viewport={currentViewport}
                 formatLegendLocation={formatLegendLocation}
                 setFilteredCountryCode={setFilteredCountryCode}

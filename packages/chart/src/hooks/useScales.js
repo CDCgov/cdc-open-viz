@@ -1,7 +1,7 @@
 import { scaleBand, scaleLinear, scaleLog, scalePoint, scaleTime } from '@visx/scale'
 
 const useScales = properties => {
-  const { xAxisDataMapped, xMax, yMax, min, max, config, data } = properties
+  let { xAxisDataMapped, xMax, yMax, min, max, config, data } = properties
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
