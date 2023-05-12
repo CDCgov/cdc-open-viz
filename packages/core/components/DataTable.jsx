@@ -135,7 +135,6 @@ const DataTable = props => {
   }
 
   const DownloadButton = memo(() => {
-    debugger
     if (rawData !== undefined) {
       let csvData
       if (config.type === 'chart' || config.general.type === 'bubble') {
