@@ -136,7 +136,17 @@ const DataTable = props => {
 
   const DownloadButton = memo(() => {
     if (rawData !== undefined) {
-      const csvData = Papa.unparse(rawData)
+      let csvData
+      if (config.type === 'chart' || config.general.type === 'bubble') {
+        // Just Unparse
+        csvData = Papa.unparse(rawData)
+      } else if ((config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') || config.general.type === 'us-geocode') {
+        // Unparse + Add column for full Geo name
+        csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[config.columns.geo.name]), ...row })))
+      } else {
+        // Unparse + Add column for full Geo name along with State
+        csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row })))
+      }
 
       const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
 
@@ -200,50 +210,6 @@ const DataTable = props => {
       if (sortVal < 0) return 1
       return -1
     })
-  /* 
-  function genMapHeader(columns) {
-    return (
-      <tr>
-        {Object.keys(columns)
-          .filter(column => columns[column].dataTable === true && columns[column].name)
-          .map(column => {
-            let text
-            if (column !== 'geo') {
-              text = columns[column].label ? columns[column].label : columns[column].name
-            } else {
-              text = config.type === 'map' ? indexTitle : config.xAxis.dataKey
-            }
-            if (config.type === 'map' && (text === undefined || text === '')) {
-              text = 'Location'
-            }
-            return (
-              <th
-                key={`col-header-${column}`}
-                tabIndex='0'
-                title={text}
-                role='columnheader'
-                scope='col'
-                onClick={() => {
-                  setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
-                }}
-                onKeyDown={e => {
-                  if (e.keyCode === 13) {
-                    setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
-                  }
-                }}
-                className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
-                {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
-              >
-                {text}
-                <button>
-                  <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
-                </button>
-              </th>
-            )
-          })}
-      </tr>
-    )
-  } */
 
   function genMapRows(rows) {
     const allrows = rows.map(row => {
@@ -259,7 +225,7 @@ const DataTable = props => {
                 const legendColor = applyLegendToRow(rowObj)
 
                 var labelValue
-                if (config.general.geoType !== 'us-county' || config.general.type === 'us-geocode') {
+                if ((config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') || config.general.type === 'us-geocode') {
                   labelValue = displayGeoName(row)
                 } else {
                   labelValue = formatLegendLocation(row)
