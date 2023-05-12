@@ -130,7 +130,17 @@ const DataTable = props => {
   }
 
   const DownloadButton = memo(() => {
-    const csvData = Papa.unparse(rawData)
+    let csvData
+    if (state.general.type === 'bubble') {
+      // Just Unparse
+      csvData = Papa.unparse(rawData)
+    } else if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
+      // Unparse + Add column for full Geo name
+      csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[state.columns.geo.name]), ...row })))
+    } else {
+      // Unparse + Add column for full Geo name
+      csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: formatLegendLocation(row[state.columns.geo.name]), ...row })))
+    }
 
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
 

@@ -1052,25 +1052,28 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // - this function is used to prevent that and instead give the formatting that is wanted
   // Example:  Desired city display in tooltip on map: "Inter-Tribal Indian Reservation"
   const titleCase = string => {
-    // if hyphen found, then split, uppercase each word, and put back together
-    if (string.includes('–') || string.includes('-')) {
-      let dashSplit = string.includes('–') ? string.split('–') : string.split('-') // determine hyphen or en dash to split on
-      let splitCharacter = string.includes('–') ? '–' : '-' // print hyphen or en dash later on.
-      let frontSplit = dashSplit[0]
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-        .join(' ')
-      let backSplit = dashSplit[1]
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-        .join(' ')
-      return frontSplit + splitCharacter + backSplit
-    } else {
-      // just return with each word uppercase
-      return string
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-        .join(' ')
+    // guard clause else error in editor
+    if (string !== undefined) {
+      // if hyphen found, then split, uppercase each word, and put back together
+      if (string.includes('–') || string.includes('-')) {
+        let dashSplit = string.includes('–') ? string.split('–') : string.split('-') // determine hyphen or en dash to split on
+        let splitCharacter = string.includes('–') ? '–' : '-' // print hyphen or en dash later on.
+        let frontSplit = dashSplit[0]
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+          .join(' ')
+        let backSplit = dashSplit[1]
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+          .join(' ')
+        return frontSplit + splitCharacter + backSplit
+      } else {
+        // just return with each word uppercase
+        return string
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+          .join(' ')
+      }
     }
   }
 
