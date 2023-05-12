@@ -1009,7 +1009,8 @@ const EditorPanel = () => {
     handleAddNewHighlightedBar,
     handleRemoveHighlightedBar,
     handleUpdateHighlightedBarColor,
-    handleHighlightedBarLegendLabel
+    handleHighlightedBarLegendLabel,
+    handleUpdateHighlightedBorderWidth
    } = useHighlightedBars(config, updateConfig)
 
   return (
@@ -2133,6 +2134,10 @@ const EditorPanel = () => {
                                   <label>
                                     <span className='edit-label column-heading'>Color</span>
                                     <input type='text' value={config.highlightedBarValues[i].color ? config.highlightedBarValues[i].color : ''} onChange={e => handleUpdateHighlightedBarColor(e, i)} />
+                                  </label>
+                                  <label>
+                                    <span className='edit-label column-heading'>Border Width</span>
+                                    <input max='5' min='0' type='number' value={config.highlightedBarValues[i].borderWidth ? config.highlightedBarValues[i].borderWidth : ''} onChange={e => handleUpdateHighlightedBorderWidth(e, i)} />
                                   </label>
                                   <label>
                                     <span className='edit-label column-heading'>Legend Label</span>
