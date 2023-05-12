@@ -288,7 +288,7 @@ const EditorPanel = props => {
         setState({
           ...state,
           table: {
-            ...state.general,
+            ...state.table,
             expanded: value
           }
         })
