@@ -69,7 +69,7 @@ export default {
     caption: '',
     showDownloadUrl: false,
     showDataTableLink: true,
-    forceDisplay: false,
+    forceDisplay: true,
     indexLabel: ''
   },
   tooltips: {
