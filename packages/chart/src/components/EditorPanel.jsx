@@ -2221,7 +2221,7 @@ const EditorPanel = () => {
                                       updateConfig({
                                         ...config,
                                         xAxis: {
-                                          ...config.yAxis,
+                                          ...config.xAxis,
                                           anchors: copiedAnchorGroups
                                         }
                                       })
