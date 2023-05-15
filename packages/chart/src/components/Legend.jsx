@@ -8,7 +8,7 @@ import useLegendClasses from './../hooks/useLegendClasses'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 const Legend = () => {
-  const { config, legend, colorScale, seriesHighlight, highlight, twoColorPalette, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
+  const { config, legend, colorScale, seriesHighlight, highlight, twoColorPalette, tableData, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
 
@@ -104,14 +104,14 @@ const Legend = () => {
     if (config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && colorCode && config.series?.length === 1) {
       let palette = colorPalettes[config.palette]
 
-      while (data.length > palette.length) {
+      while (tableData.length > palette.length) {
         palette = palette.concat(palette)
       }
       palette = palette.slice(0, data.length)
       //store uniq values to Set by colorCode
       const set = new Set()
 
-      data.forEach(d => set.add(d[colorCode]))
+      tableData.forEach(d => set.add(d[colorCode]))
 
       // create labels with uniq values
       const uniqeLabels = Array.from(set).map((val, i) => {

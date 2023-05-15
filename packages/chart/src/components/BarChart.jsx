@@ -9,7 +9,7 @@ import { BarStackHorizontal } from '@visx/shape'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, getTextWidth, parseDate } = useContext(ConfigContext)
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, tableData, formatDate, isNumber, getTextWidth, parseDate } = useContext(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
@@ -46,6 +46,27 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       style = { borderRadius: radius }
     }
     return style
+  }
+
+  const assignColorsToValues = () => {
+    const palettesArr = colorPalettes[config.palette]
+    const values = tableData.map(d => {
+      return d[config.legend.colorCode]
+    })
+    // Map to hold unique values and their  colors
+    let colorMap = new Map()
+    // Resultant array to hold colors  to the values
+    let result = []
+
+    for (let i = 0; i < values.length; i++) {
+      // If value not in map, add it and assign a color
+      if (!colorMap.has(values[i])) {
+        colorMap.set(values[i], palettesArr[colorMap.size % palettesArr.length])
+      }
+      // push the colosr to the result array
+      result.push(colorMap.get(values[i]))
+    }
+    return result
   }
 
   const updateBars = defaultBars => {
@@ -339,11 +360,12 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       if (config.isLollipopChart) {
                         offset = (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2 - lollipopBarWidth / 2
                       }
-                      const set = new Set()
-                      data.forEach(d => set.add(d[config.legend.colorCode]))
-                      const uniqValues = Array.from(set)
 
-                      let palette = colorPalettes[config.palette].slice(0, uniqValues.length)
+                      const values = tableData.map(d => {
+                        return d[config.legend.colorCode]
+                      })
+
+                      let palette = assignColorsToValues()
 
                       let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
                       let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
@@ -363,7 +385,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
 
                       const barPosition = bar.value < 0 ? 'below' : 'above'
-                      const textX = barPosition === 'below' ? 0 : 0
 
                       // check if bar text/value string fits into  each bars.
                       let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
