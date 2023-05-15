@@ -371,11 +371,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       if (config.isLollipopChart) {
                         offset = (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2 - lollipopBarWidth / 2
                       }
-
-                      const values = tableData.map(d => {
-                        return d[config.legend.colorCode]
-                      })
-
                       let palette = assignColorsToValues()
 
                       let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
