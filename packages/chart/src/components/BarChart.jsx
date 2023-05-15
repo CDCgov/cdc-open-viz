@@ -344,6 +344,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         if (!match?.color) return `rgba(255, 102, 1)`
                         return match.color
                       }
+
+                      const getHighlightedBarByValue = value => {
+                        const match = config?.highlightedBarValues.filter(item => {
+                          if (!item.value) return
+                          return config.xAxis.type === 'date' ? formatDate(parseDate(item.value)) === value : item.value === value
+                        })[0]
+
+                        if (!match?.color) return false
+                        return match
+                      }
+
                       let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
 
                       highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
@@ -438,13 +449,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                       const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
                       const isHighlightedBar = config.orientation === 'vertical' ? highlightedBarValues?.includes(xAxisValue) : highlightedBarValues?.includes(yAxisValue)
-                      const highlightedBarColor = getHighlightedBarColorByValue(yAxisValue)
+                      const highlightedBarColor = config.orientation === 'vertical' ? getHighlightedBarColorByValue(xAxisValue) : getHighlightedBarColorByValue(yAxisValue)
+                      const highlightedBar = config.orientation === 'vertical' ? getHighlightedBarByValue(xAxisValue) : getHighlightedBarByValue(yAxisValue)
 
                       const background = isRegularLollipopColor ? barColor : isTwoToneLollipopColor ? chroma(barColor).brighten(1) : isHighlightedBar ? 'transparent' : barColor
 
                       const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
 
-                      const borderWidth = isHighlightedBar ? barBorderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
+                      const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
 
                       const finalStyle = {
                         background,
