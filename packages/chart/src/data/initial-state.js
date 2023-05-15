@@ -2,6 +2,7 @@ export default {
   type: 'chart',
   title: '',
   showTitle: true,
+  showDownloadMediaButton: false,
   theme: 'theme-blue',
   animate: false,
   fontSize: 'medium',
@@ -14,6 +15,9 @@ export default {
   barStyle: '',
   roundingStyle: 'standard',
   tipRounding: 'top',
+  general: {
+    showDownloadButton: true
+  },
   padding: {
     left: 5,
     right: 5
@@ -111,9 +115,17 @@ export default {
     height: '',
     caption: '',
     showDownloadUrl: false,
-    showDataTableLink: true
+    showDataTableLink: true,
+    indexLabel: '',
+    showVertical: false
   },
   orientation: 'vertical',
+  color: 'pinkpurple',
+  columns: {
+    additionalColumn1: {
+      name: ''
+    }
+  },
   legend: {
     behavior: 'isolate',
     singleRow: false,
