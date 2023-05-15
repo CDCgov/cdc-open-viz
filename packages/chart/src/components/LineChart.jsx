@@ -71,13 +71,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   isNumber(d[seriesKey]) && (
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
-                      <Text
-                        display={config.labels ? 'block' : 'none'}
-                        x={xScale(getXAxisData(d))}
-                        y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))}
-                        fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                        textAnchor='middle'
-                      >
+                      <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>
                         {formatNumber(d[seriesKey], 'left')}
                       </Text>
 
