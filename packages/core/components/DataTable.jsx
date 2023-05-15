@@ -198,18 +198,16 @@ const DataTable = props => {
       break
   }
 
-  const rows = Object.keys(runtimeData)
-    //.filter(row => applyLegendToRow(runtimeData[row]))
-    .sort((a, b) => {
-      let sortVal
-      if (config.columns.length > 0) {
-        sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
-      }
-      if (!sortBy.asc) return sortVal
-      if (sortVal === 0) return 0
-      if (sortVal < 0) return 1
-      return -1
-    })
+  const rows = Object.keys(runtimeData).sort((a, b) => {
+    let sortVal
+    if (config.columns.length > 0) {
+      sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
+    }
+    if (!sortBy.asc) return sortVal
+    if (sortVal === 0) return 0
+    if (sortVal < 0) return 1
+    return -1
+  })
 
   function genMapRows(rows) {
     const allrows = rows.map(row => {
@@ -265,8 +263,10 @@ const DataTable = props => {
       tmpSeriesColumns = [config.xAxis.dataKey, config.yAxis.dataKey] //Object.keys(runtimeData[0])
     }
 
+    console.log('DTable CORE: config.columns', config.columns)
+
     // then add the additional Columns
-    if (Object.keys(config.columns).length > 1) {
+    if (Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
         var value = config.columns[key]
         // add if not the index AND it is enabled to be added to data table
@@ -275,12 +275,13 @@ const DataTable = props => {
         }
       })
     }
+
     return tmpSeriesColumns
   }
 
   const getLabel = name => {
     let custLabel = ''
-    if (Object.keys(config.columns).length > 1) {
+    if (Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
         var tmpColumn = config.columns[key]
         // add if not the index AND it is enabled to be added to data table
@@ -288,6 +289,7 @@ const DataTable = props => {
           custLabel = tmpColumn.label
         }
       })
+      console.log('custLable=', custLabel)
       return custLabel
     }
   }
@@ -296,7 +298,7 @@ const DataTable = props => {
     return (
       <tr>
         {dataSeriesColumns().map(column => {
-          let custLabel = getLabel(column) || column
+          let custLabel = getLabel(column) ? getLabel(column) : column
           let text = column === config.xAxis.dataKey ? config.table.indexLabel : custLabel
           return (
             <th

@@ -99,8 +99,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
 
-  if (isDebug) console.log('Chart legend', legend)
-
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
     if (!title || title === '') title = 'Chart Title'
@@ -978,8 +976,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let formattedValue = value
 
     let columnObj //= config.columns[columnName]
-    // config.columns not an array but a hash of obects
-    if (Object.keys(config.columns).length > 1) {
+    // config.columns not an array but a hash of objects
+    if (Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
         var column = config.columns[key]
         // add if not the index AND it is enabled to be added to data table
