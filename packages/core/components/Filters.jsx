@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 // CDC
 import Button from '@cdc/core/components/elements/Button'
@@ -72,7 +72,9 @@ export const useFilters = props => {
 
   const changeFilterActive = (index, value) => {
     let newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
+
     newFilters[index].active = value
+    setConfig({ ...visualizationConfig })
 
     // If this is a button filter type show the button.
     if (visualizationConfig.filterBehavior === 'Apply Button') {
@@ -183,6 +185,7 @@ const Filters = props => {
   const { config: visualizationConfig, filteredData, dimensions } = props
   const { filters, type, general, theme, filterBehavior } = visualizationConfig
   const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
+  const [selectedFilter, setSelectedFilter] = useState('')
 
   // useFilters hook provides data and logic for handling various filter functions
   // prettier-ignore
@@ -204,6 +207,13 @@ const Filters = props => {
       setMobileFilterStyle(false)
     }
   }, [dimensions])
+
+  useEffect(() => {
+    if (selectedFilter) {
+      let el = document.getElementById(selectedFilter.id)
+      if (el) el.focus()
+    }
+  }, [changeFilterActive, selectedFilter])
 
   const Filters = props => props.children
 
@@ -241,10 +251,24 @@ const Filters = props => {
     const { filter: singleFilter, index: outerIndex } = props
     return (
       <section className='single-filters__tab-bar'>
-        {singleFilter.values.map(filter => {
+        {singleFilter.values.map((filter, index) => {
           const buttonClassList = ['button__tab-bar', singleFilter.active === filter ? 'button__tab-bar--active' : '']
           return (
-            <button className={buttonClassList.join(' ')} key={filter} onClick={e => changeFilterActive(outerIndex, filter)}>
+            <button
+              id={`${filter}-${outerIndex}-${index}`}
+              className={buttonClassList.join(' ')}
+              key={filter}
+              onClick={e => {
+                changeFilterActive(outerIndex, filter)
+                setSelectedFilter(e.target)
+              }}
+              onKeyDown={e => {
+                if (e.keyCode === 13) {
+                  changeFilterActive(outerIndex, filter)
+                  setSelectedFilter(e.target)
+                }
+              }}
+            >
               {filter}
             </button>
           )
@@ -300,8 +324,22 @@ const Filters = props => {
           const tabClassList = ['tab', active === filterOption && 'tab--active', theme && theme]
 
           pillValues.push(
-            <div className='pill__wrapper'>
-              <button className={pillClassList.join(' ')} onClick={e => changeFilterActive(outerIndex, filterOption)} name={label}>
+            <div className='pill__wrapper' key={`pill-${index}`}>
+              <button
+                id={`${filterOption}-${outerIndex}-${index}`}
+                className={pillClassList.join(' ')}
+                onKeyDown={e => {
+                  if (e.keyCode === 13) {
+                    changeFilterActive(outerIndex, filterOption)
+                    setSelectedFilter(e.target)
+                  }
+                }}
+                onClick={e => {
+                  changeFilterActive(outerIndex, filterOption)
+                  setSelectedFilter(e.target)
+                }}
+                name={label}
+              >
                 {filterOption}
               </button>
             </div>
@@ -314,7 +352,20 @@ const Filters = props => {
           )
 
           tabValues.push(
-            <button className={tabClassList.join(' ')} onClick={e => changeFilterActive(outerIndex, filterOption)}>
+            <button
+              id={`${filterOption}-${outerIndex}-${index}`}
+              className={tabClassList.join(' ')}
+              onClick={e => {
+                changeFilterActive(outerIndex, filterOption)
+                setSelectedFilter(e.target)
+              }}
+              onKeyDown={e => {
+                if (e.keyCode === 13) {
+                  changeFilterActive(outerIndex, filterOption)
+                  setSelectedFilter(e.target)
+                }
+              }}
+            >
               {filterOption}
             </button>
           )
