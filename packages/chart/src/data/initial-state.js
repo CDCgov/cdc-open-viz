@@ -122,10 +122,10 @@ export default {
   orientation: 'vertical',
   color: 'pinkpurple',
   columns: {
+  },
     additionalColumn1: {
       name: ''
-    }
-  },
+    },
   legend: {
     behavior: 'isolate',
     singleRow: false,

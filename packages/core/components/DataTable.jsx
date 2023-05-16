@@ -12,7 +12,7 @@ import Loading from '@cdc/core/components/Loading'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
-  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, parseDate, formatDate, isDebug } = props
+  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, formatNumber, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, parseDate, formatDate, isDebug } = props
   if (isDebug) console.log('core/DataTable: props=', props)
   if (isDebug) console.log('core/DataTable: runtimeData=', runtimeData)
   if (isDebug) console.log('core/DataTable: rawData=', rawData)
@@ -187,10 +187,10 @@ const DataTable = props => {
     case 'Box Plot':
       if (!config.boxplot) return <Loading />
       break
-    case 'Combo':
+    /*     case 'Combo':
       if (!config.data) return <Loading />
-      break
-    case 'Line' || 'Bar' || 'Pie' || 'Deviation Bar' || 'Paired Bar':
+      break */
+    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar':
       if (!runtimeData) return <Loading />
       break
     default:
@@ -263,8 +263,6 @@ const DataTable = props => {
       tmpSeriesColumns = [config.xAxis.dataKey, config.yAxis.dataKey] //Object.keys(runtimeData[0])
     }
 
-    console.log('DTable CORE: config.columns', config.columns)
-
     // then add the additional Columns
     if (Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
@@ -289,7 +287,6 @@ const DataTable = props => {
           custLabel = tmpColumn.label
         }
       })
-      console.log('custLable=', custLabel)
       return custLabel
     }
   }
@@ -341,7 +338,7 @@ const DataTable = props => {
               if (column === config.xAxis.dataKey) {
                 const rowObj = runtimeData[row]
                 //const legendColor = applyLegendToRow(rowObj)
-                var labelValue = rowObj[column]
+                var labelValue = rowObj[column] // just raw X axis string
                 labelValue = getCellAnchor(labelValue, rowObj)
                 // no colors on row headers for charts bc it's Date not data
                 // Remove this - <LegendCircle fill={legendColor[row]} />
@@ -353,7 +350,7 @@ const DataTable = props => {
               //MAP SPECIFIC- change to CHART specific
               // onClick = { e => (config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}
               return (
-                <td tabIndex='0' role='gridcell'>
+                <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`}>
                   {cellValue}
                 </td>
               )
