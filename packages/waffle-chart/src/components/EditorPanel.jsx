@@ -444,7 +444,7 @@ const EditorPanel = memo(props => {
         <button className={`cove-editor--toggle` + (!displayPanel ? ` collapsed` : ``)} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
         <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
           <div className='cove-editor__panel-container'>
-            <h2 className='cove-editor__heading'>Configure Waffle Chart</h2>
+            <h2 className='cove-editor__heading'>Configure Chart</h2>
             <section className='cove-editor__content'>{editorContent}</section>
           </div>
         </section>
