@@ -121,11 +121,8 @@ export default {
   },
   orientation: 'vertical',
   color: 'pinkpurple',
-  columns: {
+  columns: {  // start with a blank list
   },
-    additionalColumn1: {
-      name: ''
-    },
   legend: {
     behavior: 'isolate',
     singleRow: false,
