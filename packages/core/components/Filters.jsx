@@ -347,7 +347,7 @@ const Filters = props => {
 
           values.push(
             <option key={index} value={filterOption}>
-              {filterOption}
+              {singleFilter.labels && singleFilter.labels[filterOption] ? singleFilter.labels[filterOption] : filterOption}
             </option>
           )
 
