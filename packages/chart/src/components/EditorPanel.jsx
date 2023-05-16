@@ -295,8 +295,7 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
-    //if (isDebug)
-    console.log('#COVE: CHART: EditorPanel: section, subsection, fieldName, newValue', section, subsection, fieldName, newValue) // eslint-disable-line
+    if (isDebug) console.log('#COVE: CHART: EditorPanel: section, subsection, fieldName, newValue', section, subsection, fieldName, newValue) // eslint-disable-line
 
     if (section === 'boxplot' && subsection === 'legend') {
       updateConfig({
@@ -958,7 +957,6 @@ const EditorPanel = () => {
   }
 
   const editColumn = async (addCol, columnName, setval) => {
-    console.log('EDITCOLUMN: addCol, columnName, setval', addCol, columnName, setval)
     // not using special classes like in map editorpanel so removed those cases
     switch (columnName) {
       case 'name':
@@ -987,16 +985,6 @@ const EditorPanel = () => {
         break
     }
   }
-
-  // need selection to feed into addColumn
-  /*   const selectColumn = async (columnName, editTarget, value) => {
-    // not using special classes like in map editorpanel so removed those cases
-    // store selection from Additional Columns
-    updateConfig({
-      ...config,
-      selected: value
-    })
-  } */
 
   // prettier-ignore
   const {
@@ -2358,8 +2346,6 @@ const EditorPanel = () => {
                             </Tooltip>
                           </span>
                         </label>
-                        {console.log('additionalColumns', additionalColumns)}
-                        {console.log('### config.columns', config.columns)}
                         {additionalColumns.map(val => (
                           <fieldset className='edit-block' key={val}>
                             <button
@@ -2408,7 +2394,6 @@ const EditorPanel = () => {
                                     checked={config.columns[val].dataTable}
                                     onChange={event => {
                                       editColumn(val, 'dataTable', event.target.checked)
-                                      console.log('after set columns=', config.columns)
                                     }}
                                   />
                                   <span className='edit-label'>Display in Data Table</span>
