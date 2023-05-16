@@ -1,5 +1,7 @@
 export default {
   title: 'Waffle Chart',
+  visualizationType: 'Waffle ',
+  visualizationSubType: 'linear',
   content: '',
   subtext: '',
   orientation: 'horizontal',

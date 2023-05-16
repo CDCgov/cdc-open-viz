@@ -194,10 +194,18 @@ const EditorPanel = memo(props => {
     }
     return filterDataOptions
   }
+  //visualizationType
 
   const editorContent = (
     <Accordion>
       <Accordion.Section title='General'>
+        <div className='cove-accordion__panel-section'>
+          <div style={{ width: '100%', display: 'block' }} className='cove-input-group'>
+            <InputSelect value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={['Waffle', 'Gauge']} className='cove-input' />
+            {config.visualizationType === 'Gauge' && <InputSelect value={config.visualizationSubType} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['Linear']} className='cove-input' />}
+          </div>
+        </div>
+
         <InputText value={config.title} fieldName='title' label='Title' placeholder='Waffle Chart Title' updateField={updateField} />
 
         <InputText
