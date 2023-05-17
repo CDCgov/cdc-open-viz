@@ -324,6 +324,7 @@ const EditorPanel = () => {
       })
       return
     }
+
     if (section === 'columns' && subsection !== '' && fieldName !== '') {
       updateConfig({
         ...config,
@@ -945,13 +946,6 @@ const EditorPanel = () => {
     })
   }
 
-  const clearSelectedColumn = () => {
-    updateConfig({
-      ...config,
-      selected: ''
-    })
-  }
-
   const removeAdditionalColumn = columnName => {
     const newColumns = config.columns
 
@@ -993,15 +987,6 @@ const EditorPanel = () => {
     }
   }
 
-  // need selection to feed into addColumn
-  const selectColumn = async (columnName, editTarget, value) => {
-    // not using special classes like in map editorpanel so removed those cases
-    // store selection from Additional Columns
-    updateConfig({
-      ...config,
-      selected: value
-    })
-  }
   // prettier-ignore
   const {
     highlightedBarValues,
@@ -2377,9 +2362,7 @@ const EditorPanel = () => {
                               <span className='edit-label column-heading'>Column</span>
                               <select
                                 value={config.columns[val] ? config.columns[val].name : columnsOptions[0]}
-                                //value={config.selected !== '' ? config.selected : columnsOptions[0]}
                                 onChange={event => {
-                                  //selectColumn(val, 'name', event.target.value)
                                   editColumn(val, 'name', event.target.value)
                                 }}
                               >
@@ -2440,7 +2423,6 @@ const EditorPanel = () => {
                           onClick={event => {
                             event.preventDefault()
                             addAdditionalColumn(additionalColumns.length + 1)
-                            //clearSelectedColumn()
                           }}
                         >
                           Add Column

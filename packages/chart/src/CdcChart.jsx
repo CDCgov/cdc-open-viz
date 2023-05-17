@@ -99,8 +99,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
 
-  if (isDebug) console.log('Chart legend', legend)
-
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
     if (!title || title === '') title = 'Chart Title'
@@ -978,8 +976,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let formattedValue = value
 
     let columnObj //= config.columns[columnName]
-    // config.columns not an array but a hash of obects
-    if (Object.keys(config.columns).length > 1) {
+    // config.columns not an array but a hash of objects
+    if (Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
         var column = config.columns[key]
         // add if not the index AND it is enabled to be added to data table
@@ -989,15 +987,30 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
     }
 
+    if (columnObj === undefined) {
+      // then use left axis config
+      columnObj = config.type === 'chart' ? config.dataFormat : config.primary
+      // NOTE: Left Value Axis uses different names
+      // so map them below so the code below works
+      // - copy commas to useCommas to work below
+      columnObj['useCommas'] = columnObj.commas
+      // - copy roundTo to roundToPlace to work below
+      columnObj['roundToPlace'] = columnObj.roundTo ? columnObj.roundTo : ''
+    }
+
     if (columnObj) {
       // If value is a number, apply specific formattings
+      let hasDecimal = false
+      let decimalPoint = 0
       if (Number(value)) {
-        const hasDecimal = columnObj.roundToPlace && (columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null)
-        const decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
+        if (columnObj.roundToPlace >= 0) {
+          hasDecimal = columnObj.roundToPlace ? columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null : false
+          decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
 
-        // Rounding
-        if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
-          formattedValue = Number(value).toFixed(decimalPoint)
+          // Rounding
+          if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
+            formattedValue = Number(value).toFixed(decimalPoint)
+          }
         }
 
         if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
@@ -1072,7 +1085,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         {!missingRequiredSections() && !config.newViz && (
           <div className='cdc-chart-inner-container'>
             {/* Title */}
-
             {title && config.showTitle && (
               <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
                 {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
@@ -1143,6 +1155,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 viewport={currentViewport}
                 parseDate={parseDate}
                 formatDate={formatDate}
+                formatNumber={formatNumber}
                 tabbingId={handleChartTabbing}
                 showDownloadImgButton={config.showDownloadImgButton}
                 showDownloadPdfButton={config.showDownloadPdfButton}

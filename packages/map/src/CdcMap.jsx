@@ -907,6 +907,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       return ''
     }
 
+    // if string of letters like 'Home' then dont need to format as a number
     if (typeof value === 'string' && value.length > 0 && state.legend.type === 'equalnumber') {
       return value
     }
@@ -914,6 +915,17 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     let formattedValue = value
 
     let columnObj = state.columns[columnName]
+
+    if (columnObj === undefined) {
+      // then use left axis config
+      columnObj = state.columns.primary
+      // NOTE: Left Value Axis uses different names
+      // so map them below so the code below works
+      // - copy commas to useCommas to work below
+      columnObj['useCommas'] = columnObj.commas
+      // - copy roundTo to roundToPlace to work below
+      columnObj['roundToPlace'] = columnObj.roundTo ? columnObj.roundTo : ''
+    }
 
     if (columnObj) {
       // If value is a number, apply specific formattings
@@ -1002,7 +1014,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const column = state.columns[columnKey]
 
         if (true === column.tooltip) {
-          let label = column.label.length > 0 ? column.label : ''
+          let label = column.label?.length > 0 ? column.label : ''
 
           let value
 

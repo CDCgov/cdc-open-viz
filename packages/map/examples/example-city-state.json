@@ -124,10 +124,7 @@
     "geoCodeCircleSize": 2
   },
   "mapPosition": {
-    "coordinates": [
-      0,
-      30
-    ],
+    "coordinates": [0, 30],
     "zoom": 1
   },
   "map": {
@@ -142,13 +139,13 @@
   "data": [
     {
       "STATE": "AL",
-      "Rate": 10,
+      "Rate": 1000,
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
     {
       "STATE": "AK",
-      "Rate": 12,
+      "Rate": 1200,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
