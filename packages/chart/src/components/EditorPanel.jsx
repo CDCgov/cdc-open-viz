@@ -890,6 +890,7 @@ const EditorPanel = () => {
 
   // for pie charts
   if (!config.data && data) {
+    if (!data[0]) return
     Object.keys(data[0]).map(colName => {
       // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
       const found = data.some(el => el.dataKey === colName)

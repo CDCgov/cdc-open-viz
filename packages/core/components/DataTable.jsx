@@ -324,7 +324,6 @@ const DataTable = props => {
   }
 
   function genChartRows(rows) {
-    let dataColumns = Object.keys(runtimeData[0]) // get from 1 row
     const allrows = rows.map(row => {
       return (
         <tr role='row'>
