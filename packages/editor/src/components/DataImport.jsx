@@ -395,9 +395,9 @@ export default function DataImport() {
     return (
       //todo convert to modal
       <>
-      <button className='btn danger' onClick={() => resetEditor({ type: config.type, visualizationType: config.visualizationType }, 'Resetting will remove your data and settings. Do you want to continue?')}>
-        Clear
-        <CloseIcon />
+        <button className='btn danger' onClick={() => resetEditor({ type: config.type, visualizationType: config.visualizationType }, 'Resetting will remove your data and settings. Do you want to continue?')}>
+          Clear
+          <CloseIcon />
         </button>
         {/* DEV-851 link to replace file should pop file dialog */}
         {config.dataFileSourceType === 'file' && (
@@ -406,7 +406,8 @@ export default function DataImport() {
             <p>
               <span>or replace file</span>
             </p>
-          </div>)}
+          </div>
+        )}
       </>
     )
   }
@@ -693,7 +694,7 @@ export default function DataImport() {
               <>
                 <div className='heading-3'>Data Source</div>
                 <div className='file-loaded-area'>
-                  {config.dataFileSourceType === 'file' && (
+                  {(config.dataFileSourceType === 'file' || !config.dataUrl) && (
                     <div className='data-source-options'>
                       <div className={isDragActive2 ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps2()}>
                         <input {...getInputProps2()} />
@@ -709,7 +710,7 @@ export default function DataImport() {
                     </div>
                   )}
 
-                  {config.dataFileSourceType === 'url' && (
+                  {(config.dataFileSourceType === 'url' || config.dataUrl) && (
                     <>
                       <div className='url-source-options'>
                         <div>{loadFileFromUrl(externalURL)}</div>
