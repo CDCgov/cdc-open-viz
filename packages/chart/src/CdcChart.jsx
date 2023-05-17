@@ -966,7 +966,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // used for Additional Column
   const displayDataAsText = (value, columnName) => {
     if (value === null || value === '' || value === undefined) {
-      return ''
+      return ''j
     }
 
     if (typeof value === 'string' && value.length > 0 && config.legend.type === 'equalnumber') {
@@ -988,8 +988,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     if (columnObj === undefined) {
+       debugger
       // then use left axis config
-      columnObj = config.dataFormat
+      columnObj = config.type === 'chart' ? config.dataFormat : config.primary
       // NOTE: Left Value Axis uses different names
       // so map them below so the code below works
       // - copy commas to useCommas to work below
