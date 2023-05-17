@@ -772,7 +772,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(({ columnName, label, labels, active, values, type }, idx) => {
+    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type }, idx) => {
       let newFilter = runtimeFilters[idx]
 
       const sortAsc = (a, b) => {
@@ -811,6 +811,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       newFilter.type = type
       newFilter.label = label ?? ''
       newFilter.columnName = columnName
+      newFilter.orderedValues = orderedValues
+      newFilter.queryParameter = queryParameter
+      newFilter.labels = labels
       newFilter.values = values
       handleSorting(newFilter)
       newFilter.active = active ?? values[0] // Default to first found value
