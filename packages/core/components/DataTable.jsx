@@ -12,7 +12,7 @@ import Loading from '@cdc/core/components/Loading'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
-  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, parseDate, formatDate, isDebug } = props
+  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, formatNumber, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, parseDate, formatDate, isDebug } = props
   if (isDebug) console.log('core/DataTable: props=', props)
   if (isDebug) console.log('core/DataTable: runtimeData=', runtimeData)
   if (isDebug) console.log('core/DataTable: rawData=', rawData)
@@ -187,10 +187,7 @@ const DataTable = props => {
     case 'Box Plot':
       if (!config.boxplot) return <Loading />
       break
-    case 'Combo':
-      if (!config.data) return <Loading />
-      break
-    case 'Line' || 'Bar' || 'Pie' || 'Deviation Bar' || 'Paired Bar':
+    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar':
       if (!runtimeData) return <Loading />
       break
     default:
@@ -198,18 +195,16 @@ const DataTable = props => {
       break
   }
 
-  const rows = Object.keys(runtimeData)
-    //.filter(row => applyLegendToRow(runtimeData[row]))
-    .sort((a, b) => {
-      let sortVal
-      if (config.columns.length > 0) {
-        sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
-      }
-      if (!sortBy.asc) return sortVal
-      if (sortVal === 0) return 0
-      if (sortVal < 0) return 1
-      return -1
-    })
+  const rows = Object.keys(runtimeData).sort((a, b) => {
+    let sortVal
+    if (config.columns.length > 0) {
+      sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
+    }
+    if (!sortBy.asc) return sortVal
+    if (sortVal === 0) return 0
+    if (sortVal < 0) return 1
+    return -1
+  })
 
   function genMapRows(rows) {
     const allrows = rows.map(row => {
@@ -266,7 +261,7 @@ const DataTable = props => {
     }
 
     // then add the additional Columns
-    if (Object.keys(config.columns).length > 1) {
+    if (Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
         var value = config.columns[key]
         // add if not the index AND it is enabled to be added to data table
@@ -275,12 +270,13 @@ const DataTable = props => {
         }
       })
     }
+
     return tmpSeriesColumns
   }
 
   const getLabel = name => {
     let custLabel = ''
-    if (Object.keys(config.columns).length > 1) {
+    if (Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
         var tmpColumn = config.columns[key]
         // add if not the index AND it is enabled to be added to data table
@@ -296,7 +292,7 @@ const DataTable = props => {
     return (
       <tr>
         {dataSeriesColumns().map(column => {
-          let custLabel = getLabel(column) || column
+          let custLabel = getLabel(column) ? getLabel(column) : column
           let text = column === config.xAxis.dataKey ? config.table.indexLabel : custLabel
           return (
             <th
@@ -328,7 +324,6 @@ const DataTable = props => {
   }
 
   function genChartRows(rows) {
-    let dataColumns = Object.keys(runtimeData[0]) // get from 1 row
     const allrows = rows.map(row => {
       return (
         <tr role='row'>
@@ -339,7 +334,7 @@ const DataTable = props => {
               if (column === config.xAxis.dataKey) {
                 const rowObj = runtimeData[row]
                 //const legendColor = applyLegendToRow(rowObj)
-                var labelValue = rowObj[column]
+                var labelValue = rowObj[column] // just raw X axis string
                 labelValue = getCellAnchor(labelValue, rowObj)
                 // no colors on row headers for charts bc it's Date not data
                 // Remove this - <LegendCircle fill={legendColor[row]} />
@@ -351,7 +346,7 @@ const DataTable = props => {
               //MAP SPECIFIC- change to CHART specific
               // onClick = { e => (config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}
               return (
-                <td tabIndex='0' role='gridcell'>
+                <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`}>
                   {cellValue}
                 </td>
               )
