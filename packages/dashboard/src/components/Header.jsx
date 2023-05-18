@@ -224,12 +224,22 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
               </label>
             {filter.type === 'url' && <>
               <label>
+                <span className='edit-label column-heading'>Label: </span>
+                <input
+                  type='text'
+                  value={filter.key}
+                  onChange={e => {
+                    updateFilterProp('key', index, e.target.value)
+                  }}
+                />
+              </label>
+              <label>
                 <span className='edit-label column-heading'>URL to Filter: </span>
                 <select defaultValue={filter.datasetKey || ''} onChange={e => updateFilterProp('datasetKey', index, e.target.value)}> 
                   <option value=''>- Select Option -</option>
                   {Object.keys(config.datasets).map(datasetKey => {
                     if(config.datasets[datasetKey].dataUrl){
-                      return <option key={datasetKey} value={datasetKey}>{(datasetKey + config.datasets[datasetKey].dataUrl).substring(0, 50)}</option>
+                      return <option key={datasetKey} value={datasetKey}>{(config.datasets[datasetKey].dataUrl).substring(0, 50)}</option>
                     }
                     return <React.Fragment key={datasetKey}></React.Fragment>;
                   })}
