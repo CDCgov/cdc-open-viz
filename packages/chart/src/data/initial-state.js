@@ -16,7 +16,7 @@ export default {
   roundingStyle: 'standard',
   tipRounding: 'top',
   general: {
-    showDownloadButton: true
+    showDownloadButton: false
   },
   padding: {
     left: 5,
