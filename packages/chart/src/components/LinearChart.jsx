@@ -137,6 +137,8 @@ export default function LinearChart() {
     }
   }, [dataRef?.isIntersecting, config.animate])
 
+  const { orientation, xAxis, yAxis } = config
+
   return isNaN(width) ? (
     <></>
   ) : (
@@ -452,8 +454,6 @@ export default function LinearChart() {
         {/* y anchors */}
         {config.yAxis.anchors &&
           config.yAxis.anchors.map(anchor => {
-            const { orientation, xAxis, yAxis } = config
-
             let anchorPosition = yScale(anchor.value)
             const padding = config.orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
             const middleOffset = config.orientation === 'horizontal' && config.visualizationType === 'Bar' ? config.barHeight / 4 : 0
@@ -461,6 +461,7 @@ export default function LinearChart() {
             return (
               // prettier-ignore
               <Line
+                key={anchor.value}
                 strokeDasharray={handleLineType(anchor.lineStyle)}
                 stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                 className='anchor-y'
@@ -473,8 +474,6 @@ export default function LinearChart() {
         {/* x anchors */}
         {config.xAxis.anchors &&
           config.xAxis.anchors.map(anchor => {
-            const { orientation, xAxis, yAxis } = config
-
             let newX = xAxis
             if (orientation === 'horizontal') {
               newX = yAxis
@@ -487,6 +486,7 @@ export default function LinearChart() {
             return (
               // prettier-ignore
               <Line
+                key={anchor.value}
                 strokeDasharray={handleLineType(anchor.lineStyle)}
                 stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                 fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
