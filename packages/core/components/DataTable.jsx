@@ -428,7 +428,7 @@ const DataTable = props => {
       <ErrorBoundary component='DataTable'>
         <CoveMediaControls.Section classes={['download-links']}>
           <CoveMediaControls.Link config={config} />
-          {config.general.showDownloadButton && <DownloadButton />}
+          {(config.table.download || config.general.showDownloadButton) && <DownloadButton />}
         </CoveMediaControls.Section>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
