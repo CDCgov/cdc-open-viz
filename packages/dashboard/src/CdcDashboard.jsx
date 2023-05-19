@@ -148,7 +148,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       let datasetKeys = Object.keys(config.datasets)
       for (let i = 0; i < datasetKeys.length; i++) {
         const dataset = config.datasets[datasetKeys[i]]
-        if (dataset.dataUrl && config.dashboard.sharedFilters) {
+        if (dataset.dataUrl && config.dashboard && config.dashboard.sharedFilters) {
           const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl)
           let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
