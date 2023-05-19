@@ -94,31 +94,7 @@
       "Data 6": "300"
     }
   ],
-  "visualizationType": "Line",
-  "series": [
-    {
-      "dataKey": "Data 1",
-      "type": "Line"
-    },
-    {
-      "dataKey": "Data 2",
-      "type": "Line"
-    },
-    {
-      "dataKey": "Data 3",
-      "type": "Line"
-    },
-    {
-      "dataKey": "Data 4",
-      "type": "Line"
-    },
-    {
-      "dataKey": "Data 5",
-      "type": "Line"
-    },
-    {
-      "dataKey": "Data 6",
-      "type": "Line"
-    }
-  ]
+  "visualizationType": "Bar",
+  "orientation": "horizontal",
+  "series": []
 }

@@ -18,6 +18,8 @@ import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Icon from '@cdc/core/components/ui/Icon'
 
 import '../scss/data-import.scss'
 
@@ -294,8 +296,6 @@ export default function DataImport() {
           setEditingDataset(undefined)
         }
         setAddingDataset(false)
-        setExternalURL('')
-        setKeepURL(false)
       } catch (err) {
         setErrors(err)
       }
@@ -395,9 +395,9 @@ export default function DataImport() {
     return (
       //todo convert to modal
       <>
-      <button className='btn danger' onClick={() => resetEditor({ type: config.type, visualizationType: config.visualizationType }, 'Resetting will remove your data and settings. Do you want to continue?')}>
-        Clear
-        <CloseIcon />
+        <button className='btn danger' onClick={() => resetEditor({ type: config.type, visualizationType: config.visualizationType }, 'Resetting will remove your data and settings. Do you want to continue?')}>
+          Clear
+          <CloseIcon />
         </button>
         {/* DEV-851 link to replace file should pop file dialog */}
         {config.dataFileSourceType === 'file' && (
@@ -406,7 +406,8 @@ export default function DataImport() {
             <p>
               <span>or replace file</span>
             </p>
-          </div>)}
+          </div>
+        )}
       </>
     )
   }
@@ -491,6 +492,139 @@ export default function DataImport() {
     readyToConfigure = true
   }
 
+  const urlFilters = (
+    <>
+      {config.filters &&
+        config.filters.map((filter, i) =>
+          filter.type !== 'url' ? (
+            <></>
+          ) : (
+            <fieldset key={filter.key} className='edit-block url-filters-block'>
+              <button
+                onClick={e => {
+                  let newFilters = [...config.filters]
+                  newFilters.splice(i, 1)
+                  setConfig({ ...config, filters: newFilters, runtimeDataUrl: undefined })
+                }}
+              >
+                Remove
+              </button>
+              <label>
+                <span class='edit-label column-heading'>
+                  Label
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p style={{ padding: '0.5rem' }}>The label that will appear above the dropdown filter.</p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </span>{' '}
+                <input
+                  type='text'
+                  defaultValue={filter.label}
+                  onChange={e => {
+                    let newFilters = [...config.filters]
+                    newFilters[i].label = e.target.value
+                    setConfig({ ...config, filters: newFilters })
+                  }}
+                />
+              </label>
+              <label>
+                <span class='edit-label column-heading'>
+                  Query string parameter
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p style={{ padding: '0.5rem' }}>Name of the query string parameter that will be appended to the URL above with the values provided below.</p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </span>{' '}
+                <input
+                  type='text'
+                  defaultValue={filter.queryParameter}
+                  onChange={e => {
+                    let newFilters = [...config.filters]
+                    newFilters[i].queryParameter = e.target.value
+                    setConfig({ ...config, filters: newFilters })
+                  }}
+                />
+              </label>
+              <label>
+                <span class='edit-label column-heading'>Values</span>{' '}
+              </label>
+              <ul className='value-list'>
+                {filter.orderedValues &&
+                  filter.orderedValues.map((value, valueIndex) => (
+                    <li>
+                      {value}
+                      <input
+                        type='text'
+                        placeholder='Enter value display name here'
+                        value={filter.labels ? filter.labels[value] : undefined}
+                        className='url-value-label'
+                        onChange={e => {
+                          let newFilters = [...config.filters]
+
+                          newFilters[i].labels = newFilters[i].labels || {}
+                          newFilters[i].labels[value] = e.target.value
+
+                          setConfig({ ...config, filters: newFilters })
+                        }}
+                      />
+                      <button
+                        onClick={() => {
+                          let newFilters = [...config.filters]
+
+                          if (newFilters[i].labels) {
+                            delete newFilters[i].labels[newFilters[i].orderedValues[valueIndex]]
+                          }
+
+                          newFilters[i].orderedValues.splice(valueIndex, 1)
+                          setConfig({ ...config, filters: newFilters })
+                        }}
+                      >
+                        X
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+              <form
+                onSubmit={e => {
+                  e.preventDefault()
+                  if (!config.filters[i].orderedValues || config.filters[i].orderedValues.indexOf(e.target[0].value) === -1) {
+                    let newFilters = [...config.filters]
+                    newFilters[i].orderedValues = newFilters[i].orderedValues || []
+                    newFilters[i].orderedValues.push(e.target[0].value)
+                    newFilters[i].values = newFilters[i].orderedValues
+                    if (!newFilters[i].active) newFilters[i].active = e.target[0].value
+                    e.target[0].value = ''
+                    setConfig({ ...config, filters: newFilters })
+                  }
+                }}
+              >
+                <input type='text' placeholder='Enter new value name here' />{' '}
+                <button type='submit' style={{ marginTop: '1em' }}>
+                  Add New Value
+                </button>
+              </form>
+            </fieldset>
+          )
+        )}
+      <button
+        className='btn full-width'
+        onClick={() => {
+          setConfig({ ...config, filters: config.filters ? [...config.filters, { type: 'url', key: Date.now() }] : [{ type: 'url', key: Date.now() }] })
+        }}
+      >
+        Add New URL Filter
+      </button>
+    </>
+  )
+
   const showDataDesigner = config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot'
 
   return (
@@ -560,7 +694,7 @@ export default function DataImport() {
               <>
                 <div className='heading-3'>Data Source</div>
                 <div className='file-loaded-area'>
-                  {config.dataFileSourceType === 'file' && (
+                  {(config.dataFileSourceType === 'file' || !config.dataUrl) && (
                     <div className='data-source-options'>
                       <div className={isDragActive2 ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps2()}>
                         <input {...getInputProps2()} />
@@ -576,11 +710,14 @@ export default function DataImport() {
                     </div>
                   )}
 
-                  {config.dataFileSourceType === 'url' && (
-                    <div className='url-source-options'>
-                      <div>{loadFileFromUrl(externalURL)}</div>
-                      <div>{resetButton()}</div>
-                    </div>
+                  {(config.dataFileSourceType === 'url' || config.dataUrl) && (
+                    <>
+                      <div className='url-source-options'>
+                        <div>{loadFileFromUrl(externalURL)}</div>
+                        <div>{resetButton()}</div>
+                      </div>
+                      {config.dataUrl && (config.type === 'chart' || config.type === 'map') && urlFilters}
+                    </>
                   )}
                 </div>
               </>
@@ -614,10 +751,10 @@ export default function DataImport() {
             {errors &&
               (errors.map
                 ? errors.map((message, index) => (
-                  <div className='error-box slim mt-2' key={`error-${message}`}>
-                    <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
-                  </div>
-                ))
+                    <div className='error-box slim mt-2' key={`error-${message}`}>
+                      <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
+                    </div>
+                  ))
                 : errors.message)}
             <p className='footnote'>
               Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
@@ -627,29 +764,24 @@ export default function DataImport() {
             <SampleDataContext.Provider value={{ loadData, editingDataset, config }}>
               <SampleData.Buttons />
             </SampleDataContext.Provider>
-          </div >
-        )
-        }
+          </div>
+        )}
 
-        {
-          config.type === 'dashboard' && !addingDataset && (
-            <p>
-              <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
-                + Add More Files
-              </button>
-            </p>
-          )
-        }
+        {config.type === 'dashboard' && !addingDataset && (
+          <p>
+            <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
+              + Add More Files
+            </button>
+          </p>
+        )}
 
-        {
-          readyToConfigure && (
-            <p>
-              <button className='btn btn-primary' onClick={() => setGlobalActive(2)}>
-                Configure your visualization
-              </button>
-            </p>
-          )
-        }
+        {readyToConfigure && (
+          <p>
+            <button className='btn btn-primary' onClick={() => setGlobalActive(2)}>
+              Configure your visualization
+            </button>
+          </p>
+        )}
 
         <a href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html' target='_blank' rel='noopener noreferrer' className='guidance-link'>
           <div>
@@ -657,7 +789,7 @@ export default function DataImport() {
             <p>Documentation and examples on formatting data and configuring visualizations.</p>
           </div>
         </a>
-      </div >
+      </div>
       <div className='right-col'>
         <PreviewDataTable data={previewData} />
       </div>

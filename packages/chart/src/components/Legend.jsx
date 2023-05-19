@@ -5,9 +5,10 @@ import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 
 import useLegendClasses from './../hooks/useLegendClasses'
+import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 const Legend = () => {
-  const { config, legend, colorScale, seriesHighlight, highlight, twoColorPalette, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
+  const { config, legend, colorScale, seriesHighlight, highlight, twoColorPalette, tableData, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
 
@@ -103,14 +104,14 @@ const Legend = () => {
     if (config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && colorCode && config.series?.length === 1) {
       let palette = colorPalettes[config.palette]
 
-      while (data.length > palette.length) {
+      while (tableData.length > palette.length) {
         palette = palette.concat(palette)
       }
       palette = palette.slice(0, data.length)
       //store uniq values to Set by colorCode
       const set = new Set()
 
-      data.forEach(d => set.add(d[colorCode]))
+      tableData.forEach(d => set.add(d[colorCode]))
 
       // create labels with uniq values
       const uniqeLabels = Array.from(set).map((val, i) => {
@@ -126,35 +127,43 @@ const Legend = () => {
       return uniqeLabels
     }
 
-    if (config.visualizationType === 'Forecasting') {
+    // get forecasting items inside of combo
+    if (config.runtime.forecastingSeriesKeys.length > 0) {
+      let seriesLabels = []
+
       //store uniq values to Set by colorCode
 
       // loop through each stage/group/area on the chart and create a label
-      const labels = config.forecastingChart.groups.map((group, index) => {
-        let paletteHere = colorPalettes[config.forecastingChart.colors[index]]
+      const forecastingLabels = config.runtime.forecastingSeriesKeys.map((outerGroup, index) => {
+        return outerGroup.stages.map((stage, index) => {
+          let paletteHere = colorPalettes[stage.color]
 
-        const newLabel = {
-          datum: group,
-          index: index,
-          text: group,
-          value: paletteHere[2]
-        }
-        return newLabel
+          const newLabel = {
+            datum: stage.key,
+            index: index,
+            text: stage.key,
+            value: paletteHere[2]
+          }
+
+          seriesLabels.push(newLabel)
+        })
       })
 
-      // push the bar segment label to the front
-      const barLabel = {
-        datum: config.forecastingChart.barColumn,
-        index: labels.length,
-        text: config.forecastingChart.barColumn,
-        value: config.forecastingChart.barColor
-      }
+      // loop through bars for now to meet requirements.
+      const barLabels = config.runtime.barSeriesKeys.map((bar, index) => {
+        let palette = colorPalettes[config.palette]
 
-      if (config.forecastingChart.showBars) {
-        labels.unshift(barLabel)
-      }
+        const newLabel = {
+          datum: bar,
+          index: index,
+          text: bar,
+          value: palette[index]
+        }
 
-      return labels
+        seriesLabels.push(newLabel)
+      })
+
+      return seriesLabels
     }
     return defaultLabels
   }
@@ -163,6 +172,10 @@ const Legend = () => {
   const isHorizontal = config.orientation === 'horizontal'
   const marginTop = isBottomOrSmallViewport && isHorizontal ? `${config.runtime.xAxis.size}px` : '0px'
   const marginBottom = isBottomOrSmallViewport ? '15px' : '0px'
+
+  const { HighLightedBarUtils } = useHighlightedBars(config)
+
+  let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
 
   if (!legend) return null
 
@@ -177,7 +190,6 @@ const Legend = () => {
               {createLegendLabels(labels).map((label, i) => {
                 let legendClasses = ['legend-item']
                 let itemName = label.datum
-                let forecastingInactive = seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)
 
                 // Filter excluded data keys from legend
                 if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
@@ -189,13 +201,7 @@ const Legend = () => {
                   itemName = config.runtime.seriesKeys[index]
                 }
 
-                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName) && config.visualizationType !== 'Forecasting') {
-                  legendClasses.push('inactive')
-                }
-
-                // ? not sure why this has to be broken apart at the moment.
-                // ? the logic looks equivalent to the line above but only works like this.
-                if (forecastingInactive) {
+                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
                   legendClasses.push('inactive')
                 }
 
@@ -216,6 +222,37 @@ const Legend = () => {
                     <LegendCircle fill={label.value} />
                     <LegendLabel align='left' margin='0 0 0 4px'>
                       {label.text}
+                    </LegendLabel>
+                  </LegendItem>
+                )
+              })}
+
+              {highLightedLegendItems.map((bar, i) => {
+                // if duplicates only return first item
+                let className = 'legend-item'
+                let itemName = bar.legendLabel
+
+                if (!itemName) return
+                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
+                  className += ' inactive'
+                }
+                return (
+                  <LegendItem
+                    className={className}
+                    tabIndex={0}
+                    key={`legend-quantile-${i}`}
+                    onKeyPress={e => {
+                      if (e.key === 'Enter') {
+                        highlight(bar.legendLabel)
+                      }
+                    }}
+                    onClick={() => {
+                      highlight(bar.legendLabel)
+                    }}
+                  >
+                    <LegendCircle fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />{' '}
+                    <LegendLabel align='left' margin='0 0 0 4px'>
+                      {bar.legendLabel ? bar.legendLabel : bar.value}
                     </LegendLabel>
                   </LegendItem>
                 )
