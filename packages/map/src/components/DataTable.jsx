@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo, memo, useCallback } from 'react'
-import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
+import React, { useEffect, useState, memo } from 'react'
+
 import Papa from 'papaparse'
 import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon component
 import Icon from '@cdc/core/components/ui/Icon'
@@ -15,6 +15,7 @@ const DataTable = props => {
   const { state, tableTitle, indexTitle, mapTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
 
   const [expanded, setExpanded] = useState(expandDataTable)
+  const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
@@ -22,110 +23,124 @@ const DataTable = props => {
 
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
-  const customSort = useCallback(
-    (a, b) => {
-      const digitRegex = /\d+/
+  const customSort = (a, b) => {
+    const digitRegex = /\d+/
 
-      const hasNumber = value => digitRegex.test(value)
+    const hasNumber = value => digitRegex.test(value)
 
-      // force null and undefined to the bottom
-      a = a === null || a === undefined ? '' : a
-      b = b === null || b === undefined ? '' : b
+    // force null and undefined to the bottom
+    a = a === null || a === undefined ? '' : a
+    b = b === null || b === undefined ? '' : b
 
-      // convert any strings that are actually numbers to proper data type
-      const aNum = Number(a)
+    // convert any strings that are actually numbers to proper data type
+    const aNum = Number(a)
 
-      if (!Number.isNaN(aNum)) {
-        a = aNum
-      }
+    if (!Number.isNaN(aNum)) {
+      a = aNum
+    }
 
-      const bNum = Number(b)
+    const bNum = Number(b)
 
-      if (!Number.isNaN(bNum)) {
-        b = bNum
-      }
+    if (!Number.isNaN(bNum)) {
+      b = bNum
+    }
 
-      // remove iso code prefixes
-      if (typeof a === 'string') {
-        a = a.replace('us-', '')
-        a = displayGeoName(a)
-      }
+    // remove iso code prefixes
+    if (typeof a === 'string') {
+      a = a.replace('us-', '')
+      a = displayGeoName(a)
+    }
 
-      if (typeof b === 'string') {
-        b = b.replace('us-', '')
-        b = displayGeoName(b)
-      }
+    if (typeof b === 'string') {
+      b = b.replace('us-', '')
+      b = displayGeoName(b)
+    }
 
-      // force any string values to lowercase
-      a = typeof a === 'string' ? a.toLowerCase() : a
-      b = typeof b === 'string' ? b.toLowerCase() : b
+    // force any string values to lowercase
+    a = typeof a === 'string' ? a.toLowerCase() : a
+    b = typeof b === 'string' ? b.toLowerCase() : b
 
-      // If the string contains a number, remove the text from the value and only sort by the number. Only uses the first number it finds.
-      if (typeof a === 'string' && hasNumber(a) === true) {
-        a = a.match(digitRegex)[0]
+    // If the string contains a number, remove the text from the value and only sort by the number. Only uses the first number it finds.
+    if (typeof a === 'string' && hasNumber(a) === true) {
+      a = a.match(digitRegex)[0]
 
-        a = Number(a)
-      }
+      a = Number(a)
+    }
 
-      if (typeof b === 'string' && hasNumber(b) === true) {
-        b = b.match(digitRegex)[0]
+    if (typeof b === 'string' && hasNumber(b) === true) {
+      b = b.match(digitRegex)[0]
 
-        b = Number(b)
-      }
+      b = Number(b)
+    }
 
-      // When comparing a number to a string, always send string to bottom
-      if (typeof a === 'number' && typeof b === 'string') {
-        return 1
-      }
+    // When comparing a number to a string, always send string to bottom
+    if (typeof a === 'number' && typeof b === 'string') {
+      return 1
+    }
 
-      if (typeof b === 'number' && typeof a === 'string') {
-        return -1
-      }
+    if (typeof b === 'number' && typeof a === 'string') {
+      return -1
+    }
 
-      // Return either 1 or -1 to indicate a sort priority
-      if (a > b) {
-        return 1
-      }
-      if (a < b) {
-        return -1
-      }
-      // returning 0, undefined or any falsey value will use subsequent sorts or
-      // the index as a tiebreaker
-      return 0
-    },
-    [displayGeoName]
-  )
+    // Return either 1 or -1 to indicate a sort priority
+    if (a > b) {
+      return 1
+    }
+    if (a < b) {
+      return -1
+    }
+    // returning 0, undefined or any falsey value will use subsequent sorts or
+    // the index as a tiebreaker
+    return 0
+  }
 
   // Optionally wrap cell with anchor if config defines a navigation url
-  const getCellAnchor = useCallback(
-    (markup, row) => {
-      if (columns.navigate && row[columns.navigate.name]) {
-        markup = (
-          <span
-            onClick={() => navigationHandler(row[columns.navigate.name])}
-            className='table-link'
-            title='Click for more information (Opens in a new window)'
-            role='link'
-            tabIndex='0'
-            onKeyDown={e => {
-              if (e.keyCode === 13) {
-                navigationHandler(row[columns.navigate.name])
-              }
-            }}
-          >
-            {markup}
-            <ExternalIcon className='inline-icon' />
-          </span>
-        )
-      }
+  const getCellAnchor = (markup, row) => {
+    if (columns.navigate && row[columns.navigate.name]) {
+      markup = (
+        <span
+          onClick={() => navigationHandler(row[columns.navigate.name])}
+          className='table-link'
+          title='Click for more information (Opens in a new window)'
+          role='link'
+          tabIndex='0'
+          onKeyDown={e => {
+            if (e.keyCode === 13) {
+              navigationHandler(row[columns.navigate.name])
+            }
+          }}
+        >
+          {markup}
+          <ExternalIcon className='inline-icon' />
+        </span>
+      )
+    }
 
-      return markup
-    },
-    [columns.navigate, navigationHandler]
-  )
+    return markup
+  }
+
+  const rand = Math.random().toString(16).substr(2, 8)
+  const skipId = `btn__${rand}`
+
+  const mapLookup = {
+    'us-county': 'United States County Map',
+    'single-state': 'State Map',
+    us: 'United States Map',
+    world: 'World Map'
+  }
 
   const DownloadButton = memo(() => {
-    const csvData = Papa.unparse(rawData)
+    let csvData
+    if (state.general.type === 'bubble') {
+      // Just Unparse
+      csvData = Papa.unparse(rawData)
+    } else if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
+      // Unparse + Add column for full Geo name
+      csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[state.columns.geo.name]), ...row })))
+    } else {
+      // Unparse + Add column for full Geo name
+      csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: formatLegendLocation(row[state.columns.geo.name]), ...row })))
+    }
 
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
 
@@ -144,80 +159,6 @@ const DataTable = props => {
     )
   }, [rawData])
 
-  // Creates columns structure for the table
-  const tableColumns = useMemo(() => {
-    const newTableColumns = []
-
-    Object.keys(columns).forEach(column => {
-      if (columns[column].dataTable === true && columns[column].name) {
-        const newCol = {
-          Header: columns[column].label ? columns[column].label : columns[column].name,
-          id: column,
-          accessor: row => {
-            if (runtimeData) {
-              if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
-                for (let i = 0; i < state.legend.specialClasses.length; i++) {
-                  if (String(runtimeData[row][state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
-                    return state.legend.specialClasses[i].label
-                  }
-                }
-              }
-              return runtimeData[row][columns[column].name] ?? null
-            }
-
-            return null
-          },
-          sortType: (a, b) => customSort(a.values[column], b.values[column])
-        }
-
-        if (column === 'geo') {
-          newCol.Header = indexTitle || 'Location'
-          newCol.Cell = ({ row, value }) => {
-            const rowObj = runtimeData[row.original]
-
-            const legendColor = applyLegendToRow(rowObj)
-
-            var labelValue
-            if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
-              labelValue = displayGeoName(row.original)
-            } else {
-              labelValue = formatLegendLocation(row.original)
-            }
-
-            labelValue = getCellAnchor(labelValue, rowObj)
-
-            const cellMarkup = (
-              <>
-                <LegendCircle fill={legendColor[0]} />
-                {labelValue}
-              </>
-            )
-
-            return cellMarkup
-          }
-        } else {
-          newCol.Cell = ({ value }) => {
-            const cellMarkup = displayDataAsText(value, column)
-
-            return cellMarkup
-          }
-        }
-
-        newTableColumns.push(newCol)
-      }
-    })
-
-    return newTableColumns
-  }, [indexTitle, columns, runtimeData, getCellAnchor, displayDataAsText, applyLegendToRow, customSort, displayGeoName, state.legend.specialClasses]) // eslint-disable-line
-
-  const tableData = useMemo(
-    () =>
-      Object.keys(runtimeData)
-        .filter(key => applyLegendToRow(runtimeData[key]))
-        .sort((a, b) => customSort(a, b)),
-    [runtimeData, applyLegendToRow, customSort]
-  )
-
   // Change accessibility label depending on expanded status
   useEffect(() => {
     const expandedLabel = 'Accessible data table.'
@@ -231,30 +172,20 @@ const DataTable = props => {
       setAccessibilityLabel(collapsedLabel)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded, applyLegendToRow, customSort])
-
-  const defaultColumn = useMemo(
-    () => ({
-      minWidth: 150,
-      width: 200,
-      maxWidth: 400
-    }),
-    []
-  )
-
-  const mapLookup = {
-    'us-county': 'United States County Map',
-    'single-state': 'State Map',
-    us: 'United States Map',
-    world: 'World Map'
-  }
-
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
-
-  const rand = Math.random().toString(16).substr(2, 8)
-  const skipId = `btn__${rand}`
+  }, [expanded])
 
   if (!state.data) return <Loading />
+
+  const rows = Object.keys(runtimeData)
+    .filter(row => applyLegendToRow(runtimeData[row]))
+    .sort((a, b) => {
+      const sortVal = customSort(runtimeData[a][state.columns[sortBy.column].name], runtimeData[b][state.columns[sortBy.column].name])
+      if (!sortBy.asc) return sortVal
+      if (sortVal === 0) return 0
+      if (sortVal < 0) return 1
+      return -1
+    })
+
   return (
     <ErrorBoundary component='DataTable'>
       <CoveMediaControls.Section classes={['download-links']}>
@@ -281,49 +212,85 @@ const DataTable = props => {
           {tableTitle}
         </div>
         <div className='table-container' style={{ maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' }}>
-          <table height={expanded ? null : 0} {...getTableProps()} aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={state?.data.length ? state.data.length : '-1'}>
+          <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={state?.data.length ? state.data.length : '-1'}>
             <caption className='cdcdataviz-sr-only'>{state.dataTable.caption ? state.dataTable.caption : `Datatable showing data for the ${mapLookup[state.general.geoType]} figure.`}</caption>
             <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>
-              {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map(column => (
-                    <th
-                      tabIndex='0'
-                      title={column.Header}
-                      role='columnheader'
-                      scope='col'
-                      {...column.getHeaderProps(column.getSortByToggleProps())}
-                      className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : 'sort'}
-                      onKeyDown={e => {
-                        if (e.keyCode === 13) {
-                          column.toggleSortBy()
-                        }
-                      }}
-                      //aria-sort={column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'none' }
-                      {...(column.isSorted ? (column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' }) : null)}
-                    >
-                      {column.render('Header')}
-                      <button>
-                        <span className='cdcdataviz-sr-only'>{`Sort by ${column.render('Header').toLowerCase()} in ${column.isSorted ? (column.isSortedDesc ? 'descending' : 'ascending') : 'no'} `} order</span>
-                      </button>
-                      <div {...column.getResizerProps()} className='resizer' />
-                    </th>
-                  ))}
-                </tr>
-              ))}
+              <tr>
+                {Object.keys(columns)
+                  .filter(column => columns[column].dataTable === true && columns[column].name)
+                  .map(column => {
+                    let text
+                    if (column !== 'geo') {
+                      text = columns[column].label ? columns[column].label : columns[column].name
+                    } else {
+                      text = indexTitle || 'Location'
+                    }
+
+                    return (
+                      <th
+                        key={`col-header-${column}`}
+                        tabIndex='0'
+                        title={text}
+                        role='columnheader'
+                        scope='col'
+                        onClick={() => {
+                          setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                        }}
+                        onKeyDown={e => {
+                          if (e.keyCode === 13) {
+                            setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                          }
+                        }}
+                        className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
+                        {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+                      >
+                        {text}
+                        <button>
+                          <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
+                        </button>
+                      </th>
+                    )
+                  })}
+              </tr>
             </thead>
-            <tbody {...getTableBodyProps()}>
+            <tbody>
               {rows.map(row => {
-                prepareRow(row)
                 return (
-                  <tr {...row.getRowProps()} role='row'>
-                    {row.cells.map(cell => {
-                      return (
-                        <td tabIndex='0' {...cell.getCellProps()} role='gridcell' onClick={e => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world' ? setFilteredCountryCode(cell.row.original) : true)}>
-                          {cell.render('Cell')}
-                        </td>
-                      )
-                    })}
+                  <tr role='row'>
+                    {Object.keys(columns)
+                      .filter(column => columns[column].dataTable === true && columns[column].name)
+                      .map(column => {
+                        let cellValue
+
+                        if (column === 'geo') {
+                          const rowObj = runtimeData[row]
+                          const legendColor = applyLegendToRow(rowObj)
+
+                          var labelValue
+                          if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
+                            labelValue = displayGeoName(row)
+                          } else {
+                            labelValue = formatLegendLocation(row)
+                          }
+
+                          labelValue = getCellAnchor(labelValue, rowObj)
+
+                          cellValue = (
+                            <>
+                              <LegendCircle fill={legendColor[0]} />
+                              {labelValue}
+                            </>
+                          )
+                        } else {
+                          cellValue = displayDataAsText(runtimeData[row][state.columns[column].name], column)
+                        }
+
+                        return (
+                          <td tabIndex='0' role='gridcell' onClick={e => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}>
+                            {cellValue}
+                          </td>
+                        )
+                      })}
                   </tr>
                 )
               })}

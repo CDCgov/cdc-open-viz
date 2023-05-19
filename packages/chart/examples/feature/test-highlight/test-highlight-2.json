@@ -1,33 +1,29 @@
 {
   "type": "chart",
-  "title": "Example Bar Chart",
+  "title": "",
   "showTitle": true,
-  "showDownloadMediaButton": false,
   "theme": "theme-blue",
-  "animate": false,
-  "fontSize": "medium",
+  "animate": true,
+  "fontSize": "small",
   "lineDatapointStyle": "hover",
   "barHasBorder": "false",
   "isLollipopChart": false,
   "lollipopShape": "circle",
   "lollipopColorStyle": "two-tone",
   "visualizationSubType": "regular",
-  "barStyle": "",
-  "roundingStyle": "standard",
-  "tipRounding": "top",
-  "general": {
-    "showDownloadButton": true
-  },
+  "barStyle": "rounded",
+  "roundingStyle": "finger",
+  "tipRounding": "full",
   "padding": {
     "left": 5,
     "right": 5
   },
   "yAxis": {
-    "hideAxis": false,
-    "displayNumbersOnBar": false,
+    "hideAxis": true,
+    "displayNumbersOnBar": true,
     "hideLabel": false,
     "hideTicks": false,
-    "size": 50,
+    "size": "20",
     "gridLines": false,
     "enablePadding": false,
     "min": "",
@@ -45,11 +41,9 @@
     "numTicks": "",
     "axisPadding": 0,
     "tickRotation": 0,
-    "anchors": [],
     "type": "chart",
-    "title": "Example Bar Chart",
+    "title": "",
     "showTitle": true,
-    "showDownloadMediaButton": false,
     "theme": "theme-blue",
     "animate": false,
     "fontSize": "medium",
@@ -62,9 +56,6 @@
     "barStyle": "",
     "roundingStyle": "standard",
     "tipRounding": "top",
-    "general": {
-      "showDownloadButton": true
-    },
     "padding": {
       "left": 5,
       "right": 5
@@ -74,7 +65,7 @@
       "displayNumbersOnBar": false,
       "hideLabel": false,
       "hideTicks": false,
-      "size": "76",
+      "size": 50,
       "gridLines": false,
       "enablePadding": false,
       "min": "",
@@ -91,9 +82,7 @@
       "rightAxisTickColor": "#333",
       "numTicks": "",
       "axisPadding": 0,
-      "tickRotation": 0,
-      "anchors": [],
-      "label": "Y Axis Example Label"
+      "tickRotation": 0
     },
     "boxplot": {
       "plots": [],
@@ -129,22 +118,21 @@
       "hasLine": false
     },
     "isLegendValue": false,
-    "barThickness": "0.6",
+    "barThickness": 0.35,
     "barHeight": 25,
     "barSpace": 15,
     "heights": {
       "vertical": 300,
-      "horizontal": 240
+      "horizontal": 200
     },
     "xAxis": {
-      "anchors": [],
       "type": "categorical",
       "showTargetLabel": true,
       "targetLabel": "Target",
       "hideAxis": false,
       "hideLabel": false,
       "hideTicks": false,
-      "size": "59",
+      "size": 75,
       "tickRotation": 0,
       "min": "",
       "max": "",
@@ -155,37 +143,30 @@
       "labelOffset": 65,
       "axisPadding": 0,
       "target": 0,
-      "dataKey": "Date",
-      "label": "X Axis Example Label"
+      "dataKey": "CIO"
     },
     "table": {
-      "label": "Data Type by Date",
+      "label": "Data Table",
       "expanded": true,
       "limitHeight": false,
       "height": "",
       "caption": "",
       "showDownloadUrl": false,
       "showDataTableLink": true,
-      "indexLabel": "",
-      "showVertical": false,
       "show": true
     },
     "orientation": "horizontal",
-    "color": "pinkpurple",
-    "columns": {},
     "legend": {
       "behavior": "isolate",
       "singleRow": false,
-      "colorCode": "Data 6",
+      "colorCode": "",
       "reverseLabelOrder": false,
       "description": "",
       "dynamicLegend": false,
       "dynamicLegendDefaultText": "Show All",
       "dynamicLegendItemLimit": 5,
       "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
-      "dynamicLegendChartMessage": "Select Options from the Legend",
-      "position": "right",
-      "label": "Type of Data"
+      "dynamicLegendChartMessage": "Select Options from the Legend"
     },
     "exclusions": {
       "active": false,
@@ -213,91 +194,185 @@
       "accent": true,
       "background": true
     },
-    "useLogScale": false,
     "filterBehavior": "Filter Change",
     "highlightedBarValues": [],
-    "series": [
-      {
-        "dataKey": "Data 1",
-        "type": "Bar"
-      }
-    ],
-    "height": 300,
+    "datasets": {},
+    "visualizationType": "Bar",
     "data": [
       {
-        "Date": "1/15/2016",
-        "Data 1": "90",
-        "Data 2": "135",
-        "Data 3": "300",
-        "Data 4": "95",
-        "Data 5": "120",
-        "Data 6": "Bad"
+        "Year": "2019",
+        "CIO": "NCBDDD",
+        "Participation": "30"
       },
       {
-        "Date": "2/15/2016",
-        "Data 1": "40",
-        "Data 2": "90",
-        "Data 3": "240",
-        "Data 4": "60",
-        "Data 5": "160",
-        "Data 6": "Good"
+        "Year": "2019",
+        "CIO": "NCEZID",
+        "Participation": "40"
       },
       {
-        "Date": "3/15/2016",
-        "Data 1": "50",
-        "Data 2": "300",
-        "Data 3": "290",
-        "Data 4": "100",
-        "Data 5": "200",
-        "Data 6": "Good"
+        "Year": "2019",
+        "CIO": "OC",
+        "Participation": "50"
       },
       {
-        "Date": "4/15/2016",
-        "Data 1": "120",
-        "Data 2": "160",
-        "Data 3": "230",
-        "Data 4": "180",
-        "Data 5": "160",
-        "Data 6": "Good"
+        "Year": "2019",
+        "CIO": "NCIRD",
+        "Participation": "60"
       },
       {
-        "Date": "5/15/2016",
-        "Data 1": "80",
-        "Data 2": "350",
-        "Data 3": "300",
-        "Data 4": "150",
-        "Data 5": "130",
-        "Data 6": "Good"
+        "Year": "2019",
+        "CIO": "2018",
+        "Participation": "55"
       },
       {
-        "Date": "6/15/2016",
-        "Data 1": "80",
-        "Data 2": "220",
-        "Data 3": "320",
-        "Data 4": "100",
-        "Data 5": "220",
-        "Data 6": "ABC"
+        "Year": "2020",
+        "CIO": "NCBDDD",
+        "Participation": "30"
+      },
+      {
+        "Year": "2020",
+        "CIO": "NCEZID",
+        "Participation": "40"
+      },
+      {
+        "Year": "2020",
+        "CIO": "OC",
+        "Participation": "50"
+      },
+      {
+        "Year": "2020",
+        "CIO": "NCIRD",
+        "Participation": "60"
+      },
+      {
+        "Year": "2020",
+        "CIO": "2019",
+        "Participation": "55"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCBDDD",
+        "Participation": "30"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCEZID",
+        "Participation": "40"
+      },
+      {
+        "Year": "2021",
+        "CIO": "OC",
+        "Participation": "50"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCIRD",
+        "Participation": "60"
+      },
+      {
+        "Year": "2021",
+        "CIO": "2020",
+        "Participation": "55"
       }
     ],
-    "visualizationType": "Bar",
-    "description": "This example shows a bar chart created in the visualization editor in WCMS",
-    "dataCutoff": "0",
+    "dataFileName": "CIOs_multi.csv",
+    "dataFileSourceType": "file",
+    "formattedData": [
+      {
+        "Year": "2019",
+        "CIO": "NCBDDD",
+        "Participation": "30"
+      },
+      {
+        "Year": "2019",
+        "CIO": "NCEZID",
+        "Participation": "40"
+      },
+      {
+        "Year": "2019",
+        "CIO": "OC",
+        "Participation": "50"
+      },
+      {
+        "Year": "2019",
+        "CIO": "NCIRD",
+        "Participation": "60"
+      },
+      {
+        "Year": "2019",
+        "CIO": "2018",
+        "Participation": "55"
+      },
+      {
+        "Year": "2020",
+        "CIO": "NCBDDD",
+        "Participation": "30"
+      },
+      {
+        "Year": "2020",
+        "CIO": "NCEZID",
+        "Participation": "40"
+      },
+      {
+        "Year": "2020",
+        "CIO": "OC",
+        "Participation": "50"
+      },
+      {
+        "Year": "2020",
+        "CIO": "NCIRD",
+        "Participation": "60"
+      },
+      {
+        "Year": "2020",
+        "CIO": "2019",
+        "Participation": "55"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCBDDD",
+        "Participation": "30"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCEZID",
+        "Participation": "40"
+      },
+      {
+        "Year": "2021",
+        "CIO": "OC",
+        "Participation": "50"
+      },
+      {
+        "Year": "2021",
+        "CIO": "NCIRD",
+        "Participation": "60"
+      },
+      {
+        "Year": "2021",
+        "CIO": "2020",
+        "Participation": "55"
+      }
+    ],
+    "dataDescription": {
+      "horizontal": false,
+      "series": false
+    },
     "runtime": {
       "seriesLabels": {
-        "Data 1": "Data 1"
+        "Participation": "Participation"
       },
       "seriesLabelsAll": [
-        "Data 1"
+        "Participation"
       ],
       "originalXAxis": {
-        "anchors": [],
         "type": "categorical",
         "showTargetLabel": true,
         "targetLabel": "Target",
         "hideAxis": false,
         "hideLabel": false,
         "hideTicks": false,
-        "size": "59",
+        "size": 75,
         "tickRotation": 0,
         "min": "",
         "max": "",
@@ -308,18 +383,17 @@
         "labelOffset": 65,
         "axisPadding": 0,
         "target": 0,
-        "dataKey": "Date",
-        "label": "X Axis Example Label"
+        "dataKey": "CIO"
       },
       "seriesKeys": [
-        "Data 1"
+        "Participation"
       ],
       "xAxis": {
         "hideAxis": false,
         "displayNumbersOnBar": false,
         "hideLabel": false,
         "hideTicks": false,
-        "size": "76",
+        "size": 50,
         "gridLines": false,
         "enablePadding": false,
         "min": "",
@@ -336,19 +410,16 @@
         "rightAxisTickColor": "#333",
         "numTicks": "",
         "axisPadding": 0,
-        "tickRotation": 0,
-        "anchors": [],
-        "label": "Y Axis Example Label"
+        "tickRotation": 0
       },
       "yAxis": {
-        "anchors": [],
         "type": "categorical",
         "showTargetLabel": true,
         "targetLabel": "Target",
         "hideAxis": false,
         "hideLabel": false,
         "hideTicks": false,
-        "size": "59",
+        "size": 75,
         "tickRotation": 0,
         "min": "",
         "max": "",
@@ -359,14 +430,32 @@
         "labelOffset": 65,
         "axisPadding": 0,
         "target": 0,
-        "dataKey": "Date",
-        "label": "X Axis Example Label"
+        "dataKey": "CIO"
       },
       "horizontal": true,
-      "uniqueId": 1684423946652,
+      "uniqueId": 1682687478394,
       "editorErrorMessage": ""
     },
-    "labelPlacement": "Below Bar"
+    "series": [
+      {
+        "dataKey": "Participation",
+        "type": "Bar"
+      }
+    ],
+    "filters": [
+      {
+        "values": [
+          "2019",
+          "2020",
+          "2021"
+        ],
+        "active": "2020",
+        "filterStyle": "dropdown",
+        "columnName": "Year",
+        "order": "asc"
+      }
+    ],
+    "labelPlacement": "On Date/Category Axis"
   },
   "boxplot": {
     "plots": [],
@@ -402,25 +491,24 @@
     "hasLine": false
   },
   "isLegendValue": false,
-  "barThickness": "0.6",
-  "barHeight": 25,
-  "barSpace": 15,
+  "barThickness": 0.35,
+  "barHeight": "25",
+  "barSpace": "10",
   "heights": {
     "vertical": 300,
-    "horizontal": 369.59999999999997
+    "horizontal": 175
   },
   "xAxis": {
-    "anchors": [],
     "type": "categorical",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "59",
+    "size": "100",
     "tickRotation": 0,
     "min": "",
-    "max": "",
+    "max": "100",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
@@ -428,28 +516,23 @@
     "labelOffset": 65,
     "axisPadding": 0,
     "target": 0,
-    "dataKey": "Date",
-    "label": "X Axis Example Label"
+    "dataKey": "CIO"
   },
   "table": {
-    "label": "Data Type by Date",
+    "label": "Data Table",
     "expanded": true,
     "limitHeight": false,
     "height": "",
     "caption": "",
     "showDownloadUrl": false,
     "showDataTableLink": true,
-    "indexLabel": "",
-    "showVertical": false,
     "show": true
   },
   "orientation": "horizontal",
-  "color": "pinkpurple",
-  "columns": {},
   "legend": {
     "behavior": "isolate",
-    "singleRow": false,
-    "colorCode": "Data 6",
+    "singleRow": true,
+    "colorCode": "",
     "reverseLabelOrder": false,
     "description": "",
     "dynamicLegend": false,
@@ -457,8 +540,9 @@
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
-    "position": "right",
-    "label": "Type of Data"
+    "hide": false,
+    "showLegendValuesTooltip": false,
+    "position": "bottom"
   },
   "exclusions": {
     "active": false,
@@ -474,7 +558,7 @@
   "dataFormat": {
     "commas": false,
     "prefix": "",
-    "suffix": " units",
+    "suffix": "%",
     "abbreviated": false,
     "bottomSuffix": "",
     "bottomPrefix": "",
@@ -486,73 +570,220 @@
     "accent": true,
     "background": true
   },
-  "useLogScale": false,
   "filterBehavior": "Filter Change",
-  "highlightedBarValues": [],
+  "highlightedBarValues": [
+    {
+      "dataKey": "Participation",
+      "value": "2018",
+      "legendLabel": "Previous Year Participation"
+    },
+    {
+      "dataKey": "Participation",
+      "value": "2019",
+      "legendLabel": "Previous Year Participation"
+    },
+    {
+      "dataKey": "Participation",
+      "value": "2020",
+      "legendLabel": "Previous Year Participation"
+    }
+  ],
+  "datasets": {},
+  "visualizationType": "Bar",
+  "data": [
+    {
+      "Year": "2019",
+      "CIO": "NCBDDD",
+      "Participation": "30"
+    },
+    {
+      "Year": "2019",
+      "CIO": "NCEZID",
+      "Participation": "40"
+    },
+    {
+      "Year": "2019",
+      "CIO": "OC",
+      "Participation": "50"
+    },
+    {
+      "Year": "2019",
+      "CIO": "NCIRD",
+      "Participation": "60"
+    },
+    {
+      "Year": "2019",
+      "CIO": "2018",
+      "Participation": "55"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCBDDD",
+      "Participation": "35"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCEZID",
+      "Participation": "46"
+    },
+    {
+      "Year": "2020",
+      "CIO": "OC",
+      "Participation": "57"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCIRD",
+      "Participation": "65"
+    },
+    {
+      "Year": "2020",
+      "CIO": "2019",
+      "Participation": "60"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCBDDD",
+      "Participation": "20"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCEZID",
+      "Participation": "80"
+    },
+    {
+      "Year": "2021",
+      "CIO": "OC",
+      "Participation": "59"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCIRD",
+      "Participation": "30"
+    },
+    {
+      "Year": "2021",
+      "CIO": "2020",
+      "Participation": "75"
+    }
+  ],
+  "dataFileName": "CIOs_multi.csv",
+  "dataFileSourceType": "file",
+  "formattedData": [
+    {
+      "Year": "2019",
+      "CIO": "NCBDDD",
+      "Participation": "30"
+    },
+    {
+      "Year": "2019",
+      "CIO": "NCEZID",
+      "Participation": "40"
+    },
+    {
+      "Year": "2019",
+      "CIO": "OC",
+      "Participation": "50"
+    },
+    {
+      "Year": "2019",
+      "CIO": "NCIRD",
+      "Participation": "60"
+    },
+    {
+      "Year": "2019",
+      "CIO": "2018",
+      "Participation": "55"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCBDDD",
+      "Participation": "35"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCEZID",
+      "Participation": "46"
+    },
+    {
+      "Year": "2020",
+      "CIO": "OC",
+      "Participation": "57"
+    },
+    {
+      "Year": "2020",
+      "CIO": "NCIRD",
+      "Participation": "65"
+    },
+    {
+      "Year": "2020",
+      "CIO": "2019",
+      "Participation": "60"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCBDDD",
+      "Participation": "20"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCEZID",
+      "Participation": "80"
+    },
+    {
+      "Year": "2021",
+      "CIO": "OC",
+      "Participation": "59"
+    },
+    {
+      "Year": "2021",
+      "CIO": "NCIRD",
+      "Participation": "30"
+    },
+    {
+      "Year": "2021",
+      "CIO": "2020",
+      "Participation": "75"
+    }
+  ],
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
   "series": [
     {
-      "dataKey": "Data 1",
+      "dataKey": "Participation",
       "type": "Bar"
     }
   ],
-  "height": 300,
-  "data": [
+  "filters": [
     {
-      "Date": "1/15/2016",
-      "Data 1": "90",
-      "Data 2": "135",
-      "Data 3": "300",
-      "Data 4": "95",
-      "Data 5": "120",
-      "Data 6": "Bad"
-    },
-    {
-      "Date": "2/15/2016",
-      "Data 1": "40",
-      "Data 2": "90",
-      "Data 3": "240",
-      "Data 4": "60",
-      "Data 5": "160",
-      "Data 6": "Good"
-    },
-    {
-      "Date": "3/15/2016",
-      "Data 1": "50",
-      "Data 2": "300",
-      "Data 3": "290",
-      "Data 4": "100",
-      "Data 5": "200",
-      "Data 6": "Good"
-    },
-    {
-      "Date": "4/15/2016",
-      "Data 1": "120",
-      "Data 2": "160",
-      "Data 3": "230",
-      "Data 4": "180",
-      "Data 5": "160",
-      "Data 6": "Good"
-    },
-    {
-      "Date": "5/15/2016",
-      "Data 1": "80",
-      "Data 2": "350",
-      "Data 3": "300",
-      "Data 4": "150",
-      "Data 5": "130",
-      "Data 6": "Good"
-    },
-    {
-      "Date": "6/15/2016",
-      "Data 1": "80",
-      "Data 2": "220",
-      "Data 3": "320",
-      "Data 4": "100",
-      "Data 5": "220",
-      "Data 6": "ABC"
+      "values": [
+        "2019",
+        "2020",
+        "2021"
+      ],
+      "active": "2019",
+      "filterStyle": "dropdown",
+      "columnName": "Year",
+      "order": "asc"
     }
   ],
-  "visualizationType": "Bar",
-  "description": "This example shows a bar chart created in the visualization editor in WCMS",
-  "dataCutoff": "0"
+  "copyOfHighlightedBarValues": [
+    {
+      "dataKey": "Participation",
+      "value": "2018",
+      "legendLabel": "Previous Year Participation"
+    },
+    {
+      "dataKey": "Participation",
+      "value": "2019",
+      "legendLabel": "Previous Year Participation"
+    },
+    {
+      "dataKey": "Participation",
+      "value": "2020",
+      "legendLabel": "Previous Year Participation"
+    }
+  ]
 }

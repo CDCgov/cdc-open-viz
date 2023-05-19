@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -9,10 +9,10 @@ import * as d3 from 'd3-array'
 import { scaleOrdinal } from '@visx/scale'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
-import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
+import chroma from 'chroma-js'
 
 // Primary Components
 import ConfigContext from './ConfigContext'
@@ -27,7 +27,6 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import SparkLine from './components/SparkLine'
 import Legend from './components/Legend'
-import DataTable from './components/DataTable'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
@@ -42,6 +41,36 @@ import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 
 import './scss/main.scss'
+// load both then config below determines which to use
+import DataTable_horiz from './components/DataTable'
+import DataTable_vert from '@cdc/core/components/DataTable'
+
+const generateColorsArray = (color = '#000000', special = false) => {
+  let colorObj = chroma(color)
+  let hoverColor = special ? colorObj.brighten(0.5).hex() : colorObj.saturate(1.3).hex()
+
+  return [color, hoverColor, colorObj.darken(0.3).hex()]
+}
+const hashObj = row => {
+  try {
+    if (!row) throw new Error('No row supplied to hashObj')
+
+    let str = JSON.stringify(row)
+    let hash = 0
+
+    if (str.length === 0) return hash
+
+    for (let i = 0; i < str.length; i++) {
+      let char = str.charCodeAt(i)
+      hash = (hash << 5) - hash + char
+      hash = hash & hash
+    }
+
+    return hash
+  } catch (e) {
+    console.error('COVE: ', e) // eslint-disable-line
+  }
+}
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
@@ -59,6 +88,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+
+  let legendMemo = useRef(new Map()) // map collection
+  let innerContainerRef = useRef()
+
+  if (isDebug) console.log('Chart config', config)
+
+  const DataTable = config?.table?.showVertical ? DataTable_vert : DataTable_horiz
 
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
@@ -102,18 +138,111 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }
 
+  const reloadURLData = async () => {
+    if (config.dataUrl) {
+      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl)
+      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+
+      let isUpdateNeeded = false
+      config.filters.forEach(filter => {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+          qsParams[filter.queryParameter] = filter.active
+          isUpdateNeeded = true
+        }
+      })
+
+      if ((!config.formattedData || config.formattedData.urlFiltered) && !isUpdateNeeded) return
+
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+        .map((param, i) => {
+          let qs = i === 0 ? '?' : '&'
+          qs += param + '='
+          qs += qsParams[param]
+          return qs
+        })
+        .join('')}`
+
+      let data
+
+      try {
+        const regex = /(?:\.([^.]+))?$/
+
+        const ext = regex.exec(dataUrl.pathname)[1]
+        if ('csv' === ext) {
+          data = await fetch(dataUrlFinal)
+            .then(response => response.text())
+            .then(responseText => {
+              const parsedCsv = Papa.parse(responseText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+              })
+              return parsedCsv.data
+            })
+        } else if ('json' === ext) {
+          data = await fetch(dataUrlFinal).then(response => response.json())
+        } else {
+          data = []
+        }
+      } catch {
+        console.error(`Cannot parse URL: ${dataUrlFinal}`)
+        data = []
+      }
+
+      if (config.dataDescription) {
+        data = transform.autoStandardize(data)
+        data = transform.developerStandardize(data, config.dataDescription)
+      }
+
+      Object.assign(data, { urlFiltered: true })
+
+      updateConfig({ ...config, runtimeDataUrl: dataUrlFinal, data, formattedData: data })
+
+      if (data) {
+        setStateData(data)
+        setExcludedData(data)
+        setFilteredData(filterData(config.filters, data))
+      }
+    }
+  }
+
   const handleLineType = lineType => {
     switch (lineType) {
       case 'dashed-sm':
         return '5 5'
+      case 'Dashed Small':
+        return '5 5'
       case 'dashed-md':
         return '10 5'
+      case 'Dashed Medium':
+        return '10 5'
       case 'dashed-lg':
+        return '15 5'
+      case 'Dashed Large':
         return '15 5'
       default:
         return 0
     }
   }
+
+  const lineOptions = [
+    {
+      value: 'Dashed Small',
+      key: 'dashed-sm'
+    },
+    {
+      value: 'Dashed Medium',
+      key: 'dashed-md'
+    },
+    {
+      value: 'Dashed Large',
+      key: 'dashed-lg'
+    },
+    {
+      value: 'Solid Line',
+      key: 'solid-line'
+    }
+  ]
 
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
@@ -121,7 +250,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {}
 
-    if (response.dataUrl) {
+    const urlFilters = response.filters ? (response.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
+
+    if (response.dataUrl && !urlFilters) {
       try {
         const regex = /(?:\.([^.]+))?$/
 
@@ -219,7 +350,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
-        newConfig.filters[index].active = filterValues[0]
+
+        newConfig.filters[index].active = newConfig.filters[index].active || filterValues[0]
         newConfig.filters[index].filterStyle = newConfig.filters[index].filterStyle ? newConfig.filters[index].filterStyle : 'dropdown'
       })
       currentData = filterData(newConfig.filters, newExcludedData)
@@ -420,14 +552,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     data.forEach(row => {
       let add = true
-      filters.forEach(filter => {
-        if (row[filter.columnName] !== filter.active) {
-          add = false
-        }
-      })
+      filters
+        .filter(filter => filter.type !== 'url')
+        .forEach(filter => {
+          if (row[filter.columnName] != filter.active) {
+            add = false
+          }
+        })
 
       if (add) filteredData.push(row)
     })
+
     return filteredData
   }
 
@@ -501,6 +636,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   useEffect(() => {
     loadConfig()
   }, []) // eslint-disable-line
+
+  useEffect(() => {
+    reloadURLData()
+  }, [JSON.stringify(config.filters)])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
@@ -636,10 +775,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
 
-  const parseDate = dateString => {
+  const parseDate = (dateString, showError = true) => {
     let date = timeParse(config.runtime[section].dateParseFormat)(dateString)
     if (!date) {
-      config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
+      if (showError) {
+        config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
+      }
       return new Date()
     } else {
       return date
@@ -828,10 +969,113 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return false
   }
 
+  // used for Additional Column
+  const displayDataAsText = (value, columnName) => {
+    if (value === null || value === '' || value === undefined) {
+      return ''
+    }
+
+    if (typeof value === 'string' && value.length > 0 && config.legend.type === 'equalnumber') {
+      return value
+    }
+
+    let formattedValue = value
+
+    let columnObj //= config.columns[columnName]
+    // config.columns not an array but a hash of objects
+    if (Object.keys(config.columns).length > 0) {
+      Object.keys(config.columns).forEach(function (key) {
+        var column = config.columns[key]
+        // add if not the index AND it is enabled to be added to data table
+        if (column.name === columnName) {
+          columnObj = column
+        }
+      })
+    }
+
+    if (columnObj === undefined) {
+      // then use left axis config
+      columnObj = config.type === 'chart' ? config.dataFormat : config.primary
+      // NOTE: Left Value Axis uses different names
+      // so map them below so the code below works
+      // - copy commas to useCommas to work below
+      columnObj['useCommas'] = columnObj.commas
+      // - copy roundTo to roundToPlace to work below
+      columnObj['roundToPlace'] = columnObj.roundTo ? columnObj.roundTo : ''
+    }
+
+    if (columnObj) {
+      // If value is a number, apply specific formattings
+      let hasDecimal = false
+      let decimalPoint = 0
+      if (Number(value)) {
+        if (columnObj.roundToPlace >= 0) {
+          hasDecimal = columnObj.roundToPlace ? columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null : false
+          decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
+
+          // Rounding
+          if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
+            formattedValue = Number(value).toFixed(decimalPoint)
+          }
+        }
+
+        if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
+          // Formats number to string with commas - allows up to 5 decimal places, if rounding is not defined.
+          // Otherwise, uses the rounding value set at 'columnObj.roundToPlace'.
+          formattedValue = Number(value).toLocaleString('en-US', {
+            style: 'decimal',
+            minimumFractionDigits: hasDecimal ? decimalPoint : 0,
+            maximumFractionDigits: hasDecimal ? decimalPoint : 5
+          })
+        }
+      }
+
+      // add prefix and suffix if set
+      formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
+    }
+
+    return formattedValue
+  }
+
+  // this is passed DOWN into the various components
+  // then they do a lookup based on the bin number as index into here (TT)
+  const applyLegendToRow = rowObj => {
+    try {
+      if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
+      // Navigation map
+      if ('navigation' === config.type) {
+        let mapColorPalette = colorPalettes[config.color] || colorPalettes['bluegreenreverse']
+        return generateColorsArray(mapColorPalette[3])
+      }
+
+      let hash = hashObj(rowObj)
+
+      if (legendMemo.current.has(hash)) {
+        let idx = legendMemo.current.get(hash)
+        if (runtimeLegend[idx]?.disabled) return false
+
+        // DEV-784 changed to use bin prop to get color instead of idx
+        // bc we re-order legend when showSpecialClassesLast is checked
+        let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
+        return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
+      }
+
+      // Fail state
+      return generateColorsArray()
+    } catch (e) {
+      console.error('COVE: ', e) // eslint-disable-line
+    }
+  }
+
   const clean = data => {
     // cleaning is deleting data we need in forecasting charts.
     if (config.visualizationType === 'Forecasting') return data
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
+  }
+
+  // required for DataTable
+  const displayGeoName = key => {
+    return key
   }
 
   // Prevent render if loading
@@ -849,7 +1093,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         {!missingRequiredSections() && !config.newViz && (
           <div className='cdc-chart-inner-container'>
             {/* Title */}
-
             {title && config.showTitle && (
               <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
                 {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
@@ -900,7 +1143,36 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             </CoveMediaControls.Section>
 
             {/* Data Table */}
-            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}
+            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
+              <DataTable
+                config={config}
+                rawData={config.data}
+                runtimeData={filteredData || excludedData}
+                //navigationHandler={navigationHandler}
+                expandDataTable={config.table.expanded}
+                //headerColor={general.headerColor}
+                columns={config.columns}
+                showDownloadButton={config.general.showDownloadButton}
+                runtimeLegend={dynamicLegendItems}
+                displayDataAsText={displayDataAsText}
+                displayGeoName={displayGeoName}
+                applyLegendToRow={applyLegendToRow}
+                tableTitle={config.table.label}
+                indexTitle={config.table.indexLabel}
+                vizTitle={title}
+                viewport={currentViewport}
+                parseDate={parseDate}
+                formatDate={formatDate}
+                formatNumber={formatNumber}
+                tabbingId={handleChartTabbing}
+                showDownloadImgButton={config.showDownloadImgButton}
+                showDownloadPdfButton={config.showDownloadPdfButton}
+                innerContainerRef={innerContainerRef}
+                outerContainerRef={outerContainerRef}
+                imageRef={imageId}
+                isDebug={isDebug}
+              />
+            )}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
             {/* show pdf or image button */}
           </div>
@@ -947,6 +1219,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     filterData,
     imageId,
     handleLineType,
+    lineOptions,
     isNumber,
     getTextWidth,
     twoColorPalette,

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from 'react'
 
 import ConfigContext from '../ConfigContext'
 
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
 
@@ -11,6 +13,8 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
   const { overlay } = useGlobalContext()
 
   const [columns, setColumns] = useState([])
+
+  const transform = new DataTransform()
 
   const changeConfigValue = (parentObj, key, value) => {
     let newConfig = { ...config }
@@ -43,6 +47,13 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
     let dashboardConfig = { ...config.dashboard }
 
     dashboardConfig.sharedFilters.splice(index, 1)
+
+    // Ensures URL filters refresh after filter removal
+    if(dashboardConfig.datasets){
+      Object.keys(dashboardConfig.datasets).forEach(datasetKey => {
+        delete dashboardConfig.datasets[datasetKey].runtimeDataUrl
+      })
+    }
 
     updateConfig({ ...config, dashboard: dashboardConfig })
 
@@ -89,7 +100,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
           if (config.datasets[dataKeys[i]].dataDescription) {
             try {
               config.datasets[dataKeys[i]].data = transform.autoStandardize(config.datasets[dataKeys[i]].data)
-              config.datasets[dataKeys[i]].data = transform.developerStandardize(config.datasets[dataKeys[i]].data, config.datasets[dataKey].dataDescription)
+              config.datasets[dataKeys[i]].data = transform.developerStandardize(config.datasets[dataKeys[i]].data, config.datasets[dataKeys[i]].dataDescription)
             } catch (e) {
               //Data not able to be standardized, leave as is
             }
@@ -97,7 +108,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
         }
 
         if (config.datasets[dataKeys[i]].data) {
-          config.datasets[dataKeys[i]].data.map(row => {
+          config.datasets[dataKeys[i]].data.forEach(row => {
             Object.keys(row).forEach(columnName => (columns[columnName] = true))
           })
         }
@@ -127,6 +138,14 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
       overlay?.actions.openOverlay(filterModal(newFilter, index))
     }
 
+    const updateFilterPropByFunction = (index, func) => {
+      let newFilter = { ...filter }
+
+      newFilter = func(newFilter)
+
+      overlay?.actions.openOverlay(filterModal(newFilter, index))
+    }
+
     const addFilterUsedBy = (filter, index, value) => {
       if (!filter.usedBy) filter.usedBy = []
       filter.usedBy.push(value)
@@ -138,6 +157,47 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
       if (usedByIndex !== -1) {
         filter.usedBy.splice(usedByIndex, 1)
         updateFilterProp('usedBy', index, filter.usedBy)
+      }
+    }
+
+    const updateLabel = (e, value) => {
+      let newLabels = filter.labels || {}
+
+      newLabels[value] = e.target.value
+
+
+      updateFilterProp('labels', index, newLabels)
+    }
+
+    const removeValue = (valueIndex) => {
+      let newLabels = filter.labels || {}
+      let newValues = filter.values || []
+
+      delete newLabels[filter.values[valueIndex]]
+      newValues.splice(valueIndex, 1)
+
+      updateFilterPropByFunction(index, newFilter => {
+        newFilter.labels = newLabels
+        newFilter.orderedValue = newValues
+        return newFilter
+      })
+    }
+
+    const addNewValue = (e) => {
+      e.preventDefault()
+      if (!filter.values || filter.values.indexOf(e.target[0].value) === -1) {
+        let newValues = filter.values || []
+        newValues.push(e.target[0].value)
+
+        updateFilterPropByFunction(index, newFilter => {
+          newFilter.values = newValues
+          if (!newFilter.active) {
+            newFilter.active = e.target[0].value
+          }
+          return newFilter
+        })
+
+        e.target[0].value = ''
       }
     }
 
@@ -156,81 +216,146 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
               Remove Filter
             </button>
             <label>
-              <span className='edit-label column-heading'>Filter: </span>
-              <select
-                value={filter.columnName}
-                onChange={e => {
-                  updateFilterProp('columnName', index, e.target.value)
-                }}
-              >
-                <option value=''>- Select Option -</option>
-                {columns.map(dataKey => (
-                  <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>
-                    {dataKey}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span className='edit-label column-heading'>Label: </span>
-              <input
-                type='text'
-                value={filter.key}
-                onChange={e => {
-                  updateFilterProp('key', index, e.target.value)
-                }}
-              />
-            </label>
-            <label>
-              <span className='edit-label column-heading'>Show Dropdown</span>
-              <input
-                type='checkbox'
-                defaultChecked={filter.showDropdown === true}
-                onChange={e => {
-                  updateFilterProp('showDropdown', index, !filter.showDropdown)
-                }}
-              />
-            </label>
-            <label>
-              <span className='edit-label column-heading'>Set By: </span>
-              <select value={filter.setBy} onChange={e => updateFilterProp('setBy', index, e.target.value)}>
-                <option value=''>- Select Option -</option>
-                {Object.keys(config.visualizations).map(vizKey => (
-                  <option value={vizKey} key={`set-by-select-item-${vizKey}`}>
-                    {config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span className='edit-label column-heading'>Used By:</span>
-              <ul>
-                {filter.usedBy &&
-                  filter.usedBy.map(vizKey => (
-                    <li key={`used-by-list-item-${vizKey}`}>
-                      <span>{config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}</span>{' '}
+                <span className='edit-label column-heading'>Filter Type:</span>
+                <select defaultValue={filter.type || 'data'} onChange={e => updateFilterProp('type', index, e.target.value)}>
+                  <option value="url">URL</option>
+                  <option value="data">Data</option>
+                </select>
+              </label>
+            {filter.type === 'url' && <>
+              <label>
+                <span className='edit-label column-heading'>Label: </span>
+                <input
+                  type='text'
+                  value={filter.key}
+                  onChange={e => {
+                    updateFilterProp('key', index, e.target.value)
+                  }}
+                />
+              </label>
+              <label>
+                <span className='edit-label column-heading'>URL to Filter: </span>
+                <select defaultValue={filter.datasetKey || ''} onChange={e => updateFilterProp('datasetKey', index, e.target.value)}> 
+                  <option value=''>- Select Option -</option>
+                  {Object.keys(config.datasets).map(datasetKey => {
+                    if(config.datasets[datasetKey].dataUrl){
+                      return <option key={datasetKey} value={datasetKey}>{(config.datasets[datasetKey].dataUrl).substring(0, 50)}</option>
+                    }
+                    return <React.Fragment key={datasetKey}></React.Fragment>;
+                  })}
+                </select>
+              </label>
+              <label>
+                <span className='edit-label column-heading'>Query string parameter</span>{' '}
+                <input
+                  type='text'
+                  defaultValue={filter.queryParameter}
+                  onChange={e => updateFilterProp('queryParameter', index, e.target.value)}
+                />
+              </label>
+              <span className='edit-label column-heading'>Values</span>{' '}
+              <ul className='value-list'>
+                {filter.values &&
+                  filter.values.map((value, valueIndex) => (
+                    <li>
+                      {value}
+                      <input
+                        type='text'
+                        value={filter.labels ? filter.labels[value] : undefined}
+                        onChange={(e) => updateLabel(e, value)}
+                      />
                       <button
-                        onClick={e => {
-                          e.preventDefault()
-                          removeFilterUsedBy(filter, index, vizKey)
-                        }}
+                        onClick={() => removeValue(valueIndex)}
                       >
                         X
                       </button>
                     </li>
                   ))}
               </ul>
-              <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
-                <option value=''>- Select Option -</option>
-                {Object.keys(config.visualizations)
-                  .filter(vizKey => filter.setBy !== vizKey && (!filter.usedBy || filter.usedBy.indexOf(vizKey) === -1) && !config.visualizations[vizKey].usesSharedFilter)
-                  .map(vizKey => (
-                    <option value={vizKey} key={`used-by-select-item-${vizKey}`}>
+              <form
+                onSubmit={addNewValue}
+              >
+                <input type='text' /> <button type='submit'>Add New Value</button>
+              </form>
+            </>}
+            {filter.type !== 'url' && <>
+              <label>
+                <span className='edit-label column-heading'>Filter: </span>
+                <select
+                  value={filter.columnName}
+                  onChange={e => {
+                    updateFilterProp('columnName', index, e.target.value)
+                  }}
+                >
+                  <option value=''>- Select Option -</option>
+                  {columns.map(dataKey => (
+                    <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>
+                      {dataKey}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span className='edit-label column-heading'>Label: </span>
+                <input
+                  type='text'
+                  value={filter.key}
+                  onChange={e => {
+                    updateFilterProp('key', index, e.target.value)
+                  }}
+                />
+              </label>
+              <label>
+                <span className='edit-label column-heading'>Show Dropdown</span>
+                <input
+                  type='checkbox'
+                  defaultChecked={filter.showDropdown === true}
+                  onChange={e => {
+                    updateFilterProp('showDropdown', index, !filter.showDropdown)
+                  }}
+                />
+              </label>
+              <label>
+                <span className='edit-label column-heading'>Set By: </span>
+                <select value={filter.setBy} onChange={e => updateFilterProp('setBy', index, e.target.value)}>
+                  <option value=''>- Select Option -</option>
+                  {Object.keys(config.visualizations).map(vizKey => (
+                    <option value={vizKey} key={`set-by-select-item-${vizKey}`}>
                       {config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}
                     </option>
                   ))}
-              </select>
-            </label>
+                </select>
+              </label>
+              <label>
+                <span className='edit-label column-heading'>Used By:</span>
+                <ul>
+                  {filter.usedBy &&
+                    filter.usedBy.map(vizKey => (
+                      <li key={`used-by-list-item-${vizKey}`}>
+                        <span>{config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}</span>{' '}
+                        <button
+                          onClick={e => {
+                            e.preventDefault()
+                            removeFilterUsedBy(filter, index, vizKey)
+                          }}
+                        >
+                          X
+                        </button>
+                      </li>
+                    ))}
+                </ul>
+                <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
+                  <option value=''>- Select Option -</option>
+                  {Object.keys(config.visualizations)
+                    .filter(vizKey => filter.setBy !== vizKey && (!filter.usedBy || filter.usedBy.indexOf(vizKey) === -1) && !config.visualizations[vizKey].usesSharedFilter)
+                    .map(vizKey => (
+                      <option value={vizKey} key={`used-by-select-item-${vizKey}`}>
+                        {config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            </>}
           </fieldset>
           <button type='button' className='btn btn-primary' style={{ display: 'inline-block', 'margin-right': '1em' }} onClick={overlay?.actions.toggleOverlay}>
             Cancel
