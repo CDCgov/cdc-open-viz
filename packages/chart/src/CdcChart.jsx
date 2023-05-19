@@ -289,6 +289,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setExcludedData(data)
     }
 
+    // force showVertical for data tables false if it does not exist
+    if (response !== undefined && response.table !== undefined) {
+      if (!response.table || !response.table.showVertical) {
+        response.table = response.table || {}
+        response.table.showVertical = false
+      }
+    }
     let newConfig = { ...defaults, ...response }
     if (newConfig.visualizationType === 'Box Plot') {
       newConfig.legend.hide = true
