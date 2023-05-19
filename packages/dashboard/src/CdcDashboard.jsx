@@ -216,7 +216,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
-
     let newConfig = { ...defaults, ...response }
     let datasets = {}
 
@@ -270,7 +269,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
     setData(datasets)
 
-    console.log('Dashboard newconfig', newConfig)
     updateConfig(newConfig, datasets)
     setLoading(false)
   }
