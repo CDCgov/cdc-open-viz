@@ -148,32 +148,10 @@ const useScales = properties => {
     })
   }
 
-  if (config.visualizationType === 'Forecasting') {
-    const barDataMapped = data.map(d => d[config.forecastingChart.barColumn])
-    const xColumnName = config.xAxis.dataKey
-
-    yScale = scaleLinear({
-      domain: [min, max],
-      range: [yMax, 0]
-    })
-
-    const dates = data.map(i => Date.parse(i[xColumnName]))
-
-    const sortedDates = dates.sort(function (a, b) {
-      return a > b
-    })
-
-    xScale = scaleBand({
-      domain: sortedDates,
-      range: [0, xMax],
-      padding: 0.4
-    })
-
-    xScaleNoPadding = scaleBand({
-      domain: sortedDates,
-      range: [0, xMax],
-      padding: 0
-    })
+  // * Still working on forecasting scaling here 05/19
+  if (config.visualizationType === 'Combo' && config.runtime.forecastingSeriesKeys.length > 0) {
+    // Return the configured scale function
+    // xScale = scalePoint({ domain: xAxisDataMapped, padding: 0.4 })
   }
 
   return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding }
