@@ -1685,7 +1685,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
             {/* Link */}
-            {isDashboard && config.table.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+            {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
