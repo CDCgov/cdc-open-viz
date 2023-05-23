@@ -9,7 +9,7 @@ import { BarStackHorizontal } from '@visx/shape'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, tableData, formatDate, isNumber, getTextWidth, parseDate } = useContext(ConfigContext)
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, tableData, formatDate, isNumber, getTextWidth, parseDate, setSharedFilter, setSharedFilterValue, dashboardConfig } = useContext(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
@@ -202,6 +202,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           display={displayBar ? 'block' : 'none'}
                           data-tooltip-html={tooltip}
                           data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                          onClick={e => {
+                            e.preventDefault()
+                            if (setSharedFilter) {
+                              bar[config.xAxis.dataKey] = xAxisValue
+                              setSharedFilter(config.uid, bar)
+                            }
+                          }}
                         ></foreignObject>
                       </Group>
                     </Group>
@@ -266,6 +273,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             display={displayBar ? 'block' : 'none'}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                            onClick={e => {
+                              e.preventDefault()
+                              if (setSharedFilter) {
+                                bar[config.xAxis.dataKey] = xAxisValue
+                                setSharedFilter(config.uid, bar)
+                              }
+                            }}
                           ></foreignObject>
 
                           {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel && (
@@ -447,14 +461,34 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       const highlightedBarColor = config.orientation === 'vertical' ? getHighlightedBarColorByValue(xAxisValue) : getHighlightedBarColorByValue(yAxisValue)
                       const highlightedBar = config.orientation === 'vertical' ? getHighlightedBarByValue(xAxisValue) : getHighlightedBarByValue(yAxisValue)
 
-                      const background = isRegularLollipopColor ? barColor : isTwoToneLollipopColor ? chroma(barColor).brighten(1) : isHighlightedBar ? 'transparent' : barColor
+                      const background = () => {
+                        if (isRegularLollipopColor) return barColor
+                        if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
+                        if (isHighlightedBar) return 'transparent'
+                        // loop through shared filters and get active values
+                        if (dashboardConfig && dashboardConfig?.dashboard.sharedFilters?.length > 0) {
+                          let activeFilters = []
+                          dashboardConfig.dashboard.sharedFilters?.forEach((filter, index) => {
+                            activeFilters.push(filter.active)
+                          })
+
+                          if (config.orientation === 'horizontal') {
+                            if (!activeFilters.includes(yAxisValue)) return '#ccc'
+                          }
+
+                          if (config.orientation !== 'horizontal') {
+                            if (!activeFilters.includes(xAxisValue)) return '#ccc'
+                          }
+                        }
+                        return barColor
+                      }
 
                       const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
 
                       const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
 
                       const finalStyle = {
-                        background,
+                        background: background(),
                         borderColor,
                         borderStyle: 'solid',
                         borderWidth,
@@ -485,6 +519,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               display={displayBar ? 'block' : 'none'}
                               data-tooltip-html={tooltip}
                               data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                              onClick={e => {
+                                e.preventDefault()
+                                if (setSharedFilter) {
+                                  bar[config.xAxis.dataKey] = config.orientation === 'horizontal' ? yAxisValue : xAxisValue
+                                  setSharedFilter(config.uid, bar)
+                                }
+                              }}
                             ></foreignObject>
                             {orientation === 'horizontal' && !config.isLollipopChart && displayNumbersOnBar && (
                               <Text // prettier-ignore
