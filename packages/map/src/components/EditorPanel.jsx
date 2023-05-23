@@ -89,12 +89,9 @@ const EditorPanel = props => {
   const {
     // prettier-ignore
     MapLayerHandlers: {
+      handleMapLayer,
       handleAddLayer,
-      handleMapLayerName,
-      handleMapLayerUrl,
-      handleRemoveLayer,
-      handleMapLayerNamespace,
-      handleMapLayerTooltip
+      handleRemoveLayer
     }
   } = useMapLayers(state, setState, false, true)
 
@@ -2815,7 +2812,7 @@ const EditorPanel = props => {
                     ))}
                 </AccordionItemPanel>
               </AccordionItem>
-              {/* <AccordionItem>
+              <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Custom Map Layers</AccordionItemButton>
                 </AccordionItemHeading>
@@ -2833,13 +2830,21 @@ const EditorPanel = props => {
                             <AccordionItemPanel>
                               <div className='map-layers-panel'>
                                 <label htmlFor='layerName'>Layer Name:</label>
-                                <input type='text' name='layerName' value={layer.name} onChange={e => handleMapLayerName(e, index)} />
+                                <input type='text' name='layerName' value={layer.name} onChange={e => handleMapLayer(e, index, 'name')} />
                                 <label htmlFor='layerFilename'>File:</label>
-                                <input type='text' name='layerFilename' value={layer.url} onChange={e => handleMapLayerUrl(e, index)} />
+                                <input type='text' name='layerFilename' value={layer.url} onChange={e => handleMapLayer(e, index, 'url')} />
                                 <label htmlFor='layerNamespace'>TOPOJSON Namespace:</label>
-                                <input type='text' name='layerNamespace' value={layer.namespace} onChange={e => handleMapLayerNamespace(e, index)} />
+                                <input type='text' name='layerNamespace' value={layer.namespace} onChange={e => handleMapLayer(e, index, 'namespace')} />
+                                <label htmlFor='layerFill'>Fill Color:</label>
+                                <input type='text' name='layerFill' value={layer.fill} onChange={e => handleMapLayer(e, index, 'fill')} />
+                                <label htmlFor='layerFill'>Fill Opacity (%):</label>
+                                <input type='number' min={0} max={100} name='layerFill' value={layer.fillOpacity ? layer.fillOpacity * 100 : ''} onChange={e => handleMapLayer(e, index, 'fillOpacity')} />
+                                <label htmlFor='layerStroke'>Stroke Color:</label>
+                                <input type='text' name='layerStroke' value={layer.stroke} onChange={e => handleMapLayer(e, index, 'stroke')} />
+                                <label htmlFor='layerStroke'>Stroke Width:</label>
+                                <input type='number' min={0} max={5} name='layerStrokeWidth' value={layer.strokeWidth} onChange={e => handleMapLayer(e, index, 'strokeWidth')} />
                                 <label htmlFor='layerTooltip'>Tooltip:</label>
-                                <textarea name='layerTooltip' value={layer.tooltip} onChange={e => handleMapLayerTooltip(e, index)}></textarea>
+                                <textarea name='layerTooltip' value={layer.tooltip} onChange={e => handleMapLayer(e, index, 'tooltip')}></textarea>
                                 <button onClick={e => handleRemoveLayer(e, index)}>Remove Layer</button>
                               </div>
                             </AccordionItemPanel>
@@ -2852,7 +2857,7 @@ const EditorPanel = props => {
                     Add Map Layer
                   </button>
                 </AccordionItemPanel>
-              </AccordionItem> */}
+              </AccordionItem>
             </Accordion>
           </form>
           <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
