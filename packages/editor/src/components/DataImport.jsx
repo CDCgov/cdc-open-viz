@@ -17,6 +17,7 @@ import SampleData from './SampleData'
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
 
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -37,6 +38,8 @@ export default function DataImport() {
   const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
 
   const [editingDataset, setEditingDataset] = useState()
+
+  const [asyncPreviewData, setAsyncPreviewData] = useState()
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
@@ -320,6 +323,34 @@ export default function DataImport() {
     setConfig(newConfig)
   }, []) // eslint-disable-line
 
+  useEffect(() => {
+    const asyncWrapper = async () => {
+      if (config.type === 'dashboard') {
+        Object.keys(config.datasets).forEach(async datasetKey => {
+          if (config.datasets[datasetKey].preview) {
+            if (config.datasets[datasetKey].dataUrl) {
+              const remoteData = await fetchRemoteData(config.datasets[datasetKey].dataUrl)
+              if (Array.isArray(remoteData)) {
+                setAsyncPreviewData(remoteData)
+              }
+            } else if (Array.isArray(config.datasets[datasetKey].data)) {
+              setAsyncPreviewData(config.datasets[datasetKey].data)
+            }
+          }
+        })
+      } else {
+        if (config.dataUrl) {
+          const remoteData = await fetchRemoteData(config.dataUrl)
+          if (Array.isArray(remoteData)) {
+            setAsyncPreviewData(remoteData)
+          }
+        }
+      }
+    }
+
+    asyncWrapper()
+  }, [config.datasets]) // eslint-disable-line
+
   const updateDescriptionProp = (visualizationKey, datasetKey, key, value) => {
     if (config.type === 'dashboard') {
       let dataDescription = { ...config.datasets[datasetKey].dataDescription, [key]: value }
@@ -476,7 +507,7 @@ export default function DataImport() {
   if (config.type === 'dashboard') {
     readyToConfigure = Object.keys(config.datasets).length > 0
     Object.keys(config.datasets).forEach(datasetKey => {
-      if (config.datasets[datasetKey].preview) {
+      if (config.datasets[datasetKey].preview && Array.isArray(config.datasets[datasetKey].data)) {
         previewData = config.datasets[datasetKey].data
       }
     })
@@ -791,7 +822,7 @@ export default function DataImport() {
         </a>
       </div>
       <div className='right-col'>
-        <PreviewDataTable data={previewData} />
+        <PreviewDataTable data={asyncPreviewData || previewData} />
       </div>
     </>
   )
