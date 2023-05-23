@@ -35,6 +35,7 @@ import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
+import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -75,7 +76,7 @@ const addVisualization = (type, subType) => {
   return newVisualizationConfig
 }
 
-const VisualizationsPanel = () => (
+const VisualizationsPanel = ({ loadConfig, config }) => (
   <div className='visualizations-panel'>
     <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
     <span className='subheading-3'>Chart</span>
@@ -97,6 +98,8 @@ const VisualizationsPanel = () => (
       <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
       <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
     </div>
+    <span className='subheading-3'>Advanced</span>
+    {/* <AdvancedEditor loadConfig={loadConfig} state={config} /> */}
   </div>
 )
 
@@ -268,7 +271,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     }
 
     setData(datasets)
-
     updateConfig(newConfig, datasets)
     setLoading(false)
   }
@@ -538,7 +540,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Chart' />
-                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} />
+                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} dashboardConfig={config} isDashboard={true} />
               </>
             )
             break
@@ -595,7 +597,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         <DndProvider backend={HTML5Backend}>
           <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview} />
           <div className='layout-container'>
-            <VisualizationsPanel />
+            <VisualizationsPanel loadConfig={loadConfig} config={config} />
             <Grid />
           </div>
         </DndProvider>
@@ -666,6 +668,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                 <CdcChart
                                   key={col.widget}
                                   config={visualizationConfig}
+                                  dashboardConfig={config}
                                   isEditor={false}
                                   setConfig={newConfig => {
                                     updateChildConfig(col.widget, newConfig)
