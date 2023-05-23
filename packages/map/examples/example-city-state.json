@@ -124,7 +124,10 @@
     "geoCodeCircleSize": 2
   },
   "mapPosition": {
-    "coordinates": [0, 30],
+    "coordinates": [
+      0,
+      30
+    ],
     "zoom": 1
   },
   "map": {
@@ -499,6 +502,42 @@
     },
     {
       "STATE": "Los Angeles",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Grand Rapids, MICHIGAN",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem, OReGON",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Round Rock, TEXAS",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "PROVO, UT",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "SALUDA, VIRGINIA",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "ELLENSBURG, WA",
       "Rate": 14,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
