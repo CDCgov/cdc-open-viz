@@ -99,7 +99,7 @@ const VisualizationsPanel = ({ loadConfig, config }) => (
       <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
     </div>
     <span className='subheading-3'>Advanced</span>
-    {/* <AdvancedEditor loadConfig={loadConfig} state={config} /> */}
+    <AdvancedEditor loadConfig={loadConfig} state={config} />
   </div>
 )
 
@@ -437,6 +437,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       })
 
       setFilteredData(newFilteredData)
+      if (dashboardConfig.sharedFilters[index].active === dashboardConfig.sharedFilters[index].resetLabel) {
+        setFilteredData(data)
+      }
     }
 
     const announceChange = text => {}
@@ -445,6 +448,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       if (singleFilter.type !== 'url' && !singleFilter.showDropdown) return <></>
 
       const values = []
+
+      if (singleFilter.resetLabel) {
+        values.push(
+          <option key={`${singleFilter.resetLabel}-option-${index}`} value={singleFilter.resetLabel}>
+            {singleFilter.resetLabel}
+          </option>
+        )
+      }
 
       singleFilter.values.forEach((filterOption, index) => {
         values.push(

@@ -2,7 +2,7 @@
   "dashboard": {
     "sharedFilters": [
       {
-        "key": "sharedFilter1",
+        "key": "State",
         "columnName": "state",
         "setBy": "chart1684783399780",
         "usedBy": [
@@ -14,7 +14,9 @@
           "Georgia",
           "Florida"
         ],
-        "active": "Georgia"
+        "active": "Alabama",
+        "resetLabel": "- Select -",
+        "showDropdown": true
       }
     ]
   },

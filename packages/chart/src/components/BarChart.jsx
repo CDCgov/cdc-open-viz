@@ -7,6 +7,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
+import { act } from 'react-dom/test-utils'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, tableData, formatDate, isNumber, getTextWidth, parseDate, setSharedFilter, setSharedFilterValue, dashboardConfig } = useContext(ConfigContext)
@@ -468,17 +469,37 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         // loop through shared filters and get active values
                         if (dashboardConfig && dashboardConfig?.dashboard.sharedFilters?.length > 0) {
                           let activeFilters = []
+                          let backgroundColor = barColor
+
+                          const checkForResetValue = () => {
+                            return dashboardConfig.dashboard.sharedFilters?.map((filter, index) => {
+                              if (filter.resetLabel === filter.active) {
+                                backgroundColor = barColor
+                              } else {
+                                return backgroundColor
+                              }
+                            })
+                          }
+
                           dashboardConfig.dashboard.sharedFilters?.forEach((filter, index) => {
                             activeFilters.push(filter.active)
                           })
 
+                          // if reset value is found use that.
+
                           if (config.orientation === 'horizontal') {
-                            if (!activeFilters.includes(yAxisValue)) return '#ccc'
+                            if (!activeFilters.includes(yAxisValue)) {
+                              backgroundColor = '#ccc'
+                            }
                           }
 
                           if (config.orientation !== 'horizontal') {
-                            if (!activeFilters.includes(xAxisValue)) return '#ccc'
+                            if (!activeFilters.includes(xAxisValue)) {
+                              backgroundColor = '#ccc'
+                            }
                           }
+                          checkForResetValue()
+                          return backgroundColor
                         }
                         return barColor
                       }
