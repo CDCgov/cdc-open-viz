@@ -234,7 +234,18 @@ const DataTable = props => {
                   </>
                 )
               } else {
-                cellValue = displayDataAsText(runtimeData[row][config.columns[column].name], column)
+                // check for special classes
+                let specialValFound = ''
+                if (config.legend.specialClasses && config.legend.specialClasses.length && typeof config.legend.specialClasses[0] === 'object') {
+                  for (let i = 0; i < config.legend.specialClasses.length; i++) {
+                    if (config.legend.specialClasses[i].key === config.columns[column].name) {
+                      if (String(runtimeData[row][config.legend.specialClasses[i].key]) === config.legend.specialClasses[i].value) {
+                        specialValFound = config.legend.specialClasses[i].label
+                      }
+                    }
+                  }
+                }
+                cellValue = specialValFound ? displayDataAsText(specialValFound, column) : displayDataAsText(runtimeData[row][config.columns[column].name], column)
               }
 
               return (
