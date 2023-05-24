@@ -14,7 +14,8 @@ import Loading from '@cdc/core/components/Loading'
 const DataTable = props => {
   const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, formatNumber, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, parseDate, formatDate, isDebug } = props
   if (isDebug) console.log('core/DataTable: props=', props)
-  if (isDebug) console.log('core/DataTable: runtimeData=', runtimeData)
+  //if (isDebug)
+  console.log('core/DataTable: runtimeData=', runtimeData)
   if (isDebug) console.log('core/DataTable: rawData=', rawData)
   if (isDebug) console.log('core/DataTable: config=', config)
 
@@ -206,6 +207,26 @@ const DataTable = props => {
     return -1
   })
 
+  const applySpecialClasses = () => {
+    Object.entries(runtimeData).forEach(function (row, index, hash) {
+      console.log('row=', row)
+      let cols = Object.keys(row[1])
+      console.log('cols=', cols)
+      if (config.legend.specialClasses && config.legend.specialClasses.length && typeof config.legend.specialClasses[0] === 'object') {
+        for (let i = 0; i < config.legend.specialClasses.length; i++) {
+          if (String(row[1][config.legend.specialClasses[i].key]) === config.legend.specialClasses[i].value) {
+            //return config.legend.specialClasses[i].label
+            //console.log('MATCH FOUND', config.legend.specialClasses[i].value)
+            //console.log('hashlookup i', hash[index])
+            // set value with special class label
+            //hash[index][1][config.legend.specialClasses[i].key] = config.legend.specialClasses[i].label
+          }
+        }
+      }
+      //return runtimeData[row][columns[column].name] ?? null
+    })
+  }
+
   function genMapRows(rows) {
     const allrows = rows.map(row => {
       return (
@@ -234,7 +255,25 @@ const DataTable = props => {
                   </>
                 )
               } else {
-                cellValue = displayDataAsText(runtimeData[row][config.columns[column].name], column)
+                // check for special classes??
+                //console.log('else row', runtimeData[row])
+                //console.log('else column', config.columns[column])
+                //console.log('else column name', config.columns[column].name)
+                //console.log('else value', runtimeData[row][config.columns[column].name])
+                let specialValFound = ''
+                if (config.legend.specialClasses && config.legend.specialClasses.length && typeof config.legend.specialClasses[0] === 'object') {
+                  for (let i = 0; i < config.legend.specialClasses.length; i++) {
+                    //console.log('key=', config.legend.specialClasses[i].key)
+                    if (config.legend.specialClasses[i].key === config.columns[column].name) {
+                      //console.log('Col MATCHED', config.columns[column].name)
+                      if (String(runtimeData[row][config.legend.specialClasses[i].key]) === config.legend.specialClasses[i].value) {
+                        //console.log('VALUE MATCHED', runtimeData[row][config.legend.specialClasses[i].key])
+                        specialValFound = config.legend.specialClasses[i].label
+                      }
+                    }
+                  }
+                }
+                cellValue = specialValFound ? displayDataAsText(specialValFound, column) : displayDataAsText(runtimeData[row][config.columns[column].name], column)
               }
 
               return (
@@ -423,6 +462,8 @@ const DataTable = props => {
         </tr>
       )
     }
+
+    applySpecialClasses()
 
     return (
       <ErrorBoundary component='DataTable'>
