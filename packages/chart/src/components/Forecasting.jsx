@@ -15,15 +15,7 @@ import { bisector } from 'd3-array'
 import * as d3 from 'd3'
 
 const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
-  const {
-    transformedData: data,
-    rawData,
-    config,
-    seriesHighlight,
-    parseDate,
-    formatDate,
-    formatNumber
-  } = useContext(ConfigContext)
+  const { transformedData: data, rawData, config, seriesHighlight, parseDate, formatDate, formatNumber } = useContext(ConfigContext)
 
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
@@ -137,14 +129,8 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
             return group.stages.map((stage, stageIndex) => {
               // console.log('GROUP', group)
               const groupData = rawData.filter(d => d[group.stageColumn] === stage.key)
-              let transparentArea =
-                config.legend.behavior === 'highlight' &&
-                seriesHighlight.length > 0 &&
-                seriesHighlight.indexOf(stage.key) === -1
-              let displayArea =
-                config.legend.behavior === 'highlight' ||
-                seriesHighlight.length === 0 ||
-                seriesHighlight.indexOf(stage.key) !== -1
+              let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(stage.key) === -1
+              let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(stage.key) !== -1
 
               return (
                 <Group className={`forecasting-areas-combo`} key={`forecasting-areas-combo`}>
@@ -201,12 +187,7 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
           })}
 
           {tooltipData && Object.entries(tooltipData.data).length > 0 && (
-            <TooltipInPortal
-              key={Math.random()}
-              top={tooltipData.dataYPosition + chartPosition?.top}
-              left={tooltipData.dataXPosition + chartPosition?.left}
-              style={defaultStyles}
-            >
+            <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
               <ul
                 style={{
                   listStyle: 'none',
@@ -227,14 +208,7 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
             </TooltipInPortal>
           )}
           <Group key='bars'>
-            <Bar
-              key={'bars'}
-              width={Number(width)}
-              height={Number(height)}
-              fill={DEBUG ? 'red' : 'transparent'}
-              fillOpacity={0.05}
-              onMouseMove={e => handleMouseOver(e, data)}
-            />
+            <Bar key={'bars'} width={Number(width)} height={Number(height)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleMouseOver(e, data)} />
           </Group>
         </Group>
       </ErrorBoundary>
