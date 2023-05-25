@@ -725,7 +725,7 @@ export default function DataImport() {
               <>
                 <div className='heading-3'>Data Source</div>
                 <div className='file-loaded-area'>
-                  {(config.dataFileSourceType === 'file' || !config.dataUrl) && (
+                  {(config.dataFileSourceType === 'file' || !config.dataFileSourceType) && (
                     <div className='data-source-options'>
                       <div className={isDragActive2 ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps2()}>
                         <input {...getInputProps2()} />
@@ -741,7 +741,7 @@ export default function DataImport() {
                     </div>
                   )}
 
-                  {(config.dataFileSourceType === 'url' || config.dataUrl) && (
+                  {config.dataFileSourceType === 'url' && (
                     <>
                       <div className='url-source-options'>
                         <div>{loadFileFromUrl(externalURL)}</div>
