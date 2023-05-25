@@ -1021,14 +1021,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
             // THIS CODE SHOULD NOT ACT ON THE ENTIRE ROW OF KEYS BUT ONLY THE ONE KEY IN THE SPECIAL CLASS
             for (let i = 0; i < state.legend.specialClasses.length; i++) {
-              // DEV-3303 - Special Classes label in HOVERS should only apply to selected special class key
+              // Special Classes label in HOVERS should only apply to selected special class key
               // - you have to ALSO check that the key matches - putting here otherwise the if stmt too long
-              console.log('##col check', column.name, columnKey, state.legend.specialClasses[i].key)
               if (column.name === state.legend.specialClasses[i].key) {
-                console.log('##col match', columnKey, state.legend.specialClasses[i].key)
                 if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
                   value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
-                  console.log('## value found', value)
                   break
                 }
               }
@@ -1038,7 +1035,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           if (!value) {
             value = displayDataAsText(row[column.name], columnKey)
           }
-          console.log('colName,columnKey,value', column.name, columnKey, value)
+
           if (0 < value.length) {
             // Only spit out the tooltip if there's a value there
             toolTipText += state.general.hidePrimaryColumnInTooltip ? `<div><dd>${value}</dd></div>` : `<div><dt>${label}</dt><dd>${value}</dd></div>`
