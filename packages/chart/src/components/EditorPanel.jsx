@@ -871,7 +871,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line']
+  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar']
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1204,6 +1204,20 @@ const EditorPanel = () => {
                                       updateConfig({ ...config, series })
                                     }
 
+                                    let changeSeriesName = (i, value) => {
+                                      let series = [...config.series]
+                                      let seriesLabelsCopy = { ...config.runtime.seriesLabels }
+                                      series[i].name = value
+                                      seriesLabelsCopy[series[i].dataKey] = series[i].name
+
+                                      let newConfig = {
+                                        ...config,
+                                        series
+                                      }
+
+                                      updateConfig(newConfig)
+                                    }
+
                                     let typeDropdown = (
                                       <>
                                         <label htmlFor='type-dropdown'>Series Type</label>
@@ -1292,6 +1306,20 @@ const EditorPanel = () => {
                                       </>
                                     )
 
+                                    const seriesName = (
+                                      <>
+                                        <label htmlFor='series-name'>Series Name</label>
+                                        <input
+                                          type='text'
+                                          key={`series-name-${i}`}
+                                          value={series.name ? series.name : ''}
+                                          onChange={event => {
+                                            changeSeriesName(i, event.target.value)
+                                          }}
+                                        />
+                                      </>
+                                    )
+
                                     return (
                                       <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
                                         {(provided, snapshot) => (
@@ -1321,6 +1349,7 @@ const EditorPanel = () => {
                                                           </>
                                                         )}
                                                         {['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type)) && <span className='series-item__dropdown series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
+                                                        {['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart', 'Bar'].some(item => item.includes(series.type)) && <span className='series-item__input  series-item__input--name'>{seriesName}</span>}
                                                       </div>
                                                     </AccordionItemPanel>
                                                   )}
