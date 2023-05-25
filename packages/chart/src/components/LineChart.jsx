@@ -64,6 +64,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   </div>`
                 let circleRadii = 4.5
 
+                console.log('seriesKey', seriesKey)
+
                 return (
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
