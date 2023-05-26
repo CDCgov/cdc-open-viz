@@ -137,6 +137,8 @@ export default function LinearChart() {
     }
   }, [dataRef?.isIntersecting, config.animate])
 
+  const { orientation, xAxis, yAxis } = config
+
   return isNaN(width) ? (
     <></>
   ) : (
@@ -452,14 +454,19 @@ export default function LinearChart() {
         {/* y anchors */}
         {config.yAxis.anchors &&
           config.yAxis.anchors.map(anchor => {
+            let anchorPosition = yScale(anchor.value)
+            const padding = config.orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
+            const middleOffset = config.orientation === 'horizontal' && config.visualizationType === 'Bar' ? config.barHeight / 4 : 0
+
             return (
+              // prettier-ignore
               <Line
+                key={anchor.value}
                 strokeDasharray={handleLineType(anchor.lineStyle)}
                 stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                className='customAnchor'
-                from={{ x: 0 + config.yAxis.size, y: yScale(anchor.value) }}
-                to={{ x: width, y: yScale(anchor.value) }}
-                display={config.runtime.horizontal ? 'none' : 'block'}
+                className='anchor-y'
+                from={{ x: 0 + padding, y: anchorPosition - middleOffset}}
+                to={{ x: width, y: anchorPosition - middleOffset }}
               />
             )
           })}
@@ -467,15 +474,25 @@ export default function LinearChart() {
         {/* x anchors */}
         {config.xAxis.anchors &&
           config.xAxis.anchors.map(anchor => {
-            const anchorPosition = config.xAxis.type === 'date' ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
+            let newX = xAxis
+            if (orientation === 'horizontal') {
+              newX = yAxis
+            }
+
+            let anchorPosition = newX.type === 'date' ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
+
+            const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
+
             return (
+              // prettier-ignore
               <Line
+                key={anchor.value}
                 strokeDasharray={handleLineType(anchor.lineStyle)}
                 stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                 className='anchor-x'
-                from={{ x: anchorPosition + Number(config.yAxis.size), y: 0 }}
-                to={{ x: anchorPosition + Number(config.yAxis.size), y: yMax }}
-                display={config.runtime.horizontal ? 'none' : 'block'}
+                from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
+                to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
               />
             )
           })}

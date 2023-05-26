@@ -420,6 +420,11 @@ const EditorPanel = props => {
           general: {
             ...state.general,
             showDownloadButton: !state.general.showDownloadButton
+          },
+          table: {
+            // setting both bc DataTable new core needs it here
+            ...state.table,
+            download: !state.general.showDownloadButton
           }
         })
         break

@@ -7,6 +7,7 @@ export default {
   table: {
     label: 'Data Table',
     show: true,
-    showDownloadUrl: false
+    showDownloadUrl: false,
+    showVertical: true,
   }
 }
