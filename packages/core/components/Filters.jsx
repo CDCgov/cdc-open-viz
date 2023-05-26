@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useId } from 'react'
 
 // CDC
 import Button from '@cdc/core/components/elements/Button'
@@ -186,6 +187,7 @@ const Filters = props => {
   const { filters, type, general, theme, filterBehavior } = visualizationConfig
   const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState('')
+  const id = useId()
 
   // useFilters hook provides data and logic for handling various filter functions
   // prettier-ignore
@@ -255,7 +257,7 @@ const Filters = props => {
           const buttonClassList = ['button__tab-bar', singleFilter.active === filter ? 'button__tab-bar--active' : '']
           return (
             <button
-              id={`${filter}-${outerIndex}-${index}`}
+              id={`${filter}-${outerIndex}-${index}-${id}`}
               className={buttonClassList.join(' ')}
               key={filter}
               onClick={e => {
@@ -328,7 +330,7 @@ const Filters = props => {
           pillValues.push(
             <div className='pill__wrapper' key={`pill-${index}`}>
               <button
-                id={`${filterOption}-${outerIndex}-${index}`}
+                id={`${filterOption}-${outerIndex}-${index}-${id}`}
                 className={pillClassList.join(' ')}
                 onKeyDown={e => {
                   if (e.keyCode === 13) {
@@ -349,13 +351,13 @@ const Filters = props => {
 
           values.push(
             <option key={index} value={filterOption}>
-              {filterOption}
+              {singleFilter.labels && singleFilter.labels[filterOption] ? singleFilter.labels[filterOption] : filterOption}
             </option>
           )
 
           tabValues.push(
             <button
-              id={`${filterOption}-${outerIndex}-${index}`}
+              id={`${filterOption}-${outerIndex}-${index}-${id}`}
               className={tabClassList.join(' ')}
               onClick={e => {
                 changeFilterActive(outerIndex, filterOption)

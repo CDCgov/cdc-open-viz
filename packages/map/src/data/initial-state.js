@@ -5,7 +5,7 @@ export default {
     title: '',
     showTitle: true,
     showSidebar: true,
-    showDownloadButton: true,
+    showDownloadButton: false,
     showDownloadMediaButton: false,
     displayAsHex: false,
     displayStateLabels: false,
@@ -70,6 +70,7 @@ export default {
     showDownloadUrl: false,
     showDataTableLink: true,
     forceDisplay: true,
+    download: false,
     indexLabel: ''
   },
   tooltips: {

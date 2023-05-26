@@ -772,7 +772,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(({ columnName, label, labels, active, values, type, showDropdown }, idx) => {
+    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type, showDropdown }, idx) => {
       let newFilter = runtimeFilters[idx]
 
       const sortAsc = (a, b) => {
@@ -811,6 +811,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       newFilter.type = type
       newFilter.label = label ?? ''
       newFilter.columnName = columnName
+      newFilter.orderedValues = orderedValues
+      newFilter.queryParameter = queryParameter
+      newFilter.labels = labels
       newFilter.values = values
       handleSorting(newFilter)
       newFilter.active = active ?? values[0] // Default to first found value
@@ -905,6 +908,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       return ''
     }
 
+    // if string of letters like 'Home' then dont need to format as a number
     if (typeof value === 'string' && value.length > 0 && state.legend.type === 'equalnumber') {
       return value
     }
@@ -912,6 +916,17 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     let formattedValue = value
 
     let columnObj = state.columns[columnName]
+
+    if (columnObj === undefined) {
+      // then use left axis config
+      columnObj = state.columns.primary
+      // NOTE: Left Value Axis uses different names
+      // so map them below so the code below works
+      // - copy commas to useCommas to work below
+      columnObj['useCommas'] = columnObj.commas
+      // - copy roundTo to roundToPlace to work below
+      columnObj['roundToPlace'] = columnObj.roundTo ? columnObj.roundTo : ''
+    }
 
     if (columnObj) {
       // If value is a number, apply specific formattings
@@ -1000,16 +1015,16 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const column = state.columns[columnKey]
 
         if (true === column.tooltip) {
-          let label = column.label.length > 0 ? column.label : ''
+          let label = column.label?.length > 0 ? column.label : ''
 
           let value
 
           if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
             // THIS CODE SHOULD NOT ACT ON THE ENTIRE ROW OF KEYS BUT ONLY THE ONE KEY IN THE SPECIAL CLASS
             for (let i = 0; i < state.legend.specialClasses.length; i++) {
-              // DEV-3303 - Special Classes label in HOVERS should only apply to selected special class key
+              // Special Classes label in HOVERS should only apply to selected special class key
               // - you have to ALSO check that the key matches - putting here otherwise the if stmt too long
-              if (columnKey === state.legend.specialClasses[i].key) {
+              if (column.name === state.legend.specialClasses[i].key) {
                 if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
                   value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
                   break
@@ -1671,7 +1686,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
             {/* Link */}
-            {isDashboard && config.table.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+            {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
@@ -1706,6 +1721,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 innerContainerRef={innerContainerRef}
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
+                isDebug={isDebug}
               />
             )}
 
