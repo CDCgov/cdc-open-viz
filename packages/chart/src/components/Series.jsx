@@ -3,6 +3,8 @@ import ConfigContext from '../ConfigContext'
 
 // Core
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
+import Check from '@cdc/core/assets/icon-check.svg'
+
 import Icon from '@cdc/core/components/ui/Icon'
 
 // Third Party
@@ -253,6 +255,18 @@ const SeriesDropdownConfidenceInterval = props => {
       <fieldset>
         <Accordion allowZeroExpanded>
           {series?.confidenceIntervals?.map((ciGroup, ciIndex) => {
+            const showInTooltip = ciGroup.showInTooltip ? ciGroup.showInTooltip : false
+
+            const updateShowInTooltip = (e, seriesIndex, ciIndex) => {
+              e.preventDefault()
+              let copiedSeries = [...config.series]
+              copiedSeries[seriesIndex].confidenceIntervals[ciIndex].showInTooltip = !showInTooltip
+              updateConfig({
+                ...config,
+                series: copiedSeries
+              })
+            }
+
             return (
               <AccordionItem className='series-item series-item--chart'>
                 <AccordionItemHeading className='series-item__title'>
@@ -279,6 +293,16 @@ const SeriesDropdownConfidenceInterval = props => {
                   </>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <div className='input-group'>
+                    <label for='showInTooltip'>Show In Tooltip</label>
+                    <div className={'cove-input__checkbox--small'} onClick={e => updateShowInTooltip(e, index, ciIndex)}>
+                      <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
+                        {showInTooltip && <Check className='' style={{ fill: '#025eaa' }} />}
+                      </div>
+                      <input className='cove-input--hidden' type='checkbox' name={'showInTooltip'} checked={showInTooltip ? showInTooltip : false} readOnly />
+                    </div>
+                  </div>
+
                   <InputSelect
                     initial='Select an option'
                     initialDisabled
