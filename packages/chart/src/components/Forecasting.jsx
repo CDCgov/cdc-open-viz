@@ -8,14 +8,14 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 // visx & d3
 import { useTooltip, useTooltipInPortal, defaultStyles } from '@visx/tooltip'
 import { curveMonotoneX } from '@visx/curve'
-import { Bar, Area, LinePath } from '@visx/shape'
+import { Bar, Area, LinePath, Line } from '@visx/shape'
 import { Group } from '@visx/group'
 import { localPoint } from '@visx/event'
-import { bisector } from 'd3-array'
-import * as d3 from 'd3'
 
 const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
   const { transformedData: data, rawData, config, seriesHighlight, parseDate, formatDate, formatNumber } = useContext(ConfigContext)
+  const { xAxis, yAxis, legend, runtime } = config
+  const DEBUG = false
 
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
@@ -27,7 +27,7 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
 
   // import tooltip helpers
-  const { tooltipData, showTooltip } = useTooltip()
+  const { tooltipData, showTooltip, hideTooltip } = useTooltip()
 
   // it appears we need to use TooltipInPortal.
   const { TooltipInPortal } = useTooltipInPortal({
@@ -41,33 +41,29 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
     return label === config.xAxis.dataKey ? `${label}: ${value}` : `${label}: ${formatNumber(value, 'left')}`
   }
 
-  // columns
-  const barColumn = config.forecastingChart.barColumn
-  const xColumnName = config.xAxis.dataKey
-  const DEBUG = true
-  let barThickness = width / data.length
-
   // Tooltip helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinate = x => {
-    xScale.padding = 0.4
-    let eachBand = xScale.step()
-    let numerator = x
-    const index = Math.floor(Number(numerator) / eachBand)
-    return xScale.domain()[index - 1] // fixes off by 1 error
-    // const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
-    // const x0 = xScale.invert(x)
-    // const index = bisectDate(config.data, x0, 1)
-    // const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
-    // return val
+    if (xScale.type === 'point') {
+      // Find the closest x value by calculating the minimum distance
+      let closestX = null
+      let minDistance = Number.MAX_VALUE
+      let offset = x - yAxis.size
 
-    // let xPos = x
-    // var domain = xScale.domain()
-    // var range = xScale.range()
-    // var rangePoints = d3.range(range[0], range[1], xScale.step())
-    // var yPos = domain[d3.bisect(rangePoints, xPos) - 1]
-    // const val = parseDate(yPos)
+      data.forEach(d => {
+        const xPosition = xAxis.type === 'date' ? xScale(parseDate(d[xAxis.dataKey])) : xScale(d[xAxis.dataKey])
+        const distance = Math.abs(Number(xPosition - offset))
 
-    // console.log(val)
+        if (distance < minDistance) {
+          minDistance = distance
+          closestX = xAxis.type === 'date' ? parseDate(d[xAxis.dataKey]) : d[xAxis.dataKey]
+        }
+      })
+      return closestX
+    }
+  }
+
+  const handleMouseOff = () => {
+    hideTooltip()
   }
 
   const handleMouseOver = (e, data) => {
@@ -80,19 +76,37 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
     let formattedDate = formatDate(closestXScaleValue)
 
     let yScaleValues
-    if (config.xAxis.type === 'categorical') {
-      yScaleValues = data.filter(d => d[config.xAxis.dataKey] === closestXScaleValue)
+    if (xAxis.type === 'categorical') {
+      yScaleValues = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
     } else {
-      yScaleValues = data.filter(d => formatDate(parseDate(d[config.xAxis.dataKey])) === formattedDate)
+      yScaleValues = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
     }
 
     let seriesToInclude = []
-    let yScaleMaxValues = []
-    let itemsToLoop = [config.runtime.xAxis.dataKey, ...config.runtime.seriesKeys]
+    let stageColumns = []
+    let ciItems = []
 
-    itemsToLoop.map(seriesKey => {
-      if (!seriesKey) return
-      if (!yScaleValues[0]) return
+    // loop through series for items to add to tooltip.
+    // there is probably a better way of doing this.
+    config.series.map(s => {
+      if (s.type === 'Forecasting') {
+        stageColumns.push(s.stageColumn)
+
+        // greedy fn 😭
+        s.confidenceIntervals.map(ci => {
+          if (ci.showInTooltip === true) {
+            ciItems.push(ci.low)
+            ciItems.push(ci.high)
+          }
+        })
+      }
+    })
+
+    let standardLoopItems = [runtime.xAxis.dataKey, ...runtime.barSeriesKeys, ...stageColumns, ...ciItems]
+
+    standardLoopItems.map(seriesKey => {
+      if (!seriesKey) return false
+      if (!yScaleValues[0]) return false
       for (const item of Object.entries(yScaleValues[0])) {
         if (item[0] === seriesKey) {
           seriesToInclude.push(item)
@@ -101,14 +115,13 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
     })
 
     // filter out the series that aren't added to the map.
-    seriesToInclude.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series])))
     if (!seriesToInclude) return
-    let tooltipDataFromSeries = Object.fromEntries(seriesToInclude) ? Object.fromEntries(seriesToInclude) : {}
+    let initialTooltipData = Object.fromEntries(seriesToInclude) ? Object.fromEntries(seriesToInclude) : {}
 
     let tooltipData = {}
-    tooltipData.data = tooltipDataFromSeries
-    tooltipData.dataXPosition = x + 20
-    tooltipData.dataYPosition = y - 100
+    tooltipData.data = initialTooltipData
+    tooltipData.dataXPosition = x + 10
+    tooltipData.dataYPosition = y
 
     let tooltipInformation = {
       tooltipData: tooltipData,
@@ -121,64 +134,60 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
   }
 
   return (
-    data &&
-    config.forecastingChart.groups && (
+    data && (
       <ErrorBoundary component='ForecastingChart'>
-        <Group className='forecasting-items' key='forecasting-items' left={config.xAxis.size}>
-          {config.runtime.forecastingSeriesKeys?.map((group, index) => {
+        <Group className='forecasting-items' key='forecasting-items-wrapper' left={yAxis.size}>
+          {runtime.forecastingSeriesKeys?.map((group, index) => {
             return group.stages.map((stage, stageIndex) => {
-              // console.log('GROUP', group)
+              const { behavior } = legend
               const groupData = rawData.filter(d => d[group.stageColumn] === stage.key)
-              let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(stage.key) === -1
-              let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(stage.key) !== -1
+              let transparentArea = behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(stage.key) === -1
+              let displayArea = behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(stage.key) !== -1
 
               return (
-                <Group className={`forecasting-areas-combo`} key={`forecasting-areas-combo`}>
+                <Group className={`forecasting-areas-combo-${index}`} key={`forecasting-areas--stage-${stage.key.replaceAll(' ', '-')}-${index}`}>
                   {group.confidenceIntervals.map((ciGroup, ciGroupIndex) => {
                     const palette = colorPalettesChart[stage.color]
 
-                    if (!palette) return null
                     return (
-                      <React.Fragment key={`${ciGroupIndex}--${ciGroup}`}>
+                      <Group key={`forecasting-areas--stage-${stage.key.replaceAll(' ', '-')}--group-${stageIndex}-${ciGroupIndex}`}>
                         {/* prettier-ignore */}
                         <Area
                           curve={curveMonotoneX}
                           data={groupData}
                           fill={displayArea ? palette[ciGroupIndex] : 'transparent'}
                           opacity={transparentArea ? 0.1 : 0.5}
-                          x={d => xScale(Date.parse(d[xColumnName]))}
+                          x={d => xScale(Date.parse(d[xAxis.dataKey]))}
                           y0={d => yScale(d[ciGroup.low])}
                           y1={d => yScale(d[ciGroup.high])}
                         />
 
                         {ciGroupIndex === 0 && (
-                          <React.Fragment key={`${ciGroupIndex}--${ciGroup}`}>
+                          <>
                             {/* prettier-ignore */}
                             <LinePath
-                            key={`${ciGroupIndex}`}
-                            data={groupData}
-                            x={ d => xScale(Date.parse(d[xColumnName])) }
-                            y={ d => yScale(d[ciGroup.high])}
-                            curve={curveMonotoneX}
-                            stroke={displayArea ? palette[2] : 'transparent'}
-                            strokeWidth={1}
-                            strokeOpacity={1}
-                          />
+                              data={groupData}
+                              x={ d => xScale(Date.parse(d[xAxis.dataKey])) }
+                              y={ d => yScale(d[ciGroup.high])}
+                              curve={curveMonotoneX}
+                              stroke={displayArea ? palette[2] : 'transparent'}
+                              strokeWidth={1}
+                              strokeOpacity={1}
+                            />
 
                             {/* prettier-ignore */}
                             <LinePath
-                            key={`${ciGroupIndex}`}
-                            data={groupData}
-                            x={ d => xScale(Date.parse(d[xColumnName])) }
-                            y={ d => yScale(d[ciGroup.low])}
-                            curve={curveMonotoneX}
-                            stroke={displayArea ? palette[2] : 'transparent'}
-                            strokeWidth={1}
-                            strokeOpacity={1}
-                          />
-                          </React.Fragment>
+                              data={groupData}
+                              x={ d => xScale(Date.parse(d[xAxis.dataKey])) }
+                              y={ d => yScale(d[ciGroup.low])}
+                              curve={curveMonotoneX}
+                              stroke={displayArea ? palette[2] : 'transparent'}
+                              strokeWidth={1}
+                              strokeOpacity={1}
+                            />
+                          </>
                         )}
-                      </React.Fragment>
+                      </Group>
                     )
                   })}
                 </Group>
@@ -207,10 +216,16 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
               </ul>
             </TooltipInPortal>
           )}
-          <Group key='bars'>
-            <Bar key={'bars'} width={Number(width)} height={Number(height)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleMouseOver(e, data)} />
+          <Group key='tooltip-hover-section'>
+            <Bar key={'bars'} width={Number(width)} height={Number(height)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleMouseOver(e, data)} onMouseOut={handleMouseOff} />
           </Group>
         </Group>
+
+        {showTooltip && tooltipData && (
+          <Group key='tooltipLine' className='tooltip-line'>
+            <Line from={{ x: tooltipData.dataXPosition - 10, y: 0 }} to={{ x: tooltipData.dataXPosition - 10, y: height }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' />
+          </Group>
+        )}
       </ErrorBoundary>
     )
   )

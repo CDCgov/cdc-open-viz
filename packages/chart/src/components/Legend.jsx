@@ -134,7 +134,7 @@ const Legend = () => {
       //store uniq values to Set by colorCode
 
       // loop through each stage/group/area on the chart and create a label
-      const forecastingLabels = config.runtime.forecastingSeriesKeys.map((outerGroup, index) => {
+      config.runtime.forecastingSeriesKeys.map((outerGroup, index) => {
         return outerGroup.stages.map((stage, index) => {
           let paletteHere = colorPalettes[stage.color]
 
@@ -199,6 +199,10 @@ const Legend = () => {
                 if (config.runtime.seriesLabels) {
                   let index = config.runtime.seriesLabelsAll.indexOf(itemName)
                   itemName = config.runtime.seriesKeys[index]
+
+                  if (config.runtime.forecastingSeriesKeys.length > 0) {
+                    itemName = label.text
+                  }
                 }
 
                 if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
