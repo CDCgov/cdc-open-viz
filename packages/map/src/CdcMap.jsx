@@ -1021,9 +1021,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
             // THIS CODE SHOULD NOT ACT ON THE ENTIRE ROW OF KEYS BUT ONLY THE ONE KEY IN THE SPECIAL CLASS
             for (let i = 0; i < state.legend.specialClasses.length; i++) {
-              // DEV-3303 - Special Classes label in HOVERS should only apply to selected special class key
+              // Special Classes label in HOVERS should only apply to selected special class key
               // - you have to ALSO check that the key matches - putting here otherwise the if stmt too long
-              if (columnKey === state.legend.specialClasses[i].key) {
+              if (column.name === state.legend.specialClasses[i].key) {
                 if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
                   value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
                   break
@@ -1685,7 +1685,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
             {/* Link */}
-            {isDashboard && config.table.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+            {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
@@ -1720,6 +1720,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 innerContainerRef={innerContainerRef}
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
+                isDebug={isDebug}
               />
             )}
 
