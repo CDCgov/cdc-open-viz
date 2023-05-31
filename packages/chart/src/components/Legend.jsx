@@ -135,7 +135,7 @@ const Legend = () => {
 
       // loop through each stage/group/area on the chart and create a label
       config.runtime.forecastingSeriesKeys.map((outerGroup, index) => {
-        return outerGroup.stages.map((stage, index) => {
+        return outerGroup?.stages?.map((stage, index) => {
           let paletteHere = colorPalettes[stage.color]
 
           const newLabel = {

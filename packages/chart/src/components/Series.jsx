@@ -218,7 +218,7 @@ const SeriesDropdownForecastColor = props => {
   // Hide AxisPositionDropdown in certain cases.
   if (config.visualizationType !== 'Combo' || !series) return
 
-  return series.stages.map((stage, stageIndex) => (
+  return series?.stages?.map((stage, stageIndex) => (
     <InputSelect
       initial='Select an option'
       initialDisabled
@@ -228,8 +228,6 @@ const SeriesDropdownForecastColor = props => {
       onChange={event => {
         const copyOfSeries = [...config.series] // copy the entire series array
         const copyOfStages = copyOfSeries[index].stages
-
-        console.log('copy of stages', copyOfStages)
         copyOfStages[stageIndex].color = event.target.value
         copyOfSeries[index] = { ...copyOfSeries[index], stages: copyOfStages }
 
@@ -348,7 +346,12 @@ const SeriesDropdownConfidenceInterval = props => {
           className='btn full-width'
           onClick={e => {
             e.preventDefault()
-            const copiedIndex = [...config.series[index].confidenceIntervals]
+            let copiedIndex = null
+            if (config.series[index].confidenceIntervals) {
+              copiedIndex = [...config.series[index].confidenceIntervals]
+            } else {
+              copiedIndex = []
+            }
             const copyOfSeries = [...config.series] // copy the entire series array
             copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex, { high: '', low: '' }] } // update the nested array
             updateConfig({

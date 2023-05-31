@@ -138,6 +138,7 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
       <ErrorBoundary component='ForecastingChart'>
         <Group className='forecasting-items' key='forecasting-items-wrapper' left={yAxis.size}>
           {runtime.forecastingSeriesKeys?.map((group, index) => {
+            if (!group || !group.stages) return
             return group.stages.map((stage, stageIndex) => {
               const { behavior } = legend
               const groupData = rawData.filter(d => d[group.stageColumn] === stage.key)
