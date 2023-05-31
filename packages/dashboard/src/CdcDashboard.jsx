@@ -132,7 +132,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     let dataset = config.formattedData || config.data
 
     if (config.dataUrl) {
-      dataset = await fetchRemoteData(`${config.dataUrl}}`)
+      dataset = await fetchRemoteData(`${config.dataUrl}`)
 
       dataset = getFormattedData(dataset, config.dataDescription)
     }

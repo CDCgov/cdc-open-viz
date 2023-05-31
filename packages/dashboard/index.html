@@ -1,31 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <style>
+      body {
+        margin: 0 auto !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: unset !important;
+      }
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <style>
-    body {
-      margin: 0 auto !important;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: unset !important;
-    }
+      .react-container + .react-container {
+        margin-top: 3rem;
+      }
+    </style>
+  </head>
 
-    .react-container+.react-container {
-      margin-top: 3rem;
-    }
-  </style>
-</head>
-
-<body>
-  <!-- <div class="react-container" data-config="/examples/default.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/default-multi-dataset.json"></div> -->
-  <div class="react-container" data-config="/examples/default-filter-control.json"></div>
-  <!-- <div class="react-container" data-config="/examples/private/totals.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/private/totals-two.json"></div> -->
-  <script type="module" src="./src/index.jsx"></script>
-</body>
-
+  <body>
+    <div class="react-container" data-config="/examples/default.json"></div>
+    <!-- <div class="react-container" data-config="/examples/default-multi-dataset.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/default-filter-control.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/private/totals.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/private/totals-two.json"></div> -->
+    <script type="module" src="./src/index.jsx"></script>
+  </body>
 </html>
