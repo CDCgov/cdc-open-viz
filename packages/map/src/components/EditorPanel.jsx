@@ -2222,11 +2222,11 @@ const EditorPanel = props => {
                     {'category' !== legend.type && (
                       <label className='checkbox'>
                         <input type='checkbox' checked={legend.separateZero || false} onChange={event => handleEditorChanges('separateZero', event.target.checked)} />
-                        <span className='edit-label'>
+                        <span className='edit-label column-heading'>
                           Separate Zero
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>For numeric data, you can separate the zero value as its own data class.</p>
@@ -2237,7 +2237,7 @@ const EditorPanel = props => {
                     )}
                     {/* Temp Checkbox */}
                     {state.legend.type === 'equalnumber' && (
-                      <label className='checkbox mt-4'>
+                      <label className='checkbox'>
                         <input
                           type='checkbox'
                           checked={state.general.equalNumberOptIn}
@@ -2245,10 +2245,10 @@ const EditorPanel = props => {
                             handleEditorChanges('showEqualNumber', event.target.checked)
                           }}
                         />
-                        <span className='edit-label'>Use new quantile legend</span>
+                        <span className='edit-label column-heading'>Use new quantile legend</span>
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
@@ -2357,11 +2357,11 @@ const EditorPanel = props => {
                             handleEditorChanges('dynamicDescription', filterValueOptionList[0])
                           }}
                         />
-                        <span className='edit-label'>
+                        <span className='edit-label column-heading'>
                           Dynamic Legend Description
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
@@ -2373,11 +2373,11 @@ const EditorPanel = props => {
                     {(filtersJSX.length > 0 || state.general.type === 'bubble' || state.general.geoType === 'us') && (
                       <label className='checkbox'>
                         <input type='checkbox' checked={legend.unified} onChange={event => handleEditorChanges('unifiedLegend', event.target.checked)} />
-                        <span className='edit-label'>
+                        <span className='edit-label column-heading'>
                           Unified Legend
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>
