@@ -63,7 +63,7 @@ export default {
   filters: [],
   table: {
     label: 'Data Table',
-    expanded: true,
+    expanded: false,
     limitHeight: false,
     height: '',
     caption: '',
