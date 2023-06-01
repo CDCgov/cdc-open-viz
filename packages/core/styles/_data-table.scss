@@ -39,6 +39,7 @@ table.data-table {
   border-collapse: collapse;
   overflow: auto;
   appearance: none;
+  table-layout: fixed;
   * {
     box-sizing: border-box;
   }
@@ -171,6 +172,15 @@ table.data-table {
       vertical-align: baseline;
       margin-left: 5px;
     }
+  }
+
+  .boxplot-td {
+    //display: inline-block;
+    //box-sizing: border-box;
+    table-layout: fixed;
+    width: 200;
+    //min-width: 150px;
+    //max-width: 400px;
   }
 }
 

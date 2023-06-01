@@ -9,11 +9,11 @@ import { BarStackHorizontal } from '@visx/shape'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, getTextWidth, parseDate } = useContext(ConfigContext)
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, tableData, formatDate, isNumber, getTextWidth, parseDate } = useContext(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
-
+  const barBorderWidth = 1
   const lollipopBarWidth = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5
   const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
 
@@ -26,12 +26,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const tipRounding = config.tipRounding
   const radius = config.roundingStyle === 'standard' ? '8px' : config.roundingStyle === 'shallow' ? '5px' : config.roundingStyle === 'finger' ? '15px' : '0px'
   const stackCount = config.runtime.seriesKeys.length
-  const barBorderWidth = 1
   const fontSize = { small: 16, medium: 18, large: 20 }
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
   const applyRadius = index => {
-    if (index === undefined || index === null || !isRounded) return
+    if (index === undefined || index === null || !isRounded) return {}
     let style = {}
 
     if ((isStacked && index + 1 === stackCount) || !isStacked) {
@@ -47,6 +46,27 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       style = { borderRadius: radius }
     }
     return style
+  }
+
+  const assignColorsToValues = () => {
+    const palettesArr = colorPalettes[config.palette]
+    const values = tableData.map(d => {
+      return d[config.legend.colorCode]
+    })
+    // Map to hold unique values and their  colors
+    let colorMap = new Map()
+    // Resultant array to hold colors  to the values
+    let result = []
+
+    for (let i = 0; i < values.length; i++) {
+      // If value not in map, add it and assign a color
+      if (!colorMap.has(values[i])) {
+        colorMap.set(values[i], palettesArr[colorMap.size % palettesArr.length])
+      }
+      // push the colosr to the result array
+      result.push(colorMap.get(values[i]))
+    }
+    return result
   }
 
   const updateBars = defaultBars => {
@@ -168,7 +188,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       `}
                       </style>
                       <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className='stack vertical'>
-                        <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barThickness * bar.index + offset} y={bar.y - 5} fill={bar.color} textAnchor='middle'>
+                        <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barThickness * bar.index + offset} y={bar.y - 5} fill={'#000'} textAnchor='middle'>
                           {yAxisValue}
                         </Text>
                         <foreignObject
@@ -314,6 +334,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     left={config.runtime.horizontal ? 0 : (xMax / barGroups.length) * barGroup.index}
                   >
                     {barGroup.bars.map((bar, index) => {
+                      const scaleVal = config.useLogScale ? 0.1 : 0
                       const getHighlightedBarColorByValue = value => {
                         const match = config?.highlightedBarValues.filter(item => {
                           if (!item.value) return
@@ -323,27 +344,34 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         if (!match?.color) return `rgba(255, 102, 1)`
                         return match.color
                       }
+
+                      const getHighlightedBarByValue = value => {
+                        const match = config?.highlightedBarValues.filter(item => {
+                          if (!item.value) return
+                          return config.xAxis.type === 'date' ? formatDate(parseDate(item.value)) === value : item.value === value
+                        })[0]
+
+                        if (!match?.color) return false
+                        return match
+                      }
+
                       let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
 
                       highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
 
                       let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                       let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                      let barHeight = orientation === 'horizontal' ? config.barHeight : isNumber(Math.abs(yScale(bar.value) - yScale(0))) ? Math.abs(yScale(bar.value) - yScale(0)) : 0
+                      let barHeight = orientation === 'horizontal' ? config.barHeight : isNumber(Math.abs(yScale(bar.value) - yScale(scaleVal))) ? Math.abs(yScale(bar.value) - yScale(scaleVal)) : 0
                       let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                       let barGroupWidth = ((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (config.barThickness || 0.8)
                       let offset = (((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
                       const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(0)
-                      const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(0))
+                      const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
                       // ! Unsure if this should go back.
                       if (config.isLollipopChart) {
                         offset = (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2 - lollipopBarWidth / 2
                       }
-                      const set = new Set()
-                      data.forEach(d => set.add(d[config.legend.colorCode]))
-                      const uniqValues = Array.from(set)
-
-                      let palette = colorPalettes[config.palette].slice(0, uniqValues.length)
+                      let palette = assignColorsToValues()
 
                       let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
                       let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
@@ -363,7 +391,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
 
                       const barPosition = bar.value < 0 ? 'below' : 'above'
-                      const textX = barPosition === 'below' ? 0 : 0
 
                       // check if bar text/value string fits into  each bars.
                       let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
@@ -417,13 +444,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                       const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
                       const isHighlightedBar = config.orientation === 'vertical' ? highlightedBarValues?.includes(xAxisValue) : highlightedBarValues?.includes(yAxisValue)
-                      const highlightedBarColor = getHighlightedBarColorByValue(yAxisValue)
+                      const highlightedBarColor = config.orientation === 'vertical' ? getHighlightedBarColorByValue(xAxisValue) : getHighlightedBarColorByValue(yAxisValue)
+                      const highlightedBar = config.orientation === 'vertical' ? getHighlightedBarByValue(xAxisValue) : getHighlightedBarByValue(yAxisValue)
 
                       const background = isRegularLollipopColor ? barColor : isTwoToneLollipopColor ? chroma(barColor).brighten(1) : isHighlightedBar ? 'transparent' : barColor
 
                       const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
 
-                      const borderWidth = isHighlightedBar ? barBorderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
+                      const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
 
                       const finalStyle = {
                         background,
@@ -471,7 +499,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 {xAxisValue}
                               </Text>
                             )}
-                            ;
                             {orientation === 'horizontal' && config.isLollipopChart && displayNumbersOnBar && (
                               <Text
                                 display={displayBar ? 'block' : 'none'}
@@ -495,13 +522,12 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
                               </Text>
                             )}
-                            ;
+
                             {orientation === 'vertical' && (
-                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
+                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={labelColor} textAnchor='middle'>
                                 {yAxisValue}
                               </Text>
                             )}
-                            ;
                             {config.isLollipopChart && config.lollipopShape === 'circle' && (
                               <circle
                                 cx={orientation === 'horizontal' ? bar.y : barWidth * (barGroup.bars.length - bar.index - 1) + (isLabelBelowBar && orientation === 'horizontal' ? 0 : offset) + lollipopShapeSize / 3.5}

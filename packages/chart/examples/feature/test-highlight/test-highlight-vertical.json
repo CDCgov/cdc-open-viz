@@ -1,9 +1,8 @@
 {
   "type": "chart",
-  "title": "Example Bar Chart",
+  "title": "Example Line Chart",
   "showTitle": true,
-  "showDownloadMediaButton": false,
-  "theme": "theme-blue",
+  "theme": "theme-green",
   "animate": false,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
@@ -15,9 +14,6 @@
   "barStyle": "",
   "roundingStyle": "standard",
   "tipRounding": "top",
-  "general": {
-    "showDownloadButton": true
-  },
   "padding": {
     "left": 5,
     "right": 5
@@ -47,10 +43,9 @@
     "tickRotation": 0,
     "anchors": [],
     "type": "chart",
-    "title": "Example Bar Chart",
+    "title": "Example Line Chart",
     "showTitle": true,
-    "showDownloadMediaButton": false,
-    "theme": "theme-blue",
+    "theme": "theme-green",
     "animate": false,
     "fontSize": "medium",
     "lineDatapointStyle": "hover",
@@ -62,9 +57,6 @@
     "barStyle": "",
     "roundingStyle": "standard",
     "tipRounding": "top",
-    "general": {
-      "showDownloadButton": true
-    },
     "padding": {
       "left": 5,
       "right": 5
@@ -74,7 +66,7 @@
       "displayNumbersOnBar": false,
       "hideLabel": false,
       "hideTicks": false,
-      "size": "76",
+      "size": "75",
       "gridLines": false,
       "enablePadding": false,
       "min": "",
@@ -89,11 +81,11 @@
       "rightAxisLabelColor": "#333",
       "rightAxisTickLabelColor": "#333",
       "rightAxisTickColor": "#333",
-      "numTicks": "",
+      "numTicks": "9",
       "axisPadding": 0,
       "tickRotation": 0,
       "anchors": [],
-      "label": "Y Axis Example Label"
+      "label": "Y-Axis Example Label"
     },
     "boxplot": {
       "plots": [],
@@ -129,7 +121,7 @@
       "hasLine": false
     },
     "isLegendValue": false,
-    "barThickness": "0.6",
+    "barThickness": 0.35,
     "barHeight": 25,
     "barSpace": 15,
     "heights": {
@@ -138,14 +130,14 @@
     },
     "xAxis": {
       "anchors": [],
-      "type": "categorical",
+      "type": "date",
       "showTargetLabel": true,
       "targetLabel": "Target",
       "hideAxis": false,
       "hideLabel": false,
       "hideTicks": false,
-      "size": "59",
-      "tickRotation": 0,
+      "size": "77",
+      "tickRotation": "25",
       "min": "",
       "max": "",
       "labelColor": "#333",
@@ -156,27 +148,26 @@
       "axisPadding": 0,
       "target": 0,
       "dataKey": "Date",
-      "label": "X Axis Example Label"
+      "label": "X-Axis Example Label",
+      "dateParseFormat": "%m/%d/%Y",
+      "dateDisplayFormat": "%m/%d/%Y"
     },
     "table": {
-      "label": "Data Type by Date",
+      "label": "Data Table",
       "expanded": true,
       "limitHeight": false,
       "height": "",
       "caption": "",
       "showDownloadUrl": false,
       "showDataTableLink": true,
-      "indexLabel": "",
-      "showVertical": false,
+      "download": true,
       "show": true
     },
     "orientation": "horizontal",
-    "color": "pinkpurple",
-    "columns": {},
     "legend": {
       "behavior": "isolate",
       "singleRow": false,
-      "colorCode": "Data 6",
+      "colorCode": "",
       "reverseLabelOrder": false,
       "description": "",
       "dynamicLegend": false,
@@ -218,20 +209,20 @@
     "highlightedBarValues": [],
     "series": [
       {
-        "dataKey": "Data 1",
+        "dataKey": "Date",
         "type": "Bar"
       }
     ],
-    "height": 300,
+    "height": "375",
     "data": [
       {
         "Date": "1/15/2016",
-        "Data 1": "90",
+        "Data 1": "foo",
         "Data 2": "135",
         "Data 3": "300",
         "Data 4": "95",
         "Data 5": "120",
-        "Data 6": "Bad"
+        "Data 6": "310"
       },
       {
         "Date": "2/15/2016",
@@ -240,7 +231,7 @@
         "Data 3": "240",
         "Data 4": "60",
         "Data 5": "160",
-        "Data 6": "Good"
+        "Data 6": "200"
       },
       {
         "Date": "3/15/2016",
@@ -249,7 +240,7 @@
         "Data 3": "290",
         "Data 4": "100",
         "Data 5": "200",
-        "Data 6": "Good"
+        "Data 6": "250"
       },
       {
         "Date": "4/15/2016",
@@ -258,7 +249,7 @@
         "Data 3": "230",
         "Data 4": "180",
         "Data 5": "160",
-        "Data 6": "Good"
+        "Data 6": "220"
       },
       {
         "Date": "5/15/2016",
@@ -267,38 +258,34 @@
         "Data 3": "300",
         "Data 4": "150",
         "Data 5": "130",
-        "Data 6": "Good"
+        "Data 6": "100"
       },
       {
         "Date": "6/15/2016",
-        "Data 1": "80",
+        "Data 1": "90",
         "Data 2": "220",
         "Data 3": "320",
         "Data 4": "100",
         "Data 5": "220",
-        "Data 6": "ABC"
+        "Data 6": "300"
       }
     ],
     "visualizationType": "Bar",
-    "description": "This example shows a bar chart created in the visualization editor in WCMS",
-    "dataCutoff": "0",
     "runtime": {
-      "seriesLabels": {
-        "Data 1": "Data 1"
-      },
+      "seriesLabels": [],
       "seriesLabelsAll": [
-        "Data 1"
+        "Date"
       ],
       "originalXAxis": {
         "anchors": [],
-        "type": "categorical",
+        "type": "date",
         "showTargetLabel": true,
         "targetLabel": "Target",
         "hideAxis": false,
         "hideLabel": false,
         "hideTicks": false,
-        "size": "59",
-        "tickRotation": 0,
+        "size": "77",
+        "tickRotation": "25",
         "min": "",
         "max": "",
         "labelColor": "#333",
@@ -309,17 +296,19 @@
         "axisPadding": 0,
         "target": 0,
         "dataKey": "Date",
-        "label": "X Axis Example Label"
+        "label": "X-Axis Example Label",
+        "dateParseFormat": "%m/%d/%Y",
+        "dateDisplayFormat": "%m/%d/%Y"
       },
       "seriesKeys": [
-        "Data 1"
+        "Date"
       ],
       "xAxis": {
         "hideAxis": false,
         "displayNumbersOnBar": false,
         "hideLabel": false,
         "hideTicks": false,
-        "size": "76",
+        "size": "75",
         "gridLines": false,
         "enablePadding": false,
         "min": "",
@@ -334,22 +323,22 @@
         "rightAxisLabelColor": "#333",
         "rightAxisTickLabelColor": "#333",
         "rightAxisTickColor": "#333",
-        "numTicks": "",
+        "numTicks": "9",
         "axisPadding": 0,
         "tickRotation": 0,
         "anchors": [],
-        "label": "Y Axis Example Label"
+        "label": "Y-Axis Example Label"
       },
       "yAxis": {
         "anchors": [],
-        "type": "categorical",
+        "type": "date",
         "showTargetLabel": true,
         "targetLabel": "Target",
         "hideAxis": false,
         "hideLabel": false,
         "hideTicks": false,
-        "size": "59",
-        "tickRotation": 0,
+        "size": "77",
+        "tickRotation": "25",
         "min": "",
         "max": "",
         "labelColor": "#333",
@@ -360,10 +349,12 @@
         "axisPadding": 0,
         "target": 0,
         "dataKey": "Date",
-        "label": "X Axis Example Label"
+        "label": "X-Axis Example Label",
+        "dateParseFormat": "%m/%d/%Y",
+        "dateDisplayFormat": "%m/%d/%Y"
       },
       "horizontal": true,
-      "uniqueId": 1684423946652,
+      "uniqueId": 1683836397584,
       "editorErrorMessage": ""
     },
     "labelPlacement": "Below Bar"
@@ -402,7 +393,7 @@
     "hasLine": false
   },
   "isLegendValue": false,
-  "barThickness": "0.6",
+  "barThickness": 0.35,
   "barHeight": 25,
   "barSpace": 15,
   "heights": {
@@ -411,14 +402,14 @@
   },
   "xAxis": {
     "anchors": [],
-    "type": "categorical",
+    "type": "date",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "59",
-    "tickRotation": 0,
+    "size": "77",
+    "tickRotation": "25",
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -429,27 +420,26 @@
     "axisPadding": 0,
     "target": 0,
     "dataKey": "Date",
-    "label": "X Axis Example Label"
+    "label": "X-Axis Example Label",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y"
   },
   "table": {
-    "label": "Data Type by Date",
+    "label": "Data Table",
     "expanded": true,
     "limitHeight": false,
     "height": "",
     "caption": "",
     "showDownloadUrl": false,
     "showDataTableLink": true,
-    "indexLabel": "",
-    "showVertical": false,
+    "download": true,
     "show": true
   },
-  "orientation": "horizontal",
-  "color": "pinkpurple",
-  "columns": {},
+  "orientation": "vertical",
   "legend": {
     "behavior": "isolate",
     "singleRow": false,
-    "colorCode": "Data 6",
+    "colorCode": "",
     "reverseLabelOrder": false,
     "description": "",
     "dynamicLegend": false,
@@ -474,7 +464,7 @@
   "dataFormat": {
     "commas": false,
     "prefix": "",
-    "suffix": " units",
+    "suffix": "",
     "abbreviated": false,
     "bottomSuffix": "",
     "bottomPrefix": "",
@@ -488,23 +478,30 @@
   },
   "useLogScale": false,
   "filterBehavior": "Filter Change",
-  "highlightedBarValues": [],
+  "highlightedBarValues": [
+    {
+      "dataKey": "Data 1",
+      "value": "2/15/2016",
+      "legendLabel": "label",
+      "color": "blue"
+    }
+  ],
   "series": [
     {
       "dataKey": "Data 1",
       "type": "Bar"
     }
   ],
-  "height": 300,
+  "height": "375",
   "data": [
     {
       "Date": "1/15/2016",
-      "Data 1": "90",
+      "Data 1": "foo",
       "Data 2": "135",
       "Data 3": "300",
       "Data 4": "95",
       "Data 5": "120",
-      "Data 6": "Bad"
+      "Data 6": "310"
     },
     {
       "Date": "2/15/2016",
@@ -513,7 +510,7 @@
       "Data 3": "240",
       "Data 4": "60",
       "Data 5": "160",
-      "Data 6": "Good"
+      "Data 6": "200"
     },
     {
       "Date": "3/15/2016",
@@ -522,7 +519,7 @@
       "Data 3": "290",
       "Data 4": "100",
       "Data 5": "200",
-      "Data 6": "Good"
+      "Data 6": "250"
     },
     {
       "Date": "4/15/2016",
@@ -531,7 +528,7 @@
       "Data 3": "230",
       "Data 4": "180",
       "Data 5": "160",
-      "Data 6": "Good"
+      "Data 6": "220"
     },
     {
       "Date": "5/15/2016",
@@ -540,19 +537,25 @@
       "Data 3": "300",
       "Data 4": "150",
       "Data 5": "130",
-      "Data 6": "Good"
+      "Data 6": "100"
     },
     {
       "Date": "6/15/2016",
-      "Data 1": "80",
+      "Data 1": "90",
       "Data 2": "220",
       "Data 3": "320",
       "Data 4": "100",
       "Data 5": "220",
-      "Data 6": "ABC"
+      "Data 6": "300"
     }
   ],
   "visualizationType": "Bar",
-  "description": "This example shows a bar chart created in the visualization editor in WCMS",
-  "dataCutoff": "0"
+  "copyOfHighlightedBarValues": [
+    {
+      "dataKey": "Data 1",
+      "value": "2/15/2016",
+      "legendLabel": "label",
+      "color": "blue"
+    }
+  ]
 }

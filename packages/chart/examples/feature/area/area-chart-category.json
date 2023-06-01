@@ -1,10 +1,9 @@
 {
   "type": "chart",
-  "title": "Planet Radius (Combo Example)",
+  "title": "Example Area Chart",
   "showTitle": true,
-  "showDownloadMediaButton": false,
   "theme": "theme-blue",
-  "animate": true,
+  "animate": false,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
   "barHasBorder": "false",
@@ -15,19 +14,16 @@
   "barStyle": "",
   "roundingStyle": "standard",
   "tipRounding": "top",
-  "general": {
-    "showDownloadButton": true
-  },
   "padding": {
-    "left": 0,
-    "right": 0
+    "left": 5,
+    "right": 5
   },
   "yAxis": {
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": 50,
+    "size": "150",
     "gridLines": false,
     "enablePadding": false,
     "min": "",
@@ -35,8 +31,8 @@
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "rightHideAxis": false,
-    "rightAxisSize": 50,
+    "rightHideAxis": true,
+    "rightAxisSize": 0,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
     "rightAxisLabelColor": "#333",
@@ -45,8 +41,8 @@
     "numTicks": "",
     "axisPadding": 0,
     "tickRotation": 0,
-    "anchors": [],
-    "label": "Measurement (1000km)"
+    "isLegendValue": false,
+    "label": "Y Axis Example Label"
   },
   "boxplot": {
     "plots": [],
@@ -71,63 +67,60 @@
       "median": "Median",
       "sd": "Standard Deviation",
       "iqr": "Interquartile Range",
-      "count": "Count",
+      "total": "Total",
       "outliers": "Outliers",
-      "values": "Values"
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
     }
   },
   "topAxis": {
-    "hasLine": true
+    "hasLine": false
   },
   "isLegendValue": false,
   "barThickness": 0.35,
   "barHeight": 25,
-  "barSpace": 15,
+  "barSpace": 20,
   "heights": {
     "vertical": 300,
     "horizontal": 750
   },
   "xAxis": {
-    "anchors": [],
-    "type": "categorical",
+    "type": "date",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": 75,
-    "tickRotation": 30,
+    "size": "50",
+    "tickRotation": 0,
     "min": "",
     "max": "",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "numTicks": "",
+    "numTicks": "9",
     "labelOffset": 65,
     "axisPadding": 0,
     "target": 0,
-    "label": "Planet",
-    "dataKey": "name"
+    "isLegendValue": false,
+    "dataKey": "Date",
+    "label": "X Axis Example Label",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y"
   },
   "table": {
-    "label": "Data Table",
+    "label": "Data Type by Date",
     "expanded": false,
     "limitHeight": false,
     "height": "",
     "caption": "",
-    "showDownloadUrl": false,
+    "showDownloadUrl": true,
     "showDataTableLink": true,
-    "indexLabel": "",
-    "showVertical": false,
-    "show": true
+    "show": true,
+    "download": true
   },
   "orientation": "vertical",
-  "color": "pinkpurple",
-  "columns": {
-    "additionalColumn1": {
-      "name": ""
-    }
-  },
   "legend": {
     "behavior": "isolate",
     "singleRow": false,
@@ -140,10 +133,10 @@
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "position": "right",
-    "hide": false
+    "label": "Type of Data"
   },
   "exclusions": {
-    "active": false,
+    "active": true,
     "keys": []
   },
   "palette": "qualitative-bold",
@@ -154,14 +147,14 @@
   },
   "labels": false,
   "dataFormat": {
-    "commas": false,
+    "commas": true,
     "prefix": "",
-    "suffix": "km",
-    "abbreviated": false,
+    "suffix": " units",
+    "abbreviated": true,
     "bottomSuffix": "",
     "bottomPrefix": "",
     "bottomAbbreviated": false,
-    "roundTo": 1
+    "useFormat": true
   },
   "confidenceKeys": {},
   "visual": {
@@ -169,44 +162,79 @@
     "accent": true,
     "background": true
   },
-  "useLogScale": false,
-  "filterBehavior": "Apply Button",
+  "filterBehavior": "dropdown",
   "highlightedBarValues": [],
   "series": [
     {
       "dataKey": "Radius",
-      "type": "Line",
-      "axis": "Right"
-    },
-    {
-      "dataKey": "Diameter",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "distance",
-      "type": "Bar",
-      "axis": "Left"
+      "type": "Area Chart"
     }
   ],
-  "dataUrl": "/examples/feature/__data__/planet-example-data.json",
-  "animateReplay": true,
-  "visualizationType": "Combo",
-  "filters": [
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "dataFileName": "valid-area-chart.json",
+  "dataFileSourceType": "file",
+  "formattedData": [
     {
-      "values": [
-        "0.3",
-        "0.7",
-        "1",
-        "2",
-        "7",
-        "8",
-        "18",
-        "22"
-      ],
-      "active": "0.3",
-      "filterStyle": "pill",
-      "order": "asc",
-      "columnName": "Diameter"
+      "Data 1": "900",
+      "Data 2": "135",
+      "Data 3": "300",
+      "Data 4": "95",
+      "Data 5": "120",
+      "Data 6": "310",
+      "Date": "1/15/2016"
+    },
+    {
+      "Data 1": "4000",
+      "Data 2": "90",
+      "Data 3": "240",
+      "Data 4": "60",
+      "Data 5": "160",
+      "Data 6": "2000",
+      "Date": "2/15/2016"
+    },
+    {
+      "Data 1": "500",
+      "Data 2": "300",
+      "Data 3": "290",
+      "Data 4": "100",
+      "Data 5": "200",
+      "Data 6": "250",
+      "Date": "3/15/2016"
+    },
+    {
+      "Data 1": "1200",
+      "Data 2": "160",
+      "Data 3": "230",
+      "Data 4": "180",
+      "Data 5": "160",
+      "Data 6": "220",
+      "Date": "4/15/2016"
+    },
+    {
+      "Data 1": "8000",
+      "Data 2": "350",
+      "Data 3": "300",
+      "Data 4": "150",
+      "Data 5": "130",
+      "Data 6": "100",
+      "Date": "5/15/2016"
+    },
+    {
+      "Data 1": "9000",
+      "Data 2": "220",
+      "Data 3": "320",
+      "Data 4": "100",
+      "Data 5": "220",
+      "Data 6": "300",
+      "Date": "6/15/2016"
     }
-  ]
+  ],
+  "height": 300,
+  "dataUrl": "/examples/feature/__data__/planet-example-data-max-increase.json",
+  "visualizationType": "Area Chart",
+  "description": "This example shows a bar chart created in the visualization editor in WCMS",
+  "dataCutoff": "0"
 }
