@@ -529,6 +529,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         }
       })
     }
+
+    if (newConfig.visualizationType === 'Forecasting' && newConfig.series) {
+      newConfig.runtime.forecastingSeriesKeys = []
+
+      newConfig.series.forEach(series => {
+        if (series.type === 'Forecasting') {
+          newConfig.runtime.forecastingSeriesKeys.push(series)
+        }
+      })
+    }
+
     if (newConfig.visualizationType === 'Area Chart' && newConfig.series) {
       newConfig.runtime.areaSeriesKeys = []
 
