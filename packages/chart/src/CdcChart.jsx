@@ -72,7 +72,7 @@ const hashObj = row => {
   }
 }
 
-export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
+export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
@@ -1222,7 +1222,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     isNumber,
     getTextWidth,
     twoColorPalette,
-    isDebug
+    isDebug,
+    setSharedFilter,
+    setSharedFilterValue,
+    dashboardConfig
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
