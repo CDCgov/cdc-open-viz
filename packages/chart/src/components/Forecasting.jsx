@@ -88,12 +88,12 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
 
     // loop through series for items to add to tooltip.
     // there is probably a better way of doing this.
-    config.series.map(s => {
+    config.series?.map(s => {
       if (s.type === 'Forecasting') {
         stageColumns.push(s.stageColumn)
 
         // greedy fn 😭
-        s.confidenceIntervals.map(ci => {
+        s?.confidenceIntervals.map(ci => {
           if (ci.showInTooltip === true) {
             ciItems.push(ci.low)
             ciItems.push(ci.high)
@@ -102,7 +102,13 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
       }
     })
 
-    let standardLoopItems = [runtime.xAxis.dataKey, ...runtime.barSeriesKeys, ...stageColumns, ...ciItems]
+    let standardLoopItems = []
+
+    if (config.visualizationType === 'Combo') {
+      standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...stageColumns, ...ciItems]
+    } else {
+      standardLoopItems = [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
+    }
 
     standardLoopItems.map(seriesKey => {
       if (!seriesKey) return false
@@ -147,8 +153,10 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef }) => {
 
               return (
                 <Group className={`forecasting-areas-combo-${index}`} key={`forecasting-areas--stage-${stage.key.replaceAll(' ', '-')}-${index}`}>
-                  {group.confidenceIntervals.map((ciGroup, ciGroupIndex) => {
+                  {group.confidenceIntervals?.map((ciGroup, ciGroupIndex) => {
                     const palette = colorPalettesChart[stage.color]
+
+                    console.log('group', ciGroup)
 
                     return (
                       <Group key={`forecasting-areas--stage-${stage.key.replaceAll(' ', '-')}--group-${stageIndex}-${ciGroupIndex}`}>

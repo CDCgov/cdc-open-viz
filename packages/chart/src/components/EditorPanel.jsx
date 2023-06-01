@@ -827,6 +827,7 @@ const EditorPanel = () => {
     'Box Plot',
     'Combo',
     'Deviation Bar',
+    'Forecasting',
     'Line',
     'Paired Bar',
     'Pie',

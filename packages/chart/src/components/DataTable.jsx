@@ -181,8 +181,6 @@ export default function DataTable() {
       ? [config.yAxis.dataKey]
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])
-        : config.visualizationType === 'Forecasting'
-        ? config.forecastingChart.groups
         : config.runtime.seriesKeys),
     [config.runtime.seriesKeys]) // eslint-disable-line
 

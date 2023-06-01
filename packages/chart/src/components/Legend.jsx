@@ -128,21 +128,21 @@ const Legend = () => {
     }
 
     // get forecasting items inside of combo
-    if (config.runtime.forecastingSeriesKeys.length > 0) {
+    if (config.runtime?.forecastingSeriesKeys?.length > 0) {
       let seriesLabels = []
 
       //store uniq values to Set by colorCode
 
       // loop through each stage/group/area on the chart and create a label
-      config.runtime.forecastingSeriesKeys.map((outerGroup, index) => {
+      config.runtime?.forecastingSeriesKeys?.map((outerGroup, index) => {
         return outerGroup?.stages?.map((stage, index) => {
-          let paletteHere = colorPalettes[stage.color]
+          let colorValue = colorPalettes[stage.color]?.[2] ? colorPalettes[stage.color]?.[2] : '#ccc'
 
           const newLabel = {
             datum: stage.key,
             index: index,
             text: stage.key,
-            value: paletteHere[2]
+            value: colorValue
           }
 
           seriesLabels.push(newLabel)
@@ -150,18 +150,19 @@ const Legend = () => {
       })
 
       // loop through bars for now to meet requirements.
-      const barLabels = config.runtime.barSeriesKeys.map((bar, index) => {
-        let palette = colorPalettes[config.palette]
+      config.runtime.barSeriesKeys &&
+        config.runtime.barSeriesKeys.map((bar, index) => {
+          let colorValue = colorPalettes[config.palette][index] ? colorPalettes[config.palette][index] : '#ccc'
 
-        const newLabel = {
-          datum: bar,
-          index: index,
-          text: bar,
-          value: palette[index]
-        }
+          const newLabel = {
+            datum: bar,
+            index: index,
+            text: bar,
+            value: colorValue
+          }
 
-        seriesLabels.push(newLabel)
-      })
+          seriesLabels.push(newLabel)
+        })
 
       return seriesLabels
     }
@@ -185,89 +186,91 @@ const Legend = () => {
         {legend.label && <h2>{parse(legend.label)}</h2>}
         {legend.description && <p>{parse(legend.description)}</p>}
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
-          {labels => (
-            <div className={innerClasses.join(' ')}>
-              {createLegendLabels(labels).map((label, i) => {
-                let legendClasses = ['legend-item']
-                let itemName = label.datum
+          {labels => {
+            return (
+              <div className={innerClasses.join(' ')}>
+                {createLegendLabels(labels).map((label, i) => {
+                  let className = 'legend-item'
+                  let itemName = label.datum
 
-                // Filter excluded data keys from legend
-                if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-                  return null
-                }
-
-                if (config.runtime.seriesLabels) {
-                  let index = config.runtime.seriesLabelsAll.indexOf(itemName)
-                  itemName = config.runtime.seriesKeys[index]
-
-                  if (config.runtime.forecastingSeriesKeys.length > 0) {
-                    itemName = label.text
+                  // Filter excluded data keys from legend
+                  if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
+                    return null
                   }
-                }
 
-                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                  legendClasses.push('inactive')
-                }
+                  if (config.runtime.seriesLabels) {
+                    let index = config.runtime.seriesLabelsAll.indexOf(itemName)
+                    itemName = config.runtime.seriesKeys[index]
 
-                return (
-                  <LegendItem
-                    className={legendClasses.join(' ')}
-                    tabIndex={0}
-                    key={`legend-quantile-${i}`}
-                    onKeyPress={e => {
-                      if (e.key === 'Enter') {
+                    if (config.runtime?.forecastingSeriesKeys?.length > 0) {
+                      itemName = label.text
+                    }
+                  }
+
+                  if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
+                    className += ' inactive'
+                  }
+
+                  return (
+                    <LegendItem
+                      className={className}
+                      tabIndex={0}
+                      key={`legend-quantile-${i}`}
+                      onKeyPress={e => {
+                        if (e.key === 'Enter') {
+                          highlight(label)
+                        }
+                      }}
+                      onClick={() => {
                         highlight(label)
-                      }
-                    }}
-                    onClick={() => {
-                      highlight(label)
-                    }}
-                  >
-                    <LegendCircle fill={label.value} />
-                    <LegendLabel align='left' margin='0 0 0 4px'>
-                      {label.text}
-                    </LegendLabel>
-                  </LegendItem>
-                )
-              })}
+                      }}
+                    >
+                      <LegendCircle fill={label.value} />
+                      <LegendLabel align='left' margin='0 0 0 4px'>
+                        {label.text}
+                      </LegendLabel>
+                    </LegendItem>
+                  )
+                })}
 
-              {highLightedLegendItems.map((bar, i) => {
-                // if duplicates only return first item
-                let className = 'legend-item'
-                let itemName = bar.legendLabel
+                {highLightedLegendItems.map((bar, i) => {
+                  // if duplicates only return first item
+                  let className = 'legend-item'
+                  let itemName = bar.legendLabel
 
-                if (!itemName) return
-                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                  className += ' inactive'
-                }
-                return (
-                  <LegendItem
-                    className={className}
-                    tabIndex={0}
-                    key={`legend-quantile-${i}`}
-                    onKeyPress={e => {
-                      if (e.key === 'Enter') {
+                  if (!itemName) return
+                  if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
+                    className += ' inactive'
+                  }
+                  return (
+                    <LegendItem
+                      className={className}
+                      tabIndex={0}
+                      key={`legend-quantile-${i}`}
+                      onKeyPress={e => {
+                        if (e.key === 'Enter') {
+                          highlight(bar.legendLabel)
+                        }
+                      }}
+                      onClick={() => {
                         highlight(bar.legendLabel)
-                      }
-                    }}
-                    onClick={() => {
-                      highlight(bar.legendLabel)
-                    }}
-                  >
-                    <LegendCircle fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />{' '}
-                    <LegendLabel align='left' margin='0 0 0 4px'>
-                      {bar.legendLabel ? bar.legendLabel : bar.value}
-                    </LegendLabel>
-                  </LegendItem>
-                )
-              })}
-              {seriesHighlight.length > 0 && (
-                <button className={`legend-reset ${config.theme}`} onClick={labels => highlightReset(labels)} tabIndex={0}>
-                  Reset
-                </button>
-              )}
-            </div>
-          )}
+                      }}
+                    >
+                      <LegendCircle fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />{' '}
+                      <LegendLabel align='left' margin='0 0 0 4px'>
+                        {bar.legendLabel ? bar.legendLabel : bar.value}
+                      </LegendLabel>
+                    </LegendItem>
+                  )
+                })}
+                {seriesHighlight.length > 0 && (
+                  <button className={`legend-reset ${config.theme}`} onClick={labels => highlightReset(labels)} tabIndex={0}>
+                    Reset
+                  </button>
+                )}
+              </div>
+            )
+          }}
         </LegendOrdinal>
       </aside>
     ) : (

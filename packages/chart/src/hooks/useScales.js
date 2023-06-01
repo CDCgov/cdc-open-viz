@@ -148,12 +148,6 @@ const useScales = properties => {
     })
   }
 
-  // * Still working on forecasting scaling here 05/19
-  if (config.visualizationType === 'Combo' && config.runtime.forecastingSeriesKeys.length > 0) {
-    // Return the configured scale function
-    // xScale = scalePoint({ domain: xAxisDataMapped, padding: 0.4 })
-  }
-
   return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding }
 }
 
