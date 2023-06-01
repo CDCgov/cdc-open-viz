@@ -1,8 +1,7 @@
 {
   "type": "chart",
-  "title": "Planet Radius (Combo Example)",
+  "title": "Forecasting Chart Example",
   "showTitle": true,
-  "showDownloadMediaButton": false,
   "theme": "theme-blue",
   "animate": true,
   "fontSize": "medium",
@@ -15,9 +14,6 @@
   "barStyle": "",
   "roundingStyle": "standard",
   "tipRounding": "top",
-  "general": {
-    "showDownloadButton": true
-  },
   "padding": {
     "left": 0,
     "right": 0
@@ -27,7 +23,7 @@
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": 50,
+    "size": "75",
     "gridLines": false,
     "enablePadding": false,
     "min": "",
@@ -46,7 +42,7 @@
     "axisPadding": 0,
     "tickRotation": 0,
     "anchors": [],
-    "label": "Measurement (1000km)"
+    "label": "Effective Reproduction No."
   },
   "boxplot": {
     "plots": [],
@@ -88,8 +84,7 @@
     "horizontal": 750
   },
   "xAxis": {
-    "anchors": [],
-    "type": "categorical",
+    "type": "date",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
@@ -106,8 +101,16 @@
     "labelOffset": 65,
     "axisPadding": 0,
     "target": 0,
-    "label": "Planet",
-    "dataKey": "name"
+    "anchors": [
+      {
+        "value": "10/19/2022",
+        "lineStyle": "dashed-md"
+      }
+    ],
+    "label": "",
+    "dataKey": "date",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y"
   },
   "table": {
     "label": "Data Table",
@@ -117,17 +120,9 @@
     "caption": "",
     "showDownloadUrl": false,
     "showDataTableLink": true,
-    "indexLabel": "",
-    "showVertical": false,
     "show": true
   },
   "orientation": "vertical",
-  "color": "pinkpurple",
-  "columns": {
-    "additionalColumn1": {
-      "name": ""
-    }
-  },
   "legend": {
     "behavior": "isolate",
     "singleRow": false,
@@ -140,13 +135,13 @@
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "position": "right",
-    "hide": false
+    "hide": true
   },
   "exclusions": {
     "active": false,
     "keys": []
   },
-  "palette": "qualitative-bold",
+  "palette": "sequential-green",
   "isPaletteReversed": false,
   "twoColor": {
     "palette": "monochrome-1",
@@ -156,12 +151,12 @@
   "dataFormat": {
     "commas": false,
     "prefix": "",
-    "suffix": "km",
+    "suffix": "",
     "abbreviated": false,
     "bottomSuffix": "",
     "bottomPrefix": "",
     "bottomAbbreviated": false,
-    "roundTo": 1
+    "roundTo": "0"
   },
   "confidenceKeys": {},
   "visual": {
@@ -169,44 +164,39 @@
     "accent": true,
     "background": true
   },
-  "useLogScale": false,
-  "filterBehavior": "Apply Button",
-  "highlightedBarValues": [],
-  "series": [
-    {
-      "dataKey": "Radius",
-      "type": "Line",
-      "axis": "Right"
-    },
-    {
-      "dataKey": "Diameter",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "distance",
-      "type": "Bar",
-      "axis": "Left"
-    }
-  ],
-  "dataUrl": "/examples/feature/__data__/planet-example-data.json",
+  "filterBehavior": "Filter Change",
+  "forecastingChart": {
+    "showBars": false,
+    "barColumn": "confirm",
+    "barColor": "#918e90",
+    "confidenceIntervals": [
+      {
+        "low": "lower_20",
+        "high": "upper_20"
+      },
+      {
+        "low": "lower_50",
+        "high": "upper_50"
+      },
+      {
+        "low": "lower_90",
+        "high": "upper_90"
+      }
+    ],
+    "stages": "type",
+    "colors": [
+      "qualitative4reverse",
+      "sequential-bluereverse",
+      "sequential-greenreverse"
+    ],
+    "groups": [
+      "estimate",
+      "estimate based on partial data",
+      "forecast"
+    ],
+    "showBarColumn": true
+  },
+  "dataUrl": "./examples/feature/forecasting/r_data.csv",
   "animateReplay": true,
-  "visualizationType": "Combo",
-  "filters": [
-    {
-      "values": [
-        "0.3",
-        "0.7",
-        "1",
-        "2",
-        "7",
-        "8",
-        "18",
-        "22"
-      ],
-      "active": "0.3",
-      "filterStyle": "pill",
-      "order": "asc",
-      "columnName": "Diameter"
-    }
-  ]
+  "visualizationType": "Forecasting"
 }
