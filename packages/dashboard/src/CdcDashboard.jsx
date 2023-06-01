@@ -11,7 +11,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import parse from 'html-react-parser'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
@@ -133,12 +132,86 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     let dataset = config.formattedData || config.data
 
     if (config.dataUrl) {
-      dataset = await fetchRemoteData(`${config.dataUrl}?v=${cacheBustingString()}`)
+      dataset = await fetchRemoteData(`${config.dataUrl}`)
 
       dataset = getFormattedData(dataset, config.dataDescription)
     }
 
     return dataset
+  }
+
+  const reloadURLData = async () => {
+    if (config.datasets) {
+      let newData = { ...data }
+      let newDatasets = { ...config.datasets }
+      let datasetsNeedsUpdate = false
+      let datasetKeys = Object.keys(config.datasets)
+      for (let i = 0; i < datasetKeys.length; i++) {
+        const dataset = config.datasets[datasetKeys[i]]
+        if (dataset.dataUrl && config.dashboard && config.dashboard.sharedFilters) {
+          const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl)
+          let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+
+          let isUpdateNeeded = false
+
+          config.dashboard.sharedFilters.forEach(filter => {
+            if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+              qsParams[filter.queryParameter] = filter.active
+              isUpdateNeeded = true
+            }
+          })
+
+          if (!isUpdateNeeded) return
+
+          let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+            .map((param, i) => {
+              let qs = i === 0 ? '?' : '&'
+              qs += param + '='
+              qs += qsParams[param]
+              return qs
+            })
+            .join('')}`
+
+          let newDataset = await fetchRemoteData(`${dataUrlFinal}`)
+
+          if (newDataset && dataset.dataDescription) {
+            try {
+              newDataset = transform.autoStandardize(newDataset)
+              newDataset = transform.developerStandardize(newDataset, dataset.dataDescription)
+            } catch (e) {
+              //Data not able to be standardized, leave as is
+            }
+          }
+
+          newDatasets[datasetKeys[i]].runtimeDataUrl = dataUrlFinal
+          newData[datasetKeys[i]] = newDataset
+          datasetsNeedsUpdate = true
+        }
+      }
+
+      if (datasetsNeedsUpdate) {
+        setData(newData)
+
+        let newFilteredData = {}
+        let newConfig = { ...config }
+        Object.keys(config.visualizations).forEach(key => {
+          let dataKey = config.visualizations[key].dataKey
+
+          let applicableFilters = config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
+          if (applicableFilters.length > 0) {
+            newFilteredData[key] = filterData(applicableFilters, newData[dataKey])
+          }
+
+          if (newData[dataKey]) {
+            newConfig.visualizations[key].formattedData = newData[dataKey]
+          }
+        })
+        setFilteredData(newFilteredData)
+
+        newConfig.datasets = newDatasets
+        setConfig(newConfig)
+      }
+    }
   }
 
   const loadConfig = async () => {
@@ -208,7 +281,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         let add = true
 
         filters.forEach(filter => {
-          if (row[filter.columnName] != filter.active) {
+          if (filter.type !== 'url' && row[filter.columnName] != filter.active) {
             add = false
           }
         })
@@ -328,6 +401,10 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     }
   }, [config])
 
+  useEffect(() => {
+    reloadURLData()
+  }, [JSON.stringify(config.dashboard ? config.dashboard.sharedFilters : undefined)])
+
   const updateChildConfig = (visualizationKey, newConfig) => {
     let updatedConfig = { ...config }
 
@@ -363,14 +440,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     const announceChange = text => {}
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
-      if (!singleFilter.showDropdown) return <></>
+      if (singleFilter.type !== 'url' && !singleFilter.showDropdown) return <></>
 
       const values = []
 
       singleFilter.values.forEach((filterOption, index) => {
         values.push(
           <option key={`${singleFilter.key}-option-${index}`} value={filterOption}>
-            {filterOption}
+            {singleFilter.labels ? singleFilter.labels[filterOption] || filterOption : filterOption}
           </option>
         )
       })
@@ -595,7 +672,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   }}
                                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                                   isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
                                 />
                               )}
                               {visualizationConfig.type === 'map' && (
@@ -609,7 +686,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                                   setSharedFilterValue={setSharedFilterValue}
                                   isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
                                 />
                               )}
                               {visualizationConfig.type === 'data-bite' && (
@@ -632,7 +709,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                     updateChildConfig(col.widget, newConfig)
                                   }}
                                   isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
                                 />
                               )}
                               {visualizationConfig.type === 'markup-include' && (
@@ -695,7 +772,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 config.dashboard.sharedFilters.forEach(sharedFilter => {
                   let allMatch = true
                   vizKeysUsingDataset.forEach(visualizationKey => {
-                    if (sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
+                    if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
                       allMatch = false
                     }
                   })
@@ -714,7 +791,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-                  <DataTable data={filteredTableData || config.datasets[datasetKey].data} downloadData={config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
+                  <DataTable data={filteredTableData || config.datasets[datasetKey].data || []} downloadData={config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
                 </div>
               )
             })}

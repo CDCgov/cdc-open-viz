@@ -70,7 +70,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 const EditorPanel = props => {
   const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend, changeFilterActive, isDebug, setRuntimeFilters } = props
 
-  const { general, columns, legend, dataTable, tooltips } = state
+  const { general, columns, legend, table, tooltips } = state
 
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
 
@@ -287,9 +287,9 @@ const EditorPanel = props => {
       case 'expandDataTable':
         setState({
           ...state,
-          general: {
-            ...state.general,
-            expandDataTable: value
+          table: {
+            ...state.table,
+            expanded: value
           }
         })
         break
@@ -420,6 +420,11 @@ const EditorPanel = props => {
           general: {
             ...state.general,
             showDownloadButton: !state.general.showDownloadButton
+          },
+          table: {
+            // setting both bc DataTable new core needs it here
+            ...state.table,
+            download: !state.general.showDownloadButton
           }
         })
         break
@@ -539,8 +544,8 @@ const EditorPanel = props => {
                 geoType: 'us',
                 type: state.type === 'us-geocode' ? 'data' : state.type
               },
-              dataTable: {
-                ...state.dataTable,
+              table: {
+                ...state.table,
                 forceDisplay: true
               }
             })
@@ -552,8 +557,8 @@ const EditorPanel = props => {
                 ...state.general,
                 geoType: 'us-region'
               },
-              dataTable: {
-                ...state.dataTable,
+              table: {
+                ...state.table,
                 forceDisplay: true
               }
             })
@@ -565,8 +570,8 @@ const EditorPanel = props => {
                 ...state.general,
                 geoType: 'world'
               },
-              dataTable: {
-                ...state.dataTable,
+              table: {
+                ...state.table,
                 forceDisplay: true
               }
             })
@@ -576,11 +581,11 @@ const EditorPanel = props => {
               ...state,
               general: {
                 ...state.general,
-                geoType: 'us-county',
-                expandDataTable: false
+                geoType: 'us-county'
               },
-              dataTable: {
-                ...state.dataTable,
+              table: {
+                ...state.table,
+                expanded: false,
                 forceDisplay: true
               }
             })
@@ -590,11 +595,11 @@ const EditorPanel = props => {
               ...state,
               general: {
                 ...state.general,
-                geoType: 'single-state',
-                expandDataTable: false
+                geoType: 'single-state'
               },
-              dataTable: {
-                ...state.dataTable,
+              table: {
+                ...state.table,
+                expanded: false,
                 forceDisplay: true
               }
             })
@@ -698,8 +703,8 @@ const EditorPanel = props => {
       case 'showDataTable':
         setState({
           ...state,
-          dataTable: {
-            ...state.dataTable,
+          table: {
+            ...state.table,
             forceDisplay: value
           }
         })
@@ -707,8 +712,8 @@ const EditorPanel = props => {
       case 'limitDataTableHeight':
         setState({
           ...state,
-          dataTable: {
-            ...state.dataTable,
+          table: {
+            ...state.table,
             limitHeight: value
           }
         })
@@ -910,6 +915,7 @@ const EditorPanel = props => {
     })
   }
 
+  // just adds a new column but not set to any data yet
   const addAdditionalColumn = number => {
     const columnKey = `additionalColumn${number}`
 
@@ -1184,6 +1190,8 @@ const EditorPanel = props => {
   const usedFilterColumns = {}
 
   const filtersJSX = state.filters.map((filter, index) => {
+    if (filter.type === 'url') return <></>
+
     if (filter.columnName) {
       usedFilterColumns[filter.columnName] = true
     }
@@ -1223,9 +1231,7 @@ const EditorPanel = props => {
             </select>
           </label>
 
-          {/* COMING SOON: 4.23.5: FILTER STYLES */}
-
-          {/* <label>
+          <label>
             <span className='edit-filterOrder column-heading'>Filter Style</span>
             <select
               value={filter.filterStyle}
@@ -1241,7 +1247,7 @@ const EditorPanel = props => {
                 )
               })}
             </select>
-          </label> */}
+          </label>
 
           <label>
             <span className='edit-filterOrder column-heading'>Filter Order</span>
@@ -2417,10 +2423,10 @@ const EditorPanel = props => {
                   </AccordionItemHeading>
                   <AccordionItemPanel>
                     <TextField
-                      value={dataTable.title}
+                      value={table.label}
                       updateField={updateField}
-                      section='dataTable'
-                      fieldName='title'
+                      section='table'
+                      fieldName='label'
                       id='dataTableTitle'
                       label='Data Table Title'
                       placeholder='Data Table'
@@ -2438,7 +2444,7 @@ const EditorPanel = props => {
                     <label className='checkbox'>
                       <input
                         type='checkbox'
-                        checked={state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard}
+                        checked={state.table.forceDisplay !== undefined ? state.table.forceDisplay : !isDashboard}
                         onChange={event => {
                           handleEditorChanges('showDataTable', event.target.checked)
                         }}
@@ -2456,9 +2462,9 @@ const EditorPanel = props => {
                       </span>
                     </label>
                     <TextField
-                      value={dataTable.indexLabel || ''}
+                      value={table.indexLabel || ''}
                       updateField={updateField}
-                      section='dataTable'
+                      section='table'
                       fieldName='indexLabel'
                       label='Index Column Header'
                       placeholder='Location'
@@ -2474,9 +2480,9 @@ const EditorPanel = props => {
                       }
                     />
                     <TextField
-                      value={dataTable.caption}
+                      value={state.table.caption}
                       updateField={updateField}
-                      section='dataTable'
+                      section='table'
                       fieldName='caption'
                       label='Data Table Caption'
                       placeholder='Data Table'
@@ -2495,18 +2501,18 @@ const EditorPanel = props => {
                     <label className='checkbox'>
                       <input
                         type='checkbox'
-                        checked={state.dataTable.limitHeight}
+                        checked={state.table.limitHeight}
                         onChange={event => {
                           handleEditorChanges('limitDataTableHeight', event.target.checked)
                         }}
                       />
                       <span className='edit-label'>Limit Table Height</span>
                     </label>
-                    {state.dataTable.limitHeight && <TextField value={dataTable.height} updateField={updateField} section='dataTable' fieldName='height' label='Data Table Height' placeholder='Height(px)' type='number' min='0' max='500' />}
+                    {state.table.limitHeight && <TextField value={table.height} updateField={updateField} section='table' fieldName='height' label='Data Table Height' placeholder='Height(px)' type='number' min='0' max='500' />}
                     <label className='checkbox'>
                       <input
                         type='checkbox'
-                        checked={state.general.expandDataTable || false}
+                        checked={state.table.expanded || false}
                         onChange={event => {
                           handleEditorChanges('expandDataTable', event.target.checked)
                         }}
@@ -2809,7 +2815,6 @@ const EditorPanel = props => {
                     ))}
                 </AccordionItemPanel>
               </AccordionItem>
-              {/* HIDING FOR 4.23.4 */}
               {/* <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Custom Map Layers</AccordionItemButton>

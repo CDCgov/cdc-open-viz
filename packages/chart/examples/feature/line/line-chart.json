@@ -21,8 +21,8 @@
     "dataKey": "Date",
     "label": "X-Axis Example Label",
     "type": "date",
-    "dateParseFormat": "%d/%m/%Y",
-    "dateDisplayFormat": "%d/%m/%Y"
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y"
   },
   "table": {
     "label": "Data Table",
