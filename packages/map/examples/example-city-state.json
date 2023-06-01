@@ -8,7 +8,7 @@
     "showSidebar": true,
     "showTitle": true,
     "showDownloadButton": true,
-    "expandDataTable": false,
+    "expandDataTable": true,
     "backgroundColor": "#f5f5f5",
     "geoBorderColor": "darkGray",
     "territoriesLabel": "Territories",
@@ -124,7 +124,10 @@
     "geoCodeCircleSize": 2
   },
   "mapPosition": {
-    "coordinates": [0, 30],
+    "coordinates": [
+      0,
+      30
+    ],
     "zoom": 1
   },
   "map": {

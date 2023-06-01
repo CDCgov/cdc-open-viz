@@ -1068,6 +1068,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Example:  Desired city display in tooltip on map: "Inter-Tribal Indian Reservation"
   const titleCase = string => {
     // guard clause else error in editor
+    if (!string) return
     if (string !== undefined) {
       // if hyphen found, then split, uppercase each word, and put back together
       if (string.includes('–') || string.includes('-')) {
