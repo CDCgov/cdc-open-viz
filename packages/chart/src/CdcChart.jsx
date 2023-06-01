@@ -315,7 +315,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     })
 
-    // Loop through and set initial data with exclusions - this should persist through any following data transformations (ie. filters)
     let newExcludedData
 
     if (newConfig.exclusions && newConfig.exclusions.active) {
@@ -377,8 +376,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+            newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
+            newConfig.runtime.seriesLabelsAll.push(series.name || series.label || series.dataKey)
             return series.dataKey
           })
         : []
