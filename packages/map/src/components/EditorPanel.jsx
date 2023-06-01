@@ -880,6 +880,10 @@ const EditorPanel = props => {
         newFilters[idx] = { ...newFilters[idx] }
         newFilters[idx].filterStyle = value
         break
+      case 'showDropdown':
+        newFilters[idx] = { ...newFilters[idx] }
+        newFilters[idx].showDropdown = value
+        break
       case 'columnName':
         newFilters[idx] = { ...newFilters[idx] }
         newFilters[idx].columnName = value
@@ -1226,6 +1230,17 @@ const EditorPanel = props => {
             >
               {columnsOptions.filter(({ key }) => undefined === usedFilterColumns[key] || filter.columnName === key)}
             </select>
+          </label>
+
+          <label>
+            <span className='edit-showDropdown column-heading'>Show Filter Input</span>
+            <input
+              type="checkbox"
+              checked={filter.showDropdown === undefined ? true : filter.showDropdown}
+              onChange={e => {
+                changeFilter(index, 'showDropdown', e.target.checked)
+              }}
+            />
           </label>
 
           <label>
