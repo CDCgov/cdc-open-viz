@@ -2,22 +2,18 @@
   "type": "chart",
   "title": "Planet Radius (Combo Example)",
   "showTitle": true,
-  "showDownloadMediaButton": false,
   "theme": "theme-blue",
-  "animate": true,
-  "fontSize": "medium",
+  "animate": false,
+  "fontSize": "small",
   "lineDatapointStyle": "hover",
-  "barHasBorder": "false",
+  "barHasBorder": "true",
   "isLollipopChart": false,
   "lollipopShape": "circle",
   "lollipopColorStyle": "two-tone",
   "visualizationSubType": "regular",
-  "barStyle": "",
+  "barStyle": "flat",
   "roundingStyle": "standard",
   "tipRounding": "top",
-  "general": {
-    "showDownloadButton": true
-  },
   "padding": {
     "left": 0,
     "right": 0
@@ -27,15 +23,15 @@
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": 50,
-    "gridLines": false,
+    "size": "123",
+    "gridLines": true,
     "enablePadding": false,
     "min": "",
     "max": "",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "rightHideAxis": false,
+    "rightHideAxis": true,
     "rightAxisSize": 50,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
@@ -45,8 +41,8 @@
     "numTicks": "",
     "axisPadding": 0,
     "tickRotation": 0,
-    "anchors": [],
-    "label": "Measurement (1000km)"
+    "label": "Measurement (1000km)",
+    "labelPlacement": "On Date/Category Axis"
   },
   "boxplot": {
     "plots": [],
@@ -71,13 +67,15 @@
       "median": "Median",
       "sd": "Standard Deviation",
       "iqr": "Interquartile Range",
-      "count": "Count",
+      "total": "Total",
       "outliers": "Outliers",
-      "values": "Values"
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
     }
   },
   "topAxis": {
-    "hasLine": true
+    "hasLine": false
   },
   "isLegendValue": false,
   "barThickness": 0.35,
@@ -88,7 +86,6 @@
     "horizontal": 750
   },
   "xAxis": {
-    "anchors": [],
     "type": "categorical",
     "showTargetLabel": true,
     "targetLabel": "Target",
@@ -96,7 +93,7 @@
     "hideLabel": false,
     "hideTicks": false,
     "size": 75,
-    "tickRotation": 30,
+    "tickRotation": 0,
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -117,17 +114,9 @@
     "caption": "",
     "showDownloadUrl": false,
     "showDataTableLink": true,
-    "indexLabel": "",
-    "showVertical": false,
     "show": true
   },
   "orientation": "vertical",
-  "color": "pinkpurple",
-  "columns": {
-    "additionalColumn1": {
-      "name": ""
-    }
-  },
   "legend": {
     "behavior": "isolate",
     "singleRow": false,
@@ -138,26 +127,24 @@
     "dynamicLegendDefaultText": "Show All",
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
-    "dynamicLegendChartMessage": "Select Options from the Legend",
-    "position": "right",
-    "hide": false
+    "dynamicLegendChartMessage": "Select Options from the Legend"
   },
   "exclusions": {
     "active": false,
     "keys": []
   },
-  "palette": "qualitative-bold",
+  "palette": "qualitative3",
   "isPaletteReversed": false,
   "twoColor": {
     "palette": "monochrome-1",
     "isPaletteReversed": false
   },
-  "labels": false,
+  "labels": true,
   "dataFormat": {
     "commas": false,
     "prefix": "",
-    "suffix": "km",
-    "abbreviated": false,
+    "suffix": "",
+    "abbreviated": true,
     "bottomSuffix": "",
     "bottomPrefix": "",
     "bottomAbbreviated": false,
@@ -169,44 +156,15 @@
     "accent": true,
     "background": true
   },
-  "useLogScale": false,
-  "filterBehavior": "Apply Button",
+  "useLogScale": true,
+  "filterBehavior": "Filter Change",
   "highlightedBarValues": [],
   "series": [
     {
       "dataKey": "Radius",
-      "type": "Line",
-      "axis": "Right"
-    },
-    {
-      "dataKey": "Diameter",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "distance",
-      "type": "Bar",
-      "axis": "Left"
+      "type": "Line"
     }
   ],
-  "dataUrl": "/examples/feature/__data__/planet-example-data.json",
-  "animateReplay": true,
-  "visualizationType": "Combo",
-  "filters": [
-    {
-      "values": [
-        "0.3",
-        "0.7",
-        "1",
-        "2",
-        "7",
-        "8",
-        "18",
-        "22"
-      ],
-      "active": "0.3",
-      "filterStyle": "pill",
-      "order": "asc",
-      "columnName": "Diameter"
-    }
-  ]
+  "dataUrl": "/examples/feature/__data__/planet-logaritmic-data.json",
+  "visualizationType": "Bar"
 }

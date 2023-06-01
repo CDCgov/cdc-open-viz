@@ -28,7 +28,7 @@ export default function validateFipsCodeLength(stateOrData) {
   }
 
   // Only includes data - get column name from somewhere else
-  if (Array.isArray(stateOrData)) {
+  if (Array.isArray(stateOrData) && stateOrData.length > 0) {
     let columns = Object.keys(stateOrData[0])
 
     let potentialColumnNames = ['fips', 'FIPS', 'fips codes', 'FIPS CODES', 'Fips Codes', 'fips Codes', 'Fips codes', 'FIPS Codes']

@@ -2,6 +2,7 @@ export default {
   type: 'chart',
   title: '',
   showTitle: true,
+  showDownloadMediaButton: false,
   theme: 'theme-blue',
   animate: false,
   fontSize: 'medium',
@@ -14,6 +15,9 @@ export default {
   barStyle: '',
   roundingStyle: 'standard',
   tipRounding: 'top',
+  general: {
+    showDownloadButton: false
+  },
   padding: {
     left: 5,
     right: 5
@@ -40,7 +44,8 @@ export default {
     rightAxisTickColor: '#333',
     numTicks: '',
     axisPadding: 0,
-    tickRotation: 0
+    tickRotation: 0,
+    anchors: []
   },
   boxplot: {
     plots: [],
@@ -84,6 +89,7 @@ export default {
     horizontal: 750
   },
   xAxis: {
+    anchors: [],
     type: 'categorical',
     showTargetLabel: true,
     targetLabel: 'Target',
@@ -109,9 +115,15 @@ export default {
     height: '',
     caption: '',
     showDownloadUrl: false,
-    showDataTableLink: true
+    showDataTableLink: true,
+    indexLabel: '',
+    download: false,
+    showVertical: true
   },
   orientation: 'vertical',
+  color: 'pinkpurple',
+  columns: {  // start with a blank list
+  },
   legend: {
     behavior: 'isolate',
     singleRow: false,
@@ -150,5 +162,8 @@ export default {
     accent: true,
     background: true
   },
-  filterBehavior: 'Filter Change'
+  useLogScale: false,
+  filterBehavior: 'Filter Change',
+  highlightedBarValues: [],
+  series: []
 }
