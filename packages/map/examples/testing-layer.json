@@ -66,11 +66,7 @@
           "properties": {
             "name": "Polygon 2",
             "styleUrl": "#poly-000000-1200-77-nodesc",
-            "fill-opacity": 0.30196078431372547,
-            "fill": "blue",
-            "stroke-opacity": 1,
-            "stroke": "red",
-            "stroke-width": 5
+            "fill-opacity": 0.30196078431372547
           }
         },
         {

@@ -100,11 +100,19 @@
     "layers": [
       {
         "name": "Layer One",
-        "url": "./examples/testing-layer.json"
+        "url": "./examples/testing-layer.json",
+        "namespace": "cove",
+        "fill": "blue",
+        "stroke": "orange",
+        "strokeWidth": "5"
       },
       {
         "name": "Layer Two",
-        "url": "./examples/testing-layer.json"
+        "url": "./examples/testing-layer-2.json",
+        "namespace": "cove",
+        "fill": "blue",
+        "stroke": "orange",
+        "strokeWidth": "5"
       }
     ]
   },

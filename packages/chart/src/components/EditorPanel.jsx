@@ -867,7 +867,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Forecasting']
+  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting']
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1432,7 +1432,7 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' />
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>{`Increase the size if elements in the ${config.orientation} axis are being crowded or hidden behind other elements.  Decrease if less space is required for the value axis.`}</p>
@@ -1459,7 +1459,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' />
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
@@ -1924,7 +1924,7 @@ const EditorPanel = () => {
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
                                   {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
@@ -1943,7 +1943,7 @@ const EditorPanel = () => {
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
                                   {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
@@ -1962,7 +1962,7 @@ const EditorPanel = () => {
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
-                                  <Icon display='question' />
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
                                   <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
@@ -1995,7 +1995,7 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>When this option is checked, you can select source-file values for exclusion from the date/category axis. </p>
@@ -2122,7 +2122,7 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>When this option is checked, you can select values for exclusion from the pie segments.</p>
@@ -2613,7 +2613,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
@@ -2703,6 +2703,17 @@ const EditorPanel = () => {
                                   </option>
                                 ))}
                               </select>
+                            </label>
+
+                            <label>
+                              <span className='edit-showDropdown column-heading'>Show Filter Input</span>
+                              <input
+                                type='checkbox'
+                                checked={filter.showDropdown === undefined ? true : filter.showDropdown}
+                                onChange={e => {
+                                  updateFilterProp('showDropdown', index, e.target.checked)
+                                }}
+                              />
                             </label>
 
                             <label>
@@ -2822,7 +2833,7 @@ const EditorPanel = () => {
 
                   {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 
-                  {((config.series?.some(series => series.type === 'Line') && config.visualizationType === 'Combo') || config.visualizationType === 'Line' || config.visualizationType === 'Spark Line') && (
+                  {((config.series?.some(series => series.type === 'Line') && config.visualizationType === 'Combo') || config.visualizationType === 'Line') && (
                     <Select value={config.lineDatapointStyle} fieldName='lineDatapointStyle' label='Line Datapoint Style' updateField={updateField} options={['hidden', 'hover', 'always show']} />
                   )}
 
