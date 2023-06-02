@@ -72,7 +72,7 @@ const hashObj = row => {
   }
 }
 
-export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
+export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
@@ -98,8 +98,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
-
-  if (isDebug) console.log('Chart legend', legend)
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -291,6 +289,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setExcludedData(data)
     }
 
+    // force showVertical for data tables false if it does not exist
+    if (response !== undefined && response.table !== undefined) {
+      if (!response.table || !response.table.showVertical) {
+        response.table = response.table || {}
+        response.table.showVertical = false
+      }
+    }
     let newConfig = { ...defaults, ...response }
     if (newConfig.visualizationType === 'Box Plot') {
       newConfig.legend.hide = true
@@ -310,7 +315,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     })
 
-    // Loop through and set initial data with exclusions - this should persist through any following data transformations (ie. filters)
     let newExcludedData
 
     if (newConfig.exclusions && newConfig.exclusions.active) {
@@ -372,8 +376,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+            newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
+            newConfig.runtime.seriesLabelsAll.push(series.name || series.label || series.dataKey)
             return series.dataKey
           })
         : []
@@ -978,8 +982,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let formattedValue = value
 
     let columnObj //= config.columns[columnName]
-    // config.columns not an array but a hash of obects
-    if (Object.keys(config.columns).length > 1) {
+    // config.columns not an array but a hash of objects
+    if (Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
         var column = config.columns[key]
         // add if not the index AND it is enabled to be added to data table
@@ -989,15 +993,30 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
     }
 
+    if (columnObj === undefined) {
+      // then use left axis config
+      columnObj = config.type === 'chart' ? config.dataFormat : config.primary
+      // NOTE: Left Value Axis uses different names
+      // so map them below so the code below works
+      // - copy commas to useCommas to work below
+      columnObj['useCommas'] = columnObj.commas
+      // - copy roundTo to roundToPlace to work below
+      columnObj['roundToPlace'] = columnObj.roundTo ? columnObj.roundTo : ''
+    }
+
     if (columnObj) {
       // If value is a number, apply specific formattings
+      let hasDecimal = false
+      let decimalPoint = 0
       if (Number(value)) {
-        const hasDecimal = columnObj.roundToPlace && (columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null)
-        const decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
+        if (columnObj.roundToPlace >= 0) {
+          hasDecimal = columnObj.roundToPlace ? columnObj.roundToPlace !== '' || columnObj.roundToPlace !== null : false
+          decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
 
-        // Rounding
-        if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
-          formattedValue = Number(value).toFixed(decimalPoint)
+          // Rounding
+          if (columnObj.hasOwnProperty('roundToPlace') && hasDecimal) {
+            formattedValue = Number(value).toFixed(decimalPoint)
+          }
         }
 
         if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
@@ -1072,7 +1091,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         {!missingRequiredSections() && !config.newViz && (
           <div className='cdc-chart-inner-container'>
             {/* Title */}
-
             {title && config.showTitle && (
               <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
                 {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
@@ -1143,6 +1161,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 viewport={currentViewport}
                 parseDate={parseDate}
                 formatDate={formatDate}
+                formatNumber={formatNumber}
                 tabbingId={handleChartTabbing}
                 showDownloadImgButton={config.showDownloadImgButton}
                 showDownloadPdfButton={config.showDownloadPdfButton}
@@ -1202,7 +1221,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     isNumber,
     getTextWidth,
     twoColorPalette,
-    isDebug
+    isDebug,
+    setSharedFilter,
+    setSharedFilterValue,
+    dashboardConfig
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
