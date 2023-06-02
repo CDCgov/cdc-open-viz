@@ -12,37 +12,26 @@ export default async function (url, visualizationType = '') {
 
     if ('csv' === ext) {
       data = await fetch(url.href)
-        .then(response => {
-          //this is broken out just for debugging
-          // - will clean this up into one line for PR
-          console.log("response type",typeof response)
-          let cleanText = response.text()
-          console.log("#fetch cleanText",cleanText)
-          return cleanText
-        }).then(responseText => {
+        .then(response => response.text())
+        .then(responseText => {
           // for every comma NOT inside quotes, replace with a pipe delimiter
           // - this will let commas inside the quotes not be parsed as a new column
           // - Limitation: if a delimiter other than comma is used in the csv this will break
           // Examples of other delimiters that would break: tab
-          console.log("fetchRemote responseText BEFORE",responseText)
           responseText = responseText.replace(
             /(".*?")|,/g,
             (...m) => m[1] || "|"
           );
           // now strip the double quotes
           responseText = responseText.replace(/["]+/g, '')
-          console.log("fetchRemote responseText AFTER",responseText)
           const parsedCsv = Papa.parse(responseText, {
-            //quotes: "true",
+            //quotes: "true",  // dont need these
             //quoteChar: "'",
             header: true,
             dynamicTyping: true,
             skipEmptyLines: true,
             delimiter: '|', // we are using pipe symbol as delimiter so setting this explicitly for Papa.parse
           })
-          
-          console.log("fetchRemote parsedCsv:",parsedCsv)
-          //debugger
           return parsedCsv.data
         })
     }
