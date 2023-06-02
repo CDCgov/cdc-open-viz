@@ -209,8 +209,6 @@ export default function DataImport() {
       // Validate parsed data and set if no issues.
       try {
         text = transform.autoStandardize(text)
-        console.log('##DataImport try to validate text', text)
-        console.log('##DataImport config', config)
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
             if (config.type === 'dashboard') {
@@ -237,7 +235,6 @@ export default function DataImport() {
                 dataset: newDatasets
               })
             } else {
-              console.log('##DataImport ELSE CASE tempConfig', tempConfig)
               let newConfig = {
                 ...config,
                 ...tempConfig,
@@ -252,7 +249,6 @@ export default function DataImport() {
               setConfig(newConfig)
             }
           } else {
-            console.log('##DataImport reset editor ELSE', text)
             resetEditor(
               {
                 data: text,
@@ -332,7 +328,6 @@ export default function DataImport() {
           if (config.datasets[datasetKey].preview) {
             if (config.datasets[datasetKey].dataUrl) {
               const remoteData = await fetchRemoteData(config.datasets[datasetKey].dataUrl)
-              console.log('##DataImport: remoteData loaded:', remoteData)
               if (Array.isArray(remoteData)) {
                 setAsyncPreviewData(remoteData)
               }
