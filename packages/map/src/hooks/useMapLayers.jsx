@@ -83,78 +83,18 @@ export default function useMapLayers(config, setConfig, pathGenerator) {
     setConfig(updatedState)
   }
 
-  /**
-   * Updates the index of the layer tooltip
-   * @param {Event} e
-   * @param {Integer} index
-   */
-  const handleMapLayerTooltip = (e, index) => {
+  const handleMapLayer = (e, index, layerKey) => {
     e.preventDefault()
-    let newLayers = [...config.map.layers]
 
-    newLayers[index].tooltip = e.target.value
+    let layerValue = e.target.value
 
-    setConfig({
-      ...config,
-      map: {
-        ...config.map,
-        layers: newLayers
-      }
-    })
-  }
-
-  /**
-   * Changes the map layer url for a given index
-   * @param {Event} e - on add custom layer click
-   * @param {Integer} index - index of layer to update
-   */
-  const handleMapLayerUrl = (e, index) => {
-    e.preventDefault()
-    let newLayers = [...config.map.layers]
-
-    newLayers[index].url = e.target.value
-
-    setConfig({
-      ...config,
-      map: {
-        ...config.map,
-        layers: newLayers
-      }
-    })
-  }
-
-  /**
-   * Changes the map layer name for a given index
-   * @param {Event} e - on add custom layer click
-   * @param {Integer} index - index of layer to update
-   */
-  const handleMapLayerName = (e, index) => {
-    e.preventDefault()
+    if (layerKey === 'fillOpacity') {
+      layerValue = layerValue / 100
+    }
 
     let newLayers = [...config.map.layers]
 
-    newLayers[index].name = e.target.value
-
-    setConfig({
-      ...config,
-      map: {
-        ...config.map,
-        layers: newLayers
-      }
-    })
-  }
-
-  /**
-   * Changes the map layer namespace for a given index
-   * @param {Event} e - on add custom layer click
-   * @param {Integer} index - index of layer to update
-   */
-  const handleMapLayerNamespace = (e, index) => {
-    e.preventDefault()
-
-    let newLayers = [...config.map.layers]
-
-    newLayers[index].namespace = e.target.value
+    newLayers[index][layerKey] = layerValue
 
     setConfig({
       ...config,
@@ -207,17 +147,16 @@ export default function useMapLayers(config, setConfig, pathGenerator) {
 
         // feature array for county maps
         tempFeatureArray.push(item)
-
         tempArr.push(
           <Group className={layerClasses.join(' ')} key={`customMapLayer-${item.properties.name.replace(' ', '-')}-${index}`}>
             {/* prettier-ignore */}
             <path
               d={pathGenerator(item)}
-              fill={item.properties.fill}
-              fillOpacity={item.properties['fill-opacity']}
+              fill={config.map.layers[index].fill ? config.map.layers[index].fill : item.properties.fill ? item.properties.fill : 'transparent'}
+              fillOpacity={config.map.layers[index].fillOpacity ? config.map.layers[index].fillOpacity : item.properties['fill-opacity'] ? item.properties['fill-opacity'] : '1'}
               key={geoId} data-id={geoId}
-              stroke={item.properties.stroke}
-              strokeWidth={item.properties['stroke-width']}
+              stroke={config.map.layers[index].stroke ? config.map.layers[index].stroke : item.properties.stroke ? item.properties.stroke : 'transparent'}
+              strokeWidth={config.map.layers[index].strokeWidth ? config.map.layers[index].strokeWidth : item.properties['stroke-width']}
               data-tooltip-id='tooltip'
               data-tooltip-html={config.map.layers[index].tooltip ? config.map.layers[index].tooltip : ''}
             />
@@ -234,10 +173,7 @@ export default function useMapLayers(config, setConfig, pathGenerator) {
   const MapLayerHandlers = () => null
   MapLayerHandlers.handleRemoveLayer = handleRemoveLayer
   MapLayerHandlers.handleAddLayer = handleAddLayer
-  MapLayerHandlers.handleMapLayerUrl = handleMapLayerUrl
-  MapLayerHandlers.handleMapLayerName = handleMapLayerName
-  MapLayerHandlers.handleMapLayerNamespace = handleMapLayerNamespace
-  MapLayerHandlers.handleMapLayerTooltip = handleMapLayerTooltip
+  MapLayerHandlers.handleMapLayer = handleMapLayer
 
   return { pathArray, featureArray, MapLayerHandlers }
 }

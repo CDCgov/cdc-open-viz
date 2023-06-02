@@ -501,9 +501,18 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       legendMemo.current = newLegendMemo
 
+      // before returning the legend result
+      // add property for bin number and set to index location
       result.forEach((row, i) => {
         row.bin = i // set bin number to index
       })
+
+      // Move all special legend items from "Special Classes"  to the end of the legend
+      if (state.legend.showSpecialClassesLast) {
+        let specialRows = result.filter(d => d.special === true)
+        let otherRows = result.filter(d => !d.special)
+        result = [...otherRows, ...specialRows]
+      }
 
       return result
     }
@@ -772,7 +781,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(({ columnName, label, labels, active, values, type }, idx) => {
+    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type, showDropdown }, idx) => {
       let newFilter = runtimeFilters[idx]
 
       const sortAsc = (a, b) => {
@@ -811,10 +820,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       newFilter.type = type
       newFilter.label = label ?? ''
       newFilter.columnName = columnName
+      newFilter.orderedValues = orderedValues
+      newFilter.queryParameter = queryParameter
+      newFilter.labels = labels
       newFilter.values = values
       handleSorting(newFilter)
       newFilter.active = active ?? values[0] // Default to first found value
       newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
+      newFilter.showDropdown = showDropdown
 
       filters.push(newFilter)
     })
@@ -904,6 +917,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       return ''
     }
 
+    // if string of letters like 'Home' then dont need to format as a number
     if (typeof value === 'string' && value.length > 0 && state.legend.type === 'equalnumber') {
       return value
     }
@@ -911,6 +925,17 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     let formattedValue = value
 
     let columnObj = state.columns[columnName]
+
+    if (columnObj === undefined) {
+      // then use left axis config
+      columnObj = state.columns.primary
+      // NOTE: Left Value Axis uses different names
+      // so map them below so the code below works
+      // - copy commas to useCommas to work below
+      columnObj['useCommas'] = columnObj.commas
+      // - copy roundTo to roundToPlace to work below
+      columnObj['roundToPlace'] = columnObj.roundTo ? columnObj.roundTo : ''
+    }
 
     if (columnObj) {
       // If value is a number, apply specific formattings
@@ -944,11 +969,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   // this is passed DOWN into the various components
-  // then they do a lookup based on the bin number as index into here (TT)
+  // then they do a lookup based on the bin number as index into here
   const applyLegendToRow = rowObj => {
     try {
       if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
-      // Navigation map
+      // Navigation mapchanged
       if ('navigation' === state.general.type) {
         let mapColorPalette = colorPalettes[state.color] || colorPalettes['bluegreenreverse']
         return generateColorsArray(mapColorPalette[3])
@@ -960,7 +985,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let idx = legendMemo.current.get(hash)
         if (runtimeLegend[idx]?.disabled) return false
 
-        // DEV-784 changed to use bin prop to get color instead of idx
+        // changed to use bin prop to get color instead of idx
         // bc we re-order legend when showSpecialClassesLast is checked
         let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
         return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
@@ -999,16 +1024,16 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const column = state.columns[columnKey]
 
         if (true === column.tooltip) {
-          let label = column.label.length > 0 ? column.label : ''
+          let label = column.label?.length > 0 ? column.label : ''
 
           let value
 
           if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
             // THIS CODE SHOULD NOT ACT ON THE ENTIRE ROW OF KEYS BUT ONLY THE ONE KEY IN THE SPECIAL CLASS
             for (let i = 0; i < state.legend.specialClasses.length; i++) {
-              // DEV-3303 - Special Classes label in HOVERS should only apply to selected special class key
+              // Special Classes label in HOVERS should only apply to selected special class key
               // - you have to ALSO check that the key matches - putting here otherwise the if stmt too long
-              if (columnKey === state.legend.specialClasses[i].key) {
+              if (column.name === state.legend.specialClasses[i].key) {
                 if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
                   value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
                   break
@@ -1053,6 +1078,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Example:  Desired city display in tooltip on map: "Inter-Tribal Indian Reservation"
   const titleCase = string => {
     // guard clause else error in editor
+    if (!string) return
     if (string !== undefined) {
       // if hyphen found, then split, uppercase each word, and put back together
       if (string.includes('–') || string.includes('-')) {
@@ -1670,7 +1696,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
             {/* Link */}
-            {isDashboard && config.table.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+            {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
@@ -1684,7 +1710,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 config={state}
                 rawData={state.data}
                 navigationHandler={navigationHandler}
-                expandDataTable={table.expanded}
+                expandDataTable={general.expandDataTable ? general.expandDataTable : table.expanded ? table.expanded : false}
                 headerColor={general.headerColor}
                 columns={state.columns}
                 showDownloadButton={general.showDownloadButton}
@@ -1705,6 +1731,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 innerContainerRef={innerContainerRef}
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
+                isDebug={isDebug}
               />
             )}
 

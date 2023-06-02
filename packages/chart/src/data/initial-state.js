@@ -16,7 +16,7 @@ export default {
   roundingStyle: 'standard',
   tipRounding: 'top',
   general: {
-    showDownloadButton: true
+    showDownloadButton: false
   },
   padding: {
     left: 5,
@@ -117,14 +117,12 @@ export default {
     showDownloadUrl: false,
     showDataTableLink: true,
     indexLabel: '',
-    showVertical: false
+    download: false,
+    showVertical: true
   },
   orientation: 'vertical',
   color: 'pinkpurple',
-  columns: {
-    additionalColumn1: {
-      name: ''
-    }
+  columns: {  // start with a blank list
   },
   legend: {
     behavior: 'isolate',

@@ -5,7 +5,7 @@ export default {
     title: '',
     showTitle: true,
     showSidebar: true,
-    showDownloadButton: true,
+    showDownloadButton: false,
     showDownloadMediaButton: false,
     displayAsHex: false,
     displayStateLabels: false,
@@ -63,13 +63,14 @@ export default {
   filters: [],
   table: {
     label: 'Data Table',
-    expanded: true,
+    expanded: false,
     limitHeight: false,
     height: '',
     caption: '',
     showDownloadUrl: false,
     showDataTableLink: true,
     forceDisplay: true,
+    download: false,
     indexLabel: ''
   },
   tooltips: {

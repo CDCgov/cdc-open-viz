@@ -8,7 +8,7 @@
     "showSidebar": true,
     "showTitle": true,
     "showDownloadButton": true,
-    "expandDataTable": false,
+    "expandDataTable": true,
     "backgroundColor": "#f5f5f5",
     "geoBorderColor": "darkGray",
     "territoriesLabel": "Territories",
@@ -142,13 +142,13 @@
   "data": [
     {
       "STATE": "AL",
-      "Rate": 10,
+      "Rate": 1000,
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
     {
       "STATE": "AK",
-      "Rate": 12,
+      "Rate": 1200,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
@@ -502,6 +502,42 @@
     },
     {
       "STATE": "Los Angeles",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Grand Rapids, MICHIGAN",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem, OReGON",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Round Rock, TEXAS",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "PROVO, UT",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "SALUDA, VIRGINIA",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "ELLENSBURG, WA",
       "Rate": 14,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
