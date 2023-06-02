@@ -501,9 +501,18 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       legendMemo.current = newLegendMemo
 
+      // before returning the legend result
+      // add property for bin number and set to index location
       result.forEach((row, i) => {
         row.bin = i // set bin number to index
       })
+
+      // Move all special legend items from "Special Classes"  to the end of the legend
+      if (state.legend.showSpecialClassesLast) {
+        let specialRows = result.filter(d => d.special === true)
+        let otherRows = result.filter(d => !d.special)
+        result = [...otherRows, ...specialRows]
+      }
 
       return result
     }
@@ -772,7 +781,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type }, idx) => {
+    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type, showDropdown }, idx) => {
       let newFilter = runtimeFilters[idx]
 
       const sortAsc = (a, b) => {
@@ -818,6 +827,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       handleSorting(newFilter)
       newFilter.active = active ?? values[0] // Default to first found value
       newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
+      newFilter.showDropdown = showDropdown
 
       filters.push(newFilter)
     })
@@ -959,11 +969,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   // this is passed DOWN into the various components
-  // then they do a lookup based on the bin number as index into here (TT)
+  // then they do a lookup based on the bin number as index into here
   const applyLegendToRow = rowObj => {
     try {
       if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
-      // Navigation map
+      // Navigation mapchanged
       if ('navigation' === state.general.type) {
         let mapColorPalette = colorPalettes[state.color] || colorPalettes['bluegreenreverse']
         return generateColorsArray(mapColorPalette[3])
@@ -975,7 +985,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let idx = legendMemo.current.get(hash)
         if (runtimeLegend[idx]?.disabled) return false
 
-        // DEV-784 changed to use bin prop to get color instead of idx
+        // changed to use bin prop to get color instead of idx
         // bc we re-order legend when showSpecialClassesLast is checked
         let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
         return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
@@ -1068,6 +1078,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Example:  Desired city display in tooltip on map: "Inter-Tribal Indian Reservation"
   const titleCase = string => {
     // guard clause else error in editor
+    if (!string) return
     if (string !== undefined) {
       // if hyphen found, then split, uppercase each word, and put back together
       if (string.includes('–') || string.includes('-')) {
@@ -1699,7 +1710,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 config={state}
                 rawData={state.data}
                 navigationHandler={navigationHandler}
-                expandDataTable={table.expanded}
+                expandDataTable={general.expandDataTable ? general.expandDataTable : table.expanded ? table.expanded : false}
                 headerColor={general.headerColor}
                 columns={state.columns}
                 showDownloadButton={general.showDownloadButton}

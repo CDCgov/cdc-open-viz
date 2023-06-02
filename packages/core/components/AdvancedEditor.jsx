@@ -8,7 +8,12 @@ export const AdvancedEditor = ({ loadConfig, state, convertStateToConfig }) => {
   const [configTextboxValue, setConfigTextbox] = useState({})
 
   useEffect(() => {
-    const parsedData = convertStateToConfig()
+    let parsedData = state
+    if (state.type !== 'dashboard') {
+      parsedData = convertStateToConfig()
+    } else {
+      parsedData = JSON.parse(JSON.stringify(parsedData))
+    }
     const formattedData = JSON.stringify(parsedData, undefined, 2)
 
     setConfigTextbox(formattedData)
@@ -16,6 +21,7 @@ export const AdvancedEditor = ({ loadConfig, state, convertStateToConfig }) => {
 
   const typeLookup = {
     chart: ['Charts', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/bar-chart.html', <ChartIcon />],
+    dashboard: ['Dashboard', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/bar-chart.html', <ChartIcon />],
     map: ['Maps', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html', <MapIcon />],
     'markup-include': ['Markup Include', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/Markup-Include.html', <MarkupIncludeIcon />]
   }
