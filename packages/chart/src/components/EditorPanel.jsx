@@ -19,8 +19,6 @@ import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import { useFilters } from '@cdc/core/components/Filters'
 import Series from './Series'
-import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
-import { RepeatableGroup } from '@cdc/core/components/RepeatableGroup'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 /* eslint-disable react-hooks/rules-of-hooks */

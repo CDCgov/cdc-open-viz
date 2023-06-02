@@ -123,9 +123,6 @@ const SeriesDropdownForecastingStage = props => {
       initialSnap
       value={series.stageColumn}
       label='Add Forecasting Stages'
-      // onChange={event => {
-      //   updateSeries(index, event.target.value, 'stageColumn')
-      // }}
       onChange={e => {
         let stageObjects = []
         let tempGroups = new Set(rawData?.map(item => item[e.target.value])) // [estimate, forecast, etc.]
@@ -216,7 +213,7 @@ const SeriesDropdownForecastColor = props => {
   if (series.type !== 'Forecasting') return
 
   // Hide AxisPositionDropdown in certain cases.
-  if (config.visualizationType !== 'Combo' || !series) return
+  if (!series) return
 
   return series?.stages?.map((stage, stageIndex) => (
     <InputSelect
