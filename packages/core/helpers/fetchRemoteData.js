@@ -13,26 +13,34 @@ export default async function (url, visualizationType = '') {
     if ('csv' === ext) {
       data = await fetch(url.href)
         .then(response => {
-          //debugger
+          //this is broken out just for debugging
+          // - will clean this up into one line for PR
           console.log("response type",typeof response)
           let cleanText = response.text()
           console.log("#fetch cleanText",cleanText)
           return cleanText
-        })
-        .then(responseText => {
-          // put placeholder for any commas inside headers since we parse cols separated with commas
-          
-          // remove all double quotes
+        }).then(responseText => {
+          // for every comma NOT inside quotes, replace with a pipe delimiter
+          // - this will let commas inside the quotes not be parsed as a new column
+          // - Limitation: if a delimiter other than comma is used in the csv this will break
+          // Examples of other delimiters that would break: tab
+          console.log("fetchRemote responseText BEFORE",responseText)
+          responseText = responseText.replace(
+            /(".*?")|,/g,
+            (...m) => m[1] || "|"
+          );
+          // now strip the double quotes
           responseText = responseText.replace(/["]+/g, '')
- //debugger
+          console.log("fetchRemote responseText AFTER",responseText)
           const parsedCsv = Papa.parse(responseText, {
+            //quotes: "true",
+            //quoteChar: "'",
             header: true,
             dynamicTyping: true,
             skipEmptyLines: true,
-            //delimiter: ',', // dont add this, just leave it at "default" which will guess the delimiter and is more flexible
-            //quoteChar: "'", // dont add this or it will break on single quotes or if text has apostrophe in it (TT)
+            delimiter: '|', // we are using pipe symbol as delimiter so setting this explicitly for Papa.parse
           })
-          console.log("fetchRemote responseText:",responseText)
+          
           console.log("fetchRemote parsedCsv:",parsedCsv)
           //debugger
           return parsedCsv.data
