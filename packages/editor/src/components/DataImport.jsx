@@ -337,7 +337,6 @@ export default function DataImport() {
                 setAsyncPreviewData(remoteData)
               }
             } else if (Array.isArray(config.datasets[datasetKey].data)) {
-              console.log('useEffect ELSE case config.data')
               setAsyncPreviewData(config.datasets[datasetKey].data)
             }
           }
