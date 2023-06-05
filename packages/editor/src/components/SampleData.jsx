@@ -10,6 +10,7 @@ import validScatterPlot from './../samples/valid-scatterplot.csv?raw'
 import validBoxPlotData from './../samples/valid-boxplot.csv?raw'
 import validAreaChart from './../samples/valid-area-chart.json?raw'
 import validWorldGeocodeData from './../samples/valid-world-geocode.json?raw'
+import validForecastData from './../samples/valid-forecast-data.csv?raw'
 
 // Add additional data to samples
 const sampleData = {
@@ -33,6 +34,11 @@ const sampleData = {
       text: 'Area Chart Sample Data',
       fileName: 'valid-area-chart.json',
       data: validAreaChart
+    },
+    {
+      text: 'Forecast Chart Data',
+      fileName: 'valid-forecast-data.csv',
+      data: validForecastData
     }
   ],
   maps: [

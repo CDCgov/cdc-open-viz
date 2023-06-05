@@ -12,6 +12,7 @@ const useScales = properties => {
   let g2xScale = null
   let g1xScale = null
   let seriesScale = null
+  let xScaleNoPadding = null
 
   const scaleTypes = {
     TIME: 'time',
@@ -147,7 +148,7 @@ const useScales = properties => {
     })
   }
 
-  return { xScale, yScale, seriesScale, g1xScale, g2xScale }
+  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding }
 }
 
 export default useScales

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useMemo } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
+import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
@@ -93,24 +94,29 @@ export default function DataTable() {
             {
               Header: '',
               Cell: ({ row }) => {
-                const seriesLabel = config.runtime.seriesLabels ? config.runtime.seriesLabels[row.original] : row.original
+                const getSeriesLabel = () => {
+                  if (config.runtimeSeriesLabels) return config.runtime.seriesLabels[row.original]
+                  return row.original
+                }
+                let pallete = colorPalettesChart[config.forecastingChart.colors[row.index]]
                 return (
                   <>
                     {config.visualizationType !== 'Pie' && (
                       <LegendCircle
                         fill={
                           // non-dynamic leged
-                          !config.legend.dynamicLegend
-                            ? colorScale(seriesLabel)
-                            : // dynamic legend
-                            config.legend.dynamicLegend
+                          !config.legend.dynamicLegend && config.visualizationType !== 'Forecasting'
+                            ? colorScale(getSeriesLabel())
+                            : config.visualizationType === 'Forecasting'
+                            ? pallete[2]
+                            : config.legend.dynamicLegend
                             ? colorPalettes[config.palette][row.index]
                             : // fallback
                               '#000'
                         }
                       />
                     )}
-                    <span>{seriesLabel}</span>
+                    <span>{getSeriesLabel()}</span>
                   </>
                 )
               },

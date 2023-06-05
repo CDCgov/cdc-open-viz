@@ -143,8 +143,9 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
 
             if (config.xAxis.type === 'date') {
               data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
+            } else {
+              data.map(d => xScale(d[config.xAxis.dataKey]))
             }
-
             return (
               <React.Fragment key={index}>
                 {/* prettier-ignore */}
