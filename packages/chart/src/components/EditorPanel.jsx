@@ -2998,6 +2998,13 @@ const EditorPanel = () => {
                   {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && config.showLineSeriesLabels && (
                     <CheckBox value={config.colorMatchLineSeriesLabels} fieldName='colorMatchLineSeriesLabels' label='Match Series Color to Name at End of Line Charts' updateField={updateField} />
                   )}
+
+                  {config.visualizationType === 'Combo' && config.runtime.forecastingSeriesKeys?.length > 0 && (
+                    <>
+                      <CheckBox value={config.visual.verticalHoverLine} fieldName='verticalHoverLine' section='visual' label='Vertical Hover Line' updateField={updateField} />
+                      <CheckBox value={config.visual.horizontalHoverLine} fieldName='horizontalHoverLine' section='visual' label='Horizontal Hover Line' updateField={updateField} />
+                    </>
+                  )}
                 </AccordionItemPanel>
               </AccordionItem>
               {/* Spark Line has no data table */}

@@ -5,6 +5,8 @@ import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
+import { localPoint } from '@visx/event'
+import { useTooltip, useTooltipInPortal, defaultStyles } from '@visx/tooltip'
 
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
@@ -26,7 +28,7 @@ import useTopAxis from '../hooks/useTopAxis'
 import Forecasting from './Forecasting'
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData } = useContext(ConfigContext)
 
   // getters & functions
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
@@ -117,6 +119,109 @@ export default function LinearChart() {
       }
     }
     return tickCount
+  }
+
+  // Tooltip helper for getting data to the closest date/category hovered.
+  const getXValueFromCoordinate = x => {
+    if (xScale.type === 'point') {
+      // Find the closest x value by calculating the minimum distance
+      let closestX = null
+      let minDistance = Number.MAX_VALUE
+      let offset = x - yAxis.size
+
+      data.forEach(d => {
+        const xPosition = xAxis.type === 'date' ? xScale(parseDate(d[xAxis.dataKey])) : xScale(d[xAxis.dataKey])
+        const distance = Math.abs(Number(xPosition - offset))
+
+        if (distance < minDistance) {
+          minDistance = distance
+          closestX = xAxis.type === 'date' ? parseDate(d[xAxis.dataKey]) : d[xAxis.dataKey]
+        }
+      })
+      return closestX
+    }
+  }
+
+  // import tooltip helpers
+  const { tooltipData, showTooltip, hideTooltip } = useTooltip()
+
+  const handleTooltipMouseOver = (e, data) => {
+    // get the svg coordinates of the mouse
+    // and get the closest values
+    const eventSvgCoords = localPoint(e)
+    const { x, y } = eventSvgCoords
+
+    const { runtime } = config
+
+    let closestXScaleValue = getXValueFromCoordinate(x)
+    let formattedDate = formatDate(closestXScaleValue)
+
+    let yScaleValues
+    if (xAxis.type === 'categorical') {
+      yScaleValues = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
+    } else {
+      yScaleValues = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
+    }
+
+    let seriesToInclude = []
+    let stageColumns = []
+    let ciItems = []
+
+    // loop through series for items to add to tooltip.
+    // there is probably a better way of doing this.
+    config.series?.map(s => {
+      if (s.type === 'Forecasting') {
+        stageColumns.push(s.stageColumn)
+
+        // greedy fn 😭
+        s?.confidenceIntervals.map(ci => {
+          if (ci.showInTooltip === true) {
+            ciItems.push(ci.low)
+            ciItems.push(ci.high)
+          }
+        })
+      }
+    })
+
+    let standardLoopItems = []
+
+    if (config.visualizationType === 'Combo') {
+      standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...stageColumns, ...ciItems]
+    } else {
+      standardLoopItems = [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
+    }
+
+    standardLoopItems.map(seriesKey => {
+      if (!seriesKey) return false
+      if (!yScaleValues[0]) return false
+      for (const item of Object.entries(yScaleValues[0])) {
+        if (item[0] === seriesKey) {
+          seriesToInclude.push(item)
+        }
+      }
+    })
+
+    // filter out the series that aren't added to the map.
+    if (!seriesToInclude) return
+    let initialTooltipData = Object.fromEntries(seriesToInclude) ? Object.fromEntries(seriesToInclude) : {}
+
+    let tooltipData = {}
+    tooltipData.data = initialTooltipData
+    tooltipData.dataXPosition = x + 10
+    tooltipData.dataYPosition = y
+
+    let tooltipInformation = {
+      tooltipData: tooltipData,
+      tooltipTop: 0,
+      tooltipValues: yScaleValues,
+      tooltipLeft: x
+    }
+
+    showTooltip(tooltipInformation)
+  }
+
+  const handleTooltipMouseOff = () => {
+    hideTooltip()
   }
 
   // Make sure the chart is visible if in the editor
@@ -436,7 +541,23 @@ export default function LinearChart() {
         {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} />}
         {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />}
         {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />}
-        {(config.visualizationType === 'Forecasting' || config.visualizationType === 'Combo') && <Forecasting xScale={xScale} yScale={yScale} width={xMax} height={yMax} xScaleNoPadding={xScaleNoPadding} chartRef={svgRef} />}
+        {config.visualizationType === 'Forecasting' ||
+          (config.visualizationType === 'Combo' && ( // prettier-ignore
+            <Forecasting
+              hideTooltip={hideTooltip}
+              showTooltip={showTooltip}
+              tooltipData={tooltipData}
+              xScale={xScale}
+              yScale={yScale}
+              width={xMax}
+              height={yMax}
+              xScaleNoPadding={xScaleNoPadding}
+              chartRef={svgRef}
+              getXValueFromCoordinate={getXValueFromCoordinate}
+              handleTooltipMouseOver={handleTooltipMouseOver}
+              handleTooltipMouseOff={handleTooltipMouseOff}
+            />
+          ))}
 
         {/* y anchors */}
         {config.yAxis.anchors &&

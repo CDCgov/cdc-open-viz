@@ -162,7 +162,9 @@ export default {
   visual: {
     border: true,
     accent: true,
-    background: true
+    background: true,
+    verticalHoverLine: false,
+    horizontalHoverLine: false
   },
   useLogScale: false,
   filterBehavior: 'Filter Change',
