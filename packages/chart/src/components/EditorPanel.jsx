@@ -849,15 +849,16 @@ const EditorPanel = () => {
       let datakeys = getColumns(false)
       if (datakeys.includes('Date')) return 'Date'
       if (datakeys.includes('Race')) return 'Race'
+      if (datakeys.includes('Month')) return 'Month'
       // add other known Category cols here to extend debug
     }
-    return ''
+    return config?.xAxis?.dataKey || ''
   }
   const setDataColumn = () => {
     // only for debug mode
     if (undefined !== isDebug && isDebug && getColumns(false).length > 0) {
       // then try to set the x axis to appropriate value so we dont have to manually do it
-      let datacols = getColumns(false).filter(x => x !== 'Date' && x !== 'Race')
+      let datacols = getColumns(false).filter(x => x !== setCategoryAxis())
       if (datacols.length > 0) {
         return datacols[0]
       }

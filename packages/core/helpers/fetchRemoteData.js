@@ -26,7 +26,7 @@ export default async function (url, visualizationType = '') {
           responseText = responseText.replace(/["]+/g, '')
           const parsedCsv = Papa.parse(responseText, {
             //quotes: "true",  // dont need these
-            //quoteChar: "'",
+            //quoteChar: "'",  // has no effect that I can tell
             header: true,
             dynamicTyping: true,
             skipEmptyLines: true,
