@@ -293,7 +293,7 @@ const WaffleChart = ({ config, isEditor, link }) => {
                   <div style={dataFontSize}>
                     {prefix ? prefix : ' '}
                     {config.showPercent ? dataPercentage : waffleNumerator}
-                    {suffix ? suffix : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+                    {suffix ? suffix + ' ' : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
                   </div>
                   <div className='cove-gauge-chart__data--text'>{parse(content)}</div>
                   <svg height={gaugeHeight} width={'100%'}>
