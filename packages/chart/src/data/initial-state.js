@@ -106,7 +106,8 @@ export default {
     numTicks: '',
     labelOffset: 65,
     axisPadding: 0,
-    target: 0
+    target: 0,
+    anchors: []
   },
   table: {
     label: 'Data Table',
@@ -122,7 +123,8 @@ export default {
   },
   orientation: 'vertical',
   color: 'pinkpurple',
-  columns: {  // start with a blank list
+  columns: {
+    // start with a blank list
   },
   legend: {
     behavior: 'isolate',
@@ -160,7 +162,9 @@ export default {
   visual: {
     border: true,
     accent: true,
-    background: true
+    background: true,
+    verticalHoverLine: false,
+    horizontalHoverLine: false
   },
   useLogScale: false,
   filterBehavior: 'Filter Change',
