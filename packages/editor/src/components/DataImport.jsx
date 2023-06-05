@@ -209,7 +209,6 @@ export default function DataImport() {
       // Validate parsed data and set if no issues.
       try {
         text = transform.autoStandardize(text)
-
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
             if (config.type === 'dashboard') {
@@ -262,7 +261,6 @@ export default function DataImport() {
         } else {
           if (config.type === 'dashboard') {
             let newDatasets = { ...config.datasets }
-
             Object.keys(newDatasets).forEach(datasetKey => (newDatasets[datasetKey].preview = false))
 
             newDatasets[editingDatasetKey || fileSource] = {
