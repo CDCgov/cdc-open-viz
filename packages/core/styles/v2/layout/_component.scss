@@ -21,7 +21,7 @@
   border-radius: 0 0 3px 3px;
 
   &.no-borders {
-    border: none;
+    border: none !important;
   }
 
   .cdc-data-bite-inner-container:not(.component--has-title) .cove-component__content:not(.no-borders) {
