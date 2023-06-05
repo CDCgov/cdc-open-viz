@@ -26,7 +26,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
   const setTab = index => {
     setTabSelected(index)
-    if (index === 3) {
+    if (index === 4) {
       setPreview(true)
     } else {
       setPreview(false)
@@ -54,6 +54,26 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
         delete dashboardConfig.datasets[datasetKey].runtimeDataUrl
       })
     }
+
+    updateConfig({ ...config, dashboard: dashboardConfig })
+
+    overlay?.actions.toggleOverlay()
+  }
+
+  const addNewFilterInteraction = () => {
+    let dashboardConfig = { ...config.dashboard }
+
+    dashboardConfig.filterInteractions = dashboardConfig.filterInteractions || []
+
+    dashboardConfig.filterInteractions.push({ key: 'Dashboard Filter ' + (dashboardConfig.filterInteractions.length + 1), values: [] })
+
+    updateConfig({ ...config, dashboard: dashboardConfig })
+  }
+
+  const removeFilterInteraction = index => {
+    let dashboardConfig = { ...config.dashboard }
+
+    dashboardConfig.filterInteractions.splice(index, 1)
 
     updateConfig({ ...config, dashboard: dashboardConfig })
 
@@ -119,6 +139,135 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
     runSetColumns()
   }, [config.datasets])
+
+  const filterInteractionModal = (filterInteraction, index) => {
+    const saveChanges = () => {
+      let tempConfig = { ...config.dashboard }
+      tempConfig.filterInteractions[index] = filterInteraction
+
+      updateConfig({ ...config, dashboard: tempConfig })
+
+      overlay?.actions.toggleOverlay()
+    }
+
+    const updateFilterInteractionProp = (name, index, value) => {
+      let newFilterInteraction = { ...filterInteraction }
+
+      newFilterInteraction[name] = value
+
+      overlay?.actions.openOverlay(filterInteractionModal(newFilterInteraction, index))
+    }
+
+    const addFilterSetterValue = (e) => {
+      let newFilterInteraction = { ...filterInteraction }
+
+      newFilterInteraction.filterSetterValues = newFilterInteraction.filterSetterValues || [];
+      newFilterInteraction.filterSetterValues.push(e.target.value);
+
+      overlay?.actions.openOverlay(filterInteractionModal(newFilterInteraction, index))
+    }
+
+    const removeFilterSetterValue = (index) => {
+      let newFilterInteraction = { ...filterInteraction }
+
+      if(newFilterInteraction.filterSetterValues && newFilterInteraction.filterSetterValues.length > 0){
+        newFilterInteraction.filterSetterValues.splice(index, 1);
+      } 
+
+      overlay?.actions.openOverlay(filterInteractionModal(newFilterInteraction, index))
+    }
+
+    const addFilterGetterValue = (e) => {
+      let newFilterInteraction = { ...filterInteraction }
+
+      newFilterInteraction.filterGetterValues = newFilterInteraction.filterGetterValues || [];
+      newFilterInteraction.filterGetterValues.push(e.target.value);
+
+      overlay?.actions.openOverlay(filterInteractionModal(newFilterInteraction, index))
+    }
+
+    const removeFilterGetterValue = (index) => {
+      let newFilterInteraction = { ...filterInteraction }
+
+      if(newFilterInteraction.filterGetterValues && newFilterInteraction.filterGetterValues.length > 0){
+        newFilterInteraction.filterGetterValues.splice(index, 1);
+      } 
+
+      overlay?.actions.openOverlay(filterInteractionModal(newFilterInteraction, index))
+    }
+
+    return (
+      <Modal>
+        <Modal.Content>
+        <h2>Dashboard Filter Interaction Settings</h2>
+        When 
+        <select defaultValue={filterInteraction.filterSetter} onChange={e => updateFilterInteractionProp('filterSetter', index, e.target.value)}>
+          <option>Select a filter</option>
+          {config.dashboard.sharedFilters && config.dashboard.sharedFilters.map(sharedFilter => 
+            <option>{sharedFilter.key}</option>
+          )}
+        </select> is equal to value(s) <br/><br/>
+        <ul>
+          {filterInteraction.filterSetterValues && filterInteraction.filterSetterValues.map((setterValue, i) => (
+            <li>{setterValue} <a href="#" onClick={e => removeFilterSetterValue(i)}>Remove</a></li>
+          ))}
+        </ul>
+        <select onChange={addFilterSetterValue}>
+            <option>Select a value</option>
+            {config.dashboard.sharedFilters && (config.dashboard.sharedFilters.find(sharedFilter => sharedFilter.key === filterInteraction.filterSetter) || {values: []}).values.map(value => 
+              <option>{value}</option>
+            )}
+        </select>
+        <br/><br/>
+        <select defaultValue={filterInteraction.interactionType} onChange={e => updateFilterInteractionProp('interactionType', index, e.target.value)}>
+          <option>Select an action</option>
+          <option value="remove">Remove filter</option>
+          <option value="removeOptions">Remove filter options</option>
+          <option value="set">Set filter</option>
+        </select> {filterInteraction.interactionType === 'removeOptions' && 'from'} <select defaultValue={filterInteraction.filterGetter} onChange={e => updateFilterInteractionProp('filterGetter', index, e.target.value)}>
+          <option>Select a filter</option>
+          {config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.key !== filterInteraction.filterSetter).map(sharedFilter => 
+            <option>{sharedFilter.key}</option>
+          )}
+        </select> {filterInteraction.interactionType === 'removeOptions' && (
+          <>
+              options <br/><br/>
+              <ul>
+                {filterInteraction.filterGetterValues && filterInteraction.filterGetterValues.map((getterValue, i) => (
+                  <li>{getterValue} <a href="#" onClick={e => removeFilterGetterValue(i)}>Remove</a></li>
+                ))}
+              </ul>
+              <select onChange={addFilterGetterValue}>
+                  <option>Select a value</option>
+                  {config.dashboard.sharedFilters && (config.dashboard.sharedFilters.find(sharedFilter => sharedFilter.key === filterInteraction.filterGetter) || {values: []}).values.map(value => 
+                    <option>{value}</option>
+                  )}
+              </select><br/><br/>
+          </>
+        )}
+        {filterInteraction.interactionType === 'set' && (
+          <>
+            to
+            <select>
+              <option>Select a value</option>
+              {config.dashboard.sharedFilters && (config.dashboard.sharedFilters.find(sharedFilter => sharedFilter.key === filterInteraction.filterGetter) || {values: []}).values.map(value => 
+                <option>{value}</option>
+              )}
+            </select>
+          </>
+        )}
+        <br/>
+        <br/>
+        <button type='button' className='btn btn-primary' style={{ display: 'inline-block', 'margin-right': '1em' }} onClick={overlay?.actions.toggleOverlay}>
+          Cancel
+        </button>
+        <button type='button' className='btn btn-primary' style={{ display: 'inline-block' }} onClick={saveChanges}>
+          Save
+        </button>
+        </Modal.Content>
+      </Modal>
+    )
+  }
 
   const filterModal = (filter, index) => {
     const saveChanges = () => {
@@ -396,12 +545,20 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
                 setTab(2)
               }}
             >
-              Data Table Settings
+              Dashboard Filter Interactions
             </li>
             <li
               className={tabSelected === 3 ? 'active' : 'inactive'}
               onClick={() => {
                 setTab(3)
+              }}
+            >
+              Data Table Settings
+            </li>
+            <li
+              className={tabSelected === 4 ? 'active' : 'inactive'}
+              onClick={() => {
+                setTab(4)
               }}
             >
               Dashboard Preview
@@ -430,6 +587,26 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
               </>
             )}
             {tabSelected === 2 && (
+              <>
+                {config.dashboard.filterInteractions &&
+                  config.dashboard.filterInteractions.map((filterInteraction, index) => (
+                    <span className='shared-filter-button' key={`shared-filter-${index}`}>
+                      <a
+                        href='#'
+                        onClick={e => {
+                          e.preventDefault()
+                          overlay?.actions.openOverlay(filterInteractionModal(filterInteraction, index))
+                        }}
+                      >
+                        Filter Interaction {index + 1}
+                      </a>
+                      <button onClick={() => removeFilterInteraction(index)}>X</button>
+                    </span>
+                ))}
+              <button onClick={addNewFilterInteraction}>Add New Filter Interaction</button>
+              </>
+            )}
+            {tabSelected === 3 && (
               <>
 
                 <div className="wrap">
