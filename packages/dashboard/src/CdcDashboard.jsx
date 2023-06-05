@@ -377,7 +377,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         if (applicableFilters.length > 0) {
           const visualization = newConfig.visualizations[visualizationKey]
 
-          const formattedData = getFormattedData(visualization.data, visualization.dataDescription)
+          const formattedData = getFormattedData(newConfig.datasets[visualization.dataKey] && newConfig.datasets[visualization.dataKey].data ? newConfig.datasets[visualization.dataKey].data : visualization.data, visualization.dataDescription)
 
           newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || visualization.data || (dataOverride || data)[visualization.dataKey])
         }
