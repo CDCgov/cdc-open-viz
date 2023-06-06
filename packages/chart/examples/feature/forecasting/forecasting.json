@@ -11,7 +11,7 @@
   "isLollipopChart": false,
   "lollipopShape": "circle",
   "lollipopColorStyle": "two-tone",
-  "visualizationSubType": "regular",
+  "visualizationSubType": "regular ",
   "barStyle": "",
   "roundingStyle": "standard",
   "tipRounding": "top",

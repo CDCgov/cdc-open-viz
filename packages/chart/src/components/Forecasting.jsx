@@ -133,7 +133,7 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMou
         )}
 
         {showTooltip && tooltipData && config.visual.horizontalHoverLine && (
-          <Group key='tooltipLine-horizontal' className='horizontal-tooltip-line' left={config.yAxis.size}>
+          <Group key='tooltipLine-horizontal' className='horizontal-tooltip-line' left={config.yAxis.size ? config.yAxis.size : 0}>
             <Line from={{ x: 0, y: tooltipData.dataYPosition }} to={{ x: width, y: tooltipData.dataYPosition }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='horizontal-tooltip-line' />
           </Group>
         )}
