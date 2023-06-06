@@ -6,7 +6,9 @@ const useScales = properties => {
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
 
-  //  define scxales
+  const { visualizationType } = config
+
+  //  define scales
   let xScale = null
   let yScale = null
   let g2xScale = null
@@ -35,15 +37,6 @@ const useScales = properties => {
   if (!isHorizontal) {
     xScale = composeScalePoint(xAxisDataMapped, [0, xMax], 0.5)
     xScale.type = scaleTypes.POINT
-
-    // if (config.visualizationType === 'Bar') {
-    //   xScale = scaleBand({
-    //     domain: xAxisDataMapped,
-    //     range: [0, xMax],
-    //     padding: 0.4
-    //   })
-    //   xScale.type = scaleTypes.BAND
-    // }
     yScale = composeYScale(properties)
     seriesScale = composeScalePoint(seriesDomain, [0, xMax])
   }
@@ -85,7 +78,7 @@ const useScales = properties => {
   }
 
   // handle Box plot
-  if (config.visualizationType === 'Box Plot') {
+  if (visualizationType === 'Box Plot') {
     const allOutliers = []
     const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
 
@@ -123,7 +116,7 @@ const useScales = properties => {
   }
 
   // handle Paired bar
-  if (config.visualizationType === 'Paired Bar') {
+  if (visualizationType === 'Paired Bar') {
     const offset = 1.02 // Offset of the ticks/values from the Axis
     let groupOneMax = Math.max.apply(
       Math,

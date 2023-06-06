@@ -63,8 +63,6 @@ const SeriesDropdownLineType = props => {
   return (
     <InputSelect
       initial='Select an option'
-      initialDisabled
-      initialSnap
       value={series.lineType ? series.lineType : 'curveLinear'}
       label='Series Line Type'
       onChange={event => {
@@ -87,8 +85,6 @@ const SeriesDropdownSeriesType = props => {
   return (
     <InputSelect
       initial='Select an option'
-      initialDisabled
-      initialSnap
       value={series.type}
       label='Series Type'
       onChange={event => {
@@ -119,8 +115,6 @@ const SeriesDropdownForecastingStage = props => {
   return (
     <InputSelect
       initial='Select an option'
-      initialDisabled
-      initialSnap
       value={series.stageColumn}
       label='Add Forecasting Stages'
       onChange={e => {
@@ -164,8 +158,6 @@ const SeriesDropdownForecastingColumn = props => {
   return (
     <InputSelect
       initial='Select an option'
-      initialDisabled
-      initialSnap
       value={series.stageItem}
       label='Forecasting Item Column'
       onChange={event => {
@@ -190,9 +182,7 @@ const SeriesDropdownAxisPosition = props => {
   return (
     <InputSelect
       initial='Select an option'
-      initialDisabled
       value={series.axis ? series.axis : 'Left'}
-      initialSnap
       label='Series Axis'
       onChange={event => {
         updateSeries(index, event.target.value, 'axis')
@@ -217,10 +207,9 @@ const SeriesDropdownForecastColor = props => {
 
   return series?.stages?.map((stage, stageIndex) => (
     <InputSelect
+      key={`${stage}--${stageIndex}`}
       initial='Select an option'
-      initialDisabled
       value={config.series?.[index].stages?.[stageIndex].color ? config.series?.[index].stages?.[stageIndex].color : 'Select'}
-      initialSnap
       label={`${stage.key} Series Color`}
       onChange={event => {
         const copyOfSeries = [...config.series] // copy the entire series array
@@ -263,7 +252,7 @@ const SeriesDropdownConfidenceInterval = props => {
             }
 
             return (
-              <AccordionItem className='series-item series-item--chart'>
+              <AccordionItem className='series-item series-item--chart' key={`${ciIndex}`}>
                 <AccordionItemHeading className='series-item__title'>
                   <>
                     <AccordionItemButton className={'accordion__button accordion__button'}>
@@ -289,7 +278,7 @@ const SeriesDropdownConfidenceInterval = props => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <div className='input-group'>
-                    <label for='showInTooltip'>Show In Tooltip</label>
+                    <label htmlFor='showInTooltip'>Show In Tooltip</label>
                     <div className={'cove-input__checkbox--small'} onClick={e => updateShowInTooltip(e, index, ciIndex)}>
                       <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
                         {showInTooltip && <Check className='' style={{ fill: '#025eaa' }} />}
@@ -300,8 +289,6 @@ const SeriesDropdownConfidenceInterval = props => {
 
                   <InputSelect
                     initial='Select an option'
-                    initialDisabled
-                    initialSnap
                     value={config.series[index].confidenceIntervals[ciIndex].low ? config.series[index].confidenceIntervals[ciIndex].low : 'Select'}
                     label='Low Confidence Interval'
                     onChange={e => {
@@ -318,8 +305,6 @@ const SeriesDropdownConfidenceInterval = props => {
                   />
                   <InputSelect
                     initial='Select an option'
-                    initialDisabled
-                    initialSnap
                     value={config.series[index].confidenceIntervals[ciIndex].high ? config.series[index].confidenceIntervals[ciIndex].high : 'Select'}
                     label='High Confidence Interval'
                     onChange={e => {
@@ -492,7 +477,7 @@ const SeriesItem = props => {
 const SeriesList = props => {
   const { series, getItemStyle, sortableItemStyles, chartsWithOptions } = props
   return series.map((series, i) => {
-    return <SeriesItem getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} series={series} index={i} />
+    return <SeriesItem getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} series={series} index={i} key={`series-list-${i}`} />
   })
 }
 
