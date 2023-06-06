@@ -670,6 +670,12 @@ const EditorPanel = () => {
     )
   }, [config]) // eslint-disable-line
 
+  const visSupportsTooltipLines = () => {
+    if (config.visualizationType === 'Combo' && config.runtime.forecastingSeriesKeys?.length > 0) return true
+    if (config.visualizationType === 'Forecasting') return true
+    return false
+  }
+
   const visHasLegend = () => {
     const { visualizationType } = config
 
@@ -1466,7 +1472,7 @@ const EditorPanel = () => {
                       </Tooltip>
                     }
                   />
-                  <TextField value={config.dataFormat.roundTo} type='number' section='dataFormat' fieldName='roundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
+                  <TextField value={config.dataFormat.roundTo ? config.dataFormat.roundTo : 0} type='number' section='dataFormat' fieldName='roundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
                   <div className='two-col-inputs'>
                     <TextField
                       value={config.dataFormat.prefix}
@@ -3000,7 +3006,7 @@ const EditorPanel = () => {
                     <CheckBox value={config.colorMatchLineSeriesLabels} fieldName='colorMatchLineSeriesLabels' label='Match Series Color to Name at End of Line Charts' updateField={updateField} />
                   )}
 
-                  {config.visualizationType === 'Combo' && config.runtime.forecastingSeriesKeys?.length > 0 && (
+                  {visSupportsTooltipLines() && (
                     <>
                       <CheckBox value={config.visual.verticalHoverLine} fieldName='verticalHoverLine' section='visual' label='Vertical Hover Line' updateField={updateField} />
                       <CheckBox value={config.visual.horizontalHoverLine} fieldName='horizontalHoverLine' section='visual' label='Horizontal Hover Line' updateField={updateField} />

@@ -754,7 +754,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     const newSeriesHighlight = []
 
     // If we're highlighting all the series, reset them
-    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend) {
+    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend && config.visualizationType !== 'Forecasting') {
       highlightReset()
       return
     }

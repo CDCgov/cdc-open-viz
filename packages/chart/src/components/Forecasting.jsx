@@ -113,8 +113,8 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMou
                 data-tooltip-id={tooltip_id}
               >
                 {typeof tooltipData === 'object' &&
-                  Object.entries(tooltipData.data).map(item => (
-                    <li style={{ padding: '2.5px 0' }}>
+                  Object.entries(tooltipData.data).map((item, index) => (
+                    <li style={{ padding: '2.5px 0' }} key={`li-${index}`}>
                       <TooltipListItem item={item} />
                     </li>
                   ))}
@@ -128,13 +128,13 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMou
 
         {showTooltip && tooltipData && config.visual.verticalHoverLine && (
           <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
-            <Line from={{ x: tooltipData.dataXPosition - 10, y: 0 }} to={{ x: tooltipData.dataXPosition - 10, y: height }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' />
+            <Line from={{ x: tooltipData.dataXPosition - 10, y: 0 }} to={{ x: tooltipData.dataXPosition - 10, y: height }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
           </Group>
         )}
 
         {showTooltip && tooltipData && config.visual.horizontalHoverLine && (
-          <Group key='tooltipLine-horizontal' className='vertical-tooltip-line' left={config.yAxis.size}>
-            <Line from={{ x: 0, y: tooltipData.dataYPosition }} to={{ x: width, y: tooltipData.dataYPosition }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' />
+          <Group key='tooltipLine-horizontal' className='horizontal-tooltip-line' left={config.yAxis.size}>
+            <Line from={{ x: 0, y: tooltipData.dataYPosition }} to={{ x: width, y: tooltipData.dataYPosition }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='horizontal-tooltip-line' />
           </Group>
         )}
       </ErrorBoundary>
