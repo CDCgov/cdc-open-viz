@@ -753,8 +753,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const highlight = label => {
     const newSeriesHighlight = []
 
+    console.log('s', seriesHighlight)
+    console.log('label', label)
+
     // If we're highlighting all the series, reset them
-    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend) {
+    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend && config.visualizationType !== 'Forecasting') {
       highlightReset()
       return
     }
@@ -764,6 +767,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     })
 
     let newHighlight = label.datum
+    console.log('new', newHighlight)
     if (config.runtime.seriesLabels) {
       for (let i = 0; i < config.runtime.seriesKeys.length; i++) {
         if (config.runtime.seriesLabels[config.runtime.seriesKeys[i]] === label.datum) {

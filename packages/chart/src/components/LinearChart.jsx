@@ -6,7 +6,7 @@ import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import { localPoint } from '@visx/event'
-import { useTooltip, useTooltipInPortal, defaultStyles } from '@visx/tooltip'
+import { useTooltip } from '@visx/tooltip'
 
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
@@ -66,7 +66,7 @@ export default function LinearChart() {
 
   const handleLeftTickFormatting = tick => {
     if (config.useLogScale && tick === 0.1) {
-      //when logaritmic scale applyed change value of FIRST  tick
+      //when logarithmic scale applied change value of first tick
       tick = 0
     }
     if (config.runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
@@ -250,7 +250,7 @@ export default function LinearChart() {
   ) : (
     <ErrorBoundary component='LinearChart'>
       <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
-        {/* Higlighted regions */}
+        {/* Highlighted regions */}
         {config.regions
           ? config.regions.map(region => {
               if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
@@ -308,6 +308,8 @@ export default function LinearChart() {
                     const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                     const tickLength = showTicks === 'block' ? 7 : 0
                     const to = { x: tick.to.x - tickLength, y: tick.to.y }
+
+                    console.log('tick', tick)
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -541,23 +543,22 @@ export default function LinearChart() {
         {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} />}
         {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />}
         {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />}
-        {config.visualizationType === 'Forecasting' ||
-          (config.visualizationType === 'Combo' && ( // prettier-ignore
-            <Forecasting
-              hideTooltip={hideTooltip}
-              showTooltip={showTooltip}
-              tooltipData={tooltipData}
-              xScale={xScale}
-              yScale={yScale}
-              width={xMax}
-              height={yMax}
-              xScaleNoPadding={xScaleNoPadding}
-              chartRef={svgRef}
-              getXValueFromCoordinate={getXValueFromCoordinate}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-            />
-          ))}
+        {(config.visualizationType === 'Forecasting' || config.visualizationType === 'Combo') && (
+          <Forecasting
+            hideTooltip={hideTooltip}
+            showTooltip={showTooltip}
+            tooltipData={tooltipData}
+            xScale={xScale}
+            yScale={yScale}
+            width={xMax}
+            height={yMax}
+            xScaleNoPadding={xScaleNoPadding}
+            chartRef={svgRef}
+            getXValueFromCoordinate={getXValueFromCoordinate}
+            handleTooltipMouseOver={handleTooltipMouseOver}
+            handleTooltipMouseOff={handleTooltipMouseOff}
+          />
+        )}
 
         {/* y anchors */}
         {config.yAxis.anchors &&
@@ -567,11 +568,17 @@ export default function LinearChart() {
 
         {/* Line chart */}
         {/* TODO: Make this just line or combo? */}
-        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Area Chart' && config.visualizationType !== 'Scatter Plot' && config.visualizationType !== 'Deviation Bar' && (
-          <>
-            <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
-          </>
-        )}
+        {config.visualizationType !== 'Bar' &&
+          config.visualizationType !== 'Paired Bar' &&
+          config.visualizationType !== 'Box Plot' &&
+          config.visualizationType !== 'Area Chart' &&
+          config.visualizationType !== 'Scatter Plot' &&
+          config.visualizationType !== 'Deviation Bar' &&
+          config.visualizationType !== 'Forecasting' && (
+            <>
+              <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
+            </>
+          )}
 
         {/* y anchors */}
         {config.yAxis.anchors &&
