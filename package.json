@@ -69,7 +69,9 @@
     "publish": "npx lerna publish"
   },
   "dependencies": {
+    "@visx/brush": "^3.0.1",
     "@visx/legend": "^3.0.0",
+    "@visx/pattern": "^3.0.0",
     "@visx/responsive": "^2.10.0"
   }
 }
