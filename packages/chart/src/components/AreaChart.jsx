@@ -13,9 +13,9 @@ import { useTooltip, useTooltipInPortal, defaultStyles, Tooltip } from '@visx/to
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 
-const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
+const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef, isDebug }) => {
   // enable various console logs in the file
-  const DEBUG = false
+  const DEBUG = isDebug
   const [chartPosition, setChartPosition] = useState(null)
 
   useEffect(() => {
@@ -197,6 +197,25 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                     style={{ filter: 'unset', opacity: 1 }}
                   />
                 )}
+
+                {/* another tool for showing bars during debug mode. */}
+                {DEBUG &&
+                  data.map((item, index) => {
+                    return (
+                      <Bar
+                        className='bar-here'
+                        x={Number(barThickness * index)}
+                        y={d => Number(yScale(d[config.series[index].dataKey]))}
+                        yScale={yScale}
+                        width={Number(barThickness)}
+                        height={yMax}
+                        fill={DEBUG ? 'red' : 'transparent'}
+                        fillOpacity={1}
+                        style={{ stroke: 'black', strokeWidth: 2 }}
+                        onMouseMove={e => handleMouseOver(e, data)}
+                      />
+                    )
+                  })}
 
                 {tooltipData && Object.entries(tooltipData.data).length > 0 && (
                   <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
