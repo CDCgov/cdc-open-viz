@@ -38,6 +38,55 @@ import '@cdc/core/styles/v2/main.scss'
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
+const handleFilterInteractions = (config, key) => {
+    if(config.dashboard.sharedFilters && config.dashboard.filterInteractions && config.dashboard.filterInteractions.length > 0){
+      let val = config.dashboard.sharedFilters.find(sharedFilter => sharedFilter.key === key)
+      val = val ? val.active : val;
+
+      config.dashboard.filterInteractions.forEach(filterInteraction => {
+        if((!key || key === filterInteraction.filterSetter) && filterInteraction.filterSetterValues && filterInteraction.filterSetterValues.indexOf(val) !== -1){
+          const filterGetter = config.dashboard.sharedFilters.find(sharedFilter => sharedFilter.key === filterInteraction.filterGetter);
+
+          if(filterGetter) {
+            switch(filterInteraction.interactionType) {
+              case 'remove':
+                filterGetter.disabled = true;
+                break;
+              case 'removeOptions':
+                filterGetter.valuesInteraction = [...filterGetter.values].filter(val => !filterInteraction.filterGetterValues.includes(val));
+                if(filterGetter.valuesInteraction && filterGetter.valuesInteraction.length > 0 && !filterGetter.valuesInteraction.includes(filterGetter.active)){
+                  filterGetter.active = filterGetter.valuesInteraction[0]
+                }
+                break;
+              case 'set':
+                filterGetter.active = filterInteraction.filterGetterValue;
+                break;
+            }
+          }
+        } else if(key === filterInteraction.filterSetter){
+          const filterGetter = config.dashboard.sharedFilters.find(sharedFilter => sharedFilter.key === filterInteraction.filterGetter);
+
+          if(filterGetter) {
+            switch(filterInteraction.interactionType) {
+              case 'remove':
+                filterGetter.disabled = false;
+                break;
+              case 'removeOptions':
+                delete filterGetter.valuesInteraction;
+                break;
+            }
+          }
+        }
+      })
+    }
+
+    
+
+    if(config.dashboard.filterInteractions){
+
+    }
+}
+
 const addVisualization = (type, subType) => {
   let modalWillOpen = type === 'markup-include' ? false : true
   let newVisualizationConfig = {
@@ -194,6 +243,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
         let newFilteredData = {}
         let newConfig = { ...config }
+
+        handleFilterInteractions(newConfig)
+
         Object.keys(config.visualizations).forEach(key => {
           let dataKey = config.visualizations[key].dataKey
 
@@ -281,7 +333,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         let add = true
 
         filters.forEach(filter => {
-          if (filter.type !== 'url' && row[filter.columnName] != filter.active) {
+          if (!filter.disabled && filter.type !== 'url' && row[filter.columnName] != filter.active) {
             add = false
           }
         })
@@ -303,6 +355,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         break
       }
     }
+
+    handleFilterInteractions(newConfig, key);
 
     Object.keys(newConfig.visualizations).forEach(visualizationKey => {
       let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
@@ -339,6 +393,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const updateConfig = (newConfig, dataOverride = null) => {
     let newFilteredData = {}
     let visualizationKeys = Object.keys(newConfig.visualizations)
+
+    handleFilterInteractions(newConfig);
 
     if (newConfig.dashboard.sharedFilters) {
       newConfig.dashboard.sharedFilters.forEach((filter, i) => {
@@ -420,7 +476,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
       dashboardConfig.sharedFilters[index].active = value
 
-      setConfig({ ...config, dashboard: dashboardConfig })
+      const newConfig = { ...config, dashboard: dashboardConfig };
+
+      setConfig(newConfig)
+
+      handleFilterInteractions(newConfig,  dashboardConfig.sharedFilters[index].key)
 
       let newFilteredData = {}
       Object.keys(config.visualizations).forEach(key => {
@@ -440,11 +500,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     const announceChange = text => {}
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
-      if (singleFilter.type !== 'url' && !singleFilter.showDropdown) return <></>
+      if (singleFilter.disabled || (singleFilter.type !== 'url' && !singleFilter.showDropdown)) return <></>
 
-      const values = []
+      const values = [];
 
-      singleFilter.values.forEach((filterOption, index) => {
+      (singleFilter.valuesInteraction || singleFilter.values).forEach((filterOption, index) => {
         values.push(
           <option key={`${singleFilter.key}-option-${index}`} value={filterOption}>
             {singleFilter.labels ? singleFilter.labels[filterOption] || filterOption : filterOption}

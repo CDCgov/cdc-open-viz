@@ -248,7 +248,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
         {filterInteraction.interactionType === 'set' && (
           <>
             to
-            <select>
+            <select defaultValue={filterInteraction.filterGetterValue} onChange={e => updateFilterInteractionProp('filterGetterValue', index, e.target.value)}>
               <option>Select a value</option>
               {config.dashboard.sharedFilters && (config.dashboard.sharedFilters.find(sharedFilter => sharedFilter.key === filterInteraction.filterGetter) || {values: []}).values.map(value => 
                 <option>{value}</option>
