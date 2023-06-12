@@ -16,7 +16,7 @@ export default async function (url, visualizationType = '') {
         .then(responseText => {
           const parsedCsv = Papa.parse(responseText, {
             header: true,
-            dynamicTyping: true,
+            dynamicTyping: false,
             skipEmptyLines: true
           })
           return parsedCsv.data
