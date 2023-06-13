@@ -11,7 +11,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import parse from 'html-react-parser'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
@@ -36,6 +35,7 @@ import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
+import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -76,7 +76,7 @@ const addVisualization = (type, subType) => {
   return newVisualizationConfig
 }
 
-const VisualizationsPanel = () => (
+const VisualizationsPanel = ({ loadConfig, config }) => (
   <div className='visualizations-panel'>
     <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
     <span className='subheading-3'>Chart</span>
@@ -99,6 +99,8 @@ const VisualizationsPanel = () => (
       <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
       <Widget addVisualization={() => addVisualization('filter-dropdowns', '')} type='filter-dropdowns' />
     </div>
+    <span className='subheading-3'>Advanced</span>
+    <AdvancedEditor loadConfig={loadConfig} state={config} />
   </div>
 )
 
@@ -134,12 +136,86 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     let dataset = config.formattedData || config.data
 
     if (config.dataUrl) {
-      dataset = await fetchRemoteData(`${config.dataUrl}?v=${cacheBustingString()}`)
+      dataset = await fetchRemoteData(`${config.dataUrl}`)
 
       dataset = getFormattedData(dataset, config.dataDescription)
     }
 
     return dataset
+  }
+
+  const reloadURLData = async () => {
+    if (config.datasets) {
+      let newData = { ...data }
+      let newDatasets = { ...config.datasets }
+      let datasetsNeedsUpdate = false
+      let datasetKeys = Object.keys(config.datasets)
+      for (let i = 0; i < datasetKeys.length; i++) {
+        const dataset = config.datasets[datasetKeys[i]]
+        if (dataset.dataUrl && config.dashboard && config.dashboard.sharedFilters) {
+          const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl)
+          let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+
+          let isUpdateNeeded = false
+
+          config.dashboard.sharedFilters.forEach(filter => {
+            if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+              qsParams[filter.queryParameter] = filter.active
+              isUpdateNeeded = true
+            }
+          })
+
+          if (!isUpdateNeeded) return
+
+          let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+            .map((param, i) => {
+              let qs = i === 0 ? '?' : '&'
+              qs += param + '='
+              qs += qsParams[param]
+              return qs
+            })
+            .join('')}`
+
+          let newDataset = await fetchRemoteData(`${dataUrlFinal}`)
+
+          if (newDataset && dataset.dataDescription) {
+            try {
+              newDataset = transform.autoStandardize(newDataset)
+              newDataset = transform.developerStandardize(newDataset, dataset.dataDescription)
+            } catch (e) {
+              //Data not able to be standardized, leave as is
+            }
+          }
+
+          newDatasets[datasetKeys[i]].runtimeDataUrl = dataUrlFinal
+          newData[datasetKeys[i]] = newDataset
+          datasetsNeedsUpdate = true
+        }
+      }
+
+      if (datasetsNeedsUpdate) {
+        setData(newData)
+
+        let newFilteredData = {}
+        let newConfig = { ...config }
+        Object.keys(config.visualizations).forEach(key => {
+          let dataKey = config.visualizations[key].dataKey
+
+          let applicableFilters = config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
+          if (applicableFilters.length > 0) {
+            newFilteredData[key] = filterData(applicableFilters, newData[dataKey])
+          }
+
+          if (newData[dataKey]) {
+            newConfig.visualizations[key].formattedData = newData[dataKey]
+          }
+        })
+        setFilteredData(newFilteredData)
+
+        newConfig.datasets = newDatasets
+        setConfig(newConfig)
+      }
+    }
   }
 
   const loadConfig = async () => {
@@ -196,7 +272,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     }
 
     setData(datasets)
-
     updateConfig(newConfig, datasets)
     setLoading(false)
   }
@@ -210,7 +285,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
         filters.forEach(filter => {
           // eslint-disable-next-line eqeqeq
-          if (row[filter.columnName] != filter.active) {
+          if (filter.type !== 'url' && row[filter.columnName] != filter.active) {
             add = false
           }
         })
@@ -304,7 +379,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         if (applicableFilters.length > 0) {
           const visualization = newConfig.visualizations[visualizationKey]
 
-          const formattedData = getFormattedData(visualization.data, visualization.dataDescription)
+          const formattedData = getFormattedData(newConfig.datasets[visualization.dataKey] && newConfig.datasets[visualization.dataKey].data ? newConfig.datasets[visualization.dataKey].data : visualization.data, visualization.dataDescription)
 
           newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || visualization.data || (dataOverride || data)[visualization.dataKey])
         }
@@ -329,6 +404,10 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       setParentConfig(config)
     }
   }, [config])
+
+  useEffect(() => {
+    reloadURLData()
+  }, [JSON.stringify(config.dashboard ? config.dashboard.sharedFilters : undefined)])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     let updatedConfig = { ...config }
@@ -360,19 +439,30 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       })
 
       setFilteredData(newFilteredData)
+      if (dashboardConfig.sharedFilters[index].active === dashboardConfig.sharedFilters[index].resetLabel) {
+        setFilteredData(data)
+      }
     }
 
     const announceChange = text => {}
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
-      if (!singleFilter.showDropdown || (hide && hide.indexOf(index) !== -1)) return <></>
+      if ((singleFilter.type !== 'url' && !singleFilter.showDropdown) || (hide && hide.indexOf(index) !== -1)) return <></>
 
       const values = []
+
+      if (singleFilter.resetLabel) {
+        values.push(
+          <option key={`${singleFilter.resetLabel}-option-${index}`} value={singleFilter.resetLabel}>
+            {singleFilter.resetLabel}
+          </option>
+        )
+      }
 
       singleFilter.values.forEach((filterOption, index) => {
         values.push(
           <option key={`${singleFilter.key}-option-${index}`} value={filterOption}>
-            {filterOption}
+            {singleFilter.labels ? singleFilter.labels[filterOption] || filterOption : filterOption}
           </option>
         )
       })
@@ -465,7 +555,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Chart' />
-                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} />
+                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} dashboardConfig={config} isDashboard={true} />
               </>
             )
             break
@@ -530,7 +620,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         <DndProvider backend={HTML5Backend}>
           <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview} />
           <div className='layout-container'>
-            <VisualizationsPanel />
+            <VisualizationsPanel loadConfig={loadConfig} config={config} />
             <Grid />
           </div>
         </DndProvider>
@@ -598,6 +688,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                 <CdcChart
                                   key={col.widget}
                                   config={visualizationConfig}
+                                  dashboardConfig={config}
                                   isEditor={false}
                                   setConfig={newConfig => {
                                     updateChildConfig(col.widget, newConfig)
@@ -707,7 +798,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 config.dashboard.sharedFilters.forEach(sharedFilter => {
                   let allMatch = true
                   vizKeysUsingDataset.forEach(visualizationKey => {
-                    if (sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
+                    if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
                       allMatch = false
                     }
                   })
@@ -726,7 +817,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-                  <DataTable data={filteredTableData || config.datasets[datasetKey].data} downloadData={config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
+                  <DataTable data={filteredTableData || config.datasets[datasetKey].data || []} downloadData={config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
                 </div>
               )
             })}

@@ -8,6 +8,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 // Third party
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import chroma from 'chroma-js'
+import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
@@ -34,6 +35,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
+import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
 
 // Child Components
 import ConfigContext from './context'
@@ -42,7 +44,6 @@ import Modal from './components/Modal'
 import Sidebar from './components/Sidebar'
 
 import CountyMap from './components/CountyMap' // Future: Lazy
-import DataTable from './components/DataTable' // Future: Lazy
 import EditorPanel from './components/EditorPanel' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
 import SingleStateMap from './components/SingleStateMap' // Future: Lazy
@@ -133,6 +134,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
+  if (isDebug) console.log('CdcMap state=', state) // eslint-disable-line
+
   useEffect(() => {
     try {
       if (filteredCountryCode) {
@@ -195,7 +198,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     for (let entry of entries) {
       let { width, height } = entry.contentRect
       let newViewport = getViewport(entry.contentRect.width)
-      let svgMarginWidth = 32
       let editorWidth = 350
 
       setCurrentViewport(newViewport)
@@ -499,9 +501,18 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       legendMemo.current = newLegendMemo
 
+      // before returning the legend result
+      // add property for bin number and set to index location
       result.forEach((row, i) => {
         row.bin = i // set bin number to index
       })
+
+      // Move all special legend items from "Special Classes"  to the end of the legend
+      if (state.legend.showSpecialClassesLast) {
+        let specialRows = result.filter(d => d.special === true)
+        let otherRows = result.filter(d => !d.special)
+        result = [...otherRows, ...specialRows]
+      }
 
       return result
     }
@@ -770,9 +781,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(({ columnName, label, active, values }, idx) => {
-      if (undefined === columnName) return
-
+    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type, showDropdown }, idx) => {
       let newFilter = runtimeFilters[idx]
 
       const sortAsc = (a, b) => {
@@ -783,20 +792,24 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
       }
 
-      values = getUniqueValues(state.data, columnName)
+      if (type !== 'url') {
+        values = getUniqueValues(state.data, columnName)
 
-      if (obj.filters[idx].order === 'asc') {
-        values = values.sort(sortAsc)
-      }
-
-      if (obj.filters[idx].order === 'desc') {
-        values = values.sort(sortDesc)
-      }
-
-      if (obj.filters[idx].order === 'cust') {
-        if (obj.filters[idx]?.values.length > 0) {
-          values = obj.filters[idx].values
+        if (obj.filters[idx].order === 'asc') {
+          values = values.sort(sortAsc)
         }
+
+        if (obj.filters[idx].order === 'desc') {
+          values = values.sort(sortDesc)
+        }
+
+        if (obj.filters[idx].order === 'cust') {
+          if (obj.filters[idx]?.values.length > 0) {
+            values = obj.filters[idx].values
+          }
+        }
+      } else {
+        values = values
       }
 
       if (undefined === newFilter) {
@@ -804,12 +817,17 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
 
       newFilter.order = obj.filters[idx].order ? obj.filters[idx].order : 'asc'
+      newFilter.type = type
       newFilter.label = label ?? ''
       newFilter.columnName = columnName
+      newFilter.orderedValues = orderedValues
+      newFilter.queryParameter = queryParameter
+      newFilter.labels = labels
       newFilter.values = values
       handleSorting(newFilter)
       newFilter.active = active ?? values[0] // Default to first found value
       newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
+      newFilter.showDropdown = showDropdown
 
       filters.push(newFilter)
     })
@@ -862,8 +880,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         // Filters
         if (filters?.length) {
           for (let i = 0; i < filters.length; i++) {
-            const { columnName, active } = filters[i]
-            if (String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
+            const { columnName, active, type } = filters[i]
+            if (type !== 'url' && String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
           }
         }
 
@@ -899,6 +917,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       return ''
     }
 
+    // if string of letters like 'Home' then dont need to format as a number
     if (typeof value === 'string' && value.length > 0 && state.legend.type === 'equalnumber') {
       return value
     }
@@ -906,6 +925,17 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     let formattedValue = value
 
     let columnObj = state.columns[columnName]
+
+    if (columnObj === undefined) {
+      // then use left axis config
+      columnObj = state.columns.primary
+      // NOTE: Left Value Axis uses different names
+      // so map them below so the code below works
+      // - copy commas to useCommas to work below
+      columnObj['useCommas'] = columnObj.commas
+      // - copy roundTo to roundToPlace to work below
+      columnObj['roundToPlace'] = columnObj.roundTo ? columnObj.roundTo : ''
+    }
 
     if (columnObj) {
       // If value is a number, apply specific formattings
@@ -939,11 +969,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   // this is passed DOWN into the various components
-  // then they do a lookup based on the bin number as index into here (TT)
+  // then they do a lookup based on the bin number as index into here
   const applyLegendToRow = rowObj => {
     try {
       if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
-      // Navigation map
+      // Navigation mapchanged
       if ('navigation' === state.general.type) {
         let mapColorPalette = colorPalettes[state.color] || colorPalettes['bluegreenreverse']
         return generateColorsArray(mapColorPalette[3])
@@ -955,7 +985,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let idx = legendMemo.current.get(hash)
         if (runtimeLegend[idx]?.disabled) return false
 
-        // DEV-784 changed to use bin prop to get color instead of idx
+        // changed to use bin prop to get color instead of idx
         // bc we re-order legend when showSpecialClassesLast is checked
         let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
         return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
@@ -994,16 +1024,16 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const column = state.columns[columnKey]
 
         if (true === column.tooltip) {
-          let label = column.label.length > 0 ? column.label : ''
+          let label = column.label?.length > 0 ? column.label : ''
 
           let value
 
           if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
             // THIS CODE SHOULD NOT ACT ON THE ENTIRE ROW OF KEYS BUT ONLY THE ONE KEY IN THE SPECIAL CLASS
             for (let i = 0; i < state.legend.specialClasses.length; i++) {
-              // DEV-3303 - Special Classes label in HOVERS should only apply to selected special class key
+              // Special Classes label in HOVERS should only apply to selected special class key
               // - you have to ALSO check that the key matches - putting here otherwise the if stmt too long
-              if (columnKey === state.legend.specialClasses[i].key) {
+              if (column.name === state.legend.specialClasses[i].key) {
                 if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
                   value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
                   break
@@ -1047,25 +1077,29 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // - this function is used to prevent that and instead give the formatting that is wanted
   // Example:  Desired city display in tooltip on map: "Inter-Tribal Indian Reservation"
   const titleCase = string => {
-    // if hyphen found, then split, uppercase each word, and put back together
-    if (string.includes('–') || string.includes('-')) {
-      let dashSplit = string.includes('–') ? string.split('–') : string.split('-') // determine hyphen or en dash to split on
-      let splitCharacter = string.includes('–') ? '–' : '-' // print hyphen or en dash later on.
-      let frontSplit = dashSplit[0]
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-        .join(' ')
-      let backSplit = dashSplit[1]
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-        .join(' ')
-      return frontSplit + splitCharacter + backSplit
-    } else {
-      // just return with each word uppercase
-      return string
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-        .join(' ')
+    // guard clause else error in editor
+    if (!string) return
+    if (string !== undefined) {
+      // if hyphen found, then split, uppercase each word, and put back together
+      if (string.includes('–') || string.includes('-')) {
+        let dashSplit = string.includes('–') ? string.split('–') : string.split('-') // determine hyphen or en dash to split on
+        let splitCharacter = string.includes('–') ? '–' : '-' // print hyphen or en dash later on.
+        let frontSplit = dashSplit[0]
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+          .join(' ')
+        let backSplit = dashSplit[1]
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+          .join(' ')
+        return frontSplit + splitCharacter + backSplit
+      } else {
+        // just return with each word uppercase
+        return string
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+          .join(' ')
+      }
     }
   }
 
@@ -1232,6 +1266,67 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }
 
+  const reloadURLData = async () => {
+    if (state.dataUrl) {
+      const dataUrl = new URL(state.runtimeDataUrl || state.dataUrl)
+      let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+
+      let isUpdateNeeded = false
+      state.filters.forEach(filter => {
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
+          qsParams[filter.queryParameter] = filter.active
+          isUpdateNeeded = true
+        }
+      })
+
+      if (!isUpdateNeeded) return
+
+      let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+        .map((param, i) => {
+          let qs = i === 0 ? '?' : '&'
+          qs += param + '='
+          qs += qsParams[param]
+          return qs
+        })
+        .join('')}`
+
+      let data
+
+      try {
+        const regex = /(?:\.([^.]+))?$/
+
+        const ext = regex.exec(dataUrl.pathname)[1]
+        if ('csv' === ext) {
+          data = await fetch(dataUrlFinal)
+            .then(response => response.text())
+            .then(responseText => {
+              const parsedCsv = Papa.parse(responseText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+              })
+              return parsedCsv.data
+            })
+        } else if ('json' === ext) {
+          data = await fetch(dataUrlFinal).then(response => response.json())
+        } else {
+          data = []
+        }
+      } catch (e) {
+        console.error(`Cannot parse URL: ${dataUrlFinal}`) // eslint-disable-line
+        console.log(e) // eslint-disable-line
+        data = []
+      }
+
+      if (state.dataDescription) {
+        data = transform.autoStandardize(data)
+        data = transform.developerStandardize(data, state.dataDescription)
+      }
+
+      setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
+    }
+  }
+
   const loadConfig = async configObj => {
     // Set loading flag
     if (!loading) setLoading(true)
@@ -1242,8 +1337,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       ...configObj
     }
 
-    // If a dataUrl property exists, always pull from that.
-    if (newState.dataUrl) {
+    const urlFilters = newState.filters ? (newState.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
+
+    if (newState.dataUrl && !urlFilters) {
       if (newState.dataUrl[0] === '/') {
         newState.dataUrl = 'http://' + hostname + newState.dataUrl
       }
@@ -1282,8 +1378,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       addUIDs(newState, newState.columns.geo.name || newState.columns.geo.fips)
     }
 
-    if (newState.dataTable.forceDisplay === undefined) {
-      newState.dataTable.forceDisplay = !isDashboard
+    if (newState.table.forceDisplay === undefined) {
+      newState.table.forceDisplay = !isDashboard
     }
 
     validateFipsCodeLength(newState)
@@ -1338,16 +1434,16 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // DEV-769 make "Data Table" both a required field and default value
   useEffect(() => {
-    if (state.dataTable?.title === '' || state.dataTable?.title === undefined) {
+    if (state.table?.label === '' || state.table?.label === undefined) {
       setState({
         ...state,
-        dataTable: {
-          ...state.dataTable,
+        table: {
+          ...state.table,
           title: 'Data Table'
         }
       })
     }
-  }, [state.dataTable]) // eslint-disable-line
+  }, [state.table]) // eslint-disable-line
 
   // When geo label override changes
   // - redo the tooltips
@@ -1408,6 +1504,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses]) // eslint-disable-line
 
+  useEffect(() => {
+    reloadURLData()
+  }, [JSON.stringify(state.filters)])
+
   if (config) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
@@ -1416,14 +1516,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   // Destructuring for more readable JSX
-  const { general, tooltips, dataTable } = state
+  const { general, tooltips, table } = state
   let { title, subtext = '' } = general
 
   // if no title AND in editor then set a default
   if (isEditor) {
     if (!title || title === '') title = 'Map Title'
   }
-  if (!dataTable.title || dataTable.title === '') dataTable.title = 'Data Table'
+  if (!table.label || table.label === '') table.label = 'Data Table'
 
   // Outer container classes
   let outerContainerClasses = ['cdc-open-viz-module', 'cdc-map-outer-container', currentViewport]
@@ -1475,7 +1575,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   if (!mapProps.data || !state.data) return <Loading />
 
-  const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading
+  const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading
 
   const handleMapTabbing = () => {
     let tabbingID
@@ -1596,7 +1696,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
             {/* Link */}
-            {isDashboard && config.dataTable.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+            {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
@@ -1605,12 +1705,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               {state.general.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
             </CoveMediaControls.Section>
 
-            {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
+            {state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading && (
               <DataTable
-                state={state}
+                config={state}
                 rawData={state.data}
                 navigationHandler={navigationHandler}
-                expandDataTable={general.expandDataTable}
+                expandDataTable={general.expandDataTable ? general.expandDataTable : table.expanded ? table.expanded : false}
                 headerColor={general.headerColor}
                 columns={state.columns}
                 showDownloadButton={general.showDownloadButton}
@@ -1619,9 +1719,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 displayDataAsText={displayDataAsText}
                 displayGeoName={displayGeoName}
                 applyLegendToRow={applyLegendToRow}
-                tableTitle={dataTable.title}
-                indexTitle={dataTable.indexLabel}
-                mapTitle={general.title}
+                tableTitle={table.label}
+                indexTitle={table.indexLabel}
+                vizTitle={general.title}
                 viewport={currentViewport}
                 formatLegendLocation={formatLegendLocation}
                 setFilteredCountryCode={setFilteredCountryCode}
@@ -1631,6 +1731,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 innerContainerRef={innerContainerRef}
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
+                isDebug={isDebug}
               />
             )}
 

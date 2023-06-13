@@ -23,24 +23,7 @@
     "Diameter": "7",
     "distance": "0"
   },
-  {
-    "name": "Earth",
-    "Radius": "60",
-    "Diameter": "2",
-    "distance": "20"
-  },
-  {
-    "name": "Earth",
-    "Radius": "60",
-    "Diameter": "2",
-    "distance": "40"
-  },
-  {
-    "name": "Earth",
-    "Radius": "60",
-    "Diameter": "2",
-    "distance": "60"
-  },
+
   {
     "name": "Venus",
     "Radius": "50",

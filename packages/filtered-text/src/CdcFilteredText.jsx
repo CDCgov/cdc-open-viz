@@ -11,7 +11,6 @@ import './scss/main.scss'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
-
   const transform = new DataTransform()
   // Default States
   const [config, setConfig] = useState(defaults)
@@ -126,7 +125,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
     )
 
     content = (
-      <div className={`cove ${config.theme} `} style={isDashboard ? { marginTop: '3rem' } : null}>
+      <div className={`cove ${config.theme} `}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
       </div>

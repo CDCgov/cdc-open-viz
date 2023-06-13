@@ -8,7 +8,6 @@ import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import useRightAxis from '../hooks/useRightAxis'
-import isNumber from '@cdc/core/helpers/isNumber'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType } = useContext(ConfigContext)
@@ -63,6 +62,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}
                   </div>`
+
+                // TODO: move all instances of circleRadii to state.
                 let circleRadii = 4.5
 
                 return (
@@ -72,13 +73,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   isNumber(d[seriesKey]) && (
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
-                      <Text
-                        display={config.labels ? 'block' : 'none'}
-                        x={xScale(getXAxisData(d))}
-                        y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))}
-                        fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                        textAnchor='middle'
-                      >
+                      <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>
                         {formatNumber(d[seriesKey], 'left')}
                       </Text>
 
@@ -114,7 +109,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 strokeOpacity={1}
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
                 defined={(item, i) => {
-                  return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null && item[config.runtime.seriesLabels[seriesKey]] !== undefined
+                  return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
                 }}
               />
               {config.animate && (

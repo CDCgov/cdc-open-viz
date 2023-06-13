@@ -1,0 +1,56 @@
+[
+  {
+    "name": "Jupiter",
+    "Radius": "10000",
+    "Diameter": "22",
+    "distance": "0"
+  },
+  {
+    "name": "Saturn",
+    "Radius": "9000",
+    "Diameter": "18",
+    "distance": "0"
+  },
+  {
+    "name": "Uranus",
+    "Radius": "100",
+    "Diameter": "8",
+    "distance": "40"
+  },
+  {
+    "name": "Neptune",
+    "Radius": "700",
+    "Diameter": "7",
+    "distance": "0"
+  },
+  {
+    "name": "Earth",
+    "Radius": "600",
+    "Diameter": "2",
+    "distance": "20"
+  },
+  {
+    "name": "Venus",
+    "Radius": "500",
+    "Diameter": "2",
+    "distance": "0"
+  },
+  {
+    "name": "Mars",
+    "Radius": "400",
+    "Diameter": "1",
+    "distance": "0"
+  },
+  {
+    "name": "Mercury",
+    "Radius": "3000",
+    "Diameter": "0.7",
+    "distance": "0"
+  },
+  {
+    "name": "Pluto",
+    "Radius": "2000",
+    "Diameter": "0.3",
+    "distance": "0"
+  }
+]

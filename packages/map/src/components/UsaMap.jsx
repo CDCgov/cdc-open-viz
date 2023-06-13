@@ -188,12 +188,18 @@ const UsaMap = props => {
 
     // Dynamic text color
     if (chroma.contrast(textColor, bgColor) < 3.5) {
-      textColor = '#202020'
+      textColor = '#202020' // dark gray
+    }
+
+    // always make HI black since it is off to the side
+    if (abbr === 'US-HI') {
+      textColor = '#000'
     }
 
     let x = 0,
       y = 5
 
+    // used to nudge/move some of the labels for better readability
     if (nudges[abbr] && false === isHex) {
       x += nudges[abbr][0]
       y += nudges[abbr][1]
