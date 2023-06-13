@@ -126,7 +126,46 @@ const Legend = () => {
 
       return uniqeLabels
     }
-    console.log('d', defaultLabels)
+
+    // get forecasting items inside of combo
+    if (config.runtime?.forecastingSeriesKeys?.length > 0) {
+      let seriesLabels = []
+
+      //store uniq values to Set by colorCode
+
+      // loop through each stage/group/area on the chart and create a label
+      config.runtime?.forecastingSeriesKeys?.map((outerGroup, index) => {
+        return outerGroup?.stages?.map((stage, index) => {
+          let colorValue = colorPalettes[stage.color]?.[2] ? colorPalettes[stage.color]?.[2] : '#ccc'
+
+          const newLabel = {
+            datum: stage.key,
+            index: index,
+            text: stage.key,
+            value: colorValue
+          }
+
+          seriesLabels.push(newLabel)
+        })
+      })
+
+      // loop through bars for now to meet requirements.
+      config.runtime.barSeriesKeys &&
+        config.runtime.barSeriesKeys.map((bar, index) => {
+          let colorValue = colorPalettes[config.palette][index] ? colorPalettes[config.palette][index] : '#ccc'
+
+          const newLabel = {
+            datum: bar,
+            index: index,
+            text: bar,
+            value: colorValue
+          }
+
+          seriesLabels.push(newLabel)
+        })
+
+      return seriesLabels
+    }
     return defaultLabels
   }
 
@@ -148,7 +187,6 @@ const Legend = () => {
         {legend.description && <p>{parse(legend.description)}</p>}
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => {
-            console.log('labels', labels)
             return (
               <div className={innerClasses.join(' ')}>
                 {createLegendLabels(labels).map((label, i) => {
@@ -163,6 +201,10 @@ const Legend = () => {
                   if (config.runtime.seriesLabels) {
                     let index = config.runtime.seriesLabelsAll.indexOf(itemName)
                     itemName = config.runtime.seriesKeys[index]
+
+                    if (config.runtime?.forecastingSeriesKeys?.length > 0) {
+                      itemName = label.text
+                    }
                   }
 
                   if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
