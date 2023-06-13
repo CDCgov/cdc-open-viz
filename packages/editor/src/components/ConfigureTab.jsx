@@ -43,6 +43,7 @@ export default function ConfigureTab({ containerEl }) {
         </ErrorBoundary>
       )
     case 'waffle-chart':
+    case 'linear-gauge':
       return (
         <ErrorBoundary component='CdcDashboard'>
           <CdcWaffleChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
