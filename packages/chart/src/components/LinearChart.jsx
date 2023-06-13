@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState, useMemo } from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 import { Group } from '@visx/group'
@@ -7,6 +7,15 @@ import { Text } from '@visx/text'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import { localPoint } from '@visx/event'
 import { useTooltip } from '@visx/tooltip'
+import { scaleTime, scaleLinear } from '@visx/scale'
+import { Brush } from '@visx/brush'
+import { Bounds } from '@visx/brush/lib/types'
+import BaseBrush, { BaseBrushState, UpdateBrush } from '@visx/brush/lib/BaseBrush'
+import { PatternLines } from '@visx/pattern'
+import { LinearGradient } from '@visx/gradient'
+import { max, extent } from 'd3-array'
+import { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle'
+//import { ScaleSVG } from '@visx/responsive'
 
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
@@ -28,7 +37,27 @@ import useTopAxis from '../hooks/useTopAxis'
 import Forecasting from './Forecasting'
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, isDebug } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, isDebug, isBrush } = useContext(ConfigContext)
+  if (isDebug) console.log('COVE: LinearChart: config=', config)
+
+  // Initialize Brush variables - here for now
+  // - perhaps pass in from initial-state through CdcChart???
+  const brushMargin = { top: 10, bottom: 15, left: 50, right: 20 }
+  const chartSeparation = 30
+  const PATTERN_ID = 'brush_pattern'
+  const GRADIENT_ID = 'brush_gradient'
+  const accentColor = 'red' // color of pattern slants '#ddd' // '#f6acc8' // light pink crosshairs
+  const background = '#584153' // dark purple
+  const background2 = '#af8baf' // light purple
+  const selectedBrushStyle = {
+    fill: `url(#${PATTERN_ID})`,
+    stroke: 'red', // GRADIENT_ID,
+    strokeWidth: 2 // does nothing
+  }
+  const styles = {
+    border: '1px solid red'
+  }
+  const compact = false // do we even need this?
 
   // getters & functions
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
@@ -47,6 +76,15 @@ export default function LinearChart() {
   const height = config.aspectRatio ? width * config.aspectRatio : config.heights[config.orientation]
   const xMax = width - config.runtime.yAxis.size - (config.visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
+  // MIGHT NOT NEED ALL OF THESE
+  const innerHeight = height //- margin.top - margin.bottom
+  const topChartBottomMargin = compact ? chartSeparation / 2 : chartSeparation + 10
+  const topChartHeight = 0.8 * innerHeight - topChartBottomMargin
+  const bottomChartHeight = innerHeight - topChartHeight - chartSeparation
+  //const xBrushMax = Math.max(width - brushMargin.left - brushMargin.right, 0)
+  //const yBrushMax = Math.max(bottomChartHeight - brushMargin.top - brushMargin.bottom, 0)
+  const xBrushMax = xMax
+  const yBrushMax = yMax
 
   // hooks  % states
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
@@ -63,6 +101,23 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
+  const brushRef = useRef(BaseBrush) // (useRef < BaseBrush) | (null > null)
+
+  const onBrushChange = (domain = Bounds | null) => {
+    if (!domain) return
+    const { x0, x1, y0, y1 } = domain
+    let x0Max = getXValueFromCoordinate(x0)
+    let x1Max = getXValueFromCoordinate(x1)
+    console.log('onBrushChange x0Max', x0Max)
+    console.log('onBrushChange x1Max', x1Max)
+    console.log('onBrushChange domain', domain)
+    /*     const stockCopy = stock.filter(s => {
+      const x = getDate(s).getTime()
+      const y = getStockValue(s)
+      return x > x0 && x < x1 && y > y0 && y < y1
+    })
+    setFilteredStock(stockCopy) */
+  }
 
   const handleLeftTickFormatting = tick => {
     if (config.useLogScale && tick === 0.1) {
@@ -245,11 +300,37 @@ export default function LinearChart() {
 
   const { orientation, xAxis, yAxis } = config
 
+  // We need to manually offset the handles for them to be rendered at the right position
+  function BrushHandle(BrushHandleRenderProps) {
+    const x = BrushHandleRenderProps.x
+    const height = BrushHandleRenderProps.height
+    const isBrushActive = BrushHandleRenderProps.isBrushActive
+    const pathWidth = 8
+    const pathHeight = 15
+    if (!isBrushActive) {
+      return null
+    }
+    return (
+      <Group left={x + pathWidth / 2} top={(height - pathHeight) / 2}>
+        <path fill='#f2f2f2' d='M -4.5 0.5 L 3.5 0.5 L 3.5 15.5 L -4.5 15.5 L -4.5 0.5 M -1.5 4 L -1.5 12 M 0.5 4 L 0.5 12' stroke='#999999' strokeWidth='1' style={{ cursor: 'ew-resize' }} />
+      </Group>
+    )
+  }
+  const initialBrushPosition = useMemo(
+    () => ({
+      //start: { x: xScale(parseDate(0)) },
+      //end: { x: xScale(parseDate(3)) }
+      start: { x: 0 },
+      end: { x: xMax }
+    }),
+    [xScale]
+  )
+
   return isNaN(width) ? (
     <></>
   ) : (
     <ErrorBoundary component='LinearChart'>
-      <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
+      <svg width={width} height={config.showChartBrush ? height * 1.3 : height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
         {/* Highlighted regions */}
         {config.regions
           ? config.regions.map(region => {
@@ -293,7 +374,6 @@ export default function LinearChart() {
               )
             })
           : ''}
-
         {/* Y axis */}
         {config.visualizationType !== 'Spark Line' && (
           <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(config.runtime.yAxis.size) - config.yAxis.axisPadding} label={config.runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
@@ -308,8 +388,6 @@ export default function LinearChart() {
                     const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                     const tickLength = showTicks === 'block' ? 7 : 0
                     const to = { x: tick.to.x - tickLength, y: tick.to.y }
-
-                    console.log('tick', tick)
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -371,7 +449,6 @@ export default function LinearChart() {
             }}
           </AxisLeft>
         )}
-
         {/* Right Axis */}
         {hasRightAxis && (
           <AxisRight scale={yScaleRight} left={Number(width - config.yAxis.rightAxisSize)} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={config.runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
@@ -404,7 +481,6 @@ export default function LinearChart() {
             }}
           </AxisRight>
         )}
-
         {hasTopAxis && config.topAxis.hasLine && (
           <AxisTop
             stroke='#333'
@@ -417,7 +493,6 @@ export default function LinearChart() {
             })}
           />
         )}
-
         {/* X axis */}
         {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Spark Line' && (
           <AxisBottom
@@ -469,7 +544,6 @@ export default function LinearChart() {
             }}
           </AxisBottom>
         )}
-
         {config.visualizationType === 'Paired Bar' && (
           <>
             <AxisBottom top={yMax} left={Number(config.runtime.yAxis.size)} label={config.runtime.xAxis.label} tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={config.runtime.xAxis.numTicks || undefined}>
@@ -536,13 +610,15 @@ export default function LinearChart() {
             </AxisBottom>
           </>
         )}
-        {config.visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
-        {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
-        {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
-        {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
-        {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} isDebug={isDebug} />}
-        {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />}
-        {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />}
+        {config.visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} isBrush={false} />}
+        {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} isBrush={false} />}
+        {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} isBrush={false} />}
+        {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} isBrush={false} />}
+        {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} isDebug={isDebug} isBrush={false} />}
+        {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
+          <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} isBrush={false} />
+        )}
+        {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} isBrush={false} />}
         {(config.visualizationType === 'Forecasting' || config.visualizationType === 'Combo') && (
           <Forecasting
             hideTooltip={hideTooltip}
@@ -557,15 +633,50 @@ export default function LinearChart() {
             getXValueFromCoordinate={getXValueFromCoordinate}
             handleTooltipMouseOver={handleTooltipMouseOver}
             handleTooltipMouseOff={handleTooltipMouseOff}
+            isBrush={false}
           />
         )}
+        {/* brush */}
+        {/* config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} isDebug={isDebug} isBrush={true} /> */}
+
+        {config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && (
+          <>
+            <CoveAreaChart className='brushChart' xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} isDebug={isDebug} isBrush={true}>
+              <PatternLines id={PATTERN_ID} height={8} width={8} stroke={accentColor} strokeWidth={1} orientation={['diagonal']} style={styles} />
+              <Brush
+                id='theBrush'
+                className='theBrush'
+                xScale={xScale}
+                yScale={yScale}
+                width={xMax}
+                height={yMax / 4}
+                margin={0}
+                handleSize={8}
+                innerRef={brushRef}
+                resizeTriggerAreas={['left', 'right']}
+                brushDirection='horizontal'
+                initialBrushPosition={initialBrushPosition}
+                onChange={onBrushChange}
+                //onClick={() => setFilteredStock(stock)}
+                selectedBoxStyle={selectedBrushStyle}
+                useWindowMoveEvents
+                renderBrushHandle={props => <BrushHandle {...props} />}
+                style={styles}
+              />
+            </CoveAreaChart>
+          </>
+        )}
+
+        {/*}
+        <div>TEST2</div>
+          <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} isDebug={isDebug} isBrush={true} />
+          */}
 
         {/* y anchors */}
         {config.yAxis.anchors &&
           config.yAxis.anchors.map(anchor => {
             return <Line strokeDasharray={handleLineType(anchor.lineStyle)} stroke='rgba(0,0,0,1)' className='customAnchor' from={{ x: 0 + config.yAxis.size, y: yScale(anchor.value) }} to={{ x: xMax, y: yScale(anchor.value) }} display={config.runtime.horizontal ? 'none' : 'block'} />
           })}
-
         {/* Line chart */}
         {/* TODO: Make this just line or combo? */}
         {config.visualizationType !== 'Bar' &&
@@ -579,7 +690,6 @@ export default function LinearChart() {
               <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
             </>
           )}
-
         {/* y anchors */}
         {config.yAxis.anchors &&
           config.yAxis.anchors.map(anchor => {
@@ -599,7 +709,6 @@ export default function LinearChart() {
               />
             )
           })}
-
         {/* x anchors */}
         {config.xAxis.anchors &&
           config.xAxis.anchors.map(anchor => {

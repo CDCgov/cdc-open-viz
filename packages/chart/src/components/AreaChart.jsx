@@ -13,11 +13,11 @@ import { useTooltip, useTooltipInPortal, defaultStyles, Tooltip } from '@visx/to
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 
-const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef, isDebug }) => {
+const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef, isDebug, isBrush, children }) => {
   // enable various console logs in the file
   const DEBUG = isDebug
   const [chartPosition, setChartPosition] = useState(null)
-
+  //console.log('AreaChart chartPosition=', chartPosition)
   useEffect(() => {
     setChartPosition(chartRef.current.getBoundingClientRect())
   }, [chartRef])
@@ -122,34 +122,41 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef, isDebug }) => {
   }
 
   const handleY = (d, index, s = undefined) => {
-    return yScale(d[s.dataKey])
+    //console.log('d,s.dataKey', d, s.dataKey)
+    return isBrush ? yScale(d[s.dataKey]) / 5 : yScale(d[s.dataKey])
+    //return 10
   }
+
+  //console.log('isBrush yMax', isBrush, yMax)
+  //yMax = isBrush ? Number(yMax) + 0 : Number(yMax)
 
   return (
     data && (
-      <ErrorBoundary component='AreaChart'>
-        <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)}>
-          {(config.runtime.areaSeriesKeys || config.runtime.seriesKeys).map((s, index) => {
-            let seriesData = data.map(d => {
-              return {
-                [config.xAxis.dataKey]: d[config.xAxis.dataKey],
-                [s.dataKey]: d[s.dataKey]
+      <svg>
+        {/* putting width={width} height={height} here does not scale the svg */}
+        <ErrorBoundary component='AreaChart'>
+          <Group className='area-chart  xyz' key='area-wrapper' left={Number(config.yAxis.size)} top={isBrush ? yMax * 1.3 : 0}>
+            {(config.runtime.areaSeriesKeys || config.runtime.seriesKeys).map((s, index) => {
+              let seriesData = data.map(d => {
+                return {
+                  [config.xAxis.dataKey]: d[config.xAxis.dataKey],
+                  [s.dataKey]: d[s.dataKey]
+                }
+              })
+
+              let curveType = allCurves[s.lineType]
+              let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
+              let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1
+
+              if (config.xAxis.type === 'date') {
+                data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
+              } else {
+                data.map(d => xScale(d[config.xAxis.dataKey]))
               }
-            })
-
-            let curveType = allCurves[s.lineType]
-            let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
-            let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1
-
-            if (config.xAxis.type === 'date') {
-              data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
-            } else {
-              data.map(d => xScale(d[config.xAxis.dataKey]))
-            }
-            return (
-              <React.Fragment key={index}>
-                {/* prettier-ignore */}
-                <LinePath
+              return (
+                <React.Fragment key={index}>
+                  {/* prettier-ignore */}
+                  <LinePath
                   data={seriesData}
                   x={d => handleX(d)}
                   y={d => handleY(d, index, s)}
@@ -161,60 +168,58 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef, isDebug }) => {
                   strokeDasharray={s.type ? handleLineType(s.type) : 0}
                 />
 
-                {/* prettier-ignore */}
-                <AreaClosed
+                  {/* prettier-ignore */}
+                  <AreaClosed
                   key={'area-chart'}
-                  fill={ displayArea ? colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
+                  fill={displayArea ? colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
                   fillOpacity={transparentArea ? 0.25 : 0.5}
                   data={seriesData}
                   x={d => handleX(d)}
-                  y={d => handleY(d, index, s)}
+                  y={d => handleY(d, index, s)} // isBrush ? handleBrushY : 
                   yScale={yScale}
                   curve={curveType}
                   strokeDasharray={s.type ? handleLineType(s.type) : 0}
-                  />
+                    style={isBrush ? { border: '2px solid green' } : {}}
+                  >
+                  </AreaClosed>
 
-                {/* Transparent bar for tooltips */}
-                {/* prettier-ignore */}
-                <Bar
-                  width={ Number(xMax)}
-                  height={ Number(yMax)}
-                  fill={DEBUG ? 'red' : 'transparent'}
-                  fillOpacity={0.05}
-                  style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
-                  onMouseMove={e => handleMouseOver(e, data)}
-                  />
+                  {/* Transparent bar for tooltips */}
+                  {/* prettier-ignore */}
+                  {<Bar width={Number(xMax)} height={isBrush ? Number(yMax) / 4 : Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} style={DEBUG ? { stroke: 'purple', strokeWidth: 2 } : {}} onMouseMove={e => handleMouseOver(e, data)} />}
 
-                {/* circles that appear on hover */}
-                {tooltipData && Object.entries(tooltipData.data).length > 0 && (
-                  <circle
-                    cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
-                    cy={yScale(tooltipData.data[s.dataKey])}
-                    r={4.5}
-                    opacity={1}
-                    fillOpacity={1}
-                    fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000') : 'transparent'}
-                    style={{ filter: 'unset', opacity: 1 }}
-                  />
-                )}
+                  {/* circles that appear on hover */}
+                  {!isBrush && tooltipData && Object.entries(tooltipData.data).length > 0 && (
+                    <circle
+                      cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
+                      cy={yScale(tooltipData.data[s.dataKey])}
+                      r={4.5}
+                      opacity={1}
+                      fillOpacity={1}
+                      fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000') : 'transparent'}
+                      style={{ filter: 'unset', opacity: 1 }}
+                    />
+                  )}
 
-                {tooltipData && Object.entries(tooltipData.data).length > 0 && (
-                  <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
-                    <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id}>
-                      {typeof tooltipData === 'object' &&
-                        Object.entries(tooltipData.data).map(item => (
-                          <li style={{ padding: '2.5px 0' }}>
-                            <TooltipListItem item={item} />
-                          </li>
-                        ))}
-                    </ul>
-                  </TooltipInPortal>
-                )}
-              </React.Fragment>
-            )
-          })}
-        </Group>
-      </ErrorBoundary>
+                  {!isBrush && tooltipData && Object.entries(tooltipData.data).length > 0 && (
+                    <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
+                      <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id}>
+                        {typeof tooltipData === 'object' &&
+                          Object.entries(tooltipData.data).map(item => (
+                            <li style={{ padding: '2.5px 0' }}>
+                              <TooltipListItem item={item} />
+                            </li>
+                          ))}
+                      </ul>
+                    </TooltipInPortal>
+                  )}
+                  {children}
+                  {console.log('## AreaChart children in', children)}
+                </React.Fragment>
+              )
+            })}
+          </Group>
+        </ErrorBoundary>
+      </svg>
     )
   )
 }

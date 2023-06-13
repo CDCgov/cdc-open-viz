@@ -168,6 +168,7 @@ const composeYScale = ({ min, max, yMax, config }) => {
   // Select the appropriate scale function
   const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
   // Return the configured scale function
+  //let yMax2 = isBrush ? yMax / 4 : yMax
   return scaleFunc({
     domain: [min, max],
     range: [yMax, 0],
