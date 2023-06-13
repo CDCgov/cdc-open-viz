@@ -121,8 +121,8 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
                         <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={yScale(getYAxisData(d, seriesKey))} fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'} textAnchor='middle'>
                           {formatNumber(d[seriesKey])}
                         </Text>
-
-                        {dataIndex + 1 !== data.length && (config.lineDatapointStyle === 'always show' || config.lineDatapointStyle === 'hover') && (
+                        {/* hide data point circles */}
+                        {/* dataIndex + 1 !== data.length && (config.lineDatapointStyle === 'always show' || config.lineDatapointStyle === 'hover') && (
                           <circle
                             key={`${seriesKey}-${dataIndex}`}
                             r={circleRadii}
@@ -133,7 +133,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                           />
-                        )}
+                        )*/}
                       </Group>
                     )
                   })}

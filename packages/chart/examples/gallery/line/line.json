@@ -1,1 +1,173 @@
-{"type":"chart","title":"Example Line Chart","theme":"theme-green","animate":true,"fontSize":"medium","lineDatapointStyle":"hover","barHasBorder":"false","isLollipopChart":false,"lollipopShape":"circle","lollipopColorStyle":"two-tone","visualizationSubType":"regular","barStyle":"","roundingStyle":"standard","tipRounding":"top","padding":{"left":5,"right":5},"yAxis":{"hideAxis":false,"displayNumbersOnBar":false,"hideLabel":false,"hideTicks":false,"size":"75","gridLines":false,"min":"","max":"","label":"Y-Axis Example Label","numTicks":"9"},"barThickness":0.35,"barHeight":25,"height":"375","xAxis":{"type":"date","hideAxis":false,"hideLabel":false,"hideTicks":false,"size":"77","tickRotation":"25","min":"","max":"","dataKey":"Date","label":"X-Axis Example Label","dateParseFormat":"%d/%m/%Y","dateDisplayFormat":"%d/%m/%Y"},"table":{"label":"Data Table","expanded":true,"limitHeight":false,"height":"","caption":"","download":true,"show":true},"orientation":"vertical","legend":{"behavior":"isolate","position":"right","colorCode":"","reverseLabelOrder":false,"description":"","dynamicLegend":false,"dynamicLegendDefaultText":"Show All","dynamicLegendItemLimit":5,"dynamicLegendItemLimitMessage":"Dynamic Legend Item Limit Hit.","dynamicLegendChartMessage":"Select Options from the Legend","label":"Type of Data"},"exclusions":{"active":false,"keys":[]},"palette":"qualitative-bold","isPaletteReversed":false,"labels":false,"dataFormat":{"commas":false,"prefix":"","suffix":""},"confidenceKeys":{},"visual":{"border":true,"accent":true,"background":true},"data":[{"Date":"1/15/2016","Data 1":"90","Data 2":"135","Data 3":"300","Data 4":"95","Data 5":"120","Data 6":"310"},{"Date":"2/15/2016","Data 1":"40","Data 2":"90","Data 3":"240","Data 4":"60","Data 5":"160","Data 6":"200"},{"Date":"3/15/2016","Data 1":"50","Data 2":"300","Data 3":"290","Data 4":"100","Data 5":"200","Data 6":"250"},{"Date":"4/15/2016","Data 1":"120","Data 2":"160","Data 3":"230","Data 4":"180","Data 5":"160","Data 6":"220"},{"Date":"5/15/2016","Data 1":"80","Data 2":"350","Data 3":"300","Data 4":"150","Data 5":"130","Data 6":"100"},{"Date":"6/15/2016","Data 1":"90","Data 2":"220","Data 3":"320","Data 4":"100","Data 5":"220","Data 6":"300"}],"visualizationType":"Line","series":[{"dataKey":"Data 1","type":"Bar"},{"dataKey":"Data 2","type":"Bar"},{"dataKey":"Data 3","type":"Bar"},{"dataKey":"Data 4","type":"Bar"},{"dataKey":"Data 5","type":"Bar"},{"dataKey":"Data 6","type":"Bar"}]}
+{
+  "type": "chart",
+  "title": "Example Line Chart",
+  "theme": "theme-green",
+  "animate": true,
+  "fontSize": "medium",
+  "lineDatapointStyle": "hover",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "75",
+    "gridLines": false,
+    "min": "",
+    "max": "",
+    "label": "Y-Axis Example Label",
+    "numTicks": "9"
+  },
+  "barThickness": 0.35,
+  "barHeight": 25,
+  "height": "375",
+  "xAxis": {
+    "type": "date",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "77",
+    "tickRotation": "25",
+    "min": "",
+    "max": "",
+    "dataKey": "Date",
+    "label": "X-Axis Example Label",
+    "dateParseFormat": "%d/%m/%Y",
+    "dateDisplayFormat": "%d/%m/%Y"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "download": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "legend": {
+    "behavior": "isolate",
+    "position": "right",
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "Type of Data"
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": ""
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true
+  },
+  "data": [
+    {
+      "Date": "1/15/2016",
+      "Data 1": "90",
+      "Data 2": "135",
+      "Data 3": "300",
+      "Data 4": "95",
+      "Data 5": "120",
+      "Data 6": "310"
+    },
+    {
+      "Date": "2/15/2016",
+      "Data 1": "40",
+      "Data 2": "90",
+      "Data 3": "240",
+      "Data 4": "60",
+      "Data 5": "160",
+      "Data 6": "200"
+    },
+    {
+      "Date": "3/15/2016",
+      "Data 1": "50",
+      "Data 2": "300",
+      "Data 3": "290",
+      "Data 4": "100",
+      "Data 5": "200",
+      "Data 6": "250"
+    },
+    {
+      "Date": "4/15/2016",
+      "Data 1": "120",
+      "Data 2": "160",
+      "Data 3": "230",
+      "Data 4": "180",
+      "Data 5": "160",
+      "Data 6": "220"
+    },
+    {
+      "Date": "5/15/2016",
+      "Data 1": "80",
+      "Data 2": "350",
+      "Data 3": "300",
+      "Data 4": "150",
+      "Data 5": "130",
+      "Data 6": "100"
+    },
+    {
+      "Date": "6/15/2016",
+      "Data 1": "90",
+      "Data 2": "220",
+      "Data 3": "320",
+      "Data 4": "100",
+      "Data 5": "220",
+      "Data 6": "300"
+    }
+  ],
+  "visualizationType": "Line",
+  "series": [
+    {
+      "dataKey": "Data 1",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Data 2",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Data 3",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Data 4",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Data 5",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Data 6",
+      "type": "Bar"
+    }
+  ]
+}

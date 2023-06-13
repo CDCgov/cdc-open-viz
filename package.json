@@ -48,7 +48,7 @@
     "resize-observer-polyfill": "^1.5.1",
     "sass": "^1.57.1",
     "use-debounce": "^7.0.1",
-    "vite": "^4.0.0",
+    "vite": "^4.1.5",
     "vite-plugin-css-injected-by-js": "^2.4.0",
     "vite-plugin-svgr": "^2.4.0",
     "vitest": "^0.29.2",

@@ -5,7 +5,7 @@ export default {
     title: '',
     showTitle: true,
     showSidebar: true,
-    showDownloadButton: true,
+    showDownloadButton: false,
     showDownloadMediaButton: false,
     displayAsHex: false,
     displayStateLabels: false,
@@ -15,7 +15,6 @@ export default {
     geoType: 'single-state',
     geoLabelOverride: '',
     hasRegions: false,
-    expandDataTable: true,
     fullBorder: false,
     type: 'data',
     palette: {
@@ -62,12 +61,17 @@ export default {
     title: 'Legend'
   },
   filters: [],
-  dataTable: {
-    title: 'Data Table'
-  },
   table: {
+    label: 'Data Table',
+    expanded: false,
+    limitHeight: false,
+    height: '',
+    caption: '',
     showDownloadUrl: false,
-    showDataTableLink: true
+    showDataTableLink: true,
+    forceDisplay: true,
+    download: false,
+    indexLabel: ''
   },
   tooltips: {
     appearanceType: 'hover',

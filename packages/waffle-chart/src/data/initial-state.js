@@ -1,5 +1,10 @@
 export default {
   title: 'Waffle Chart',
+  visualizationType: 'Gauge',
+  visualizationSubType: 'linear',
+  showPercent: true,
+  showDenominator: true,
+  valueDescription: 'out of',
   content: '',
   subtext: '',
   orientation: 'horizontal',

@@ -40,23 +40,21 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
   if (!data) return
-  let barThickness = xMax / data
+  let barThickness = xMax / data.length
   let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
   let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
 
   // Tooltip helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinate = x => {
-    if (config.xAxis.type === 'categorical') {
+    if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
       let eachBand = xScale.step()
       let numerator = x
       const index = Math.floor(Number(numerator) / eachBand)
       return xScale.domain()[index - 1] // fixes off by 1 error
     }
 
-    if (config.xAxis.type === 'date') {
+    if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
-      if (!x) return
-      if (!xScale) return
       const x0 = xScale.invert(x)
       const index = bisectDate(config.data, x0, 1)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
@@ -123,8 +121,8 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
     return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])
   }
 
-  const handleY = (d, index) => {
-    return yScale(d[config.series[index].dataKey])
+  const handleY = (d, index, s = undefined) => {
+    return yScale(d[s.dataKey])
   }
 
   return (
@@ -132,23 +130,30 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
       <ErrorBoundary component='AreaChart'>
         <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)}>
           {(config.runtime.areaSeriesKeys || config.runtime.seriesKeys).map((s, index) => {
-            let seriesColor = colorPalettesChart[config.palette][index]
+            let seriesData = data.map(d => {
+              return {
+                [config.xAxis.dataKey]: d[config.xAxis.dataKey],
+                [s.dataKey]: d[s.dataKey]
+              }
+            })
+
             let curveType = allCurves[s.lineType]
             let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
             let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1
 
             if (config.xAxis.type === 'date') {
               data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
+            } else {
+              data.map(d => xScale(d[config.xAxis.dataKey]))
             }
-
             return (
               <React.Fragment key={index}>
                 {/* prettier-ignore */}
                 <LinePath
-                  data={data}
+                  data={seriesData}
                   x={d => handleX(d)}
-                  y={d => yScale(d[config.series[index].dataKey])}
-                  stroke={displayArea ? seriesColor : 'transparent'}
+                  y={d => handleY(d, index, s)}
+                  stroke={displayArea ?  colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
                   strokeWidth={2}
                   strokeOpacity={1}
                   shapeRendering='geometricPrecision'
@@ -161,11 +166,12 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                   key={'area-chart'}
                   fill={ displayArea ? colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
                   fillOpacity={transparentArea ? 0.25 : 0.5}
-                  data={data} x={d => handleX(d)}
-                  y={d => handleY(d, index)}
+                  data={seriesData}
+                  x={d => handleX(d)}
+                  y={d => handleY(d, index, s)}
                   yScale={yScale}
                   curve={curveType}
-                  strokeDasharray={s.type ? handleLineType(s.typ) : 0}
+                  strokeDasharray={s.type ? handleLineType(s.type) : 0}
                   />
 
                 {/* Transparent bar for tooltips */}
@@ -180,7 +186,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                   />
 
                 {/* circles that appear on hover */}
-                {tooltipData && (
+                {tooltipData && Object.entries(tooltipData.data).length > 0 && (
                   <circle
                     cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
                     cy={yScale(tooltipData.data[s.dataKey])}
@@ -192,26 +198,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                   />
                 )}
 
-                {/* another tool for showing bars during debug mode. */}
-                {DEBUG &&
-                  data.map((item, index) => {
-                    return (
-                      <Bar
-                        className='bar-here'
-                        x={Number(barThickness * index + offset)}
-                        y={d => Number(yScale(d[config.series[index].dataKey]))}
-                        yScale={yScale}
-                        width={barThicknessAdjusted}
-                        height={yMax}
-                        fill={'transparent'}
-                        fillOpacity={1}
-                        style={{ stroke: 'black', strokeWidth: 2 }}
-                        onMouseMove={e => handleMouseOver(e, data)}
-                      />
-                    )
-                  })}
-
-                {tooltipData && (
+                {tooltipData && Object.entries(tooltipData.data).length > 0 && (
                   <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
                     <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id}>
                       {typeof tooltipData === 'object' &&

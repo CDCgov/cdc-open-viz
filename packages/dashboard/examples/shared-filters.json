@@ -1,0 +1,542 @@
+{
+  "dashboard": {
+    "sharedFilters": [
+      {
+        "key": "State",
+        "columnName": "state",
+        "setBy": "chart1684783399780",
+        "usedBy": [
+          "chart1",
+          "map1"
+        ],
+        "values": [
+          "Alabama",
+          "Georgia",
+          "Florida"
+        ],
+        "active": "Alabama",
+        "resetLabel": "- Select -",
+        "showDropdown": true
+      }
+    ]
+  },
+  "rows": [
+    [
+      {
+        "width": 12,
+        "widget": "map1"
+      },
+      {},
+      {}
+    ],
+    [
+      {
+        "width": 12,
+        "widget": "chart1"
+      },
+      {},
+      {}
+    ],
+    [
+      {
+        "width": 12,
+        "widget": "chart1684783399780"
+      },
+      {
+        "equalHeight": false
+      },
+      {},
+      {}
+    ]
+  ],
+  "visualizations": {
+    "map1": {
+      "uid": "map1",
+      "type": "map",
+      "defaultData": false,
+      "dataKey": "data2",
+      "general": {
+        "title": "Map Example",
+        "subtext": "",
+        "territoriesLabel": "Territories",
+        "type": "data",
+        "geoType": "us",
+        "headerColor": "theme-blue",
+        "showSidebar": true,
+        "showTitle": true,
+        "geoBorderColor": "darkGray",
+        "showDownloadButton": true,
+        "expandDataTable": true,
+        "showDownloadMediaButton": false,
+        "displayAsHex": false,
+        "displayStateLabels": false,
+        "territoriesAlwaysShow": false,
+        "language": "en",
+        "geoLabelOverride": "",
+        "hasRegions": false,
+        "fullBorder": false,
+        "palette": {
+          "isReversed": false
+        },
+        "allowMapZoom": true,
+        "hideGeoColumnInTooltip": false,
+        "hidePrimaryColumnInTooltip": false
+      },
+      "color": "pinkpurple",
+      "columns": {
+        "geo": {
+          "name": "state",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": true
+        },
+        "primary": {
+          "name": "Insured Rate",
+          "label": "Data Label",
+          "prefix": "",
+          "suffix": "%",
+          "dataTable": true,
+          "tooltip": true
+        },
+        "navigate": {
+          "name": "link",
+          "tooltip": false,
+          "dataTable": false
+        },
+        "latitude": {
+          "name": ""
+        },
+        "longitude": {
+          "name": ""
+        }
+      },
+      "legend": {
+        "numberOfItems": 3,
+        "position": "side",
+        "title": "Legend Title",
+        "description": "Legend Text",
+        "type": "equalnumber",
+        "specialClasses": [
+          "N/A"
+        ],
+        "descriptions": {},
+        "unified": false,
+        "singleColumn": false,
+        "singleRow": false,
+        "showSpecialClassesLast": false,
+        "dynamicDescription": false
+      },
+      "formattedData": [
+        {
+          "Insured Rate": 43,
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": 63,
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": 53,
+          "state": "Florida"
+        }
+      ]
+    },
+    "chart1": {
+      "uid": "chart1",
+      "type": "chart",
+      "dataKey": "data1",
+      "title": "Test",
+      "description": "<p>Test</p>",
+      "visualizationType": "Line",
+      "series": [
+        {
+          "dataKey": "Insured Rate",
+          "label": "Insured Rate"
+        }
+      ],
+      "fontSize": "large",
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": ""
+      },
+      "padding": {
+        "left": 15,
+        "right": 15
+      },
+      "yAxis": {
+        "label": "Insured Rate",
+        "paddingPercent": 0.15
+      },
+      "xAxis": {
+        "label": "Date",
+        "dataKey": "date",
+        "type": "date",
+        "dateParseFormat": "%Y-%m-%d",
+        "dateDisplayFormat": "%b %d",
+        "numTicks": 8,
+        "tickRotation": 50
+      },
+      "legend": {
+        "label": "Legend",
+        "above": true,
+        "left": true
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": false,
+        "download": true,
+        "showVertical": false,
+        "show": false
+      },
+      "formattedData": [
+        {
+          "Insured Rate": "43",
+          "date": "2022-01-02",
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": "53",
+          "date": "2022-02-02",
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": "23",
+          "date": "2022-03-02",
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": "13",
+          "date": "2022-01-02",
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": "63",
+          "date": "2022-02-02",
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": "40",
+          "date": "2022-03-02",
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": "30",
+          "date": "2022-01-02",
+          "state": "Florida"
+        },
+        {
+          "Insured Rate": "55",
+          "date": "2022-02-02",
+          "state": "Florida"
+        },
+        {
+          "Insured Rate": "90",
+          "date": "2022-03-02",
+          "state": "Florida"
+        }
+      ]
+    },
+    "chart1684783399780": {
+      "type": "chart",
+      "title": "",
+      "showTitle": true,
+      "showDownloadMediaButton": false,
+      "theme": "theme-blue",
+      "animate": false,
+      "fontSize": "medium",
+      "lineDatapointStyle": "hover",
+      "barHasBorder": "false",
+      "isLollipopChart": false,
+      "lollipopShape": "circle",
+      "lollipopColorStyle": "two-tone",
+      "visualizationSubType": "regular",
+      "barStyle": "",
+      "roundingStyle": "standard",
+      "tipRounding": "top",
+      "general": {
+        "showDownloadButton": false
+      },
+      "padding": {
+        "left": 5,
+        "right": 5
+      },
+      "yAxis": {
+        "hideAxis": false,
+        "displayNumbersOnBar": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 50,
+        "gridLines": false,
+        "enablePadding": false,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "rightHideAxis": true,
+        "rightAxisSize": 50,
+        "rightLabel": "",
+        "rightLabelOffsetSize": 0,
+        "rightAxisLabelColor": "#333",
+        "rightAxisTickLabelColor": "#333",
+        "rightAxisTickColor": "#333",
+        "numTicks": "",
+        "axisPadding": 0,
+        "tickRotation": 0,
+        "anchors": []
+      },
+      "boxplot": {
+        "plots": [],
+        "borders": "true",
+        "firstQuartilePercentage": 25,
+        "thirdQuartilePercentage": 75,
+        "boxWidthPercentage": 40,
+        "plotOutlierValues": false,
+        "plotNonOutlierValues": true,
+        "legend": {
+          "showHowToReadText": false,
+          "howToReadText": ""
+        },
+        "labels": {
+          "q1": "Lower Quartile",
+          "q2": "q2",
+          "q3": "Upper Quartile",
+          "q4": "q4",
+          "minimum": "Minimum",
+          "maximum": "Maximum",
+          "mean": "Mean",
+          "median": "Median",
+          "sd": "Standard Deviation",
+          "iqr": "Interquartile Range",
+          "total": "Total",
+          "outliers": "Outliers",
+          "values": "Values",
+          "lowerBounds": "Lower Bounds",
+          "upperBounds": "Upper Bounds"
+        }
+      },
+      "topAxis": {
+        "hasLine": false
+      },
+      "isLegendValue": false,
+      "barThickness": 0.35,
+      "barHeight": 25,
+      "barSpace": 15,
+      "heights": {
+        "vertical": 300,
+        "horizontal": 750
+      },
+      "xAxis": {
+        "anchors": [],
+        "type": "categorical",
+        "showTargetLabel": true,
+        "targetLabel": "Target",
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 75,
+        "tickRotation": 0,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "numTicks": "",
+        "labelOffset": 65,
+        "axisPadding": 0,
+        "target": 0,
+        "dataKey": "state"
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": true,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "indexLabel": "",
+        "download": false,
+        "showVertical": true,
+        "show": false
+      },
+      "orientation": "vertical",
+      "color": "pinkpurple",
+      "columns": {},
+      "legend": {
+        "behavior": "isolate",
+        "singleRow": false,
+        "colorCode": "",
+        "reverseLabelOrder": false,
+        "description": "",
+        "dynamicLegend": false,
+        "dynamicLegendDefaultText": "Show All",
+        "dynamicLegendItemLimit": 5,
+        "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+        "dynamicLegendChartMessage": "Select Options from the Legend"
+      },
+      "exclusions": {
+        "active": false,
+        "keys": []
+      },
+      "palette": "qualitative-bold",
+      "isPaletteReversed": false,
+      "twoColor": {
+        "palette": "monochrome-1",
+        "isPaletteReversed": false
+      },
+      "labels": false,
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "",
+        "abbreviated": false,
+        "bottomSuffix": "",
+        "bottomPrefix": "",
+        "bottomAbbreviated": false
+      },
+      "confidenceKeys": {},
+      "visual": {
+        "border": true,
+        "accent": true,
+        "background": true
+      },
+      "useLogScale": false,
+      "filterBehavior": "Filter Change",
+      "highlightedBarValues": [],
+      "series": [
+        {
+          "dataKey": "Insured Rate",
+          "type": "Bar"
+        }
+      ],
+      "openModal": false,
+      "uid": "chart1684783399780",
+      "visualizationType": "Bar",
+      "dataKey": "data2",
+      "data": [
+        {
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": "63",
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": "53",
+          "state": "Florida"
+        }
+      ],
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "formattedData": [
+        {
+          "Insured Rate": 43,
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": 63,
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": 53,
+          "state": "Florida"
+        }
+      ],
+      "originalFormattedData": [
+        {
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": "63",
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": "53",
+          "state": "Florida"
+        }
+      ]
+    }
+  },
+  "table": {
+    "downloadImageButton": true,
+    "downloadPdfButton": true,
+    "download": true,
+    "show": true
+  },
+  "type": "dashboard",
+  "datasets": {
+    "data1": {
+      "data": [
+        {
+          "Insured Rate": "43",
+          "date": "2022-01-02",
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": "53",
+          "date": "2022-02-02",
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": "23",
+          "date": "2022-03-02",
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": "13",
+          "date": "2022-01-02",
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": "63",
+          "date": "2022-02-02",
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": "40",
+          "date": "2022-03-02",
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": "30",
+          "date": "2022-01-02",
+          "state": "Florida"
+        },
+        {
+          "Insured Rate": "55",
+          "date": "2022-02-02",
+          "state": "Florida"
+        },
+        {
+          "Insured Rate": "90",
+          "date": "2022-03-02",
+          "state": "Florida"
+        }
+      ]
+    },
+    "data2": {
+      "data": [
+        {
+          "Insured Rate": 43,
+          "state": "Alabama"
+        },
+        {
+          "Insured Rate": 63,
+          "state": "Georgia"
+        },
+        {
+          "Insured Rate": 53,
+          "state": "Florida"
+        }
+      ]
+    }
+  },
+  "runtime": {},
+  "uuid": 1684783370106
+}
