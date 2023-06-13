@@ -18,6 +18,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import { useFilters } from '@cdc/core/components/Filters'
+import Series from './Series'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 /* eslint-disable react-hooks/rules-of-hooks */
@@ -207,7 +208,7 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, lineOptions } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, lineOptions, rawData } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
@@ -215,14 +216,6 @@ const EditorPanel = () => {
 
   // argument acts as props
   const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config, setConfig: updateConfig, filteredData: data, setFilteredData })
-
-  const approvedCurveTypes = {
-    Linear: 'curveLinear',
-    Cardinal: 'curveCardinal',
-    Natural: 'curveNatural',
-    'Monotone X': 'curveMonotoneX',
-    Step: 'curveStep'
-  }
 
   // when the visualization type changes we
   // have to update the individual series type & axis details
@@ -677,6 +670,12 @@ const EditorPanel = () => {
     )
   }, [config]) // eslint-disable-line
 
+  const visSupportsTooltipLines = () => {
+    if (config.visualizationType === 'Combo' && config.runtime.forecastingSeriesKeys?.length > 0) return true
+    if (config.visualizationType === 'Forecasting') return true
+    return false
+  }
+
   const visHasLegend = () => {
     const { visualizationType } = config
 
@@ -832,6 +831,7 @@ const EditorPanel = () => {
     'Box Plot',
     'Combo',
     'Deviation Bar',
+    'Forecasting',
     'Line',
     'Paired Bar',
     'Pie',
@@ -872,7 +872,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar']
+  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting']
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1158,244 +1158,49 @@ const EditorPanel = () => {
                   <AccordionItemPanel>
                     {(!config.series || config.series.length === 0) && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
                     {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
-                    <Select
-                      fieldName='visualizationType'
-                      label='Add Data Series'
-                      initial='Select'
-                      onChange={e => {
-                        if (e.target.value !== '' && e.target.value !== 'Select') {
-                          addNewSeries(e.target.value)
-                        }
-                        e.target.value = ''
-                      }}
-                      options={getColumns()}
-                    />
-                    {config.series && config.series.length !== 0 && (
-                      <>
-                        <fieldset>
-                          <legend className='edit-label float-left'>Displaying</legend>
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </fieldset>
+                    <>
+                      <Select
+                        fieldName='visualizationType'
+                        label='Add Data Series'
+                        initial='Select'
+                        onChange={e => {
+                          if (e.target.value !== '' && e.target.value !== 'Select') {
+                            addNewSeries(e.target.value)
+                          }
+                          e.target.value = ''
+                        }}
+                        options={getColumns()}
+                      />
+                      {config.series && config.series.length !== 0 && (
+                        <Series.Wrapper getColumns={getColumns}>
+                          <fieldset>
+                            <legend className='edit-label float-left'>Displaying</legend>
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </fieldset>
 
-                        <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
-                          <Droppable droppableId='filter_order'>
-                            {provided => (
-                              <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
-                                {config.series.map((series, i) => {
-                                  if (config.visualizationType === 'Combo' || 'Area Chart') {
-                                    let changeType = (i, value) => {
-                                      let series = [...config.series]
-                                      series[i].type = value
-
-                                      series[i].axis = 'Left'
-
-                                      updateConfig({ ...config, series })
-                                    }
-
-                                    let changeLineType = (i, value) => {
-                                      let series = [...config.series]
-                                      series[i].lineType = value
-                                      updateConfig({ ...config, series })
-                                    }
-
-                                    let changeSeriesName = (i, value) => {
-                                      let series = [...config.series]
-                                      let seriesLabelsCopy = { ...config.runtime.seriesLabels }
-                                      series[i].name = value
-                                      seriesLabelsCopy[series[i].dataKey] = series[i].name
-
-                                      let newConfig = {
-                                        ...config,
-                                        series
-                                      }
-
-                                      updateConfig(newConfig)
-                                    }
-
-                                    let typeDropdown = (
-                                      <>
-                                        <label htmlFor='type-dropdown'>Series Type</label>
-                                        <select
-                                          name='type-dropdown'
-                                          value={series.type}
-                                          onChange={event => {
-                                            changeType(i, event.target.value)
-                                          }}
-                                        >
-                                          <option value='' default key='default'>
-                                            Select
-                                          </option>
-                                          {config.visualizationType === 'Combo' && <option value='Bar'>Bar</option>}
-                                          <option value='Line' key='Line'>
-                                            Solid Line
-                                          </option>
-                                          <option value='dashed-sm' key='dashed-sm'>
-                                            Small Dashed
-                                          </option>
-                                          <option value='dashed-md' key='dashed-md'>
-                                            Medium Dashed
-                                          </option>
-                                          <option value='dashed-lg' key='dashed-lg'>
-                                            Large Dashed
-                                          </option>
-                                          <option value='Area Chart' key='Area Chart'>
-                                            Area
-                                          </option>
-                                        </select>
-                                      </>
-                                    )
-
-                                    // used for assigning axis
-                                    let changeAxis = (i, value) => {
-                                      let series = [...config.series]
-                                      series[i].axis = value
-                                      updateConfig({ ...config, series })
-                                    }
-
-                                    // assign an axis dropdown
-                                    let axisDropdown = (
-                                      <>
-                                        <label htmlFor='assign-axis'>Assign an axis</label>
-                                        <select
-                                          name='assign-axis'
-                                          value={series.axis}
-                                          onChange={event => {
-                                            changeAxis(i, event.target.value)
-                                          }}
-                                        >
-                                          <option value='Left' default key='left'>
-                                            left
-                                          </option>
-                                          <option value='Right' key='right'>
-                                            right
-                                          </option>
-                                        </select>
-                                      </>
-                                    )
-
-                                    // line type dropdown
-                                    const lineType = (
-                                      <>
-                                        <label htmlFor='line-type'>Line Type</label>
-                                        <select
-                                          name='line-type'
-                                          value={series.lineStyle}
-                                          onChange={event => {
-                                            changeLineType(i, event.target.value)
-                                          }}
-                                          key='lineTypeSelection'
-                                        >
-                                          <option value='' default>
-                                            Select
-                                          </option>
-
-                                          {Object.keys(approvedCurveTypes).map(curveName => {
-                                            return (
-                                              <option key={`curve-option-${approvedCurveTypes[curveName]}`} value={approvedCurveTypes[curveName]}>
-                                                {curveName}
-                                              </option>
-                                            )
-                                          })}
-                                        </select>
-                                      </>
-                                    )
-
-                                    const seriesName = (
-                                      <>
-                                        <label htmlFor='series-name'>Series Name</label>
-                                        <input
-                                          type='text'
-                                          key={`series-name-${i}`}
-                                          value={series.name ? series.name : ''}
-                                          onChange={event => {
-                                            changeSeriesName(i, event.target.value)
-                                          }}
-                                        />
-                                      </>
-                                    )
-
-                                    return (
-                                      <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
-                                        {(provided, snapshot) => (
-                                          <>
-                                            <div key={i} className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                              <div className={`series-list__name ${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}></div>
-                                              <Accordion allowZeroExpanded>
-                                                <AccordionItem className='series-item series-item--chart'>
-                                                  <AccordionItemHeading className='series-item__title'>
-                                                    <AccordionItemButton className={chartsWithOptions.includes(config.visualizationType) ? 'accordion__button' : 'accordion__button hide-arrow'}>
-                                                      <Icon display='move' size={15} style={{ cursor: 'default' }} />
-                                                      {series.dataKey}
-                                                      {config.series && config.series.length > 1 && (
-                                                        <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                                          Remove
-                                                        </button>
-                                                      )}
-                                                    </AccordionItemButton>
-                                                  </AccordionItemHeading>
-                                                  {chartsWithOptions.includes(config.visualizationType) && (
-                                                    <AccordionItemPanel>
-                                                      <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                        {config.visualizationType === 'Combo' && (
-                                                          <>
-                                                            <span className='series-list__dropdown series-item__dropdown'>{typeDropdown}</span>
-                                                            {hasRightAxis && config.series && (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') && <span className='series-item__dropdown series-list__dropdown'>{axisDropdown}</span>}
-                                                          </>
-                                                        )}
-                                                        {['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type)) && <span className='series-item__dropdown series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>}
-                                                        {['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart', 'Bar'].some(item => item.includes(series.type)) && <span className='series-item__input  series-item__input--name'>{seriesName}</span>}
-                                                      </div>
-                                                    </AccordionItemPanel>
-                                                  )}
-                                                </AccordionItem>
-                                              </Accordion>
-                                            </div>
-                                          </>
-                                        )}
-                                      </Draggable>
-                                    )
-                                  }
-
-                                  return (
-                                    <Draggable key={`series.dataKey--${i}`} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
-                                      {(provided, snapshot) => (
-                                        <li
-                                          key={series.dataKey}
-                                          className={snapshot.isDragging ? 'currently-dragging' : ''}
-                                          style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
-                                          ref={provided.innerRef}
-                                          {...provided.draggableProps}
-                                          {...provided.dragHandleProps}
-                                        >
-                                          {/*<div  className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>*/}
-                                          <div className='series-list__name' data-title={series.dataKey}>
-                                            <div className='series-list__name--text'>{series.dataKey}</div>
-                                          </div>
-                                          {config.series && config.series.length > 1 && (
-                                            <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                              &#215;
-                                            </button>
-                                          )}
-                                          {/*</div>*/}
-                                        </li>
-                                      )}
-                                    </Draggable>
-                                  )
-                                })}
-                                {provided.placeholder}
-                              </ul>
-                            )}
-                          </Droppable>
-                        </DragDropContext>
-                      </>
-                    )}
+                          <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
+                            <Droppable droppableId='filter_order'>
+                              {/* prettier-ignore */}
+                              {provided => {
+                                return (
+                                  <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
+                                    <Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
+                                    {provided.placeholder}
+                                  </ul>
+                                )
+                              }}
+                            </Droppable>
+                          </DragDropContext>
+                        </Series.Wrapper>
+                      )}
+                    </>
 
                     {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
                       <>
@@ -1667,7 +1472,7 @@ const EditorPanel = () => {
                       </Tooltip>
                     }
                   />
-                  <TextField value={config.dataFormat.roundTo} type='number' section='dataFormat' fieldName='roundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
+                  <TextField value={config.dataFormat.roundTo ? config.dataFormat.roundTo : 0} type='number' section='dataFormat' fieldName='roundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
                   <div className='two-col-inputs'>
                     <TextField
                       value={config.dataFormat.prefix}
@@ -2908,7 +2713,7 @@ const EditorPanel = () => {
                             <label>
                               <span className='edit-showDropdown column-heading'>Show Filter Input</span>
                               <input
-                                type="checkbox"
+                                type='checkbox'
                                 checked={filter.showDropdown === undefined ? true : filter.showDropdown}
                                 onChange={e => {
                                   updateFilterProp('showDropdown', index, e.target.checked)
@@ -3199,6 +3004,13 @@ const EditorPanel = () => {
                   {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.showLineSeriesLabels} fieldName='showLineSeriesLabels' label='Append Series Name to End of Line Charts' updateField={updateField} />}
                   {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && config.showLineSeriesLabels && (
                     <CheckBox value={config.colorMatchLineSeriesLabels} fieldName='colorMatchLineSeriesLabels' label='Match Series Color to Name at End of Line Charts' updateField={updateField} />
+                  )}
+
+                  {visSupportsTooltipLines() && (
+                    <>
+                      <CheckBox value={config.visual.verticalHoverLine} fieldName='verticalHoverLine' section='visual' label='Vertical Hover Line' updateField={updateField} />
+                      <CheckBox value={config.visual.horizontalHoverLine} fieldName='horizontalHoverLine' section='visual' label='Horizontal Hover Line' updateField={updateField} />
+                    </>
                   )}
                 </AccordionItemPanel>
               </AccordionItem>

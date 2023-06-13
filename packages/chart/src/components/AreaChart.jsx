@@ -143,8 +143,9 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
 
             if (config.xAxis.type === 'date') {
               data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
+            } else {
+              data.map(d => xScale(d[config.xAxis.dataKey]))
             }
-
             return (
               <React.Fragment key={index}>
                 {/* prettier-ignore */}
@@ -196,25 +197,6 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                     style={{ filter: 'unset', opacity: 1 }}
                   />
                 )}
-
-                {/* another tool for showing bars during debug mode. */}
-                {DEBUG &&
-                  data.map((item, index) => {
-                    return (
-                      <Bar
-                        className='bar-here'
-                        x={Number(barThickness * index)}
-                        y={d => Number(yScale(d[config.series[index].dataKey]))}
-                        yScale={yScale}
-                        width={Number(barThickness)}
-                        height={yMax}
-                        fill={DEBUG ? 'red' : 'transparent'}
-                        fillOpacity={1}
-                        style={{ stroke: 'black', strokeWidth: 2 }}
-                        onMouseMove={e => handleMouseOver(e, data)}
-                      />
-                    )
-                  })}
 
                 {tooltipData && Object.entries(tooltipData.data).length > 0 && (
                   <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>

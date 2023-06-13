@@ -511,10 +511,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.runtime.areaSeriesKeys = []
+      newConfig.runtime.forecastingSeriesKeys = []
 
       newConfig.series.forEach(series => {
         if (series.type === 'Area Chart') {
           newConfig.runtime.areaSeriesKeys.push(series)
+        }
+        if (series.type === 'Forecasting') {
+          newConfig.runtime.forecastingSeriesKeys.push(series)
         }
         if (series.type === 'Bar') {
           newConfig.runtime.barSeriesKeys.push(series.dataKey)
@@ -524,6 +528,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         }
       })
     }
+
+    if (newConfig.visualizationType === 'Forecasting' && newConfig.series) {
+      newConfig.runtime.forecastingSeriesKeys = []
+
+      newConfig.series.forEach(series => {
+        if (series.type === 'Forecasting') {
+          newConfig.runtime.forecastingSeriesKeys.push(series)
+        }
+      })
+    }
+
     if (newConfig.visualizationType === 'Area Chart' && newConfig.series) {
       newConfig.runtime.areaSeriesKeys = []
 
@@ -739,7 +754,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     const newSeriesHighlight = []
 
     // If we're highlighting all the series, reset them
-    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend) {
+    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend && config.visualizationType !== 'Forecasting') {
       highlightReset()
       return
     }
@@ -941,6 +956,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Select appropriate chart type
   const chartComponents = {
     'Paired Bar': <LinearChart />,
+    Forecasting: <LinearChart />,
     Bar: <LinearChart />,
     Line: <LinearChart />,
     Combo: <LinearChart />,
@@ -952,6 +968,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const missingRequiredSections = () => {
+    if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
     if (config.visualizationType === 'Pie') {
       if (undefined === config?.yAxis.dataKey) {
         return true
@@ -1068,6 +1085,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const clean = data => {
+    // cleaning is deleting data we need in forecasting charts.
+    if (config.visualizationType === 'Forecasting') return data
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
   }
 

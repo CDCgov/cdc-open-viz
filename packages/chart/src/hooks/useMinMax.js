@@ -26,6 +26,42 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     }
   }
 
+  if (config.visualizationType === 'Forecasting') {
+    const {
+      runtime: { forecastingSeriesKeys }
+    } = config
+    if (forecastingSeriesKeys.length > 0) {
+      // push all keys into an array
+      let columnNames = []
+
+      forecastingSeriesKeys.forEach(f => {
+        f.confidenceIntervals?.map(ciGroup => {
+          columnNames.push(ciGroup.high)
+          columnNames.push(ciGroup.low)
+        })
+      })
+
+      // Using the columnNames or "keys" get the returned result
+      const result = data.map(obj => columnNames.map(key => obj[key]))
+
+      const highCIGroup = Math.max.apply(
+        null,
+        result.map(item => item[0])
+      ) // Extract ages from result
+      const lowCIGroup = Math.min.apply(
+        null,
+        result.map(item => item[1])
+      ) // Extract ages from result
+
+      if (highCIGroup > max) {
+        max = highCIGroup
+      }
+      if (lowCIGroup < min) {
+        min = lowCIGroup
+      }
+    }
+  }
+
   if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
     min = 0
   }
