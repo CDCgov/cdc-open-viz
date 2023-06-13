@@ -19,6 +19,7 @@ import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 import ScatterPlotIcon from '@cdc/core/assets/icon-chart-scatterplot.svg'
 import BoxPlotIcon from '@cdc/core/assets/icon-chart-box-whisker.svg'
 import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
+import LinearGaugeIcon from '@cdc/core/assets/icon-linear-gauge.svg'
 import InfoIcon from '@cdc/core/assets/icon-info.svg'
 
 export default function ChooseTab() {
@@ -141,6 +142,14 @@ export default function ChooseTab() {
               <IconButton label='Waffle Chart' type='waffle-chart' icon={<WaffleChartIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Highlight a piece of data in relationship to a data set.</Tooltip.Content>
+          </Tooltip>
+        </li>
+        <li>
+          <Tooltip>
+            <Tooltip.Target>
+              <IconButton label='Linear Gauge' type='linear-gauge' icon={<LinearGaugeIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal scale.</Tooltip.Content>
           </Tooltip>
         </li>
       </ul>
