@@ -76,7 +76,8 @@ export default {
   tooltips: {
     appearanceType: 'hover',
     linkLabel: 'Learn More',
-    capitalizeLabels: true
+    capitalizeLabels: true,
+    opacity: 100
   },
   runtime: {
     editorErrorMessage: []

@@ -716,3 +716,19 @@
     transform: translate(-20px, 0);
   }
 }
+
+:root {
+  --cove-tooltip-color: black;
+  --cove-tooltip-font-size: 14px;
+  --cove-tooltip-border-color: black;
+}
+
+.cdc-open-viz-module .tooltip {
+  color: var(--cove-tooltip-color);
+  .tooltip-heading {
+    display: block;
+    border-bottom: 1px solid var(--cove-tooltip-border-color);
+    padding-bottom: 5px;
+    font-size: var(--cove-tooltip-font-size);
+  }
+}

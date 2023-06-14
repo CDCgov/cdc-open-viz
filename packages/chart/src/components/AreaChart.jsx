@@ -3,15 +3,15 @@ import React, { useContext, useEffect, useState } from 'react'
 // cdc
 import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 // visx & d3
 import * as allCurves from '@visx/curve'
 import { AreaClosed, LinePath, Bar } from '@visx/shape'
 import { Group } from '@visx/group'
-import { useTooltip, useTooltipInPortal, defaultStyles, Tooltip } from '@visx/tooltip'
+import { useTooltip, useTooltipInPortal } from '@visx/tooltip'
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
+import 'react-tooltip/dist/react-tooltip.css'
 
 const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
   // enable various console logs in the file
@@ -23,11 +23,11 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
   }, [chartRef])
 
   // import data from context
-  const { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale } = useContext(ConfigContext)
+  const { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale, capitalize } = useContext(ConfigContext)
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
 
   // import tooltip helpers
-  const { tooltipData, showTooltip } = useTooltip()
+  const { tooltipData, showTooltip, hideTooltip } = useTooltip()
 
   // here we're inside of the svg,
   // it appears we need to use TooltipInPortal.
@@ -40,9 +40,6 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
   if (!data) return
-  let barThickness = xMax / data.length
-  let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
-  let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
 
   // Tooltip helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinate = x => {
@@ -99,8 +96,8 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
 
     let tooltipData = {}
     tooltipData.data = tooltipDataFromSeries
-    tooltipData.dataXPosition = x + 20
-    tooltipData.dataYPosition = y - 100
+    tooltipData.dataXPosition = x + 0
+    tooltipData.dataYPosition = y - 75
 
     let tooltipInformation = {
       tooltipData: tooltipData,
@@ -112,9 +109,15 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
     showTooltip(tooltipInformation)
   }
 
-  const TooltipListItem = ({ item }) => {
+  const TooltipListItem = ({ item, index }) => {
     const [label, value] = item
-    return label === config.xAxis.dataKey ? `${label}: ${value}` : `${label}: ${formatNumber(value, 'left')}`
+    return label === config.xAxis.dataKey ? (
+      <p className='tooltip-heading'>
+        <strong>{`${capitalize(label)}: ${value}`}</strong>
+      </p>
+    ) : (
+      `${label}: ${formatNumber(value, 'left')}`
+    )
   }
 
   const handleX = d => {
@@ -183,6 +186,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                   fillOpacity={0.05}
                   style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
                   onMouseMove={e => handleMouseOver(e, data)}
+                  onMouseLeave={ hideTooltip }
                   />
 
                 {/* circles that appear on hover */}
@@ -199,12 +203,12 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                 )}
 
                 {tooltipData && Object.entries(tooltipData.data).length > 0 && (
-                  <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
-                    <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id}>
+                  <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} className='cdc-open-viz-module'>
+                    <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id} className='tooltip light'>
                       {typeof tooltipData === 'object' &&
-                        Object.entries(tooltipData.data).map(item => (
+                        Object.entries(tooltipData.data).map((item, index) => (
                           <li style={{ padding: '2.5px 0' }}>
-                            <TooltipListItem item={item} />
+                            <TooltipListItem item={item} index={index} />
                           </li>
                         ))}
                     </ul>

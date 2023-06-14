@@ -12,7 +12,7 @@ import { Bar, Area, LinePath, Line } from '@visx/shape'
 import { Group } from '@visx/group'
 
 const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMouseOver, tooltipData, showTooltip, handleTooltipMouseOff }) => {
-  const { transformedData: data, rawData, config, seriesHighlight, formatNumber } = useContext(ConfigContext)
+  const { transformedData: data, rawData, config, seriesHighlight, formatNumber, capitalize } = useContext(ConfigContext)
   const { xAxis, yAxis, legend, runtime } = config
   const DEBUG = false
 
@@ -34,7 +34,13 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMou
 
   const TooltipListItem = ({ item }) => {
     const [label, value] = item
-    return label === config.xAxis.dataKey ? `${label}: ${value}` : `${label}: ${formatNumber(value, 'left')}`
+    return label === config.xAxis.dataKey ? (
+      <p className='tooltip-heading'>
+        <strong>{`${capitalize(label)}: ${value}`}</strong>
+      </p>
+    ) : (
+      `${label}: ${formatNumber(value, 'left')}`
+    )
   }
 
   return (
@@ -100,8 +106,9 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMou
             })
           })}
 
+          {/* TODO: combine area chart and this components tooltips */}
           {tooltipData && Object.entries(tooltipData.data).length > 0 && (
-            <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
+            <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} className='cdc-open-viz-module'>
               <ul
                 style={{
                   listStyle: 'none',
@@ -111,6 +118,7 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMou
                   lineHeight: '1rem'
                 }}
                 data-tooltip-id={tooltip_id}
+                className='tooltip'
               >
                 {typeof tooltipData === 'object' &&
                   Object.entries(tooltipData.data).map((item, index) => (

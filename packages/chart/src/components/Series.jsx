@@ -235,7 +235,7 @@ const SeriesDropdownConfidenceInterval = props => {
 
   return (
     <div className='edit-block'>
-      <h3>Confidence Interval Groups</h3>
+      <span className='edit-label column-heading'>Confidence Interval Groups</span>
       <fieldset>
         <Accordion allowZeroExpanded>
           {series?.confidenceIntervals?.map((ciGroup, ciIndex) => {
