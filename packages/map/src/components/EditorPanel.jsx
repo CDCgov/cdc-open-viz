@@ -1235,7 +1235,7 @@ const EditorPanel = props => {
           <label>
             <span className='edit-showDropdown column-heading'>Show Filter Input</span>
             <input
-              type="checkbox"
+              type='checkbox'
               checked={filter.showDropdown === undefined ? true : filter.showDropdown}
               onChange={e => {
                 changeFilter(index, 'showDropdown', e.target.checked)
@@ -2826,6 +2826,9 @@ const EditorPanel = props => {
                         </select>
                       </label>
                     ))}
+                  <label htmlFor='opacity'>
+                    <TextField type='number' min={0} max={100} value={state.tooltips.opacity ? state.tooltips.opacity : 100} section='tooltips' fieldName='opacity' label='Tooltip Opacity (%)' updateField={updateField} />
+                  </label>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>

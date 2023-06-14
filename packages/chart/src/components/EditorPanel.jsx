@@ -1547,7 +1547,7 @@ const EditorPanel = () => {
                   {/* start: anchors */}
                   {visHasAnchors() && config.orientation !== 'horizontal' ? (
                     <div className='edit-block'>
-                      <h3>Anchors</h3>
+                      <span className='edit-label column-heading'>Anchors</span>
                       <Accordion allowZeroExpanded>
                         {config.yAxis?.anchors?.map((anchor, index) => (
                           <AccordionItem className='series-item series-item--chart'>
@@ -1671,7 +1671,7 @@ const EditorPanel = () => {
                     </div>
                   ) : (
                     <div className='edit-block'>
-                      <h3>Anchors</h3>
+                      <span className='edit-label column-heading'>Anchors</span>
                       <Accordion allowZeroExpanded>
                         {config.xAxis?.anchors?.map((anchor, index) => (
                           <AccordionItem className='series-item series-item--chart'>
@@ -2166,7 +2166,7 @@ const EditorPanel = () => {
                   {/* anchors */}
                   {visHasAnchors() && config.orientation !== 'horizontal' ? (
                     <div className='edit-block'>
-                      <h3>Anchors</h3>
+                      <span className='edit-label column-heading'>Anchors</span>
                       <Accordion allowZeroExpanded>
                         {config.xAxis?.anchors?.map((anchor, index) => (
                           <AccordionItem className='series-item series-item--chart'>
@@ -2290,7 +2290,7 @@ const EditorPanel = () => {
                     </div>
                   ) : (
                     <div className='edit-block'>
-                      <h3>Anchors</h3>
+                      <span className='edit-label column-heading'>Anchors</span>
                       <Accordion allowZeroExpanded>
                         {config.yAxis?.anchors?.map((anchor, index) => (
                           <AccordionItem className='series-item series-item--chart'>

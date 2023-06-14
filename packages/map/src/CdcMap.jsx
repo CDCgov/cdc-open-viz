@@ -1578,7 +1578,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         )}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
+            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
+              <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
+            )}
             {title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}

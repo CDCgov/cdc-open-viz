@@ -1201,7 +1201,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
+  const capitalize = str => {
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
+
   const contextValues = {
+    capitalize,
     getXAxisData,
     getYAxisData,
     config,
