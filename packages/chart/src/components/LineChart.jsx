@@ -9,14 +9,13 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import useRightAxis from '../hooks/useRightAxis'
 
-const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, showTooltip, seriesStyle = 'Line' }) => {
+const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, showTooltip, seriesStyle = 'Line', svgRef }) => {
   // Not sure why there's a redraw here.
-  if (!handleTooltipMouseOver) return
 
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType } = useContext(ConfigContext)
-
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
+  if (!handleTooltipMouseOver) return
   const handleAxisFormating = (axis = 'left', label, value) => {
     // if this is an x axis category/date value return without doing any formatting.
     // if (label === config.runtime.xAxis.label) return value
@@ -27,7 +26,7 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
     return `${formatNumber(value, axis)}`
   }
 
-  const DEBUG = true
+  const DEBUG = false
   return (
     <ErrorBoundary component='LineChart'>
       <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
@@ -75,6 +74,9 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                   d[seriesKey] !== null &&
                   isNumber(d[seriesKey]) && (
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
+                      {/* tooltips */}
+                      <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />
+
                       {/* Render legend */}
                       <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>
                         {formatNumber(d[seriesKey], 'left')}
@@ -151,11 +153,6 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                     </text>
                   )
                 })}
-
-              {/* tooltips */}
-              {/* Transparent bar for tooltips */}
-              {/* prettier-ignore */}
-              <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />
             </Group>
           )
         })}
