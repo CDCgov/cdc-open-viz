@@ -2,14 +2,17 @@ import React, { useContext } from 'react'
 
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
-import { LinePath } from '@visx/shape'
+import { LinePath, Bar } from '@visx/shape'
 import { Text } from '@visx/text'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import useRightAxis from '../hooks/useRightAxis'
 
-export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
+const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, showTooltip, seriesStyle = 'Line' }) => {
+  // Not sure why there's a redraw here.
+  if (!handleTooltipMouseOver) return
+
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType } = useContext(ConfigContext)
 
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
@@ -17,7 +20,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   const handleAxisFormating = (axis = 'left', label, value) => {
     // if this is an x axis category/date value return without doing any formatting.
     // if (label === config.runtime.xAxis.label) return value
-
     axis = String(axis).toLocaleLowerCase()
     if (label) {
       return `${label}: ${formatNumber(value, axis)}`
@@ -25,6 +27,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     return `${formatNumber(value, axis)}`
   }
 
+  const DEBUG = true
   return (
     <ErrorBoundary component='LineChart'>
       <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
@@ -148,6 +151,11 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     </text>
                   )
                 })}
+
+              {/* tooltips */}
+              {/* Transparent bar for tooltips */}
+              {/* prettier-ignore */}
+              <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />
             </Group>
           )
         })}
@@ -161,3 +169,5 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     </ErrorBoundary>
   )
 }
+
+export default LineChart

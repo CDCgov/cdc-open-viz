@@ -671,8 +671,8 @@ const EditorPanel = () => {
   }, [config]) // eslint-disable-line
 
   const visSupportsTooltipLines = () => {
-    if (config.visualizationType === 'Combo' && config.runtime.forecastingSeriesKeys?.length > 0) return true
-    if (config.visualizationType === 'Forecasting') return true
+    const chartsWithTooltipGuides = ['Combo', 'Forecasting', 'Area Chart', 'Line']
+    if (chartsWithTooltipGuides.includes(config.visualizationType)) return true
     return false
   }
 
@@ -3012,6 +3012,25 @@ const EditorPanel = () => {
                       <CheckBox value={config.visual.horizontalHoverLine} fieldName='horizontalHoverLine' section='visual' label='Horizontal Hover Line' updateField={updateField} />
                     </>
                   )}
+
+                  {
+                    <label>
+                      <span className='edit-label column-heading'>Tooltip Opacity</span>
+                      <input
+                        type='number'
+                        value={config.tooltips.opacity ? config.tooltips.opacity : 100}
+                        onChange={e =>
+                          updateConfig({
+                            ...config,
+                            tooltips: {
+                              ...config.tooltips,
+                              opacity: e.target.value
+                            }
+                          })
+                        }
+                      />
+                    </label>
+                  }
                 </AccordionItemPanel>
               </AccordionItem>
               {/* Spark Line has no data table */}

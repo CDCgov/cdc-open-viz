@@ -7,7 +7,6 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
-import { act } from 'react-dom/test-utils'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, tableData, formatDate, isNumber, getTextWidth, parseDate, setSharedFilter, setSharedFilterValue, dashboardConfig } = useContext(ConfigContext)
@@ -172,11 +171,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   }
 
-                  const tooltip = `<div>
-                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                  const {
+                    legend: { showLegendValuesTooltip },
+                    runtime: { seriesLabels }
+                  } = config
+
+                  const barStackTooltip = `<div>
+                  <p class="tooltip-heading"><strong>${xAxisTooltip}</strong></p>
+                  ${showLegendValuesTooltip && seriesLabels && hasMultipleSeries ? `${seriesLabels[bar.key] || ''}<br/>` : ''}
                   ${yAxisTooltip}<br />
-                  ${xAxisTooltip}
                     </div>`
+
                   return (
                     <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
                       <style>
@@ -201,7 +206,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
-                          data-tooltip-html={tooltip}
+                          data-tooltip-html={barStackTooltip}
                           data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                           onClick={e => {
                             e.preventDefault()
