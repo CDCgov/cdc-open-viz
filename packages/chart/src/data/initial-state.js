@@ -106,8 +106,7 @@ export default {
     numTicks: '',
     labelOffset: 65,
     axisPadding: 0,
-    target: 0,
-    anchors: []
+    target: 0
   },
   table: {
     label: 'Data Table',
@@ -169,5 +168,8 @@ export default {
   useLogScale: false,
   filterBehavior: 'Filter Change',
   highlightedBarValues: [],
-  series: []
+  series: [],
+  tooltips: {
+    opacity: 100
+  }
 }

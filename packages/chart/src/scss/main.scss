@@ -723,8 +723,18 @@
   --cove-tooltip-border-color: black;
 }
 
-.cdc-open-viz-module .tooltip {
+.cdc-open-viz-module.tooltip {
   color: var(--cove-tooltip-color);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+
+  li {
+    padding: 2.5px 0;
+  }
+
+  ul {
+    list-style: none;
+  }
+
   .tooltip-heading {
     display: block;
     border-bottom: 1px solid var(--cove-tooltip-border-color);
