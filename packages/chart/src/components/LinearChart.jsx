@@ -87,7 +87,7 @@ export default function LinearChart() {
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
   useEffect(() => {
-    setChartPosition(svgRef.current.getBoundingClientRect())
+    setChartPosition(svgRef?.current?.getBoundingClientRect())
   }, [svgRef])
 
   const TooltipListItem = ({ item }) => {
