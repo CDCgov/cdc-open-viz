@@ -236,10 +236,19 @@ export default function LinearChart() {
 
     let standardLoopItems = []
 
-    if (visualizationType === 'Combo') {
-      standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...stageColumns, ...ciItems]
-    } else {
-      standardLoopItems = [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
+    switch (visualizationType) {
+      case 'Combo':
+        standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...stageColumns, ...ciItems]
+        break
+      case 'Forecasting':
+        standardLoopItems = [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
+        break
+      case 'Line':
+        standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
+        break
+      default:
+        console.info('COVE: no visualization type found in handleMouseOver')
+        break
     }
 
     standardLoopItems.map(seriesKey => {
