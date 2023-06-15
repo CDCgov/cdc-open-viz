@@ -137,7 +137,7 @@ const DataTable = props => {
   const DownloadButton = memo(() => {
     if (rawData !== undefined) {
       let csvData
-      if (config.type === 'chart' || config.general.type === 'bubble') {
+      if (config.type === 'chart' || config.general.type === 'bubble' || !config.table.showFullGeoNameInCSV) {
         // Just Unparse
         csvData = Papa.unparse(rawData)
       } else if ((config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') || config.general.type === 'us-geocode') {

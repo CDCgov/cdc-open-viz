@@ -1163,7 +1163,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (true === Object.keys(dict).includes(value)) {
       value = dict[value]
     }
-    return titleCase(value)
+
+    // if you get here and it's 2 letters then DONT titleCase state abbreviations like "AL"
+    if (value.length === 2) {
+      return value
+    } else {
+      return titleCase(value)
+    }
   }
 
   const navigationHandler = urlString => {
@@ -1714,6 +1720,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 headerColor={general.headerColor}
                 columns={state.columns}
                 showDownloadButton={general.showDownloadButton}
+                showFullGeoNameInCSV={table.showFullGeoNameInCSV}
                 runtimeLegend={runtimeLegend}
                 runtimeData={runtimeData}
                 displayDataAsText={displayDataAsText}
