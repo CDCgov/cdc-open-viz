@@ -13,11 +13,11 @@ import { useTooltip, useTooltipInPortal, defaultStyles, Tooltip } from '@visx/to
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 
-const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef, isDebug, isBrush, children }) => {
+const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, chartRef, isDebug, isBrush, children }) => {
   // enable various console logs in the file
   const DEBUG = isDebug
   const [chartPosition, setChartPosition] = useState(null)
-  //console.log('AreaChart chartPosition=', chartPosition)
+
   useEffect(() => {
     setChartPosition(chartRef.current.getBoundingClientRect())
   }, [chartRef])
@@ -122,20 +122,15 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef, isDebug, isBrush,
   }
 
   const handleY = (d, index, s = undefined) => {
-    //console.log('d,s.dataKey', d, s.dataKey)
     return isBrush ? yScale(d[s.dataKey]) / 5 : yScale(d[s.dataKey])
-    //return 10
   }
-
-  //console.log('isBrush yMax', isBrush, yMax)
-  //yMax = isBrush ? Number(yMax) + 0 : Number(yMax)
 
   return (
     data && (
       <svg>
         {/* putting width={width} height={height} here does not scale the svg */}
         <ErrorBoundary component='AreaChart'>
-          <Group className='area-chart  xyz' key='area-wrapper' left={Number(config.yAxis.size)} top={isBrush ? yMax * 1.3 : 0}>
+          <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)} top={isBrush ? yMax * 1.3 : 0}>
             {(config.runtime.areaSeriesKeys || config.runtime.seriesKeys).map((s, index) => {
               let seriesData = data.map(d => {
                 return {
@@ -213,7 +208,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef, isDebug, isBrush,
                     </TooltipInPortal>
                   )}
                   {children}
-                  {console.log('## AreaChart children in', children)}
+                  {/* console.log('## AreaChart children in', children) */}
                 </React.Fragment>
               )
             })}
