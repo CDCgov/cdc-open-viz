@@ -93,11 +93,11 @@ export default function LinearChart() {
   const TooltipListItem = ({ item }) => {
     const [label, value] = item
     return label === config.xAxis.dataKey ? (
-      <p className='tooltip-heading'>
+      <li className='tooltip-heading'>
         <strong>{`${capitalize(label)}: ${value}`}</strong>
-      </p>
+      </li>
     ) : (
-      `${label}: ${formatNumber(value, 'left')}`
+      <li className='tooltip-body'>{`${label}: ${formatNumber(value, 'left')}`}</li>
     )
   }
 
@@ -756,14 +756,7 @@ export default function LinearChart() {
         {/* TODO: combine area chart and this components tooltips */}
         {tooltipData && Object.entries(tooltipData.data).length > 0 && (
           <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} className='cdc-open-viz-module tooltip' style={{ ...defaultStyles, background: `rgba(255,255,255, ${config.tooltips.opacity / 100})` }}>
-            <ul data-tooltip-id={tooltip_id}>
-              {typeof tooltipData === 'object' &&
-                Object.entries(tooltipData.data).map((item, index) => (
-                  <li key={`li-${index}`}>
-                    <TooltipListItem item={item} />
-                  </li>
-                ))}
-            </ul>
+            <ul data-tooltip-id={tooltip_id}>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
           </TooltipInPortal>
         )}
       </svg>
