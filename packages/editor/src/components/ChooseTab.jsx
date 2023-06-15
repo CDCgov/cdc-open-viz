@@ -45,12 +45,12 @@ export default function ChooseTab() {
       isSubType = subType === geoType
     }
 
-    if (type === 'chart') {
+    if (type === 'chart' || type === 'waffle-chart' || type === 'linear-gauge') {
       isSubType = subType === config.visualizationType
       isHorizontalStackedChart = orientation === config.orientation && stacked === true
     }
 
-    if (type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart' || type === 'markup-include') isSubType = true
+    if (type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart' || type === 'linear-gauge' || type === 'markup-include') isSubType = true
 
     // TODO: sorry, we should refactor this at some point.
     // trying to get this out for 4.22.5 - this is so stacked horizontal and bar charts aren't highlighted at the same time.
