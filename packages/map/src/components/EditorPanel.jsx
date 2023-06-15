@@ -425,6 +425,16 @@ const EditorPanel = props => {
           }
         })
         break
+      case 'toggleShowFullGeoNameInCSV':
+        setState({
+          ...state,
+          table: {
+            // setting both bc DataTable new core needs it here
+            ...state.table,
+            showFullGeoNameInCSV: !state.table.showFullGeoNameInCSV
+          }
+        })
+        break
       case 'toggleDownloadImgButton':
         setState({
           ...state,
@@ -1235,7 +1245,7 @@ const EditorPanel = props => {
           <label>
             <span className='edit-showDropdown column-heading'>Show Filter Input</span>
             <input
-              type="checkbox"
+              type='checkbox'
               checked={filter.showDropdown === undefined ? true : filter.showDropdown}
               onChange={e => {
                 changeFilter(index, 'showDropdown', e.target.checked)
@@ -2565,6 +2575,16 @@ const EditorPanel = props => {
                         }}
                       />
                       <span className='edit-label'>Show Download CSV Link</span>
+                    </label>
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.general.showFullGeoNameInCSV}
+                        onChange={event => {
+                          handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Include Full Geo Name in CSV Download</span>
                     </label>
                     {/* <label className='checkbox'>
                       <input
