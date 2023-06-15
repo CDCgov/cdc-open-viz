@@ -727,18 +727,27 @@
   color: var(--cove-tooltip-color);
   border: 1px solid rgba(0, 0, 0, 0.3);
 
-  li {
-    padding: 2.5px 0;
-  }
-
   ul {
     list-style: none;
+
+    li {
+      padding: 5px 0;
+    }
+
+    > li.tooltip-body {
+      border-top: 1px solid var(--cove-tooltip-border-color);
+      padding-top: 5px;
+    }
+
+    // undo previous except first class
+    > li.tooltip-body ~ li.tooltip-body {
+      border-top: initial;
+      padding-top: initial;
+    }
   }
 
   .tooltip-heading {
     display: block;
-    border-bottom: 1px solid var(--cove-tooltip-border-color);
-    padding-bottom: 5px;
     font-size: var(--cove-tooltip-font-size);
   }
 }
