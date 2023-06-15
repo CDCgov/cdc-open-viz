@@ -165,6 +165,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
       newFilterInteraction.filterSetterValues.push(e.target.value);
 
       overlay?.actions.openOverlay(filterInteractionModal(newFilterInteraction, index))
+      e.target.value = ''
     }
 
     const removeFilterSetterValue = (index) => {
@@ -184,6 +185,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
       newFilterInteraction.filterGetterValues.push(e.target.value);
 
       overlay?.actions.openOverlay(filterInteractionModal(newFilterInteraction, index))
+      e.target.value = ''
     }
 
     const removeFilterGetterValue = (index) => {
@@ -213,8 +215,8 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
           ))}
         </ul>
         <select onChange={addFilterSetterValue}>
-            <option>Select a value</option>
-            {config.dashboard.sharedFilters && (config.dashboard.sharedFilters.find(sharedFilter => sharedFilter.key === filterInteraction.filterSetter) || {values: []}).values.map(value => 
+            <option value=''>Select a value</option>
+            {config.dashboard.sharedFilters && (config.dashboard.sharedFilters.find(sharedFilter => sharedFilter.key === filterInteraction.filterSetter) || {values: []}).values.filter(val => !filterInteraction.filterSetterValues || !filterInteraction.filterSetterValues.includes(val)).map(value => 
               <option>{value}</option>
             )}
         </select>
@@ -238,8 +240,8 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
                 ))}
               </ul>
               <select onChange={addFilterGetterValue}>
-                  <option>Select a value</option>
-                  {config.dashboard.sharedFilters && (config.dashboard.sharedFilters.find(sharedFilter => sharedFilter.key === filterInteraction.filterGetter) || {values: []}).values.map(value => 
+                  <option value=''>Select a value</option>
+                  {config.dashboard.sharedFilters && (config.dashboard.sharedFilters.find(sharedFilter => sharedFilter.key === filterInteraction.filterGetter) || {values: []}).values.filter(val => !filterInteraction.filterGetterValues || !filterInteraction.filterGetterValues.includes(val)).map(value => 
                     <option>{value}</option>
                   )}
               </select><br/><br/>
