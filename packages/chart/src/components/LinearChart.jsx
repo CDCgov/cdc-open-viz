@@ -246,6 +246,8 @@ export default function LinearChart() {
       case 'Line':
         standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
         break
+      case 'Bar':
+        standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
       default:
         console.info('COVE: no visualization type found in handleMouseOver')
         break
@@ -308,6 +310,7 @@ export default function LinearChart() {
     if (visualizationType === 'Combo' && runtime.forecastingSeriesKeys > 0) return true
     if (visualizationType === 'Area Chart') return true
     if (visualizationType === 'Line') return true
+    if (visualizationType === 'Bar') return true
     return false
   }
 
@@ -657,7 +660,24 @@ export default function LinearChart() {
         {(visualizationType === 'Area Chart' || visualizationType === 'Combo') && (
           <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleAreaTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
         )}
-        {(visualizationType === 'Bar' || visualizationType === 'Combo') && <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />}
+        {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
+          <BarChart
+            xScale={xScale}
+            yScale={yScale}
+            seriesScale={seriesScale}
+            xMax={xMax}
+            yMax={yMax}
+            getXAxisData={getXAxisData}
+            getYAxisData={getYAxisData}
+            animatedChart={animatedChart}
+            visible={animatedChart}
+            handleTooltipMouseOver={handleTooltipMouseOver}
+            handleTooltipMouseOff={handleTooltipMouseOff}
+            tooltipData={tooltipData}
+            showTooltip={showTooltip}
+            chartRef={svgRef}
+          />
+        )}
         {(visualizationType === 'Line' || visualizationType === 'Combo') && (
           <LineChart
             xScale={xScale}
