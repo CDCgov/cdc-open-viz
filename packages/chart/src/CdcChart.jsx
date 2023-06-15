@@ -302,6 +302,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
 
+    newConfig.series.map(series => {
+      if (!series.tooltip) series.tooltip = true
+    })
+
     updateConfig(newConfig, data)
   }
 

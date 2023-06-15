@@ -8,7 +8,7 @@ import { Line } from '@visx/shape'
 import { localPoint } from '@visx/event'
 import { Text } from '@visx/text'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import { useTooltip } from '@visx/tooltip'
+import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 
 // CDC Components
 import AreaChart from './AreaChart'
@@ -29,9 +29,9 @@ import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
-import { useTooltipInPortal, defaultStyles } from '@visx/tooltip'
 
 // styles
+import { defaultStyles } from '@visx/tooltip'
 import '../scss/LinearChart.scss'
 
 export default function LinearChart() {
@@ -58,7 +58,7 @@ export default function LinearChart() {
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.size)
 
-  // hooks  % states
+  // hooks
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
@@ -77,13 +77,6 @@ export default function LinearChart() {
   // a unique id is needed for tooltips.
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
 
-  // Tooltip Items
-  const { TooltipInPortal } = useTooltipInPortal({
-    detectBounds: true,
-    // when tooltip containers are scrolled, this will correctly update the Tooltip position
-    scroll: true
-  })
-
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
   useEffect(() => {
@@ -94,7 +87,7 @@ export default function LinearChart() {
     const [label, value] = item
     return label === config.xAxis.dataKey ? (
       <li className='tooltip-heading'>
-        <strong>{`${capitalize(label)}: ${value}`}</strong>
+        <strong>{`${capitalize(config.runtime.xAxis.label ? config.runtime.xAxis.label : label)}: ${value}`}</strong>
       </li>
     ) : (
       <li className='tooltip-body'>{`${label}: ${formatNumber(value, 'left')}`}</li>
@@ -204,14 +197,25 @@ export default function LinearChart() {
     const eventSvgCoords = localPoint(e)
     const { x, y } = eventSvgCoords
 
+    let yScaleValues
     let closestXScaleValue = getXValueFromCoordinate(x)
     let formattedDate = formatDate(closestXScaleValue)
 
-    let yScaleValues
+    //  keep track of the series.tooltip values
+    // and remember to push the xaxis data key on top
+    let includedSeries = config.series.filter(series => series.tooltip === true).map(item => item.dataKey)
+    includedSeries.push(config.xAxis.dataKey)
+
     if (xAxis.type === 'categorical') {
       yScaleValues = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
+      yScaleValues = yScaleValues.map(object => {
+        return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
+      })
     } else {
       yScaleValues = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
+      yScaleValues = yScaleValues.map(object => {
+        return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
+      })
     }
 
     let seriesToInclude = []
@@ -238,7 +242,7 @@ export default function LinearChart() {
 
     switch (visualizationType) {
       case 'Combo':
-        standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...stageColumns, ...ciItems]
+        standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...runtime?.lineSeriesKeys, ...stageColumns, ...ciItems]
         break
       case 'Forecasting':
         standardLoopItems = [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
@@ -781,14 +785,13 @@ export default function LinearChart() {
             <Line from={{ x: 0, y: tooltipData.dataYPosition }} to={{ x: xMax, y: tooltipData.dataYPosition }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='horizontal-tooltip-line' />
           </Group>
         )}
-
-        {/* TODO: combine area chart and this components tooltips */}
-        {tooltipData && Object.entries(tooltipData.data).length > 0 && (
-          <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} className='cdc-open-viz-module tooltip' style={{ ...defaultStyles, background: `rgba(255,255,255, ${config.tooltips.opacity / 100})` }}>
-            <ul data-tooltip-id={tooltip_id}>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
-          </TooltipInPortal>
-        )}
       </svg>
+      {/* TODO: combine area chart and this components tooltips */}
+      {tooltipData && Object.entries(tooltipData.data).length > 0 && (
+        <TooltipWithBounds key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} className='cdc-open-viz-module tooltip' style={{ ...defaultStyles, background: `rgba(255,255,255, ${config.tooltips.opacity / 100})` }}>
+          <ul data-tooltip-id={tooltip_id}>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
+        </TooltipWithBounds>
+      )}
       <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
