@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { Group } from '@visx/group'
-import { BarGroup, BarStack } from '@visx/shape'
+import { BarGroup, BarStack, Bar } from '@visx/shape'
 import { Text } from '@visx/text'
 import chroma from 'chroma-js'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -8,7 +8,7 @@ import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
-export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
+export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible, handleTooltipMouseOver, handleTooltipMouseOff }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, tableData, formatDate, isNumber, getTextWidth, parseDate, setSharedFilter, setSharedFilterValue, dashboardConfig } = useContext(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const { orientation, visualizationSubType } = config
@@ -679,6 +679,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               : ''}
           </Group>
         )}
+        {/* tooltips */}
+        <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />
       </Group>
     </ErrorBoundary>
   )
