@@ -680,7 +680,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
           </Group>
         )}
         {/* tooltips */}
-        <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />
+        {orientation !== 'horizontal' && <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />}
       </Group>
     </ErrorBoundary>
   )
