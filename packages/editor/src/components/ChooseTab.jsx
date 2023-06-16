@@ -19,7 +19,7 @@ import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 import ScatterPlotIcon from '@cdc/core/assets/icon-chart-scatterplot.svg'
 import BoxPlotIcon from '@cdc/core/assets/icon-chart-box-whisker.svg'
 import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
-import LinearGaugeIcon from '@cdc/core/assets/icon-linear-gauge.svg'
+import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
 import InfoIcon from '@cdc/core/assets/icon-info.svg'
 
 export default function ChooseTab() {
@@ -39,18 +39,16 @@ export default function ChooseTab() {
     let isSubType = false
     let isHorizontalStackedChart = false
     let classNames
-
     if (type === 'map' && config.general) {
       let geoType = config.general.geoType
       isSubType = subType === geoType
     }
-
-    if (type === 'chart' || type === 'waffle-chart' || type === 'linear-gauge') {
+    if (type === 'chart') {
       isSubType = subType === config.visualizationType
       isHorizontalStackedChart = orientation === config.orientation && stacked === true
     }
 
-    if (type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart' || type === 'linear-gauge' || type === 'markup-include') isSubType = true
+    if (type === 'dashboard' || type === 'data-bite' || type === 'markup-include') isSubType = true
 
     // TODO: sorry, we should refactor this at some point.
     // trying to get this out for 4.22.5 - this is so stacked horizontal and bar charts aren't highlighted at the same time.
@@ -139,7 +137,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Waffle Chart' type='waffle-chart' icon={<WaffleChartIcon />} />
+              <IconButton label='Waffle Chart' type='chart' subType='Waffle' icon={<WaffleChartIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Highlight a piece of data in relationship to a data set.</Tooltip.Content>
           </Tooltip>
@@ -147,7 +145,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Linear Gauge' type='linear-gauge' icon={<LinearGaugeIcon />} />
+              <IconButton label='Gauge Chart' type='chart' subType='Gauge' icon={<GaugeChartIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal scale.</Tooltip.Content>
           </Tooltip>
