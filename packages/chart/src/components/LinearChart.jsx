@@ -8,7 +8,7 @@ import { Line } from '@visx/shape'
 import { localPoint } from '@visx/event'
 import { Text } from '@visx/text'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
+import { useTooltip, TooltipWithBounds, useTooltipInPortal } from '@visx/tooltip'
 
 // CDC Components
 import AreaChart from './AreaChart'
@@ -240,21 +240,28 @@ export default function LinearChart() {
 
     let standardLoopItems = []
 
-    switch (visualizationType) {
-      case 'Combo':
-        standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...runtime?.lineSeriesKeys, ...stageColumns, ...ciItems]
-        break
-      case 'Forecasting':
-        standardLoopItems = [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
-        break
-      case 'Line':
-        standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
-        break
-      case 'Bar':
-        standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
-      default:
-        console.info('COVE: no visualization type found in handleMouseOver')
-        break
+    if (!config.dashboard) {
+      switch (visualizationType) {
+        case 'Combo':
+          standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...runtime?.lineSeriesKeys, ...stageColumns, ...ciItems]
+          break
+        case 'Forecasting':
+          standardLoopItems = [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
+          break
+        case 'Line':
+          standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
+          break
+        case 'Bar':
+          standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
+          break
+        default:
+          console.info('COVE: no visualization type found in handleMouseOver')
+          break
+      }
+    }
+
+    if (config.dashboard) {
+      standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...runtime?.lineSeriesKeys, ...stageColumns, ...ciItems]
     }
 
     standardLoopItems.map(seriesKey => {
@@ -367,6 +374,14 @@ export default function LinearChart() {
     }
     showTooltip(tooltipInformation)
   }
+
+  const { containerRef, TooltipInPortal } = useTooltipInPortal({
+    // TooltipInPortal is rendered in a separate child of <body /> and positioned
+    // with page coordinates which should be updated on scroll. consider using
+    // Tooltip or TooltipWithBounds if you don't need to render inside a Portal
+    detectBounds: true,
+    scroll: true
+  })
 
   return isNaN(width) ? (
     <></>
@@ -788,9 +803,11 @@ export default function LinearChart() {
       </svg>
       {/* TODO: combine area chart and this components tooltips */}
       {tooltipData && Object.entries(tooltipData.data).length > 0 && (
-        <TooltipWithBounds key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} className='cdc-open-viz-module tooltip' style={{ ...defaultStyles, background: `rgba(255,255,255, ${config.tooltips.opacity / 100})` }}>
-          <ul data-tooltip-id={tooltip_id}>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
-        </TooltipWithBounds>
+        <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} className='cdc-open-viz-module tooltip' style={{ ...defaultStyles, background: `rgba(255,255,255, ${config.tooltips.opacity / 100})` }}>
+          <div>
+            <ul data-tooltip-id={tooltip_id}>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
+          </div>
+        </TooltipInPortal>
       )}
       <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
