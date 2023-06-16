@@ -73,7 +73,7 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                   d[seriesKey] !== '' &&
                   d[seriesKey] !== null &&
                   isNumber(d[seriesKey]) && (
-                    <Group key={`series-${seriesKey}-point-${dataIndex}`}>
+                    <Group key={`series-${seriesKey}-point-${dataIndex}`} className='checkwidth'>
                       {/* tooltips */}
                       {!dashboardConfig && <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />}
 
