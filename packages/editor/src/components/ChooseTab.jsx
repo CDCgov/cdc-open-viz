@@ -225,7 +225,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Forecasting Chart' type='chart' subType='Forecasting' orientation='vertical' icon={<InfoIcon />} />
+              <IconButton label='Forecast Chart' type='chart' subType='Forecasting' orientation='vertical' icon={<InfoIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Display a forecasting chart</Tooltip.Content>
           </Tooltip>

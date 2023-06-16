@@ -131,7 +131,7 @@ const DataTable = props => {
 
   const DownloadButton = memo(() => {
     let csvData
-    if (state.general.type === 'bubble') {
+    if (state.general.type === 'bubble' || !state.table.showFullGeoNameInCSV) {
       // Just Unparse
       csvData = Papa.unparse(rawData)
     } else if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
@@ -157,7 +157,7 @@ const DataTable = props => {
         Download Data (CSV)
       </a>
     )
-  }, [rawData])
+  }, [rawData, state.table])
 
   // Change accessibility label depending on expanded status
   useEffect(() => {
