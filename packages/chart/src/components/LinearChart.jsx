@@ -309,8 +309,6 @@ export default function LinearChart() {
                     const tickLength = showTicks === 'block' ? 7 : 0
                     const to = { x: tick.to.x - tickLength, y: tick.to.y }
 
-                    console.log('tick', tick)
-
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                         {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={config.useLogScale ? to : tick.to} stroke={config.yAxis.tickColor} display={config.runtime.horizontal ? 'none' : 'block'} />}
