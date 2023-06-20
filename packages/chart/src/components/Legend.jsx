@@ -7,8 +7,8 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import useLegendClasses from './../hooks/useLegendClasses'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
+// * FILE REVIEW *
 // TODO: fix eslint-disable jsxa11y issues
-// TODO: use destructuring
 
 // * ADDITIONAL NOTES *
 // > recently removed dynamic legend items as they weren't used
