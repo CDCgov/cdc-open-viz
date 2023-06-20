@@ -13,8 +13,10 @@ import Loading from '@cdc/core/components/Loading'
 // FILE REVIEW
 // TODO: Remove eslint-disable jsx/a11y/non-interactive-tabindex and handle appropriately
 // TODO: Move ExternalIcon to core Icon component
-// TODO: It looks like there's an unused variable setFilteredCountryCode
-// TODO: change function declarations to arrow functions
+// TODO: use destructuring
+// TODO: @tturnerswdev33 - It looks like there's an unused variable setFilteredCountryCode that was added
+// TODO: @tturnerswdev33 - change function declarations to arrow functions
+// TODO: @tturnerswdev33 - move caption so that useMemo is not rendered conditionally
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
