@@ -27,7 +27,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
 
   // import tooltip helpers
-  const { tooltipData, showTooltip } = useTooltip()
+  const { tooltipData, showTooltip, hideTooltip } = useTooltip()
 
   // here we're inside of the svg,
   // it appears we need to use TooltipInPortal.
@@ -183,6 +183,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                   fillOpacity={0.05}
                   style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
                   onMouseMove={e => handleMouseOver(e, data)}
+                  onMouseOut={hideTooltip}
                   />
 
                 {/* circles that appear on hover */}
