@@ -72,6 +72,9 @@ const hashObj = row => {
   }
 }
 
+// * FILE REVIEW
+// TODO: @tturnerswdev33 - remove/fix mentions of runtimeLegend that were added
+
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
@@ -376,8 +379,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.name || series.label || series.dataKey)
+            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
             return series.dataKey
           })
         : []

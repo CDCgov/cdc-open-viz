@@ -1,7 +1,7 @@
 import React, { useEffect, useState, memo, useMemo } from 'react'
 
 import Papa from 'papaparse'
-import ExternalIcon from '../assets/external-link.svg' // TODO: Move to Icon component
+import ExternalIcon from '../assets/external-link.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -10,13 +10,26 @@ import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 import Loading from '@cdc/core/components/Loading'
 
+// FILE REVIEW
+// TODO: Remove eslint-disable jsx/a11y/non-interactive-tabindex and handle appropriately
+// TODO: Move ExternalIcon to core Icon component
+// TODO: use destructuring
+// TODO: @tturnerswdev33 - It looks like there's an unused variable setFilteredCountryCode that was added
+// TODO: @tturnerswdev33 - change function declarations to arrow functions
+// TODO: @tturnerswdev33 - move caption so that useMemo is not rendered conditionally
+
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
-  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, formatNumber, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, parseDate, formatDate, isDebug } = props
-  if (isDebug) console.log('core/DataTable: props=', props)
-  if (isDebug) console.log('core/DataTable: runtimeData=', runtimeData)
-  if (isDebug) console.log('core/DataTable: rawData=', rawData)
-  if (isDebug) console.log('core/DataTable: config=', config)
+  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, isDebug } = props
+
+  /* eslint-disable no-console */
+  if (isDebug) {
+    console.log('core/DataTable: props=', props)
+    console.log('core/DataTable: runtimeData=', runtimeData)
+    console.log('core/DataTable: rawData=', rawData)
+    console.log('core/DataTable: config=', config)
+  }
+  /* eslint-enable no-console */
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
@@ -299,12 +312,17 @@ const DataTable = props => {
     }
   }
 
-  function genChartHeader(columns, data) {
+  const genChartHeader = (columns, data) => {
     return (
       <tr>
         {dataSeriesColumns().map(column => {
           let custLabel = getLabel(column) ? getLabel(column) : column
           let text = column === config.xAxis.dataKey ? config.table.indexLabel : custLabel
+
+          // If a user sets the name on a series use that.
+          let userUpdatedSeriesName = config.series.filter(series => series.dataKey === column)?.[0]?.name
+          if (userUpdatedSeriesName) text = userUpdatedSeriesName
+
           return (
             <th
               key={`col-header-${column}`}
@@ -338,30 +356,26 @@ const DataTable = props => {
     const allrows = rows.map(row => {
       return (
         <tr role='row'>
-          {dataSeriesColumns()
-            //.filter(column => columns[column].dataTable === true && columns[column].name)
-            .map(column => {
-              let cellValue
-              if (column === config.xAxis.dataKey) {
-                const rowObj = runtimeData[row]
-                //const legendColor = applyLegendToRow(rowObj)
-                var labelValue = rowObj[column] // just raw X axis string
-                labelValue = getCellAnchor(labelValue, rowObj)
-                // no colors on row headers for charts bc it's Date not data
-                // Remove this - <LegendCircle fill={legendColor[row]} />
-                cellValue = <>{labelValue}</>
-              } else {
-                cellValue = displayDataAsText(runtimeData[row][column], column)
-              }
+          {dataSeriesColumns().map(column => {
+            let cellValue
+            if (column === config.xAxis.dataKey) {
+              const rowObj = runtimeData[row]
+              //const legendColor = applyLegendToRow(rowObj)
+              var labelValue = rowObj[column] // just raw X axis string
+              labelValue = getCellAnchor(labelValue, rowObj)
+              // no colors on row headers for charts bc it's Date not data
+              // Remove this - <LegendCircle fill={legendColor[row]} />
+              cellValue = <>{labelValue}</>
+            } else {
+              cellValue = displayDataAsText(runtimeData[row][column], column)
+            }
 
-              //MAP SPECIFIC- change to CHART specific
-              // onClick = { e => (config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}
-              return (
-                <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`}>
-                  {cellValue}
-                </td>
-              )
-            })}
+            return (
+              <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`}>
+                {cellValue}
+              </td>
+            )
+          })}
         </tr>
       )
     })
