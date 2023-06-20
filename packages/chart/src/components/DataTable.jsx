@@ -95,6 +95,9 @@ export default function DataTable() {
               Header: '',
               Cell: ({ row }) => {
                 const getSeriesLabel = () => {
+                  let userUpdatedSeriesName = config.series.filter(series => series.dataKey === row.original)?.[0]?.name
+
+                  if (userUpdatedSeriesName) return userUpdatedSeriesName
                   if (config.runtimeSeriesLabels) return config.runtime.seriesLabels[row.original]
                   return row.original
                 }
