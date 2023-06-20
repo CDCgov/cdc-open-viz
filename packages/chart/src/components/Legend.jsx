@@ -118,6 +118,38 @@ const Legend = () => {
 
       return seriesLabels
     }
+
+    // DEV-4161: replaceable series name in the legend
+    const hasNewSeriesName = config.series.map(s => s.name).filter(item => item).length > 0
+    if (hasNewSeriesName) {
+      let palette = colorPalettes[config.palette]
+
+      while (tableData.length > palette.length) {
+        palette = palette.concat(palette)
+      }
+
+      palette = palette.slice(0, data.length)
+      //store unique values to Set by colorCode
+      const set = new Set()
+
+      config.series.forEach(d => {
+        set.add(d['name'] ? d['name'] : d['dataKey'])
+      })
+
+      // create labels with unique values
+      const uniqueLabels = Array.from(set).map((val, i) => {
+        const newLabel = {
+          datum: val,
+          index: i,
+          text: val,
+          value: palette[i]
+        }
+        return newLabel
+      })
+
+      return uniqueLabels
+    }
+
     return defaultLabels
   }
 

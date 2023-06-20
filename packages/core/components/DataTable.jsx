@@ -312,12 +312,17 @@ const DataTable = props => {
     }
   }
 
-  function genChartHeader(columns, data) {
+  const genChartHeader = (columns, data) => {
     return (
       <tr>
         {dataSeriesColumns().map(column => {
           let custLabel = getLabel(column) ? getLabel(column) : column
           let text = column === config.xAxis.dataKey ? config.table.indexLabel : custLabel
+
+          // If a user sets the name on a series use that.
+          let userUpdatedSeriesName = config.series.filter(series => series.dataKey === column)?.[0]?.name
+          if (userUpdatedSeriesName) text = userUpdatedSeriesName
+
           return (
             <th
               key={`col-header-${column}`}
