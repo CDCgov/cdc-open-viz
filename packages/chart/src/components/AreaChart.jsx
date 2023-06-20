@@ -13,7 +13,7 @@ import { useTooltip, useTooltipInPortal, defaultStyles, Tooltip } from '@visx/to
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 
-const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, chartRef, isDebug, isBrush, children }) => {
+const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, chartRef, isDebug, isBrush, brushData, children }) => {
   // enable various console logs in the file
   const DEBUG = isDebug
   const [chartPosition, setChartPosition] = useState(null)
@@ -25,6 +25,8 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
   // import data from context
   const { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale } = useContext(ConfigContext)
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
+
+  console.log('### data, BrushData', data, brushData)
 
   // import tooltip helpers
   const { tooltipData, showTooltip } = useTooltip()
@@ -61,6 +63,24 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
       return val
     }
   }
+
+  const getXAxisDates = brushDataSet => {
+    //debugger
+    if (undefined === brushDataSet || !brushDataSet) return
+    let XAxisBrushDates = []
+    brushDataSet.forEach(function convertDateTimeNumber(key, value, brushDataSet) {
+      let tmp = getXValueFromCoordinate(xScale(value))
+      //console.log('getXAxisDates xvalue', tmp)
+      let date = formatDate(tmp)
+      //console.log('Converted X Date=', date)
+      XAxisBrushDates.push(date)
+    })
+    return XAxisBrushDates
+  }
+
+  // just for testing the conversion
+  const brushDataSet = getXAxisDates(brushData)
+  console.log('####filtered brushDataSet', brushDataSet)
 
   const handleMouseOver = (e, data) => {
     // get the svg coordinates of the mouse

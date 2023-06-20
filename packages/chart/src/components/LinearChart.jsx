@@ -111,7 +111,9 @@ export default function LinearChart() {
   const brushRef = useRef(BaseBrush) // (useRef < BaseBrush) | (null > null)
 
   // getters & functions
-  const getXAxisData = d => {
+  const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+
+  const getXAxisDataBAD = d => {
     if (config.runtime.xAxis.type === 'date') {
       let xdatetime = parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
 
@@ -140,7 +142,7 @@ export default function LinearChart() {
   const { min, max } = useMinMax(properties)
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding } = useScales({ ...properties, min, max })
 
-  const onBrushChange = (domain = Bounds | null) => {
+  const onBrushChange = domain => {
     if (!domain) return
     const { x0, x1, y0, y1 } = domain
     console.log('## onBrushChange domain x0, x1', domain, x0, x1)
@@ -151,29 +153,13 @@ export default function LinearChart() {
       //const y = getStockValue(s)
       if (x > x0 && x < x1) brushFilteredData.add(x)
     })
+    console.log('## Set brushFilteredData', brushFilteredData)
     setXAxisBrushData(brushFilteredData)
     // WHAT DATA IS USED TO FEED MAIN CHART?
     // -- need that as a STATE variable
     // --- THEN set it here to cause MAIN chart to update
     //setFilteredStock(stockCopy)
   }
-
-  /*   const onBrushChangeBAD = (domain = Bounds | null) => {
-    if (!domain) return
-    const { x0, x1, y0, y1 } = domain
-    debugger
-    let x0Scaled = xScale(x0)
-    let x1Scaled = xScale(x1)
-    console.log('onBrushChange x0Scaled', x0Scaled)
-    console.log('onBrushChange x1Scaled', x1Scaled)
-    let x0Min = getXValueFromCoordinateDate(x0Scaled)
-    let x1Max = getXValueFromCoordinateDate(x1Scaled)
-    console.log('onBrushChange x0Min', x0Min)
-    console.log('onBrushChange x1Max', x1Max)
-    console.log('onBrushChange domain', domain)
-    let x0Date = x0Min.getTime() // converts it back to the original unscaled x0
-    console.log('# onBrushChange x0Date', x0Date)
-  } */
 
   const handleLeftTickFormatting = tick => {
     if (config.useLogScale && tick === 0.1) {
@@ -712,9 +698,9 @@ export default function LinearChart() {
         {/* brush */}
         {/* config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} isDebug={isDebug} isBrush={true} /> */}
 
-        {config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && (
+        {config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
           <>
-            <CoveAreaChart className='brushChart' xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} isDebug={isDebug} isBrush={true}>
+            <CoveAreaChart className='brushChart' xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} brushData={xAxisBrushData} isDebug={isDebug} isBrush={true}>
               <PatternLines id={PATTERN_ID} height={8} width={8} stroke={accentColor} strokeWidth={1} orientation={['diagonal']} style={styles} />
               <Brush
                 id='theBrush'
@@ -739,11 +725,6 @@ export default function LinearChart() {
             </CoveAreaChart>
           </>
         )}
-
-        {/*}
-        <div>TEST2</div>
-          <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} isDebug={isDebug} isBrush={true} />
-          */}
 
         {/* y anchors */}
         {config.yAxis.anchors &&
