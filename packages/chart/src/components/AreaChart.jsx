@@ -26,7 +26,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
   const { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale } = useContext(ConfigContext)
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
 
-  console.log('### data, BrushData', data, brushData)
+  //console.log('### data, BrushData', data, brushData)
 
   // import tooltip helpers
   const { tooltipData, showTooltip } = useTooltip()
@@ -56,9 +56,11 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
     }
 
     if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
+      //debugger
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
       const x0 = xScale.invert(x)
       const index = bisectDate(config.data, x0, 1)
+      //console.log('##AREACHART: x x0 index config.data', x, x0, index, config.data)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
       return val
     }
@@ -70,7 +72,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
     let XAxisBrushDates = []
     brushDataSet.forEach(function convertDateTimeNumber(key, value, brushDataSet) {
       let tmp = getXValueFromCoordinate(xScale(value))
-      //console.log('getXAxisDates xvalue', tmp)
+      //console.log('AREACHART: getXAxisDates value date', value, tmp)
       let date = formatDate(tmp)
       //console.log('Converted X Date=', date)
       XAxisBrushDates.push(date)
@@ -80,7 +82,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
 
   // just for testing the conversion
   const brushDataSet = getXAxisDates(brushData)
-  console.log('####filtered brushDataSet', brushDataSet)
+  //console.log('####filtered brushDataSet', brushDataSet)
 
   const handleMouseOver = (e, data) => {
     // get the svg coordinates of the mouse

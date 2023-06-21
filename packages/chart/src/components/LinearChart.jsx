@@ -142,18 +142,44 @@ export default function LinearChart() {
   const { min, max } = useMinMax(properties)
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding } = useScales({ ...properties, min, max })
 
+  // Helper for getting data to the closest date/category hovered.
+  const getXValueFromCoordinateDate = x => {
+    console.log('##getXValueFromCoordinateDate: incoming x', x)
+    if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
+      let eachBand = xScale.step()
+      let numerator = x
+      const index = Math.floor(Number(numerator) / eachBand)
+      return xScale.domain()[index - 1] // fixes off by 1 error
+    }
+
+    if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
+      //debugger
+      const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
+      const x0 = xScale.invert(xScale(x)) // GETTING INVALID DATE ****
+      const index = bisectDate(config.data, x0, 1)
+      //console.log('##LinearChart: x x0 index config.data', x, x0, index, config.data)
+      const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
+      console.log('##LinearChart: getXValueFromCoordinate DATE', val)
+      return val
+    }
+  }
+
   const onBrushChange = domain => {
     if (!domain) return
     const { x0, x1, y0, y1 } = domain
-    console.log('## onBrushChange domain x0, x1', domain, x0, x1)
-    const brushFilteredData = new Set()
-    config.data.filter(s => {
+    //console.log('## onBrushChange domain x0, x1', domain, x0, x1)
+    let brushFilteredData = []
+    brushFilteredData = config.data.filter(s => {
       const x = getDate(s).getTime()
-      console.log('# onBrushChange date to time x0,x,x1', x0, x, x1)
+      //console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
       //const y = getStockValue(s)
-      if (x > x0 && x < x1) brushFilteredData.add(x)
+      if (x > x0 && x < x1) {
+        //let date = formatDate(getXValueFromCoordinateDate(x))
+        //console.log('YES ADD', date)
+        return s
+      }
     })
-    console.log('## Set brushFilteredData', brushFilteredData)
+    console.log('### Set ### brushFilteredData', brushFilteredData)
     setXAxisBrushData(brushFilteredData)
     // WHAT DATA IS USED TO FEED MAIN CHART?
     // -- need that as a STATE variable
@@ -241,8 +267,7 @@ export default function LinearChart() {
     }
   }
 
-  // Helper for getting data to the closest date/category hovered.
-  const getXValueFromCoordinateDate = x => {
+  const getXValueFromCoordinateDateBAD = x => {
     if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
       debugger
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
@@ -377,8 +402,6 @@ export default function LinearChart() {
   }
   const initialBrushPosition = useMemo(
     () => ({
-      //start: { x: xScale(parseDate(0)) },
-      //end: { x: xScale(parseDate(3)) }
       start: { x: 0 },
       end: { x: xMax }
     }),
