@@ -41,8 +41,6 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
   // Turn DEBUG on for additional context.
   if (!data) return
   let barThickness = xMax / data.length
-  let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
-  let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
 
   // Tooltip helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinate = x => {
@@ -87,6 +85,9 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
       if (!yScaleValues[0]) return
       for (const item of Object.entries(yScaleValues[0])) {
         if (item[0] === seriesKey) {
+          // let userUpdatedSeriesName = config.series.filter(series => series.dataKey === item[0])?.[0]?.name
+          // if (userUpdatedSeriesName) item[0] = userUpdatedSeriesName
+
           seriesToInclude.push(item)
         }
       }
@@ -95,6 +96,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
     // filter out the series that aren't added to the map.
     seriesToInclude.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series])))
     if (!seriesToInclude) return
+
     let tooltipDataFromSeries = Object.fromEntries(seriesToInclude) ? Object.fromEntries(seriesToInclude) : {}
 
     let tooltipData = {}
