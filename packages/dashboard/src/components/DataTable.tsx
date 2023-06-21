@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo, memo } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 import Icon from '@cdc/core/components/ui/Icon'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -94,7 +94,7 @@ export default function DataTable(props) {
 
   return (
     <ErrorBoundary component='DataTable'>
-      <CoveMediaControls.Section classes={['download-links']}>
+      <MediaControls.Section classes={['download-links']}>
         {config.table.showDownloadUrl && dataFileSourceType === 'url' && (
           <a className='dashboard-download-link' href={config.datasets[datasetKey].dataFileName} title='Link to View Dataset' target='_blank'>
             {' '}
@@ -103,7 +103,7 @@ export default function DataTable(props) {
           </a>
         )}
         {config.table.download && <DownloadButton data={data} />}
-      </CoveMediaControls.Section>
+      </MediaControls.Section>
       {config.table.show && (
         <section className={`data-table-container`} aria-label={accessibilityLabel}>
           <div
@@ -119,7 +119,7 @@ export default function DataTable(props) {
               }
             }}
           >
-            <Icon display={tableExpanded ? 'minus' : 'plus'} base/>
+            <Icon display={tableExpanded ? 'minus' : 'plus'} base />
             {config.table.label}
             {datasetKey ? `: ${datasetKey}` : ''}
           </div>
