@@ -8,6 +8,9 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
+import { parseDate, formatDate } from '@cdc/core/helpers/cove/date'
+import { formatNumber } from '@cdc/core/helpers/cove/number'
+
 import Loading from '@cdc/core/components/Loading'
 
 // FILE REVIEW
@@ -352,22 +355,32 @@ const DataTable = props => {
     )
   }
 
-  function genChartRows(rows) {
-    const allrows = rows.map(row => {
+  const genChartRows = rows => {
+    const allRows = rows.map(row => {
       return (
         <tr role='row'>
           {dataSeriesColumns().map(column => {
-            let cellValue
+            const rowObj = runtimeData[row]
+            let cellValue // placeholder for formatting below
+            let labelValue = rowObj[column] // just raw X axis string
             if (column === config.xAxis.dataKey) {
-              const rowObj = runtimeData[row]
-              //const legendColor = applyLegendToRow(rowObj)
-              var labelValue = rowObj[column] // just raw X axis string
-              labelValue = getCellAnchor(labelValue, rowObj)
-              // no colors on row headers for charts bc it's Date not data
-              // Remove this - <LegendCircle fill={legendColor[row]} />
-              cellValue = <>{labelValue}</>
+              // not the prettiest, but helper functions work nicely here.
+              cellValue = <>{formatDate(config.xAxis.dateDisplayFormat, parseDate(config.xAxis.dateParseFormat, labelValue))}</>
             } else {
-              cellValue = displayDataAsText(runtimeData[row][column], column)
+              let resolvedAxis = ''
+              let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
+              let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
+              console.log('column', column)
+
+              leftAxisItems.map(leftSeriesItem => {
+                if (leftSeriesItem.dataKey === column) resolvedAxis = 'left'
+              })
+
+              rightAxisItems.map(rightSeriesItem => {
+                if (rightSeriesItem.dataKey === column) resolvedAxis = 'right'
+              })
+
+              cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config)
             }
 
             return (
@@ -379,7 +392,7 @@ const DataTable = props => {
         </tr>
       )
     })
-    return allrows
+    return allRows
   }
 
   const limitHeight = {
