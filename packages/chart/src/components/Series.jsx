@@ -93,6 +93,7 @@ const SeriesDropdownSeriesType = props => {
     }
     if (config.visualizationType === 'Line') {
       return {
+        Line: 'Line',
         'dashed-sm': 'Small Dashed',
         'dashed-md': 'Medium Dashed',
         'dashed-lg': 'Large Dashed'
