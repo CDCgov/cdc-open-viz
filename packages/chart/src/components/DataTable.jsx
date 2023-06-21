@@ -133,7 +133,19 @@ export default function DataTable() {
         const newCol = {
           Header: resolveTableHeader(),
           Cell: ({ row }) => {
-            return <>{numberFormatter(d[row.original], 'left')}</>
+            let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
+            let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
+            let resolvedAxis = ''
+
+            leftAxisItems.map(leftSeriesItem => {
+              if (leftSeriesItem.dataKey === row.original) resolvedAxis = 'left'
+            })
+
+            rightAxisItems.map(rightSeriesItem => {
+              if (rightSeriesItem.dataKey === row.original) resolvedAxis = 'right'
+            })
+
+            return <>{numberFormatter(d[row.original], resolvedAxis)}</>
           },
           id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
           canSort: true
