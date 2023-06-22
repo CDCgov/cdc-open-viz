@@ -377,7 +377,7 @@ const CountyMap = props => {
   return (
     <ErrorBoundary component='CountyMap'>
       <canvas ref={canvasRef} aria-label={handleMapAriaLabels(state)} onMouseMove={canvasHover} onClick={canvasClick}></canvas>
-      <div ref={tooltipRef} id='canvas-tooltip' className='tooltip'></div>
+      <div ref={tooltipRef} id='canvas-tooltip' className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})` }}></div>
       <button className={`btn btn--reset`} onClick={onReset} ref={resetButton} tabIndex='0'>
         Reset Zoom
       </button>
