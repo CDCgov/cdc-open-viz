@@ -10,7 +10,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 
 import ConfigContext from '../ConfigContext'
 
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 
 export default function DataTable() {
   const { rawData, tableData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
@@ -228,10 +228,10 @@ export default function DataTable() {
 
   return (
     <ErrorBoundary component='DataTable'>
-      <CoveMediaControls.Section classes={['download-links']}>
-        <CoveMediaControls.Link config={config} />
+      <MediaControls.Section classes={['download-links']}>
+        <MediaControls.Link config={config} />
         {config.table.download && <DownloadButton data={rawData} type='link' />}
-      </CoveMediaControls.Section>
+      </MediaControls.Section>
 
       <section id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
         <div

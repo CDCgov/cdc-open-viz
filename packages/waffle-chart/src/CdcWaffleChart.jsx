@@ -18,6 +18,7 @@ import defaults from './data/initial-state'
 import { publish } from '@cdc/core/helpers/events'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 import './scss/main.scss'
 
@@ -371,7 +372,8 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
 
     response.data = responseData
 
-    updateConfig({ ...defaults, ...response })
+    const processedConfig = { ...(await coveUpdateWorker(response)) }
+    updateConfig({ ...defaults, ...processedConfig })
     setLoading(false)
   }, [])
 
