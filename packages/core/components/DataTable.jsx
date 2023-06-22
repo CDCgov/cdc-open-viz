@@ -6,7 +6,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 
 import { parseDate, formatDate } from '@cdc/core/helpers/cove/date'
 import { formatNumber } from '@cdc/core/helpers/cove/number'
@@ -464,10 +464,10 @@ const DataTable = props => {
 
     return (
       <ErrorBoundary component='DataTable'>
-        <CoveMediaControls.Section classes={['download-links']}>
-          <CoveMediaControls.Link config={config} />
+        <MediaControls.Section classes={['download-links']}>
+          <MediaControls.Link config={config} />
           {(config.table.download || config.general.showDownloadButton) && <DownloadButton />}
-        </CoveMediaControls.Section>
+        </MediaControls.Section>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
             Skip Navigation or Skip to Content
@@ -617,10 +617,10 @@ const DataTable = props => {
     return (
       <ErrorBoundary component='DataTable'>
         {/* cove media results in error so disabling for now (TT)
-        <CoveMediaControls.Section classes={['download-links']}>
-          <CoveMediaControls.Link config={config} />
+        <MediaControls.Section classes={['download-links']}>
+          <MediaControls.Link config={config} />
           {config.general.showDownloadButton && <DownloadButton />}
-        </CoveMediaControls.Section>
+        </MediaControls.Section>
         */}
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
