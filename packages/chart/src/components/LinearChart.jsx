@@ -388,6 +388,20 @@ export default function LinearChart() {
     showTooltip(tooltipInformation)
   }
 
+  const tooltipStyles = tooltipData => {
+    const { dataXPosition, dataYPosition } = tooltipData
+    if (!dataXPosition || !dataYPosition) return false
+
+    return {
+      top: 0,
+      left: 0,
+      transform: `translate(${dataXPosition}px, ${Number(dataYPosition) - yMax}px)`,
+      opacity: '1',
+      width: 'fit-content',
+      background: 'white'
+    }
+  }
+
   return isNaN(width) ? (
     <></>
   ) : (
@@ -813,16 +827,16 @@ export default function LinearChart() {
       {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
         <TooltipWithBounds
           key={Math.random()}
-          top={Number(tooltipData.dataYPosition) + Number(chartPosition?.top)}
-          left={Number(tooltipData.dataXPosition) + Number(chartPosition?.left)}
-          className='cdc-open-viz-module tooltip'
-          // style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})` }}
+          className={'tooltip cdc-open-viz-module'}
+          // top={Number(tooltipData.dataYPosition) + Number(chartPosition?.top)}
+          // left={Number(tooltipData.dataXPosition) + Number(chartPosition?.left)}
+          style={tooltipStyles(tooltipData)}
           width={width}
         >
           <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
         </TooltipWithBounds>
       )}
-      <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
+      {/* <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' /> */}
       <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
   )
