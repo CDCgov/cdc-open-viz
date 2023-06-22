@@ -168,7 +168,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         const regex = /(?:\.([^.]+))?$/
 
         const ext = regex.exec(dataUrl.pathname)[1]
+        debugger
         if ('csv' === ext) {
+          debugger
           data = await fetch(dataUrlFinal)
             .then(response => response.text())
             .then(responseText => {
@@ -189,7 +191,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         data = []
       }
 
+      console.log('CdcChart data=', data)
       if (config.dataDescription) {
+        debugger
         data = transform.autoStandardize(data)
         data = transform.developerStandardize(data, config.dataDescription)
       }
@@ -279,6 +283,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
 
       if (response.dataDescription) {
+        debugger
         data = transform.autoStandardize(data)
         data = transform.developerStandardize(data, response.dataDescription)
       }

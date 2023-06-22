@@ -12,10 +12,11 @@ export class DataTransform {
   //Performs standardizations that can be completed automatically without use input
   autoStandardize(data) {
     const errorsFound = [];
-
+debugger
     // Empty data
     if (0 === data.length) {
       errorsFound.push(this.constants.errorMessageEmptyData);
+      //return undefined;
     }
 
     // Does it have the correct data structure?
