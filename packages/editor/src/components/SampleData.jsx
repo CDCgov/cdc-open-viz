@@ -34,12 +34,12 @@ const sampleData = {
       text: 'Area Chart Sample Data',
       fileName: 'valid-area-chart.json',
       data: validAreaChart
-    },
-    {
-      text: 'Forecast Chart Data',
-      fileName: 'valid-forecast-data.csv',
-      data: validForecastData
     }
+    // {
+    //   text: 'Forecast Chart Data',
+    //   fileName: 'valid-forecast-data.csv',
+    //   data: validForecastData
+    // }
   ],
   maps: [
     {

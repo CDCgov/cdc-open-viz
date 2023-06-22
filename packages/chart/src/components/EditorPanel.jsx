@@ -831,7 +831,7 @@ const EditorPanel = () => {
     'Box Plot',
     'Combo',
     'Deviation Bar',
-    'Forecasting',
+    // 'Forecasting',
     'Line',
     'Paired Bar',
     'Pie',
@@ -1544,7 +1544,7 @@ const EditorPanel = () => {
                 )}
 
                 {/* start: anchors */}
-                {visHasAnchors() && config.orientation !== 'horizontal' ? (
+                {visHasAnchors() && config.orientation !== 'horizontal' && (
                   <div className='edit-block'>
                     <h3>Anchors</h3>
                     <Accordion allowZeroExpanded>
@@ -1668,7 +1668,9 @@ const EditorPanel = () => {
                       Add Anchor
                     </button>
                   </div>
-                ) : (
+                )}
+
+                {visHasAnchors() && config.orientation === 'horizontal' && (
                   <div className='edit-block'>
                     <h3>Anchors</h3>
                     <Accordion allowZeroExpanded>
@@ -2163,7 +2165,7 @@ const EditorPanel = () => {
                 )}
 
                 {/* anchors */}
-                {visHasAnchors() && config.orientation !== 'horizontal' ? (
+                {visHasAnchors() && config.orientation !== 'horizontal' && (
                   <div className='edit-block'>
                     <h3>Anchors</h3>
                     <Accordion allowZeroExpanded>
@@ -2287,7 +2289,9 @@ const EditorPanel = () => {
                       Add Anchor
                     </button>
                   </div>
-                ) : (
+                )}
+
+                {visHasAnchors() && config.orientation === 'horizontal' && (
                   <div className='edit-block'>
                     <h3>Anchors</h3>
                     <Accordion allowZeroExpanded>
