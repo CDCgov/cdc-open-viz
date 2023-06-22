@@ -13,6 +13,7 @@ export class DataTransform {
   autoStandardize(data) {
     const errorsFound = [];
 
+    // Empty data
     if (0 === data.length) {
       errorsFound.push(this.constants.errorMessageEmptyData);
     }
