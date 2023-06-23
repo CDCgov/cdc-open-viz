@@ -205,8 +205,8 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                   <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
                     <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id}>
                       {typeof tooltipData === 'object' &&
-                        Object.entries(tooltipData.data).map(item => (
-                          <li style={{ padding: '2.5px 0' }}>
+                        Object.entries(tooltipData.data).map((item, index) => (
+                          <li key={index} style={{ padding: '2.5px 0' }}>
                             <TooltipListItem item={item} />
                           </li>
                         ))}

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useContext, useEffect, useRef, useState } from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 import { Group } from '@visx/group'
@@ -28,7 +28,7 @@ import useTopAxis from '../hooks/useTopAxis'
 import Forecasting from './Forecasting'
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, getTextWidth } = useContext(ConfigContext)
 
   // getters & functions
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
@@ -169,12 +169,12 @@ export default function LinearChart() {
 
     // loop through series for items to add to tooltip.
     // there is probably a better way of doing this.
-    config.series?.map(s => {
+    config.series?.forEach(s => {
       if (s.type === 'Forecasting') {
         stageColumns.push(s.stageColumn)
 
         // greedy fn 😭
-        s?.confidenceIntervals.map(ci => {
+        s?.confidenceIntervals.forEach(ci => {
           if (ci.showInTooltip === true) {
             ciItems.push(ci.low)
             ciItems.push(ci.high)
@@ -425,19 +425,43 @@ export default function LinearChart() {
             tickFormat={handleBottomTickFormatting}
             scale={xScale}
             stroke='#333'
-            tickStroke='#333'
             numTicks={countNumOfTicks('xAxis')}
+            tickStroke='#333'
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
+              // Calculate sumOfTickWidth here, before map function
+              const fontSize = { small: 16, medium: 18, large: 20 }
+              const textWidths = props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`))
+              const sumOfTickWidth = textWidths.reduce((a, b) => a + b, 100)
+              const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (props.ticks.length - 1)
+
+              // Check if ticks are overlapping
+              // Determine the position of each tick
+              let positions = [0] // The first tick is at position 0
+              for (let i = 1; i < textWidths.length; i++) {
+                // The position of each subsequent tick is the position of the previous tick
+                // plus the width of the previous tick and the space
+                positions[i] = positions[i - 1] + textWidths[i - 1] + spaceBetweenEachTick
+              }
+
+              // Check if ticks are overlapping
+              let areTicksTouching = false
+              textWidths.forEach((_, i) => {
+                if (positions[i] + textWidths[i] > positions[i + 1]) {
+                  areTicksTouching = true
+                  return
+                }
+              })
               return (
                 <Group className='bottom-axis'>
                   {props.ticks.map((tick, i) => {
                     // when using LogScale show major ticks values only
                     const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
-                    const tickWidth = xMax / props.ticks.length
                     const tickLength = showTick === 'block' ? 16 : 8
                     const to = { x: tick.to.x, y: tickLength }
+                    let textWidth = getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                    const tickRotation = areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : Number(config.runtime.xAxis.tickRotation)
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -446,10 +470,12 @@ export default function LinearChart() {
                           <Text
                             dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
                             display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
-                            transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
-                            verticalAnchor='start'
-                            textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
-                            width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
+                            x={tick.to.x}
+                            y={tick.to.y}
+                            angle={areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : -tickRotation}
+                            verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
+                            textAnchor={tickRotation ? 'end' : 'middle'}
+                            width={textWidth}
                             fill={config.xAxis.tickLabelColor}
                           >
                             {tick.formattedValue}
