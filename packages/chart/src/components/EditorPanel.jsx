@@ -2062,6 +2062,27 @@ const EditorPanel = () => {
                     )}
 
                     {config.yAxis.labelPlacement !== 'Below Bar' && <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                    <TextField
+                      value={config.xAxis.maxTickRotation}
+                      type='number'
+                      min='0'
+                      section='xAxis'
+                      fieldName='maxTickRotation'
+                      label='Max Tick Rotation'
+                      className='number-narrow'
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Degrees ticks will be rotated if values overlap, especially in smaller viewports.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+
                     {config.orientation === 'horizontal' ? (
                       <>
                         <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
