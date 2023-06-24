@@ -1131,10 +1131,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
-              <div className='p-relative'>
-                {/* All charts except sparkline */}
-                {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
-              </div>
+              {/* All charts except sparkline */}
+              {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
 
               {/* Sparkline */}
               {config.visualizationType === 'Spark Line' && (
