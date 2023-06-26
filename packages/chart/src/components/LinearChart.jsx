@@ -86,13 +86,7 @@ export default function LinearChart() {
 
   const TooltipListItem = ({ item }) => {
     const [label, value] = item
-    return label === config.xAxis.dataKey ? (
-      <li className='tooltip-heading'>
-        <strong>{`${capitalize(config.runtime.xAxis.label ? config.runtime.xAxis.label : label)}: ${value}`}</strong>
-      </li>
-    ) : (
-      <li className='tooltip-body'>{`${label}: ${formatNumber(value, 'left')}`}</li>
-    )
+    return label === config.xAxis.dataKey ? <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? config.runtime.xAxis.label : label)}: ${value}`}</li> : <li className='tooltip-body'>{`${label}: ${formatNumber(value, 'left')}`}</li>
   }
 
   const handleLeftTickFormatting = tick => {
@@ -222,7 +216,6 @@ export default function LinearChart() {
 
   // todo: combine mouseover functions
   const handleTooltipMouseOver = (e, data) => {
-    console.info('handle tooltip mouse over')
     // get the svg coordinates of the mouse
     // and get the closest values
     const eventSvgCoords = localPoint(e)
@@ -409,9 +402,13 @@ export default function LinearChart() {
   const tooltipStyles = tooltipData => {
     const { dataXPosition, dataYPosition } = tooltipData
 
+    console.log('defaultStyles', defaultStyles)
+
     return {
-      opacity: '1',
-      ...defaultStyles,
+      opacity: config.tooltips.opacity ? config.tooltips.opacity / 100 : 1,
+      position: 'absolute',
+      backgroundColor: 'white',
+      borderRadius: '4px',
       transform: `translate(${dataXPosition}px, ${Number(dataYPosition)}px)`
     }
   }
@@ -850,7 +847,7 @@ export default function LinearChart() {
           <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
         </TooltipWithBounds>
       )}
-      {/* <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' /> */}
+      {config.orientation === 'horizontal' && <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
       <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
   )

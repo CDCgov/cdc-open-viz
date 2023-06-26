@@ -71,7 +71,8 @@ const useTooltip = props => {
   const handleTooltipPrimaryColumn = (tooltipValue, column) => {
     const { hidePrimaryColumnInTooltip } = state.general
     let tooltipPrefix = column.label?.length > 0 ? column.label : ''
-    return hidePrimaryColumnInTooltip ? `<div><dd>${tooltipValue}</dd></div>` : `<div><dt>${tooltipPrefix}</dt><dd>${tooltipValue}</dd></div>`
+    if (hidePrimaryColumnInTooltip || !tooltipPrefix) return `<li class="tooltip-body">${tooltipValue}</li>`
+    return `<li class="tooltip-body">${tooltipPrefix}: ${tooltipValue}</li>`
   }
 
   /**
@@ -89,7 +90,7 @@ const useTooltip = props => {
     } = state
 
     if (tooltipEnabledMaps.includes(currentMapType) && undefined !== row) {
-      toolTipText += `<dl>`
+      toolTipText += `<ul className="capitalize">`
 
       // if tooltips are allowed, loop through each column
       Object.keys(columns).forEach(columnKey => {
@@ -105,7 +106,7 @@ const useTooltip = props => {
           toolTipText += handleTooltipPrimaryColumn(tooltipValue, column)
         }
       })
-      toolTipText += `</dl>`
+      toolTipText += `</ul>`
     }
 
     return toolTipText
