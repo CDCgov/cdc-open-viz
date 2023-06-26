@@ -35,7 +35,7 @@ import { defaultStyles } from '@visx/tooltip'
 import '../scss/LinearChart.scss'
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize } = useContext(ConfigContext)
+  const { isEditor, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue } = useContext(ConfigContext)
 
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime } = config
@@ -191,6 +191,35 @@ export default function LinearChart() {
   // visx tooltip hook
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen } = useTooltip()
 
+  /**
+   * handleTooltipClick - used on dashboard filters
+   *  with visx tooltips, the handler is overwritten and we have to get the closest
+   *  x axis value.
+   * TODO: move tooltip handlers to there own hook.
+   * @param {*} e
+   * @param {*} data
+   */
+  const handleTooltipClick = (e, data) => {
+    try {
+      // Get the closest x axis value from the pointer.
+      // After getting the closest value, return the data entry with that x scale value.
+      // Pass the config.visual uid (not uuid) along with that data entry to setSharedFilters
+      const eventSvgCoords = localPoint(e)
+      const { x } = eventSvgCoords
+      if (!x) throw new Error('COVE: no x value in handleTooltipClick.')
+      let closestXScaleValue = getXValueFromCoordinate(x)
+      if (!closestXScaleValue) throw new Error('COVE: no closest x scale value in handleTooltipClick')
+      let datum = config.data.filter(item => item[config.xAxis.dataKey] === closestXScaleValue)
+
+      if (setSharedFilter) {
+        setSharedFilter(config.uid, datum[0])
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e.message)
+    }
+  }
+
   // todo: combine mouseover functions
   const handleTooltipMouseOver = (e, data) => {
     console.info('handle tooltip mouse over')
@@ -282,7 +311,7 @@ export default function LinearChart() {
 
     let tooltipData = {}
     tooltipData.data = initialTooltipData
-    tooltipData.dataXPosition = x + 10
+    tooltipData.dataXPosition = isEditor ? x - 300 + 10 : x + 10
     tooltipData.dataYPosition = y
 
     let tooltipInformation = {
@@ -291,8 +320,6 @@ export default function LinearChart() {
       tooltipValues: yScaleValues,
       tooltipLeft: x
     }
-
-    console.log('tooltip info', tooltipInformation)
 
     showTooltip(tooltipInformation)
   }
@@ -699,6 +726,7 @@ export default function LinearChart() {
             visible={animatedChart}
             handleTooltipMouseOver={handleTooltipMouseOver}
             handleTooltipMouseOff={handleTooltipMouseOff}
+            handleTooltipClick={handleTooltipClick}
             tooltipData={tooltipData}
             showTooltip={showTooltip}
             chartRef={svgRef}
@@ -715,6 +743,7 @@ export default function LinearChart() {
             seriesStyle={config.series}
             handleTooltipMouseOver={handleTooltipMouseOver}
             handleTooltipMouseOff={handleTooltipMouseOff}
+            handleTooltipClick={handleTooltipClick}
             tooltipData={tooltipData}
             showTooltip={showTooltip}
             chartRef={svgRef}
