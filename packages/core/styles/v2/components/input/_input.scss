@@ -2,9 +2,9 @@
   display: block;
   position: relative;
   padding: 0.5em 0.5em;
-  border-width: 1px;
-  border-style: solid;
-  border-color: #cbcbcb;
+  border-width: 1px !important; // intentional use of !important for CDC
+  border-style: solid !important; // intentional use of !important for CDC
+  border-color: #cbcbcb !important; // intentional use of !important for CDC
   border-radius: 0.1875rem;
   transition: border-color 200ms $transition-expo-out;
   font-family: sans-serif;

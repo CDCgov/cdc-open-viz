@@ -79,9 +79,30 @@ const SeriesDropdownSeriesType = props => {
 
   const { index, series } = props
 
-  // Only combo charts are allowed to have different options
-  if (config.visualizationType !== 'Combo') return
+  const getOptions = () => {
+    if (config.visualizationType === 'Combo') {
+      return {
+        Bar: 'Bar',
+        Line: 'Line',
+        'dashed-sm': 'Small Dashed',
+        'dashed-md': 'Medium Dashed',
+        'dashed-lg': 'Large Dashed',
+        'Area Chart': 'Area Chart',
+        Forecasting: 'Forecasting'
+      }
+    }
+    if (config.visualizationType === 'Line') {
+      return {
+        Line: 'Line',
+        'dashed-sm': 'Small Dashed',
+        'dashed-md': 'Medium Dashed',
+        'dashed-lg': 'Large Dashed'
+      }
+    }
+  }
 
+  // Allowable changes
+  if (!['Line', 'Combo'].includes(config.visualizationType)) return
   return (
     <InputSelect
       initial='Select an option'
@@ -90,15 +111,7 @@ const SeriesDropdownSeriesType = props => {
       onChange={event => {
         updateSeries(index, event.target.value, 'type')
       }}
-      options={{
-        Bar: 'Bar',
-        Line: 'Line',
-        'dashed-sm': 'Small Dashed',
-        'dashed-md': 'Medium Dashed',
-        'dashed-lg': 'Large Dashed',
-        'Area Chart': 'Area Chart',
-        Forecasting: 'Forecasting'
-      }}
+      options={getOptions()}
     />
   )
 }
@@ -352,7 +365,7 @@ const SeriesDropdownConfidenceInterval = props => {
 const SeriesInputName = props => {
   const { series, index: i } = props
   const { config, updateConfig } = useContext(ConfigContext)
-  const adjustableNameSeriesTypes = ['Bar', 'Line']
+  const adjustableNameSeriesTypes = ['Bar', 'Line', 'Area Chart']
 
   if (config.visualizationType === 'Combo') return
 

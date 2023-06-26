@@ -10,7 +10,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 
 import ConfigContext from '../ConfigContext'
 
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 
 export default function DataTable() {
   const { rawData, tableData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
@@ -95,6 +95,9 @@ export default function DataTable() {
               Header: '',
               Cell: ({ row }) => {
                 const getSeriesLabel = () => {
+                  let userUpdatedSeriesName = config.series.filter(series => series.dataKey === row.original)?.[0]?.name
+
+                  if (userUpdatedSeriesName) return userUpdatedSeriesName
                   if (config.runtimeSeriesLabels) return config.runtime.seriesLabels[row.original]
                   return row.original
                 }
@@ -130,7 +133,19 @@ export default function DataTable() {
         const newCol = {
           Header: resolveTableHeader(),
           Cell: ({ row }) => {
-            return <>{numberFormatter(d[row.original], 'left')}</>
+            let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
+            let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
+            let resolvedAxis = ''
+
+            leftAxisItems.map(leftSeriesItem => {
+              if (leftSeriesItem.dataKey === row.original) resolvedAxis = 'left'
+            })
+
+            rightAxisItems.map(rightSeriesItem => {
+              if (rightSeriesItem.dataKey === row.original) resolvedAxis = 'right'
+            })
+
+            return <>{numberFormatter(d[row.original], resolvedAxis)}</>
           },
           id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
           canSort: true
@@ -213,10 +228,10 @@ export default function DataTable() {
 
   return (
     <ErrorBoundary component='DataTable'>
-      <CoveMediaControls.Section classes={['download-links']}>
-        <CoveMediaControls.Link config={config} />
+      <MediaControls.Section classes={['download-links']}>
+        <MediaControls.Link config={config} />
         {config.table.download && <DownloadButton data={rawData} type='link' />}
-      </CoveMediaControls.Section>
+      </MediaControls.Section>
 
       <section id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
         <div

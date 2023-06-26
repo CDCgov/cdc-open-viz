@@ -15,6 +15,7 @@ import './scss/main.scss'
 import { publish } from '@cdc/core/helpers/events'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
   // Default States
@@ -57,8 +58,9 @@ const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, i
     }
 
     response.data = responseData
+    const processedConfig = { ...(await coveUpdateWorker(response)) }
 
-    updateConfig({ ...defaults, ...response })
+    updateConfig({ ...defaults, ...processedConfig })
     setLoading(false)
   }, [])
 

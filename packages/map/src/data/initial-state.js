@@ -69,6 +69,7 @@ export default {
     caption: '',
     showDownloadUrl: false,
     showDataTableLink: true,
+    showFullGeoNameInCSV: false,
     forceDisplay: true,
     download: false,
     indexLabel: ''
