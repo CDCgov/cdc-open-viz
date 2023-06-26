@@ -134,11 +134,11 @@ const Section = ({ children, classes }) => {
   )
 }
 
-const CoveMediaControls = () => null
+const MediaControls = () => null
 
-CoveMediaControls.Section = Section
-CoveMediaControls.Link = Link
-CoveMediaControls.Button = Button
-CoveMediaControls.generateMedia = generateMedia
+MediaControls.Section = Section
+MediaControls.Link = Link
+MediaControls.Button = Button
+MediaControls.generateMedia = generateMedia
 
-export default CoveMediaControls
+export default MediaControls

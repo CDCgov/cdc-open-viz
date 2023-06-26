@@ -14,6 +14,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 
 // Helpers
 import { publish } from '@cdc/core/helpers/events'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -30,7 +31,7 @@ import './scss/btn.scss'
 
 // Core
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import Loading from '@cdc/core/components/Loading'
@@ -1089,7 +1090,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (true === Object.keys(dict).includes(value)) {
       value = dict[value]
     }
-    return titleCase(value)
+
+    // if you get here and it's 2 letters then DONT titleCase state abbreviations like "AL"
+    if (value.length === 2) {
+      return value
+    } else {
+      return titleCase(value)
+    }
   }
 
   // todo: convert to store or context eventually.
@@ -1333,7 +1340,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
 
     validateFipsCodeLength(newState)
-    setState(newState)
+
+    // add ability to rename state properties over time.
+    const processedConfig = { ...(await coveUpdateWorker(newState)) }
+
+    setState(processedConfig)
     setLoading(false)
   }
 
@@ -1652,10 +1663,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
-            <CoveMediaControls.Section classes={['download-buttons']}>
-              {state.general.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
-              {state.general.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
-            </CoveMediaControls.Section>
+            <MediaControls.Section classes={['download-buttons']}>
+              {state.general.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
+              {state.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
+            </MediaControls.Section>
 
             {state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading && (
               <DataTable
@@ -1666,6 +1677,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 headerColor={general.headerColor}
                 columns={state.columns}
                 showDownloadButton={general.showDownloadButton}
+                showFullGeoNameInCSV={table.showFullGeoNameInCSV}
                 runtimeLegend={runtimeLegend}
                 runtimeData={runtimeData}
                 displayDataAsText={displayDataAsText}
