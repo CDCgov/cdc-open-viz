@@ -77,7 +77,7 @@ export default {
     appearanceType: 'hover',
     linkLabel: 'Learn More',
     capitalizeLabels: true,
-    opacity: 100
+    opacity: 90
   },
   runtime: {
     editorErrorMessage: []

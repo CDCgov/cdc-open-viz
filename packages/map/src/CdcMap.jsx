@@ -1105,10 +1105,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       if (state.columns.hasOwnProperty('navigate') && row[state.columns.navigate.name]) {
         toolTipText.push(
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-          <span className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[state.columns.navigate.name])}>
+          <ul className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[state.columns.navigate.name])}>
             {state.tooltips.linkLabel}
             <ExternalIcon className='inline-icon ml-1' />
-          </span>
+          </ul>
         )
       }
     }

@@ -449,17 +449,17 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYA
                       let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                       let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                       if (!hasMultipleSeries && config.runtime.horizontal) {
-                        xAxisTooltip = config.isLegendValue ? `${bar.key}: ${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                        xAxisTooltip = config.isLegendValue ? `<p className="tooltip-heading">${bar.key}: ${xAxisValue}</p>` : config.runtime.xAxis.label ? `<p className="tooltip-heading">${config.runtime.xAxis.label}: ${xAxisValue}</p>` : xAxisValue
                       }
                       if (!hasMultipleSeries && !config.runtime.horizontal) {
                         yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                       }
 
-                      const tooltip = `<div>
+                      const tooltip = `<ul>
                       ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
-                      ${yAxisTooltip}<br />
-                      ${xAxisTooltip}
-                        </div>`
+                      <li class="tooltip-heading">${yAxisTooltip}</li>
+                      <li class="tooltip-body">${xAxisTooltip}</li>
+                        </li></ul>`
 
                       const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                       const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
@@ -681,7 +681,7 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYA
         )}
 
         {/* tooltips */}
-        <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={false ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
+        {orientation !== 'horizontal' && <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={false ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />}
       </Group>
     </ErrorBoundary>
   )

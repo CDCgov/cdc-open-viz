@@ -170,6 +170,6 @@ export default {
   highlightedBarValues: [],
   series: [],
   tooltips: {
-    opacity: 100
+    opacity: 90
   }
 }
