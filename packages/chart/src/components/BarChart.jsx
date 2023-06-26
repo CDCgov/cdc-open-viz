@@ -8,7 +8,7 @@ import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
-export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible, handleTooltipMouseOver, handleTooltipMouseOff }) {
+const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible, handleTooltipMouseOver, handleTooltipMouseOff, handleTooltipClick }) => {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, tableData, formatDate, isNumber, getTextWidth, parseDate, setSharedFilter, setSharedFilterValue, dashboardConfig } = useContext(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const { orientation, visualizationSubType } = config
@@ -63,7 +63,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       if (!colorMap.has(values[i])) {
         colorMap.set(values[i], palettesArr[colorMap.size % palettesArr.length])
       }
-      // push the colosr to the result array
+      // push the color to the result array
       result.push(colorMap.get(values[i]))
     }
     return result
@@ -679,9 +679,12 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               : ''}
           </Group>
         )}
+
         {/* tooltips */}
-        {orientation !== 'horizontal' && <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />}
+        <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={false ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
       </Group>
     </ErrorBoundary>
   )
 }
+
+export default BarChart
