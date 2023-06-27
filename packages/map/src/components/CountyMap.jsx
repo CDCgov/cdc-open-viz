@@ -44,9 +44,6 @@ states.forEach(state => {
   countyIndecies[state.id] = [minIndex, maxIndex]
 })
 
-// CREATE STATE LINES
-const projection = geoAlbersUsaTerritories()
-
 // Ensures county map is only rerendered when it needs to (when one of the variables below is updated)
 function CountyMapChecks(prevState, nextState) {
   const equalNumberOptIn = prevState.state.general.equalNumberOptIn && nextState.state.general.equalNumberOptIn
@@ -61,6 +58,9 @@ function CountyMapChecks(prevState, nextState) {
 
 const CountyMap = props => {
   const { state, runtimeLegend, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels } = props
+
+  // CREATE STATE LINES
+  const projection = geoAlbersUsaTerritories()
 
   const [focus, setFocus] = useState({})
 
