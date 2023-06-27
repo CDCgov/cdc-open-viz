@@ -1543,65 +1543,65 @@ const EditorPanel = () => {
                   )
                 )}
 
-                  {/* start: anchors */}
-                  {visHasAnchors() && config.orientation !== 'horizontal' ? (
-                    <div className='edit-block'>
-                      <span className='edit-label column-heading'>Anchors</span>
-                      <Accordion allowZeroExpanded>
-                        {config.yAxis?.anchors?.map((anchor, index) => (
-                          <AccordionItem className='series-item series-item--chart'>
-                            <AccordionItemHeading className='series-item__title'>
-                              <>
-                                <AccordionItemButton className={'accordion__button accordion__button'}>
-                                  Anchor {index + 1}
-                                  <button
-                                    className='series-list__remove'
-                                    onClick={e => {
-                                      e.preventDefault()
-                                      const copiedAnchorGroups = [...config.yAxis.anchors]
-                                      copiedAnchorGroups.splice(index, 1)
-                                      updateConfig({
-                                        ...config,
-                                        yAxis: {
-                                          ...config.yAxis,
-                                          anchors: copiedAnchorGroups
-                                        }
-                                      })
-                                    }}
-                                  >
-                                    Remove
-                                  </button>
-                                </AccordionItemButton>
-                              </>
-                            </AccordionItemHeading>
-                            <AccordionItemPanel>
-                              <label>
-                                <span>Anchor Value</span>
-                                <Tooltip style={{ textTransform: 'none' }}>
-                                  <Tooltip.Target>
-                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                  </Tooltip.Target>
-                                  <Tooltip.Content>
-                                    <p>Enter the value as its shown in the data column</p>
-                                  </Tooltip.Content>
-                                </Tooltip>
-                                <input
-                                  type='text'
-                                  value={config.yAxis.anchors[index].value ? config.yAxis.anchors[index].value : ''}
-                                  onChange={e => {
+                {/* start: anchors */}
+                {visHasAnchors() && config.orientation !== 'horizontal' && (
+                  <div className='edit-block'>
+                    <span className='edit-label column-heading'>Anchors</span>
+                    <Accordion allowZeroExpanded>
+                      {config.yAxis?.anchors?.map((anchor, index) => (
+                        <AccordionItem className='series-item series-item--chart'>
+                          <AccordionItemHeading className='series-item__title'>
+                            <>
+                              <AccordionItemButton className={'accordion__button accordion__button'}>
+                                Anchor {index + 1}
+                                <button
+                                  className='series-list__remove'
+                                  onClick={e => {
                                     e.preventDefault()
-                                    const copiedAnchors = [...config.yAxis.anchors]
-                                    copiedAnchors[index].value = e.target.value
+                                    const copiedAnchorGroups = [...config.yAxis.anchors]
+                                    copiedAnchorGroups.splice(index, 1)
                                     updateConfig({
                                       ...config,
                                       yAxis: {
                                         ...config.yAxis,
-                                        anchors: copiedAnchors
+                                        anchors: copiedAnchorGroups
                                       }
                                     })
                                   }}
-                                />
-                              </label>
+                                >
+                                  Remove
+                                </button>
+                              </AccordionItemButton>
+                            </>
+                          </AccordionItemHeading>
+                          <AccordionItemPanel>
+                            <label>
+                              <span>Anchor Value</span>
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Enter the value as its shown in the data column</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                              <input
+                                type='text'
+                                value={config.yAxis.anchors[index].value ? config.yAxis.anchors[index].value : ''}
+                                onChange={e => {
+                                  e.preventDefault()
+                                  const copiedAnchors = [...config.yAxis.anchors]
+                                  copiedAnchors[index].value = e.target.value
+                                  updateConfig({
+                                    ...config,
+                                    yAxis: {
+                                      ...config.yAxis,
+                                      anchors: copiedAnchors
+                                    }
+                                  })
+                                }}
+                              />
+                            </label>
 
                             <label>
                               <span>Anchor Color</span>
@@ -1668,7 +1668,7 @@ const EditorPanel = () => {
                       Add Anchor
                     </button>
                   </div>
-                ) : (
+                )}
 
                 {visHasAnchors() && config.orientation === 'horizontal' && (
                   <div className='edit-block'>
@@ -3009,64 +3009,83 @@ const EditorPanel = () => {
                   <CheckBox value={config.colorMatchLineSeriesLabels} fieldName='colorMatchLineSeriesLabels' label='Match Series Color to Name at End of Line Charts' updateField={updateField} />
                 )}
 
-                  {visSupportsTooltipLines() && (
-                    <>
-                      <CheckBox value={config.visual.verticalHoverLine} fieldName='verticalHoverLine' section='visual' label='Vertical Hover Line' updateField={updateField} />
-                      <CheckBox value={config.visual.horizontalHoverLine} fieldName='horizontalHoverLine' section='visual' label='Horizontal Hover Line' updateField={updateField} />
-                    </>
-                  )}
+                {visSupportsTooltipLines() && (
+                  <>
+                    <CheckBox value={config.visual.verticalHoverLine} fieldName='verticalHoverLine' section='visual' label='Vertical Hover Line' updateField={updateField} />
+                    <CheckBox value={config.visual.horizontalHoverLine} fieldName='horizontalHoverLine' section='visual' label='Horizontal Hover Line' updateField={updateField} />
+                  </>
+                )}
 
-                  {
-                    <label>
-                      <span className='edit-label column-heading'>Tooltip Opacity</span>
-                      <input
-                        type='number'
-                        value={config.tooltips.opacity ? config.tooltips.opacity : 100}
-                        onChange={e =>
-                          updateConfig({
-                            ...config,
-                            tooltips: {
-                              ...config.tooltips,
-                              opacity: e.target.value
-                            }
-                          })
-                        }
-                      />
-                    </label>
-                  }
-                </AccordionItemPanel>
-              </AccordionItem>
-              {/* Spark Line has no data table */}
-              {config.visualizationType !== 'Spark Line' && (
-                <AccordionItem>
-                  <AccordionItemHeading>
-                    <AccordionItemButton>Data Table</AccordionItemButton>
-                  </AccordionItemHeading>
-                  <AccordionItemPanel>
-                    <TextField
-                      value={config.table.label}
-                      updateField={updateField}
-                      section='table'
-                      fieldName='label'
-                      id='tableLabel'
-                      label='Data Table Title'
-                      placeholder='Data Table'
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Label is required for Data Table for 508 Compliance</p>
-                          </Tooltip.Content>
-                        </Tooltip>
+                {
+                  <label>
+                    <span className='edit-label column-heading'>Tooltip Opacity</span>
+                    <input
+                      type='number'
+                      value={config.tooltips.opacity ? config.tooltips.opacity : 100}
+                      onChange={e =>
+                        updateConfig({
+                          ...config,
+                          tooltips: {
+                            ...config.tooltips,
+                            opacity: e.target.value
+                          }
+                        })
                       }
                     />
+                  </label>
+                }
+              </AccordionItemPanel>
+            </AccordionItem>
+            {/* Spark Line has no data table */}
+            {config.visualizationType !== 'Spark Line' && (
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Data Table</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <TextField
+                    value={config.table.label}
+                    updateField={updateField}
+                    section='table'
+                    fieldName='label'
+                    id='tableLabel'
+                    label='Data Table Title'
+                    placeholder='Data Table'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Label is required for Data Table for 508 Compliance</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                  <CheckBox
+                    value={config.table.show}
+                    section='table'
+                    fieldName='show'
+                    label='Show Data Table'
+                    updateField={updateField}
+                    className='column-heading'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                  {config.visualizationType !== 'Box Plot' && (
                     <CheckBox
-                      value={config.table.show}
+                      value={config.table.showVertical}
                       section='table'
-                      fieldName='show'
-                      label='Show Data Table'
+                      fieldName='showVertical'
+                      label='Show Vertical Data'
                       updateField={updateField}
                       className='column-heading'
                       tooltip={
@@ -3075,64 +3094,44 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement.</p>
+                            <p>This will draw the data table with vertical data instead of horizontal.</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
                     />
-                    {config.visualizationType !== 'Box Plot' && (
-                      <CheckBox
-                        value={config.table.showVertical}
-                        section='table'
-                        fieldName='showVertical'
-                        label='Show Vertical Data'
-                        updateField={updateField}
-                        className='column-heading'
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>This will draw the data table with vertical data instead of horizontal.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
-                    )}
-                    <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />
-                    <TextField
-                      value={config.table.caption}
-                      updateField={updateField}
-                      section='table'
-                      type='textarea'
-                      fieldName='caption'
-                      label='Data Table Caption'
-                      placeholder=' Data table'
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Enter a description of the data table to be read by screen readers.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                    />
-                    <CheckBox value={config.table.limitHeight} section='table' fieldName='limitHeight' label='Limit Table Height' updateField={updateField} />
-                    {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min='0' max='500' placeholder='Height(px)' updateField={updateField} />}
-                    <CheckBox value={config.table.expanded} section='table' fieldName='expanded' label='Expanded by Default' updateField={updateField} />
-                    {isDashboard && <CheckBox value={config.table.showDataTableLink} section='table' fieldName='showDataTableLink' label='Show Data Table Name & Link' updateField={updateField} />}
-                    {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' updateField={updateField} />}
-                    <CheckBox value={config.table.download} section='table' fieldName='download' label='Show Download CSV Link' updateField={updateField} />
-                    {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
-                    {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
-                  </AccordionItemPanel>
-                </AccordionItem>
-              )}
-            </Accordion>
-          </form>
+                  )}
+                  <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />
+                  <TextField
+                    value={config.table.caption}
+                    updateField={updateField}
+                    section='table'
+                    type='textarea'
+                    fieldName='caption'
+                    label='Data Table Caption'
+                    placeholder=' Data table'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Enter a description of the data table to be read by screen readers.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                  <CheckBox value={config.table.limitHeight} section='table' fieldName='limitHeight' label='Limit Table Height' updateField={updateField} />
+                  {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min='0' max='500' placeholder='Height(px)' updateField={updateField} />}
+                  <CheckBox value={config.table.expanded} section='table' fieldName='expanded' label='Expanded by Default' updateField={updateField} />
+                  {isDashboard && <CheckBox value={config.table.showDataTableLink} section='table' fieldName='showDataTableLink' label='Show Data Table Name & Link' updateField={updateField} />}
+                  {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' updateField={updateField} />}
+                  <CheckBox value={config.table.download} section='table' fieldName='download' label='Show Download CSV Link' updateField={updateField} />
+                  {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
+                  {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
+                </AccordionItemPanel>
+              </AccordionItem>
+            )}
+          </Accordion>
           {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
         </section>
       </section>

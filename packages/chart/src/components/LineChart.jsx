@@ -99,7 +99,7 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
 
                       {/* circles that appear on hover */}
                       {/* todo: circle radii used here should be global with other circle radii */}
-                      {tooltipData && Object.entries(tooltipData.data).length > 0 && isNumber(tooltipData.data[seriesKey]) && config.lineDatapointStyle === 'hover' && (
+                      {/* {tooltipData && Object.entries(tooltipData.data).length > 0 && isNumber(tooltipData.data[seriesKey]) && config.lineDatapointStyle === 'hover' && config.series.filter(s => s.type === 'Line') && (
                         <circle
                           cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
                           cy={yScale(tooltipData.data[seriesKey])}
@@ -109,7 +109,7 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                           fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000') : 'transparent'}
                           style={{ filter: 'unset', opacity: 1 }}
                         />
-                      )}
+                      )} */}
                     </Group>
                   )
                 )
