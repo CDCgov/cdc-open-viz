@@ -2829,22 +2829,20 @@ const EditorPanel = props => {
                     <span className='edit-label'>Bubble Map has extra border</span>
                   </label>
                 )}
-                {state.general.geoType === 'us' ||
-                  state.general.geoType === 'us-county' ||
-                  (state.general.geoType === 'world' && (
-                    <label>
-                      <span className='edit-label'>City Style</span>
-                      <select
-                        value={state.visual.cityStyle || false}
-                        onChange={event => {
-                          handleEditorChanges('handleCityStyle', event.target.value)
-                        }}
-                      >
-                        <option value='circle'>Circle</option>
-                        <option value='pin'>Pin</option>
-                      </select>
-                    </label>
-                  ))}
+                {(state.general.geoType === 'us' || state.general.geoType === 'us-county' || state.general.geoType === 'world') && (
+                  <label>
+                    <span className='edit-label'>City Style</span>
+                    <select
+                      value={state.visual.cityStyle || false}
+                      onChange={event => {
+                        handleEditorChanges('handleCityStyle', event.target.value)
+                      }}
+                    >
+                      <option value='circle'>Circle</option>
+                      <option value='pin'>Pin</option>
+                    </select>
+                  </label>
+                )}
                 <label htmlFor='opacity'>
                   <TextField type='number' min={0} max={100} value={state.tooltips.opacity ? state.tooltips.opacity : 100} section='tooltips' fieldName='opacity' label='Tooltip Opacity (%)' updateField={updateField} />
                 </label>
