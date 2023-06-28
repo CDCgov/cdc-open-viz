@@ -6,7 +6,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 
 import Loading from '@cdc/core/components/Loading'
 
@@ -131,7 +131,7 @@ const DataTable = props => {
 
   const DownloadButton = memo(() => {
     let csvData
-    if (state.general.type === 'bubble') {
+    if (state.general.type === 'bubble' || !state.table.showFullGeoNameInCSV) {
       // Just Unparse
       csvData = Papa.unparse(rawData)
     } else if (state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
@@ -157,7 +157,7 @@ const DataTable = props => {
         Download Data (CSV)
       </a>
     )
-  }, [rawData])
+  }, [rawData, state.table])
 
   // Change accessibility label depending on expanded status
   useEffect(() => {
@@ -188,10 +188,10 @@ const DataTable = props => {
 
   return (
     <ErrorBoundary component='DataTable'>
-      <CoveMediaControls.Section classes={['download-links']}>
-        <CoveMediaControls.Link config={state} />
+      <MediaControls.Section classes={['download-links']}>
+        <MediaControls.Link config={state} />
         {state.general.showDownloadButton && <DownloadButton />}
-      </CoveMediaControls.Section>
+      </MediaControls.Section>
       <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
         <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
           Skip Navigation or Skip to Content
