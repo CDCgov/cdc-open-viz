@@ -62,6 +62,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}
                   </div>`
+
+                // TODO: move all instances of circleRadii to state.
                 let circleRadii = 4.5
 
                 return (
@@ -107,7 +109,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 strokeOpacity={1}
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
                 defined={(item, i) => {
-                  return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null && item[config.runtime.seriesLabels[seriesKey]] !== undefined
+                  return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
                 }}
               />
               {config.animate && (

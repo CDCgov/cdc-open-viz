@@ -13,6 +13,7 @@ import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 
 import '@cdc/core/styles/v2/components/editor.scss'
+import WarningImage from '../images/warning.svg'
 
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
 
@@ -194,12 +195,23 @@ const EditorPanel = memo(props => {
     }
     return filterDataOptions
   }
+  //visualizationType
+
+  const approvedWaffleChartOptions = [
+    'Waffle'
+    // 'Gauge'
+  ]
 
   const editorContent = (
     <Accordion>
       <Accordion.Section title='General'>
+        <div className='cove-accordion__panel-section'>
+          <div style={{ width: '100%', display: 'block' }} className='cove-input-group'>
+            <InputSelect value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={approvedWaffleChartOptions} className='cove-input' />
+            {config.visualizationType === 'Gauge' && <InputSelect value={config.visualizationSubType} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['Linear']} className='cove-input' />}
+          </div>
+        </div>
         <InputText value={config.title} fieldName='title' label='Title' placeholder='Waffle Chart Title' updateField={updateField} />
-
         <InputText
           type='textarea'
           value={config.content}
@@ -236,7 +248,13 @@ const EditorPanel = memo(props => {
           }
         />
       </Accordion.Section>
-      <Accordion.Section title='Data'>
+
+      <Accordion.Section icon={!config.dataColumn || !config.dataFunction ? <WarningImage width='15' className='warning-icon' /> : ''} title='Data'>
+        {(!config.dataColumn || !config.dataFunction) && (
+          <div className='cove-accordion__panel-section'>
+            <p className='warning-text'>Please select numerator</p>
+          </div>
+        )}
         <h4 style={{ fontWeight: '600' }}>Numerator</h4>
         <div className='cove-accordion__panel-section'>
           <div className='cove-input-group'>
@@ -308,9 +326,16 @@ const EditorPanel = memo(props => {
             </div>
           </li>
         </ul>
-
-        <hr className='cove-accordion__divider' />
-
+        {false && (
+          <>
+            <hr className='cove-accordion__divider' />
+            <div className='cove-accordion__panel-section reverse-labels'>
+              <InputText inline size='small' value={config.valueDescription} label='Value Descriptor' fieldName='valueDescription' updateField={updateField} />
+              <InputCheckbox inline size='small' value={config.showPercent} label='Show Percentage' fieldName='showPercent' updateField={updateField} />
+              <InputCheckbox inline size='small' label='Show Denominator' value={config.showDenominator} fieldName='showDenominator' updateField={updateField} />
+            </div>
+          </>
+        )}
         <label style={{ marginBottom: '1rem' }}>
           <span className='edit-label'>Data Point Filters</span>
           <Tooltip style={{ textTransform: 'none' }}>
@@ -322,6 +347,7 @@ const EditorPanel = memo(props => {
             </Tooltip.Content>
           </Tooltip>
         </label>
+
         {config.filters && (
           <ul className='filters-list' style={{ paddingLeft: 0, marginBottom: '1rem' }}>
             {config.filters.map((filter, index) => (
@@ -376,20 +402,19 @@ const EditorPanel = memo(props => {
         </Button>
       </Accordion.Section>
       <Accordion.Section title='Visual'>
-        <InputSelect value={config.shape} fieldName='shape' label='Shape' updateField={updateField} options={['circle', 'square', 'person']} className='cove-input' />
-
-        <div className='cove-accordion__panel-row cove-accordion__small-inputs' style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-          <div className='cove-accordion__panel-col'>
-            <InputText type='number' value={config.nodeWidth} fieldName='nodeWidth' label='Width' updateField={updateField} />
+        {config.visualizationType !== 'Gauge' && <InputSelect value={config.shape} fieldName='shape' label='Shape' updateField={updateField} options={['circle', 'square', 'person']} className='cove-input' />}
+        {config.visualizationType !== 'Gauge' && (
+          <div className='cove-accordion__panel-row cove-accordion__small-inputs' style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+            <div className='cove-accordion__panel-col'>
+              <InputText type='number' value={config.nodeWidth} fieldName='nodeWidth' label='Width' updateField={updateField} />
+            </div>
+            <div className='cove-accordion__panel-col'>
+              <InputText type='number' value={config.nodeSpacer} fieldName='nodeSpacer' label='Spacer' updateField={updateField} />
+            </div>
           </div>
-          <div className='cove-accordion__panel-col'>
-            <InputText type='number' value={config.nodeSpacer} fieldName='nodeSpacer' label='Spacer' updateField={updateField} />
-          </div>
-        </div>
+        )}
 
-        <div className='cove-input-group'>
-          <InputSelect value={config.orientation} fieldName='orientation' label='Layout' updateField={updateField} className='cove-input' options={['horizontal', 'vertical']} />
-        </div>
+        <div className='cove-input-group'>{config.visualizationType !== 'Gauge' && <InputSelect value={config.orientation} fieldName='orientation' label='Layout' updateField={updateField} className='cove-input' options={['horizontal', 'vertical']} />}</div>
 
         <div className='cove-input-group'>
           <label>
@@ -400,7 +425,7 @@ const EditorPanel = memo(props => {
               <InputText type='number' value={config.fontSize} fieldName='fontSize' updateField={updateField} />
             </div>
             <div className='cove-accordion__panel-col' style={{ display: 'flex', alignItems: 'center' }}>
-              <label className='accordion__panel-label--muted'>default (50px)</label>
+              <label className='accordion__panel-label--muted'> {config.visualizationType === 'Gauge' ? ' default (16px)' : ' default (50px)'}</label>
             </div>
           </div>
         </div>
@@ -444,7 +469,7 @@ const EditorPanel = memo(props => {
         <button className={`cove-editor--toggle` + (!displayPanel ? ` collapsed` : ``)} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
         <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
           <div className='cove-editor__panel-container'>
-            <h2 className='cove-editor__heading'>Configure Waffle Chart</h2>
+            <h2 className='cove-editor__heading'>Configure Chart</h2>
             <section className='cove-editor__content'>{editorContent}</section>
           </div>
         </section>

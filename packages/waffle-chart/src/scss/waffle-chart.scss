@@ -18,10 +18,46 @@
 //  }
 //}
 
+.warning-icon {
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  transform: translate(-50%, -50%);
+  color: red;
+}
+
+.warning-text {
+  background-color: rgba(235, 146, 146, 0.953);
+  color: red;
+  text-align: center;
+  padding: 12px 0;
+}
+
 .cove {
   &-editor__panel {
     ul.color-palette {
       margin: 0;
+    }
+  }
+
+  .cove-gauge-chart {
+    &__chart {
+      width: 85%;
+      margin: 0 auto;
+      margin-left: auto;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      justify-items: center;
+      align-items: flex-start;
+    }
+
+    &__subtext {
+      font-size: 0.75em;
+    }
+    &__text {
+      line-height: 1.25em;
+      width: 100%;
     }
   }
 
@@ -54,7 +90,6 @@
   }
 
   .cove-waffle-chart__subtext {
-    font-style: italic;
     font-size: 0.75em;
   }
 
@@ -92,29 +127,38 @@
 }
 
 @at-root {
-  .cove-waffle-chart.font-small #{&} {
-    .cove-waffle-chart__data--primary {
+  .cove-waffle-chart.font-small,
+  .cove-gauge-chart.font-small #{&} {
+    .cove-waffle-chart__data--primary,
+    .cove-gauge-chart__data--primary {
       font-size: 35px;
     }
-    .cove-waffle-chart__data--text {
+    .cove-waffle-chart__data--text,
+    .cove-gauge-chart__data--text {
       font-size: 14px;
     }
   }
 
-  .cove-waffle-chart.font-medium #{&} {
-    .cove-waffle-chart__data--primary {
+  .cove-waffle-chart.font-medium,
+  .cove-gauge-chart.font-medium #{&} {
+    .cove-waffle-chart__data--primary,
+    .cove-gauge-chart__data--primary {
       font-size: 50px;
     }
-    .cove-waffle-chart__data--text {
+    .cove-waffle-chart__data--text,
+    .cove-gauge-chart__data--text {
       font-size: 18px;
     }
   }
 
-  .cove-waffle-chart.font-large #{&} {
-    .cove-waffle-chart__data--primary {
+  .cove-waffle-chart.font-large,
+  .cove-gauge-chart.font-large #{&} {
+    .cove-waffle-chart__data--primary,
+    .cove-gauge-chart__data--primary {
       font-size: 80px;
     }
-    .cove-waffle-chart__data--text {
+    .cove-waffle-chart__data--text,
+    .cove-gauge-chart__data--text {
       font-size: 20px;
     }
   }

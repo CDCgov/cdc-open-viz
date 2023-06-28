@@ -31,7 +31,7 @@ import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 
 // Helpers
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -39,6 +39,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 import './scss/main.scss'
 // load both then config below determines which to use
@@ -72,7 +73,10 @@ const hashObj = row => {
   }
 }
 
-export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
+// * FILE REVIEW
+// TODO: @tturnerswdev33 - remove/fix mentions of runtimeLegend that were added
+
+export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
@@ -261,10 +265,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
             .then(response => response.text())
             .then(responseText => {
+              // for every comma NOT inside quotes, replace with a pipe delimiter
+              // - this will let commas inside the quotes not be parsed as a new column
+              // - Limitation: if a delimiter other than comma is used in the csv this will break
+              // Examples of other delimiters that would break: tab
+              responseText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || '|')
+              // now strip the double quotes
+              responseText = responseText.replace(/["]+/g, '')
               const parsedCsv = Papa.parse(responseText, {
+                //quotes: "true",  // dont need these
+                //quoteChar: "'",  // has no effect that I can tell
                 header: true,
                 dynamicTyping: true,
-                skipEmptyLines: true
+                skipEmptyLines: true,
+                delimiter: '|' // we are using pipe symbol as delimiter so setting this explicitly for Papa.parse
               })
               return parsedCsv.data
             })
@@ -302,7 +316,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
 
-    updateConfig(newConfig, data)
+    const processedConfig = { ...(await coveUpdateWorker(newConfig)) }
+
+    updateConfig(processedConfig, data)
   }
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
@@ -315,7 +331,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     })
 
-    // Loop through and set initial data with exclusions - this should persist through any following data transformations (ie. filters)
     let newExcludedData
 
     if (newConfig.exclusions && newConfig.exclusions.active) {
@@ -512,10 +527,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.runtime.areaSeriesKeys = []
+      newConfig.runtime.forecastingSeriesKeys = []
 
       newConfig.series.forEach(series => {
         if (series.type === 'Area Chart') {
           newConfig.runtime.areaSeriesKeys.push(series)
+        }
+        if (series.type === 'Forecasting') {
+          newConfig.runtime.forecastingSeriesKeys.push(series)
         }
         if (series.type === 'Bar') {
           newConfig.runtime.barSeriesKeys.push(series.dataKey)
@@ -525,6 +544,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         }
       })
     }
+
+    if (newConfig.visualizationType === 'Forecasting' && newConfig.series) {
+      newConfig.runtime.forecastingSeriesKeys = []
+
+      newConfig.series.forEach(series => {
+        if (series.type === 'Forecasting') {
+          newConfig.runtime.forecastingSeriesKeys.push(series)
+        }
+      })
+    }
+
     if (newConfig.visualizationType === 'Area Chart' && newConfig.series) {
       newConfig.runtime.areaSeriesKeys = []
 
@@ -740,7 +770,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     const newSeriesHighlight = []
 
     // If we're highlighting all the series, reset them
-    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend) {
+    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend && config.visualizationType !== 'Forecasting') {
       highlightReset()
       return
     }
@@ -942,6 +972,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Select appropriate chart type
   const chartComponents = {
     'Paired Bar': <LinearChart />,
+    Forecasting: <LinearChart />,
     Bar: <LinearChart />,
     Line: <LinearChart />,
     Combo: <LinearChart />,
@@ -953,6 +984,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const missingRequiredSections = () => {
+    if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
     if (config.visualizationType === 'Pie') {
       if (undefined === config?.yAxis.dataKey) {
         return true
@@ -1069,6 +1101,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const clean = data => {
+    // cleaning is deleting data we need in forecasting charts.
+    if (config.visualizationType === 'Forecasting') return data
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
   }
 
@@ -1136,10 +1170,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
 
             {/* buttons */}
-            <CoveMediaControls.Section classes={['download-buttons']}>
-              {config.table.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
-              {config.table.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
-            </CoveMediaControls.Section>
+            <MediaControls.Section classes={['download-buttons']}>
+              {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+              {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+            </MediaControls.Section>
 
             {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
@@ -1222,7 +1256,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     isNumber,
     getTextWidth,
     twoColorPalette,
-    isDebug
+    isDebug,
+    setSharedFilter,
+    setSharedFilterValue,
+    dashboardConfig
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]

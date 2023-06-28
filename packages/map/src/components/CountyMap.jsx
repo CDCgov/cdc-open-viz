@@ -44,9 +44,6 @@ states.forEach(state => {
   countyIndecies[state.id] = [minIndex, maxIndex]
 })
 
-// CREATE STATE LINES
-const projection = geoAlbersUsaTerritories()
-
 // Ensures county map is only rerendered when it needs to (when one of the variables below is updated)
 function CountyMapChecks(prevState, nextState) {
   const equalNumberOptIn = prevState.state.general.equalNumberOptIn && nextState.state.general.equalNumberOptIn
@@ -61,6 +58,9 @@ function CountyMapChecks(prevState, nextState) {
 
 const CountyMap = props => {
   const { state, runtimeLegend, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels } = props
+
+  // CREATE STATE LINES
+  const projection = geoAlbersUsaTerritories()
 
   const [focus, setFocus] = useState({})
 
@@ -160,7 +160,7 @@ const CountyMap = props => {
       if (isNaN(currentTooltipIndex) || !geoContains(mapData[currentTooltipIndex], pointCoordinates)) {
         const context = canvas.getContext('2d')
         const path = geoPath(projection, context)
-        if (!isNaN(currentTooltipIndex)) {
+        if (!isNaN(currentTooltipIndex) && applyLegendToRow(data[mapData[currentTooltipIndex].id])) {
           context.fillStyle = applyLegendToRow(data[mapData[currentTooltipIndex].id])[0]
           context.strokeStyle = geoStrokeColor
           context.lineWidth = lineWidth
@@ -193,13 +193,16 @@ const CountyMap = props => {
 
         // If the hovered county is found, show the tooltip for that county, otherwise hide the tooltip
         if (county && data[county.id]) {
-          context.fillStyle = applyLegendToRow(data[county.id])[1]
-          context.strokeStyle = geoStrokeColor
-          context.lineWidth = lineWidth
-          context.beginPath()
-          path(mapData[countyIndex])
-          context.fill()
-          context.stroke()
+          if (applyLegendToRow(data[county.id])) {
+            context.globalAlpha = 1
+            context.fillStyle = applyLegendToRow(data[county.id])[1]
+            context.strokeStyle = geoStrokeColor
+            context.lineWidth = lineWidth
+            context.beginPath()
+            path(mapData[countyIndex])
+            context.fill()
+            context.stroke()
+          }
 
           tooltipRef.current.style.display = 'block'
           tooltipRef.current.style.top = e.clientY + 'px'

@@ -312,6 +312,8 @@ const Filters = props => {
       delete filtersToLoop.fromHash
 
       return filtersToLoop.map((singleFilter, outerIndex) => {
+        if(singleFilter.showDropdown === false) return
+
         const values = []
         const pillValues = []
         const tabValues = []
