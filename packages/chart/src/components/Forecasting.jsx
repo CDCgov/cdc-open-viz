@@ -100,7 +100,7 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMou
             })
           })}
 
-          {tooltipData && Object.entries(tooltipData.data).length > 0 && (
+          {tooltipData && Object.entries(tooltipData.data).length > 0 && config?.runtime?.forecastingSeriesKeys?.length > 0 && (config.visualizationType === 'Combo' || config.visualizationType === 'Forecasting') && (
             <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
               <ul
                 style={{
@@ -121,9 +121,11 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMou
               </ul>
             </TooltipInPortal>
           )}
-          <Group key='tooltip-hover-section'>
-            <Bar key={'bars'} width={Number(width)} height={Number(height)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />
-          </Group>
+          {config?.runtime?.forecastingSeriesKeys?.length > 0 && (config.visualizationType === 'Combo' || config.visualizationType === 'Forecasting') && (
+            <Group key='tooltip-hover-section'>
+              <Bar key={'bars'} width={Number(width)} height={Number(height)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />
+            </Group>
+          )}
         </Group>
 
         {showTooltip && tooltipData && config.visual.verticalHoverLine && (
