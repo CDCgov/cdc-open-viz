@@ -4,7 +4,7 @@ import useReduceData from '../hooks/useReduceData'
 export default function useRightAxis({ config, yMax = 0, data = [], updateConfig }) {
   const hasRightAxis = config.visualizationType === 'Combo' && config.orientation === 'vertical'
   const rightSeriesKeys = config.series && config.series.filter(series => series.axis === 'Right').map(key => key.dataKey)
-  const { minValue } = useReduceData(config, data)
+  let { minValue } = useReduceData(config, data)
 
   const allRightAxisData = rightSeriesKeys => {
     if (!rightSeriesKeys) return [0]
@@ -15,8 +15,14 @@ export default function useRightAxis({ config, yMax = 0, data = [], updateConfig
     return rightAxisData
   }
 
-  const min = Math.min.apply(null, allRightAxisData(rightSeriesKeys))
   const max = Math.max.apply(null, allRightAxisData(rightSeriesKeys))
+
+  // if there is a bar series & the right axis doesn't include a negative number, default to zero
+  const hasBarSeries = config.runtime?.barSeriesKeys?.length > 0
+
+  if (hasBarSeries && minValue > 0) {
+    minValue = 0
+  }
 
   const yScaleRight = scaleLinear({
     domain: [minValue, max],

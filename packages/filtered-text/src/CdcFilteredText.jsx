@@ -1,17 +1,26 @@
 import React, { useEffect, useState } from 'react'
 
+// context & initial state
+import ConfigContext from './ConfigContext'
+import defaults from './data/initial-state'
+
+// components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import DataTransform from '@cdc/core/helpers/DataTransform'
 import Loading from '@cdc/core/components/Loading'
 import EditorPanel from './components/EditorPanel'
-import defaults from './data/initial-state'
-import ConfigContext from './ConfigContext'
-import parse from 'html-react-parser'
-import './scss/main.scss'
+
+// helpers
+import DataTransform from '@cdc/core/helpers/DataTransform'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+
+// external
+import parse from 'html-react-parser'
+
+// styles
+import './scss/main.scss'
 
 const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
-
   const transform = new DataTransform()
   // Default States
   const [config, setConfig] = useState(defaults)
@@ -46,7 +55,9 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
     }
 
     let newConfig = { ...config, ...response }
-    updateConfig(newConfig)
+    const processedConfig = { ...(await coveUpdateWorker(newConfig)) }
+
+    updateConfig(processedConfig)
     setLoading(false)
   }
 
@@ -61,6 +72,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
     newConfig.runtime.uniqueId = Date.now()
 
     newConfig.runtime.editorErrorMessage = ''
+
     setConfig(newConfig)
   }
 
@@ -126,7 +138,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
     )
 
     content = (
-      <div className={`cove ${config.theme} `} style={isDashboard ? { marginTop: '3rem' } : null}>
+      <div className={`cove ${config.theme} `}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
       </div>

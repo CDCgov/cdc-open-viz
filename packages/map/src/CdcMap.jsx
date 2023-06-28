@@ -14,6 +14,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 
 // Helpers
 import { publish } from '@cdc/core/helpers/events'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -30,7 +31,7 @@ import './scss/btn.scss'
 
 // Core
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import Loading from '@cdc/core/components/Loading'
@@ -501,9 +502,18 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       legendMemo.current = newLegendMemo
 
+      // before returning the legend result
+      // add property for bin number and set to index location
       result.forEach((row, i) => {
         row.bin = i // set bin number to index
       })
+
+      // Move all special legend items from "Special Classes"  to the end of the legend
+      if (state.legend.showSpecialClassesLast) {
+        let specialRows = result.filter(d => d.special === true)
+        let otherRows = result.filter(d => !d.special)
+        result = [...otherRows, ...specialRows]
+      }
 
       return result
     }
@@ -772,7 +782,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type }, idx) => {
+    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type, showDropdown }, idx) => {
       let newFilter = runtimeFilters[idx]
 
       const sortAsc = (a, b) => {
@@ -818,6 +828,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       handleSorting(newFilter)
       newFilter.active = active ?? values[0] // Default to first found value
       newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
+      newFilter.showDropdown = showDropdown
 
       filters.push(newFilter)
     })
@@ -959,11 +970,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   // this is passed DOWN into the various components
-  // then they do a lookup based on the bin number as index into here (TT)
+  // then they do a lookup based on the bin number as index into here
   const applyLegendToRow = rowObj => {
     try {
       if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
-      // Navigation map
+      // Navigation mapchanged
       if ('navigation' === state.general.type) {
         let mapColorPalette = colorPalettes[state.color] || colorPalettes['bluegreenreverse']
         return generateColorsArray(mapColorPalette[3])
@@ -975,7 +986,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let idx = legendMemo.current.get(hash)
         if (runtimeLegend[idx]?.disabled) return false
 
-        // DEV-784 changed to use bin prop to get color instead of idx
+        // changed to use bin prop to get color instead of idx
         // bc we re-order legend when showSpecialClassesLast is checked
         let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
         return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
@@ -1153,7 +1164,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (true === Object.keys(dict).includes(value)) {
       value = dict[value]
     }
-    return titleCase(value)
+
+    // if you get here and it's 2 letters then DONT titleCase state abbreviations like "AL"
+    if (value.length === 2) {
+      return value
+    } else {
+      return titleCase(value)
+    }
   }
 
   const navigationHandler = urlString => {
@@ -1373,7 +1390,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
 
     validateFipsCodeLength(newState)
-    setState(newState)
+
+    // add ability to rename state properties over time.
+    const processedConfig = { ...(await coveUpdateWorker(newState)) }
+
+    setState(processedConfig)
     setLoading(false)
   }
 
@@ -1690,10 +1711,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
-            <CoveMediaControls.Section classes={['download-buttons']}>
-              {state.general.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
-              {state.general.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
-            </CoveMediaControls.Section>
+            <MediaControls.Section classes={['download-buttons']}>
+              {state.general.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
+              {state.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
+            </MediaControls.Section>
 
             {state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading && (
               <DataTable
@@ -1704,6 +1725,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 headerColor={general.headerColor}
                 columns={state.columns}
                 showDownloadButton={general.showDownloadButton}
+                showFullGeoNameInCSV={table.showFullGeoNameInCSV}
                 runtimeLegend={runtimeLegend}
                 runtimeData={runtimeData}
                 displayDataAsText={displayDataAsText}

@@ -31,10 +31,11 @@ import Header from './components/Header'
 import defaults from './data/initial-state'
 import Widget from './components/Widget'
 import DataTable from './components/DataTable'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
+import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -75,7 +76,7 @@ const addVisualization = (type, subType) => {
   return newVisualizationConfig
 }
 
-const VisualizationsPanel = () => (
+const VisualizationsPanel = ({ loadConfig, config }) => (
   <div className='visualizations-panel'>
     <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
     <span className='subheading-3'>Chart</span>
@@ -97,6 +98,8 @@ const VisualizationsPanel = () => (
       <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
       <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
     </div>
+    <span className='subheading-3'>Advanced</span>
+    <AdvancedEditor loadConfig={loadConfig} state={config} />
   </div>
 )
 
@@ -268,7 +271,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     }
 
     setData(datasets)
-
     updateConfig(newConfig, datasets)
     setLoading(false)
   }
@@ -435,6 +437,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       })
 
       setFilteredData(newFilteredData)
+      if (dashboardConfig.sharedFilters[index].active === dashboardConfig.sharedFilters[index].resetLabel) {
+        setFilteredData(data)
+      }
     }
 
     const announceChange = text => {}
@@ -443,6 +448,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       if (singleFilter.type !== 'url' && !singleFilter.showDropdown) return <></>
 
       const values = []
+
+      if (singleFilter.resetLabel) {
+        values.push(
+          <option key={`${singleFilter.resetLabel}-option-${index}`} value={singleFilter.resetLabel}>
+            {singleFilter.resetLabel}
+          </option>
+        )
+      }
 
       singleFilter.values.forEach((filterOption, index) => {
         values.push(
@@ -538,7 +551,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Chart' />
-                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} />
+                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} dashboardConfig={config} isDashboard={true} />
               </>
             )
             break
@@ -595,7 +608,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         <DndProvider backend={HTML5Backend}>
           <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview} />
           <div className='layout-container'>
-            <VisualizationsPanel />
+            <VisualizationsPanel loadConfig={loadConfig} config={config} />
             <Grid />
           </div>
         </DndProvider>
@@ -666,6 +679,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                 <CdcChart
                                   key={col.widget}
                                   config={visualizationConfig}
+                                  dashboardConfig={config}
                                   isEditor={false}
                                   setConfig={newConfig => {
                                     updateChildConfig(col.widget, newConfig)
@@ -746,8 +760,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
           {/* Image or PDF Inserts */}
           <section className='download-buttons'>
-            {config.table.downloadImageButton && <CoveMediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
-            {config.table.downloadPdfButton && <CoveMediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
+            {config.table.downloadImageButton && <MediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
+            {config.table.downloadPdfButton && <MediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
           </section>
 
           {/* Data Table */}

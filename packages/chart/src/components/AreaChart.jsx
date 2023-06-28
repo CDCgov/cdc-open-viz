@@ -27,7 +27,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
 
   // import tooltip helpers
-  const { tooltipData, showTooltip } = useTooltip()
+  const { tooltipData, showTooltip, hideTooltip } = useTooltip()
 
   // here we're inside of the svg,
   // it appears we need to use TooltipInPortal.
@@ -41,8 +41,6 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
   // Turn DEBUG on for additional context.
   if (!data) return
   let barThickness = xMax / data.length
-  let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
-  let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
 
   // Tooltip helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinate = x => {
@@ -87,6 +85,9 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
       if (!yScaleValues[0]) return
       for (const item of Object.entries(yScaleValues[0])) {
         if (item[0] === seriesKey) {
+          // let userUpdatedSeriesName = config.series.filter(series => series.dataKey === item[0])?.[0]?.name
+          // if (userUpdatedSeriesName) item[0] = userUpdatedSeriesName
+
           seriesToInclude.push(item)
         }
       }
@@ -95,6 +96,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
     // filter out the series that aren't added to the map.
     seriesToInclude.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series])))
     if (!seriesToInclude) return
+
     let tooltipDataFromSeries = Object.fromEntries(seriesToInclude) ? Object.fromEntries(seriesToInclude) : {}
 
     let tooltipData = {}
@@ -143,8 +145,9 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
 
             if (config.xAxis.type === 'date') {
               data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
+            } else {
+              data.map(d => xScale(d[config.xAxis.dataKey]))
             }
-
             return (
               <React.Fragment key={index}>
                 {/* prettier-ignore */}
@@ -182,6 +185,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                   fillOpacity={0.05}
                   style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
                   onMouseMove={e => handleMouseOver(e, data)}
+                  onMouseOut={hideTooltip}
                   />
 
                 {/* circles that appear on hover */}
@@ -196,25 +200,6 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                     style={{ filter: 'unset', opacity: 1 }}
                   />
                 )}
-
-                {/* another tool for showing bars during debug mode. */}
-                {DEBUG &&
-                  data.map((item, index) => {
-                    return (
-                      <Bar
-                        className='bar-here'
-                        x={Number(barThickness * index)}
-                        y={d => Number(yScale(d[config.series[index].dataKey]))}
-                        yScale={yScale}
-                        width={Number(barThickness)}
-                        height={yMax}
-                        fill={DEBUG ? 'red' : 'transparent'}
-                        fillOpacity={1}
-                        style={{ stroke: 'black', strokeWidth: 2 }}
-                        onMouseMove={e => handleMouseOver(e, data)}
-                      />
-                    )
-                  })}
 
                 {tooltipData && Object.entries(tooltipData.data).length > 0 && (
                   <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
