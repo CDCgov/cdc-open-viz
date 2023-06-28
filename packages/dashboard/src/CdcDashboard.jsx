@@ -11,7 +11,8 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import parse from 'html-react-parser'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
+import { useGlobalContext, GlobalContextProvider } from '@cdc/core/components/GlobalContext'
+import Modal from '@cdc/core/components/ui/Modal'
 import ConfigContext from './ConfigContext'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
@@ -76,32 +77,449 @@ const addVisualization = (type, subType) => {
   return newVisualizationConfig
 }
 
-const VisualizationsPanel = ({ loadConfig, config }) => (
-  <div className='visualizations-panel'>
-    <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
-    <span className='subheading-3'>Chart</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('chart', 'Bar')} type='Bar' />
-      <Widget addVisualization={() => addVisualization('chart', 'Line')} type='Line' />
-      <Widget addVisualization={() => addVisualization('chart', 'Pie')} type='Pie' />
+const VisualizationsPanel = ({ loadConfig, setPreview, tabOpen, setTabOpen, config, updateConfig, setParentConfig }) => {
+  const { overlay } = useGlobalContext()
+
+  const [columns, setColumns] = useState([])
+
+  const filterModal = (filter, index) => {
+    const saveChanges = () => {
+      let tempConfig = { ...config.dashboard }
+      tempConfig.sharedFilters[index] = filter
+  
+      updateConfig({ ...config, dashboard: tempConfig })
+  
+      overlay?.actions.toggleOverlay()
+    }
+  
+    const updateFilterProp = (name, index, value) => {
+      let newFilter = { ...filter }
+  
+      newFilter[name] = value
+  
+      overlay?.actions.openOverlay(filterModal(newFilter, index))
+    }
+  
+    const updateFilterPropByFunction = (index, func) => {
+      let newFilter = { ...filter }
+  
+      newFilter = func(newFilter)
+  
+      overlay?.actions.openOverlay(filterModal(newFilter, index))
+    }
+  
+    const addFilterUsedBy = (filter, index, value) => {
+      if (!filter.usedBy) filter.usedBy = []
+      filter.usedBy.push(value)
+      updateFilterProp('usedBy', index, filter.usedBy)
+    }
+  
+    const removeFilterUsedBy = (filter, index, value) => {
+      let usedByIndex = filter.usedBy.indexOf(value)
+      if (usedByIndex !== -1) {
+        filter.usedBy.splice(usedByIndex, 1)
+        updateFilterProp('usedBy', index, filter.usedBy)
+      }
+    }
+  
+    const updateLabel = (e, value) => {
+      let newLabels = filter.labels || {}
+  
+      newLabels[value] = e.target.value
+  
+      updateFilterProp('labels', index, newLabels)
+    }
+  
+    const removeValue = valueIndex => {
+      let newLabels = filter.labels || {}
+      let newValues = filter.values || []
+  
+      delete newLabels[filter.values[valueIndex]]
+      newValues.splice(valueIndex, 1)
+  
+      updateFilterPropByFunction(index, newFilter => {
+        newFilter.labels = newLabels
+        newFilter.orderedValue = newValues
+        return newFilter
+      })
+    }
+  
+    const addNewValue = e => {
+      e.preventDefault()
+      if (!filter.values || filter.values.indexOf(e.target[0].value) === -1) {
+        let newValues = filter.values || []
+        newValues.push(e.target[0].value)
+  
+        updateFilterPropByFunction(index, newFilter => {
+          newFilter.values = newValues
+          if (!newFilter.active) {
+            newFilter.active = e.target[0].value
+          }
+          return newFilter
+        })
+  
+        e.target[0].value = ''
+      }
+    }
+  
+    return (
+      <Modal>
+        <Modal.Content>
+          <h2>Dashboard Filter Settings</h2>
+          <fieldset className='shared-filter-modal' key={filter.columnName + index}>
+            <button
+              type='button'
+              className='btn btn-primary remove-column'
+              onClick={() => {
+                removeFilter(index)
+              }}
+            >
+              Remove Filter
+            </button>
+            <label>
+              <span className='edit-label column-heading'>Filter Type:</span>
+              <select defaultValue={filter.type || 'data'} onChange={e => updateFilterProp('type', index, e.target.value)}>
+                <option value='url'>URL</option>
+                <option value='data'>Data</option>
+              </select>
+            </label>
+            {filter.type === 'url' && (
+              <>
+                <label>
+                  <span className='edit-label column-heading'>Label: </span>
+                  <input
+                    type='text'
+                    value={filter.key}
+                    onChange={e => {
+                      updateFilterProp('key', index, e.target.value)
+                    }}
+                  />
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>URL to Filter: </span>
+                  <select defaultValue={filter.datasetKey || ''} onChange={e => updateFilterProp('datasetKey', index, e.target.value)}>
+                    <option value=''>- Select Option -</option>
+                    {Object.keys(config.datasets).map(datasetKey => {
+                      if (config.datasets[datasetKey].dataUrl) {
+                        return (
+                          <option key={datasetKey} value={datasetKey}>
+                            {config.datasets[datasetKey].dataUrl.substring(0, 50)}
+                          </option>
+                        )
+                      }
+                      return <React.Fragment key={datasetKey}></React.Fragment>
+                    })}
+                  </select>
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Query string parameter</span> <input type='text' defaultValue={filter.queryParameter} onChange={e => updateFilterProp('queryParameter', index, e.target.value)} />
+                </label>
+                <span className='edit-label column-heading'>Values</span>{' '}
+                <ul className='value-list'>
+                  {filter.values &&
+                    filter.values.map((value, valueIndex) => (
+                      <li>
+                        {value}
+                        <input type='text' value={filter.labels ? filter.labels[value] : undefined} onChange={e => updateLabel(e, value)} />
+                        <button onClick={() => removeValue(valueIndex)}>X</button>
+                      </li>
+                    ))}
+                </ul>
+                <form onSubmit={addNewValue}>
+                  <input type='text' /> <button type='submit'>Add New Value</button>
+                </form>
+              </>
+            )}
+            {filter.type !== 'url' && (
+              <>
+                <label>
+                  <span className='edit-label column-heading'>Filter: </span>
+                  <select
+                    value={filter.columnName}
+                    onChange={e => {
+                      updateFilterProp('columnName', index, e.target.value)
+                    }}
+                  >
+                    <option value=''>- Select Option -</option>
+                    {columns.map(dataKey => (
+                      <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>
+                        {dataKey}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Label: </span>
+                  <input
+                    type='text'
+                    value={filter.key}
+                    onChange={e => {
+                      updateFilterProp('key', index, e.target.value)
+                    }}
+                  />
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Show Dropdown</span>
+                  <input
+                    type='checkbox'
+                    defaultChecked={filter.showDropdown === true}
+                    onChange={e => {
+                      updateFilterProp('showDropdown', index, !filter.showDropdown)
+                    }}
+                  />
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Set By: </span>
+                  <select value={filter.setBy} onChange={e => updateFilterProp('setBy', index, e.target.value)}>
+                    <option value=''>- Select Option -</option>
+                    {Object.keys(config.visualizations).map(vizKey => (
+                      <option value={vizKey} key={`set-by-select-item-${vizKey}`}>
+                        {config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Used By:</span>
+                  <ul>
+                    {filter.usedBy &&
+                      filter.usedBy.map(vizKey => (
+                        <li key={`used-by-list-item-${vizKey}`}>
+                          <span>{config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}</span>{' '}
+                          <button
+                            onClick={e => {
+                              e.preventDefault()
+                              removeFilterUsedBy(filter, index, vizKey)
+                            }}
+                          >
+                            X
+                          </button>
+                        </li>
+                      ))}
+                  </ul>
+                  <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
+                    <option value=''>- Select Option -</option>
+                    {Object.keys(config.visualizations)
+                      .filter(vizKey => filter.setBy !== vizKey && (!filter.usedBy || filter.usedBy.indexOf(vizKey) === -1) && !config.visualizations[vizKey].usesSharedFilter)
+                      .map(vizKey => (
+                        <option value={vizKey} key={`used-by-select-item-${vizKey}`}>
+                          {config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Reset Label: </span>
+                  <input
+                    type='text'
+                    value={filter.resetLabel ? filter.resetLabel : ''}
+                    onChange={e => {
+                      updateFilterProp('resetLabel', index, e.target.value)
+                    }}
+                  />
+                </label>
+              </>
+            )}
+          </fieldset>
+          <button type='button' className='btn btn-primary' style={{ display: 'inline-block', 'margin-right': '1em' }} onClick={overlay?.actions.toggleOverlay}>
+            Cancel
+          </button>
+          <button type='button' className='btn btn-primary' style={{ display: 'inline-block' }} onClick={saveChanges}>
+            Save
+          </button>
+        </Modal.Content>
+      </Modal>
+    )
+  }
+
+  const changeConfigValue = (parentObj, key, value) => {
+    let newConfig = { ...config }
+    if (!newConfig[parentObj]) newConfig[parentObj] = {}
+    newConfig[parentObj][key] = value
+
+    updateConfig(newConfig)
+  }
+
+  const addNewFilter = () => {
+    let dashboardConfig = { ...config.dashboard }
+
+    dashboardConfig.sharedFilters = dashboardConfig.sharedFilters || []
+
+    dashboardConfig.sharedFilters.push({ key: 'Dashboard Filter ' + (dashboardConfig.sharedFilters.length + 1), values: [] })
+
+    updateConfig({ ...config, dashboard: dashboardConfig })
+  }
+
+  const removeFilter = index => {
+    let dashboardConfig = { ...config.dashboard }
+
+    dashboardConfig.sharedFilters.splice(index, 1)
+
+    // Ensures URL filters refresh after filter removal
+    if (dashboardConfig.datasets) {
+      Object.keys(dashboardConfig.datasets).forEach(datasetKey => {
+        delete dashboardConfig.datasets[datasetKey].runtimeDataUrl
+      })
+    }
+
+    updateConfig({ ...config, dashboard: dashboardConfig })
+
+    overlay?.actions.toggleOverlay()
+  }
+
+  const convertStateToConfig = (type = 'JSON') => {
+    let strippedState = JSON.parse(JSON.stringify(config))
+    delete strippedState.newViz
+    delete strippedState.runtime
+
+    if (type === 'JSON') {
+      return JSON.stringify(strippedState)
+    }
+
+    return strippedState
+  }
+
+  useEffect(() => {
+    const parsedData = convertStateToConfig()
+
+    // Emit the data in a regular JS event so it can be consumed by anything.
+    const event = new CustomEvent('updateVizConfig', { detail: parsedData })
+
+    window.dispatchEvent(event)
+
+    // Pass up to Editor if needed
+    if (setParentConfig) {
+      const newConfig = convertStateToConfig('object')
+      setParentConfig(newConfig)
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config])
+
+  useEffect(() => {
+    const runSetColumns = async () => {
+      let columns = {}
+      let dataKeys = Object.keys(config.datasets)
+
+      for (let i = 0; i < dataKeys.length; i++) {
+        if (!config.datasets[dataKeys[i]].data && config.datasets[dataKeys[i]].dataUrl) {
+          config.datasets[dataKeys[i]].data = await fetchRemoteData(config.datasets[dataKeys[i]].dataUrl)
+          if (config.datasets[dataKeys[i]].dataDescription) {
+            try {
+              config.datasets[dataKeys[i]].data = transform.autoStandardize(config.datasets[dataKeys[i]].data)
+              config.datasets[dataKeys[i]].data = transform.developerStandardize(config.datasets[dataKeys[i]].data, config.datasets[dataKeys[i]].dataDescription)
+            } catch (e) {
+              //Data not able to be standardized, leave as is
+            }
+          }
+        }
+
+        if (config.datasets[dataKeys[i]].data) {
+          config.datasets[dataKeys[i]].data.forEach(row => {
+            Object.keys(row).forEach(columnName => (columns[columnName] = true))
+          })
+        }
+      }
+
+      setColumns(Object.keys(columns))
+    }
+
+    runSetColumns()
+  }, [config.datasets])
+
+  return (
+    <div className='visualizations-panel'>
+      <button onClick={() => {
+        setPreview(false)
+        setTabOpen(tabOpen === 0 ? -1 : 0)
+      }}>Configure Dashboard</button>
+      {tabOpen === 0 && <>
+        <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
+        <span className='subheading-3'>Chart</span>
+        <div className='drag-grid'>
+          <Widget addVisualization={() => addVisualization('chart', 'Bar')} type='Bar' />
+          <Widget addVisualization={() => addVisualization('chart', 'Line')} type='Line' />
+          <Widget addVisualization={() => addVisualization('chart', 'Pie')} type='Pie' />
+        </div>
+        <span className='subheading-3'>Map</span>
+        <div className='drag-grid'>
+          <Widget addVisualization={() => addVisualization('map', 'us')} type='us' />
+          <Widget addVisualization={() => addVisualization('map', 'world')} type='world' />
+          <Widget addVisualization={() => addVisualization('map', 'single-state')} type='single-state' />
+        </div>
+        <span className='subheading-3'>Misc.</span>
+        <div className='drag-grid'>
+          <Widget addVisualization={() => addVisualization('data-bite', '')} type='data-bite' />
+          <Widget addVisualization={() => addVisualization('waffle-chart', '')} type='waffle-chart' />
+          <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
+          <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
+        </div>
+      </>}
+      <button onClick={() => {
+        setTabOpen(tabOpen === 1 ? -1 : 1)
+        setPreview(true)
+      }}>Dashboard Settings</button>
+      {tabOpen === 1 && <>
+        Dashboard settings
+
+        <input type='text' className='description-input' placeholder='Type a dashboard description here.' defaultValue={config.dashboard.description} onChange={e => changeConfigValue('dashboard', 'description', e.target.value)} />
+
+        {config.dashboard.sharedFilters &&
+          config.dashboard.sharedFilters.map((sharedFilter, index) => (
+            <span className='shared-filter-button' key={`shared-filter-${sharedFilter.key}`}>
+              <a
+                href='#'
+                onClick={e => {
+                  e.preventDefault()
+                  overlay?.actions.openOverlay(filterModal(sharedFilter, index))
+                }}
+              >
+                {sharedFilter.key}
+              </a>
+              <button onClick={() => removeFilter(index)}>X</button>
+            </span>
+          ))}
+        <button onClick={addNewFilter}>Add New Filter</button>
+
+        <div className='wrap'>
+          <label>
+            <input type='checkbox' defaultChecked={config.table.show} onChange={e => changeConfigValue('table', 'show', e.target.checked)} />
+            Show Data Table(s)
+          </label>
+          <br />
+
+          <label>
+            <input type='checkbox' defaultChecked={config.table.expanded} onChange={e => changeConfigValue('table', 'expanded', e.target.checked)} />
+            Expanded by Default
+          </label>
+          <br />
+        </div>
+
+        <div className='wrap'>
+          <label>
+            <input type='checkbox' defaultChecked={config.table.limitHeight} onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)} />
+            Limit Table Height
+          </label>
+          {config.table.limitHeight && <input class='table-height-input' type='text' placeholder='Height (px)' defaultValue={config.table.height} onChange={e => changeConfigValue('table', 'height', e.target.value)} />}
+        </div>
+
+        <div className='wrap'>
+          <label>
+            <input type='checkbox' defaultChecked={config.table.download} onChange={e => changeConfigValue('table', 'download', e.target.checked)} />
+            Show Download CSV Link
+          </label>
+          <label>
+            <input type='checkbox' defaultChecked={config.table.showDownloadUrl} onChange={e => changeConfigValue('table', 'showDownloadUrl', e.target.checked)} />
+            Show URL to Automatically Updated Data
+          </label>
+        </div>
+      </>}
+
+      <span className='subheading-3'>Advanced</span>
+      <AdvancedEditor loadConfig={loadConfig} state={config} />
     </div>
-    <span className='subheading-3'>Map</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('map', 'us')} type='us' />
-      <Widget addVisualization={() => addVisualization('map', 'world')} type='world' />
-      <Widget addVisualization={() => addVisualization('map', 'single-state')} type='single-state' />
-    </div>
-    <span className='subheading-3'>Misc.</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('data-bite', '')} type='data-bite' />
-      <Widget addVisualization={() => addVisualization('waffle-chart', '')} type='waffle-chart' />
-      <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
-      <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
-    </div>
-    <span className='subheading-3'>Advanced</span>
-    <AdvancedEditor loadConfig={loadConfig} state={config} />
-  </div>
-)
+  )
+}
 
 export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, isDebug = false, setConfig: setParentConfig }) {
   const [config, setConfig] = useState(configObj ?? {})
@@ -112,6 +530,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const [tabSelected, setTabSelected] = useState(0)
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [tabOpen, setTabOpen] = useState(0);
 
   const { title, description } = config.dashboard || config
 
@@ -608,7 +1027,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         <DndProvider backend={HTML5Backend}>
           <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview} />
           <div className='layout-container'>
-            <VisualizationsPanel loadConfig={loadConfig} config={config} />
+            <VisualizationsPanel loadConfig={loadConfig} setPreview={setPreview} tabOpen={tabOpen} setTabOpen={setTabOpen} config={config} updateConfig={updateConfig} setParentConfig={setParentConfig}
+            />
             <Grid />
           </div>
         </DndProvider>
@@ -618,198 +1038,204 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     body = (
       <>
         {isEditor && <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview} />}
-        <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
-          {/* Title */}
-          {title && (
-            <div role='heading' aria-level='3' className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>
-              {title}
-            </div>
-          )}
-          {/* Description */}
-          {description && <div className='subtext'>{parse(description)}</div>}
-          {/* Filters */}
-          {config.dashboard.sharedFilters && (
-            <div className='cove-dashboard-filters'>
-              {' '}
-              <Filters />
-            </div>
-          )}
-
-          {/* Visualizations */}
-          {config.rows &&
-            config.rows
-              .filter(row => row.filter(col => col.widget).length !== 0)
-              .map((row, index) => {
-                return (
-                  <div className={`dashboard-row ${row.equalHeight ? 'equal-height' : ''}`} key={`row__${index}`}>
-                    {row.map((col, colIndex) => {
-                      if (col.width) {
-                        if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`dashboard-col dashboard-col-${col.width}`}></div>
-
-                        let visualizationConfig = { ...config.visualizations[col.widget] }
-
-                        const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
-
-                        if (filteredData && filteredData[col.widget]) {
-                          visualizationConfig.data = filteredData[col.widget]
-                          if (visualizationConfig.formattedData) {
-                            visualizationConfig.originalFormattedData = visualizationConfig.formattedData
-                            visualizationConfig.formattedData = visualizationConfig.data
-                          }
-                        } else {
-                          visualizationConfig.data = data[dataKey]
-                          if (visualizationConfig.formattedData) {
-                            visualizationConfig.originalFormattedData = visualizationConfig.formattedData
-                            visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
-                          }
-                        }
-
-                        const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
-                        const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
-                        const tableLink = (
-                          <a href={`#data-table-${visualizationConfig.dataKey}`} className='margin-left-href'>
-                            {visualizationConfig.dataKey} (Go to Table)
-                          </a>
-                        )
-
-                        return (
-                          <React.Fragment key={`vis__${index}__${colIndex}`}>
-                            <div className={`dashboard-col dashboard-col-${col.width}`}>
-                              {visualizationConfig.type === 'chart' && (
-                                <CdcChart
-                                  key={col.widget}
-                                  config={visualizationConfig}
-                                  dashboardConfig={config}
-                                  isEditor={false}
-                                  setConfig={newConfig => {
-                                    updateChildConfig(col.widget, newConfig)
-                                  }}
-                                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                                  isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
-                                />
-                              )}
-                              {visualizationConfig.type === 'map' && (
-                                <CdcMap
-                                  key={col.widget}
-                                  config={visualizationConfig}
-                                  isEditor={false}
-                                  setConfig={newConfig => {
-                                    updateChildConfig(col.widget, newConfig)
-                                  }}
-                                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                                  setSharedFilterValue={setSharedFilterValue}
-                                  isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
-                                />
-                              )}
-                              {visualizationConfig.type === 'data-bite' && (
-                                <CdcDataBite
-                                  key={col.widget}
-                                  config={visualizationConfig}
-                                  isEditor={false}
-                                  setConfig={newConfig => {
-                                    updateChildConfig(col.widget, newConfig)
-                                  }}
-                                  isDashboard={true}
-                                />
-                              )}
-                              {visualizationConfig.type === 'waffle-chart' && (
-                                <CdcWaffleChart
-                                  key={col.widget}
-                                  config={visualizationConfig}
-                                  isEditor={false}
-                                  setConfig={newConfig => {
-                                    updateChildConfig(col.widget, newConfig)
-                                  }}
-                                  isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
-                                />
-                              )}
-                              {visualizationConfig.type === 'markup-include' && (
-                                <CdcMarkupInclude
-                                  key={col.widget}
-                                  config={visualizationConfig}
-                                  isEditor={false}
-                                  setConfig={newConfig => {
-                                    updateChildConfig(col.widget, newConfig)
-                                  }}
-                                  isDashboard={true}
-                                />
-                              )}
-                              {visualizationConfig.type === 'filtered-text' && (
-                                <CdcFilteredText
-                                  key={col.widget}
-                                  config={visualizationConfig}
-                                  isEditor={false}
-                                  setConfig={newConfig => {
-                                    updateChildConfig(col.widget, newConfig)
-                                  }}
-                                  isDashboard={true}
-                                />
-                              )}
-                            </div>
-                          </React.Fragment>
-                        )
-                      }
-                      return <React.Fragment key={`vis__${index}__${colIndex}`}></React.Fragment>
-                    })}
-                  </div>
-                )
-              })}
-
-          {/* Image or PDF Inserts */}
-          <section className='download-buttons'>
-            {config.table.downloadImageButton && <MediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
-            {config.table.downloadPdfButton && <MediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
-          </section>
-
-          {/* Data Table */}
-          {config.table && config.data && <DataTable data={config.data} config={config} imageRef={imageId} />}
-          {config.table &&
-            config.datasets &&
-            Object.keys(config.datasets).map(datasetKey => {
-              //For each dataset, find any shared filters that apply to all visualizations using the dataset
-              //Apply these filters to the table
-              let filteredTableData
-              if (config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0) {
-                //Gets list of visuailzations using the dataset
-                let vizKeysUsingDataset = []
-                Object.keys(config.visualizations).forEach(visualizationKey => {
-                  if (config.visualizations[visualizationKey].dataKey === datasetKey) {
-                    vizKeysUsingDataset.push(visualizationKey)
-                  }
-                })
-
-                //Checks shared filters against list to see if all visualizations are represented
-                let applicableFilters = []
-                config.dashboard.sharedFilters.forEach(sharedFilter => {
-                  let allMatch = true
-                  vizKeysUsingDataset.forEach(visualizationKey => {
-                    if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
-                      allMatch = false
-                    }
-                  })
-                  if (allMatch) {
-                    applicableFilters.push(sharedFilter)
-                  }
-                })
-
-                //Applys any applicable filters
-                if (applicableFilters.length > 0) {
-                  filteredTableData = filterData(applicableFilters, config.datasets[datasetKey].data)
-                }
-              }
-
-              let dataFileSourceType = config.datasets[datasetKey]?.dataFileSourceType
-
-              return (
-                <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-                  <DataTable data={filteredTableData || config.datasets[datasetKey].data || []} downloadData={config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
+        
+        <DndProvider backend={HTML5Backend}>
+          <div className='layout-container'>
+            {isEditor && <VisualizationsPanel loadConfig={loadConfig} setPreview={setPreview} tabOpen={tabOpen} setTabOpen={setTabOpen} config={config} updateConfig={updateConfig} setParentConfig={setParentConfig}/>}
+            <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
+              {/* Title */}
+              {title && (
+                <div role='heading' aria-level='3' className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>
+                  {title}
                 </div>
-              )
-            })}
-        </div>
+              )}
+              {/* Description */}
+              {description && <div className='subtext'>{parse(description)}</div>}
+              {/* Filters */}
+              {config.dashboard.sharedFilters && (
+                <div className='cove-dashboard-filters'>
+                  {' '}
+                  <Filters />
+                </div>
+              )}
+
+              {/* Visualizations */}
+              {config.rows &&
+                config.rows
+                  .filter(row => row.filter(col => col.widget).length !== 0)
+                  .map((row, index) => {
+                    return (
+                      <div className={`dashboard-row ${row.equalHeight ? 'equal-height' : ''}`} key={`row__${index}`}>
+                        {row.map((col, colIndex) => {
+                          if (col.width) {
+                            if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`dashboard-col dashboard-col-${col.width}`}></div>
+
+                            let visualizationConfig = { ...config.visualizations[col.widget] }
+
+                            const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
+
+                            if (filteredData && filteredData[col.widget]) {
+                              visualizationConfig.data = filteredData[col.widget]
+                              if (visualizationConfig.formattedData) {
+                                visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+                                visualizationConfig.formattedData = visualizationConfig.data
+                              }
+                            } else {
+                              visualizationConfig.data = data[dataKey]
+                              if (visualizationConfig.formattedData) {
+                                visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+                                visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
+                              }
+                            }
+
+                            const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
+                            const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
+                            const tableLink = (
+                              <a href={`#data-table-${visualizationConfig.dataKey}`} className='margin-left-href'>
+                                {visualizationConfig.dataKey} (Go to Table)
+                              </a>
+                            )
+
+                            return (
+                              <React.Fragment key={`vis__${index}__${colIndex}`}>
+                                <div className={`dashboard-col dashboard-col-${col.width}`}>
+                                  {visualizationConfig.type === 'chart' && (
+                                    <CdcChart
+                                      key={col.widget}
+                                      config={visualizationConfig}
+                                      dashboardConfig={config}
+                                      isEditor={false}
+                                      setConfig={newConfig => {
+                                        updateChildConfig(col.widget, newConfig)
+                                      }}
+                                      setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                                      isDashboard={true}
+                                      link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                                    />
+                                  )}
+                                  {visualizationConfig.type === 'map' && (
+                                    <CdcMap
+                                      key={col.widget}
+                                      config={visualizationConfig}
+                                      isEditor={false}
+                                      setConfig={newConfig => {
+                                        updateChildConfig(col.widget, newConfig)
+                                      }}
+                                      setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                                      setSharedFilterValue={setSharedFilterValue}
+                                      isDashboard={true}
+                                      link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                                    />
+                                  )}
+                                  {visualizationConfig.type === 'data-bite' && (
+                                    <CdcDataBite
+                                      key={col.widget}
+                                      config={visualizationConfig}
+                                      isEditor={false}
+                                      setConfig={newConfig => {
+                                        updateChildConfig(col.widget, newConfig)
+                                      }}
+                                      isDashboard={true}
+                                    />
+                                  )}
+                                  {visualizationConfig.type === 'waffle-chart' && (
+                                    <CdcWaffleChart
+                                      key={col.widget}
+                                      config={visualizationConfig}
+                                      isEditor={false}
+                                      setConfig={newConfig => {
+                                        updateChildConfig(col.widget, newConfig)
+                                      }}
+                                      isDashboard={true}
+                                      link={config.table && config.table.show && config.datasets && visualizationConfig.table && visualizationConfig.table.showDataTableLink ? tableLink : undefined}
+                                    />
+                                  )}
+                                  {visualizationConfig.type === 'markup-include' && (
+                                    <CdcMarkupInclude
+                                      key={col.widget}
+                                      config={visualizationConfig}
+                                      isEditor={false}
+                                      setConfig={newConfig => {
+                                        updateChildConfig(col.widget, newConfig)
+                                      }}
+                                      isDashboard={true}
+                                    />
+                                  )}
+                                  {visualizationConfig.type === 'filtered-text' && (
+                                    <CdcFilteredText
+                                      key={col.widget}
+                                      config={visualizationConfig}
+                                      isEditor={false}
+                                      setConfig={newConfig => {
+                                        updateChildConfig(col.widget, newConfig)
+                                      }}
+                                      isDashboard={true}
+                                    />
+                                  )}
+                                </div>
+                              </React.Fragment>
+                            )
+                          }
+                          return <React.Fragment key={`vis__${index}__${colIndex}`}></React.Fragment>
+                        })}
+                      </div>
+                    )
+                  })}
+
+              {/* Image or PDF Inserts */}
+              <section className='download-buttons'>
+                {config.table.downloadImageButton && <MediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
+                {config.table.downloadPdfButton && <MediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
+              </section>
+
+              {/* Data Table */}
+              {config.table && config.data && <DataTable data={config.data} config={config} imageRef={imageId} />}
+              {config.table &&
+                config.datasets &&
+                Object.keys(config.datasets).map(datasetKey => {
+                  //For each dataset, find any shared filters that apply to all visualizations using the dataset
+                  //Apply these filters to the table
+                  let filteredTableData
+                  if (config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0) {
+                    //Gets list of visuailzations using the dataset
+                    let vizKeysUsingDataset = []
+                    Object.keys(config.visualizations).forEach(visualizationKey => {
+                      if (config.visualizations[visualizationKey].dataKey === datasetKey) {
+                        vizKeysUsingDataset.push(visualizationKey)
+                      }
+                    })
+
+                    //Checks shared filters against list to see if all visualizations are represented
+                    let applicableFilters = []
+                    config.dashboard.sharedFilters.forEach(sharedFilter => {
+                      let allMatch = true
+                      vizKeysUsingDataset.forEach(visualizationKey => {
+                        if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
+                          allMatch = false
+                        }
+                      })
+                      if (allMatch) {
+                        applicableFilters.push(sharedFilter)
+                      }
+                    })
+
+                    //Applys any applicable filters
+                    if (applicableFilters.length > 0) {
+                      filteredTableData = filterData(applicableFilters, config.datasets[datasetKey].data)
+                    }
+                  }
+
+                  let dataFileSourceType = config.datasets[datasetKey]?.dataFileSourceType
+
+                  return (
+                    <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
+                      <DataTable data={filteredTableData || config.datasets[datasetKey].data || []} downloadData={config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
+                    </div>
+                  )
+                })}
+            </div>
+          </div>
+        </DndProvider>
       </>
     )
   }

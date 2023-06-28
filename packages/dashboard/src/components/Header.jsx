@@ -11,6 +11,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
   const { config, updateConfig, setParentConfig } = useContext(ConfigContext)
 
   const { overlay } = useGlobalContext()
+  console.log(overlay)
 
   const [columns, setColumns] = useState([])
 
@@ -378,119 +379,10 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
         </div>
       ) : (
         <div className='heading-1'>
-          Dashboard Editor
-          <br />
           {<input type='text' placeholder='Enter Dashboard Name Here' defaultValue={config.dashboard.title} onChange={e => changeConfigValue('dashboard', 'title', e.target.value)} />}
         </div>
       )}
-      {!subEditor && (
-        <div className='toggle-bar__wrapper'>
-          <ul className='toggle-bar'>
-            <li
-              className={tabSelected === 0 ? 'active' : 'inactive'}
-              onClick={() => {
-                setTab(0)
-              }}
-            >
-              Dashboard Description
-            </li>
-            <li
-              className={tabSelected === 1 ? 'active' : 'inactive'}
-              onClick={() => {
-                setTab(1)
-              }}
-            >
-              Dashboard Filters
-            </li>
-            <li
-              className={tabSelected === 2 ? 'active' : 'inactive'}
-              onClick={() => {
-                setTab(2)
-              }}
-            >
-              Data Table Settings
-            </li>
-            <li
-              className={tabSelected === 3 ? 'active' : 'inactive'}
-              onClick={() => {
-                setTab(3)
-              }}
-            >
-              Dashboard Preview
-            </li>
-          </ul>
-          <div className='heading-body'>
-            {tabSelected === 0 && <input type='text' className='description-input' placeholder='Type a dashboard description here.' defaultValue={config.dashboard.description} onChange={e => changeConfigValue('dashboard', 'description', e.target.value)} />}
-            {tabSelected === 1 && (
-              <>
-                {config.dashboard.sharedFilters &&
-                  config.dashboard.sharedFilters.map((sharedFilter, index) => (
-                    <span className='shared-filter-button' key={`shared-filter-${sharedFilter.key}`}>
-                      <a
-                        href='#'
-                        onClick={e => {
-                          e.preventDefault()
-                          overlay?.actions.openOverlay(filterModal(sharedFilter, index))
-                        }}
-                      >
-                        {sharedFilter.key}
-                      </a>
-                      <button onClick={() => removeFilter(index)}>X</button>
-                    </span>
-                  ))}
-                <button onClick={addNewFilter}>Add New Filter</button>
-              </>
-            )}
-            {tabSelected === 2 && (
-              <>
-                <div className='wrap'>
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.show} onChange={e => changeConfigValue('table', 'show', e.target.checked)} />
-                    Show Data Table(s)
-                  </label>
-                  <br />
 
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.expanded} onChange={e => changeConfigValue('table', 'expanded', e.target.checked)} />
-                    Expanded by Default
-                  </label>
-                  <br />
-                </div>
-
-                {/* <div className="wrap">
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.downloadPdfButton} onChange={e => changeConfigValue('table', 'downloadPdfButton', e.target.checked)} />
-                    Show PDF Button
-                  </label>
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.downloadImageButton} onChange={e => changeConfigValue('table', 'downloadImageButton', e.target.checked)} />
-                    Show Image Button
-                  </label>
-                </div> */}
-
-                <div className='wrap'>
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.limitHeight} onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)} />
-                    Limit Table Height
-                  </label>
-                  {config.table.limitHeight && <input class='table-height-input' type='text' placeholder='Height (px)' defaultValue={config.table.height} onChange={e => changeConfigValue('table', 'height', e.target.value)} />}
-                </div>
-
-                <div className='wrap'>
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.download} onChange={e => changeConfigValue('table', 'download', e.target.checked)} />
-                    Show Download CSV Link
-                  </label>
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.showDownloadUrl} onChange={e => changeConfigValue('table', 'showDownloadUrl', e.target.checked)} />
-                    Show URL to Automatically Updated Data
-                  </label>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
