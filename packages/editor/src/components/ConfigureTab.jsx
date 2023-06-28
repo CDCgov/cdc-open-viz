@@ -25,11 +25,19 @@ export default function ConfigureTab({ containerEl }) {
         </ErrorBoundary>
       )
     case 'chart':
-      return (
-        <ErrorBoundary component='CdcChart'>
-          <CdcChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
-        </ErrorBoundary>
-      )
+      if (config.visualizationType === 'Waffle' || config.visualizationType === 'Gauge') {
+        return (
+          <ErrorBoundary component='CdcWaffleChart'>
+            <CdcWaffleChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
+          </ErrorBoundary>
+        )
+      } else {
+        return (
+          <ErrorBoundary component='CdcChart'>
+            <CdcChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
+          </ErrorBoundary>
+        )
+      }
     case 'dashboard':
       return (
         <ErrorBoundary component='CdcDashboard'>
@@ -40,12 +48,6 @@ export default function ConfigureTab({ containerEl }) {
       return (
         <ErrorBoundary component='CdcDashboard'>
           <CdcDataBite isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
-        </ErrorBoundary>
-      )
-    case 'waffle-chart':
-      return (
-        <ErrorBoundary component='CdcDashboard'>
-          <CdcWaffleChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
         </ErrorBoundary>
       )
     case 'markup-include':
