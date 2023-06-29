@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react'
 
 // cdc
 import ConfigContext from '../ConfigContext'
@@ -23,10 +23,13 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
   }, [chartRef])
 
   // import data from context
-  const { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale } = useContext(ConfigContext)
+  let { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale } = useContext(ConfigContext)
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
 
-  //console.log('### data, BrushData', data, brushData)
+  // use brush data if it is passed in AND if this is NOT a brush chart
+  data = !isBrush && undefined !== brushData && brushData.length ? brushData : data
+
+  //if (!isBrush) console.log('###AREAchart BRUSH data, xScale, yScale, yMax, xMax', data, xScale, yScale, yMax, xMax)
 
   // import tooltip helpers
   const { tooltipData, showTooltip } = useTooltip()
@@ -56,7 +59,6 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
     }
 
     if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
-      //debugger
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
       const x0 = xScale.invert(x)
       const index = bisectDate(config.data, x0, 1)
@@ -67,12 +69,10 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
   }
 
   const getXAxisDates = brushDataSet => {
-    //debugger
     if (undefined === brushDataSet || !brushDataSet) return
     let XAxisBrushDates = []
     brushDataSet.forEach(function convertDateTimeNumber(key, value, brushDataSet) {
       let tmp = getXValueFromCoordinate(xScale(value))
-      //console.log('AREACHART: getXAxisDates value date', value, tmp)
       let date = formatDate(tmp)
       //console.log('Converted X Date=', date)
       XAxisBrushDates.push(date)

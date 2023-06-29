@@ -7,7 +7,7 @@ import { Text } from '@visx/text'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import { localPoint } from '@visx/event'
 import { useTooltip } from '@visx/tooltip'
-import { scaleTime, scaleLinear } from '@visx/scale'
+import { scaleTime, scaleLinear, scaleLog } from '@visx/scale'
 import { Brush } from '@visx/brush'
 import { Bounds } from '@visx/brush/lib/types'
 import BaseBrush, { BaseBrushState, UpdateBrush } from '@visx/brush/lib/BaseBrush'
@@ -41,22 +41,20 @@ export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, isDebug } = useContext(ConfigContext)
   if (isDebug) console.log('COVE: LinearChart: config=', config)
 
-  const isBrush = config.showChartBrush
-
   const getDate = d => new Date(d.Date)
 
   const initBrushData = () => {
     let brushFilteredData = new Set()
     config.data.filter(s => {
       const x = getDate(s).getTime()
-      brushFilteredData.add(x)
+      brushFilteredData.add(x) // just adds the time data x point not the entire data record
     })
     console.log('# brushFilteredData=', brushFilteredData)
     return brushFilteredData
   }
 
   // Initialize Brush variables - here for now
-  const [xAxisBrushData, setXAxisBrushData] = useState(initBrushData)
+  const [xAxisBrushData, setXAxisBrushData] = useState(data) // initBrushData
   const brushMargin = { top: 10, bottom: 15, left: 50, right: 20 }
   const chartSeparation = 30
   const PATTERN_ID = 'brush_pattern'
@@ -93,11 +91,16 @@ export default function LinearChart() {
   const bottomChartHeight = innerHeight - topChartHeight - chartSeparation
   //const xBrushMax = Math.max(width - brushMargin.left - brushMargin.right, 0)
   //const yBrushMax = Math.max(bottomChartHeight - brushMargin.top - brushMargin.bottom, 0)
-  const xBrushMax = xMax
-  const yBrushMax = yMax
+  const xMaxBrush = xMax
+  const yMaxBrush = yMax
+
+  // account for brush data changes
+  const brushData = useMemo(() => (undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data))
 
   // hooks  % states
-  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useMemo(() => useReduceData(config, brushData))
+  // make brush set one time up front on original data
+  const { minValue: minValueBrush, maxValue: maxValueBrush, existPositiveValue: existPositiveValueBrush, isAllLine: isAllLineBrush } = useMemo(() => useReduceData(config, data))
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
@@ -112,39 +115,24 @@ export default function LinearChart() {
 
   // getters & functions
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
-
-  const getXAxisDataBAD = d => {
-    if (config.runtime.xAxis.type === 'date') {
-      let xdatetime = parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
-
-      console.log('xdatetime,xAxisBrushData', xdatetime, xAxisBrushData)
-      let temp = isBrush ? (xAxisBrushData !== undefined ? xAxisBrushData.has(xdatetime) : xdatetime) : d
-      if (isBrush && xAxisBrushData !== undefined) {
-        if (xAxisBrushData.has(xdatetime)) {
-          console.log('yes inbrushdata return xdatetime', xdatetime)
-          return xdatetime
-        }
-      } else {
-        console.log('else return d', d)
-        return d
-      }
-      //console.log('JUST temp', temp)
-      //console.log('isBrush, xAxisBrushData, d,temp,xdatetime', isBrush, xAxisBrushData, d, temp, xdatetime)
-      //return temp
-    } else {
-      return d[config.runtime.originalXAxis.dataKey]
-    }
-  }
-
   const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const xAxisDataMapped = data.map(d => getXAxisData(d))
-  const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
+  const xAxisDataMapped = brushData.map(d => getXAxisData(d))
+  const properties = { data: brushData, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
   const { min, max } = useMinMax(properties)
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding } = useScales({ ...properties, min, max })
 
+  // values sent to Brush dont change after initial render
+  const isBrush = true
+  const xAxisDataMappedBrush = data.map(d => getXAxisData(d))
+  const propertiesBrush = { data, config, minValue: minValueBrush, maxValue: maxValueBrush, isAllLine: isAllLineBrush, existPositiveValue: existPositiveValueBrush, xAxisDataMapped: xAxisDataMappedBrush, xMax: xMaxBrush, yMax: yMaxBrush, isBrush }
+  const { min: minBrush, max: maxBrush } = useMinMax(propertiesBrush)
+  const { xScale: xScaleBrush, yScale: yScaleBrush, seriesScale: seriesScaleBrush, g1xScale: g1xScaleBrush, g2xScale: g2xScaleBrush, xScaleNoPadding: xScaleNoPaddingBrush, yScaleBrushTest } = useScales({ ...propertiesBrush, min: minBrush, max: maxBrush })
+
+  //console.log('min, max, minBrush, maxBrush', min, max, minBrush, maxBrush)
+
   // Helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinateDate = x => {
-    console.log('##getXValueFromCoordinateDate: incoming x', x)
+    //console.log('##getXValueFromCoordinateDate: incoming x', x)
     if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
       let eachBand = xScale.step()
       let numerator = x
@@ -153,13 +141,11 @@ export default function LinearChart() {
     }
 
     if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
-      //debugger
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
       const x0 = xScale.invert(xScale(x)) // GETTING INVALID DATE ****
       const index = bisectDate(config.data, x0, 1)
-      //console.log('##LinearChart: x x0 index config.data', x, x0, index, config.data)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
-      console.log('##LinearChart: getXValueFromCoordinate DATE', val)
+      //console.log('##LinearChart: getXValueFromCoordinate DATE', val)
       return val
     }
   }
@@ -179,8 +165,11 @@ export default function LinearChart() {
         return s
       }
     })
-    console.log('### Set ### brushFilteredData', brushFilteredData)
-    setXAxisBrushData(brushFilteredData)
+
+    if (undefined !== brushFilteredData && brushFilteredData.length) {
+      //console.log('### Set ### brushFilteredData', brushFilteredData)
+      setXAxisBrushData(brushFilteredData)
+    }
     // WHAT DATA IS USED TO FEED MAIN CHART?
     // -- need that as a STATE variable
     // --- THEN set it here to cause MAIN chart to update
@@ -210,10 +199,11 @@ export default function LinearChart() {
 
   const countNumOfTicks = axis => {
     const { numTicks } = config.runtime[axis]
+    console.log('xAxis, numTicks', config.runtime[axis], numTicks)
     let tickCount = undefined
 
     if (axis === 'yAxis') {
-      tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      tickCount = isHorizontal && !numTicks ? brushData.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
       // to fix edge case of small numbers with decimals
       if (tickCount === undefined && !config.dataFormat.roundTo) {
         // then it is set to Auto
@@ -231,6 +221,7 @@ export default function LinearChart() {
 
     if (axis === 'xAxis') {
       tickCount = isHorizontal && !numTicks ? undefined : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      console.log('xAxis TERNARY tickCount=', tickCount)
       if (isHorizontal && tickCount === undefined && !config.dataFormat.roundTo) {
         // then it is set to Auto
         // - check for small numbers situation
@@ -240,14 +231,15 @@ export default function LinearChart() {
           tickCount = 4 // same default as standalone components
         }
       }
+      console.log('xAxis LAST tickCount=', tickCount)
     }
     return tickCount
   }
 
   // Tooltip helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinate = x => {
-    console.log('getXValueFromCoordinate xScale', xScale.type)
-    console.log('getXValueFromCoordinate xAxis.type', xAxis.type)
+    //console.log('getXValueFromCoordinate xScale', xScale.type)
+    //console.log('getXValueFromCoordinate xAxis.type', xAxis.type)
     if (xScale.type === 'point') {
       // Find the closest x value by calculating the minimum distance
       let closestX = null
@@ -264,20 +256,6 @@ export default function LinearChart() {
         }
       })
       return closestX
-    }
-  }
-
-  const getXValueFromCoordinateDateBAD = x => {
-    if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
-      debugger
-      const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
-      const x0 = xScale(x)
-      const x0invert = xScale.invert(x) // this is useless bc it creates a date "made up" based on inverting x number
-      // the dates "made up" are not even in the data
-      console.log('x0,x0invert', x0, x0invert)
-      const index = bisectDate(config.data, x0, 1)
-      const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
-      return val
     }
   }
 
@@ -696,7 +674,7 @@ export default function LinearChart() {
         {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} isBrush={false} />}
         {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} isBrush={false} />}
         {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} isBrush={false} />}
-        {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} chartRef={svgRef} isDebug={isDebug} isBrush={false} />}
+        {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} brushData={brushData} chartRef={svgRef} isDebug={isDebug} isBrush={false} />}
         {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
           <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} isBrush={false} />
         )}
@@ -723,15 +701,17 @@ export default function LinearChart() {
 
         {config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
           <>
-            <CoveAreaChart className='brushChart' xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} brushData={xAxisBrushData} isDebug={isDebug} isBrush={true}>
+            {/* console.log('### yScaleBrush,yScale', yScaleBrush, yScale) */}
+            {/* console.log('### xScaleBrush,xScale', xScaleBrush, xScale) */}
+            <CoveAreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} chartRef={svgRef} isDebug={isDebug} isBrush={true}>
               <PatternLines id={PATTERN_ID} height={8} width={8} stroke={accentColor} strokeWidth={1} orientation={['diagonal']} style={styles} />
               <Brush
                 id='theBrush'
                 className='theBrush'
-                xScale={xScale}
-                yScale={yScale}
-                width={xMax}
-                height={yMax / 4}
+                xScale={xScaleBrush}
+                yScale={yScaleBrush}
+                width={xMaxBrush}
+                height={yMaxBrush / 4}
                 margin={0}
                 handleSize={8}
                 innerRef={brushRef}
