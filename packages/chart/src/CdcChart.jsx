@@ -316,6 +316,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
 
+    newConfig.series.map(series => {
+      if (!series.tooltip) series.tooltip = true
+    })
+
     const processedConfig = { ...(await coveUpdateWorker(newConfig)) }
 
     updateConfig(processedConfig, data)
@@ -1141,10 +1145,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
               style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
-              className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
+              className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
-              {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
+              {config.visualizationType !== 'Spark Line' && <LinearChart />}
 
               {/* Sparkline */}
               {config.visualizationType === 'Spark Line' && (
@@ -1217,7 +1221,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
+  const capitalize = str => {
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
+
   const contextValues = {
+    capitalize,
     getXAxisData,
     getYAxisData,
     config,
