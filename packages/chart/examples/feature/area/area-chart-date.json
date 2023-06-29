@@ -125,7 +125,7 @@
     "tickLabelColor": "#333",
     "tickColor": "#333",
     "isLegendValue": false,
-    "numTicks": "9",
+    "numTicks": "6",
     "dataKey": "Date",
     "label": "X Axis Example Label",
     "dateParseFormat": "%m/%d/%Y",
