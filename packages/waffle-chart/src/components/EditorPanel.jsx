@@ -197,10 +197,7 @@ const EditorPanel = memo(props => {
   }
   //visualizationType
 
-  const approvedWaffleChartOptions = [
-    'Waffle'
-    // 'Gauge'
-  ]
+  const approvedWaffleChartOptions = ['Waffle', 'Gauge']
 
   const editorContent = (
     <Accordion>
