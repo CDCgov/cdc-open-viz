@@ -467,7 +467,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
                         if (isHighlightedBar) return 'transparent'
                         // loop through shared filters and get active values
-                        if (dashboardConfig && dashboardConfig?.dashboard.sharedFilters?.length > 0) {
+                        /* if (dashboardConfig && dashboardConfig?.dashboard.sharedFilters?.length > 0) {
                           let activeFilters = []
                           let backgroundColor = barColor
 
@@ -500,7 +500,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           }
                           checkForResetValue()
                           return backgroundColor
-                        }
+                        } */
                         return barColor
                       }
 
