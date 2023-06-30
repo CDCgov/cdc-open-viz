@@ -308,6 +308,7 @@ export default function LinearChart() {
                     const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                     const tickLength = showTicks === 'block' ? 7 : 0
                     const to = { x: tick.to.x - tickLength, y: tick.to.y }
+                    console.log(config.yAxis.tickRotation, 'RO')
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -348,6 +349,7 @@ export default function LinearChart() {
                             dx={config.useLogScale ? -6 : 0}
                             x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                             y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                            angle={-Number(config.yAxis.tickRotation) || 0}
                             verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
                             textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                             fill={config.yAxis.tickLabelColor}
@@ -432,6 +434,10 @@ export default function LinearChart() {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
               // Calculate sumOfTickWidth here, before map function
               const fontSize = { small: 16, medium: 18, large: 20 }
+              const defaultTickLength = 8
+              const tickWidthMax = Math.max(...props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)))
+              const marginTop = 20
+
               const textWidths = props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`))
               const sumOfTickWidth = textWidths.reduce((a, b) => a + b, 100)
               const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (props.ticks.length - 1)
@@ -453,15 +459,22 @@ export default function LinearChart() {
                   return
                 }
               })
+
+              const dynamicMarginTop = areTicksTouching ? tickWidthMax + defaultTickLength + marginTop : 0
+              config.dynamicMarginTop = dynamicMarginTop
+              // config.xAxis.size = dynamicMarginTop
               return (
                 <Group className='bottom-axis'>
                   {props.ticks.map((tick, i) => {
                     // when using LogScale show major ticks values only
                     const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
-                    const tickLength = showTick === 'block' ? 16 : 8
+                    const tickLength = showTick === 'block' ? 16 : defaultTickLength
                     const to = { x: tick.to.x, y: tickLength }
                     let textWidth = getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                    const tickRotation = areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : Number(config.runtime.xAxis.tickRotation)
+                    //reset rotation
+                    config.yAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
+                    //configure rotation
+                    const tickRotation = config.isResponsiveTicks && areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : -Number(config.runtime.xAxis.tickRotation)
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -472,7 +485,7 @@ export default function LinearChart() {
                             display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
                             x={tick.to.x}
                             y={tick.to.y}
-                            angle={areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : -tickRotation}
+                            angle={tickRotation}
                             verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
                             textAnchor={tickRotation ? 'end' : 'middle'}
                             width={textWidth}
@@ -485,7 +498,7 @@ export default function LinearChart() {
                     )
                   })}
                   {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                  <Text x={axisCenter} y={config.orientation === 'horizontal' ? config.xAxis.labelOffset : config.xAxis.size} textAnchor='middle' fontWeight='bold' fill={config.xAxis.labelColor}>
+                  <Text x={axisCenter} y={config.orientation === 'horizontal' ? dynamicMarginTop || config.xAxis.labelOffset : dynamicMarginTop || config.xAxis.size} textAnchor='middle' fontWeight='bold' fill={config.xAxis.labelColor}>
                     {props.label}
                   </Text>
                 </Group>

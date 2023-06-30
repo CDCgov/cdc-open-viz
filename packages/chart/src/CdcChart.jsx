@@ -1140,7 +1140,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
-              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
+              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.dynamicMarginTop || config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
@@ -1167,7 +1167,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
 
             {/* Description */}
-            {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
+            {description && config.visualizationType !== 'Spark Line' && (
+              <div className='subtext' style={{ marginTop: config.dynamicMarginTop / 5 || 0 }}>
+                {parse(description)}
+              </div>
+            )}
 
             {/* buttons */}
             <MediaControls.Section classes={['download-buttons']}>
