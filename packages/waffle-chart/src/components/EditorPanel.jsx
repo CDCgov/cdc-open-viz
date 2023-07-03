@@ -197,12 +197,14 @@ const EditorPanel = memo(props => {
   }
   //visualizationType
 
+  const approvedWaffleChartOptions = ['Waffle', 'Gauge']
+
   const editorContent = (
     <Accordion>
       <Accordion.Section title='General'>
         <div className='cove-accordion__panel-section'>
           <div style={{ width: '100%', display: 'block' }} className='cove-input-group'>
-            <InputSelect value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={['Waffle', 'Gauge']} className='cove-input' />
+            <InputSelect value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={approvedWaffleChartOptions} className='cove-input' />
             {config.visualizationType === 'Gauge' && <InputSelect value={config.visualizationSubType} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['Linear']} className='cove-input' />}
           </div>
         </div>
@@ -321,13 +323,16 @@ const EditorPanel = memo(props => {
             </div>
           </li>
         </ul>
-
-        <hr className='cove-accordion__divider' />
-        <div className='cove-accordion__panel-section reverse-labels'>
-          <InputText inline size='small' value={config.valueDescription} label='Value Descriptor' fieldName='valueDescription' updateField={updateField} />
-          <InputCheckbox inline size='small' value={config.showPercent} label='Show Percentage' fieldName='showPercent' updateField={updateField} />
-          <InputCheckbox inline size='small' label='Show Denominator' value={config.showDenominator} fieldName='showDenominator' updateField={updateField} />
-        </div>
+        {false && (
+          <>
+            <hr className='cove-accordion__divider' />
+            <div className='cove-accordion__panel-section reverse-labels'>
+              <InputText inline size='small' value={config.valueDescription} label='Value Descriptor' fieldName='valueDescription' updateField={updateField} />
+              <InputCheckbox inline size='small' value={config.showPercent} label='Show Percentage' fieldName='showPercent' updateField={updateField} />
+              <InputCheckbox inline size='small' label='Show Denominator' value={config.showDenominator} fieldName='showDenominator' updateField={updateField} />
+            </div>
+          </>
+        )}
         <label style={{ marginBottom: '1rem' }}>
           <span className='edit-label'>Data Point Filters</span>
           <Tooltip style={{ textTransform: 'none' }}>

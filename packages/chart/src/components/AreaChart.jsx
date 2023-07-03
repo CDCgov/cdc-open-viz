@@ -3,17 +3,13 @@ import React, { useContext, useEffect, useState, useMemo, useCallback } from 're
 // cdc
 import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 // visx & d3
 import * as allCurves from '@visx/curve'
 import { AreaClosed, LinePath, Bar } from '@visx/shape'
 import { Group } from '@visx/group'
-import { useTooltip, useTooltipInPortal, defaultStyles, Tooltip } from '@visx/tooltip'
-import { localPoint } from '@visx/event'
-import { bisector } from 'd3-array'
 
-const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, chartRef, isDebug, isBrush, brushData, children }) => {
+const AreaChart = ({ xScale, yScale, yMax, xMax, chartRef, handleTooltipMouseOver, handleTooltipMouseOff, isDebug, isBrush, brushData, children }) => {
   // enable various console logs in the file
   const DEBUG = isDebug
   const [chartPosition, setChartPosition] = useState(null)
@@ -202,10 +198,18 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
 
                   {/* Transparent bar for tooltips */}
                   {/* prettier-ignore */}
-                  {<Bar width={Number(xMax)} height={isBrush ? Number(yMax) / 4 : Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} style={DEBUG ? { stroke: 'purple', strokeWidth: 2 } : {}} onMouseMove={e => handleMouseOver(e, data)} />}
+                  <Bar
+                  width={ Number(xMax)}
+                  height={ Number(yMax)}
+                  fill={DEBUG ? 'red' : 'transparent'}
+                  fillOpacity={0.05}
+                  style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
+                  onMouseMove={e => handleTooltipMouseOver(e, rawData)}
+                  onMouseLeave={ handleTooltipMouseOff }
+                  />
 
                   {/* circles that appear on hover */}
-                  {!isBrush && tooltipData && Object.entries(tooltipData.data).length > 0 && (
+                  {tooltipData && Object.entries(tooltipData.data).length > 0 && (
                     <circle
                       cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
                       cy={yScale(tooltipData.data[s.dataKey])}
@@ -216,21 +220,6 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
                       style={{ filter: 'unset', opacity: 1 }}
                     />
                   )}
-
-                  {!isBrush && tooltipData && Object.entries(tooltipData.data).length > 0 && (
-                    <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
-                      <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id}>
-                        {typeof tooltipData === 'object' &&
-                          Object.entries(tooltipData.data).map(item => (
-                            <li style={{ padding: '2.5px 0' }}>
-                              <TooltipListItem item={item} />
-                            </li>
-                          ))}
-                      </ul>
-                    </TooltipInPortal>
-                  )}
-                  {children}
-                  {/* console.log('## AreaChart children in', children) */}
                 </React.Fragment>
               )
             })}
@@ -241,4 +230,4 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData,
   )
 }
 
-export default CoveAreaChart
+export default AreaChart

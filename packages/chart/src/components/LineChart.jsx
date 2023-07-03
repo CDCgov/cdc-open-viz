@@ -2,22 +2,23 @@ import React, { useContext } from 'react'
 
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
-import { LinePath } from '@visx/shape'
+import { LinePath, Bar } from '@visx/shape'
 import { Text } from '@visx/text'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import useRightAxis from '../hooks/useRightAxis'
 
-export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
-  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType } = useContext(ConfigContext)
+const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, showTooltip, seriesStyle = 'Line', svgRef, handleTooltipClick, tooltipData }) => {
+  // Not sure why there's a redraw here.
 
+  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType, dashboardConfig } = useContext(ConfigContext)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
+  if (!handleTooltipMouseOver) return
   const handleAxisFormating = (axis = 'left', label, value) => {
     // if this is an x axis category/date value return without doing any formatting.
     // if (label === config.runtime.xAxis.label) return value
-
     axis = String(axis).toLocaleLowerCase()
     if (label) {
       return `${label}: ${formatNumber(value, axis)}`
@@ -25,6 +26,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     return `${formatNumber(value, axis)}`
   }
 
+  const DEBUG = false
   return (
     <ErrorBoundary component='LineChart'>
       <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
@@ -34,6 +36,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
           let lineType = config.series.filter(item => item.dataKey === seriesKey)[0].type
           const seriesData = config.series.filter(item => item.dataKey === seriesKey)
           const seriesAxis = seriesData[0].axis ? seriesData[0].axis : 'left'
+
+          let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
 
           return (
             <Group
@@ -71,7 +75,10 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   d[seriesKey] !== '' &&
                   d[seriesKey] !== null &&
                   isNumber(d[seriesKey]) && (
-                    <Group key={`series-${seriesKey}-point-${dataIndex}`}>
+                    <Group key={`series-${seriesKey}-point-${dataIndex}`} className='checkwidth'>
+                      {/* tooltips */}
+                      <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
+
                       {/* Render legend */}
                       <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>
                         {formatNumber(d[seriesKey], 'left')}
@@ -83,10 +90,26 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                         cx={Number(xScale(getXAxisData(d)))}
                         cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))}
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                        style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
+                        style={{
+                          fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'
+                        }}
                         data-tooltip-html={tooltip}
                         data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
+
+                      {/* circles that appear on hover */}
+                      {/* todo: circle radii used here should be global with other circle radii */}
+                      {/* {tooltipData && Object.entries(tooltipData.data).length > 0 && isNumber(tooltipData.data[seriesKey]) && config.lineDatapointStyle === 'hover' && config.series.filter(s => s.type === 'Line') && (
+                        <circle
+                          cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
+                          cy={yScale(tooltipData.data[seriesKey])}
+                          r={4.5}
+                          opacity={tooltipData[seriesKey] ? 1 : 0}
+                          fillOpacity={1}
+                          fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000') : 'transparent'}
+                          style={{ filter: 'unset', opacity: 1 }}
+                        />
+                      )} */}
                     </Group>
                   )
                 )
@@ -161,3 +184,5 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     </ErrorBoundary>
   )
 }
+
+export default LineChart

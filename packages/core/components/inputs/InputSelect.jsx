@@ -33,7 +33,7 @@ const InputSelect = memo(({ label, value, options, fieldName, section = null, su
   }
 
   return (
-    <label>
+    <label style={{ width: '100%', display: 'block' }}>
       {label && <span className='edit-label cove-input__label'>{label}</span>}
       <select
         className={required && !value ? 'warning' : ''}

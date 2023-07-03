@@ -1,17 +1,34 @@
-$cove-tooltip-bg: #fff;
-$cove-tooltip-color: #333;
-$cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
+// Reusable variables, nice for JS manipulations
+:root {
+  --cove-tooltip-bg: #fff;
+  --cove-tooltip-color: black;
+  --cove-tooltip-font-size: 14px;
+  --cove-tooltip-border-color: #bdbdbd;
+  --cove-tooltip-heading-fontWeight: bold;
+  --cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
+  --cove-tooltip-maxWidth: 280px;
+}
 
-.cove-tooltip {
-  display: inline-block;
-  position: relative;
-  line-height: 1em;
-
-  &.cove-tooltip--border {
-    border: 1px solid #bdbdbd;
+// Namespace to cove project, inconveniently using two different classes.
+.cove,
+.cdc-open-viz-module {
+  // todo: move to a utils folder.
+  .capitalize {
+    text-transform: capitalize;
   }
 
-  @at-root {
+  // react-tooltip library
+  .react-tooltip {
+    .styles-module_arrow,
+    .react-tooltip-arrow {
+      border-bottom: var(--cove-tooltip-border-color) 1px solid;
+      border-right: var(--cove-tooltip-border-color) 1px solid;
+      backface-visibility: hidden;
+    }
+  }
+
+  // editor-panel
+  .editor-panel {
     .cove-label + .cove-tooltip {
       top: 1px;
       margin-left: 0.5rem;
@@ -30,6 +47,61 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
       line-height: inherit;
     }
   }
+
+  // begin actual tooltip styles
+  .react-tooltip,
+  .tooltip {
+    color: var(--cove-tooltip-color);
+    border: 1px solid var(--cove-tooltip-border-color);
+    padding: 0.3rem 0.5rem;
+    z-index: 1000;
+    opacity: 1;
+
+    .interactive {
+      a {
+        pointer-events: all;
+      }
+    }
+
+    ul {
+      list-style: none;
+
+      li {
+        font-size: var(--cove-tooltip-font-size) !important;
+      }
+
+      // under the heading
+      > li.tooltip-body {
+        border-top: 1px solid black;
+        padding-top: 5px;
+      }
+
+      li.tooltip-body:first-of-type {
+        padding-top: 5px;
+        border-top: 1px solid black;
+      }
+
+      // undo previous except first class
+      > li.tooltip-body ~ li.tooltip-body {
+        border-top: initial;
+        padding-top: initial;
+      }
+    }
+
+    .tooltip-heading {
+      display: block;
+      font-weight: var(--cove-tooltip-heading-fontWeight) !important;
+      padding-bottom: 3px;
+      padding-top: 3px;
+      font-size: var(--cove-tooltip-font-size) !important;
+    }
+  }
+}
+
+.cove-tooltip {
+  display: inline-block;
+  position: relative;
+  line-height: 1em;
 }
 
 .cove-tooltip--target {
@@ -45,16 +117,15 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
 }
 
 .cove-tooltip__content {
-  max-width: 280px;
+  max-width: var(--cove-tooltip-maxWidth);
   padding: 10px 8px;
   font-size: 0.875rem;
   line-height: 1.125rem;
   text-align: left;
-  color: $cove-tooltip-color;
-  background-color: $cove-tooltip-bg;
+  color: var(--cove-tooltip-color);
+  background-color: var(--cove-tooltip-bg);
   border-radius: 5px;
   user-select: none;
-  opacity: 0;
   cursor: default;
   z-index: 1;
 
@@ -64,7 +135,7 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
     }
 
     &.cove-tooltip__content--animated[class*='styles-module_show__'] {
-      animation: tooltip-btt $cove-tooltip-animation;
+      animation: tooltip-btt var(--cove-tooltip-animation);
     }
   }
 
@@ -74,7 +145,7 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
     }
 
     &.cove-tooltip__content--animated[class*='styles-module_show__'] {
-      animation: tooltip-ltr $cove-tooltip-animation;
+      animation: tooltip-ltr var(--cove-tooltip-animation);
     }
   }
 
@@ -84,7 +155,7 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
     }
 
     &.cove-tooltip__content--animated[class*='styles-module_show__'] {
-      animation: tooltip-ttb $cove-tooltip-animation;
+      animation: tooltip-ttb var(--cove-tooltip-animation);
     }
   }
 
@@ -94,61 +165,7 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
     }
 
     &.cove-tooltip__content--animated[class*='styles-module_show__'] {
-      animation: tooltip-rtl $cove-tooltip-animation;
+      animation: tooltip-rtl var(--cove-tooltip-animation);
     }
-  }
-}
-
-.interactive {
-  a {
-    pointer-events: all;
-  }
-}
-
-@keyframes tooltip-ltr {
-  0% {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes tooltip-rtl {
-  0% {
-    opacity: 0;
-    transform: translateX(8px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes tooltip-ttb {
-  0% {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes tooltip-btt {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
