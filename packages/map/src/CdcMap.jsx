@@ -14,6 +14,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 
 // Helpers
 import { publish } from '@cdc/core/helpers/events'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -30,7 +31,7 @@ import './scss/btn.scss'
 
 // Core
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import Loading from '@cdc/core/components/Loading'
@@ -50,6 +51,7 @@ import SingleStateMap from './components/SingleStateMap' // Future: Lazy
 import UsaMap from './components/UsaMap' // Future: Lazy
 import UsaRegionMap from './components/UsaRegionMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
+import useTooltip from './hooks/useTooltip'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -998,81 +1000,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }
 
-  const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
-    if (!row) return
-    let toolTipText = ''
-
-    // Adds geo label, ie State: Georgia
-    let stateOrCounty = state.general.geoType === 'us' ? 'State: ' : state.general.geoType === 'us-county' || state.general.geoType === 'single-state' ? 'County: ' : ''
-
-    // check the override
-    stateOrCounty = state.general.geoLabelOverride !== '' ? state.general.geoLabelOverride + ': ' : stateOrCounty
-
-    if (state.general.geoType === 'us-county' && state.general.type !== 'us-geocode') {
-      let stateFipsCode = row[state.columns.geo.name].substring(0, 2)
-      const stateName = supportedStatesFipsCodes[stateFipsCode]
-
-      toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
-    }
-
-    toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
-
-    if (('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode' || state.general.type === 'world-geocode') && undefined !== row) {
-      toolTipText += `<dl>`
-
-      Object.keys(state.columns).forEach(columnKey => {
-        const column = state.columns[columnKey]
-
-        if (true === column.tooltip) {
-          let label = column.label?.length > 0 ? column.label : ''
-
-          let value
-
-          if (state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object') {
-            // THIS CODE SHOULD NOT ACT ON THE ENTIRE ROW OF KEYS BUT ONLY THE ONE KEY IN THE SPECIAL CLASS
-            for (let i = 0; i < state.legend.specialClasses.length; i++) {
-              // Special Classes label in HOVERS should only apply to selected special class key
-              // - you have to ALSO check that the key matches - putting here otherwise the if stmt too long
-              if (column.name === state.legend.specialClasses[i].key) {
-                if (String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value) {
-                  value = displayDataAsText(state.legend.specialClasses[i].label, columnKey)
-                  break
-                }
-              }
-            }
-          }
-
-          if (!value) {
-            value = displayDataAsText(row[column.name], columnKey)
-          }
-
-          if (0 < value.length) {
-            // Only spit out the tooltip if there's a value there
-            toolTipText += state.general.hidePrimaryColumnInTooltip ? `<div><dd>${value}</dd></div>` : `<div><dt>${label}</dt><dd>${value}</dd></div>`
-          }
-        }
-      })
-      toolTipText += `</dl>`
-    }
-
-    // We convert the markup into JSX and add a navigation link if it's going into a modal.
-    if ('jsx' === returnType) {
-      toolTipText = [<div key='modal-content'>{parse(toolTipText)}</div>]
-
-      if (state.columns.hasOwnProperty('navigate') && row[state.columns.navigate.name]) {
-        toolTipText.push(
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-          <span className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[state.columns.navigate.name])}>
-            {state.tooltips.linkLabel}
-            <ExternalIcon className='inline-icon ml-1' />
-          </span>
-        )
-      }
-    }
-
-    return toolTipText
-  }
-
   // if city has a hyphen then in tooltip it ends up UPPER CASE instead of just regular Upper Case
   // - this function is used to prevent that and instead give the formatting that is wanted
   // Example:  Desired city display in tooltip on map: "Inter-Tribal Indian Reservation"
@@ -1163,7 +1090,37 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (true === Object.keys(dict).includes(value)) {
       value = dict[value]
     }
-    return titleCase(value)
+
+    // if you get here and it's 2 letters then DONT titleCase state abbreviations like "AL"
+    if (value.length === 2) {
+      return value
+    } else {
+      return titleCase(value)
+    }
+  }
+
+  // todo: convert to store or context eventually.
+  const { buildTooltip } = useTooltip({ state, displayGeoName, displayDataAsText, supportedStatesFipsCodes })
+
+  const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
+    let toolTipText = buildTooltip(row, geoName, '')
+
+    // We convert the markup into JSX and add a navigation link if it's going into a modal.
+    if ('jsx' === returnType) {
+      toolTipText = [<div key='modal-content'>{parse(toolTipText)}</div>]
+
+      if (state.columns.hasOwnProperty('navigate') && row[state.columns.navigate.name]) {
+        toolTipText.push(
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+          <ul className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[state.columns.navigate.name])}>
+            {state.tooltips.linkLabel}
+            <ExternalIcon className='inline-icon ml-1' />
+          </ul>
+        )
+      }
+    }
+
+    return toolTipText
   }
 
   const navigationHandler = urlString => {
@@ -1383,7 +1340,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
 
     validateFipsCodeLength(newState)
-    setState(newState)
+
+    // add ability to rename state properties over time.
+    const processedConfig = { ...(await coveUpdateWorker(newState)) }
+
+    setState(processedConfig)
     setLoading(false)
   }
 
@@ -1628,7 +1589,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         )}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
+            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
+              <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
+            )}
             {title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
@@ -1700,10 +1663,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
-            <CoveMediaControls.Section classes={['download-buttons']}>
-              {state.general.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
-              {state.general.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
-            </CoveMediaControls.Section>
+            <MediaControls.Section classes={['download-buttons']}>
+              {state.general.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
+              {state.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
+            </MediaControls.Section>
 
             {state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading && (
               <DataTable
@@ -1714,6 +1677,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 headerColor={general.headerColor}
                 columns={state.columns}
                 showDownloadButton={general.showDownloadButton}
+                showFullGeoNameInCSV={table.showFullGeoNameInCSV}
                 runtimeLegend={runtimeLegend}
                 runtimeData={runtimeData}
                 displayDataAsText={displayDataAsText}
