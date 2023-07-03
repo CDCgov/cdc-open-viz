@@ -30,7 +30,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, chartRef, handleTooltipMouseOve
   // import tooltip helpers
   const { tooltipData, showTooltip } = useTooltip()
 
-  // here we're inside of the svg,
+  // here we're inside of the svg,git
   // it appears we need to use TooltipInPortal.
   const { TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
