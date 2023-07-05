@@ -69,6 +69,7 @@ export default {
     caption: '',
     showDownloadUrl: false,
     showDataTableLink: true,
+    showFullGeoNameInCSV: false,
     forceDisplay: true,
     download: false,
     indexLabel: ''
@@ -76,7 +77,8 @@ export default {
   tooltips: {
     appearanceType: 'hover',
     linkLabel: 'Learn More',
-    capitalizeLabels: true
+    capitalizeLabels: true,
+    opacity: 90
   },
   runtime: {
     editorErrorMessage: []
