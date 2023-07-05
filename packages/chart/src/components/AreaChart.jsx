@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react'
+import React, { useContext } from 'react'
 
 // cdc
 import ConfigContext from '../ConfigContext'
@@ -16,12 +16,11 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
 
   // import data from context
   let { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale, rawData } = useContext(ConfigContext)
-  const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
 
   // use brush data if it is passed in AND if this is NOT a brush chart
   data = !isBrush && undefined !== brushData && brushData.length ? brushData : data
 
-  //if (!isBrush) console.log('###AREAchart BRUSH data, xScale, yScale, yMax, xMax', data, xScale, yScale, yMax, xMax)
+  if (isBrush && isDebug) console.log('###AREAchart BRUSH data, xScale, yScale, yMax, xMax', data, xScale, yScale, yMax, xMax)
 
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
@@ -40,7 +39,6 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
       const x0 = xScale.invert(x)
       const index = bisectDate(config.data, x0, 1)
-      //console.log('##AREACHART: x x0 index config.data', x, x0, index, config.data)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
       return val
     }
@@ -52,15 +50,10 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
     brushDataSet.forEach(function convertDateTimeNumber(key, value, brushDataSet) {
       let tmp = getXValueFromCoordinate(xScale(value))
       let date = formatDate(tmp)
-      //console.log('Converted X Date=', date)
       XAxisBrushDates.push(date)
     })
     return XAxisBrushDates
   }
-
-  // just for testing the conversion
-  const brushDataSet = getXAxisDates(brushData)
-  //console.log('####filtered brushDataSet', brushDataSet)
 
   const handleX = d => {
     return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])
@@ -73,7 +66,6 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
   return (
     data && (
       <svg>
-        {/* putting width={width} height={height} here does not scale the svg */}
         <ErrorBoundary component='AreaChart'>
           <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)} top={isBrush ? yMax * 1.3 : 0}>
             {(config.runtime.areaSeriesKeys || config.runtime.seriesKeys).map((s, index) => {
@@ -150,7 +142,6 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
                     />
                   )}
                   {children}
-                  {/* console.log('## AreaChart children in', children) */}
                 </React.Fragment>
               )
             })}

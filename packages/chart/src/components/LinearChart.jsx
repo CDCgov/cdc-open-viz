@@ -58,7 +58,6 @@ export default function LinearChart() {
       const x = getDate(s).getTime()
       brushFilteredData.add(x) // just adds the time data x point not the entire data record
     })
-    console.log('# brushFilteredData=', brushFilteredData)
     return brushFilteredData
   }
 
@@ -99,16 +98,14 @@ export default function LinearChart() {
   const topChartBottomMargin = compact ? chartSeparation / 2 : chartSeparation + 10
   const topChartHeight = 0.8 * innerHeight - topChartBottomMargin
   const bottomChartHeight = innerHeight - topChartHeight - chartSeparation
-  //const xBrushMax = Math.max(width - brushMargin.left - brushMargin.right, 0)
-  //const yBrushMax = Math.max(bottomChartHeight - brushMargin.top - brushMargin.bottom, 0)
   const xMaxBrush = xMax
   const yMaxBrush = yMax
 
   // account for brush data changes
-  const brushData = useMemo(() => (undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data))
+  const brushData = undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data
 
   // hooks  % states
-  const { minValue, maxValue, existPositiveValue, isAllLine } = useMemo(() => useReduceData(config, brushData))
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, brushData)
   // make brush set one time up front on original data
   const { minValue: minValueBrush, maxValue: maxValueBrush, existPositiveValue: existPositiveValueBrush, isAllLine: isAllLineBrush } = useMemo(() => useReduceData(config, data))
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
@@ -121,7 +118,7 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
-  const brushRef = useRef(BaseBrush) // (useRef < BaseBrush) | (null > null)
+  const brushRef = useRef(BaseBrush)
 
   // getters & functions
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
@@ -138,11 +135,8 @@ export default function LinearChart() {
   const { min: minBrush, max: maxBrush } = useMinMax(propertiesBrush)
   const { xScale: xScaleBrush, yScale: yScaleBrush, seriesScale: seriesScaleBrush, g1xScale: g1xScaleBrush, g2xScale: g2xScaleBrush, xScaleNoPadding: xScaleNoPaddingBrush, yScaleBrushTest } = useScales({ ...propertiesBrush, min: minBrush, max: maxBrush })
 
-  //console.log('min, max, minBrush, maxBrush', min, max, minBrush, maxBrush)
-
   // Helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinateDate = x => {
-    //console.log('##getXValueFromCoordinateDate: incoming x', x)
     if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
       let eachBand = xScale.step()
       let numerator = x
@@ -155,7 +149,6 @@ export default function LinearChart() {
       const x0 = xScale.invert(xScale(x)) // GETTING INVALID DATE ****
       const index = bisectDate(config.data, x0, 1)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
-      //console.log('##LinearChart: getXValueFromCoordinate DATE', val)
       return val
     }
   }
@@ -177,13 +170,8 @@ export default function LinearChart() {
     })
 
     if (undefined !== brushFilteredData && brushFilteredData.length) {
-      //console.log('### Set ### brushFilteredData', brushFilteredData)
       setXAxisBrushData(brushFilteredData)
     }
-    // WHAT DATA IS USED TO FEED MAIN CHART?
-    // -- need that as a STATE variable
-    // --- THEN set it here to cause MAIN chart to update
-    //setFilteredStock(stockCopy)
   }
 
   // a unique id is needed for tooltips.
@@ -262,8 +250,6 @@ export default function LinearChart() {
 
   // Tooltip helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinate = x => {
-    //console.log('getXValueFromCoordinate xScale', xScale.type)
-    //console.log('getXValueFromCoordinate xAxis.type', xAxis.type)
     if (xScale.type === 'point') {
       // Find the closest x value by calculating the minimum distance
       let closestX = null
@@ -517,8 +503,6 @@ export default function LinearChart() {
 
   const tooltipStyles = tooltipData => {
     const { dataXPosition, dataYPosition } = tooltipData
-
-    console.log('defaultStyles', defaultStyles)
 
     return {
       opacity: config.tooltips.opacity ? config.tooltips.opacity / 100 : 1,
@@ -901,8 +885,6 @@ export default function LinearChart() {
         {/* brush */}
         {config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
           <>
-            {/* console.log('### yScaleBrush,yScale', yScaleBrush, yScale) */}
-            {/* console.log('### xScaleBrush,xScale', xScaleBrush, xScale) */}
             <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} chartRef={svgRef} isDebug={isDebug} isBrush={true}>
               <PatternLines id={PATTERN_ID} height={8} width={8} stroke={accentColor} strokeWidth={1} orientation={['diagonal']} style={styles} />
               <Brush
