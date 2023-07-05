@@ -31,7 +31,7 @@ import Header from './components/Header'
 import defaults from './data/initial-state'
 import Widget from './components/Widget'
 import DataTable from './components/DataTable'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
@@ -760,8 +760,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
           {/* Image or PDF Inserts */}
           <section className='download-buttons'>
-            {config.table.downloadImageButton && <CoveMediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
-            {config.table.downloadPdfButton && <CoveMediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
+            {config.table.downloadImageButton && <MediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
+            {config.table.downloadPdfButton && <MediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
           </section>
 
           {/* Data Table */}

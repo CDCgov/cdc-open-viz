@@ -31,7 +31,7 @@ import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/MediaControls'
 
 // Helpers
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -39,6 +39,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 import './scss/main.scss'
 // load both then config below determines which to use
@@ -71,6 +72,9 @@ const hashObj = row => {
     console.error('COVE: ', e) // eslint-disable-line
   }
 }
+
+// * FILE REVIEW
+// TODO: @tturnerswdev33 - remove/fix mentions of runtimeLegend that were added
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
@@ -261,10 +265,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
             .then(response => response.text())
             .then(responseText => {
+              // for every comma NOT inside quotes, replace with a pipe delimiter
+              // - this will let commas inside the quotes not be parsed as a new column
+              // - Limitation: if a delimiter other than comma is used in the csv this will break
+              // Examples of other delimiters that would break: tab
+              responseText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || '|')
+              // now strip the double quotes
+              responseText = responseText.replace(/["]+/g, '')
               const parsedCsv = Papa.parse(responseText, {
+                //quotes: "true",  // dont need these
+                //quoteChar: "'",  // has no effect that I can tell
                 header: true,
                 dynamicTyping: true,
-                skipEmptyLines: true
+                skipEmptyLines: true,
+                delimiter: '|' // we are using pipe symbol as delimiter so setting this explicitly for Papa.parse
               })
               return parsedCsv.data
             })
@@ -302,7 +316,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
 
-    updateConfig(newConfig, data)
+    newConfig.series.map(series => {
+      if (!series.tooltip) series.tooltip = true
+    })
+
+    const processedConfig = { ...(await coveUpdateWorker(newConfig)) }
+
+    updateConfig(processedConfig, data)
   }
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
@@ -376,8 +396,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.name || series.label || series.dataKey)
+            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
             return series.dataKey
           })
         : []
@@ -1125,10 +1145,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
               style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
-              className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
+              className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
-              {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
+              {config.visualizationType !== 'Spark Line' && <LinearChart />}
 
               {/* Sparkline */}
               {config.visualizationType === 'Spark Line' && (
@@ -1154,10 +1174,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
 
             {/* buttons */}
-            <CoveMediaControls.Section classes={['download-buttons']}>
-              {config.table.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
-              {config.table.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
-            </CoveMediaControls.Section>
+            <MediaControls.Section classes={['download-buttons']}>
+              {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+              {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+            </MediaControls.Section>
 
             {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
@@ -1201,7 +1221,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
+  const capitalize = str => {
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
+
   const contextValues = {
+    capitalize,
     getXAxisData,
     getYAxisData,
     config,

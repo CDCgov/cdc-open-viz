@@ -1,209 +1,208 @@
 // Map Download UI
 .map-downloads {
-	position: relative;
-	z-index: 3;
+  position: relative;
+  z-index: 3;
 
-	.map-downloads__ui.btn-group {
-		transform: scale(0.8);
-	}
+  .map-downloads__ui.btn-group {
+    transform: scale(0.8);
+  }
 
-	.map-downloads__ui {
-		position: absolute;
-		top: 0.5em;
-		left: 0.5em;
-		transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-		box-shadow: 0 5px 12px -8px rgba(0, 0, 0, 0.5);
-		user-select: none;
-		height: 42px;
-	}
+  .map-downloads__ui {
+    position: absolute;
+    top: 0.5em;
+    left: 0.5em;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 5px 12px -8px rgba(0, 0, 0, 0.5);
+    user-select: none;
+    height: 42px;
+  }
 }
 
 .map-container {
-	&.full-border {
-		border: #c2c2c2 1px solid;
-	}
+  &.full-border {
+    border: #c2c2c2 1px solid;
+  }
 }
 
 header + .map-container.full-border {
-	border-top: 0; // When they have a header, don't add a border top
+  border-top: 0; // When they have a header, don't add a border top
 }
 
 // World Specific Styles
 .map-container.world {
-	&.data .geography-container {
-		border-bottom: $lightGray 1px solid;
-	}
-	.geography-container {
-		cursor: move;
-	}
+  &.data .geography-container {
+    border-bottom: $lightGray 1px solid;
+  }
+  .geography-container {
+    cursor: move;
+  }
 }
 
 @include breakpointClass(md) {
-	// US Specific
-	.map-container.us {
-		margin: 0 1em;
-	}
-	// Data Specific
-	.map-container.data {
-		&.side {
-			flex-direction: row;
-		}
-	}
-	// Bubble Specific
-	.map-container.bubble {
-		&.side {
-			flex-direction: row;
-		}
-	}
+  // US Specific
+  .map-container.us {
+    margin: 0 1em;
+  }
+  // Data Specific
+  .map-container.data {
+    &.side {
+      flex-direction: row;
+    }
+  }
+  // Bubble Specific
+  .map-container.bubble {
+    &.side {
+      flex-direction: row;
+    }
+  }
 
-	.map-container.us-geocode {
-		&.side {
-			flex-direction: row;
-		}
-	}
+  .map-container.us-geocode {
+    &.side {
+      flex-direction: row;
+    }
+  }
 }
 
 .geography-container {
-	position: relative;
-	flex-grow: 1;
-	width: 100%;
-	overflow: hidden;
-	.geo-point {
-		transition: 0.3s all;
-		circle {
-			fill: inherit;
-			transition: 0.1s transform;
-		}
-		&:hover {
-			transition: 0.2s all;
-		}
-	}
-	.map-logo {
-		position: absolute;
-		bottom: 2em;
-		right: 1em;
-		z-index: 3;
-		width: 75px;
-	}
+  position: relative;
+  flex-grow: 1;
+  width: 100%;
+  overflow: hidden;
+  .geo-point {
+    transition: 0.3s all;
+    circle {
+      fill: inherit;
+      transition: 0.1s transform;
+    }
+    &:hover {
+      transition: 0.2s all;
+    }
+  }
+  .map-logo {
+    position: absolute;
+    bottom: 2em;
+    right: 1em;
+    z-index: 3;
+    width: 75px;
+  }
 }
 
 .single-geo {
-	transition: 0.2s fill;
-	cursor: pointer;
-	&:focus {
-		outline: 0;
-	}
+  transition: 0.2s fill;
+  cursor: pointer;
+  &:focus {
+    outline: 0;
+  }
 }
 
 // Cities and Territories
 .territories {
-	margin: 2em 100px 2em 0;
-	font-size: 1.1em;
-	display: flex;
-	align-items: center;
-	> span {
-		margin-left: 1em;
-		margin-right: 0.5em;
-	}
-	svg {
-		max-width: 35px;
-	    min-width: 25px;
-		margin-left: 0.5em;
-		transition: 0.3s all;
-		text {
-			font-size: 0.95em;
-		}
-	}
+  margin: 2em 100px 2em 0;
+  font-size: 1.1em;
+  display: flex;
+  align-items: center;
+  > span {
+    margin-left: 1em;
+    margin-right: 0.5em;
+  }
+  svg {
+    max-width: 35px;
+    min-width: 25px;
+    margin-left: 0.5em;
+    transition: 0.3s all;
+    text {
+      font-size: 0.95em;
+    }
+  }
 }
 
 .zoom-controls {
-	display: flex;
-	position: absolute;
-	bottom: 2em;
-	left: 1em;
-	z-index: 4;
-	> button.reset {
-		margin-left: 5px;
-		background: rgba(0, 0, 0, 0.65);
-		transition: 0.2s all;
-		color: #fff;
-		&:hover {
-			background: rgba(0, 0, 0, 0.8);
-			transition: 0.2s all;
-		}
-		&:active {
-			transform: scale(0.9);
-		}
-		&:focus {
-			background: #005eaa;
-		}
-	}
-	> button:not(.reset) {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.2em;
-		height: 1.75em;
-		width: 1.75em;
-		background: rgba(0, 0, 0, 0.65);
-		transition: 0.2s all;
-		color: #fff;
-		border-radius: 100%;
-		border: 0;
-		&:hover {
-			background: rgba(0, 0, 0, 0.8);
-			transition: 0.2s all;
-		}
-		&:active {
-			transform: scale(0.9);
-		}
-		svg {
-			height: 1.75em;
-			width: 1.75em;
-		}
-		&:focus {
-			background: #005eaa;
-		}
-	}
-	> button:first-child {
-		margin-right: 0.25em;
-	}
+  display: flex;
+  position: absolute;
+  bottom: 2em;
+  left: 1em;
+  z-index: 4;
+  > button.reset {
+    margin-left: 5px;
+    background: rgba(0, 0, 0, 0.65);
+    transition: 0.2s all;
+    color: #fff;
+    &:hover {
+      background: rgba(0, 0, 0, 0.8);
+      transition: 0.2s all;
+    }
+    &:active {
+      transform: scale(0.9);
+    }
+    &:focus {
+      background: #005eaa;
+    }
+  }
+  > button:not(.reset) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.2em;
+    height: 1.75em;
+    width: 1.75em;
+    background: rgba(0, 0, 0, 0.65);
+    transition: 0.2s all;
+    color: #fff;
+    border-radius: 100%;
+    border: 0;
+    &:hover {
+      background: rgba(0, 0, 0, 0.8);
+      transition: 0.2s all;
+    }
+    &:active {
+      transform: scale(0.9);
+    }
+    svg {
+      height: 1.75em;
+      width: 1.75em;
+    }
+    &:focus {
+      background: #005eaa;
+    }
+  }
+  > button:first-child {
+    margin-right: 0.25em;
+  }
 }
 
 @include breakpointClass(sm) {
-	.zoom-controls > button:not(.reset) {
-		height: 2.5em;
-		width: 2.5em;
-		svg {
-			height: 2.5em;
-			width: 2.5em;
-		}
-	}
-	
+  .zoom-controls > button:not(.reset) {
+    height: 2.5em;
+    width: 2.5em;
+    svg {
+      height: 2.5em;
+      width: 2.5em;
+    }
+  }
 }
 
 @include breakpointClass(md) {
-	.map-downloads .map-downloads__ui.btn-group {
-		top: 1em;
-		left: 1em;
-		transform: none;
-	}
-	.territories {
-		font-size: 1em;
-		> span {
-			margin-left: 0;
-		}
-		svg {
-			max-width: 45px;
-		}
-	}
+  .map-downloads .map-downloads__ui.btn-group {
+    top: 1em;
+    left: 1em;
+    transform: none;
+  }
+  .territories {
+    font-size: 1em;
+    > span {
+      margin-left: 0;
+    }
+    svg {
+      max-width: 45px;
+    }
+  }
 }
 
 .countyMapGroup {
-	transition: transform 1s;
-	will-change: transform;
-	transform-origin: center;
-	stroke: none !important;
+  transition: transform 1s;
+  will-change: transform;
+  transform-origin: center;
+  stroke: none !important;
 }
 
 // .state {
@@ -211,21 +210,21 @@ header + .map-container.full-border {
 // }
 
 .state {
-	&--inactive:hover path {
-		cursor: pointer;
-		transition: fill 0.5s;
-	}
+  &--inactive:hover path {
+    cursor: pointer;
+    transition: fill 0.5s;
+  }
 }
 
 .county--path {
-	fill: white;
+  fill: white;
 }
 
 .btn--reset {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: none;
 }
 
 //Region Maps
@@ -239,69 +238,69 @@ header + .map-container.full-border {
 #region-8-label,
 #region-9-label,
 #region-10-label {
-	background: #fff;
+  background: #fff;
 }
 
 #region-1-label {
-	transform: translate(90%, 22%);
+  transform: translate(90%, 22%);
 }
 
 #region-2-label {
-	//transform: translate(83%, 31%); SIDE CHART EXPERIMENT
-	transform: translate(83%, 33%);
+  //transform: translate(83%, 31%); SIDE CHART EXPERIMENT
+  transform: translate(83%, 33%);
 }
 
 #region-3-label {
-	//transform: translate(78%, 48%); SIDE CHART EXPERIMENT
-	transform: translate(75%, 45%);
+  //transform: translate(78%, 48%); SIDE CHART EXPERIMENT
+  transform: translate(75%, 45%);
 }
 
 #region-4-label {
-	transform: translate(68%, 70%);
+  transform: translate(68%, 70%);
 }
 
 #region-5-label {
-	transform: translate(65%, 44%);
+  transform: translate(65%, 44%);
 }
 
 #region-6-label {
-	transform: translate(45%, 75%);
+  transform: translate(45%, 75%);
 }
 
 #region-7-label {
-	transform: translate(53%, 47%);
+  transform: translate(53%, 47%);
 }
 
 #region-8-label {
-	transform: translate(35%, 30%);
+  transform: translate(35%, 30%);
 }
 
 #region-9-label {
-	transform: translate(18%, 58%);
+  transform: translate(18%, 58%);
 }
 
 #region-10-label {
-	transform: translate(15%, 28%);
+  transform: translate(15%, 28%);
 }
 
 #region-2-territories,
 #region-9-territories {
-	text {
-		font-weight: bold;
-		font-size: 14px;
-	}
+  text {
+    font-weight: bold;
+    font-size: 14px;
+  }
 }
 
 #region-2-territories {
-	transform: translate(86%, 40%);
+  transform: translate(86%, 40%);
 }
 
 #region-9-territories {
-	transform: translate(4%, 72%);
+  transform: translate(4%, 72%);
 
-	.region-9-row2 {
-		transform: translateY(34px);
-	}
+  .region-9-row2 {
+    transform: translateY(34px);
+  }
 }
 
 .county-borders {
@@ -313,12 +312,5 @@ header + .map-container.full-border {
 }
 
 canvas {
-	width: 100%;
-}
-
-#canvas-tooltip {
-	position: fixed;
-	background-color: white;
-	pointer-events: none;
-	display: none;
+  width: 100%;
 }

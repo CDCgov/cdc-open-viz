@@ -1,22 +1,31 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import EditorPanel from './components/EditorPanel'
+import { Fragment } from 'react'
+
+// contexts & initial state
 import defaults from './data/initial-state'
+import Context from './context'
+
+// internal components
+import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
-import getViewport from '@cdc/core/helpers/getViewport'
+import CircleCallout from './components/CircleCallout'
+
+// external
 import ResizeObserver from 'resize-observer-polyfill'
 import parse from 'html-react-parser'
 
-import Context from './context'
+// helpers
+import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import CircleCallout from './components/CircleCallout'
-import './scss/main.scss'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import { Fragment } from 'react'
-
 import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+
+// styles
+import './scss/main.scss'
 
 const CdcDataBite = props => {
   const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig, link } = props
@@ -96,7 +105,9 @@ const CdcDataBite = props => {
 
     response.data = responseData
 
-    updateConfig({ ...defaults, ...response })
+    const processedConfig = { ...(await coveUpdateWorker(response)) }
+
+    updateConfig({ ...defaults, ...processedConfig })
 
     setLoading(false)
   }

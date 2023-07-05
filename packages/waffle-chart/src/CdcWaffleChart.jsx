@@ -18,6 +18,7 @@ import defaults from './data/initial-state'
 import { publish } from '@cdc/core/helpers/events'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 import './scss/main.scss'
 
@@ -306,7 +307,7 @@ const WaffleChart = ({ config, isEditor, link }) => {
                 </div>
               </div>
             )}
-            {config.visualizationType === 'Waffle' && (
+            {config.visualizationType !== 'Gauge' && (
               <div className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
                 <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
                   <svg width={setRatio()} height={setRatio()} role='img' aria-label={handleWaffleChartAriaLabel(config)} tabIndex={0}>
@@ -371,7 +372,8 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
 
     response.data = responseData
 
-    updateConfig({ ...defaults, ...response })
+    const processedConfig = { ...(await coveUpdateWorker(response)) }
+    updateConfig({ ...defaults, ...processedConfig })
     setLoading(false)
   }, [])
 
