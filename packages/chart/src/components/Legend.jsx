@@ -33,6 +33,8 @@ const Legend = () => {
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
   const { visualizationType, visualizationSubType, series, runtime, orientation } = config
+  // create fn to reverse labels while legend is Bottom.  Legend-right , legend-left works by default.
+  const reverseLabels = labels => (config.legend.reverseLabelOrder && config.legend.position === 'bottom' ? labels.reverse() : labels)
 
   const createLegendLabels = defaultLabels => {
     const colorCode = config.legend?.colorCode
@@ -51,7 +53,7 @@ const Legend = () => {
         value: aboveColor
       }
 
-      return [labelBelow, labelAbove]
+      return reverseLabels([labelBelow, labelAbove])
     }
     if (visualizationType === 'Bar' && visualizationSubType === 'regular' && colorCode && series?.length === 1) {
       let palette = colorPalettes[config.palette]
@@ -76,7 +78,7 @@ const Legend = () => {
         return newLabel
       })
 
-      return uniqueLabels
+      return reverseLabels(uniqueLabels)
     }
 
     // get forecasting items inside of combo
@@ -116,7 +118,7 @@ const Legend = () => {
           seriesLabels.push(newLabel)
         })
 
-      return seriesLabels
+      return reverseLabels(seriesLabels)
     }
 
     // DEV-4161: replaceable series name in the legend
@@ -147,10 +149,10 @@ const Legend = () => {
         return newLabel
       })
 
-      return uniqueLabels
+      return reverseLabels(uniqueLabels)
     }
 
-    return defaultLabels
+    return reverseLabels(defaultLabels)
   }
 
   const isBottomOrSmallViewport = legend.position === 'bottom' || currentViewport === 'sm' || currentViewport === 'xs' || currentViewport === 'xxs'
