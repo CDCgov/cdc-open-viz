@@ -308,7 +308,6 @@ export default function LinearChart() {
                     const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                     const tickLength = showTicks === 'block' ? 7 : 0
                     const to = { x: tick.to.x - tickLength, y: tick.to.y }
-                    console.log(config.yAxis.tickRotation, 'RO')
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -318,7 +317,7 @@ export default function LinearChart() {
 
                         {config.orientation === 'horizontal' && config.visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
                           <Text
-                            transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.to.y - minY : tick.to.y - minY + (Number(config.barHeight * config.series.length) - barMinHeight) / 2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                            transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.to.y - minY : tick.to.y - minY + (Number(config.barHeight * config.series.length) - barMinHeight) / 2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0})`}
                             verticalAnchor={'start'}
                             textAnchor={'end'}
                           >
@@ -460,8 +459,9 @@ export default function LinearChart() {
                 }
               })
 
-              const dynamicMarginTop = areTicksTouching ? tickWidthMax + defaultTickLength + marginTop : 0
+              const dynamicMarginTop = areTicksTouching && config.isResponsiveTicks ? tickWidthMax + defaultTickLength + marginTop : 0
               config.dynamicMarginTop = dynamicMarginTop
+              console.log(dynamicMarginTop)
               // config.xAxis.size = dynamicMarginTop
               return (
                 <Group className='bottom-axis'>
@@ -471,8 +471,9 @@ export default function LinearChart() {
                     const tickLength = showTick === 'block' ? 16 : defaultTickLength
                     const to = { x: tick.to.x, y: tickLength }
                     let textWidth = getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                    //reset rotation
+                    //reset rotations by updating config
                     config.yAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
+                    config.xAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'vertical' ? 0 : config.xAxis.tickRotation
                     //configure rotation
                     const tickRotation = config.isResponsiveTicks && areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : -Number(config.runtime.xAxis.tickRotation)
 
