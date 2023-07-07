@@ -15,11 +15,12 @@ import Loading from '@cdc/core/components/Loading'
 
 // FILE REVIEW
 // TODO: Remove eslint-disable jsx/a11y/non-interactive-tabindex and handle appropriately
-// TODO: Move ExternalIcon to core Icon component
-// TODO: use destructuring
-// TODO: @tturnerswdev33 - It looks like there's an unused variable setFilteredCountryCode that was added
-// TODO: @tturnerswdev33 - change function declarations to arrow functions
-// TODO: @tturnerswdev33 - move caption so that useMemo is not rendered conditionally
+//  - I am not finding jsx/a11y/non-interactive-tabindex... did you fix already?
+// TODO: Move ExternalIcon to core Icon component - Looks like you already moved it???
+// TODO: use destructuring - WHERE?
+// TODO: @tturnerswdev33 - It looks like there's an unused variable setFilteredCountryCode that was added - no it is used in line 268
+// TODO: @tturnerswdev33 - change function declarations to arrow functions - DONE not sure why I did that but brings up question as to why arrow functions are better?  Or just code consistency?
+// TODO: @tturnerswdev33 - move caption so that useMemo is not rendered conditionally - MOVE it where?  I can just remove the useMemo
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
@@ -203,7 +204,7 @@ const DataTable = props => {
     case 'Box Plot':
       if (!config.boxplot) return <Loading />
       break
-    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar':
+    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Pairensoled Bar':
       if (!runtimeData) return <Loading />
       break
     default:
@@ -212,8 +213,8 @@ const DataTable = props => {
   }
 
   const rows = Object.keys(runtimeData).sort((a, b) => {
-    let sortVal
-    if (config.columns.length > 0) {
+    let sortVal, aval, dakeys
+    if (config.columns) {
       sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
     }
     if (!sortBy.asc) return sortVal
@@ -222,7 +223,7 @@ const DataTable = props => {
     return -1
   })
 
-  function genMapRows(rows) {
+  const genMapRows = rows => {
     const allrows = rows.map(row => {
       return (
         <tr role='row'>
@@ -315,7 +316,8 @@ const DataTable = props => {
     }
   }
 
-  const genChartHeader = (columns, data) => {
+  const genChartHeader = useMemo((columns, data) => {
+    if (!data) return
     return (
       <tr>
         {dataSeriesColumns().map(column => {
@@ -353,7 +355,7 @@ const DataTable = props => {
         })}
       </tr>
     )
-  }
+  })
 
   const genChartRows = rows => {
     const allRows = rows.map(row => {
@@ -370,7 +372,6 @@ const DataTable = props => {
               let resolvedAxis = ''
               let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
               let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
-              console.log('column', column)
 
               leftAxisItems.map(leftSeriesItem => {
                 if (leftSeriesItem.dataKey === column) resolvedAxis = 'left'
@@ -418,7 +419,7 @@ const DataTable = props => {
     [config.runtime.seriesKeys]) // eslint-disable-line
 
   if (config.visualizationType !== 'Box Plot') {
-    function genMapHeader(columns) {
+    const genMapHeader = columns => {
       return (
         <tr>
           {Object.keys(columns)
@@ -433,9 +434,11 @@ const DataTable = props => {
               if (config.type === 'map' && (text === undefined || text === '')) {
                 text = 'Location'
               }
+
               return (
                 <th
                   key={`col-header-${column}`}
+                  id={column}
                   tabIndex='0'
                   title={text}
                   role='columnheader'
@@ -530,7 +533,7 @@ const DataTable = props => {
     )
   } else {
     // Render Data Table for Box Plots
-    function genBoxplotHeader(categories) {
+    const genBoxplotHeader = categories => {
       let columns = ['Measures', ...categories]
       return (
         <tr>
@@ -584,7 +587,7 @@ const DataTable = props => {
       if (Number(rowid) === 10) return plot.values.length > 0 ? plot.values.toString() : '-'
       return <p>-</p>
     }
-    function genBoxplotRows(rows) {
+    const genBoxplotRows = rows => {
       // get list of data keys for each row
       let dataKeys = rows.map(row => {
         return row[0]
