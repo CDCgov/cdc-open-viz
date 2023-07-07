@@ -677,8 +677,8 @@ const EditorPanel = () => {
   }, [config]) // eslint-disable-line
 
   const visSupportsTooltipLines = () => {
-    if (config.visualizationType === 'Combo' && config.runtime.forecastingSeriesKeys?.length > 0) return true
-    if (config.visualizationType === 'Forecasting') return true
+    const chartsWithTooltipGuides = ['Combo', 'Forecasting', 'Area Chart', 'Line', 'Bar']
+    if (chartsWithTooltipGuides.includes(config.visualizationType)) return true
     return false
   }
 
@@ -837,7 +837,7 @@ const EditorPanel = () => {
     'Box Plot',
     'Combo',
     'Deviation Bar',
-    // 'Forecasting',
+    'Forecasting',
     'Line',
     'Paired Bar',
     'Pie',
@@ -1577,7 +1577,7 @@ const EditorPanel = () => {
                 {/* start: anchors */}
                 {visHasAnchors() && config.orientation !== 'horizontal' && (
                   <div className='edit-block'>
-                    <h3>Anchors</h3>
+                    <span className='edit-label column-heading'>Anchors</span>
                     <Accordion allowZeroExpanded>
                       {config.yAxis?.anchors?.map((anchor, index) => (
                         <AccordionItem className='series-item series-item--chart'>
@@ -1703,7 +1703,7 @@ const EditorPanel = () => {
 
                 {visHasAnchors() && config.orientation === 'horizontal' && (
                   <div className='edit-block'>
-                    <h3>Anchors</h3>
+                    <span className='edit-label column-heading'>Anchors</span>
                     <Accordion allowZeroExpanded>
                       {config.xAxis?.anchors?.map((anchor, index) => (
                         <AccordionItem className='series-item series-item--chart'>
@@ -2221,7 +2221,7 @@ const EditorPanel = () => {
                 {/* anchors */}
                 {visHasAnchors() && config.orientation !== 'horizontal' && (
                   <div className='edit-block'>
-                    <h3>Anchors</h3>
+                    <span className='edit-label column-heading'>Anchors</span>
                     <Accordion allowZeroExpanded>
                       {config.xAxis?.anchors?.map((anchor, index) => (
                         <AccordionItem className='series-item series-item--chart'>
@@ -2347,7 +2347,7 @@ const EditorPanel = () => {
 
                 {visHasAnchors() && config.orientation === 'horizontal' && (
                   <div className='edit-block'>
-                    <h3>Anchors</h3>
+                    <span className='edit-label column-heading'>Anchors</span>
                     <Accordion allowZeroExpanded>
                       {config.yAxis?.anchors?.map((anchor, index) => (
                         <AccordionItem className='series-item series-item--chart'>
@@ -3069,6 +3069,25 @@ const EditorPanel = () => {
                     <CheckBox value={config.visual.horizontalHoverLine} fieldName='horizontalHoverLine' section='visual' label='Horizontal Hover Line' updateField={updateField} />
                   </>
                 )}
+
+                {
+                  <label>
+                    <span className='edit-label column-heading'>Tooltip Opacity</span>
+                    <input
+                      type='number'
+                      value={config.tooltips.opacity ? config.tooltips.opacity : 100}
+                      onChange={e =>
+                        updateConfig({
+                          ...config,
+                          tooltips: {
+                            ...config.tooltips,
+                            opacity: e.target.value
+                          }
+                        })
+                      }
+                    />
+                  </label>
+                }
               </AccordionItemPanel>
             </AccordionItem>
             {/* Spark Line has no data table */}
