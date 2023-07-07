@@ -13,11 +13,12 @@ import ConfigContext from '../ConfigContext'
 import MediaControls from '@cdc/core/components/MediaControls'
 
 export default function DataTable() {
-  const { rawData, tableData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext(ConfigContext)
+  const { rawData, tableData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, currentViewport } = useContext(ConfigContext)
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
+  const isLegendBottom = ['sm', 'xs', 'xxs'].includes(currentViewport)
 
   const DownloadButton = ({ data }, type) => {
     const fileName = `${config.title.substring(0, 50)}.csv`
@@ -233,7 +234,7 @@ export default function DataTable() {
         {config.table.download && <DownloadButton data={rawData} type='link' />}
       </MediaControls.Section>
 
-      <section id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
+      <section style={{ marginTop: !isLegendBottom ? config.dynamicMarginTop + 'px' : '0px' }} id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
         <div
           role='button'
           className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}

@@ -105,7 +105,7 @@ const Legend = () => {
 
       // loop through bars for now to meet requirements.
       config.runtime.barSeriesKeys &&
-        config.runtime.barSeriesKeys.map((bar, index) => {
+        config.runtime.barSeriesKeys.forEach((bar, index) => {
           let colorValue = colorPalettes[config.palette][index] ? colorPalettes[config.palette][index] : '#ccc'
 
           const newLabel = {
@@ -155,11 +155,11 @@ const Legend = () => {
     return reverseLabels(defaultLabels)
   }
 
-  const isBottomOrSmallViewport = legend.position === 'bottom' || currentViewport === 'sm' || currentViewport === 'xs' || currentViewport === 'xxs'
+  const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px'
+    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `0px`
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
