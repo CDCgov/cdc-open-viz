@@ -1451,7 +1451,7 @@ const EditorPanel = () => {
                       }
                     />
                     {config.orientation === 'horizontal' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
-                    {!config.isResponsiveTicks && <TextField value={config.yAxis.tickRotation} type='number' min='0' section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                    {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation} type='number' min='0' section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                     {config.isResponsiveTicks && config.orientation === 'horizontal' && (
                       <TextField
                         value={config.xAxis.maxTickRotation}
@@ -2092,8 +2092,8 @@ const EditorPanel = () => {
                       </>
                     )}
                     {config.orientation === 'vertical' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
-                    <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />
-                    {config.orientation === 'vertical' && (
+                    {(config.orientation === 'horizontal' || !config.isResponsiveTicks) && <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                    {config.orientation === 'vertical' && config.isResponsiveTicks && (
                       <TextField
                         value={config.xAxis.maxTickRotation}
                         type='number'

@@ -157,7 +157,7 @@ const Legend = () => {
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.dynamicMarginTop || config.runtime.xAxis.size}px` : `${config.dynamicMarginTop / 3 || 0}px`
+    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : `0px`
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
