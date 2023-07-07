@@ -204,7 +204,7 @@ const DataTable = props => {
     case 'Box Plot':
       if (!config.boxplot) return <Loading />
       break
-    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Pairensoled Bar':
+    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar':
       if (!runtimeData) return <Loading />
       break
     default:
@@ -213,7 +213,7 @@ const DataTable = props => {
   }
 
   const rows = Object.keys(runtimeData).sort((a, b) => {
-    let sortVal, aval, dakeys
+    let sortVal
     if (config.columns) {
       sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
     }
@@ -316,7 +316,7 @@ const DataTable = props => {
     }
   }
 
-  const genChartHeader = useMemo((columns, data) => {
+  const genChartHeader = (columns, data) => {
     if (!data) return
     return (
       <tr>
@@ -355,7 +355,7 @@ const DataTable = props => {
         })}
       </tr>
     )
-  })
+  }
 
   const genChartRows = rows => {
     const allRows = rows.map(row => {
