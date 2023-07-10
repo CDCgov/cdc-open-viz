@@ -420,9 +420,9 @@ const EditorPanel = () => {
     })
 
     if (config.visualizationType === 'Forecasting') {
-      newSeries.push({ dataKey: seriesKey, type: config.visualizationType, stages: forecastingStageArr, stageColumn: seriesKey })
+      newSeries.push({ dataKey: seriesKey, type: config.visualizationType, stages: forecastingStageArr, stageColumn: seriesKey, axis: 'Left' })
     } else {
-      newSeries.push({ dataKey: seriesKey, type: config.visualizationType })
+      newSeries.push({ dataKey: seriesKey, type: config.visualizationType, axis: 'Left' })
     }
     updateConfig({ ...config, series: newSeries }) // left axis series keys
   }
