@@ -169,37 +169,7 @@
   "useLogScale": false,
   "filterBehavior": "Filter Change",
   "highlightedBarValues": [],
-  "series": [
-    {
-      "dataKey": "quarter",
-      "type": "Forecasting",
-      "stages": [
-        {
-          "key": "quarter one",
-          "color": "qualitative-boldreverse"
-        },
-        {
-          "key": "quarter two",
-          "color": "qualitative-softreverse"
-        },
-        {
-          "key": "quarter three",
-          "color": "qualitative1reverse"
-        },
-        {
-          "key": "quarter four",
-          "color": "qualitative1reverse"
-        }
-      ],
-      "stageColumn": "quarter",
-      "confidenceIntervals": [
-        {
-          "high": "upper_90",
-          "low": "lower_90"
-        }
-      ]
-    }
-  ],
+  "series": [],
   "datasets": {},
   "visualizationType": "Forecasting",
   "data": [
