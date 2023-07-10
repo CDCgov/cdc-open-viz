@@ -146,6 +146,8 @@ export default function DataTable() {
               if (rightSeriesItem.dataKey === row.original) resolvedAxis = 'right'
             })
 
+            if (config.visualizationType !== 'Combo') resolvedAxis = 'left'
+
             return <>{numberFormatter(d[row.original], resolvedAxis)}</>
           },
           id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
