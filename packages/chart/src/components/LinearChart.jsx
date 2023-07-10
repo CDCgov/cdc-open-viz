@@ -402,8 +402,6 @@ export default function LinearChart() {
   const tooltipStyles = tooltipData => {
     const { dataXPosition, dataYPosition } = tooltipData
 
-    console.log('defaultStyles', defaultStyles)
-
     return {
       opacity: config.tooltips.opacity ? config.tooltips.opacity / 100 : 1,
       position: 'absolute',
@@ -630,7 +628,6 @@ export default function LinearChart() {
 
               const dynamicMarginTop = areTicksTouching && config.isResponsiveTicks ? tickWidthMax + defaultTickLength + marginTop : 0
               config.dynamicMarginTop = dynamicMarginTop
-              console.log(dynamicMarginTop)
               // config.xAxis.size = dynamicMarginTop
               return (
                 <Group className='bottom-axis'>
