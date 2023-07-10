@@ -290,7 +290,7 @@ const SeriesDropdownConfidenceInterval = props => {
                   </>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <div className='input-group'>
+                  {/* <div className='input-group'>
                     <label htmlFor='showInTooltip'>Show In Tooltip</label>
                     <div className={'cove-input__checkbox--small'} onClick={e => updateShowInTooltip(e, index, ciIndex)}>
                       <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
@@ -298,7 +298,7 @@ const SeriesDropdownConfidenceInterval = props => {
                       </div>
                       <input className='cove-input--hidden' type='checkbox' name={'showInTooltip'} checked={showInTooltip ? showInTooltip : false} readOnly />
                     </div>
-                  </div>
+                  </div> */}
 
                   <InputSelect
                     initial='Select an option'
@@ -411,15 +411,11 @@ const SeriesDisplayInTooltip = props => {
 
     copiedSeries[seriesIndex].tooltip = !copiedSeries[seriesIndex].tooltip
 
-    console.log('copiedSeries', copiedSeries[seriesIndex])
-
     updateConfig({
       ...config,
       series: copiedSeries
     })
   }
-
-  console.log(series.tooltip)
 
   return (
     <>
@@ -510,7 +506,7 @@ const SeriesItem = props => {
                   <Series.Dropdown.SeriesType series={series} index={i} />
                   <Series.Dropdown.AxisPosition series={series} index={i} />
                   <Series.Dropdown.LineType series={series} index={i} />
-                  <Series.Dropdown.ForecastingStage series={series} index={i} />
+                  {/* <Series.Dropdown.ForecastingStage series={series} index={i} /> */}
                   <Series.Dropdown.ForecastingColor series={series} index={i} />
                   <Series.Dropdown.ConfidenceInterval series={series} index={i} />
                   <Series.Checkbox.DisplayInTooltip series={series} index={i} />
