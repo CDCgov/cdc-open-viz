@@ -104,15 +104,12 @@
     "cityStyle": "circle"
   },
   "mapPosition": {
-    "coordinates": [
-      0,
-      30
-    ],
+    "coordinates": [0, 30],
     "zoom": 1
   },
   "data": [
     {
-      "Insured Rate": 8,
+      "Insured Rate": 1,
       "Coverage Status": "Insured",
       "FIPS Codes": "06071",
       "Year (Good filter option)": "2010",
@@ -133,35 +130,35 @@
       "link": ""
     },
     {
-      "Insured Rate": 25,
+      "Insured Rate": 21,
       "Coverage Status": "Insured",
       "FIPS Codes": "32005",
       "Year (Good filter option)": "2010",
       "link": ""
     },
     {
-      "Insured Rate": 18,
+      "Insured Rate": 4,
       "Coverage Status": "Insured",
       "FIPS Codes": "06075",
       "Year (Good filter option)": "2010",
       "link": ""
     },
     {
-      "Insured Rate": 3,
+      "Insured Rate": 2,
       "Coverage Status": "Insured",
       "FIPS Codes": "06027",
       "Year (Good filter option)": "2010",
       "link": ""
     },
     {
-      "Insured Rate": 25,
+      "Insured Rate": 3,
       "Coverage Status": "Insured",
       "FIPS Codes": "06029",
       "Year (Good filter option)": "2010",
       "link": ""
     },
     {
-      "Insured Rate": 60,
+      "Insured Rate": 5,
       "Coverage Status": "Insured",
       "FIPS Codes": "06065",
       "Year (Good filter option)": "2010",
