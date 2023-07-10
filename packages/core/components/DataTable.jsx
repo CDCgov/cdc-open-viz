@@ -214,9 +214,9 @@ const DataTable = props => {
 
   const rows = Object.keys(runtimeData).sort((a, b) => {
     let sortVal
-    if (config.columns) {
-      sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
-    }
+    // if (config.columns) {
+    //   sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
+    // }
     if (!sortBy.asc) return sortVal
     if (sortVal === 0) return 0
     if (sortVal < 0) return 1
