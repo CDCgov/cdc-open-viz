@@ -402,8 +402,6 @@ export default function LinearChart() {
   const tooltipStyles = tooltipData => {
     const { dataXPosition, dataYPosition } = tooltipData
 
-    console.log('defaultStyles', defaultStyles)
-
     return {
       opacity: config.tooltips.opacity ? config.tooltips.opacity / 100 : 1,
       position: 'absolute',
