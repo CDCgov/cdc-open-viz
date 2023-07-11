@@ -15,6 +15,7 @@ export default {
   barStyle: '',
   roundingStyle: 'standard',
   tipRounding: 'top',
+  isResponsiveTicks: true,
   general: {
     showDownloadButton: false
   },
@@ -106,7 +107,8 @@ export default {
     numTicks: '',
     labelOffset: 65,
     axisPadding: 0,
-    target: 0
+    target: 0,
+    maxTickRotation: 0
   },
   table: {
     label: 'Data Table',
