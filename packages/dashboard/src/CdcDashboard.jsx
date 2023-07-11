@@ -97,6 +97,7 @@ const VisualizationsPanel = ({ loadConfig, config }) => (
       <Widget addVisualization={() => addVisualization('waffle-chart', '')} type='waffle-chart' />
       <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
       <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
+      <Widget addVisualization={() => addVisualization('filter-dropdowns', '')} type='filter-dropdowns' />
     </div>
     <span className='subheading-3'>Advanced</span>
     <AdvancedEditor loadConfig={loadConfig} state={config} />
@@ -283,6 +284,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         let add = true
 
         filters.forEach(filter => {
+          // eslint-disable-next-line eqeqeq
           if (filter.type !== 'url' && row[filter.columnName] != filter.active) {
             add = false
           }
@@ -416,7 +418,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     setConfig(updatedConfig)
   }
 
-  const Filters = () => {
+  const Filters = ({hide}) => {
     const changeFilterActive = (index, value) => {
       let dashboardConfig = { ...config.dashboard }
 
@@ -445,7 +447,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     const announceChange = text => {}
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
-      if (singleFilter.type !== 'url' && !singleFilter.showDropdown) return <></>
+      if ((singleFilter.type !== 'url' && !singleFilter.showDropdown) || (hide && hide.indexOf(index) !== -1)) return <></>
 
       const values = []
 
@@ -466,21 +468,23 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       })
 
       return (
-        <section className='dashboard-filters-section' key={`${singleFilter.key}-filtersection-${index}`}>
-          <label htmlFor={`filter-${index}`}>{singleFilter.key}</label>
-          <select
-            id={`filter-${index}`}
-            className='filter-select'
-            data-index='0'
-            value={singleFilter.active}
-            onChange={val => {
-              changeFilterActive(index, val.target.value)
-              announceChange(`Filter ${singleFilter.key} value has been changed to ${val.target.value}, please reference the data table to see updated values.`)
-            }}
-          >
-            {values}
-          </select>
-        </section>
+        <div className='cove-dashboard-filters'>
+          <section className='dashboard-filters-section' key={`${singleFilter.key}-filtersection-${index}`}>
+            <label htmlFor={`filter-${index}`}>{singleFilter.key}</label>
+            <select
+              id={`filter-${index}`}
+              className='filter-select'
+              data-index='0'
+              value={singleFilter.active}
+              onChange={val => {
+                changeFilterActive(index, val.target.value)
+                announceChange(`Filter ${singleFilter.key} value has been changed to ${val.target.value}, please reference the data table to see updated values.`)
+              }}
+            >
+              {values}
+            </select>
+          </section>
+        </div>
       )
     })
   }
@@ -596,6 +600,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               </>
             )
             break
+          case 'filter-dropdowns':
+            body = (
+              <>
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Filter Dropdowns' />
+                <Filters hide={visualizationConfig.hide} />
+              </>
+            )
+            break
           default:
             body = <></>
             break
@@ -628,11 +640,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           {/* Description */}
           {description && <div className='subtext'>{parse(description)}</div>}
           {/* Filters */}
-          {config.dashboard.sharedFilters && (
-            <div className='cove-dashboard-filters'>
-              {' '}
-              <Filters />
-            </div>
+          {config.dashboard.sharedFilters && Object.keys(config.visualizations).filter(vizKey => config.visualizations[vizKey].visualizationType === 'filter-dropdowns').length === 0 && (
+            <Filters />
           )}
 
           {/* Visualizations */}
@@ -747,6 +756,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   }}
                                   isDashboard={true}
                                 />
+                              )}
+                              {visualizationConfig.type === 'filter-dropdowns' && (
+                                <Filters hide={visualizationConfig.hide} />
                               )}
                             </div>
                           </React.Fragment>
