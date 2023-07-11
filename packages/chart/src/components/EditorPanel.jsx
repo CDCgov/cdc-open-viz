@@ -1990,6 +1990,22 @@ const EditorPanel = () => {
                         </p>
                         <TextField value={config.xAxis.dateParseFormat} section='xAxis' fieldName='dateParseFormat' placeholder='Ex. %Y-%m-%d' label='Date Parse Format' updateField={updateField} />
                         <TextField value={config.xAxis.dateDisplayFormat} section='xAxis' fieldName='dateDisplayFormat' placeholder='Ex. %Y-%m-%d' label='Date Display Format' updateField={updateField} />
+                        <CheckBox
+                          value={config.showChartBrush}
+                          fieldName='showChartBrush'
+                          label={'Show Axis Zoom'}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>When this option is checked, you can zoom into specific ranges on the x-axis. </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                          updateField={updateField}
+                        />
                       </>
                     )}
 
