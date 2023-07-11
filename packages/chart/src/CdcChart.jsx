@@ -1208,6 +1208,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
                 isDebug={isDebug}
+                isEditor={isEditor}
               />
             )}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
