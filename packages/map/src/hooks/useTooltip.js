@@ -42,7 +42,7 @@ const useTooltip = props => {
           break
       }
 
-      if (geoLabelOverride) toolTipText = geoLabelOverride
+      if (geoLabelOverride) toolTipText = `${geoLabelOverride}: `
 
       return toolTipText
     }
