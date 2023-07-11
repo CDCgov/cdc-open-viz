@@ -84,9 +84,23 @@ export default function LinearChart() {
     setChartPosition(svgRef?.current?.getBoundingClientRect())
   }, [svgRef, config.legend])
 
+  // resolved an issue here with Object.entries, label no longer used.
   const TooltipListItem = ({ item }) => {
     const [label, value] = item
-    return label === config.xAxis.dataKey ? <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? config.runtime.xAxis.label : label)}: ${value}`}</li> : <li className='tooltip-body'>{`${label}: ${formatNumber(value, 'left')}`}</li>
+
+    /**
+     * find the original series and use the name property if available
+     * otherwise default back to the original column name.
+     * @param {String} input - original columnName
+     * @returns user defined series name.
+     */
+    const getSeriesNameFromLabel = originalColumnName => {
+      let series = config.series.filter(s => s.dataKey === originalColumnName)
+      if (series[0].name) return series[0].name
+      return originalColumnName
+    }
+
+    return value[0] === config.xAxis.dataKey ? <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${value[1]}`}</li> : <li className='tooltip-body'>{`${getSeriesNameFromLabel(value[0])}: ${formatNumber(value[1], 'left')}`}</li>
   }
 
   const handleLeftTickFormatting = tick => {
@@ -300,7 +314,7 @@ export default function LinearChart() {
 
     // filter out the series that aren't added to the map.
     if (!seriesToInclude) return
-    let initialTooltipData = Object.fromEntries(seriesToInclude) ? Object.fromEntries(seriesToInclude) : {}
+    let initialTooltipData = seriesToInclude ? seriesToInclude : {}
 
     let tooltipData = {}
     tooltipData.data = initialTooltipData
