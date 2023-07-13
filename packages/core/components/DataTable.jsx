@@ -351,6 +351,27 @@ const DataTable = props => {
     )
   }
 
+  // if its additional column, return formatting params
+  const isAdditionalColumn = column => {
+    let inthere = false
+    let formattingParams = {}
+    Object.keys(config.columns).forEach(keycol => {
+      if (config.columns[keycol].name === column) {
+        inthere = true
+        formattingParams = {
+          addColPrefix: config.columns[keycol].prefix,
+          addColSuffix: config.columns[keycol].suffix,
+          addColRoundTo: config.columns[keycol].roundToPlace ? config.columns[keycol].roundToPlace : '',
+          addColCommas: config.columns[keycol].commas
+        }
+      }
+      console.log('keycol', config.columns[keycol].name)
+    })
+    //debugger
+    console.log('isAdditional col, inthere, formattingParams', column, inthere, formattingParams)
+    return formattingParams
+  }
+
   const genChartRows = rows => {
     const allRows = rows.map(row => {
       return (
@@ -363,7 +384,7 @@ const DataTable = props => {
               // not the prettiest, but helper functions work nicely here.
               cellValue = <>{config.xAxis.type === 'date' ? formatDate(config.xAxis.dateDisplayFormat, parseDate(config.xAxis.dateParseFormat, labelValue)) : labelValue}</>
             } else {
-              let resolvedAxis = ''
+              let resolvedAxis = 'left'
               let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
               let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
 
@@ -375,7 +396,14 @@ const DataTable = props => {
                 if (rightSeriesItem.dataKey === column) resolvedAxis = 'right'
               })
 
-              cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config)
+              let addColParams = isAdditionalColumn(column)
+              console.log('addCOlParams', addColParams)
+              if (addColParams) {
+                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config, addColParams)
+              } else {
+                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config)
+              }
+              console.log('##CORE Datatable column, datapt, cellValue, axis', runtimeData[row][column], cellValue, resolvedAxis, column)
             }
 
             return (
