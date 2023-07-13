@@ -19,7 +19,7 @@ const abbreviateNumber = num => {
 }
 
 // Format numeric data based on settings in config
-const formatNumber = (num, axis, shouldAbbreviate = false, config = null) => {
+const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addColParams = null) => {
   if (!config) console.error('no config found in formatNumber')
   // if num is NaN return num
   if (isNaN(num) || !num) return num
@@ -36,17 +36,36 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null) => {
     dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix, bottomPrefix, bottomSuffix, bottomAbbreviated }
   } = config
 
+  // destructure Additional Col dataformat values
+  const { addColCommas, addColRoundTo, addColPrefix, addColSuffix } = addColParams
+
   // check if value contains comma and remove it. later will add comma below.
   if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
 
   let original = num
   let stringFormattingOptions
   if (axis === 'left') {
-    stringFormattingOptions = {
-      useGrouping: config.dataFormat.commas ? true : false,
-      minimumFractionDigits: roundTo ? Number(roundTo) : 0,
-      maximumFractionDigits: roundTo ? Number(roundTo) : 0
-    }
+      let roundToPlace
+      if (addColRoundTo !== undefined) {
+        // if its an Additional Column
+        roundToPlace = addColRoundTo ? Number(addColRoundTo) : 0
+      } else {
+        roundToPlace = roundTo ? Number(roundTo) : 0
+      }
+      // Need to prevent negative values in rounding
+      if (roundToPlace < 0) roundToPlace = 0
+      let useCommas
+      if (addColCommas !== undefined) {
+        // if its an Additional Column
+        useCommas = addColCommas ? true : false
+      } else {
+        useCommas = config.dataFormat.commas ? true : false
+      }
+      stringFormattingOptions = {
+        useGrouping: useCommas,
+        minimumFractionDigits: roundToPlace,
+        maximumFractionDigits: roundToPlace
+      }
   }
 
   if (axis === 'right') {
@@ -104,8 +123,12 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null) => {
     num = abbreviateNumber(parseFloat(num))
   }
 
-  if (prefix && axis === 'left') {
-    result += prefix
+  if (addColPrefix !== undefined && axis === 'left') {
+      result = addColPrefix + result
+  } else {
+    if (prefix && axis === 'left') {
+      result = prefix + result
+    }
   }
 
   if (rightPrefix && axis === 'right') {
@@ -118,8 +141,12 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null) => {
 
   result += num
 
-  if (suffix && axis === 'left') {
-    result += suffix
+  if (addColSuffix !== undefined && axis === 'left') {
+    result += addColSuffix
+  } else {
+    if (suffix && axis === 'left') {
+      result += suffix
+    }
   }
 
   if (rightSuffix && axis === 'right') {
