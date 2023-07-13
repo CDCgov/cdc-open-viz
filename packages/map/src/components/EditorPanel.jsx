@@ -1573,7 +1573,7 @@ const EditorPanel = props => {
                         handleEditorChanges('displayStateLabels', event.target.checked)
                       }}
                     />
-                    <span className='edit-label'>Display state labels</span>
+                    <span className='edit-label'>Show state labels</span>
                   </label>
                 )}
               </AccordionItemPanel>
@@ -1841,7 +1841,7 @@ const EditorPanel = props => {
                               editColumn('primary', 'dataTable', event.target.checked)
                             }}
                           />
-                          <span className='edit-label'>Display in Data Table</span>
+                          <span className='edit-label'>Show in Data Table</span>
                         </label>
                       </li>
                       <li>
@@ -1853,7 +1853,7 @@ const EditorPanel = props => {
                               editColumn('primary', 'tooltip', event.target.checked)
                             }}
                           />
-                          <span className='edit-label'>Display in Tooltips</span>
+                          <span className='edit-label'>Show in Tooltips</span>
                         </label>
                       </li>
                     </ul>
@@ -2068,7 +2068,7 @@ const EditorPanel = props => {
                                   editColumn(val, 'dataTable', event.target.checked)
                                 }}
                               />
-                              <span className='edit-label'>Display in Data Table</span>
+                              <span className='edit-label'>Show in Data Table</span>
                             </label>
                           </li>
                           <li>
@@ -2080,7 +2080,7 @@ const EditorPanel = props => {
                                   editColumn(val, 'tooltip', event.target.checked)
                                 }}
                               />
-                              <span className='edit-label'>Display in Tooltips</span>
+                              <span className='edit-label'>Show in Tooltips</span>
                             </label>
                           </li>
                         </ul>
