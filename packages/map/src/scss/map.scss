@@ -314,3 +314,10 @@ header + .map-container.full-border {
 canvas {
   width: 100%;
 }
+
+#canvas-tooltip {
+  position: fixed;
+  background-color: white;
+  pointer-events: none;
+  display: none;
+}
