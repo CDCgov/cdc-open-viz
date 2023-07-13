@@ -412,7 +412,18 @@ const EditorPanel = () => {
 
   const addNewSeries = seriesKey => {
     let newSeries = config.series ? [...config.series] : []
-    newSeries.push({ dataKey: seriesKey, type: config.visualizationType })
+    let forecastingStages = Array.from(new Set(data.map(item => item[seriesKey])))
+    let forecastingStageArr = []
+
+    forecastingStages.forEach(stage => {
+      forecastingStageArr.push({ key: stage })
+    })
+
+    if (config.visualizationType === 'Forecasting') {
+      newSeries.push({ dataKey: seriesKey, type: config.visualizationType, stages: forecastingStageArr, stageColumn: seriesKey, axis: 'Left' })
+    } else {
+      newSeries.push({ dataKey: seriesKey, type: config.visualizationType, axis: 'Left' })
+    }
     updateConfig({ ...config, series: newSeries }) // left axis series keys
   }
 

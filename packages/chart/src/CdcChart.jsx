@@ -397,7 +397,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
             newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+            newConfig.runtime.seriesLabelsAll.push(series.name || series.label || series.dataKey)
             return series.dataKey
           })
         : []
@@ -798,6 +798,21 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newSeriesHighlight.push(newHighlight)
     }
+
+    /**
+     * pushDataKeyBySeriesName
+     * - pushes series.dataKey into the series highlight based on the found series.name
+     * @param {String} value
+     */
+    const pushDataKeyBySeriesName = value => {
+      let matchingSeries = config.series.filter(series => series.name === value.text)
+      if (matchingSeries?.length > 0) {
+        newSeriesHighlight.push(matchingSeries[0].dataKey)
+      }
+    }
+
+    pushDataKeyBySeriesName(label)
+
     setSeriesHighlight(newSeriesHighlight)
   }
 
@@ -1208,6 +1223,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
                 isDebug={isDebug}
+                isEditor={isEditor}
               />
             )}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
