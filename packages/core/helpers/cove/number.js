@@ -38,7 +38,6 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
 
   // destructure Additional Col dataformat values
   const { addColCommas, addColRoundTo, addColPrefix, addColSuffix } = addColParams
-  console.log("addColCommas, addColRoundTo, addColPrefix, addColSuffix",addColCommas, addColRoundTo, addColPrefix, addColSuffix)
 
   // check if value contains comma and remove it. later will add comma below.
   if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
@@ -62,7 +61,6 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
       } else {
         useCommas = config.dataFormat.commas ? true : false
       }
-    console.log("num useCommas=",num,useCommas)
       stringFormattingOptions = {
         useGrouping: useCommas,
         minimumFractionDigits: roundToPlace,

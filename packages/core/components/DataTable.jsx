@@ -365,10 +365,7 @@ const DataTable = props => {
           addColCommas: config.columns[keycol].commas
         }
       }
-      console.log('keycol', config.columns[keycol].name)
     })
-    //debugger
-    console.log('isAdditional col, inthere, formattingParams', column, inthere, formattingParams)
     return formattingParams
   }
 
@@ -397,13 +394,11 @@ const DataTable = props => {
               })
 
               let addColParams = isAdditionalColumn(column)
-              console.log('addCOlParams', addColParams)
               if (addColParams) {
                 cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config, addColParams)
               } else {
                 cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config)
               }
-              console.log('##CORE Datatable column, datapt, cellValue, axis', runtimeData[row][column], cellValue, resolvedAxis, column)
             }
 
             return (
