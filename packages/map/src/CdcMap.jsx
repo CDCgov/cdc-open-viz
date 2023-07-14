@@ -115,7 +115,21 @@ const getUniqueValues = (data, columnName) => {
   return Object.keys(result)
 }
 
-const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
+const CdcMap = ({
+  className,
+  config,
+  navigationHandler: customNavigationHandler,
+  isDashboard = false,
+  isEditor = false,
+  isDebug = false,
+  configUrl,
+  logo = 'https://upload.wikimedia.org/wikipedia/commons/4/45/US-CDC-Logo.png',
+  setConfig,
+  setSharedFilter,
+  setSharedFilterValue,
+  hostname = 'localhost:8080',
+  link
+}) => {
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
