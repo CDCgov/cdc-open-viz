@@ -1178,7 +1178,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
-              {config.visualizationType !== 'Spark Line' && <LinearChart />}
+              {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
 
               {/* Sparkline */}
               {config.visualizationType === 'Spark Line' && (
