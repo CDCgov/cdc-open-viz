@@ -239,6 +239,11 @@
     width: 100%;
   }
 
+  .cove-dashboard-filters {
+    display: inline-flex;
+    margin: 1em;
+  }
+
   @include breakpointClass(md) {
     .dashboard-row {
       flex-direction: row;
@@ -268,13 +273,6 @@
   @include breakpointClass(xs) {
     .dashboard-col {
       margin-bottom: 1em;
-    }
-  }
-
-  @include breakpoint(md) {
-    .cove-dashboard-filters {
-      display: flex;
-      gap: 30px;
     }
   }
 
