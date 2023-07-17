@@ -476,8 +476,23 @@ export default function LinearChart() {
             })
           : ''}
 
+        {visualizationType === 'Forest Plot' && (
+          // FOREST PLOT SERIES NAME
+          <AxisLeft
+            scale={yScale}
+            top={0}
+            left={config.yAxis.size}
+            label={runtime.yAxis.label}
+            tickLabelProps={() => ({
+              dy: '0.33em',
+              fontSize: '14px',
+              textAnchor: 'end'
+            })}
+          />
+        )}
+
         {/* Y axis */}
-        {visualizationType !== 'Spark Line' && (
+        {visualizationType !== 'Spark Line' && visualizationType !== 'Forest Plot' && (
           <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
             {props => {
               const axisCenter = runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2

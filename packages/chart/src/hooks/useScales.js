@@ -1,12 +1,19 @@
 import { scaleBand, scaleLinear, scaleLog, scalePoint, scaleTime } from '@visx/scale'
+import { useContext } from 'react'
+import ConfigContext from '../ConfigContext'
+// TODO move props in
 
 const useScales = properties => {
   let { xAxisDataMapped, xMax, yMax, min, max, config, data } = properties
+  const { rawData } = useContext(ConfigContext)
+
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
 
   const { visualizationType } = config
+
+  console.log(rawData)
 
   //  define scales
   let xScale = null
@@ -138,6 +145,18 @@ const useScales = properties => {
       domain: g1xScale.domain(),
       range: [xMax / 2, xMax],
       nice: true
+    })
+  }
+
+  if (visualizationType === 'Forest Plot') {
+    yScale = scaleBand({
+      domain: rawData.map(d => d['Author(s) and Year']),
+      range: [0, yMax]
+    })
+
+    xScale = scaleLinear({
+      domain: [Math.min(...data.map(d => parseFloat(d.Lower))), Math.max(...data.map(d => parseFloat(d.Upper)))],
+      range: [0, xMax]
     })
   }
 
