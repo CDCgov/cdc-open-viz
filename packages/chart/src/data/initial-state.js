@@ -173,5 +173,23 @@ export default {
   series: [],
   tooltips: {
     opacity: 90
+  },
+  forestPlot: {
+    estimateField: '',
+    estimateRadius: '',
+    lowerCiField: '',
+    upperCiField: '',
+    rowHeight: 20,
+    plotWidth: 100,
+    description: {
+      show: true,
+      text: 'description',
+      location: 0
+    },
+    result: {
+      show: true,
+      text: 'result',
+      location: 100
+    }
   }
 }
