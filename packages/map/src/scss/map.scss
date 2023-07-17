@@ -63,6 +63,9 @@ header + .map-container.full-border {
   }
 }
 
+$small: 500px;
+$medium: 768px;
+
 .geography-container {
   position: relative;
   flex-grow: 1;
@@ -78,14 +81,29 @@ header + .map-container.full-border {
       transition: 0.2s all;
     }
   }
-  .map-logo {
-    position: absolute;
-    bottom: 2em;
-    right: 1em;
-    z-index: 3;
-    width: 75px;
+  // make logo smaller on mobile
+  @media screen and (max-width: $small) {
+      .map-logo {
+        position: absolute;
+        bottom: 4em; // needed to align to top of Territories
+        right: 1em;
+        z-index: 3;
+        width: 50px;  // make it smaller
+      }
   }
+  // everything else but mobile
+  @media screen and (min-width: $small) {
+    .map-logo {
+      position: absolute;
+      bottom: 2em;
+      right: 1em;
+      z-index: 3;
+      width: 75px;
+    }
+  }
+
 }
+
 
 .single-geo {
   transition: 0.2s fill;
@@ -95,11 +113,28 @@ header + .map-container.full-border {
   }
 }
 
+// for Territories label in one col and Territory blocks wrapping in 2nd column
+.two-col {
+  display: flex;
+  margin-top: 0;
+  justify-content: flex-start;
+  > label {
+    margin-top: 0;
+    display: inline-block;
+  }
+}
+.territories-label {
+  margin: 2em 5px 2em 1em;
+  font-size: 1.1em;
+  display:block;
+}
+
 // Cities and Territories
 .territories {
-  margin: 2em 100px 6em 0;
+  margin: 2em 200px 2em 0;
   font-size: 1.1em;
-  display: flex;
+  width: 100%;
+  display: block;
   align-items: center;
   > span {
     margin-left: 1em;
@@ -113,6 +148,11 @@ header + .map-container.full-border {
     text {
       font-size: 0.95em;
     }
+  }
+
+    &--mobile {
+    @extend .territories;
+    width: 70%;
   }
 }
 
