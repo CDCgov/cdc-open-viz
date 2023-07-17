@@ -123,7 +123,7 @@ const CdcMap = ({
   isEditor = false,
   isDebug = false,
   configUrl,
-  logo = 'https://upload.wikimedia.org/wikipedia/commons/4/45/US-CDC-Logo.png',
+  logo = 'https://upload.wikimedia.org/wikipedia/commons/4/45/US-CDC-Logo.png', // TTT
   setConfig,
   setSharedFilter,
   setSharedFilterValue,
