@@ -1,6 +1,6 @@
 {
   "type": "chart",
-  "title": "",
+  "title": "Forest Plot Example",
   "showTitle": true,
   "showDownloadMediaButton": false,
   "theme": "theme-blue",
@@ -28,7 +28,7 @@
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": 50,
+    "size": "124",
     "gridLines": false,
     "enablePadding": false,
     "min": "",
@@ -698,5 +698,6 @@
     "horizontal": false,
     "series": false
   },
-  "validated": 4.23
+  "validated": 4.23,
+  "dynamicMarginTop": 0
 }
