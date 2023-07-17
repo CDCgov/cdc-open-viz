@@ -3201,7 +3201,81 @@ const EditorPanel = () => {
                 <AccordionItemHeading>
                   <AccordionItemButton>Forest Plot Settings</AccordionItemButton>
                 </AccordionItemHeading>
-                <AccordionItemPanel>Test</AccordionItemPanel>
+                <AccordionItemPanel>
+                  <Select
+                    value={config.forestPlot.radiusScaledTo}
+                    label='Radius Scaled To'
+                    onChange={e => {
+                      if (e.target.value !== '' && e.target.value !== 'Select') {
+                        updateConfig({
+                          ...config,
+                          forestPlot: {
+                            ...config.forestPlot,
+                            radiusScaledTo: e.target.value
+                          }
+                        })
+                      }
+                      e.target.value = ''
+                    }}
+                    options={getColumns(false)}
+                  />
+
+                  <Select
+                    value={config.forestPlot.estimateField}
+                    label='Estimate'
+                    onChange={e => {
+                      if (e.target.value !== '' && e.target.value !== 'Select') {
+                        updateConfig({
+                          ...config,
+                          forestPlot: {
+                            ...config.forestPlot,
+                            estimateField: e.target.value
+                          }
+                        })
+                      }
+                      e.target.value = ''
+                    }}
+                    options={getColumns(false)}
+                  />
+
+                  <Select
+                    value={config.forestPlot.lower}
+                    label='Lower CI Column'
+                    onChange={e => {
+                      if (e.target.value !== '' && e.target.value !== 'Select') {
+                        updateConfig({
+                          ...config,
+                          forestPlot: {
+                            ...config.forestPlot,
+                            lower: e.target.value
+                          }
+                        })
+                      }
+                      e.target.value = ''
+                    }}
+                    options={getColumns(false)}
+                  />
+                  <Select
+                    value={config.forestPlot.upper}
+                    label='Upper CI Column'
+                    onChange={e => {
+                      if (e.target.value !== '' && e.target.value !== 'Select') {
+                        updateConfig({
+                          ...config,
+                          forestPlot: {
+                            ...config.forestPlot,
+                            upper: e.target.value
+                          }
+                        })
+                      }
+                      e.target.value = ''
+                    }}
+                    options={getColumns(false)}
+                  />
+                  <CheckBox value={config.forestPlot.showZeroLine} section='forestPlot' fieldName='showZeroLine' label='Show Line on Zero' updateField={updateField} />
+                  <CheckBox value={config.forestPlot.showRadiusAsNumber} section='forestPlot' fieldName='showRadiusAsNumber' label='Show Radius as Number' updateField={updateField} />
+                  <CheckBox value={config.forestPlot.showRadiusAsCircle} section='forestPlot' fieldName='showRadiusAsCircle' label='Show Radius as Circle' updateField={updateField} />
+                </AccordionItemPanel>
               </AccordionItem>
             )}
           </Accordion>
