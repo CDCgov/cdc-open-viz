@@ -180,6 +180,9 @@ export default {
     lowerCiField: '',
     upperCiField: '',
     rowHeight: 20,
+    showZeroLine: false,
+    showRadiusAsNumber: false,
+    showRadiusAsCircle: false,
     plotWidth: 100,
     description: {
       show: true,

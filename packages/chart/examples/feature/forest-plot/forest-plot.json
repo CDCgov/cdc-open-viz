@@ -209,11 +209,12 @@
     "opacity": 90
   },
   "forestPlot": {
-    "estimateField": "",
+    "estimateField": "Estimate",
     "estimateRadius": "",
     "lowerCiField": "",
     "upperCiField": "",
     "rowHeight": 20,
+    "hasZeroLine": true,
     "plotWidth": 100,
     "description": {
       "show": true,
@@ -224,7 +225,9 @@
       "show": true,
       "text": "result",
       "location": 100
-    }
+    },
+    "lower": "Lower",
+    "upper": "Upper"
   },
   "datasets": {},
   "visualizationType": "Forest Plot",

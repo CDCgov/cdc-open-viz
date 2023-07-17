@@ -151,7 +151,8 @@ const useScales = properties => {
   if (visualizationType === 'Forest Plot') {
     yScale = scaleBand({
       domain: rawData.map(d => d['Author(s) and Year']),
-      range: [0, yMax]
+      range: [0, yMax],
+      padding: 0.2
     })
 
     xScale = scaleLinear({

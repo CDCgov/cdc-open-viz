@@ -833,8 +833,8 @@ export default function LinearChart() {
             xScale={xScale}
             yScale={yScale}
             seriesScale={seriesScale}
-            xMax={xMax}
-            yMax={yMax}
+            width={xMax}
+            height={yMax}
             getXAxisData={getXAxisData}
             getYAxisData={getYAxisData}
             animatedChart={animatedChart}
