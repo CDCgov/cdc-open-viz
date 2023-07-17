@@ -20,6 +20,7 @@ import DeviationBar from './DeviationBar'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Forecasting from './Forecasting'
 import LineChart from './LineChart'
+import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
 
@@ -810,6 +811,26 @@ export default function LinearChart() {
             getXValueFromCoordinate={getXValueFromCoordinate}
             handleTooltipMouseOver={handleTooltipMouseOver}
             handleTooltipMouseOff={handleTooltipMouseOff}
+          />
+        )}
+        {visualizationType === 'Forest Plot' && (
+          <ForestPlot
+            xScale={xScale}
+            yScale={yScale}
+            seriesScale={seriesScale}
+            xMax={xMax}
+            yMax={yMax}
+            getXAxisData={getXAxisData}
+            getYAxisData={getYAxisData}
+            animatedChart={animatedChart}
+            visible={animatedChart}
+            handleTooltipMouseOver={handleTooltipMouseOver}
+            handleTooltipMouseOff={handleTooltipMouseOff}
+            handleTooltipClick={handleTooltipClick}
+            tooltipData={tooltipData}
+            showTooltip={showTooltip}
+            chartRef={svgRef}
+            config={config}
           />
         )}
 

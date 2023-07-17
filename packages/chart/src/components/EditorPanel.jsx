@@ -1166,7 +1166,7 @@ const EditorPanel = () => {
                 {config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
               </AccordionItemPanel>
             </AccordionItem>
-            {config.visualizationType !== 'Pie' && (
+            {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && (
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
@@ -3194,6 +3194,14 @@ const EditorPanel = () => {
                   {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
                   {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
                 </AccordionItemPanel>
+              </AccordionItem>
+            )}
+            {config.visualizationType === 'Forest Plot' && (
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Forest Plot Settings</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>Test</AccordionItemPanel>
               </AccordionItem>
             )}
           </Accordion>

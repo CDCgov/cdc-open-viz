@@ -18,6 +18,7 @@ import chroma from 'chroma-js'
 import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
 import LinearChart from './components/LinearChart'
+import ForestPlot from './components/ForestPlot'
 
 import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 
@@ -1014,11 +1015,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     'Box Plot': <LinearChart />,
     'Area Chart': <LinearChart />,
     'Scatter Plot': <LinearChart />,
-    'Deviation Bar': <LinearChart />
+    'Deviation Bar': <LinearChart />,
+    'Forest Plot': <LinearChart />
   }
 
   const missingRequiredSections = () => {
     if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
+    if (config.visualizationType === 'Forest Plot') return false // skip required checks for now.
     if (config.visualizationType === 'Pie') {
       if (undefined === config?.yAxis.dataKey) {
         return true
