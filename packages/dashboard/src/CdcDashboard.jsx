@@ -429,11 +429,12 @@ const VisualizationsPanel = ({ loadConfig, setPreview, tabOpen, setTabOpen, conf
 
   return (
     <div className='visualizations-panel'>
-      <button onClick={() => {
+      <button className={`collapse${tabOpen === 0 ? ' enabled' : ''}`}
+        onClick={() => {
         setPreview(false)
         setTabOpen(tabOpen === 0 ? -1 : 0)
-      }}>Configure Dashboard</button>
-      {tabOpen === 0 && <>
+      }}>Dashboard Builder</button>
+      {tabOpen === 0 && <div className="collapse-panel">
         <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
         <span className='subheading-3'>Chart</span>
         <div className='drag-grid'>
@@ -454,16 +455,21 @@ const VisualizationsPanel = ({ loadConfig, setPreview, tabOpen, setTabOpen, conf
           <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
           <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
         </div>
-      </>}
-      <button onClick={() => {
+      </div>}
+      <button className={`collapse${tabOpen === 1 ? ' enabled' : ''}`}
+      onClick={() => {
         setTabOpen(tabOpen === 1 ? -1 : 1)
         setPreview(true)
-      }}>Dashboard Settings</button>
-      {tabOpen === 1 && <>
-        Dashboard settings
+      }}>Settings</button>
+      {tabOpen === 1 && <div className="collapse-panel">
+        <h3>Dashboard settings</h3><br/>
 
-        <input type='text' className='description-input' placeholder='Type a dashboard description here.' defaultValue={config.dashboard.description} onChange={e => changeConfigValue('dashboard', 'description', e.target.value)} />
+        <div>
+          <label>Dashboard Description</label>
+          <input type='text' className='description-input' placeholder='Type a dashboard description here.' defaultValue={config.dashboard.description} onChange={e => changeConfigValue('dashboard', 'description', e.target.value)} />
+        </div><br/>
 
+        <h3>Dashboard Filters</h3>
         {config.dashboard.sharedFilters &&
           config.dashboard.sharedFilters.map((sharedFilter, index) => (
             <span className='shared-filter-button' key={`shared-filter-${sharedFilter.key}`}>
@@ -476,11 +482,13 @@ const VisualizationsPanel = ({ loadConfig, setPreview, tabOpen, setTabOpen, conf
               >
                 {sharedFilter.key}
               </a>
-              <button onClick={() => removeFilter(index)}>X</button>
+              <button onClick={() => removeFilter(index)}>X</button><br/>
             </span>
           ))}
-        <button onClick={addNewFilter}>Add New Filter</button>
+        <br/><br/><button onClick={addNewFilter}>Add New Filter</button><br/>
 
+        <br/>
+        <h3>Data Table Settings</h3><br/>
         <div className='wrap'>
           <label>
             <input type='checkbox' defaultChecked={config.table.show} onChange={e => changeConfigValue('table', 'show', e.target.checked)} />
@@ -499,7 +507,7 @@ const VisualizationsPanel = ({ loadConfig, setPreview, tabOpen, setTabOpen, conf
           <label>
             <input type='checkbox' defaultChecked={config.table.limitHeight} onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)} />
             Limit Table Height
-          </label>
+          </label><br/>
           {config.table.limitHeight && <input class='table-height-input' type='text' placeholder='Height (px)' defaultValue={config.table.height} onChange={e => changeConfigValue('table', 'height', e.target.value)} />}
         </div>
 
@@ -507,13 +515,13 @@ const VisualizationsPanel = ({ loadConfig, setPreview, tabOpen, setTabOpen, conf
           <label>
             <input type='checkbox' defaultChecked={config.table.download} onChange={e => changeConfigValue('table', 'download', e.target.checked)} />
             Show Download CSV Link
-          </label>
+          </label><br/>
           <label>
             <input type='checkbox' defaultChecked={config.table.showDownloadUrl} onChange={e => changeConfigValue('table', 'showDownloadUrl', e.target.checked)} />
             Show URL to Automatically Updated Data
           </label>
         </div>
-      </>}
+      </div>}
 
       <span className='subheading-3'>Advanced</span>
       <AdvancedEditor loadConfig={loadConfig} state={config} />

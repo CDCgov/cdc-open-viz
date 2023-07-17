@@ -15,7 +15,7 @@
     border-bottom: #c7c7c7 1px solid;
     padding: 0 1em;
     display: flex;
-    height: 6em;
+    height: 3em;
     position: fixed;
     width: 100%;
     z-index: 19;
@@ -61,6 +61,12 @@
           width: 100%;
         }
       }
+    }
+
+    .header-title-input {
+      height: 1.5em !important;
+      position: relative;
+      top: -0.5em;
     }
 
     .heading-body {
@@ -239,6 +245,28 @@
     width: 100%;
   }
 
+  .collapse {
+    width: 100%;
+    padding: .75em;
+    text-align: left;
+    margin-top: 1em;
+
+    &::after {
+      content: 'v';
+      float: right;
+      font-weight: bold;
+    }
+
+    &.enabled::after {
+      content: '^';
+    }
+  }
+
+  .collapse-panel {
+    border: 1px solid black;
+    padding: 1em;
+  }
+
   @include breakpointClass(md) {
     .dashboard-row {
       flex-direction: row;
@@ -290,7 +318,7 @@
     margin: 1em;
 
     &.is-editor {
-      margin-top: 7em;
+      margin-top: 3em;
       margin-left: calc(350px + 1em);
     }
   }

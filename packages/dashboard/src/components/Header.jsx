@@ -379,7 +379,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
         </div>
       ) : (
         <div className='heading-1'>
-          {<input type='text' placeholder='Enter Dashboard Name Here' defaultValue={config.dashboard.title} onChange={e => changeConfigValue('dashboard', 'title', e.target.value)} />}
+          {<input className="header-title-input" type='text' placeholder='Enter Dashboard Name Here' defaultValue={config.dashboard.title} onChange={e => changeConfigValue('dashboard', 'title', e.target.value)} />}
         </div>
       )}
 
