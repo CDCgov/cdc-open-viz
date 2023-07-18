@@ -3272,9 +3272,30 @@ const EditorPanel = () => {
                     }}
                     options={getColumns(false)}
                   />
+                  <Select
+                    value={config.forestPlot.scaleRadiusColumn}
+                    label='Scale Radius Column'
+                    onChange={e => {
+                      if (e.target.value !== '' && e.target.value !== 'Select') {
+                        updateConfig({
+                          ...config,
+                          forestPlot: {
+                            ...config.forestPlot,
+                            radius: {
+                              ...config.forestPlot.radius,
+                              scalingColumn: e.target.value
+                            }
+                          }
+                        })
+                      }
+                      e.target.value = ''
+                    }}
+                    options={getColumns(false)}
+                  />
                   <CheckBox value={config.forestPlot.showZeroLine} section='forestPlot' fieldName='showZeroLine' label='Show Line on Zero' updateField={updateField} />
                   <CheckBox value={config.forestPlot.showRadiusAsNumber} section='forestPlot' fieldName='showRadiusAsNumber' label='Show Radius as Number' updateField={updateField} />
                   <CheckBox value={config.forestPlot.showRadiusAsCircle} section='forestPlot' fieldName='showRadiusAsCircle' label='Show Radius as Circle' updateField={updateField} />
+                  <TextField min={10} max={45} value={config.forestPlot.rowHeight} updateField={updateField} section='forestPlot' type='number' fieldName='rowHeight' label='Row Height' placeholder=' 10' />
                 </AccordionItemPanel>
               </AccordionItem>
             )}
