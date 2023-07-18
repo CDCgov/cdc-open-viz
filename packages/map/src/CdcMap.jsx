@@ -123,7 +123,9 @@ const CdcMap = ({
   isEditor = false,
   isDebug = false,
   configUrl,
-  logo = 'https://upload.wikimedia.org/wikipedia/commons/4/45/US-CDC-Logo.png', // TTT
+  logo = '',
+  // if you need to test the logo overlay, you can use this url below:
+  // 'https://upload.wikimedia.org/wikipedia/commons/4/45/US-CDC-Logo.png',
   setConfig,
   setSharedFilter,
   setSharedFilterValue,
