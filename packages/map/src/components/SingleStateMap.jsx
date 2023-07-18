@@ -128,26 +128,13 @@ const SingleStateMap = props => {
         }
 
         return (
-          <g
-            key={`key--${county.id}`}
-            className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[state.columns.geo.name]}`}
-            css={styles}
-            onClick={() => geoClickHandler(geoDisplayName, geoData)}
-            data-tooltip-id="tooltip"
-            data-tooltip-html={toolTip}
-          >
+          <g key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[state.columns.geo.name]}`} css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip}>
             <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
           </g>
         )
       } else {
         return (
-          <g
-            key={`key--${county.id}`}
-            className={`county county--${geoDisplayName.split(' ').join('')}`}
-            style={{ fill: '#e6e6e6' }}
-            data-tooltip-id="tooltip"
-            data-tooltip-html={toolTip}
-          >
+          <g key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')}`} style={{ fill: '#e6e6e6' }} data-tooltip-id='tooltip' data-tooltip-html={toolTip}>
             <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
           </g>
         )

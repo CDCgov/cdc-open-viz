@@ -16,21 +16,7 @@ const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 let projection = geoMercator()
 
 const WorldMap = props => {
-  const {
-    state,
-    applyTooltipsToGeo,
-    data,
-    geoClickHandler,
-    applyLegendToRow,
-    displayGeoName,
-    supportedCountries,
-    setState, setRuntimeData,
-    generateRuntimeData,
-    setFilteredCountryCode,
-    position, setPosition,
-    hasZoom,
-    handleMapAriaLabels,
-    titleCase } = props
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedCountries, setState, setRuntimeData, generateRuntimeData, setFilteredCountryCode, position, setPosition, hasZoom, handleMapAriaLabels, titleCase } = props
 
   // TODO Refactor - state should be set together here to avoid rerenders
   // Resets to original data & zooms out
@@ -95,7 +81,7 @@ const WorldMap = props => {
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
       const geoKey = geo.properties.iso
 
-      if (!geoKey) return null;
+      if (!geoKey) return null
 
       const geoData = data[geoKey]
 
@@ -138,16 +124,7 @@ const WorldMap = props => {
           styles.cursor = 'pointer'
         }
 
-        return <Geo
-          key={i + '-geo'}
-          css={styles}
-          path={path}
-          stroke={geoStrokeColor}
-          strokeWidth={strokeWidth}
-          onClick={() => geoClickHandler(geoDisplayName, geoData)}
-          data-tooltip-id="tooltip"
-          data-tooltip-html={toolTip}
-        />
+        return <Geo key={i + '-geo'} css={styles} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
       }
 
       // Default return state, just geo with no additional information
@@ -156,18 +133,7 @@ const WorldMap = props => {
 
     // Cities
     geosJsx.push(
-      <CityList
-        applyLegendToRow={applyLegendToRow}
-        applyTooltipsToGeo={applyTooltipsToGeo}
-        data={data}
-        displayGeoName={displayGeoName}
-        geoClickHandler={geoClickHandler}
-        isGeoCodeMap={state.general.type === 'world-geocode'}
-        key='cities'
-        projection={projection}
-        state={state}
-        titleCase={titleCase}
-      />
+      <CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} isGeoCodeMap={state.general.type === 'world-geocode'} key='cities' projection={projection} state={state} titleCase={titleCase} />
     )
 
     // Bubbles
@@ -206,7 +172,9 @@ const WorldMap = props => {
           </ZoomableGroup>
         </svg>
       )}
-      {(state.general.type === 'data' || (state.general.type === 'world-geocode' && hasZoom) || (state.general.type === 'bubble' && hasZoom)) && <ZoomControls position={position} setPosition={setPosition} setRuntimeData={setRuntimeData} state={state} setState={setState} generateRuntimeData={generateRuntimeData} />}
+      {(state.general.type === 'data' || (state.general.type === 'world-geocode' && hasZoom) || (state.general.type === 'bubble' && hasZoom)) && (
+        <ZoomControls position={position} setPosition={setPosition} setRuntimeData={setRuntimeData} state={state} setState={setState} generateRuntimeData={generateRuntimeData} />
+      )}
     </ErrorBoundary>
   )
 }
