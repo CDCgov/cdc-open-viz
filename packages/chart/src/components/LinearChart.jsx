@@ -479,6 +479,10 @@ export default function LinearChart() {
         {visualizationType === 'Forest Plot' && (
           // FOREST PLOT SERIES NAME
           <AxisLeft
+            hideZero={false}
+            hideTicks={config.yAxis.hideTicks}
+            hideLabel={config.yAxis.hideLabel}
+            hideAxisLine={config.yAxis.hideAxis}
             scale={yScale}
             top={0}
             left={config.yAxis.size}
@@ -488,6 +492,8 @@ export default function LinearChart() {
               fontSize: '14px',
               textAnchor: 'end'
             })}
+            tickFormat={(d, i) => (!config.yAxis.hideLabel ? data[i]?.['Author(s) and Year'] : '')}
+            numTicks={data.length}
           />
         )}
 

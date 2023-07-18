@@ -58,7 +58,8 @@
     "plotNonOutlierValues": true,
     "legend": {
       "showHowToReadText": false,
-      "howToReadText": ""
+      "howToReadText": "",
+      "show": false
     },
     "labels": {
       "q1": "Lower Quartile",
@@ -171,7 +172,8 @@
     "dynamicLegendDefaultText": "Show All",
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
-    "dynamicLegendChartMessage": "Select Options from the Legend"
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "hide": true
   },
   "exclusions": {
     "active": false,
@@ -214,7 +216,9 @@
     "lowerCiField": "",
     "upperCiField": "",
     "rowHeight": 20,
-    "hasZeroLine": true,
+    "showZeroLine": false,
+    "showRadiusAsNumber": false,
+    "showRadiusAsCircle": false,
     "plotWidth": 100,
     "description": {
       "show": true,
@@ -226,6 +230,7 @@
       "text": "result",
       "location": 100
     },
+    "hasZeroLine": true,
     "lower": "Lower",
     "upper": "Upper"
   },

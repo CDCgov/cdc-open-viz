@@ -193,6 +193,11 @@ export default {
       show: true,
       text: 'result',
       location: 100
+    },
+    radius: {
+      min: 1,
+      max: 8,
+      scalingColumn: ''
     }
   }
 }

@@ -149,11 +149,27 @@ const useScales = properties => {
   }
 
   if (visualizationType === 'Forest Plot') {
-    yScale = scaleBand({
-      domain: rawData.map(d => d['Author(s) and Year']),
-      range: [0, yMax],
-      padding: 0.2
+    const show = false
+
+    if (show) {
+      yScale = scaleBand({
+        domain: rawData.map(d => d['Author(s) and Year']),
+        range: [0, yMax],
+        padding: 0.2
+      })
+    }
+
+    // TESTING LINEAR SCALING FOR ROW HEIGHTS
+    console.log(
+      'raw data',
+      rawData.map(d => d['Author(s) and Year'])
+    )
+    yScale = scaleLinear({
+      domain: [0, rawData.length],
+      range: [0, yMax]
     })
+
+    console.log('yScale', yScale.domain())
 
     xScale = scaleLinear({
       domain: [Math.min(...data.map(d => parseFloat(d.Lower))), Math.max(...data.map(d => parseFloat(d.Upper)))],
