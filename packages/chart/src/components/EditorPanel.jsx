@@ -688,7 +688,7 @@ const EditorPanel = () => {
   }, [config]) // eslint-disable-line
 
   const visSupportsTooltipLines = () => {
-    const chartsWithTooltipGuides = ['Combo', 'Forecasting', 'Area Chart', 'Line', 'Bar']
+    const chartsWithTooltipGuides = ['Combo', 'Forecasting', 'Area Chart', 'Line', 'Bar', 'Forest Plot']
     if (chartsWithTooltipGuides.includes(config.visualizationType)) return true
     return false
   }

@@ -13,8 +13,6 @@ const useScales = properties => {
 
   const { visualizationType } = config
 
-  console.log(rawData)
-
   //  define scales
   let xScale = null
   let yScale = null
@@ -159,17 +157,10 @@ const useScales = properties => {
       })
     }
 
-    // TESTING LINEAR SCALING FOR ROW HEIGHTS
-    console.log(
-      'raw data',
-      rawData.map(d => d['Author(s) and Year'])
-    )
     yScale = scaleLinear({
       domain: [0, rawData.length],
       range: [0, yMax]
     })
-
-    console.log('yScale', yScale.domain())
 
     xScale = scaleLinear({
       domain: [Math.min(...data.map(d => parseFloat(d.Lower))), Math.max(...data.map(d => parseFloat(d.Upper)))],

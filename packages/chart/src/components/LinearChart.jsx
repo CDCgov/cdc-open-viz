@@ -102,7 +102,7 @@ export default function LinearChart() {
      */
     const getSeriesNameFromLabel = originalColumnName => {
       let series = config.series.filter(s => s.dataKey === originalColumnName)
-      if (series[0].name) return series[0].name
+      if (series[0]?.name) return series[0]?.name
       return originalColumnName
     }
 
@@ -237,6 +237,46 @@ export default function LinearChart() {
     }
   }
 
+  // Tooltip helper for getting data to the closest y value hovered.
+  const handleForestPlotMouseOver = (e, inputData) => {
+    const eventSvgCoords = localPoint(e)
+
+    if (!eventSvgCoords) return
+    const { x, y } = eventSvgCoords
+
+    let minDistance = Number.MAX_VALUE
+    let closestYValue = null
+
+    data.forEach((d, i) => {
+      const yValue = yScale(i)
+
+      const distance = Math.abs(y - yValue)
+
+      if (distance < minDistance) {
+        minDistance = distance
+        closestYValue = d[config.yAxis.dataKey]
+      }
+    })
+
+    let standardLoopItems = [config.yAxis.dataKey]
+
+    let initialTooltipData = standardLoopItems ? standardLoopItems : {}
+
+    let tooltipData = {}
+    tooltipData.data = initialTooltipData
+    tooltipData.dataXPosition = isEditor ? x - 300 + 10 : x + 10
+    tooltipData.dataYPosition = y
+
+    let tooltipInformation = {
+      tooltipData: tooltipData,
+      tooltipTop: 0,
+      tooltipValues: [1, 2, 3],
+      tooltipLeft: x
+    }
+
+    showTooltip(tooltipInformation)
+  }
+
   // todo: combine mouseover functions
   const handleTooltipMouseOver = (e, data) => {
     // get the svg coordinates of the mouse
@@ -301,9 +341,6 @@ export default function LinearChart() {
         case 'Bar':
           standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
           break
-        case 'Forest Plot':
-        case 'Bar':
-          standardLoopItems = [runtime.xAxis.dataKey]
         default:
           console.info('COVE: no visualization type found in handleTooltipMouseOver')
           break
@@ -862,7 +899,7 @@ export default function LinearChart() {
             getYAxisData={getYAxisData}
             animatedChart={animatedChart}
             visible={animatedChart}
-            handleTooltipMouseOver={handleTooltipMouseOver}
+            handleTooltipMouseOver={handleForestPlotMouseOver}
             handleTooltipMouseOff={handleTooltipMouseOff}
             handleTooltipClick={handleTooltipClick}
             tooltipData={tooltipData}
