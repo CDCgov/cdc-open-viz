@@ -109,11 +109,14 @@ export default function LinearChart() {
     return value[0] === config.xAxis.dataKey ? <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${value[1]}`}</li> : <li className='tooltip-body'>{`${getSeriesNameFromLabel(value[0])}: ${formatNumber(value[1], 'left')}`}</li>
   }
 
-  const handleLeftTickFormatting = tick => {
+  const handleLeftTickFormatting = (tick, index) => {
     if (config.useLogScale && tick === 0.1) {
       //when logarithmic scale applied change value of first tick
       tick = 0
     }
+
+    if (!config.data[index] && visualizationType === 'Forest Plot') return
+    if (config.visualizationType === 'Forest Plot') return config.data[index][config.yAxis.dataKey]
     if (runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
     if (orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
@@ -186,7 +189,7 @@ export default function LinearChart() {
       return closestX
     }
 
-    if (config.xAxis.type === 'categorical' || visualizationType === 'Combo') {
+    if ((config.xAxis.type === 'categorical' || visualizationType === 'Combo') && visualizationType !== 'Forest Plot') {
       let eachBand = xScale.step()
       let numerator = x
       const index = Math.floor(Number(numerator) / eachBand)
@@ -298,8 +301,11 @@ export default function LinearChart() {
         case 'Bar':
           standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
           break
+        case 'Forest Plot':
+        case 'Bar':
+          standardLoopItems = [runtime.xAxis.dataKey]
         default:
-          console.info('COVE: no visualization type found in handleMouseOver')
+          console.info('COVE: no visualization type found in handleTooltipMouseOver')
           break
       }
     }
@@ -431,6 +437,12 @@ export default function LinearChart() {
     }
   }
 
+  const handleNumTicks = () => {
+    // On forest plots we need to return every "study" or y axis value.
+    if (config.visualizationType === 'Forest Plot') return config.data.length
+    return countNumOfTicks('yAxis')
+  }
+
   return isNaN(width) ? (
     <></>
   ) : (
@@ -481,30 +493,30 @@ export default function LinearChart() {
             })
           : ''}
 
-        {visualizationType === 'Forest Plot' && (
+        {/* {visualizationType === 'Forest Plot' && (
           // FOREST PLOT SERIES NAME
-          <AxisLeft
-            hideZero={false}
-            hideTicks={config.yAxis.hideTicks}
-            hideLabel={config.yAxis.hideLabel}
-            hideAxisLine={config.yAxis.hideAxis}
-            scale={yScale}
-            top={0}
-            left={config.yAxis.size}
-            label={runtime.yAxis.label}
-            tickLabelProps={() => ({
-              dy: '0.33em',
-              fontSize: '14px',
-              textAnchor: 'end'
-            })}
-            tickFormat={(d, i) => (!config.yAxis.hideLabel ? data[i]?.['Author(s) and Year'] : '')}
-            numTicks={data.length}
-          />
-        )}
+          // <AxisLeft
+          //   hideZero={false}
+          //   hideTicks={config.yAxis.hideTicks}
+          //   hideLabel={config.yAxis.hideLabel}
+          //   hideAxisLine={config.yAxis.hideAxis}
+          //   scale={yScale}
+          //   top={0}
+          //   left={config.yAxis.size}
+          //   label={runtime.yAxis.label}
+          //   tickLabelProps={() => ({
+          //     dy: '0.33em',
+          //     fontSize: '14px',
+          //     textAnchor: 'end'
+          //   })}
+          //   tickFormat={(d, i) => (!config.yAxis.hideLabel ? data[i]?.['Author(s) and Year'] : '')}
+          //   numTicks={data.length}
+          // />
+        )} */}
 
         {/* Y axis */}
-        {visualizationType !== 'Spark Line' && visualizationType !== 'Forest Plot' && (
-          <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
+        {visualizationType !== 'Spark Line' && (
+          <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
             {props => {
               const axisCenter = runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5

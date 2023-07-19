@@ -1,68 +1,55 @@
 import React, { useContext } from 'react'
+
+// visx
 import { Group } from '@visx/group'
-import { Line, Bar, Circle, LinePath } from '@visx/shape'
+import { Line, Bar, Circle } from '@visx/shape'
 import { Text } from '@visx/text'
-import ConfigContext from '../ConfigContext'
-import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import { scaleLinear } from '@visx/scale'
+
+// cdc
+import ConfigContext from '../ConfigContext'
 
 const ForestPlot = props => {
   const { rawData: data } = useContext(ConfigContext)
-  const { xScale, yScale, config, yMax, height } = props
+  const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver } = props
   const { forestPlot } = config
 
-  // TODO: pull from editor settings
+  // Tooltip helper for getting data to the closest y value hovered.
+  const handleForestPlotMouseOver = yPosition => {
+    let minDistance = Number.MAX_VALUE
+    let closestYValue = null
+
+    data.forEach(d => {
+      const yValue = yScale(d['Author(s) and Year']) + yScale.bandwidth() / 2
+      const distance = Math.abs(yPosition - yValue)
+
+      if (distance < minDistance) {
+        minDistance = distance
+        closestYValue = d['Author(s) and Year']
+      }
+    })
+
+    console.log('closestYValue', closestYValue)
+  }
+
+  /**
+   * TODO: refactor later
+   * These are placeholders used during initial development that could be cleaned up.
+   */
   const columns = {
     upper: forestPlot.upper,
     lower: forestPlot.lower,
     estimate: forestPlot.estimateField,
-    series: 'Author(s) and Year' // just a column name?
+    series: config.yAxis.dataKey
   }
 
-  const fontSize = 12
-  const old = false
+  /**
+   * TODO:
+   * Search on this in the codebase and create a re-usable function.
+   */
+  const fontSize = { small: 16, medium: 18, large: 20 }
 
-  return old ? (
-    <Group>
-      {/* zero line marker */}
-      {forestPlot.showZeroLine && <Line from={{ x: Number(config.yAxis.size) + xScale(0), y: 0 }} to={{ x: Number(config.yAxis.size) + xScale(0), y: height }} className='zero-line' stroke='gray' strokeDasharray={'5 5'} />}
-
-      {data.map(d => {
-        const barWidth = Math.abs(xScale(Number(d[columns.lower])) - xScale(Number(d[columns.upper])))
-        const barX = xScale(Math.min(Number(d[columns.lower]), Number(d[columns.upper])))
-
-        return (
-          <Group key={`${d[columns.series]}`} top={yScale(d[columns.series])} left={config.yAxis.size}>
-            <Line from={{ x: xScale(Number(d[columns.estimate])), y: yScale.bandwidth() / 2 }} to={{ x: xScale(Number(d.Estimate)), y: yScale.bandwidth() / 2 }} stroke='black' />
-
-            {/* top accent line */}
-            <Line from={{ x: xScale(Number(d[columns.lower])), y: yScale.bandwidth() / 4 }} to={{ x: xScale(Number(d[columns.upper])), y: yScale.bandwidth() / 4 }} stroke='black' />
-
-            {/* bottom accent line */}
-            <Line from={{ x: xScale(Number(d[columns.lower])), y: yScale.bandwidth() * 0.75 }} to={{ x: xScale(Number(d[columns.upper])), y: yScale.bandwidth() * 0.75 }} stroke='black' />
-
-            <Bar x={barX} y={yScale.bandwidth() / 4} width={barWidth} height={yScale.bandwidth() / 2} fill={colorPalettesChart[config.palette][0]} opacity={0.25} />
-
-            {forestPlot.shape === 'text' && (
-              <Text x={xScale(Number(d[columns.estimate])) + 5} y={yScale.bandwidth() / 2} verticalAnchor='middle' fontSize={fontSize}>
-                {d[columns.estimate]}
-              </Text>
-            )}
-            {forestPlot.showRadiusAsCircle && <Circle className='radius' cx={xScale(Number(d[columns.estimate]))} cy={yScale.bandwidth() / 2} r={2} fill={colorPalettesChart[config.palette][1]} style={{ opacity: 1 }} />}
-
-            {/* todo: loop through the cols here */}
-            <Text x={config.yAxis.size - 10} y={yScale.bandwidth() / 2} verticalAnchor='middle' fontSize={fontSize} textAnchor='end'>
-              {d['Timing']}
-            </Text>
-
-            <Text x={config.yAxis.size - 30} y={yScale.bandwidth() / 2} verticalAnchor='middle' fontSize={fontSize} textAnchor='end'>
-              {d['Confidence']}
-            </Text>
-          </Group>
-        )
-      })}
-    </Group>
-  ) : (
+  return (
     <Group left={config.yAxis.size}>
       {forestPlot.showZeroLine && <Line from={{ x: xScale(0), y: 0 }} to={{ x: xScale(0), y: height }} className='zero-line' stroke='gray' strokeDasharray={'5 5'} />}
 
@@ -123,6 +110,8 @@ const ForestPlot = props => {
           </Group>
         )
       })}
+
+      <Bar key='forest-plot-tooltip-area' className='forest-plot-tooltip-area' width={width} height={height} fill={false ? 'red' : 'transparent'} fillOpacity={0.5} onMouseMove={e => handleForestPlotMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />
     </Group>
   )
 }
