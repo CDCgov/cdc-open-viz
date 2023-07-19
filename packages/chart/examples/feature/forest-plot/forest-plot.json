@@ -46,7 +46,8 @@
     "numTicks": "",
     "axisPadding": 0,
     "tickRotation": 0,
-    "anchors": []
+    "anchors": [],
+    "dataKey": "Author(s) and Year"
   },
   "boxplot": {
     "plots": [],
