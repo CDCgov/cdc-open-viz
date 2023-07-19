@@ -96,11 +96,11 @@ export default function LinearChart() {
      */
     const getSeriesNameFromLabel = originalColumnName => {
       let series = config.series.filter(s => s.dataKey === originalColumnName)
-      if (series[0].name) return series[0].name
+      if (series[0]?.name) return series[0]?.name
       return originalColumnName
     }
 
-    if (value[0] === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1])) : value[1]}`}</li>
+    if (value[0] === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1], false)) : value[1]}`}</li>
     return <li className='tooltip-body'>{`${getSeriesNameFromLabel(value[0])}: ${formatNumber(value[1], 'left')}`}</li>
   }
 
@@ -333,7 +333,13 @@ export default function LinearChart() {
   }
 
   const handleTooltipMouseOff = () => {
-    hideTooltip()
+    if (config.visualizationType === 'Area Chart') {
+      setTimeout(() => {
+        hideTooltip()
+      }, 3000)
+    } else {
+      hideTooltip()
+    }
   }
 
   // Make sure the chart is visible if in the editor
@@ -386,8 +392,8 @@ export default function LinearChart() {
     let itemsToLoop = [runtime.xAxis.dataKey, ...runtime.seriesKeys]
 
     itemsToLoop.map(seriesKey => {
-      if (!seriesKey) return
-      if (!yScaleValues[0]) return
+      if (!seriesKey) return false
+      if (!yScaleValues[0]) return false
       for (const item of Object.entries(yScaleValues[0])) {
         if (item[0] === seriesKey) {
           seriesToInclude.push(item)
@@ -398,7 +404,7 @@ export default function LinearChart() {
     // filter out the series that aren't added to the map.
     seriesToInclude.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series])))
     if (!seriesToInclude) return
-    let tooltipDataFromSeries = Object.fromEntries(seriesToInclude) ? Object.fromEntries(seriesToInclude) : {}
+    let tooltipDataFromSeries = seriesToInclude ? seriesToInclude : {}
 
     let tooltipData = {}
     tooltipData.data = tooltipDataFromSeries
@@ -760,7 +766,7 @@ export default function LinearChart() {
         {visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
         {visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
         {(visualizationType === 'Area Chart' || visualizationType === 'Combo') && (
-          <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleAreaTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
+          <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleAreaTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} showTooltip={showTooltip} tooltipData={tooltipData} />
         )}
         {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
           <BarChart
@@ -886,16 +892,8 @@ export default function LinearChart() {
           </Group>
         )}
       </svg>
-      {/* TODO: combine area chart and this components tooltips */}
       {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
-        <TooltipWithBounds
-          key={Math.random()}
-          className={'tooltip cdc-open-viz-module'}
-          // top={Number(tooltipData.dataYPosition) + Number(chartPosition?.top)}
-          // left={Number(tooltipData.dataXPosition) + Number(chartPosition?.left)}
-          style={tooltipStyles(tooltipData)}
-          width={width}
-        >
+        <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} style={tooltipStyles(tooltipData)} width={width}>
           <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
         </TooltipWithBounds>
       )}
