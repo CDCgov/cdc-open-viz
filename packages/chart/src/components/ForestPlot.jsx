@@ -8,29 +8,12 @@ import { scaleLinear } from '@visx/scale'
 
 // cdc
 import ConfigContext from '../ConfigContext'
+import { localPoint } from '@visx/event'
 
 const ForestPlot = props => {
   const { rawData: data } = useContext(ConfigContext)
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver } = props
   const { forestPlot } = config
-
-  // Tooltip helper for getting data to the closest y value hovered.
-  const handleForestPlotMouseOver = yPosition => {
-    let minDistance = Number.MAX_VALUE
-    let closestYValue = null
-
-    data.forEach(d => {
-      const yValue = yScale(d['Author(s) and Year']) + yScale.bandwidth() / 2
-      const distance = Math.abs(yPosition - yValue)
-
-      if (distance < minDistance) {
-        minDistance = distance
-        closestYValue = d['Author(s) and Year']
-      }
-    })
-
-    console.log('closestYValue', closestYValue)
-  }
 
   /**
    * TODO: refactor later
@@ -111,7 +94,7 @@ const ForestPlot = props => {
         )
       })}
 
-      <Bar key='forest-plot-tooltip-area' className='forest-plot-tooltip-area' width={width} height={height} fill={false ? 'red' : 'transparent'} fillOpacity={0.5} onMouseMove={e => handleForestPlotMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />
+      <Bar key='forest-plot-tooltip-area' className='forest-plot-tooltip-area' width={width} height={height} fill={false ? 'red' : 'transparent'} fillOpacity={0.5} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} />
     </Group>
   )
 }
