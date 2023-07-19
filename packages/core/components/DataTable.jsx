@@ -13,14 +13,6 @@ import { formatNumber } from '@cdc/core/helpers/cove/number'
 
 import Loading from '@cdc/core/components/Loading'
 
-// FILE REVIEW
-// TODO: Remove eslint-disable jsx/a11y/non-interactive-tabindex and handle appropriately
-// TODO: Move ExternalIcon to core Icon component
-// TODO: use destructuring
-// TODO: @tturnerswdev33 - It looks like there's an unused variable setFilteredCountryCode that was added
-// TODO: @tturnerswdev33 - change function declarations to arrow functions
-// TODO: @tturnerswdev33 - move caption so that useMemo is not rendered conditionally
-
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
   const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, isDebug } = props
@@ -213,8 +205,11 @@ const DataTable = props => {
 
   const rows = Object.keys(runtimeData).sort((a, b) => {
     let sortVal
-    if (config.columns.length > 0) {
+    if (config.type === 'map' && config.columns) {
       sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
+    }
+    if (config.type === 'chart') {
+      sortVal = customSort(runtimeData[a][sortBy.column], runtimeData[b][sortBy.column])
     }
     if (!sortBy.asc) return sortVal
     if (sortVal === 0) return 0
@@ -222,7 +217,7 @@ const DataTable = props => {
     return -1
   })
 
-  function genMapRows(rows) {
+  const genMapRows = rows => {
     const allrows = rows.map(row => {
       return (
         <tr role='row'>
@@ -316,6 +311,7 @@ const DataTable = props => {
   }
 
   const genChartHeader = (columns, data) => {
+    if (!data) return
     return (
       <tr>
         {dataSeriesColumns().map(column => {
@@ -355,6 +351,24 @@ const DataTable = props => {
     )
   }
 
+  // if its additional column, return formatting params
+  const isAdditionalColumn = column => {
+    let inthere = false
+    let formattingParams = {}
+    Object.keys(config.columns).forEach(keycol => {
+      if (config.columns[keycol].name === column) {
+        inthere = true
+        formattingParams = {
+          addColPrefix: config.columns[keycol].prefix,
+          addColSuffix: config.columns[keycol].suffix,
+          addColRoundTo: config.columns[keycol].roundToPlace ? config.columns[keycol].roundToPlace : '',
+          addColCommas: config.columns[keycol].commas
+        }
+      }
+    })
+    return formattingParams
+  }
+
   const genChartRows = rows => {
     const allRows = rows.map(row => {
       return (
@@ -367,10 +381,9 @@ const DataTable = props => {
               // not the prettiest, but helper functions work nicely here.
               cellValue = <>{config.xAxis.type === 'date' ? formatDate(config.xAxis.dateDisplayFormat, parseDate(config.xAxis.dateParseFormat, labelValue)) : labelValue}</>
             } else {
-              let resolvedAxis = ''
+              let resolvedAxis = 'left'
               let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
               let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
-              console.log('column', column)
 
               leftAxisItems.map(leftSeriesItem => {
                 if (leftSeriesItem.dataKey === column) resolvedAxis = 'left'
@@ -380,7 +393,12 @@ const DataTable = props => {
                 if (rightSeriesItem.dataKey === column) resolvedAxis = 'right'
               })
 
-              cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config)
+              let addColParams = isAdditionalColumn(column)
+              if (addColParams) {
+                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config, addColParams)
+              } else {
+                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config)
+              }
             }
 
             return (
@@ -418,7 +436,7 @@ const DataTable = props => {
     [config.runtime.seriesKeys]) // eslint-disable-line
 
   if (config.visualizationType !== 'Box Plot') {
-    function genMapHeader(columns) {
+    const genMapHeader = columns => {
       return (
         <tr>
           {Object.keys(columns)
@@ -433,9 +451,11 @@ const DataTable = props => {
               if (config.type === 'map' && (text === undefined || text === '')) {
                 text = 'Location'
               }
+
               return (
                 <th
                   key={`col-header-${column}`}
+                  id={column}
                   tabIndex='0'
                   title={text}
                   role='columnheader'
@@ -530,7 +550,7 @@ const DataTable = props => {
     )
   } else {
     // Render Data Table for Box Plots
-    function genBoxplotHeader(categories) {
+    const genBoxplotHeader = categories => {
       let columns = ['Measures', ...categories]
       return (
         <tr>
@@ -584,7 +604,7 @@ const DataTable = props => {
       if (Number(rowid) === 10) return plot.values.length > 0 ? plot.values.toString() : '-'
       return <p>-</p>
     }
-    function genBoxplotRows(rows) {
+    const genBoxplotRows = rows => {
       // get list of data keys for each row
       let dataKeys = rows.map(row => {
         return row[0]

@@ -1573,7 +1573,7 @@ const EditorPanel = props => {
                         handleEditorChanges('displayStateLabels', event.target.checked)
                       }}
                     />
-                    <span className='edit-label'>Display state labels</span>
+                    <span className='edit-label'>Show state labels</span>
                   </label>
                 )}
               </AccordionItemPanel>
@@ -1841,7 +1841,7 @@ const EditorPanel = props => {
                               editColumn('primary', 'dataTable', event.target.checked)
                             }}
                           />
-                          <span className='edit-label'>Display in Data Table</span>
+                          <span className='edit-label'>Show in Data Table</span>
                         </label>
                       </li>
                       <li>
@@ -1853,7 +1853,7 @@ const EditorPanel = props => {
                               editColumn('primary', 'tooltip', event.target.checked)
                             }}
                           />
-                          <span className='edit-label'>Display in Tooltips</span>
+                          <span className='edit-label'>Show in Tooltips</span>
                         </label>
                       </li>
                     </ul>
@@ -2068,7 +2068,7 @@ const EditorPanel = props => {
                                   editColumn(val, 'dataTable', event.target.checked)
                                 }}
                               />
-                              <span className='edit-label'>Display in Data Table</span>
+                              <span className='edit-label'>Show in Data Table</span>
                             </label>
                           </li>
                           <li>
@@ -2080,7 +2080,7 @@ const EditorPanel = props => {
                                   editColumn(val, 'tooltip', event.target.checked)
                                 }}
                               />
-                              <span className='edit-label'>Display in Tooltips</span>
+                              <span className='edit-label'>Show in Tooltips</span>
                             </label>
                           </li>
                         </ul>
@@ -2848,52 +2848,52 @@ const EditorPanel = props => {
                 </label>
               </AccordionItemPanel>
             </AccordionItem>
-            {/* <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>Custom Map Layers</AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  {state.map.layers.length === 0 && <p>There are currently no layers.</p>}
+            <AccordionItem>
+              <AccordionItemHeading>
+                <AccordionItemButton>Custom Map Layers</AccordionItemButton>
+              </AccordionItemHeading>
+              <AccordionItemPanel>
+                {state.map.layers.length === 0 && <p>There are currently no layers.</p>}
 
-                  {state.map.layers.map((layer, index) => {
-                    return (
-                      <>
-                        <Accordion allowZeroExpanded>
-                          <AccordionItem className='series-item map-layers-list'>
-                            <AccordionItemHeading className='series-item__title map-layers-list--title'>
-                              <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
-                            </AccordionItemHeading>
-                            <AccordionItemPanel>
-                              <div className='map-layers-panel'>
-                                <label htmlFor='layerName'>Layer Name:</label>
-                                <input type='text' name='layerName' value={layer.name} onChange={e => handleMapLayer(e, index, 'name')} />
-                                <label htmlFor='layerFilename'>File:</label>
-                                <input type='text' name='layerFilename' value={layer.url} onChange={e => handleMapLayer(e, index, 'url')} />
-                                <label htmlFor='layerNamespace'>TOPOJSON Namespace:</label>
-                                <input type='text' name='layerNamespace' value={layer.namespace} onChange={e => handleMapLayer(e, index, 'namespace')} />
-                                <label htmlFor='layerFill'>Fill Color:</label>
-                                <input type='text' name='layerFill' value={layer.fill} onChange={e => handleMapLayer(e, index, 'fill')} />
-                                <label htmlFor='layerFill'>Fill Opacity (%):</label>
-                                <input type='number' min={0} max={100} name='layerFill' value={layer.fillOpacity ? layer.fillOpacity * 100 : ''} onChange={e => handleMapLayer(e, index, 'fillOpacity')} />
-                                <label htmlFor='layerStroke'>Stroke Color:</label>
-                                <input type='text' name='layerStroke' value={layer.stroke} onChange={e => handleMapLayer(e, index, 'stroke')} />
-                                <label htmlFor='layerStroke'>Stroke Width:</label>
-                                <input type='number' min={0} max={5} name='layerStrokeWidth' value={layer.strokeWidth} onChange={e => handleMapLayer(e, index, 'strokeWidth')} />
-                                <label htmlFor='layerTooltip'>Tooltip:</label>
-                                <textarea name='layerTooltip' value={layer.tooltip} onChange={e => handleMapLayer(e, index, 'tooltip')}></textarea>
-                                <button onClick={e => handleRemoveLayer(e, index)}>Remove Layer</button>
-                              </div>
-                            </AccordionItemPanel>
-                          </AccordionItem>
-                        </Accordion>
-                      </>
-                    )
-                  })}
-                  <button className={'btn full-width'} onClick={handleAddLayer}>
-                    Add Map Layer
-                  </button>
-                </AccordionItemPanel>
-              </AccordionItem> */}
+                {state.map.layers.map((layer, index) => {
+                  return (
+                    <>
+                      <Accordion allowZeroExpanded>
+                        <AccordionItem className='series-item map-layers-list'>
+                          <AccordionItemHeading className='series-item__title map-layers-list--title'>
+                            <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
+                          </AccordionItemHeading>
+                          <AccordionItemPanel>
+                            <div className='map-layers-panel'>
+                              <label htmlFor='layerName'>Layer Name:</label>
+                              <input type='text' name='layerName' value={layer.name} onChange={e => handleMapLayer(e, index, 'name')} />
+                              <label htmlFor='layerFilename'>File:</label>
+                              <input type='text' name='layerFilename' value={layer.url} onChange={e => handleMapLayer(e, index, 'url')} />
+                              <label htmlFor='layerNamespace'>TOPOJSON Namespace:</label>
+                              <input type='text' name='layerNamespace' value={layer.namespace} onChange={e => handleMapLayer(e, index, 'namespace')} />
+                              <label htmlFor='layerFill'>Fill Color:</label>
+                              <input type='text' name='layerFill' value={layer.fill} onChange={e => handleMapLayer(e, index, 'fill')} />
+                              <label htmlFor='layerFill'>Fill Opacity (%):</label>
+                              <input type='number' min={0} max={100} name='layerFill' value={layer.fillOpacity ? layer.fillOpacity * 100 : ''} onChange={e => handleMapLayer(e, index, 'fillOpacity')} />
+                              <label htmlFor='layerStroke'>Stroke Color:</label>
+                              <input type='text' name='layerStroke' value={layer.stroke} onChange={e => handleMapLayer(e, index, 'stroke')} />
+                              <label htmlFor='layerStroke'>Stroke Width:</label>
+                              <input type='number' min={0} max={5} name='layerStrokeWidth' value={layer.strokeWidth} onChange={e => handleMapLayer(e, index, 'strokeWidth')} />
+                              <label htmlFor='layerTooltip'>Tooltip:</label>
+                              <textarea name='layerTooltip' value={layer.tooltip} onChange={e => handleMapLayer(e, index, 'tooltip')}></textarea>
+                              <button onClick={e => handleRemoveLayer(e, index)}>Remove Layer</button>
+                            </div>
+                          </AccordionItemPanel>
+                        </AccordionItem>
+                      </Accordion>
+                    </>
+                  )
+                })}
+                <button className={'btn full-width'} onClick={handleAddLayer}>
+                  Add Map Layer
+                </button>
+              </AccordionItemPanel>
+            </AccordionItem>
           </Accordion>
           <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
         </section>

@@ -412,7 +412,18 @@ const EditorPanel = () => {
 
   const addNewSeries = seriesKey => {
     let newSeries = config.series ? [...config.series] : []
-    newSeries.push({ dataKey: seriesKey, type: config.visualizationType })
+    let forecastingStages = Array.from(new Set(data.map(item => item[seriesKey])))
+    let forecastingStageArr = []
+
+    forecastingStages.forEach(stage => {
+      forecastingStageArr.push({ key: stage })
+    })
+
+    if (config.visualizationType === 'Forecasting') {
+      newSeries.push({ dataKey: seriesKey, type: config.visualizationType, stages: forecastingStageArr, stageColumn: seriesKey, axis: 'Left', tooltip: true })
+    } else {
+      newSeries.push({ dataKey: seriesKey, type: config.visualizationType, axis: 'Left', tooltip: true })
+    }
     updateConfig({ ...config, series: newSeries }) // left axis series keys
   }
 
@@ -649,6 +660,12 @@ const EditorPanel = () => {
       updateConfig({ ...config, orientation: 'horizontal' })
     }
   }, [config.visualizationType])
+
+  useEffect(() => {
+    if (config.orientation === 'vertical') {
+      updateConfig({ ...config, isResponsiveTicks: false })
+    }
+  }, [config.orientation])
 
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
@@ -1444,10 +1461,35 @@ const EditorPanel = () => {
                         </Tooltip>
                       }
                     />
+                    {config.orientation === 'horizontal' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
+                    {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation} type='number' min='0' section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                    {config.isResponsiveTicks && config.orientation === 'horizontal' && (
+                      <TextField
+                        value={config.xAxis.maxTickRotation}
+                        type='number'
+                        min='0'
+                        section='xAxis'
+                        fieldName='maxTickRotation'
+                        label='Max Tick Rotation'
+                        className='number-narrow'
+                        updateField={updateField}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Degrees ticks will be rotated if values overlap, especially in smaller viewports.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                    )}
+
                     {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                     {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
                     {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
-                    {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Display Gridlines' updateField={updateField} />}
+                    {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
                     <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
                     {config.visualizationSubType === 'regular' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
                   </>
@@ -1524,7 +1566,7 @@ const EditorPanel = () => {
                       <>
                         <TextField value={config.xAxis.target} section='xAxis' fieldName='target' type='number' label='Deviation point' placeholder='Auto' updateField={updateField} />
                         <TextField value={config.xAxis.targetLabel || 'Target'} section='xAxis' fieldName='targetLabel' type='text' label='Deviation point Label' updateField={updateField} />
-                        <CheckBox value={config.xAxis.showTargetLabel} section='xAxis' fieldName='showTargetLabel' label='Display Deviation point label' updateField={updateField} />
+                        <CheckBox value={config.xAxis.showTargetLabel} section='xAxis' fieldName='showTargetLabel' label='Show Deviation point label' updateField={updateField} />
                       </>
                     )}
                   </>
@@ -2076,8 +2118,31 @@ const EditorPanel = () => {
                         <TextField value={config.dataFormat.bottomRoundTo} type='number' section='dataFormat' fieldName='bottomRoundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
                       </>
                     )}
+                    {config.orientation === 'vertical' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
+                    {(config.orientation === 'horizontal' || !config.isResponsiveTicks) && <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                    {config.orientation === 'vertical' && config.isResponsiveTicks && (
+                      <TextField
+                        value={config.xAxis.maxTickRotation}
+                        type='number'
+                        min='0'
+                        section='xAxis'
+                        fieldName='maxTickRotation'
+                        label='Max Tick Rotation'
+                        className='number-narrow'
+                        updateField={updateField}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Degrees ticks will be rotated if values overlap, especially in smaller viewports.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                    )}
 
-                    {config.yAxis.labelPlacement !== 'Below Bar' && <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                     {config.orientation === 'horizontal' ? (
                       <>
                         <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
@@ -2499,9 +2564,9 @@ const EditorPanel = () => {
                               <label className='checkbox'>
                                 <input
                                   type='checkbox'
-                                  checked={config.columns[val].useCommas}
+                                  checked={config.columns[val].commas}
                                   onChange={event => {
-                                    editColumn(val, 'useCommas', event.target.checked)
+                                    editColumn(val, 'commas', event.target.checked)
                                   }}
                                 />
                                 <span className='edit-label'>Add Commas to Numbers</span>
@@ -2516,7 +2581,7 @@ const EditorPanel = () => {
                                     editColumn(val, 'dataTable', event.target.checked)
                                   }}
                                 />
-                                <span className='edit-label'>Display in Data Table</span>
+                                <span className='edit-label'>Show in Data Table</span>
                               </label>
                             </li>
                             {/* disable for now */}
@@ -3012,7 +3077,7 @@ const EditorPanel = () => {
 
                 {config.visualizationType === 'Spark Line' && (
                   <div className='cove-accordion__panel-section checkbox-group'>
-                    <CheckBox value={config.visual?.border} section='visual' fieldName='border' label='Display Border' updateField={updateField} />
+                    <CheckBox value={config.visual?.border} section='visual' fieldName='border' label='Show Border' updateField={updateField} />
                     <CheckBox value={config.visual?.borderColorTheme} section='visual' fieldName='borderColorTheme' label='Use Border Color Theme' updateField={updateField} />
                     <CheckBox value={config.visual?.accent} section='visual' fieldName='accent' label='Use Accent Style' updateField={updateField} />
                     <CheckBox value={config.visual?.background} section='visual' fieldName='background' label='Use Theme Background Color' updateField={updateField} />
