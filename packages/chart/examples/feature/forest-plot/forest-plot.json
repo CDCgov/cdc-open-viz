@@ -98,7 +98,7 @@
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": 75,
+    "size": "50",
     "tickRotation": 0,
     "min": "",
     "max": "",
@@ -215,11 +215,9 @@
     "estimateRadius": "",
     "lowerCiField": "",
     "upperCiField": "",
+    "shape": "circle",
     "rowHeight": 20,
-    "showZeroLine": false,
-    "showRadiusAsNumber": false,
-    "showRadiusAsCircle": false,
-    "plotWidth": 100,
+    "showZeroLine": true,
     "description": {
       "show": true,
       "text": "description",
@@ -229,6 +227,11 @@
       "show": true,
       "text": "result",
       "location": 100
+    },
+    "radius": {
+      "min": 1,
+      "max": 5,
+      "scalingColumn": "Estimate"
     },
     "hasZeroLine": true,
     "lower": "Lower",

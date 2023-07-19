@@ -4,6 +4,7 @@ import { Line, Bar, Circle, LinePath } from '@visx/shape'
 import { Text } from '@visx/text'
 import ConfigContext from '../ConfigContext'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
+import { scaleLinear } from '@visx/scale'
 
 const ForestPlot = props => {
   const { rawData: data } = useContext(ConfigContext)
@@ -42,7 +43,7 @@ const ForestPlot = props => {
 
             <Bar x={barX} y={yScale.bandwidth() / 4} width={barWidth} height={yScale.bandwidth() / 2} fill={colorPalettesChart[config.palette][0]} opacity={0.25} />
 
-            {forestPlot.showRadiusAsNumber && (
+            {forestPlot.shape === 'text' && (
               <Text x={xScale(Number(d[columns.estimate])) + 5} y={yScale.bandwidth() / 2} verticalAnchor='middle' fontSize={fontSize}>
                 {d[columns.estimate]}
               </Text>
@@ -66,16 +67,59 @@ const ForestPlot = props => {
       {forestPlot.showZeroLine && <Line from={{ x: xScale(0), y: 0 }} to={{ x: xScale(0), y: height }} className='zero-line' stroke='gray' strokeDasharray={'5 5'} />}
 
       {data.map((d, i) => {
-        const dx = d[columns.lower] > xScale.domain()[0] ? config.forestPlot.rowHeight * 0.3 : 0
+        // calculate both square and circle size based on radius.min and radius.max
+        const scaleRadius = scaleLinear({
+          domain: [
+            Math.min.apply(
+              null,
+              data.map(d => d[columns.lower])
+            ),
+            Math.max.apply(
+              null,
+              data.map(d => d[columns.upper])
+            )
+          ],
+          range: [forestPlot.radius.min, forestPlot.radius.max]
+        })
 
-        const scaleRadius = d => {
-          return 1
-        }
+        // square size
+        const rectSize = forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][columns.estimate]) : 4
+
+        // ci size
+        const ciEndSize = 4
+
         return (
           <Group>
+            {/* Confidence Interval Paths */}
+            <path
+              stroke='#333'
+              strokeWidth={1}
+              className='lower-ci'
+              d={`
+                    M${xScale(d[columns.lower])} ${yScale(i) - Number(ciEndSize)}
+                    L${xScale(d[columns.lower])} ${yScale(i) + Number(ciEndSize)}
+                `}
+            />
+
+            <path
+              stroke='#333'
+              strokeWidth={1}
+              className='upper-ci'
+              d={`
+                    M${xScale(d[columns.upper])} ${yScale(i) - Number(ciEndSize)}
+                    L${xScale(d[columns.upper])} ${yScale(i) + Number(ciEndSize)}
+                `}
+            />
+
             {/* main line */}
             <line stroke={'black'} className={`line-${d[columns.series]}`} key={i} x1={xScale(d[columns.lower])} x2={xScale(d[columns.upper])} y1={yScale(i)} y2={yScale(i)} />
-            {forestPlot.showRadiusAsCircle && <Circle className='radius' cx={xScale(Number(d[columns.estimate]))} cy={yScale(i)} r={config.forestPlot.radius.scalingColumn !== '' ? scaleRadius(d) : 4} fill={'black'} style={{ opacity: 1, filter: 'unset' }} />}
+            {forestPlot.shape === 'circle' && <Circle className='forest-plot--circle' cx={xScale(Number(d[columns.estimate]))} cy={yScale(i)} r={forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][columns.estimate]) : 4} fill={'black'} style={{ opacity: 1, filter: 'unset' }} />}
+            {forestPlot.shape === 'square' && <rect className='forest-plot--square' x={xScale(Number(d[columns.estimate]))} y={yScale(i) - rectSize / 2} width={rectSize} height={rectSize} fill={'black'} style={{ opacity: 1, filter: 'unset' }} />}
+            {forestPlot.shape === 'text' && (
+              <Text x={xScale(Number(d[columns.estimate]))} y={yScale(i)} textAnchor='middle' verticalAnchor='middle' fontSize={fontSize}>
+                {d[columns.estimate]}
+              </Text>
+            )}
           </Group>
         )
       })}
