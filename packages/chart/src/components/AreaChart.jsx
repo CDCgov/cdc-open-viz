@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, memo } from 'react'
 
 // cdc
 import ConfigContext from '../ConfigContext'
@@ -21,7 +21,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, chartRef, handleTooltipMouseOve
   if (!data) return
 
   const handleX = d => {
-    return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])
+    return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])
   }
 
   const handleY = (d, index, s = undefined) => {
@@ -49,6 +49,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, chartRef, handleTooltipMouseOve
             } else {
               data.map(d => xScale(d[config.xAxis.dataKey]))
             }
+
             return (
               <React.Fragment key={index}>
                 {/* prettier-ignore */}
@@ -75,39 +76,39 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, chartRef, handleTooltipMouseOve
                   yScale={yScale}
                   curve={curveType}
                   strokeDasharray={s.type ? handleLineType(s.type) : 0}
-                  />
-
-                {/* Transparent bar for tooltips */}
-                {/* prettier-ignore */}
-                <Bar
-                  width={ Number(xMax)}
-                  height={ Number(yMax)}
-                  fill={DEBUG ? 'red' : 'transparent'}
-                  fillOpacity={0.05}
-                  style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
-                  onMouseMove={e => handleTooltipMouseOver(e, rawData)}
-                  onMouseLeave={ handleTooltipMouseOff }
-                  />
+                />
 
                 {/* circles that appear on hover */}
-                {tooltipData && Object.entries(tooltipData.data).length > 0 && (
+                {/* {tooltipData && Object.entries(tooltipData.data).length > 0 && (
                   <circle
                     cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
-                    cy={yScale(tooltipData.data[s.dataKey])}
+                    cy={yScale(tooltipData.data[index][1])}
                     r={4.5}
                     opacity={1}
                     fillOpacity={1}
                     fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000') : 'transparent'}
                     style={{ filter: 'unset', opacity: 1 }}
                   />
-                )}
+                )} */}
               </React.Fragment>
             )
           })}
+
+          {/* Transparent bar for tooltips */}
+          {/* prettier-ignore */}
+          <Bar
+            width={ Number(xMax)}
+            height={ Number(yMax)}
+            fill={DEBUG ? 'red' : 'red'}
+            fillOpacity={0.05}
+            style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
+            onMouseMove={e => handleTooltipMouseOver(e, rawData)}
+            onMouseLeave={ handleTooltipMouseOff }
+            />
         </Group>
       </ErrorBoundary>
     )
   )
 }
 
-export default AreaChart
+export default memo(AreaChart)
