@@ -99,7 +99,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, chartRef, handleTooltipMouseOve
           <Bar
             width={ Number(xMax)}
             height={ Number(yMax)}
-            fill={DEBUG ? 'red' : 'red'}
+            fill={DEBUG ? 'red' : 'transparent'}
             fillOpacity={0.05}
             style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
             onMouseMove={e => handleTooltipMouseOver(e, rawData)}
