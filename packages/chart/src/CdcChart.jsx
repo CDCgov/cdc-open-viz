@@ -397,7 +397,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
             newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+            newConfig.runtime.seriesLabelsAll.push(series.name || series.label || series.dataKey)
             return series.dataKey
           })
         : []
@@ -798,6 +798,21 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newSeriesHighlight.push(newHighlight)
     }
+
+    /**
+     * pushDataKeyBySeriesName
+     * - pushes series.dataKey into the series highlight based on the found series.name
+     * @param {String} value
+     */
+    const pushDataKeyBySeriesName = value => {
+      let matchingSeries = config.series.filter(series => series.name === value.text)
+      if (matchingSeries?.length > 0) {
+        newSeriesHighlight.push(matchingSeries[0].dataKey)
+      }
+    }
+
+    pushDataKeyBySeriesName(label)
+
     setSeriesHighlight(newSeriesHighlight)
   }
 
@@ -856,8 +871,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return num + unit
   }
 
-  // Format numeric data based on settings in config
-  const formatNumber = (num, axis, shouldAbbreviate = false) => {
+  // Format numeric data based on settings in config OR from passed in settings for Additional Columns
+  const formatNumber = (num, axis, shouldAbbreviate = false, addColPrefix, addColSuffix, addColRoundTo) => {
     // if num is NaN return num
     if (isNaN(num) || !num) return num
     // Check if the input number is negative
@@ -879,10 +894,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let original = num
     let stringFormattingOptions
     if (axis === 'left') {
+      let roundToPlace
+      if (addColRoundTo !== undefined) {
+        // if its an Additional Column
+        roundToPlace = addColRoundTo ? Number(addColRoundTo) : 0
+      } else {
+        roundToPlace = roundTo ? Number(roundTo) : 0
+      }
       stringFormattingOptions = {
-        useGrouping: config.dataFormat.commas ? true : false,
-        minimumFractionDigits: roundTo ? Number(roundTo) : 0,
-        maximumFractionDigits: roundTo ? Number(roundTo) : 0
+        useGrouping: addColRoundTo ? true : config.dataFormat.commas ? true : false,
+        minimumFractionDigits: roundToPlace,
+        maximumFractionDigits: roundToPlace
       }
     }
 
@@ -941,8 +963,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       num = abbreviateNumber(parseFloat(num))
     }
 
-    if (prefix && axis === 'left') {
-      result += prefix
+    if (addColPrefix && axis === 'left') {
+      result = addColPrefix + result
+    } else {
+      if (prefix && axis === 'left') {
+        result = prefix + result
+      }
     }
 
     if (rightPrefix && axis === 'right') {
@@ -955,8 +981,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     result += num
 
-    if (suffix && axis === 'left') {
-      result += suffix
+    if (addColSuffix && axis === 'left') {
+      result += addColSuffix
+    } else {
+      if (suffix && axis === 'left') {
+        result += suffix
+      }
     }
 
     if (rightSuffix && axis === 'right') {
@@ -1148,7 +1178,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
-              {config.visualizationType !== 'Spark Line' && <LinearChart />}
+              {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
 
               {/* Sparkline */}
               {config.visualizationType === 'Spark Line' && (
@@ -1185,9 +1215,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 config={config}
                 rawData={config.data}
                 runtimeData={filteredData || excludedData}
-                //navigationHandler={navigationHandler}
+                //navigationHandler={navigationHandler} // do we need this? What does it do?
                 expandDataTable={config.table.expanded}
-                //headerColor={general.headerColor}
+                //headerColor={general.headerColor} // have this in map but not chart
                 columns={config.columns}
                 showDownloadButton={config.general.showDownloadButton}
                 runtimeLegend={dynamicLegendItems}
@@ -1208,6 +1238,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
                 isDebug={isDebug}
+                isEditor={isEditor}
               />
             )}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}

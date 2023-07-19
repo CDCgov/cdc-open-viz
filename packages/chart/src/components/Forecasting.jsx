@@ -32,13 +32,23 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
                   {group.confidenceIntervals?.map((ciGroup, ciGroupIndex) => {
                     const palette = colorPalettesChart[stage.color]
 
+                    const getFill = () => {
+                      if (displayArea) return palette[ciGroupIndex] ? palette[ciGroupIndex] : 'transparent'
+                      return 'transparent'
+                    }
+
+                    const getStroke = () => {
+                      if (displayArea) return palette[2] ? palette[2] : 'transparent'
+                      return 'transparent'
+                    }
+
                     return (
                       <Group key={`forecasting-areas--stage-${stage.key.replaceAll(' ', '-')}--group-${stageIndex}-${ciGroupIndex}`}>
                         {/* prettier-ignore */}
                         <Area
                           curve={curveMonotoneX}
                           data={groupData}
-                          fill={displayArea ? palette[ciGroupIndex] : 'transparent'}
+                          fill={getFill()}
                           opacity={transparentArea ? 0.1 : 0.5}
                           x={d => xScale(Date.parse(d[xAxis.dataKey]))}
                           y0={d => yScale(d[ciGroup.low])}
@@ -53,7 +63,7 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
                               x={ d => xScale(Date.parse(d[xAxis.dataKey])) }
                               y={ d => yScale(d[ciGroup.high])}
                               curve={curveMonotoneX}
-                              stroke={displayArea ? palette[2] : 'transparent'}
+                              stroke={getStroke()}
                               strokeWidth={1}
                               strokeOpacity={1}
                             />
@@ -64,7 +74,7 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
                               x={ d => xScale(Date.parse(d[xAxis.dataKey])) }
                               y={ d => yScale(d[ciGroup.low])}
                               curve={curveMonotoneX}
-                              stroke={displayArea ? palette[2] : 'transparent'}
+                              stroke={getStroke()}
                               strokeWidth={1}
                               strokeOpacity={1}
                             />

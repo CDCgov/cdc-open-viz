@@ -60,7 +60,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
   }
 
   const handleY = (d, index, s = undefined) => {
-    return isBrush ? yScale(d[s.dataKey]) / 5 : yScale(d[s.dataKey])
+    return isBrush ? yScale(d[s.dataKey]) / 4 : yScale(d[s.dataKey])
   }
 
   return (

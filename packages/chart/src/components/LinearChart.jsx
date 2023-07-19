@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useRef, useState, useMemo } from 'react'
-import { Tooltip as ReactTooltip } from 'react-tooltip'
+import React, { forwardRef, useContext, useEffect, useRef, useState, useMemo } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -44,8 +43,7 @@ import { defaultStyles } from '@visx/tooltip'
 import '../scss/LinearChart.scss'
 
 export default function LinearChart() {
-  const { isEditor, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, isDebug } = useContext(ConfigContext)
-  if (isDebug) console.log('COVE: LinearChart: config=', config)
+  const { isEditor, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
 
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime } = config
@@ -99,8 +97,10 @@ export default function LinearChart() {
   const topChartHeight = 0.8 * innerHeight - topChartBottomMargin
   const bottomChartHeight = innerHeight - topChartHeight - chartSeparation
   const xMaxBrush = xMax
-  const yMaxBrush = yMax
-
+  let dynamicMarginTop = 0 || config.dynamicMarginTop // need to init this up top so calc for height can work
+  const marginTop = 20
+  let yMaxBrush = config.isResponsiveTicks && config.showChartBrush ? yMax + config.dynamicMarginTop / 4 + marginTop : yMax
+  console.log('yMaxBrush', yMaxBrush)
   // account for brush data changes
   const brushData = undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data
 
@@ -183,9 +183,24 @@ export default function LinearChart() {
     setChartPosition(svgRef?.current?.getBoundingClientRect())
   }, [svgRef, config.legend])
 
+  // resolved an issue here with Object.entries, label no longer used.
   const TooltipListItem = ({ item }) => {
     const [label, value] = item
-    return label === config.xAxis.dataKey ? <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? config.runtime.xAxis.label : label)}: ${value}`}</li> : <li className='tooltip-body'>{`${label}: ${formatNumber(value, 'left')}`}</li>
+
+    /**
+     * find the original series and use the name property if available
+     * otherwise default back to the original column name.
+     * @param {String} input - original columnName
+     * @returns user defined series name.
+     */
+    const getSeriesNameFromLabel = originalColumnName => {
+      let series = config.series.filter(s => s.dataKey === originalColumnName)
+      if (series[0].name) return series[0].name
+      return originalColumnName
+    }
+
+    if (value[0] === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1])) : value[1]}`}</li>
+    return <li className='tooltip-body'>{`${getSeriesNameFromLabel(value[0])}: ${formatNumber(value[1], 'left')}`}</li>
   }
 
   const handleLeftTickFormatting = tick => {
@@ -355,7 +370,7 @@ export default function LinearChart() {
         stageColumns.push(s.stageColumn)
 
         // greedy fn 😭
-        s?.confidenceIntervals.map(ci => {
+        s?.confidenceIntervals.forEach(ci => {
           if (ci.showInTooltip === true) {
             ciItems.push(ci.low)
             ciItems.push(ci.high)
@@ -402,7 +417,7 @@ export default function LinearChart() {
 
     // filter out the series that aren't added to the map.
     if (!seriesToInclude) return
-    let initialTooltipData = Object.fromEntries(seriesToInclude) ? Object.fromEntries(seriesToInclude) : {}
+    let initialTooltipData = seriesToInclude ? seriesToInclude : {}
 
     let tooltipData = {}
     tooltipData.data = initialTooltipData
@@ -529,6 +544,9 @@ export default function LinearChart() {
       </Group>
     )
   }
+
+  // this controls where the brush handles are intiially
+  // - 0, xMax basically have the handles flush to each end of the area
   const initialBrushPosition = useMemo(
     () => ({
       start: { x: 0 },
@@ -537,12 +555,25 @@ export default function LinearChart() {
     [xScale]
   )
 
+  const getChartHeight = useMemo(() => {
+    if (config.showChartBrush) {
+      if (!config.isResponsiveTicks) {
+        return height * 1.3
+      } else {
+        console.log('height, dynamicMarginTop', height, dynamicMarginTop)
+        return (height + dynamicMarginTop) * 1.3 - yMaxBrush * 0.25 - marginTop / 4
+      }
+    } else {
+      return height
+    }
+  })
+
   return isNaN(width) ? (
     <></>
   ) : (
     <ErrorBoundary component='LinearChart'>
-      <svg width={width} height={config.showChartBrush ? height * 1.3 : height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
-        <Bar width={width} height={height} fill={'transparent'}></Bar>
+      <svg width={width} height={getChartHeight} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
+        <Bar width={width} height={getChartHeight} fill={'transparent'}></Bar>
         {/* Highlighted regions */}
         {config.regions
           ? config.regions.map(region => {
@@ -609,7 +640,7 @@ export default function LinearChart() {
 
                         {orientation === 'horizontal' && visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
                           <Text
-                            transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.to.y - minY : tick.to.y - minY + (Number(config.barHeight * config.series.length) - barMinHeight) / 2}) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
+                            transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.to.y - minY : tick.to.y - minY + (Number(config.barHeight * config.series.length) - barMinHeight) / 2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0})`}
                             verticalAnchor={'start'}
                             textAnchor={'end'}
                           >
@@ -638,10 +669,11 @@ export default function LinearChart() {
                           <Text
                             display={config.useLogScale ? showTicks : 'block'}
                             dx={config.useLogScale ? -6 : 0}
-                            x={runtime.horizontal ? tick.from.x + 2 : tick.to.x}
-                            y={tick.to.y + (runtime.horizontal ? horizontalTickOffset : 0)}
-                            verticalAnchor={runtime.horizontal ? 'start' : 'middle'}
-                            textAnchor={runtime.horizontal ? 'start' : 'end'}
+                            x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
+                            y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                            angle={-Number(config.yAxis.tickRotation) || 0}
+                            verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
+                            textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                             fill={config.yAxis.tickLabelColor}
                           >
                             {tick.formattedValue}
@@ -714,31 +746,69 @@ export default function LinearChart() {
             tickFormat={handleBottomTickFormatting}
             scale={xScale}
             stroke='#333'
-            tickStroke='#333'
             numTicks={countNumOfTicks('xAxis')}
+            tickStroke='#333'
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
+              // Calculate sumOfTickWidth here, before map function
+              const fontSize = { small: 16, medium: 18, large: 20 }
+              const defaultTickLength = 8
+              const tickWidthMax = Math.max(...props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)))
+              // const marginTop = 20 // moved to top bc need for yMax calcs
+
+              const textWidths = props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`))
+              const sumOfTickWidth = textWidths.reduce((a, b) => a + b, 100)
+              const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (props.ticks.length - 1)
+
+              // Check if ticks are overlapping
+              // Determine the position of each tick
+              let positions = [0] // The first tick is at position 0
+              for (let i = 1; i < textWidths.length; i++) {
+                // The position of each subsequent tick is the position of the previous tick
+                // plus the width of the previous tick and the space
+                positions[i] = positions[i - 1] + textWidths[i - 1] + spaceBetweenEachTick
+              }
+
+              // Check if ticks are overlapping
+              let areTicksTouching = false
+              textWidths.forEach((_, i) => {
+                if (positions[i] + textWidths[i] > positions[i + 1]) {
+                  areTicksTouching = true
+                  return
+                }
+              })
+
+              dynamicMarginTop = areTicksTouching && config.isResponsiveTicks ? tickWidthMax + defaultTickLength + marginTop : 0
+              config.dynamicMarginTop = dynamicMarginTop
+              console.log('dynamicMarginTop', dynamicMarginTop)
               return (
                 <Group className='bottom-axis'>
                   {props.ticks.map((tick, i) => {
                     // when using LogScale show major ticks values only
                     const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
-                    const tickWidth = xMax / props.ticks.length
-                    const tickLength = showTick === 'block' ? 16 : 8
+                    const tickLength = showTick === 'block' ? 16 : defaultTickLength
                     const to = { x: tick.to.x, y: tickLength }
+                    let textWidth = getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                    //reset rotations by updating config
+                    config.yAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
+                    config.xAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'vertical' ? 0 : config.xAxis.tickRotation
+                    //configure rotation
+                    const tickRotation = config.isResponsiveTicks && areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : -Number(config.runtime.xAxis.tickRotation)
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                         {!config.xAxis.hideTicks && <Line from={tick.from} to={orientation === 'horizontal' && config.useLogScale ? to : tick.to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' ? 1.3 : 1} />}
                         {!config.xAxis.hideLabel && (
                           <Text
-                            dy={orientation === 'horizontal' && config.useLogScale ? 8 : 0}
-                            display={orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
-                            transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!runtime.horizontal ? runtime.xAxis.tickRotation : 0})`}
-                            verticalAnchor='start'
-                            textAnchor={runtime.xAxis.tickRotation && runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
-                            width={runtime.xAxis.tickRotation && runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
+                            dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
+                            display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
+                            x={tick.to.x}
+                            y={tick.to.y}
+                            angle={tickRotation}
+                            verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
+                            textAnchor={tickRotation ? 'end' : 'middle'}
+                            width={textWidth}
                             fill={config.xAxis.tickLabelColor}
                           >
                             {tick.formattedValue}
@@ -748,7 +818,7 @@ export default function LinearChart() {
                     )
                   })}
                   {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                  <Text x={axisCenter} y={orientation === 'horizontal' ? config.xAxis.labelOffset : config.xAxis.size} textAnchor='middle' fontWeight='bold' fill={config.xAxis.labelColor}>
+                  <Text x={axisCenter} y={config.orientation === 'horizontal' ? dynamicMarginTop || config.xAxis.labelOffset : dynamicMarginTop || config.xAxis.size} textAnchor='middle' fontWeight='bold' fill={config.xAxis.labelColor}>
                     {props.label}
                   </Text>
                 </Group>
@@ -885,7 +955,7 @@ export default function LinearChart() {
         {/* brush */}
         {config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
           <>
-            <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} chartRef={svgRef} isDebug={isDebug} isBrush={true}>
+            <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} height={yMaxBrush / 4} chartRef={svgRef} isDebug={isDebug} isBrush={true}>
               <PatternLines id={PATTERN_ID} height={8} width={8} stroke={accentColor} strokeWidth={1} orientation={['diagonal']} style={styles} />
               <Brush
                 id='theBrush'
