@@ -56,9 +56,14 @@ export default function LinearChart() {
   const { horizontal: heightHorizontal } = config.heights
   const isHorizontal = orientation === 'horizontal'
   const shouldAbbreviate = true
-  const height = config.aspectRatio ? width * config.aspectRatio : config.heights[orientation]
+  let height = config.aspectRatio ? width * config.aspectRatio : config.heights[orientation]
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  const yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.size)
+  let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.size)
+
+  if (visualizationType === 'Forest Plot') {
+    height = height + config.data.length * config.forestPlot.rowHeight
+    yMax = yMax + config.data.length * config.forestPlot.rowHeight
+  }
 
   // hooks
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)

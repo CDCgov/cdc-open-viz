@@ -179,11 +179,9 @@ export default {
     estimateRadius: '',
     lowerCiField: '',
     upperCiField: '',
+    shape: '',
     rowHeight: 20,
     showZeroLine: false,
-    showRadiusAsNumber: false,
-    showRadiusAsCircle: false,
-    plotWidth: 100,
     description: {
       show: true,
       text: 'description',
