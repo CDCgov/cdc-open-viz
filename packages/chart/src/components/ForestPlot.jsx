@@ -3,6 +3,7 @@ import React, { useContext } from 'react'
 // visx
 import { Group } from '@visx/group'
 import { Line, Bar, Circle } from '@visx/shape'
+import { GlyphDiamond } from '@visx/glyph'
 import { Text } from '@visx/text'
 import { scaleLinear } from '@visx/scale'
 
@@ -85,6 +86,7 @@ const ForestPlot = props => {
             <line stroke={'black'} className={`line-${d[columns.series]}`} key={i} x1={xScale(d[columns.lower])} x2={xScale(d[columns.upper])} y1={yScale(i)} y2={yScale(i)} />
             {forestPlot.shape === 'circle' && <Circle className='forest-plot--circle' cx={xScale(Number(d[columns.estimate]))} cy={yScale(i)} r={forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][columns.estimate]) : 4} fill={'black'} style={{ opacity: 1, filter: 'unset' }} />}
             {forestPlot.shape === 'square' && <rect className='forest-plot--square' x={xScale(Number(d[columns.estimate]))} y={yScale(i) - rectSize / 2} width={rectSize} height={rectSize} fill={'black'} style={{ opacity: 1, filter: 'unset' }} />}
+            {forestPlot.shape === 'diamond' && <GlyphDiamond size={forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][columns.estimate]) * 5 : 4} top={yScale(i)} left={xScale(Number(d[columns.estimate]))} />}
             {forestPlot.shape === 'text' && (
               <Text x={xScale(Number(d[columns.estimate]))} y={yScale(i)} textAnchor='middle' verticalAnchor='middle' fontSize={fontSize}>
                 {d[columns.estimate]}
