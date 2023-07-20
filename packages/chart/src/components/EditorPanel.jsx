@@ -1151,7 +1151,7 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
                   <Select
                     value={config.forestPlot.estimateField}
-                    label='Estimate Column'
+                    label='Point Estimate Column'
                     onChange={e => {
                       if (e.target.value !== '' && e.target.value !== 'Select') {
                         updateConfig({
@@ -1205,7 +1205,7 @@ const EditorPanel = () => {
                   <CheckBox value={config.forestPlot.showZeroLine} section='forestPlot' fieldName='showZeroLine' label='Show Line on Zero' updateField={updateField} />
                   <Select
                     value={config.forestPlot.shape}
-                    label='Shape'
+                    label='Point Estimate Shape'
                     onChange={e => {
                       if (e.target.value !== '' && e.target.value !== 'Select') {
                         updateConfig({
@@ -1218,7 +1218,7 @@ const EditorPanel = () => {
                       }
                       e.target.value = ''
                     }}
-                    options={['text', 'circle', 'square']}
+                    options={['text', 'circle', 'square', 'diamond']}
                   />
                   <Select
                     value={config.forestPlot.radius.scalingColumn}
