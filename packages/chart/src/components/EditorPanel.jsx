@@ -661,12 +661,6 @@ const EditorPanel = () => {
     }
   }, [config.visualizationType])
 
-  useEffect(() => {
-    if (config.orientation === 'vertical') {
-      updateConfig({ ...config, isResponsiveTicks: false })
-    }
-  }, [config.orientation])
-
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
     return (
