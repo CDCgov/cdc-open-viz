@@ -570,10 +570,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
     }
 
-    if (((newConfig.visualizationType === 'Bar' || newConfig.visualizationType === 'Deviation Bar') && newConfig.orientation === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
+    if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar'].includes(newConfig.visualizationType)) {
       newConfig.runtime.xAxis = newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis
       newConfig.runtime.horizontal = true
+      newConfig.orientation = 'horizontal'
     } else {
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
