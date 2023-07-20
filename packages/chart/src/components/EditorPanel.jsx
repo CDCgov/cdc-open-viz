@@ -635,16 +635,6 @@ const EditorPanel = () => {
     })
   }, [config.orientation])
 
-  // Set paired bars to be horizontal, even though that option doesn't display
-  useEffect(() => {
-    if (config.visualizationType === 'Paired Bar') {
-      updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
-    }
-  }, []) // eslint-disable-line
-
   useEffect(() => {
     if (config.orientation === 'horizontal') {
       updateConfig({
@@ -653,19 +643,6 @@ const EditorPanel = () => {
       })
     }
   }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
-
-  /// temporary force orientation untill we support Vartical deviaton bar
-  useEffect(() => {
-    if (config.visualizationType === 'Deviation Bar') {
-      updateConfig({ ...config, orientation: 'horizontal' })
-    }
-  }, [config.visualizationType])
-
-  useEffect(() => {
-    if (config.orientation === 'vertical') {
-      updateConfig({ ...config, isResponsiveTicks: false })
-    }
-  }, [config.orientation])
 
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
@@ -1610,9 +1587,9 @@ const EditorPanel = () => {
                         </Tooltip>
                       }
                     />
-                    {config.orientation === 'horizontal' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
+                    {config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
                     {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation} type='number' min='0' section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
-                    {config.isResponsiveTicks && config.orientation === 'horizontal' && (
+                    {config.isResponsiveTicks && config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && (
                       <TextField
                         value={config.xAxis.maxTickRotation}
                         type='number'
@@ -2251,9 +2228,9 @@ const EditorPanel = () => {
                         <TextField value={config.dataFormat.bottomRoundTo} type='number' section='dataFormat' fieldName='bottomRoundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
                       </>
                     )}
-                    {config.orientation === 'vertical' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
+                    {config.orientation === 'vertical' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
                     {(config.orientation === 'horizontal' || !config.isResponsiveTicks) && <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
-                    {config.orientation === 'vertical' && config.isResponsiveTicks && (
+                    {config.orientation === 'vertical' && config.isResponsiveTicks && config.visualizationType !== 'Paired Bar' && (
                       <TextField
                         value={config.xAxis.maxTickRotation}
                         type='number'
