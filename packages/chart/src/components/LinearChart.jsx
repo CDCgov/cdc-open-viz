@@ -92,7 +92,8 @@ export default function LinearChart() {
 
   // resolved an issue here with Object.entries, label no longer used.
   const TooltipListItem = ({ item }) => {
-    const [label, value] = item
+    const [index, keyValue] = item
+    const [key, value] = keyValue
 
     /**
      * find the original series and use the name property if available
@@ -106,8 +107,13 @@ export default function LinearChart() {
       return originalColumnName
     }
 
-    if (value[0] === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1], false)) : value[1]}`}</li>
-    return <li className='tooltip-body'>{`${getSeriesNameFromLabel(value[0])}: ${formatNumber(value[1], 'left')}`}</li>
+    if (visualizationType === 'Forest Plot') {
+      if (key === config.yAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.yAxis.dataKey ? `${config.yAxis.dataKey}: ` : '')} ${config.yAxis.type === 'date' ? formatDate(parseDate(key, false)) : value}`}</li>
+      return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
+    }
+
+    if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(key, false)) : key}`}</li>
+    return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
   }
 
   const handleLeftTickFormatting = (tick, index) => {
@@ -245,21 +251,30 @@ export default function LinearChart() {
     if (!eventSvgCoords) return
     const { x, y } = eventSvgCoords
 
-    let minDistance = Number.MAX_VALUE
-    let closestYValue = null
+    // Function to get the closest y-axis value from the cursor's position
+    // Function to get the closest y-axis value from the cursor's position
+    const getClosestYValue = yPosition => {
+      let minDistance = Number.MAX_VALUE
+      let closestYValue = null
 
-    data.forEach((d, i) => {
-      const yValue = yScale(i)
+      data.forEach((d, index) => {
+        const yPositionOnPlot = yScale(index)
+        const distance = Math.abs(yPositionOnPlot - yPosition)
 
-      const distance = Math.abs(y - yValue)
+        if (distance < minDistance) {
+          minDistance = distance
+          closestYValue = d[config.yAxis.dataKey]
+        }
+      })
+      return closestYValue
+    }
 
-      if (distance < minDistance) {
-        minDistance = distance
-        closestYValue = d[config.yAxis.dataKey]
-      }
-    })
+    const xValue = data.filter(d => d[yAxis.dataKey] === getClosestYValue(y))[0]['Estimate']
 
-    let standardLoopItems = [config.yAxis.dataKey]
+    let standardLoopItems = [
+      [config.yAxis.dataKey, getClosestYValue(y)],
+      ['Estimate', xValue]
+    ]
 
     let initialTooltipData = standardLoopItems ? standardLoopItems : {}
 
@@ -271,42 +286,54 @@ export default function LinearChart() {
     let tooltipInformation = {
       tooltipData: tooltipData,
       tooltipTop: 0,
-      tooltipValues: [1, 2, 3],
+      tooltipValues: 'test',
       tooltipLeft: x
     }
 
     showTooltip(tooltipInformation)
   }
 
-  // todo: combine mouseover functions
-  const handleTooltipMouseOver = (e, data) => {
-    // get the svg coordinates of the mouse
-    // and get the closest values
-    const eventSvgCoords = localPoint(e)
-    const { x, y } = eventSvgCoords
+  /**
+   *
+   * @param {*} closestXScaleValue
+   * @param {*} includedSeries
+   * @returns an array of objects with the closest x and y series data items
+   * see example below
+   * [{
+        "Data 1": "foo",
+        "Data 2": "1350",
+        "Data 3": "300",
+        "Data 4": "950",
+        "Data 5": "1200",
+        "Data 6": "3100",
+        "Date": "1/15/2016"
+      }]
+   */
+  const getYScaleValues = (closestXScaleValue, includedSeries) => {
+    const formattedDate = formatDate(closestXScaleValue)
 
-    let yScaleValues
-    let closestXScaleValue = getXValueFromCoordinate(x)
-    let formattedDate = formatDate(closestXScaleValue)
-
-    //  keep track of the series.tooltip values
-    // and remember to push the xaxis data key on top
-    let includedSeries = config.series.filter(series => series.tooltip === true).map(item => item.dataKey)
-    includedSeries.push(config.xAxis.dataKey)
-
+    let dataToSearch
     if (xAxis.type === 'categorical') {
-      yScaleValues = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
-      yScaleValues = yScaleValues.map(object => {
-        return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
-      })
+      dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
     } else {
-      yScaleValues = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
-      yScaleValues = yScaleValues.map(object => {
-        return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
-      })
+      dataToSearch = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
     }
 
-    let seriesToInclude = []
+    // Return an empty array if no matching data is found.
+    if (!dataToSearch || dataToSearch.length === 0) {
+      return []
+    }
+
+    const yScaleValues = dataToSearch.map(object => {
+      return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
+    })
+
+    return yScaleValues
+  }
+
+  const getIncludedTooltipSeries = () => {
+    let standardLoopItems
+
     let stageColumns = []
     let ciItems = []
 
@@ -325,8 +352,6 @@ export default function LinearChart() {
         })
       }
     })
-
-    let standardLoopItems = []
 
     if (!config.dashboard) {
       switch (visualizationType) {
@@ -352,15 +377,43 @@ export default function LinearChart() {
       standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...runtime?.lineSeriesKeys, ...stageColumns, ...ciItems]
     }
 
+    return standardLoopItems
+  }
+
+  // todo: combine mouseover functions
+  const handleTooltipMouseOver = async (e, data) => {
+    // get the svg coordinates of the mouse
+    const eventSvgCoords = localPoint(e)
+    const { x, y } = eventSvgCoords
+
+    // get the closest x value & format the date if
+    let closestXScaleValue = getXValueFromCoordinate(x)
+
+    //  keep track of the series that have tooltip.show equals true.
+    // and remember to push the xaxis data key on top
+    let includedSeries = config.series.filter(series => series.tooltip === true).map(item => item.dataKey)
+    includedSeries.push(config.xAxis.dataKey)
+
+    // returns ALL data closest object with key value paris of thes series.
+    const yScaleValues = getYScaleValues(closestXScaleValue, includedSeries)
+
+    // standard loop items format ['Date', 'Data 1', 'Data 2', 'Data 3', 'Data 4', 'Data 5', 'Data 6']
+    const standardLoopItems = getIncludedTooltipSeries()
+
+    let seriesToInclude = []
+
     standardLoopItems.map(seriesKey => {
       if (!seriesKey) return false
       if (!yScaleValues[0]) return false
-      for (const item of Object.entries(yScaleValues[0])) {
-        if (item[0] === seriesKey) {
-          seriesToInclude.push(item)
+      for (const series of Object.entries(yScaleValues[0])) {
+        if (series[0] === seriesKey) {
+          seriesToInclude.push(series)
         }
       }
     })
+
+    // Here seriesToInclude is a nested array [ ['Date', '01/01/2023'], ['Data 1', '40'], ...]
+    console.log(seriesToInclude)
 
     // filter out the series that aren't added to the map.
     if (!seriesToInclude) return
