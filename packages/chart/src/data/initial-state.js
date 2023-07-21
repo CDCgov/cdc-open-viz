@@ -175,12 +175,16 @@ export default {
     opacity: 90
   },
   forestPlot: {
+    colors: {
+      line: '',
+      shape: ''
+    },
     estimateField: '',
     estimateRadius: '',
     lowerCiField: '',
     upperCiField: '',
     shape: '',
-    rowHeight: 20,
+    rowHeight: 10,
     showZeroLine: false,
     description: {
       show: true,

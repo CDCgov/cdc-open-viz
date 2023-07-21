@@ -47,7 +47,7 @@
     "axisPadding": 0,
     "tickRotation": 0,
     "anchors": [],
-    "dataKey": "Author(s) and Year"
+    "dataKey": "N"
   },
   "boxplot": {
     "plots": [],
@@ -105,12 +105,12 @@
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "numTicks": "",
+    "numTicks": "10",
     "labelOffset": 65,
     "axisPadding": 0,
     "target": 0,
     "maxTickRotation": 0,
-    "dataKey": "N",
+    "dataKey": "Author(s) and Year",
     "label": "Units"
   },
   "table": {
@@ -216,7 +216,7 @@
     "lowerCiField": "",
     "upperCiField": "",
     "shape": "circle",
-    "rowHeight": 20,
+    "rowHeight": 10,
     "showZeroLine": true,
     "description": {
       "show": true,
