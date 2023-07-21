@@ -226,7 +226,7 @@ export default function LinearChart() {
 
   const countNumOfTicks = axis => {
     const { numTicks } = runtime[axis]
-    console.log('xAxis, numTicks', config.runtime[axis], numTicks)
+    //console.log('xAxis, numTicks', config.runtime[axis], numTicks)
     let tickCount = undefined
 
     if (axis === 'yAxis') {
@@ -248,7 +248,7 @@ export default function LinearChart() {
 
     if (axis === 'xAxis') {
       tickCount = isHorizontal && !numTicks ? undefined : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
-      console.log('xAxis TERNARY tickCount=', tickCount)
+      //console.log('xAxis TERNARY tickCount=', tickCount)
       if (isHorizontal && tickCount === undefined && !config.dataFormat.roundTo) {
         // then it is set to Auto
         // - check for small numbers situation
@@ -258,7 +258,7 @@ export default function LinearChart() {
           tickCount = 4 // same default as standalone components
         }
       }
-      console.log('xAxis LAST tickCount=', tickCount)
+      //console.log('xAxis LAST tickCount=', tickCount)
     }
     return tickCount
   }
@@ -561,16 +561,37 @@ export default function LinearChart() {
     [xScale]
   )
 
+  const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
+
   const getChartHeight = useMemo(() => {
+    if (height === NaN) return 0
+
+    let tmpHeight = height // bc height is const
+    //const xtraBuffer = Number(runtime.xAxis.size) === 50 ? 0 : 3 // I dont know why but the math does not add up
+    let xtraBuffer = 0
+    if (Number(runtime.xAxis.size) > 50) {
+      xtraBuffer = ((runtime.xAxis.size - 50) / 10) * 3
+    }
+    if (Number(runtime.xAxis.size) < 50) {
+      xtraBuffer = ((50 - runtime.xAxis.size) / 10) * 4.2
+    }
     if (config.showChartBrush) {
+      // need to account for SIZE (HEIGHT) which is mapped to padding?
+      if (runtime.xAxis.size > 50) {
+        tmpHeight -= runtime.xAxis.size - 50
+      } else {
+        tmpHeight += 50 - runtime.xAxis.size
+      }
+      console.log('padding config.yAxis.size runtime.XAxis.size tmpHeight xtraBuffer', padding, config.yAxis.size, config.runtime.xAxis.size, tmpHeight, xtraBuffer)
       if (!config.isResponsiveTicks) {
-        return height * 1.3
+        return runtime.xAxis.size > 50 ? (tmpHeight - xtraBuffer) * 1.3 : (tmpHeight + xtraBuffer) * 1.3
       } else {
         console.log('height, dynamicMarginTop', height, dynamicMarginTop)
-        return (height + dynamicMarginTop) * 1.3 - yMaxBrush * 0.25 - marginTop / 4
+        tmpHeight = (tmpHeight + dynamicMarginTop) * 1.3 - yMaxBrush * 0.25 - marginTop / 4
+        return runtime.xAxis.size > 50 ? tmpHeight - xtraBuffer : tmpHeight + xtraBuffer
       }
     } else {
-      return height
+      return tmpHeight
     }
   })
 
@@ -961,7 +982,7 @@ export default function LinearChart() {
         {/* brush */}
         {config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
           <>
-            <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} height={yMaxBrush / 4} chartRef={svgRef} isDebug={isDebug} isBrush={true}>
+            <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} height={yMaxBrush / 4} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} chartRef={svgRef} isDebug={isDebug} isBrush={true}>
               <PatternLines id={PATTERN_ID} height={8} width={8} stroke={accentColor} strokeWidth={1} orientation={['diagonal']} style={styles} />
               <Brush
                 id='theBrush'
@@ -1004,7 +1025,8 @@ export default function LinearChart() {
         {config.yAxis.anchors &&
           config.yAxis.anchors.map(anchor => {
             let anchorPosition = yScale(anchor.value)
-            const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
+            // have to move up
+            // const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
             const middleOffset = orientation === 'horizontal' && visualizationType === 'Bar' ? config.barHeight / 4 : 0
 
             return (
@@ -1029,7 +1051,8 @@ export default function LinearChart() {
 
             let anchorPosition = newX.type === 'date' ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
 
-            const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
+            // have to move up
+            // const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
 
             return (
               // prettier-ignore

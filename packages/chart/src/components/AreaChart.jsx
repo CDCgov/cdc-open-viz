@@ -20,7 +20,8 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
   // use brush data if it is passed in AND if this is NOT a brush chart
   data = !isBrush && undefined !== brushData && brushData.length ? brushData : data
 
-  if (isBrush && isDebug) console.log('###AREAchart BRUSH data, xScale, yScale, yMax, xMax', data, xScale, yScale, yMax, xMax)
+  //if (isBrush && isDebug) console.log('###AREAchart BRUSH data, xScale, yScale, yMax, xMax', data, xScale, yScale, yMax, xMax)
+  if (isBrush && isDebug) console.log('###AREAchart BRUSH yMax, xMax', yMax, xMax)
 
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
