@@ -45,27 +45,27 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   let original = num
   let stringFormattingOptions
   if (axis === 'left') {
-      let roundToPlace
-      if (addColRoundTo !== undefined) {
-        // if its an Additional Column
-        roundToPlace = addColRoundTo ? Number(addColRoundTo) : 0
-      } else {
-        roundToPlace = roundTo ? Number(roundTo) : 0
-      }
-      // Need to prevent negative values in rounding
-      if (roundToPlace < 0) roundToPlace = 0
-      let useCommas
-      if (addColCommas !== undefined) {
-        // if its an Additional Column
-        useCommas = addColCommas ? true : false
-      } else {
-        useCommas = config.dataFormat.commas ? true : false
-      }
-      stringFormattingOptions = {
-        useGrouping: useCommas,
-        minimumFractionDigits: roundToPlace,
-        maximumFractionDigits: roundToPlace
-      }
+    let roundToPlace
+    if (addColRoundTo !== undefined) {
+      // if its an Additional Column
+      roundToPlace = addColRoundTo ? Number(addColRoundTo) : 0
+    } else {
+      roundToPlace = roundTo ? Number(roundTo) : 0
+    }
+    // Need to prevent negative values in rounding
+    if (roundToPlace < 0) roundToPlace = 0
+    let useCommas
+    if (addColCommas !== undefined) {
+      // if its an Additional Column
+      useCommas = addColCommas ? true : false
+    } else {
+      useCommas = config.dataFormat.commas ? true : false
+    }
+    stringFormattingOptions = {
+      useGrouping: useCommas,
+      minimumFractionDigits: roundToPlace,
+      maximumFractionDigits: roundToPlace
+    }
   }
 
   if (axis === 'right') {
@@ -124,7 +124,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   }
 
   if (addColPrefix !== undefined && axis === 'left') {
-      result = addColPrefix + result
+    result = addColPrefix + result
   } else {
     if (prefix && axis === 'left') {
       result = prefix + result
@@ -163,4 +163,10 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   return String(result)
 }
 
-export { formatNumber }
+const getFontSize = (size = 'medium') => {
+  const fontSize = { small: 16, medium: 18, large: 20 }
+
+  return fontSize[size]
+}
+
+export { formatNumber, getFontSize }

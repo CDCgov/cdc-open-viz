@@ -676,6 +676,8 @@ const EditorPanel = () => {
     switch (visualizationType) {
       case 'Box Plot':
         return false
+      case 'Forest Plot':
+        return false
       default:
         return true
     }
@@ -1152,6 +1154,7 @@ const EditorPanel = () => {
                   <Select
                     value={config.forestPlot.estimateField}
                     label='Point Estimate Column'
+                    required={true}
                     onChange={e => {
                       if (e.target.value !== '' && e.target.value !== 'Select') {
                         updateConfig({
@@ -1170,6 +1173,7 @@ const EditorPanel = () => {
                   <Select
                     value={config.forestPlot.lower}
                     label='Lower CI Column'
+                    required={true}
                     onChange={e => {
                       if (e.target.value !== '' && e.target.value !== 'Select') {
                         updateConfig({
@@ -1187,6 +1191,7 @@ const EditorPanel = () => {
                   <Select
                     value={config.forestPlot.upper}
                     label='Upper CI Column'
+                    required={true}
                     onChange={e => {
                       if (e.target.value !== '' && e.target.value !== 'Select') {
                         updateConfig({

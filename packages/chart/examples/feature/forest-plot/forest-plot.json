@@ -59,8 +59,7 @@
     "plotNonOutlierValues": true,
     "legend": {
       "showHowToReadText": false,
-      "howToReadText": "",
-      "show": false
+      "howToReadText": ""
     },
     "labels": {
       "q1": "Lower Quartile",
@@ -174,7 +173,7 @@
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
-    "hide": true
+    "hide": false
   },
   "exclusions": {
     "active": false,
