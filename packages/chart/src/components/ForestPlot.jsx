@@ -9,29 +9,12 @@ import { scaleLinear } from '@visx/scale'
 
 // cdc
 import ConfigContext from '../ConfigContext'
-import { localPoint } from '@visx/event'
+import { getFontSize } from '@cdc/core/helpers/cove/number'
 
 const ForestPlot = props => {
   const { rawData: data } = useContext(ConfigContext)
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver } = props
   const { forestPlot } = config
-
-  /**
-   * TODO: refactor later
-   * These are placeholders used during initial development that could be cleaned up.
-   */
-  const columns = {
-    upper: forestPlot.upper,
-    lower: forestPlot.lower,
-    estimate: forestPlot.estimateField,
-    series: config.yAxis.dataKey
-  }
-
-  /**
-   * TODO:
-   * Search on this in the codebase and create a re-usable function.
-   */
-  const fontSize = { small: 16, medium: 18, large: 20 }
 
   return (
     <Group left={config.yAxis.size}>
@@ -40,21 +23,12 @@ const ForestPlot = props => {
       {data.map((d, i) => {
         // calculate both square and circle size based on radius.min and radius.max
         const scaleRadius = scaleLinear({
-          domain: [
-            Math.min.apply(
-              null,
-              data.map(d => d[columns.lower])
-            ),
-            Math.max.apply(
-              null,
-              data.map(d => d[columns.upper])
-            )
-          ],
+          domain: xScale.domain(),
           range: [forestPlot.radius.min, forestPlot.radius.max]
         })
 
         // square size
-        const rectSize = forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][columns.estimate]) : 4
+        const rectSize = forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.estimateField]) : 4
 
         // ci size
         const ciEndSize = 4
@@ -67,8 +41,8 @@ const ForestPlot = props => {
               strokeWidth={1}
               className='lower-ci'
               d={`
-                    M${xScale(d[columns.lower])} ${yScale(i) - Number(ciEndSize)}
-                    L${xScale(d[columns.lower])} ${yScale(i) + Number(ciEndSize)}
+                    M${xScale(d[forestPlot.lower])} ${yScale(i) - Number(ciEndSize)}
+                    L${xScale(d[forestPlot.lower])} ${yScale(i) + Number(ciEndSize)}
                 `}
             />
 
@@ -77,19 +51,21 @@ const ForestPlot = props => {
               strokeWidth={1}
               className='upper-ci'
               d={`
-                    M${xScale(d[columns.upper])} ${yScale(i) - Number(ciEndSize)}
-                    L${xScale(d[columns.upper])} ${yScale(i) + Number(ciEndSize)}
+                    M${xScale(d[forestPlot.upper])} ${yScale(i) - Number(ciEndSize)}
+                    L${xScale(d[forestPlot.upper])} ${yScale(i) + Number(ciEndSize)}
                 `}
             />
 
             {/* main line */}
-            <line stroke={'black'} className={`line-${d[columns.series]}`} key={i} x1={xScale(d[columns.lower])} x2={xScale(d[columns.upper])} y1={yScale(i)} y2={yScale(i)} />
-            {forestPlot.shape === 'circle' && <Circle className='forest-plot--circle' cx={xScale(Number(d[columns.estimate]))} cy={yScale(i)} r={forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][columns.estimate]) : 4} fill={'black'} style={{ opacity: 1, filter: 'unset' }} />}
-            {forestPlot.shape === 'square' && <rect className='forest-plot--square' x={xScale(Number(d[columns.estimate]))} y={yScale(i) - rectSize / 2} width={rectSize} height={rectSize} fill={'black'} style={{ opacity: 1, filter: 'unset' }} />}
-            {forestPlot.shape === 'diamond' && <GlyphDiamond size={forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][columns.estimate]) * 5 : 4} top={yScale(i)} left={xScale(Number(d[columns.estimate]))} />}
+            <line stroke={'black'} className={`line-${d[config.yAxis.dataKey]}`} key={i} x1={xScale(d[forestPlot.lower])} x2={xScale(d[forestPlot.upper])} y1={yScale(i)} y2={yScale(i)} />
+            {forestPlot.shape === 'circle' && (
+              <Circle className='forest-plot--circle' cx={xScale(Number(d[forestPlot.estimateField]))} cy={yScale(i)} r={forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.estimateField]) : 4} fill={'black'} style={{ opacity: 1, filter: 'unset' }} />
+            )}
+            {forestPlot.shape === 'square' && <rect className='forest-plot--square' x={xScale(Number(d[forestPlot.estimateField]))} y={yScale(i) - rectSize / 2} width={rectSize} height={rectSize} fill={'black'} style={{ opacity: 1, filter: 'unset' }} />}
+            {forestPlot.shape === 'diamond' && <GlyphDiamond size={forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.estimateField]) * 5 : 4} top={yScale(i)} left={xScale(Number(d[forestPlot.estimateField]))} />}
             {forestPlot.shape === 'text' && (
-              <Text x={xScale(Number(d[columns.estimate]))} y={yScale(i)} textAnchor='middle' verticalAnchor='middle' fontSize={fontSize}>
-                {d[columns.estimate]}
+              <Text x={xScale(Number(d[forestPlot.estimateField]))} y={yScale(i)} textAnchor='middle' verticalAnchor='middle' fontSize={getFontSize(config.fontSize)}>
+                {d[forestPlot.estimateField]}
               </Text>
             )}
           </Group>

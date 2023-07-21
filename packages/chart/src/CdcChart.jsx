@@ -404,6 +404,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         : []
     }
 
+    if (newConfig.visualizationType === 'Forest Plot') {
+      newConfig.legend.hide = true
+    }
+
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
       let allKeys = newExcludedData ? newExcludedData.map(d => d[newConfig.xAxis.dataKey]) : data.map(d => d[newConfig.xAxis.dataKey])
       let allValues = newExcludedData ? newExcludedData.map(d => Number(d[newConfig?.series[0]?.dataKey])) : data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
