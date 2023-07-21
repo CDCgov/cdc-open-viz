@@ -406,6 +406,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     if (newConfig.visualizationType === 'Forest Plot') {
       newConfig.legend.hide = true
+      newConfig.orientation = 'horizontal'
+      newConfig.runtime.horizontal = true
+      newConfig.yAxis.labelPlacement = 'On Date/Category Axis'
+      newConfig.xAxis.labelPlacement = 'Value Axis'
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {

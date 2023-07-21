@@ -8,7 +8,7 @@ import { Line, Bar } from '@visx/shape'
 import { localPoint } from '@visx/event'
 import { Text } from '@visx/text'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import { useTooltip, TooltipWithBounds, useTooltipInPortal } from '@visx/tooltip'
+import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 
 // CDC Components
 import AreaChart from './AreaChart'
@@ -56,7 +56,7 @@ export default function LinearChart() {
   const { horizontal: heightHorizontal } = config.heights
   const isHorizontal = orientation === 'horizontal'
   const shouldAbbreviate = true
-  let height = config.aspectRatio ? width * config.aspectRatio : config.heights[orientation]
+  let height = config.aspectRatio ? width * config.aspectRatio : config.visualizationType === 'Forest Plot' ? config.heights['vertical'] : config.heights[orientation]
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.size)
 
@@ -95,6 +95,8 @@ export default function LinearChart() {
     const [index, keyValue] = item
     const [key, value] = keyValue
 
+    console.log('item', item)
+
     /**
      * find the original series and use the name property if available
      * otherwise default back to the original column name.
@@ -108,7 +110,7 @@ export default function LinearChart() {
     }
 
     if (visualizationType === 'Forest Plot') {
-      if (key === config.yAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.yAxis.dataKey ? `${config.yAxis.dataKey}: ` : '')} ${config.yAxis.type === 'date' ? formatDate(parseDate(key, false)) : value}`}</li>
+      if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${config.yAxis.type === 'date' ? formatDate(parseDate(key, false)) : value}`}</li>
       return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
     }
 
@@ -123,7 +125,7 @@ export default function LinearChart() {
     }
 
     if (!config.data[index] && visualizationType === 'Forest Plot') return
-    if (config.visualizationType === 'Forest Plot') return config.data[index][config.yAxis.dataKey]
+    if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
     if (runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
     if (orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
@@ -263,16 +265,16 @@ export default function LinearChart() {
 
         if (distance < minDistance) {
           minDistance = distance
-          closestYValue = d[config.yAxis.dataKey]
+          closestYValue = d[config.xAxis.dataKey]
         }
       })
       return closestYValue
     }
 
-    const xValue = data.filter(d => d[yAxis.dataKey] === getClosestYValue(y))[0]['Estimate']
+    const xValue = data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))[0][config.forestPlot.estimateField]
 
     let standardLoopItems = [
-      [config.yAxis.dataKey, getClosestYValue(y)],
+      [config.xAxis.dataKey, getClosestYValue(y)],
       ['Estimate', xValue]
     ]
 

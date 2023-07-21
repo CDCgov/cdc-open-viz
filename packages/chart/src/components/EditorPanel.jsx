@@ -252,6 +252,10 @@ const EditorPanel = () => {
     }
   }, [])
 
+  useEffect(() => {
+    console.log('ORIENTATION', config.orientation)
+  }, [])
+
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
 
   const getItemStyle = (isDragging, draggableStyle) => ({
@@ -828,6 +832,7 @@ const EditorPanel = () => {
     'Combo',
     'Deviation Bar',
     'Forecasting',
+    'Forest Plot',
     'Line',
     'Paired Bar',
     'Pie',
@@ -1148,12 +1153,16 @@ const EditorPanel = () => {
             {config.visualizationType === 'Forest Plot' && (
               <AccordionItem>
                 <AccordionItemHeading>
-                  <AccordionItemButton>Forest Plot Settings</AccordionItemButton>
+                  <AccordionItemButton>
+                    Forest Plot Settings
+                    {(!config.forestPlot.estimateField || !config.forestPlot.upper || !config.forestPlot.lower) && <WarningImage width='25' className='warning-icon' />}
+                  </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select
                     value={config.forestPlot.estimateField}
                     label='Point Estimate Column'
+                    initial={'Select'}
                     required={true}
                     onChange={e => {
                       if (e.target.value !== '' && e.target.value !== 'Select') {
@@ -1174,6 +1183,7 @@ const EditorPanel = () => {
                     value={config.forestPlot.lower}
                     label='Lower CI Column'
                     required={true}
+                    initial={'Select'}
                     onChange={e => {
                       if (e.target.value !== '' && e.target.value !== 'Select') {
                         updateConfig({
@@ -1191,6 +1201,7 @@ const EditorPanel = () => {
                   <Select
                     value={config.forestPlot.upper}
                     label='Upper CI Column'
+                    initial={'Select'}
                     required={true}
                     onChange={e => {
                       if (e.target.value !== '' && e.target.value !== 'Select') {
@@ -1211,6 +1222,7 @@ const EditorPanel = () => {
                   <Select
                     value={config.forestPlot.shape}
                     label='Point Estimate Shape'
+                    initial={'Select'}
                     onChange={e => {
                       if (e.target.value !== '' && e.target.value !== 'Select') {
                         updateConfig({
@@ -1228,7 +1240,7 @@ const EditorPanel = () => {
                   <Select
                     value={config.forestPlot.radius.scalingColumn}
                     label='Scale Radius Column'
-                    initial='- Select -'
+                    initial={'Select'}
                     onChange={e => {
                       if (e.target.value !== '' && e.target.value !== 'Select') {
                         updateConfig({
@@ -1292,7 +1304,7 @@ const EditorPanel = () => {
                       placeholder=' 1'
                     />
                   </label>
-                  <TextField min={10} max={45} value={config.forestPlot.rowHeight} updateField={updateField} section='forestPlot' type='number' fieldName='rowHeight' label='Row Height' placeholder=' 10' />
+                  <TextField min={0} max={45} value={config.forestPlot.rowHeight} updateField={updateField} section='forestPlot' type='number' fieldName='rowHeight' label='Row Height' placeholder=' 10' />
                 </AccordionItemPanel>
               </AccordionItem>
             )}
@@ -1539,34 +1551,33 @@ const EditorPanel = () => {
             <AccordionItem>
               <AccordionItemHeading>
                 <AccordionItemButton>
-                  {config.visualizationType !== 'Pie' ? (config.orientation !== 'horizontal' ? 'Left Value Axis' : 'Value Axis') : 'Data Format'}
+                  {config.visualizationType === 'Pie' ? 'Data Format' : config.orientation === 'vertical' ? 'Left Value Axis' : 'Value Axis'}
                   {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
                 </AccordionItemButton>
               </AccordionItemHeading>
               <AccordionItemPanel>
-                {config.visualizationType === 'Pie' ||
-                  (config.visualizationType === 'Forest Plot' && (
-                    <Select
-                      value={config.yAxis.dataKey || ''}
-                      section='yAxis'
-                      fieldName='dataKey'
-                      label='Data Column'
-                      initial='Select'
-                      required={true}
-                      updateField={updateField}
-                      options={getColumns(false)}
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Select the source data to be visually represented.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                    />
-                  ))}
+                {config.visualizationType === 'Pie' && (
+                  <Select
+                    value={config.yAxis.dataKey || ''}
+                    section='yAxis'
+                    fieldName='dataKey'
+                    label='Data Column'
+                    initial='Select'
+                    required={true}
+                    updateField={updateField}
+                    options={getColumns(false)}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Select the source data to be visually represented.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                )}
                 {config.visualizationType !== 'Pie' && (
                   <>
                     <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
@@ -1620,7 +1631,7 @@ const EditorPanel = () => {
                     {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                     {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
                     {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
-                    {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
+                    {(config.orientation !== 'horizontal' || (config.orientation === 'horizontal' && config.visualizationType === 'Forest Plot')) && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
                     <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
                     {config.visualizationSubType === 'regular' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
                   </>
@@ -2034,14 +2045,16 @@ const EditorPanel = () => {
             <AccordionItem>
               <AccordionItemHeading>
                 <AccordionItemButton>
-                  {config.visualizationType !== 'Pie' ? (config.visualizationType === 'Bar' ? 'Date/Category Axis' : 'Date/Category Axis') : 'Segments'}
+                  {config.visualizationType === 'Pie' ? 'Segments' : 'Date/Category Axis'}
                   {!config.xAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
                 </AccordionItemButton>
               </AccordionItemHeading>
               <AccordionItemPanel>
                 {config.visualizationType !== 'Pie' && (
                   <>
-                    <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
+                    {config.visualizationType !== 'Forest Plot' && (
+                      <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
+                    )}
                     <Select
                       value={config.xAxis.dataKey || setCategoryAxis() || ''}
                       section='xAxis'
