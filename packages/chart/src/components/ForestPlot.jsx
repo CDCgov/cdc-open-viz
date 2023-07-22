@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 
 // visx
 import { Group } from '@visx/group'
@@ -17,7 +17,7 @@ const ForestPlot = props => {
   const { forestPlot } = config
 
   return (
-    <Group left={config.yAxis.size}>
+    <Group left={config.xAxis.size}>
       {forestPlot.showZeroLine && <Line from={{ x: xScale(0), y: 0 }} to={{ x: xScale(0), y: height }} className='zero-line' stroke='gray' strokeDasharray={'5 5'} />}
 
       {data.map((d, i) => {

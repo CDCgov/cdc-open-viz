@@ -404,14 +404,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         : []
     }
 
-    if (newConfig.visualizationType === 'Forest Plot') {
-      newConfig.legend.hide = true
-      newConfig.orientation = 'horizontal'
-      newConfig.runtime.horizontal = true
-      newConfig.yAxis.labelPlacement = 'On Date/Category Axis'
-      newConfig.xAxis.labelPlacement = 'Value Axis'
-    }
-
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
       let allKeys = newExcludedData ? newExcludedData.map(d => d[newConfig.xAxis.dataKey]) : data.map(d => d[newConfig.xAxis.dataKey])
       let allValues = newExcludedData ? newExcludedData.map(d => Number(d[newConfig?.series[0]?.dataKey])) : data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
@@ -578,7 +570,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
     }
 
-    if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar'].includes(newConfig.visualizationType)) {
+    if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)) {
       newConfig.runtime.xAxis = newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis
       newConfig.runtime.horizontal = true

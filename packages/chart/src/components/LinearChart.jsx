@@ -52,7 +52,7 @@ export default function LinearChart() {
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
     width = width * 0.73
   }
-  //  configure height , yMax, xMAx
+  //  configure height , yMax, xMax
   const { horizontal: heightHorizontal } = config.heights
   const isHorizontal = orientation === 'horizontal'
   const shouldAbbreviate = true
@@ -60,7 +60,7 @@ export default function LinearChart() {
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.size)
 
-  if (visualizationType === 'Forest Plot') {
+  if (config.visualizationType === 'Forest Plot') {
     height = height + config.data.length * config.forestPlot.rowHeight
     yMax = yMax + config.data.length * config.forestPlot.rowHeight
   }
@@ -94,8 +94,6 @@ export default function LinearChart() {
   const TooltipListItem = ({ item }) => {
     const [index, keyValue] = item
     const [key, value] = keyValue
-
-    console.log('item', item)
 
     /**
      * find the original series and use the name property if available
@@ -592,27 +590,6 @@ export default function LinearChart() {
             })
           : ''}
 
-        {/* {visualizationType === 'Forest Plot' && (
-          // FOREST PLOT SERIES NAME
-          // <AxisLeft
-          //   hideZero={false}
-          //   hideTicks={config.yAxis.hideTicks}
-          //   hideLabel={config.yAxis.hideLabel}
-          //   hideAxisLine={config.yAxis.hideAxis}
-          //   scale={yScale}
-          //   top={0}
-          //   left={config.yAxis.size}
-          //   label={runtime.yAxis.label}
-          //   tickLabelProps={() => ({
-          //     dy: '0.33em',
-          //     fontSize: '14px',
-          //     textAnchor: 'end'
-          //   })}
-          //   tickFormat={(d, i) => (!config.yAxis.hideLabel ? data[i]?.['Author(s) and Year'] : '')}
-          //   numTicks={data.length}
-          // />
-        )} */}
-
         {/* Y axis */}
         {visualizationType !== 'Spark Line' && (
           <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
@@ -678,7 +655,7 @@ export default function LinearChart() {
                       </Group>
                     )
                   })}
-                  {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={runtime.horizontal ? { x: 0, y: Number(heightHorizontal) } : props.axisToPoint} stroke='#000' />}
+                  {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={runtime.horizontal ? { x: 0, y: config.visualizationType === 'Forest Plot' ? height : Number(heightHorizontal) } : props.axisToPoint} stroke='#000' />}
                   {yScale.domain()[0] < 0 && <Line from={{ x: props.axisFromPoint.x, y: yScale(0) }} to={{ x: xMax, y: yScale(0) }} stroke='#333' />}
                   {visualizationType === 'Bar' && orientation === 'horizontal' && xScale.domain()[0] < 0 && <Line from={{ x: xScale(0), y: 0 }} to={{ x: xScale(0), y: yMax }} stroke='#333' strokeWidth={2} />}
                   <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${-1 * runtime.yAxis.size}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
@@ -739,7 +716,7 @@ export default function LinearChart() {
         {/* X axis */}
         {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
           <AxisBottom
-            top={runtime.horizontal ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
+            top={runtime.horizontal && config.visualizationType !== 'Forest Plot' ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
             left={Number(runtime.yAxis.size)}
             label={runtime.xAxis.label}
             tickFormat={handleBottomTickFormatting}
@@ -1048,9 +1025,9 @@ export default function LinearChart() {
           <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
         </TooltipWithBounds>
       )}
-      {(config.orientation === 'horizontal' ||
-        config.visualizationType === 'Scatter Plot' ||
-        config.visualizationType === 'Box Plot') && <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
+      {(config.orientation === 'horizontal' || config.visualizationType === 'Scatter Plot' || config.visualizationType === 'Box Plot') && (
+        <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />
+      )}
       <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
   )
