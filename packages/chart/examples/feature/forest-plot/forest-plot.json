@@ -28,7 +28,7 @@
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "124",
+    "size": "50",
     "gridLines": false,
     "enablePadding": false,
     "min": "",
@@ -47,7 +47,9 @@
     "axisPadding": 0,
     "tickRotation": 0,
     "anchors": [],
-    "dataKey": "N"
+    "dataKey": "N",
+    "labelPlacement": "On Date/Category Axis",
+    "label": "value"
   },
   "boxplot": {
     "plots": [],
@@ -98,7 +100,7 @@
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "50",
+    "size": "200",
     "tickRotation": 0,
     "min": "",
     "max": "",
@@ -106,12 +108,13 @@
     "tickLabelColor": "#333",
     "tickColor": "#333",
     "numTicks": "10",
-    "labelOffset": 65,
+    "labelOffset": "60",
     "axisPadding": 0,
     "target": 0,
     "maxTickRotation": 0,
     "dataKey": "Author(s) and Year",
-    "label": "Units"
+    "label": "authors",
+    "labelPlacement": "On Date/Category Axis"
   },
   "table": {
     "label": "Data Table",
@@ -126,7 +129,7 @@
     "showVertical": true,
     "show": true
   },
-  "orientation": "vertical",
+  "orientation": "horizontal",
   "color": "pinkpurple",
   "columns": {
     "additionalColumn1": {
@@ -173,7 +176,7 @@
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
-    "hide": false
+    "hide": true
   },
   "exclusions": {
     "active": false,
@@ -211,12 +214,16 @@
     "opacity": 90
   },
   "forestPlot": {
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
     "estimateField": "Estimate",
     "estimateRadius": "",
     "lowerCiField": "",
     "upperCiField": "",
     "shape": "circle",
-    "rowHeight": 10,
+    "rowHeight": "19",
     "showZeroLine": true,
     "description": {
       "show": true,
