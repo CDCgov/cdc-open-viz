@@ -24,7 +24,7 @@
     "right": 5
   },
   "yAxis": {
-    "hideAxis": false,
+    "hideAxis": true,
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
@@ -43,9 +43,9 @@
     "rightAxisLabelColor": "#333",
     "rightAxisTickLabelColor": "#333",
     "rightAxisTickColor": "#333",
-    "numTicks": "",
+    "numTicks": "8",
     "axisPadding": 0,
-    "tickRotation": 0,
+    "tickRotation": "45",
     "anchors": [],
     "dataKey": "N",
     "labelPlacement": "On Date/Category Axis",
@@ -100,7 +100,7 @@
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "200",
+    "size": "300",
     "tickRotation": 0,
     "min": "",
     "max": "",
@@ -113,7 +113,7 @@
     "target": 0,
     "maxTickRotation": 0,
     "dataKey": "Author(s) and Year",
-    "label": "authors",
+    "label": "",
     "labelPlacement": "On Date/Category Axis"
   },
   "table": {
@@ -138,7 +138,10 @@
       "tooltips": false,
       "prefix": "",
       "suffix": "",
-      "name": "Author(s) and Year"
+      "name": "Author(s) and Year",
+      "forestPlot": true,
+      "startAt": "23",
+      "startingPoint": "0"
     },
     "additionalColumn2": {
       "label": "Confidence",
@@ -146,7 +149,10 @@
       "tooltips": false,
       "prefix": "",
       "suffix": "",
-      "name": "Confidence"
+      "name": "Confidence",
+      "forestPlot": true,
+      "startAt": false,
+      "startingPoint": "200"
     },
     "additionalColumn3": {
       "label": "Timing",
@@ -154,7 +160,9 @@
       "tooltips": false,
       "prefix": "",
       "suffix": "",
-      "name": "Timing"
+      "name": "Timing",
+      "startPoint": "1",
+      "startingPoint": "150"
     },
     "additionalColumn4": {
       "label": "Result",
@@ -223,7 +231,7 @@
     "lowerCiField": "",
     "upperCiField": "",
     "shape": "circle",
-    "rowHeight": "19",
+    "rowHeight": "26",
     "showZeroLine": true,
     "description": {
       "show": true,
@@ -240,9 +248,21 @@
       "max": 5,
       "scalingColumn": "Estimate"
     },
+    "width": 350,
     "hasZeroLine": true,
     "lower": "Lower",
-    "upper": "Upper"
+    "upper": "Upper",
+    "regression": {
+      "showBaseLine": true,
+      "description": "Regression model, all studies, Ln Scale (Q-pval = 0.05, I² = 39.2%)",
+      "upper": "-14.5",
+      "lower": "-43.5",
+      "estimateField": "-28.6",
+      "baseLineColor": "#87c4c3"
+    },
+    "null": {
+      "rowHeight": "31"
+    }
   },
   "datasets": {},
   "visualizationType": "Forest Plot",

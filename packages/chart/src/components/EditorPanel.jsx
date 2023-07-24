@@ -21,6 +21,8 @@ import { useFilters } from '@cdc/core/components/Filters'
 import Series from './Series'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
+import ForestPlotSettings from './ForestPlotSettings'
+
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -960,7 +962,9 @@ const EditorPanel = () => {
           dataTable: false,
           tooltips: false,
           prefix: '',
-          suffix: ''
+          suffix: '',
+          forestPlot: false,
+          startingPoint: '0'
         }
       }
     })
@@ -1150,164 +1154,7 @@ const EditorPanel = () => {
                 {config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
               </AccordionItemPanel>
             </AccordionItem>
-            {config.visualizationType === 'Forest Plot' && (
-              <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>
-                    Forest Plot Settings
-                    {(!config.forestPlot.estimateField || !config.forestPlot.upper || !config.forestPlot.lower) && <WarningImage width='25' className='warning-icon' />}
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <Select
-                    value={config.forestPlot.estimateField}
-                    label='Point Estimate Column'
-                    initial={'Select'}
-                    required={true}
-                    onChange={e => {
-                      if (e.target.value !== '' && e.target.value !== 'Select') {
-                        updateConfig({
-                          ...config,
-                          forestPlot: {
-                            ...config.forestPlot,
-                            estimateField: e.target.value
-                          }
-                        })
-                      }
-                      e.target.value = ''
-                    }}
-                    options={getColumns(false)}
-                  />
-
-                  <Select
-                    value={config.forestPlot.lower}
-                    label='Lower CI Column'
-                    required={true}
-                    initial={'Select'}
-                    onChange={e => {
-                      if (e.target.value !== '' && e.target.value !== 'Select') {
-                        updateConfig({
-                          ...config,
-                          forestPlot: {
-                            ...config.forestPlot,
-                            lower: e.target.value
-                          }
-                        })
-                      }
-                      e.target.value = ''
-                    }}
-                    options={getColumns(false)}
-                  />
-                  <Select
-                    value={config.forestPlot.upper}
-                    label='Upper CI Column'
-                    initial={'Select'}
-                    required={true}
-                    onChange={e => {
-                      if (e.target.value !== '' && e.target.value !== 'Select') {
-                        updateConfig({
-                          ...config,
-                          forestPlot: {
-                            ...config.forestPlot,
-                            upper: e.target.value
-                          }
-                        })
-                      }
-                      e.target.value = ''
-                    }}
-                    options={getColumns(false)}
-                  />
-
-                  <CheckBox value={config.forestPlot.showZeroLine} section='forestPlot' fieldName='showZeroLine' label='Show Line on Zero' updateField={updateField} />
-                  <Select
-                    value={config.forestPlot.shape}
-                    label='Point Estimate Shape'
-                    initial={'Select'}
-                    onChange={e => {
-                      if (e.target.value !== '' && e.target.value !== 'Select') {
-                        updateConfig({
-                          ...config,
-                          forestPlot: {
-                            ...config.forestPlot,
-                            shape: e.target.value
-                          }
-                        })
-                      }
-                      e.target.value = ''
-                    }}
-                    options={['text', 'circle', 'square', 'diamond']}
-                  />
-                  <Select
-                    value={config.forestPlot.radius.scalingColumn}
-                    label='Scale Radius Column'
-                    initial={'Select'}
-                    onChange={e => {
-                      if (e.target.value !== '' && e.target.value !== 'Select') {
-                        updateConfig({
-                          ...config,
-                          forestPlot: {
-                            ...config.forestPlot,
-                            radius: {
-                              ...config.forestPlot.radius,
-                              scalingColumn: e.target.value
-                            }
-                          }
-                        })
-                      }
-                      e.target.value = ''
-                    }}
-                    options={getColumns(false)}
-                  />
-                  <label>
-                    <span className='edit-label column-heading'>Radius Minimum Size</span>
-                    <input
-                      min={1}
-                      max={5}
-                      value={config.forestPlot.radius.min}
-                      onChange={e => {
-                        updateConfig({
-                          ...config,
-                          forestPlot: {
-                            ...config.forestPlot,
-                            radius: {
-                              ...config.forestPlot.radius,
-                              min: Number(e.target.value)
-                            }
-                          }
-                        })
-                      }}
-                      type='number'
-                      label='Radius Minimum'
-                      placeholder=' 1'
-                    />
-                  </label>
-                  <label>
-                    <span className='edit-label column-heading'>Radius Maximum Size</span>
-                    <input
-                      min={5}
-                      max={10}
-                      value={config.forestPlot.radius.max}
-                      onChange={e => {
-                        updateConfig({
-                          ...config,
-                          forestPlot: {
-                            ...config.forestPlot,
-                            radius: {
-                              ...config.forestPlot.radius,
-                              max: Number(e.target.value)
-                            }
-                          }
-                        })
-                      }}
-                      type='number'
-                      label='Radius Minimum'
-                      placeholder=' 1'
-                    />
-                  </label>
-                  <TextField min={0} max={45} value={config.forestPlot.rowHeight} updateField={updateField} section='forestPlot' type='number' fieldName='rowHeight' label='Row Height' placeholder=' 10' />
-                </AccordionItemPanel>
-              </AccordionItem>
-            )}
+            <ForestPlotSettings />
             {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && (
               <AccordionItem>
                 <AccordionItemHeading>
@@ -2727,6 +2574,35 @@ const EditorPanel = () => {
                               </label>
                             </li>
                                 */}
+
+                            {config.visualizationType === 'Forest Plot' && (
+                              <>
+                                <li>
+                                  <label className='checkbox'>
+                                    <input
+                                      type='checkbox'
+                                      checked={config.columns[val].forestPlot || false}
+                                      onChange={event => {
+                                        editColumn(val, 'forestPlot', event.target.checked)
+                                      }}
+                                    />
+                                    <span className='edit-label'>Show in Forest Plot</span>
+                                  </label>
+                                </li>
+                                <li>
+                                  <label className='text'>
+                                    <span className='edit-label'>Starting Point</span>
+                                    <input
+                                      type='number'
+                                      value={config.columns[val].startingPoint || 0}
+                                      onChange={event => {
+                                        editColumn(val, 'startingPoint', event.target.value)
+                                      }}
+                                    />
+                                  </label>
+                                </li>
+                              </>
+                            )}
                           </ul>
                         </fieldset>
                       ))}
