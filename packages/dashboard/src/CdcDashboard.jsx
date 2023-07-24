@@ -278,6 +278,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
   const filterData = (filters, data) => {
     let filteredData = []
+    let filteredDataTier2 = []
 
     if (data) {
       data.forEach(row => {
@@ -285,7 +286,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
         filters.forEach(filter => {
           // eslint-disable-next-line eqeqeq
-          if (filter.type !== 'url' && row[filter.columnName] != filter.active) {
+          if (filter.type !== 'url' && !filter.hideValuesWithoutData && filter.active && row[filter.columnName] != filter.active) {
             add = false
           }
         })
@@ -293,7 +294,29 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         if (add) filteredData.push(row)
       })
 
-      return filteredData
+      filters.forEach(sharedFilter => {
+        if (sharedFilter.hideValuesWithoutData) {
+          sharedFilter.values = generateValuesForFilter(sharedFilter.columnName, { data: filteredData })
+          if (sharedFilter.values.length > 0 && (!sharedFilter.active || sharedFilter.values.indexOf(sharedFilter.active) === -1)) {
+            sharedFilter.active = sharedFilter.values[0]
+          }
+        }
+      })
+
+      filteredData.forEach(row => {
+        let add = true
+
+        filters.forEach(filter => {
+          // eslint-disable-next-line eqeqeq
+          if (filter.type !== 'url' && filter.hideValuesWithoutData && filter.active && row[filter.columnName] != filter.active) {
+            add = false
+          }
+        })
+
+        if (add) filteredDataTier2.push(row)
+      })
+
+      return filteredDataTier2
     }
   }
 
@@ -418,7 +441,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     setConfig(updatedConfig)
   }
 
-  const Filters = ({hide}) => {
+  const Filters = ({ hide }) => {
     const changeFilterActive = (index, value) => {
       let dashboardConfig = { ...config.dashboard }
 
@@ -640,9 +663,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           {/* Description */}
           {description && <div className='subtext'>{parse(description)}</div>}
           {/* Filters */}
-          {config.dashboard.sharedFilters && Object.keys(config.visualizations).filter(vizKey => config.visualizations[vizKey].visualizationType === 'filter-dropdowns').length === 0 && (
-            <Filters />
-          )}
+          {config.dashboard.sharedFilters && Object.keys(config.visualizations).filter(vizKey => config.visualizations[vizKey].visualizationType === 'filter-dropdowns').length === 0 && <Filters />}
 
           {/* Visualizations */}
           {config.rows &&
@@ -757,9 +778,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   isDashboard={true}
                                 />
                               )}
-                              {visualizationConfig.type === 'filter-dropdowns' && (
-                                <Filters hide={visualizationConfig.hide} />
-                              )}
+                              {visualizationConfig.type === 'filter-dropdowns' && <Filters hide={visualizationConfig.hide} />}
                             </div>
                           </React.Fragment>
                         )
