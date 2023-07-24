@@ -591,7 +591,7 @@ export default function LinearChart() {
           : ''}
 
         {/* Y axis */}
-        {visualizationType !== 'Spark Line' && (
+        {!['Spark Line', 'Forest Plot'].includes(visualizationType) && (
           <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
             {props => {
               const axisCenter = runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
@@ -716,7 +716,13 @@ export default function LinearChart() {
         {/* X axis */}
         {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
           <AxisBottom
-            top={runtime.horizontal && config.visualizationType !== 'Forest Plot' ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
+            top={
+              runtime.horizontal && config.visualizationType !== 'Forest Plot'
+                ? Number(heightHorizontal) + Number(config.xAxis.axisPadding)
+                : config.visualizationType === 'Forest Plot'
+                ? yMax + Number(config.xAxis.axisPadding) + Number(config.forestPlot.rowHeight)
+                : yMax + Number(config.xAxis.axisPadding)
+            }
             left={Number(runtime.yAxis.size)}
             label={runtime.xAxis.label}
             tickFormat={handleBottomTickFormatting}
@@ -934,6 +940,8 @@ export default function LinearChart() {
             seriesScale={seriesScale}
             width={xMax}
             height={yMax}
+            maxWidth={width}
+            maxHeight={height}
             getXAxisData={getXAxisData}
             getYAxisData={getYAxisData}
             animatedChart={animatedChart}

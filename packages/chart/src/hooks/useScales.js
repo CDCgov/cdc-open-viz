@@ -147,9 +147,14 @@ const useScales = properties => {
   }
 
   if (visualizationType === 'Forest Plot') {
+    const margin = {
+      top: 35,
+      bottom: 35
+    }
+
     yScale = scaleLinear({
-      domain: [0, rawData.length],
-      range: [0, yMax]
+      domain: [0, rawData.length + 1],
+      range: [margin.top, yMax - margin.bottom]
     })
 
     const xAxisPadding = 5
