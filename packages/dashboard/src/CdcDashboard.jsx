@@ -278,6 +278,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
   const filterData = (filters, data) => {
     let filteredData = []
+    let filteredDataTier2 = []
 
     if (data) {
       data.forEach(row => {
@@ -285,7 +286,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
         filters.forEach(filter => {
           // eslint-disable-next-line eqeqeq
-          if (filter.type !== 'url' && row[filter.columnName] != filter.active) {
+          if (filter.type !== 'url' && !filter.hideValuesWithoutData && filter.active && row[filter.columnName] != filter.active) {
             add = false
           }
         })
@@ -293,7 +294,29 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         if (add) filteredData.push(row)
       })
 
-      return filteredData
+      filters.forEach(sharedFilter => {
+        if (sharedFilter.hideValuesWithoutData) {
+          sharedFilter.values = generateValuesForFilter(sharedFilter.columnName, { data: filteredData })
+          if (sharedFilter.values.length > 0 && (!sharedFilter.active || sharedFilter.values.indexOf(sharedFilter.active) === -1)) {
+            sharedFilter.active = sharedFilter.values[0]
+          }
+        }
+      })
+
+      filteredData.forEach(row => {
+        let add = true
+
+        filters.forEach(filter => {
+          // eslint-disable-next-line eqeqeq
+          if (filter.type !== 'url' && filter.hideValuesWithoutData && filter.active && row[filter.columnName] != filter.active) {
+            add = false
+          }
+        })
+
+        if (add) filteredDataTier2.push(row)
+      })
+
+      return filteredDataTier2
     }
   }
 
