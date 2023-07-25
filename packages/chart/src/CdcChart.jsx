@@ -42,6 +42,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 import './scss/main.scss'
+import '@cdc/core/styles/v2/main.scss'
 // load both then config below determines which to use
 import DataTable_horiz from './components/DataTable'
 import DataTable_vert from '@cdc/core/components/DataTable'
@@ -1201,7 +1202,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
 
             {/* Description */}
-            {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
+            {description && config.visualizationType !== 'Spark Line' && <div className={'column ' + config.isResponsiveTicks ? 'subtext--responsive-ticks' : 'subtext'}>{parse(description)}</div>}
 
             {/* buttons */}
             <MediaControls.Section classes={['download-buttons']}>
