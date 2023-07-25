@@ -21,34 +21,39 @@ const ForestPlot = props => {
 
   // diamond path
   const regressionPoints = [
-    { x: xScale(forestPlot.regression.lower), y: height },
-    { x: xScale(forestPlot.regression.estimateField), y: height - diamondHeight },
-    { x: xScale(forestPlot.regression.upper), y: height },
-    { x: xScale(forestPlot.regression.estimateField), y: height + diamondHeight },
-    { x: xScale(forestPlot.regression.lower), y: height }
+    { x: xScale(forestPlot.regression.lower), y: height - Number(config.forestPlot.rowHeight) },
+    { x: xScale(forestPlot.regression.estimateField), y: height - diamondHeight - Number(config.forestPlot.rowHeight) },
+    { x: xScale(forestPlot.regression.upper), y: height - Number(config.forestPlot.rowHeight) },
+    { x: xScale(forestPlot.regression.estimateField), y: height + diamondHeight - Number(config.forestPlot.rowHeight) },
+    { x: xScale(forestPlot.regression.lower), y: height - Number(config.forestPlot.rowHeight) }
   ]
 
+  const topMarginOffset = config.forestPlot.rowHeight
+
   const topLine = [
-    { x: 0, y: 0 },
-    { x: maxWidth, y: 0 }
+    { x: 0, y: topMarginOffset },
+    { x: maxWidth, y: topMarginOffset }
   ]
 
   const bottomLine = [
-    { x: 0, y: maxHeight + Number(forestPlot.rowHeight) },
-    { x: maxWidth, y: maxHeight + Number(forestPlot.rowHeight) }
+    { x: 0, y: maxHeight },
+    { x: maxWidth, y: maxHeight }
   ]
 
   const columnsOnChart = Object.entries(config.columns)
     .map(entry => entry[1])
     .filter(entry => entry.forestPlot === true)
 
-  console.log('cols', columnsOnChart)
-
   return (
     <>
-      <Group left={config.xAxis.size}>
-        {forestPlot.regression.showBaseLine && <Line from={{ x: xScale(forestPlot.regression.estimateField), y: 0 }} to={{ x: xScale(forestPlot.regression.estimateField), y: height + Number(forestPlot.rowHeight) }} className='forestplot__baseline' stroke={forestPlot.regression.baseLineColor} />}
-        {forestPlot.showZeroLine && <Line from={{ x: xScale(0), y: 0 }} to={{ x: xScale(0), y: height + Number(forestPlot.rowHeight) }} className='forestplot__zero-line' stroke='gray' strokeDasharray={'5 5'} />}
+      <Group>
+        {forestPlot.title !== '' && (
+          <Text className={`forest-plot--title`} x={Number(forestPlot.startAt) + Number(forestPlot.width / 2)} y={0} textAnchor='start' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+            {forestPlot.title}
+          </Text>
+        )}
+        {forestPlot.regression.showBaseLine && <Line from={{ x: xScale(forestPlot.regression.estimateField), y: 0 + topMarginOffset }} to={{ x: xScale(forestPlot.regression.estimateField), y: height }} className='forestplot__baseline' stroke={forestPlot.regression.baseLineColor} />}
+        {forestPlot.showZeroLine && <Line from={{ x: xScale(0), y: 0 + topMarginOffset }} to={{ x: xScale(0), y: height }} className='forestplot__zero-line' stroke='gray' strokeDasharray={'5 5'} />}
 
         {data.map((d, i) => {
           // calculate both square and circle size based on radius.min and radius.max
@@ -105,13 +110,11 @@ const ForestPlot = props => {
           )
         })}
 
-        {columnsOnChart.map(col => {})}
-
         {/* regression diamond */}
         {regressionPoints && <LinePath data={regressionPoints} x={d => d.x} y={d => d.y} stroke='black' strokeWidth={2} fill={forestPlot.regression.baseLineColor} curve={curveLinearClosed} />}
         {/* regression text */}
         {forestPlot.regression.description && (
-          <Text x={0 - Number(config.xAxis.size)} width={width} y={height - Number(forestPlot.rowHeight) / 3} verticalAnchor='start' textAnchor='start' style={{ fontWeight: 'bold', fontSize: 12 }}>
+          <Text x={0 - Number(config.xAxis.size)} width={width} y={height - config.forestPlot.rowHeight - Number(forestPlot.rowHeight) / 3} verticalAnchor='start' textAnchor='start' style={{ fontWeight: 'bold', fontSize: 12 }}>
             {forestPlot.regression.description}
           </Text>
         )}
@@ -121,15 +124,25 @@ const ForestPlot = props => {
       <Line from={topLine[0]} to={topLine[1]} style={{ stroke: 'black', strokeWidth: 2 }} className='forestplot__top-line' />
       <Line from={bottomLine[0]} to={bottomLine[1]} style={{ stroke: 'black', strokeWidth: 2 }} className='forestplot__bottom-line' />
 
+      {/* column data */}
       {columnsOnChart.map(column => {
         return data.map((d, i) => {
-          console.log('data here is', d[column])
           return (
-            <Text className={`${d[column.name]}--testing`} x={column.startingPoint} y={yScale(i)} textAnchor='start' verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+            <Text className={`${d[column.name]}`} x={column.startingPoint} y={yScale(i)} textAnchor='start' verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={'black'}>
               {d[column.name]}
             </Text>
           )
         })
+      })}
+
+      {/* column headers */}
+      {columnsOnChart.map(column => {
+        console.log('column', column)
+        return (
+          <Text className={`${column.label}`} x={column.startingPoint} y={0} textAnchor='start' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+            {column.label}
+          </Text>
+        )
       })}
     </>
   )

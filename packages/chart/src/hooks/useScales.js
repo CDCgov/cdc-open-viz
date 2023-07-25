@@ -147,21 +147,16 @@ const useScales = properties => {
   }
 
   if (visualizationType === 'Forest Plot') {
-    const margin = {
-      top: 35,
-      bottom: 35
-    }
-
     yScale = scaleLinear({
-      domain: [0, rawData.length + 1],
-      range: [margin.top, yMax - margin.bottom]
+      domain: [0, rawData.length],
+      range: [0 + config.forestPlot.rowHeight * 2, yMax - config.forestPlot.rowHeight]
     })
 
     const xAxisPadding = 5
 
     xScale = scaleLinear({
       domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
-      range: [0, xMax],
+      range: [config.forestPlot.startAt, Number(config.forestPlot.startAt) + Number(config.forestPlot.width)],
       type: 'linear'
     })
   }

@@ -1,5 +1,6 @@
 export default {
   type: 'chart',
+  debugSvg: false,
   title: '',
   showTitle: true,
   showDownloadMediaButton: false,
