@@ -243,6 +243,10 @@ const ForestPlotSettings = () => {
         </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
+        <TextField type='text' value={config.forestPlot?.title || ''} updateField={updateField} section='forestPlot' fieldName='title' label='Plot Title' />
+        <TextField type='number' value={config.forestPlot?.width || ''} updateField={updateField} section='forestPlot' fieldName='width' label='Plot Width' />
+        <TextField type='number' value={config.forestPlot?.startAt || ''} updateField={updateField} section='forestPlot' fieldName='startAt' label='Start At' />
+
         <Select
           value={config.forestPlot.estimateField}
           label='Point Estimate Column'

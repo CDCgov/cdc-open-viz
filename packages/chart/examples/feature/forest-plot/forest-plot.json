@@ -1,5 +1,6 @@
 {
   "type": "chart",
+  "debugSvg": true,
   "title": "Forest Plot Example",
   "showTitle": true,
   "showDownloadMediaButton": false,
@@ -100,7 +101,7 @@
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "300",
+    "size": "0",
     "tickRotation": 0,
     "min": "",
     "max": "",
@@ -142,17 +143,6 @@
       "forestPlot": true,
       "startAt": "23",
       "startingPoint": "0"
-    },
-    "additionalColumn2": {
-      "label": "Confidence",
-      "dataTable": true,
-      "tooltips": false,
-      "prefix": "",
-      "suffix": "",
-      "name": "Confidence",
-      "forestPlot": true,
-      "startAt": false,
-      "startingPoint": "200"
     },
     "additionalColumn3": {
       "label": "Timing",
@@ -231,7 +221,7 @@
     "lowerCiField": "",
     "upperCiField": "",
     "shape": "circle",
-    "rowHeight": "26",
+    "rowHeight": "20",
     "showZeroLine": true,
     "description": {
       "show": true,
@@ -248,7 +238,7 @@
       "max": 5,
       "scalingColumn": "Estimate"
     },
-    "width": 350,
+    "width": "200",
     "hasZeroLine": true,
     "lower": "Lower",
     "upper": "Upper",
@@ -256,13 +246,16 @@
       "showBaseLine": true,
       "description": "Regression model, all studies, Ln Scale (Q-pval = 0.05, I² = 39.2%)",
       "upper": "-14.5",
-      "lower": "-43.5",
-      "estimateField": "-28.6",
+      "lower": "#87c4c3",
+      "estimateField": "#87c4c3",
       "baseLineColor": "#87c4c3"
     },
     "null": {
       "rowHeight": "31"
-    }
+    },
+    "title": "Plot Title 2",
+    "padding": "200",
+    "startAt": "150"
   },
   "datasets": {},
   "visualizationType": "Forest Plot",

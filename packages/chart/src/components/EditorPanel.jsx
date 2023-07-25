@@ -886,9 +886,15 @@ const EditorPanel = () => {
   if (config.data && config.series) {
     Object.keys(config.data[0]).map(colName => {
       // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
-      const found = config?.series.some(el => el.dataKey === colName)
+      const found = config?.series.some(series => series.dataKey === colName)
       if (colName !== config.xAxis.dataKey && !found) {
         // if not the index then add it
+        return columnsOptions.push(
+          <option value={colName} key={colName}>
+            {colName}
+          </option>
+        )
+      } else if (config.visualizationType === 'Forest Plot') {
         return columnsOptions.push(
           <option value={colName} key={colName}>
             {colName}
@@ -2591,7 +2597,7 @@ const EditorPanel = () => {
                                 </li>
                                 <li>
                                   <label className='text'>
-                                    <span className='edit-label'>Starting Point</span>
+                                    <span className='edit-label'>Forest Plot Starting Point</span>
                                     <input
                                       type='number'
                                       value={config.columns[val].startingPoint || 0}

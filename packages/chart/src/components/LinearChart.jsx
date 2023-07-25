@@ -39,7 +39,7 @@ export default function LinearChart() {
   const { isEditor, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth } = useContext(ConfigContext)
 
   // todo: start destructuring this file for conciseness
-  const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime } = config
+  const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
 
   // getters & functions
   const getXAxisData = d => (runtime.xAxis.type === 'date' ? parseDate(d[runtime.originalXAxis.dataKey]).getTime() : d[runtime.originalXAxis.dataKey])
@@ -544,7 +544,7 @@ export default function LinearChart() {
     <></>
   ) : (
     <ErrorBoundary component='LinearChart'>
-      <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
+      <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
         <Bar width={width} height={height} fill={'transparent'}></Bar>
         {/* Highlighted regions */}
         {config.regions
@@ -716,13 +716,7 @@ export default function LinearChart() {
         {/* X axis */}
         {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
           <AxisBottom
-            top={
-              runtime.horizontal && config.visualizationType !== 'Forest Plot'
-                ? Number(heightHorizontal) + Number(config.xAxis.axisPadding)
-                : config.visualizationType === 'Forest Plot'
-                ? yMax + Number(config.xAxis.axisPadding) + Number(config.forestPlot.rowHeight)
-                : yMax + Number(config.xAxis.axisPadding)
-            }
+            top={runtime.horizontal && config.visualizationType !== 'Forest Plot' ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : config.visualizationType === 'Forest Plot' ? yMax + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
             left={Number(runtime.yAxis.size)}
             label={runtime.xAxis.label}
             tickFormat={handleBottomTickFormatting}
