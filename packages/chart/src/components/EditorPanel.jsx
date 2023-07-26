@@ -1339,47 +1339,6 @@ const EditorPanel = () => {
                   <TextField type='text' value={config.boxplot.labels.outliers} fieldName='outliers' section='boxplot' subsection='labels' label='Outliers' updateField={updateField} />
                   {/* values */}
                   <TextField type='text' value={config.boxplot.labels.values} fieldName='values' section='boxplot' subsection='labels' label='Values' updateField={updateField} />
-                  <br />
-                  <h4 style={{ fontSize: '18px' }}>Percentages for Quartiles</h4>
-                  <TextField
-                    type='number'
-                    value={config.boxplot.firstQuartilePercentage ? config.boxplot.firstQuartilePercentage : 25}
-                    fieldName='firstQuartilePercentage'
-                    section='boxplot'
-                    label='Lower Quartile'
-                    max={100}
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Represented by bottom line of box. 25% of data are lower.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-
-                  <TextField
-                    type='number'
-                    value={config.boxplot.thirdQuartilePercentage ? config.boxplot.thirdQuartilePercentage : 75}
-                    fieldName='thirdQuartilePercentage'
-                    label='Upper Quartile'
-                    section='boxplot'
-                    max={100}
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Represented by top line of box. 25% of data are higher.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
                 </AccordionItemPanel>
               </AccordionItem>
             )}
