@@ -42,7 +42,6 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 import './scss/main.scss'
-import '@cdc/core/styles/v2/main.scss'
 // load both then config below determines which to use
 import DataTable_horiz from './components/DataTable'
 import DataTable_vert from '@cdc/core/components/DataTable'
@@ -97,7 +96,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
 
-  if (isDebug) console.log('Chart config', config)
+  if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
   const DataTable = config?.table?.showVertical ? DataTable_vert : DataTable_horiz
 
@@ -1297,6 +1296,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     isNumber,
     getTextWidth,
     twoColorPalette,
+    isEditor,
     isDebug,
     setSharedFilter,
     setSharedFilterValue,

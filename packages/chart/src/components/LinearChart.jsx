@@ -564,16 +564,36 @@ export default function LinearChart() {
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
 
   const getChartHeight = useMemo(() => {
-    if (height === NaN) return 0
-
+    if (isNaN(height)) return 0
+    console.log('## isEditor=', isEditor)
     let tmpHeight = height // bc height is const
-    //const xtraBuffer = Number(runtime.xAxis.size) === 50 ? 0 : 3 // I dont know why but the math does not add up
+    // I dont know why but the math setting height does not add up and needs adjustments
     let xtraBuffer = 0
     if (Number(runtime.xAxis.size) > 50) {
-      xtraBuffer = ((runtime.xAxis.size - 50) / 10) * 3
+      xtraBuffer = ((runtime.xAxis.size - 50) / 10) * 3.1
+      if (isEditor) {
+        if (!config.isResponsiveTicks) {
+          xtraBuffer -= 2 // dont know why but its off
+        } else {
+          xtraBuffer += ((runtime.xAxis.size - 60) / 10) * 3
+          if (Number(runtime.xAxis.size) > 80) {
+            xtraBuffer -= ((runtime.xAxis.size - 80) / 10) * 2 // yes subtract it
+          }
+        }
+      }
     }
     if (Number(runtime.xAxis.size) < 50) {
       xtraBuffer = ((50 - runtime.xAxis.size) / 10) * 4.2
+      if (isEditor) {
+        if (!config.isResponsiveTicks) {
+          xtraBuffer -= ((50 - runtime.xAxis.size) / 10) * 3 // dont know why but its off
+          if (Number(runtime.xAxis.size) < 25) {
+            xtraBuffer += 2
+          }
+        } else {
+          xtraBuffer += (60 - runtime.xAxis.size) / 10
+        }
+      }
     }
     if (config.showChartBrush) {
       // need to account for SIZE (HEIGHT) which is mapped to padding?
