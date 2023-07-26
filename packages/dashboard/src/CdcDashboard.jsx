@@ -276,9 +276,23 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     setLoading(false)
   }
 
+  const findFilterTier = (filters, sharedFilter) => {
+    if(!sharedFilter.parent) {
+      return 1
+    } else {
+      let parent = filters.find(filter => filter.key === sharedFilter.parent);
+      if(!parent) return 1
+      return 1 + findFilterTier(filters, parent);
+    }
+  }
+
   const filterData = (filters, data) => {
     if (data) {
       let maxTier = 1
+      filters.forEach(sharedFilter => {
+        sharedFilter.tier = findFilterTier(filters, sharedFilter);
+      })
+
       filters.forEach(sharedFilter => {
         if (sharedFilter.tier && sharedFilter.tier > maxTier) {
           maxTier = sharedFilter.tier
