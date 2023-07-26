@@ -277,46 +277,58 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   }
 
   const filterData = (filters, data) => {
-    let filteredData = []
-    let filteredDataTier2 = []
-
     if (data) {
-      data.forEach(row => {
-        let add = true
-
-        filters.forEach(filter => {
-          // eslint-disable-next-line eqeqeq
-          if (filter.type !== 'url' && !filter.hideValuesWithoutData && filter.active && row[filter.columnName] != filter.active) {
-            add = false
-          }
-        })
-
-        if (add) filteredData.push(row)
-      })
-
+      let maxTier = 1
       filters.forEach(sharedFilter => {
-        if (sharedFilter.hideValuesWithoutData) {
-          sharedFilter.values = generateValuesForFilter(sharedFilter.columnName, { data: filteredData })
-          if (sharedFilter.values.length > 0 && (!sharedFilter.active || sharedFilter.values.indexOf(sharedFilter.active) === -1)) {
-            sharedFilter.active = sharedFilter.values[0]
-          }
+        if (sharedFilter.tier && sharedFilter.tier > maxTier) {
+          maxTier = sharedFilter.tier
         }
       })
 
+      let filteredData = data
+      for (let i = 0; i < maxTier; i++) {
+        let filteredDataSubTier = []
+
+        filteredData.forEach(row => {
+          let add = true
+
+          filters.forEach(filter => {
+            // eslint-disable-next-line eqeqeq
+            if (filter.type !== 'url' && ((!filter.tier && i === 0) || filter.tier === i + 1) && filter.active && row[filter.columnName] != filter.active) {
+              add = false
+            }
+          })
+
+          if (add) filteredDataSubTier.push(row)
+        })
+
+        filters.forEach(sharedFilter => {
+          if (sharedFilter.tier && sharedFilter.tier === i + 2) {
+            sharedFilter.values = generateValuesForFilter(sharedFilter.columnName, { data: filteredDataSubTier })
+            if (sharedFilter.values.length > 0 && (!sharedFilter.active || sharedFilter.values.indexOf(sharedFilter.active) === -1)) {
+              sharedFilter.active = sharedFilter.values[0]
+            }
+          }
+        })
+
+        filteredData = filteredDataSubTier
+      }
+
+      let filteredDataSubTier = []
       filteredData.forEach(row => {
         let add = true
 
         filters.forEach(filter => {
           // eslint-disable-next-line eqeqeq
-          if (filter.type !== 'url' && filter.hideValuesWithoutData && filter.active && row[filter.columnName] != filter.active) {
+          if (filter.type !== 'url' && filter.tier && filter.tier === maxTier - 1 && filter.active && row[filter.columnName] != filter.active) {
             add = false
           }
         })
 
-        if (add) filteredDataTier2.push(row)
+        if (add) filteredDataSubTier.push(row)
       })
 
-      return filteredDataTier2
+      return filteredDataSubTier
     }
   }
 
