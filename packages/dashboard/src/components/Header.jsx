@@ -370,6 +370,23 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
                     }}
                   />
                 </label>
+                <label>
+                  <span className='edit-label column-heading'>Parent Filter: </span>
+                  <select
+                    type='text'
+                    value={filter.parent || ''}
+                    onChange={e => {
+                      updateFilterProp('parent', index, e.target.value)
+                    }}
+                  >
+                    <option value="">Select a filter</option>
+                    {config.dashboard.sharedFilters && config.dashboard.sharedFilters.map(sharedFilter => {
+                      if(sharedFilter.key !== filter.key && sharedFilter.type !== 'url'){
+                        return <option>{sharedFilter.key}</option>
+                      }
+                    })}
+                  </select>
+                </label>
               </>
             )}
           </fieldset>
