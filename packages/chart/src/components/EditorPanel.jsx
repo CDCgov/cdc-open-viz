@@ -237,6 +237,11 @@ const EditorPanel = () => {
       ...config,
       series: newSeries
     })
+
+    // disable brush if categorical
+    if (config.xAxis.type === 'categorical') {
+      config.showChartBrush = false
+    }
   }, [config.visualizationType]) // eslint-disable-line
 
   // Scatter Plots default date/category axis is 'continuous'
