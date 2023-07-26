@@ -128,7 +128,7 @@ const ForestPlot = props => {
       {columnsOnChart.map(column => {
         return data.map((d, i) => {
           return (
-            <Text className={`${d[column.name]}`} x={column.startingPoint} y={yScale(i)} textAnchor='start' verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+            <Text className={`${d[column.name]}`} x={column.forestPlotAlignRight ? width : column.forestPlotStartingPoint} y={yScale(i)} textAnchor={column.forestPlotAlignRight ? 'end' : 'start'} verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={'black'}>
               {d[column.name]}
             </Text>
           )
@@ -139,7 +139,7 @@ const ForestPlot = props => {
       {columnsOnChart.map(column => {
         console.log('column', column)
         return (
-          <Text className={`${column.label}`} x={column.startingPoint} y={0} textAnchor='start' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+          <Text className={`${column.label}`} x={column.forestPlotAlignRight ? width : column.forestPlotStartingPoint} y={0} textAnchor={column.forestPlotAlignRight ? 'end' : 'start'} verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
             {column.label}
           </Text>
         )

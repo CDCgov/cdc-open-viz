@@ -970,7 +970,8 @@ const EditorPanel = () => {
           prefix: '',
           suffix: '',
           forestPlot: false,
-          startingPoint: '0'
+          startingPoint: '0',
+          forestPlotAlignRight: false
         }
       }
     })
@@ -2596,17 +2597,32 @@ const EditorPanel = () => {
                                   </label>
                                 </li>
                                 <li>
-                                  <label className='text'>
-                                    <span className='edit-label'>Forest Plot Starting Point</span>
+                                  <label className='checkbox'>
                                     <input
-                                      type='number'
-                                      value={config.columns[val].startingPoint || 0}
+                                      type='checkbox'
+                                      checked={config.columns[val].forestPlotAlignRight || false}
                                       onChange={event => {
-                                        editColumn(val, 'startingPoint', event.target.value)
+                                        editColumn(val, 'forestPlotAlignRight', event.target.checked)
                                       }}
                                     />
+                                    <span className='edit-label'>Align Right</span>
                                   </label>
                                 </li>
+
+                                {!config.columns[val].forestPlotAlignRight && (
+                                  <li>
+                                    <label className='text'>
+                                      <span className='edit-label'>Forest Plot Starting Point</span>
+                                      <input
+                                        type='number'
+                                        value={config.columns[val].forestPlotStartingPoint || 0}
+                                        onChange={event => {
+                                          editColumn(val, 'forestPlotStartingPoint', event.target.value)
+                                        }}
+                                      />
+                                    </label>
+                                  </li>
+                                )}
                               </>
                             )}
                           </ul>

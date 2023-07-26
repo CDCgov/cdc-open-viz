@@ -1,6 +1,6 @@
 {
   "type": "chart",
-  "debugSvg": true,
+  "debugSvg": false,
   "title": "Forest Plot Example",
   "showTitle": true,
   "showDownloadMediaButton": false,
@@ -238,7 +238,7 @@
       "max": 5,
       "scalingColumn": "Estimate"
     },
-    "width": "200",
+    "width": "500",
     "hasZeroLine": true,
     "lower": "Lower",
     "upper": "Upper",
@@ -246,8 +246,8 @@
       "showBaseLine": true,
       "description": "Regression model, all studies, Ln Scale (Q-pval = 0.05, I² = 39.2%)",
       "upper": "-14.5",
-      "lower": "#87c4c3",
-      "estimateField": "#87c4c3",
+      "lower": "13.5",
+      "estimateField": "-10",
       "baseLineColor": "#87c4c3"
     },
     "null": {
