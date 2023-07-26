@@ -319,7 +319,7 @@ const EditorPanel = memo(props => {
             </div>
           </li>
         </ul>
-        {false && (
+        {config.visualizationType === 'Gauge' && (
           <>
             <hr className='cove-accordion__divider' />
             <div className='cove-accordion__panel-section reverse-labels'>
