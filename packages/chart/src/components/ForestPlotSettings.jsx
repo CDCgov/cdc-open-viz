@@ -393,7 +393,7 @@ const ForestPlotSettings = () => {
             placeholder=' 1'
           />
         </label>
-        <TextField type='number' min={0} max={45} value={config.forestPlot.rowHeight ? config.forestPlot.rowHeight : 10} updateField={updateField} section='forestPlot' fieldName='rowHeight' label='Row Height' placeholder='10' />
+        <TextField type='number' min={20} max={45} value={config.forestPlot.rowHeight ? config.forestPlot.rowHeight : 10} updateField={updateField} section='forestPlot' fieldName='rowHeight' label='Row Height' placeholder='10' />
         <br />
         <hr />
         <br />
@@ -403,6 +403,8 @@ const ForestPlotSettings = () => {
         <TextField type='number' value={config.forestPlot?.regression?.estimateField || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='estimateField' label='Estimate Value' />
         <TextField type='text' value={config.forestPlot?.regression?.baseLineColor || 'black'} updateField={updateField} section='forestPlot' subsection='regression' fieldName='baseLineColor' label='Base Color' />
         <CheckBox value={config.forestPlot?.regression?.showBaseLine || false} section='forestPlot' subsection='regression' fieldName='showBaseLine' label='Show base line' updateField={updateField} />
+        <CheckBox value={config.forestPlot?.regression?.showDiamond || false} section='forestPlot' subsection='regression' fieldName='showDiamond' label='Show Diamond' updateField={updateField} />
+        <CheckBox value={config.forestPlot?.hideDateCategoryCol || false} section='forestPlot' fieldName='hideDateCategoryCol' label='Hide Date Category Column' updateField={updateField} />
         <TextField type='text' value={config.forestPlot?.regression?.description || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='description' label='Description' />
       </AccordionItemPanel>
     </AccordionItem>
