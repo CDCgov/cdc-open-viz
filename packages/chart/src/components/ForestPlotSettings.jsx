@@ -1,6 +1,7 @@
 import React, { useContext, memo, useState, useEffect } from 'react'
 import ConfigContext from '../ConfigContext'
 import { useDebounce } from 'use-debounce'
+import WarningImage from '../images/warning.svg'
 
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
