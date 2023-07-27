@@ -133,17 +133,9 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
               )
             })}
 
-            {/* Transparent bar for tooltips */}
+            {/* Transparent bar for tooltips - disable if AreaChart is a brush */}
             {/* prettier-ignore */}
-            <Bar
-            width={ Number(xMax)}
-            height={isBrush ? Number(yMax) / 4 : Number(yMax)}
-            fill={DEBUG ? 'red' : 'transparent'}
-            fillOpacity={0.05}
-            style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
-            onMouseMove={e => handleTooltipMouseOver(e, rawData)}
-            onMouseLeave={ handleTooltipMouseOff }
-            />
+            {!isBrush && <Bar width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />}
           </Group>
         </ErrorBoundary>
       </svg>

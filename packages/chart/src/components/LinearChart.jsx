@@ -43,7 +43,7 @@ import { defaultStyles } from '@visx/tooltip'
 import '../scss/LinearChart.scss'
 
 export default function LinearChart() {
-  const { isEditor, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
+  const { isEditor, isDashboard, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
 
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime } = config
@@ -169,7 +169,8 @@ export default function LinearChart() {
       }
     })
 
-    if (undefined !== brushFilteredData && brushFilteredData.length) {
+    // dont let the number of points go below config.xAxis.numTicks
+    if (undefined !== brushFilteredData && brushFilteredData.length >= config.xAxis.numTicks) {
       setXAxisBrushData(brushFilteredData)
     }
   }
@@ -329,6 +330,11 @@ export default function LinearChart() {
       // eslint-disable-next-line no-console
       console.error(e.message)
     }
+  }
+
+  // cant do this in handleTooltipMouseOver bc isBrush set manually into the charts below
+  const disableMouseOver = (e, data) => {
+    return () => null
   }
 
   // todo: combine mouseover functions
@@ -565,7 +571,7 @@ export default function LinearChart() {
 
   const getChartHeight = useMemo(() => {
     if (isNaN(height)) return 0
-    console.log('## isEditor=', isEditor)
+    console.log('## isEditor, isDashboard', isEditor, isDashboard)
     let tmpHeight = height // bc height is const
     // I dont know why but the math setting height does not add up and needs adjustments
     let xtraBuffer = 0
@@ -581,6 +587,16 @@ export default function LinearChart() {
           }
         }
       }
+      if (isDashboard) {
+        if (!config.isResponsiveTicks) {
+          xtraBuffer -= 2 // dont know why but its off
+        } else {
+          xtraBuffer += (runtime.xAxis.size - 50) / 10 // + 1
+          if (Number(runtime.xAxis.size) >= 80) {
+            xtraBuffer -= 2 // += ((runtime.xAxis.size - 80) / 10) * 2 // yes subtract it
+          }
+        }
+      }
     }
     if (Number(runtime.xAxis.size) < 50) {
       xtraBuffer = ((50 - runtime.xAxis.size) / 10) * 4.2
@@ -592,6 +608,16 @@ export default function LinearChart() {
           }
         } else {
           xtraBuffer += (60 - runtime.xAxis.size) / 10
+        }
+      }
+      if (isDashboard) {
+        if (!config.isResponsiveTicks) {
+          xtraBuffer -= (50 - runtime.xAxis.size) / 10 // * 3 // dont know why but its off
+          if (Number(runtime.xAxis.size) < 25) {
+            xtraBuffer += 2
+          }
+        } else {
+          xtraBuffer += ((50 - runtime.xAxis.size) / 10) * 2 + 1
         }
       }
     }
@@ -619,7 +645,8 @@ export default function LinearChart() {
     <></>
   ) : (
     <ErrorBoundary component='LinearChart'>
-      <svg width={width} height={getChartHeight} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
+      {/* width has to accommodate brush handle on right if enabled */}
+      <svg width={config.showChartBrush ? width + 5 : width} height={getChartHeight} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
         <Bar width={width} height={getChartHeight} fill={'transparent'}></Bar>
         {/* Highlighted regions */}
         {config.regions
@@ -990,6 +1017,7 @@ export default function LinearChart() {
             xScale={xScale}
             yScale={yScale}
             width={xMax}
+            le
             height={yMax}
             xScaleNoPadding={xScaleNoPadding}
             chartRef={svgRef}
@@ -1002,7 +1030,7 @@ export default function LinearChart() {
         {/* brush */}
         {config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
           <>
-            <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} height={yMaxBrush / 4} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} chartRef={svgRef} isDebug={isDebug} isBrush={true}>
+            <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} height={yMaxBrush / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>
               <PatternLines id={PATTERN_ID} height={8} width={8} stroke={accentColor} strokeWidth={1} orientation={['diagonal']} style={styles} />
               <Brush
                 id='theBrush'
