@@ -254,10 +254,6 @@ const EditorPanel = () => {
     }
   }, [])
 
-  useEffect(() => {
-    console.log('ORIENTATION', config.orientation)
-  }, [])
-
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
 
   const getItemStyle = (isDragging, draggableStyle) => ({

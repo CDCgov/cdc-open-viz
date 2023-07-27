@@ -412,9 +412,6 @@ export default function LinearChart() {
       }
     })
 
-    // Here seriesToInclude is a nested array [ ['Date', '01/01/2023'], ['Data 1', '40'], ...]
-    console.log(seriesToInclude)
-
     // filter out the series that aren't added to the map.
     if (!seriesToInclude) return
     let initialTooltipData = seriesToInclude ? seriesToInclude : {}

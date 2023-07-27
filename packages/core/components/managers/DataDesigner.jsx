@@ -9,7 +9,6 @@ import '../../styles/v2/components/data-designer.scss'
 const DataDesigner = props => {
   const { configureData, updateDescriptionProp, visualizationKey, dataKey } = props
 
-
   return (
     <div className='cove-data-designer__container'>
       <div className='mb-2'>
@@ -166,65 +165,102 @@ const DataDesigner = props => {
                     </select>
                   </div>
                   <div className='mb-2'>
-                    <div className='mb-1'>Which properties in the dataset represent the numeric value?  (all remaining properties will be treated as filters)</div>
+                    <div className='mb-1'>Which properties in the dataset represent the numeric value? (all remaining properties will be treated as filters)</div>
                     {configureData.dataDescription.valueKeys && configureData.dataDescription.valueKeys.length > 0 && (
-                      <ul className="value-list">
+                      <ul className='value-list'>
                         {configureData.dataDescription.valueKeys.map((valueKey, index) => (
-                          <li key={`value-keys-list-${index}`}>{valueKey}<button onClick={() => {
-                            let newValueKeys = configureData.dataDescription.valueKeys;
-                            newValueKeys.splice(index, 1);
-                            updateDescriptionProp(visualizationKey, dataKey, 'valueKeys', newValueKeys)
-                          }}>X</button></li>
+                          <li key={`value-keys-list-${index}`}>
+                            {valueKey}
+                            <button
+                              onClick={() => {
+                                let newValueKeys = configureData.dataDescription.valueKeys
+                                newValueKeys.splice(index, 1)
+                                updateDescriptionProp(visualizationKey, dataKey, 'valueKeys', newValueKeys)
+                              }}
+                            >
+                              X
+                            </button>
+                          </li>
                         ))}
                       </ul>
                     )}
                     <select
                       onChange={e => {
-                        if(e.target.value && (!configureData.dataDescription.valueKeys || configureData.dataDescription.valueKeys.indexOf(e.target.value) === -1)){
+                        if (e.target.value && (!configureData.dataDescription.valueKeys || configureData.dataDescription.valueKeys.indexOf(e.target.value) === -1)) {
                           updateDescriptionProp(visualizationKey, dataKey, 'valueKeys', [...(configureData.dataDescription.valueKeys || []), e.target.value])
                         }
                       }}
                     >
                       <option value=''>Choose an option</option>
-                      {Object.keys(configureData.data[0]).filter(value => !configureData.dataDescription.valueKeys || configureData.dataDescription.valueKeys.indexOf(value) === -1).map((value, index) => (
-                        <option value={value} key={`value-keys-option-${index}`}>
-                          {value}
-                        </option>
-                      ))}
+                      {Object.keys(configureData.data[0])
+                        .filter(value => !configureData.dataDescription.valueKeys || configureData.dataDescription.valueKeys.indexOf(value) === -1)
+                        .map((value, index) => (
+                          <option value={value} key={`value-keys-option-${index}`}>
+                            {value}
+                          </option>
+                        ))}
                     </select>
                   </div>
                   <div className='mb-2'>
-                    <div className='mb-1'>(Optional) Which properties in the dataset should be ignored?  (will not be used or treated as filters)</div>
+                    <div className='mb-1'>(Optional) Which properties in the dataset should be ignored? (will not be used or treated as filters)</div>
                     {configureData.dataDescription.ignoredKeys && configureData.dataDescription.ignoredKeys.length > 0 && (
-                      <ul className="value-list">
+                      <ul className='value-list'>
                         {configureData.dataDescription.ignoredKeys.map((ignoredKey, index) => (
-                          <li key={`value-keys-list-${index}`}>{ignoredKey}<button onClick={() => {
-                            let newIgnoredKeys = configureData.dataDescription.ignoredKeys;
-                            newIgnoredKeys.splice(index, 1);
-                            updateDescriptionProp(visualizationKey, dataKey, 'ignoredKeys', newIgnoredKeys)
-                          }}>X</button></li>
+                          <li key={`value-keys-list-${index}`}>
+                            {ignoredKey}
+                            <button
+                              onClick={() => {
+                                let newIgnoredKeys = configureData.dataDescription.ignoredKeys
+                                newIgnoredKeys.splice(index, 1)
+                                updateDescriptionProp(visualizationKey, dataKey, 'ignoredKeys', newIgnoredKeys)
+                              }}
+                            >
+                              X
+                            </button>
+                          </li>
                         ))}
                       </ul>
                     )}
                     <select
                       onChange={e => {
-                        if(e.target.value){
+                        if (e.target.value) {
                           updateDescriptionProp(visualizationKey, dataKey, 'ignoredKeys', [...(configureData.dataDescription.ignoredKeys || []), e.target.value])
                         }
-                        e.target.value = '';
+                        e.target.value = ''
                       }}
                     >
                       <option value=''>Choose an option</option>
-                      {Object.keys(configureData.data[0]).filter(value => !configureData.dataDescription.ignoredKeys || configureData.dataDescription.ignoredKeys.indexOf(value) === -1).map((value, index) => (
-                        <option value={value} key={`ignored-keys-option-${index}`}>
-                          {value}
-                        </option>
-                      ))}
+                      {Object.keys(configureData.data[0])
+                        .filter(value => !configureData.dataDescription.ignoredKeys || configureData.dataDescription.ignoredKeys.indexOf(value) === -1)
+                        .map((value, index) => (
+                          <option value={value} key={`ignored-keys-option-${index}`}>
+                            {value}
+                          </option>
+                        ))}
                     </select>
                   </div>
                 </>
               )}
             </>
+          )}
+
+          {config.visualizationType === 'Forest Plot' && (
+            <div className='mb-2'>
+              <div className='mb-1'>Which column represents the date/category column?</div>
+              <select
+                onChange={e => {
+                  updateDescriptionProp(visualizationKey, dataKey, 'seriesKey', e.target.value)
+                }}
+                defaultValue={configureData.dataDescription.seriesKey}
+              >
+                <option value=''>Choose an option</option>
+                {Object.keys(configureData.data[0]).map((value, index) => (
+                  <option value={value} key={index}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
         </>
       )}

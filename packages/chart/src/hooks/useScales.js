@@ -147,16 +147,24 @@ const useScales = properties => {
   }
 
   if (visualizationType === 'Forest Plot') {
+    const resolvedYRange = () => {
+      if (config.forestPlot.regression.showDiamond || config.forestPlot.regression.description) {
+        return [0 + config.forestPlot.rowHeight * 2, yMax - config.forestPlot.rowHeight]
+      } else {
+        return [0 + config.forestPlot.rowHeight * 2, yMax]
+      }
+    }
+
     yScale = scaleLinear({
       domain: [0, rawData.length],
-      range: [0 + config.forestPlot.rowHeight * 2, yMax - config.forestPlot.rowHeight]
+      range: resolvedYRange()
     })
 
     const xAxisPadding = 5
 
     xScale = scaleLinear({
       domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
-      range: [config.forestPlot.startAt, Number(config.forestPlot.startAt) + Number(config.forestPlot.width)],
+      range: [config.forestPlot.startAt, Number(config.forestPlot.startAt) + Number(config.forestPlot.width === 'auto' ? xMax : config.forestPlot.width)],
       type: 'linear'
     })
   }

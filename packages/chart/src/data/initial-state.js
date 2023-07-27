@@ -176,6 +176,8 @@ export default {
     opacity: 90
   },
   forestPlot: {
+    startAt: 0,
+    width: 'auto',
     colors: {
       line: '',
       shape: ''
@@ -185,7 +187,7 @@ export default {
     lowerCiField: '',
     upperCiField: '',
     shape: '',
-    rowHeight: 10,
+    rowHeight: 20,
     showZeroLine: false,
     description: {
       show: true,

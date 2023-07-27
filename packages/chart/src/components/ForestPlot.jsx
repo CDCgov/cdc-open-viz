@@ -13,9 +13,28 @@ import ConfigContext from '../ConfigContext'
 import { getFontSize } from '@cdc/core/helpers/cove/number'
 
 const ForestPlot = props => {
-  const { rawData: data } = useContext(ConfigContext)
+  const { rawData: data, updateConfig } = useContext(ConfigContext)
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver, maxWidth, maxHeight } = props
   const { forestPlot, runtime, dataFormat } = config
+
+  // Requirements for forest plot
+  // - force legend to be hidden for this chart type
+  // - reset the date category axis to zero
+  useEffect(() => {
+    if (!config.legend.hide) {
+      updateConfig({
+        ...config,
+        legend: {
+          ...config.legend,
+          hide: true
+        },
+        xAxis: {
+          ...config.xAxis,
+          size: 0
+        }
+      })
+    }
+  }, [])
 
   const diamondHeight = 5
 
@@ -48,7 +67,7 @@ const ForestPlot = props => {
     <>
       <Group>
         {forestPlot.title !== '' && (
-          <Text className={`forest-plot--title`} x={Number(forestPlot.startAt) + Number(forestPlot.width / 2)} y={0} textAnchor='start' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+          <Text className={`forest-plot--title`} x={Number(forestPlot.startAt) + Number(forestPlot.width === 'auto' ? width : forestPlot.width / 2)} y={0} textAnchor='start' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
             {forestPlot.title}
           </Text>
         )}
@@ -111,7 +130,7 @@ const ForestPlot = props => {
         })}
 
         {/* regression diamond */}
-        {regressionPoints && <LinePath data={regressionPoints} x={d => d.x} y={d => d.y} stroke='black' strokeWidth={2} fill={forestPlot.regression.baseLineColor} curve={curveLinearClosed} />}
+        {regressionPoints && forestPlot.regression.showDiamond && <LinePath data={regressionPoints} x={d => d.x} y={d => d.y} stroke='black' strokeWidth={2} fill={forestPlot.regression.baseLineColor} curve={curveLinearClosed} />}
         {/* regression text */}
         {forestPlot.regression.description && (
           <Text x={0 - Number(config.xAxis.size)} width={width} y={height - config.forestPlot.rowHeight - Number(forestPlot.rowHeight) / 3} verticalAnchor='start' textAnchor='start' style={{ fontWeight: 'bold', fontSize: 12 }}>
@@ -135,9 +154,25 @@ const ForestPlot = props => {
         })
       })}
 
+      {/* X Axis DataKey Cols*/}
+      {!forestPlot.hideDateCategoryCol &&
+        data.map((d, i) => {
+          return (
+            <Text className={`${d[config.xAxis.dataKey]}`} x={0} y={yScale(i)} textAnchor={'start'} verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+              {d[config.xAxis.dataKey]}
+            </Text>
+          )
+        })}
+
+      {/* X Axis Datakey Header */}
+      {!forestPlot.hideDateCategoryCol && config.xAxis.dataKey && (
+        <Text className={config.xAxis.dataKey} x={0} y={0} textAnchor={'start'} verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+          {config.xAxis.dataKey}
+        </Text>
+      )}
+
       {/* column headers */}
       {columnsOnChart.map(column => {
-        console.log('column', column)
         return (
           <Text className={`${column.label}`} x={column.forestPlotAlignRight ? width : column.forestPlotStartingPoint} y={0} textAnchor={column.forestPlotAlignRight ? 'end' : 'start'} verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
             {column.label}
