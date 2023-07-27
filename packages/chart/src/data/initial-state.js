@@ -201,6 +201,11 @@ export default {
       min: 1,
       max: 8,
       scalingColumn: ''
+    },
+    regression: {
+      lower: 0,
+      upper: 0,
+      estimateField: 0
     }
   }
 }
