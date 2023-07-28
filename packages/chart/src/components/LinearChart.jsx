@@ -100,7 +100,7 @@ export default function LinearChart() {
   let dynamicMarginTop = 0 || config.dynamicMarginTop // need to init this up top so calc for height can work
   const marginTop = 20
   let yMaxBrush = config.isResponsiveTicks && config.showChartBrush ? yMax + config.dynamicMarginTop / 4 + marginTop : yMax
-  console.log('yMaxBrush', yMaxBrush)
+  //console.log('yMaxBrush', yMaxBrush)
   // account for brush data changes
   const brushData = undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data
 
@@ -160,17 +160,17 @@ export default function LinearChart() {
     let brushFilteredData = []
     brushFilteredData = config.data.filter(s => {
       const x = getDate(s).getTime()
-      //console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
+      console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
       //const y = getStockValue(s)
       if (x > x0 && x < x1) {
-        //let date = formatDate(getXValueFromCoordinateDate(x))
-        //console.log('YES ADD', date)
+        let date = formatDate(getXValueFromCoordinateDate(x))
+        console.log('YES ADD', date)
         return s
       }
     })
 
-    // dont let the number of points go below config.xAxis.numTicks
-    if (undefined !== brushFilteredData && brushFilteredData.length >= config.xAxis.numTicks) {
+    // dont let the number of points go below config.xAxis.numTicks ??? (TT)
+    if (undefined !== brushFilteredData && brushFilteredData.length) {
       setXAxisBrushData(brushFilteredData)
     }
   }
@@ -571,7 +571,7 @@ export default function LinearChart() {
 
   const getChartHeight = useMemo(() => {
     if (isNaN(height)) return 0
-    console.log('## isEditor, isDashboard', isEditor, isDashboard)
+
     let tmpHeight = height // bc height is const
     // I dont know why but the math setting height does not add up and needs adjustments
     let xtraBuffer = 0
@@ -628,11 +628,10 @@ export default function LinearChart() {
       } else {
         tmpHeight += 50 - runtime.xAxis.size
       }
-      console.log('padding config.yAxis.size runtime.XAxis.size tmpHeight xtraBuffer', padding, config.yAxis.size, config.runtime.xAxis.size, tmpHeight, xtraBuffer)
+      //console.log('padding config.yAxis.size runtime.XAxis.size tmpHeight xtraBuffer', padding, config.yAxis.size, config.runtime.xAxis.size, tmpHeight, xtraBuffer)
       if (!config.isResponsiveTicks) {
         return runtime.xAxis.size > 50 ? (tmpHeight - xtraBuffer) * 1.3 : (tmpHeight + xtraBuffer) * 1.3
       } else {
-        console.log('height, dynamicMarginTop', height, dynamicMarginTop)
         tmpHeight = (tmpHeight + dynamicMarginTop) * 1.3 - yMaxBrush * 0.25 - marginTop / 4
         return runtime.xAxis.size > 50 ? tmpHeight - xtraBuffer : tmpHeight + xtraBuffer
       }
@@ -855,7 +854,7 @@ export default function LinearChart() {
 
               dynamicMarginTop = areTicksTouching && config.isResponsiveTicks ? tickWidthMax + defaultTickLength + marginTop : 0
               config.dynamicMarginTop = dynamicMarginTop
-              console.log('dynamicMarginTop', dynamicMarginTop)
+
               return (
                 <Group className='bottom-axis'>
                   {props.ticks.map((tick, i) => {
