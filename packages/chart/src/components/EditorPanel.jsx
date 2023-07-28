@@ -668,7 +668,7 @@ const EditorPanel = () => {
 
   useEffect(() => {
     if (config.orientation === 'vertical') {
-      updateConfig({ ...config, isResponsiveTicks: false })
+      //updateConfig({ ...config, isResponsiveTicks: false })
     }
   }, [config.orientation])
 
