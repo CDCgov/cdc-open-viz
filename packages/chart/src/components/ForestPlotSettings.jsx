@@ -245,7 +245,64 @@ const ForestPlotSettings = () => {
       </AccordionItemHeading>
       <AccordionItemPanel>
         <TextField type='text' value={config.forestPlot?.title || ''} updateField={updateField} section='forestPlot' fieldName='title' label='Plot Title' />
-        <TextField type='number' value={config.forestPlot?.width || ''} updateField={updateField} section='forestPlot' fieldName='width' label='Plot Width' />
+
+        {/* width in center */}
+        <label>
+          <span className='edit-label column-heading'>Forest Plot Width</span>
+          <input
+            type='number'
+            min={0}
+            max={100}
+            value={config.forestPlot.width || ''}
+            onChange={e => {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  width: e.target.value
+                }
+              })
+            }}
+          />
+        </label>
+
+        <label>
+          <span className='edit-label column-heading'>Forest Left Percentage Offset</span>
+          <input
+            type='number'
+            min={0}
+            max={100}
+            value={config.forestPlot.leftWidthOffset || ''}
+            onChange={e => {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  leftWidthOffset: e.target.value
+                }
+              })
+            }}
+          />
+        </label>
+
+        <label>
+          <span className='edit-label column-heading'>Forest Right Percentage Offset</span>
+          <input
+            type='number'
+            min={0}
+            max={100}
+            value={config.forestPlot.rightWidthOffset || ''}
+            onChange={e => {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  rightWidthOffset: e.target.value
+                }
+              })
+            }}
+          />
+        </label>
         <TextField type='number' value={config.forestPlot?.startAt || ''} updateField={updateField} section='forestPlot' fieldName='startAt' label='Start At' />
 
         <Select

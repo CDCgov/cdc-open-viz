@@ -149,7 +149,9 @@
       "tooltips": false,
       "prefix": "",
       "suffix": "",
-      "name": "Result"
+      "name": "Result",
+      "forestPlotAlignRight": true,
+      "forestPlot": true
     }
   },
   "legend": {
@@ -166,7 +168,7 @@
     "hide": true
   },
   "exclusions": {
-    "active": false,
+    "active": true,
     "keys": []
   },
   "palette": "qualitative-bold",
@@ -201,8 +203,8 @@
     "opacity": 90
   },
   "forestPlot": {
-    "startAt": "150",
-    "width": "500",
+    "startAt": "0",
+    "width": "100",
     "colors": {
       "line": "",
       "shape": ""
@@ -233,7 +235,7 @@
       "showBaseLine": true,
       "description": "Regression model, all studies, Ln Scale (Q-pval = 0.05, I² = 39.2%)",
       "upper": "-14.5",
-      "lower": "13.5",
+      "lower": "#87c4c3",
       "estimateField": "-10",
       "baseLineColor": "#87c4c3"
     },
@@ -244,7 +246,9 @@
       "rowHeight": "31"
     },
     "title": "Plot Title 2",
-    "padding": "200"
+    "padding": "200",
+    "leftWidthOffset": "38",
+    "rightWidthOffset": "28"
   },
   "datasets": {},
   "visualizationType": "Forest Plot",

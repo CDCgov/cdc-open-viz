@@ -63,11 +63,13 @@ const ForestPlot = props => {
     .map(entry => entry[1])
     .filter(entry => entry.forestPlot === true)
 
+  const center = ((Number(config.forestPlot.width) / 100) * width) / 2
+
   return (
     <>
       <Group>
         {forestPlot.title !== '' && (
-          <Text className={`forest-plot--title`} x={Number(forestPlot.startAt) + Number(forestPlot.width === 'auto' ? width : forestPlot.width / 2)} y={0} textAnchor='start' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+          <Text className={`forest-plot--title`} x={center} y={0} textAnchor='start' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
             {forestPlot.title}
           </Text>
         )}
@@ -166,7 +168,7 @@ const ForestPlot = props => {
 
       {/* X Axis Datakey Header */}
       {!forestPlot.hideDateCategoryCol && config.xAxis.dataKey && (
-        <Text className={config.xAxis.dataKey} x={0} y={0} textAnchor={'start'} verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+        <Text className={config.xAxis.dataKey} x={0} y={0} textAnchor={'start'} verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
           {config.xAxis.dataKey}
         </Text>
       )}

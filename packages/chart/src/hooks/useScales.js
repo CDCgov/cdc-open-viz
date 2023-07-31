@@ -162,9 +162,12 @@ const useScales = properties => {
 
     const xAxisPadding = 5
 
+    const leftWidthOffset = (Number(config.forestPlot.leftWidthOffset) / 100) * xMax
+    const rightWidthOffset = (Number(config.forestPlot.rightWidthOffset) / 100) * xMax
+
     xScale = scaleLinear({
       domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
-      range: [config.forestPlot.startAt, Number(config.forestPlot.startAt) + Number(config.forestPlot.width === 'auto' ? xMax : config.forestPlot.width)],
+      range: [leftWidthOffset, Number(config.forestPlot.startAt) + Number(config.forestPlot.width === 'auto' || config.forestPlot.width === '' ? xMax : (Number(config.forestPlot.width) / 100) * xMax - rightWidthOffset)],
       type: 'linear'
     })
   }
