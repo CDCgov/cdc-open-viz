@@ -21,7 +21,6 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
   data = !isBrush && undefined !== brushData && brushData.length ? brushData : data
 
   if (isBrush && isDebug) console.log('###AREAchart BRUSH data, xScale, yScale, yMax, xMax', data, xScale, yScale, yMax, xMax)
-  //if (isBrush && isDebug) console.log('###AREAchart BRUSH yMax, xMax', yMax, xMax)
 
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
@@ -113,7 +112,6 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
                   yScale={yScale}
                   curve={curveType}
                   strokeDasharray={s.type ? handleLineType(s.type) : 0}
-                  style={isBrush ? { border: '2px solid green' } : {}}
                   />
 
                   {/* circles that appear on hover */}

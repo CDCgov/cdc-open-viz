@@ -100,7 +100,6 @@ export default function LinearChart() {
   let dynamicMarginTop = 0 || config.dynamicMarginTop // need to init this up top so calc for height can work
   const marginTop = 20
   let yMaxBrush = config.isResponsiveTicks && config.showChartBrush ? yMax + config.dynamicMarginTop / 4 + marginTop : yMax
-  //console.log('yMaxBrush', yMaxBrush)
   // account for brush data changes
   const brushData = undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data
 
@@ -160,11 +159,11 @@ export default function LinearChart() {
     let brushFilteredData = []
     brushFilteredData = config.data.filter(s => {
       const x = getDate(s).getTime()
-      console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
+      //console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
       //const y = getStockValue(s)
       if (x > x0 && x < x1) {
         let date = formatDate(getXValueFromCoordinateDate(x))
-        console.log('YES ADD', date)
+        //console.log('YES ADD', date)
         return s
       }
     })
