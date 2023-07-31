@@ -1,4 +1,5 @@
 import React, { forwardRef, useContext, useEffect, useRef, useState, useMemo } from 'react'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -1131,9 +1132,9 @@ export default function LinearChart() {
           <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
         </TooltipWithBounds>
       )}
-      {(config.orientation === 'horizontal' ||
-        config.visualizationType === 'Scatter Plot' ||
-        config.visualizationType === 'Box Plot') && <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
+      {(config.orientation === 'horizontal' || config.visualizationType === 'Scatter Plot' || config.visualizationType === 'Box Plot') && (
+        <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />
+      )}
       <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
   )
