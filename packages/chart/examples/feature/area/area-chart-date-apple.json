@@ -5179,7 +5179,7 @@
   "barSpace": 20,
   "height": 300,
   "xAxis": {
-    "type": "Date",
+    "type": "date",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
