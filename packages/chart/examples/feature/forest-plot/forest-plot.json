@@ -133,17 +133,6 @@
   "orientation": "horizontal",
   "color": "pinkpurple",
   "columns": {
-    "additionalColumn1": {
-      "label": "Author(s) & Year",
-      "dataTable": true,
-      "tooltips": false,
-      "prefix": "",
-      "suffix": "",
-      "name": "Author(s) and Year",
-      "forestPlot": true,
-      "startAt": "23",
-      "startingPoint": "0"
-    },
     "additionalColumn3": {
       "label": "Timing",
       "dataTable": true,
@@ -212,6 +201,8 @@
     "opacity": 90
   },
   "forestPlot": {
+    "startAt": "150",
+    "width": "500",
     "colors": {
       "line": "",
       "shape": ""
@@ -238,10 +229,6 @@
       "max": 5,
       "scalingColumn": "Estimate"
     },
-    "width": "500",
-    "hasZeroLine": true,
-    "lower": "Lower",
-    "upper": "Upper",
     "regression": {
       "showBaseLine": true,
       "description": "Regression model, all studies, Ln Scale (Q-pval = 0.05, I² = 39.2%)",
@@ -250,12 +237,14 @@
       "estimateField": "-10",
       "baseLineColor": "#87c4c3"
     },
+    "hasZeroLine": true,
+    "lower": "Lower",
+    "upper": "Upper",
     "null": {
       "rowHeight": "31"
     },
     "title": "Plot Title 2",
-    "padding": "200",
-    "startAt": "150"
+    "padding": "200"
   },
   "datasets": {},
   "visualizationType": "Forest Plot",
