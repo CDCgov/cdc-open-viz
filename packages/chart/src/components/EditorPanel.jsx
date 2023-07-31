@@ -666,12 +666,6 @@ const EditorPanel = () => {
     }
   }, [config.visualizationType])
 
-  useEffect(() => {
-    if (config.orientation === 'vertical') {
-      //updateConfig({ ...config, isResponsiveTicks: false })
-    }
-  }, [config.orientation])
-
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
     return (
@@ -1367,47 +1361,6 @@ const EditorPanel = () => {
                   <TextField type='text' value={config.boxplot.labels.outliers} fieldName='outliers' section='boxplot' subsection='labels' label='Outliers' updateField={updateField} />
                   {/* values */}
                   <TextField type='text' value={config.boxplot.labels.values} fieldName='values' section='boxplot' subsection='labels' label='Values' updateField={updateField} />
-                  <br />
-                  <h4 style={{ fontSize: '18px' }}>Percentages for Quartiles</h4>
-                  <TextField
-                    type='number'
-                    value={config.boxplot.firstQuartilePercentage ? config.boxplot.firstQuartilePercentage : 25}
-                    fieldName='firstQuartilePercentage'
-                    section='boxplot'
-                    label='Lower Quartile'
-                    max={100}
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Represented by bottom line of box. 25% of data are lower.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-
-                  <TextField
-                    type='number'
-                    value={config.boxplot.thirdQuartilePercentage ? config.boxplot.thirdQuartilePercentage : 75}
-                    fieldName='thirdQuartilePercentage'
-                    label='Upper Quartile'
-                    section='boxplot'
-                    max={100}
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Represented by top line of box. 25% of data are higher.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
                 </AccordionItemPanel>
               </AccordionItem>
             )}
@@ -1466,9 +1419,9 @@ const EditorPanel = () => {
                         </Tooltip>
                       }
                     />
-                    {config.orientation === 'horizontal' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
+                    {config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
                     {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation} type='number' min='0' section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
-                    {config.isResponsiveTicks && config.orientation === 'horizontal' && (
+                    {config.isResponsiveTicks && config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && (
                       <TextField
                         value={config.xAxis.maxTickRotation}
                         type='number'
@@ -2123,9 +2076,9 @@ const EditorPanel = () => {
                         <TextField value={config.dataFormat.bottomRoundTo} type='number' section='dataFormat' fieldName='bottomRoundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
                       </>
                     )}
-                    {config.orientation === 'vertical' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
+                    {config.orientation === 'vertical' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
                     {(config.orientation === 'horizontal' || !config.isResponsiveTicks) && <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
-                    {config.orientation === 'vertical' && config.isResponsiveTicks && (
+                    {config.orientation === 'vertical' && config.isResponsiveTicks && config.visualizationType !== 'Paired Bar' && (
                       <TextField
                         value={config.xAxis.maxTickRotation}
                         type='number'

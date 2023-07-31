@@ -16,7 +16,7 @@ export default {
   barStyle: '',
   roundingStyle: 'standard',
   tipRounding: 'top',
-  isResponsiveTicks: true,
+  isResponsiveTicks: false,
   general: {
     showDownloadButton: false
   },
