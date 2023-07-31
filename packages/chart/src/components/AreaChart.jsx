@@ -112,7 +112,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
                   yScale={yScale}
                   curve={curveType}
                   strokeDasharray={s.type ? handleLineType(s.type) : 0}
-                  />
+                />
 
                   {/* circles that appear on hover */}
                   {/* !isBrush && tooltipData && Object.entries(tooltipData.data).length > 0 && (
