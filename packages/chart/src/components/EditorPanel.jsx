@@ -22,6 +22,7 @@ import Series from './Series'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 import ForestPlotSettings from './ForestPlotSettings'
+import { useEditorPermissions } from '../hooks/useEditorPermissions'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -215,6 +216,8 @@ const EditorPanel = () => {
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
+
+  const { enabledChartTypes, visSupportsTooltipLines, visSupportsNonSequentialPallete, visSupportsSequentialPallete, visSupportsReverseColorPalette, visHasLabelOnData, visHasNumbersOnBars, visHasAnchors, visHasBarBorders, visHasDataCutoff, visCanAnimate, visHasLegend } = useEditorPermissions()
 
   // argument acts as props
   const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config, setConfig: updateConfig, filteredData: data, setFilteredData })
@@ -666,93 +669,6 @@ const EditorPanel = () => {
     )
   }, [config]) // eslint-disable-line
 
-  const visSupportsTooltipLines = () => {
-    const chartsWithTooltipGuides = ['Combo', 'Forecasting', 'Area Chart', 'Line', 'Bar', 'Forest Plot']
-    if (chartsWithTooltipGuides.includes(config.visualizationType)) return true
-    return false
-  }
-
-  const visHasLegend = () => {
-    const { visualizationType } = config
-
-    switch (visualizationType) {
-      case 'Box Plot':
-        return false
-      case 'Forest Plot':
-        return false
-      default:
-        return true
-    }
-  }
-
-  const visCanAnimate = () => {
-    const { visualizationType } = config
-    switch (visualizationType) {
-      case 'Area Chart':
-        return false
-      case 'Scatter Plot':
-        return false
-      case 'Box Plot':
-        return false
-      default:
-        return true
-    }
-  }
-
-  const visHasDataCutoff = () => {
-    const { visualizationType } = config
-    switch (visualizationType) {
-      case 'Box Plot':
-        return false
-      case 'Pie':
-        return false
-      default:
-        return true
-    }
-  }
-
-  const visHasLabelOnData = () => {
-    const { visualizationType } = config
-    switch (visualizationType) {
-      case 'Area Chart':
-        return false
-      case 'Box Plot':
-        return false
-      case 'Pie':
-        return false
-      case 'Scatter Plot':
-        return false
-      default:
-        return true
-    }
-  }
-
-  const visHasAnchors = () => {
-    const { visualizationType } = config
-    switch (visualizationType) {
-      case 'Area Chart':
-        return true
-      case 'Combo':
-        return true
-      case 'Line':
-        return true
-      case 'Bar':
-        return true
-      case 'Scatter Plot':
-        return true
-      default:
-        return false
-    }
-  }
-
-  const visHasBarBorders = () => {
-    const { series, visualizationType } = config
-    if (visualizationType === 'Box Plot') return false
-    if (visualizationType === 'Scatter Plot') return false
-    if (visualizationType === 'Pie') return false
-    return series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar' || series.type === 'Deviation Bar')
-  }
-
   const handleSeriesChange = (idx1, idx2) => {
     let seriesOrder = config.series
     let [movedItem] = seriesOrder.splice(idx1, 1)
@@ -822,22 +738,6 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
-  // prettier-ignore
-  const enabledChartTypes = [
-    'Area Chart',
-    'Bar',
-    'Box Plot',
-    'Combo',
-    'Deviation Bar',
-    'Forecasting',
-    'Forest Plot',
-    'Line',
-    'Paired Bar',
-    'Pie',
-    'Scatter Plot',
-    'Spark Line'
-  ]
-
   const isLoadedFromUrl = config?.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
 
   // if isDebug = true, then try to set the category and data col to reduce clicking
@@ -885,12 +785,6 @@ const EditorPanel = () => {
       const found = config?.series.some(series => series.dataKey === colName)
       if (colName !== config.xAxis.dataKey && !found) {
         // if not the index then add it
-        return columnsOptions.push(
-          <option value={colName} key={colName}>
-            {colName}
-          </option>
-        )
-      } else if (config.visualizationType === 'Forest Plot') {
         return columnsOptions.push(
           <option value={colName} key={colName}>
             {colName}
@@ -1054,7 +948,7 @@ const EditorPanel = () => {
                   <Select value={config.roundingStyle || 'standard'} fieldName='roundingStyle' label='rounding style' updateField={updateField} options={['standard', 'shallow', 'finger']} />
                 )}
                 {config.visualizationType === 'Bar' && config.orientation === 'horizontal' && <Select value={config.yAxis.labelPlacement || 'Below Bar'} section='yAxis' fieldName='labelPlacement' label='Label Placement' updateField={updateField} options={['Below Bar', 'On Date/Category Axis']} />}
-                {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') ? (
+                {visHasNumbersOnBars() ? (
                   <CheckBox value={config.yAxis.displayNumbersOnBar} section='yAxis' fieldName='displayNumbersOnBar' label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
                 ) : (
                   visHasLabelOnData() && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
@@ -1157,7 +1051,7 @@ const EditorPanel = () => {
                 {config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
               </AccordionItemPanel>
             </AccordionItem>
-            <ForestPlotSettings />
+            {config.visualizationType === 'Forest Plot' && <ForestPlotSettings />}
             {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && (
               <AccordionItem>
                 <AccordionItemHeading>
@@ -2924,77 +2818,85 @@ const EditorPanel = () => {
                     ))}
                   </ul>
                 </label>
-                <label>
-                  <span className='edit-label'>Chart Color Palette</span>
-                </label>
                 {/* eslint-enable */}
-                {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Deviation Bar' && (
+                {(visSupportsNonSequentialPallete() || visSupportsNonSequentialPallete()) && (
                   <>
-                    <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.isPaletteReversed} />
-                    <span>Sequential</span>
-                    <ul className='color-palette'>
-                      {sequential.map(palette => {
-                        const colorOne = {
-                          backgroundColor: colorPalettes[palette][2]
-                        }
+                    <label>
+                      <span className='edit-label'>Chart Color Palette</span>
+                    </label>
+                    {visSupportsReverseColorPalette() && <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.isPaletteReversed} />}
+                    {visSupportsSequentialPallete() && (
+                      <>
+                        <span>Sequential</span>
+                        <ul className='color-palette'>
+                          {sequential.map(palette => {
+                            const colorOne = {
+                              backgroundColor: colorPalettes[palette][2]
+                            }
 
-                        const colorTwo = {
-                          backgroundColor: colorPalettes[palette][3]
-                        }
+                            const colorTwo = {
+                              backgroundColor: colorPalettes[palette][3]
+                            }
 
-                        const colorThree = {
-                          backgroundColor: colorPalettes[palette][5]
-                        }
+                            const colorThree = {
+                              backgroundColor: colorPalettes[palette][5]
+                            }
 
-                        return (
-                          <button
-                            title={palette}
-                            key={palette}
-                            onClick={e => {
-                              e.preventDefault()
-                              updateConfig({ ...config, palette })
-                            }}
-                            className={config.palette === palette ? 'selected' : ''}
-                          >
-                            <span style={colorOne}></span>
-                            <span style={colorTwo}></span>
-                            <span style={colorThree}></span>
-                          </button>
-                        )
-                      })}
-                    </ul>
-                    <span>Non-Sequential</span>
-                    <ul className='color-palette'>
-                      {nonSequential.map(palette => {
-                        const colorOne = {
-                          backgroundColor: colorPalettes[palette][2]
-                        }
+                            return (
+                              <button
+                                title={palette}
+                                key={palette}
+                                onClick={e => {
+                                  e.preventDefault()
+                                  updateConfig({ ...config, palette })
+                                }}
+                                className={config.palette === palette ? 'selected' : ''}
+                              >
+                                <span style={colorOne}></span>
+                                <span style={colorTwo}></span>
+                                <span style={colorThree}></span>
+                              </button>
+                            )
+                          })}
+                        </ul>
+                      </>
+                    )}
+                    {visSupportsNonSequentialPallete() && (
+                      <>
+                        <span>Non-Sequential</span>
+                        <ul className='color-palette'>
+                          {nonSequential.map(palette => {
+                            const colorOne = {
+                              backgroundColor: colorPalettes[palette][2]
+                            }
 
-                        const colorTwo = {
-                          backgroundColor: colorPalettes[palette][4]
-                        }
+                            const colorTwo = {
+                              backgroundColor: colorPalettes[palette][4]
+                            }
 
-                        const colorThree = {
-                          backgroundColor: colorPalettes[palette][6]
-                        }
+                            const colorThree = {
+                              backgroundColor: colorPalettes[palette][6]
+                            }
 
-                        return (
-                          <button
-                            title={palette}
-                            key={palette}
-                            onClick={e => {
-                              e.preventDefault()
-                              updateConfig({ ...config, palette })
-                            }}
-                            className={config.palette === palette ? 'selected' : ''}
-                          >
-                            <span style={colorOne}></span>
-                            <span style={colorTwo}></span>
-                            <span style={colorThree}></span>
-                          </button>
-                        )
-                      })}
-                    </ul>
+                            return (
+                              <button
+                                title={palette}
+                                key={palette}
+                                onClick={e => {
+                                  e.preventDefault()
+                                  updateConfig({ ...config, palette })
+                                }}
+                                className={config.palette === palette ? 'selected' : ''}
+                              >
+                                <span style={colorOne}></span>
+                                <span style={colorTwo}></span>
+                                <span style={colorThree}></span>
+                              </button>
+                            )
+                          })}
+                        </ul>
+                      </>
+                    )}
                   </>
                 )}
                 {(config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') && (

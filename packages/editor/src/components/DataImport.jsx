@@ -752,7 +752,7 @@ export default function DataImport() {
               </>
             )}
 
-            {showDataDesigner && <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />}
+            {showDataDesigner && <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} config={config} setConfig={setConfig} />}
           </>
         )}
 

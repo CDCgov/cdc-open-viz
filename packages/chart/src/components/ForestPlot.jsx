@@ -13,7 +13,7 @@ import ConfigContext from '../ConfigContext'
 import { getFontSize } from '@cdc/core/helpers/cove/number'
 
 const ForestPlot = props => {
-  const { rawData: data, updateConfig } = useContext(ConfigContext)
+  const { transformedData: data, updateConfig } = useContext(ConfigContext)
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver, maxWidth, maxHeight } = props
   const { forestPlot, runtime, dataFormat } = config
 
@@ -51,12 +51,12 @@ const ForestPlot = props => {
 
   const topLine = [
     { x: 0, y: topMarginOffset },
-    { x: maxWidth, y: topMarginOffset }
+    { x: width, y: topMarginOffset }
   ]
 
   const bottomLine = [
-    { x: 0, y: maxHeight },
-    { x: maxWidth, y: maxHeight }
+    { x: 0, y: height },
+    { x: width, y: height }
   ]
 
   const columnsOnChart = Object.entries(config.columns)

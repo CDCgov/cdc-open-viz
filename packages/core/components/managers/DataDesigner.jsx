@@ -7,7 +7,7 @@ import { DATA_TABLE_VERTICAL, DATA_TABLE_HORIZONTAL, DATA_TABLE_SINGLE_ROW, DATA
 import '../../styles/v2/components/data-designer.scss'
 
 const DataDesigner = props => {
-  const { configureData, updateDescriptionProp, visualizationKey, dataKey } = props
+  const { configureData, updateDescriptionProp, visualizationKey, dataKey, config, setConfig } = props
 
   return (
     <div className='cove-data-designer__container'>
@@ -245,22 +245,122 @@ const DataDesigner = props => {
           )}
 
           {config.visualizationType === 'Forest Plot' && (
-            <div className='mb-2'>
-              <div className='mb-1'>Which column represents the date/category column?</div>
-              <select
-                onChange={e => {
-                  updateDescriptionProp(visualizationKey, dataKey, 'seriesKey', e.target.value)
-                }}
-                defaultValue={configureData.dataDescription.seriesKey}
-              >
-                <option value=''>Choose an option</option>
-                {Object.keys(configureData.data[0]).map((value, index) => (
-                  <option value={value} key={index}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <>
+              <div className='mb-2'>
+                <div className='mb-1'>Which column represents the date/category column?</div>
+                <select
+                  onChange={e => {
+                    setConfig({
+                      ...config,
+                      xAxis: {
+                        ...config.xAxis,
+                        dataKey: e.target.value
+                      }
+                    })
+                  }}
+                  defaultValue={'Select'}
+                >
+                  <option value=''>Choose an option</option>
+                  {Object.keys(configureData.data[0]).map((value, index) => (
+                    <option value={value} key={index}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className='mb-2'>
+                <div className='mb-1'>Which column represents your estimate field?</div>
+                <select
+                  onChange={e => {
+                    setConfig({
+                      ...config,
+                      forestPlot: {
+                        ...config.forestPlot,
+                        estimateField: e.target.value
+                      }
+                    })
+                  }}
+                  defaultValue={'Select'}
+                >
+                  <option value=''>Choose an option</option>
+                  {Object.keys(configureData.data[0]).map((value, index) => (
+                    <option value={value} key={index}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className='mb-2'>
+                <div className='mb-1'>Which column represents the low confidence interval?</div>
+                <select
+                  onChange={e => {
+                    setConfig({
+                      ...config,
+                      forestPlot: {
+                        ...config.forestPlot,
+                        lower: e.target.value
+                      }
+                    })
+                  }}
+                  defaultValue={'Select'}
+                >
+                  <option value=''>Choose an option</option>
+                  {Object.keys(configureData.data[0]).map((value, index) => (
+                    <option value={value} key={index}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className='mb-2'>
+                <div className='mb-1'>Which column represents the high confidence interval?</div>
+                <select
+                  onChange={e => {
+                    setConfig({
+                      ...config,
+                      forestPlot: {
+                        ...config.forestPlot,
+                        upper: e.target.value
+                      }
+                    })
+                  }}
+                  defaultValue={'Select'}
+                >
+                  <option value=''>Choose an option</option>
+                  {Object.keys(configureData.data[0]).map((value, index) => (
+                    <option value={value} key={index}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className='mb-2'>
+                <div className='mb-1'>Which shape do you want to use in your forest plot?</div>
+                <select
+                  onChange={e => {
+                    setConfig({
+                      ...config,
+                      forestPlot: {
+                        ...config.forestPlot,
+                        shape: e.target.value
+                      }
+                    })
+                  }}
+                  defaultValue={'Select'}
+                >
+                  <option value=''>Choose an option</option>
+                  {['text', 'circle', 'square', 'diamond'].map((value, index) => (
+                    <option value={value} key={index}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
           )}
         </>
       )}
