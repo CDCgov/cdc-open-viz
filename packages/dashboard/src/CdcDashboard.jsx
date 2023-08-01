@@ -155,12 +155,19 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         if (dataset.dataUrl && config.dashboard && config.dashboard.sharedFilters) {
           const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl)
           let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+          let qsParamsFitlerable = {}
 
           let isUpdateNeeded = false
 
           config.dashboard.sharedFilters.forEach(filter => {
             if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
-              qsParams[filter.queryParameter] = filter.active
+              if (!qsParamsFitlerable[filter.queryParameter]) {
+                qsParams[filter.queryParameter] = filter.active
+                qsParamsFitlerable[filter.queryParameter] = true
+              } else {
+                qsParams[filter.queryParameter] = qsParams[filter.queryParameter] + filter.active
+              }
+
               isUpdateNeeded = true
             }
           })
@@ -277,12 +284,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   }
 
   const findFilterTier = (filters, sharedFilter) => {
-    if(!sharedFilter.parent) {
+    if (!sharedFilter.parent) {
       return 1
     } else {
-      let parent = filters.find(filter => filter.key === sharedFilter.parent);
-      if(!parent) return 1
-      return 1 + findFilterTier(filters, parent);
+      let parent = filters.find(filter => filter.key === sharedFilter.parent)
+      if (!parent) return 1
+      return 1 + findFilterTier(filters, parent)
     }
   }
 
@@ -290,7 +297,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     if (data) {
       let maxTier = 1
       filters.forEach(sharedFilter => {
-        sharedFilter.tier = findFilterTier(filters, sharedFilter);
+        sharedFilter.tier = findFilterTier(filters, sharedFilter)
       })
 
       filters.forEach(sharedFilter => {
