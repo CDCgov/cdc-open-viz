@@ -3,7 +3,7 @@ import ConfigContext from '../ConfigContext'
 
 export const useEditorPermissions = () => {
   const { config } = useContext(ConfigContext)
-  const { visualizationType, series } = config
+  const { visualizationType, series, orientation } = config
 
   // Overall support for the chart types
   const enabledChartTypes = ['Area Chart', 'Bar', 'Box Plot', 'Combo', 'Deviation Bar', 'Forecasting', 'Forest Plot', 'Line', 'Paired Bar', 'Pie', 'Scatter Plot', 'Spark Line']
@@ -62,6 +62,8 @@ export const useEditorPermissions = () => {
 
   const visHasDataCutoff = () => {
     switch (visualizationType) {
+      case 'Forest Plot':
+        return false
       case 'Box Plot':
         return false
       case 'Pie':
@@ -95,6 +97,83 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsDateCategoryAxisLabel = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsDateCategoryAxisLine = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsDateCategoryAxisTicks = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsDateCategoryTickRotation = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsDateCategoryNumTicks = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsRegions = () => {
+    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsFilters = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsValueAxisGridLines = () => {
+    const disabledCharts = ['Forest Plot']
+    if (orientation === 'horizontal') return false
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  // implement later
+  const visSupportsValueAxisTicks = () => {
+    return true
+  }
+
+  // implement later
+  const visSupportsValueAxisLine = () => {
+    return true
+  }
+
+  // implement later
+  const visSupportsValueAxisLabels = () => {
+    return true
+  }
+
+  const visSupportsBarSpace = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
+    if (orientation === 'horizontal' || visualizationType === 'Paired Bar') return true
+    return false
+  }
+
+  const visSupportsBarThickness = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
   return {
     enabledChartTypes,
     visHasLabelOnData,
@@ -103,11 +182,23 @@ export const useEditorPermissions = () => {
     visHasBarBorders,
     visHasDataCutoff,
     visCanAnimate,
-    visHasDataCutoff,
     visHasLegend,
     visSupportsTooltipLines,
     visSupportsNonSequentialPallete,
     visSupportsSequentialPallete,
-    visSupportsReverseColorPalette
+    visSupportsReverseColorPalette,
+    visSupportsDateCategoryAxisLabel,
+    visSupportsDateCategoryAxisLine,
+    visSupportsDateCategoryAxisTicks,
+    visSupportsDateCategoryTickRotation,
+    visSupportsDateCategoryNumTicks,
+    visSupportsRegions,
+    visSupportsFilters,
+    visSupportsValueAxisGridLines,
+    visSupportsValueAxisTicks,
+    visSupportsValueAxisLine,
+    visSupportsValueAxisLabels,
+    visSupportsBarSpace,
+    visSupportsBarThickness
   }
 }

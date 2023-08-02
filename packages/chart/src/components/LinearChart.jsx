@@ -710,6 +710,8 @@ export default function LinearChart() {
           />
         )}
 
+        {console.log(width)}
+
         {/* X axis */}
         {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
           <AxisBottom
@@ -723,7 +725,7 @@ export default function LinearChart() {
             tickStroke='#333'
           >
             {props => {
-              const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
+              const axisCenter = config.visualizationType !== 'Forest Plot' ? (props.axisToPoint.x - props.axisFromPoint.x) / 2 : width / 2
               // Calculate sumOfTickWidth here, before map function
               const fontSize = { small: 16, medium: 18, large: 20 }
               const defaultTickLength = 8
