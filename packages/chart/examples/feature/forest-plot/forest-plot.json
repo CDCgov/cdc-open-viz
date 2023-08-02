@@ -50,7 +50,7 @@
     "anchors": [],
     "dataKey": "N",
     "labelPlacement": "On Date/Category Axis",
-    "label": "value"
+    "label": "The entire chart width centered x axis title"
   },
   "boxplot": {
     "plots": [],
@@ -247,8 +247,8 @@
     },
     "title": "Plot Title 2",
     "padding": "200",
-    "leftWidthOffset": "38",
-    "rightWidthOffset": "28"
+    "leftWidthOffset": "0",
+    "rightWidthOffset": "0"
   },
   "datasets": {},
   "visualizationType": "Forest Plot",

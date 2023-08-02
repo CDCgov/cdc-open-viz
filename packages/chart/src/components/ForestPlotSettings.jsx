@@ -248,7 +248,7 @@ const ForestPlotSettings = () => {
 
         {/* width in center */}
         <label>
-          <span className='edit-label column-heading'>Forest Plot Width</span>
+          <span className='edit-label column-heading'>Forest Plot Width (%)</span>
           <input
             type='number'
             min={0}
@@ -267,7 +267,7 @@ const ForestPlotSettings = () => {
         </label>
 
         <label>
-          <span className='edit-label column-heading'>Forest Left Percentage Offset</span>
+          <span className='edit-label column-heading'>Chart Offset Left (%)</span>
           <input
             type='number'
             min={0}
@@ -286,7 +286,7 @@ const ForestPlotSettings = () => {
         </label>
 
         <label>
-          <span className='edit-label column-heading'>Forest Right Percentage Offset</span>
+          <span className='edit-label column-heading'>Chart Offset Right (%)</span>
           <input
             type='number'
             min={0}
@@ -303,7 +303,6 @@ const ForestPlotSettings = () => {
             }}
           />
         </label>
-        <TextField type='number' value={config.forestPlot?.startAt || ''} updateField={updateField} section='forestPlot' fieldName='startAt' label='Start At' />
 
         <Select
           value={config.forestPlot.estimateField}

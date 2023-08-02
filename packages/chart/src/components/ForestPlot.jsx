@@ -63,13 +63,19 @@ const ForestPlot = props => {
     .map(entry => entry[1])
     .filter(entry => entry.forestPlot === true)
 
-  const center = ((Number(config.forestPlot.width) / 100) * width) / 2
+  console.log('width', width)
+
+  const chartWidth = (Number(config.forestPlot.width) / 100) * width
+  const rightOffset = (Number(config.forestPlot.rightWidthOffset) / 100) * width
+  const leftOffset = (Number(config.forestPlot.leftWidthOffset) / 100) * width
+
+  const center = (chartWidth + leftOffset - rightOffset) / 2
 
   return (
     <>
       <Group>
         {forestPlot.title !== '' && (
-          <Text className={`forest-plot--title`} x={center} y={0} textAnchor='start' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+          <Text className={`forest-plot--title`} x={center} y={0} textAnchor='middle' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
             {forestPlot.title}
           </Text>
         )}
