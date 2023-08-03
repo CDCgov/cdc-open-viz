@@ -133,16 +133,6 @@
   "orientation": "horizontal",
   "color": "pinkpurple",
   "columns": {
-    "additionalColumn3": {
-      "label": "Timing",
-      "dataTable": true,
-      "tooltips": false,
-      "prefix": "",
-      "suffix": "",
-      "name": "Timing",
-      "startPoint": "1",
-      "startingPoint": "150"
-    },
     "additionalColumn4": {
       "label": "Result",
       "dataTable": true,
@@ -233,8 +223,8 @@
     },
     "regression": {
       "showBaseLine": true,
-      "description": "Regression model, all studies, Ln Scale (Q-pval = 0.05, I² = 39.2%)",
-      "upper": "-14.5",
+      "description": "",
+      "upper": "-10",
       "lower": "#87c4c3",
       "estimateField": "-10",
       "baseLineColor": "#87c4c3"
@@ -247,8 +237,10 @@
     },
     "title": "Plot Title 2",
     "padding": "200",
-    "leftWidthOffset": "0",
-    "rightWidthOffset": "0"
+    "leftWidthOffset": "15",
+    "rightWidthOffset": "25",
+    "leftWidthOffsetMobile": "45",
+    "rightWidthOffsetMobile": "45"
   },
   "datasets": {},
   "visualizationType": "Forest Plot",
