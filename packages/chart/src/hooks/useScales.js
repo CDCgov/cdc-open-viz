@@ -5,8 +5,9 @@ import ConfigContext from '../ConfigContext'
 
 const useScales = properties => {
   let { xAxisDataMapped, xMax, yMax, min, max, config, data } = properties
-  const { rawData } = useContext(ConfigContext)
+  const { rawData, dimensions } = useContext(ConfigContext)
 
+  const [screenWidth, screenHeight] = dimensions
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
@@ -165,11 +166,22 @@ const useScales = properties => {
     const leftWidthOffset = (Number(config.forestPlot.leftWidthOffset) / 100) * xMax
     const rightWidthOffset = (Number(config.forestPlot.rightWidthOffset) / 100) * xMax
 
-    xScale = scaleLinear({
-      domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
-      range: [leftWidthOffset, Number(config.forestPlot.startAt) + Number(config.forestPlot.width === 'auto' || config.forestPlot.width === '' ? xMax : (Number(config.forestPlot.width) / 100) * xMax - rightWidthOffset)],
-      type: 'linear'
-    })
+    const rightWidthOffsetMobile = (Number(config.forestPlot.rightWidthOffsetMobile) / 100) * xMax
+    const leftWidthOffsetMobile = (Number(config.forestPlot.leftWidthOffsetMobile) / 100) * xMax
+
+    if (screenWidth > 480) {
+      xScale = scaleLinear({
+        domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
+        range: [leftWidthOffset, Number(config.forestPlot.startAt) + Number(config.forestPlot.width === 'auto' || config.forestPlot.width === '' ? xMax : (Number(config.forestPlot.width) / 100) * xMax - rightWidthOffset)],
+        type: 'linear'
+      })
+    } else {
+      xScale = scaleLinear({
+        domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
+        range: [leftWidthOffsetMobile, Number(config.forestPlot.startAt) + Number(config.forestPlot.width === 'auto' || config.forestPlot.width === '' ? xMax : (Number(config.forestPlot.width) / 100) * xMax - rightWidthOffsetMobile)],
+        type: 'linear'
+      })
+    }
   }
 
   return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding }

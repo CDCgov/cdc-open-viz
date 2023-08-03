@@ -247,7 +247,7 @@ const ForestPlotSettings = () => {
         <TextField type='text' value={config.forestPlot?.title || ''} updateField={updateField} section='forestPlot' fieldName='title' label='Plot Title' />
 
         {/* width in center */}
-        <label>
+        {/* <label>
           <span className='edit-label column-heading'>Forest Plot Width (%)</span>
           <input
             type='number'
@@ -264,7 +264,7 @@ const ForestPlotSettings = () => {
               })
             }}
           />
-        </label>
+        </label> */}
 
         <label>
           <span className='edit-label column-heading'>Chart Offset Left (%)</span>
@@ -286,6 +286,25 @@ const ForestPlotSettings = () => {
         </label>
 
         <label>
+          <span className='edit-label column-heading'>Chart Offset Left Mobile(%)</span>
+          <input
+            type='number'
+            min={0}
+            max={100}
+            value={config.forestPlot.leftWidthOffsetMobile || ''}
+            onChange={e => {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  leftWidthOffsetMobile: e.target.value
+                }
+              })
+            }}
+          />
+        </label>
+
+        <label>
           <span className='edit-label column-heading'>Chart Offset Right (%)</span>
           <input
             type='number'
@@ -298,6 +317,25 @@ const ForestPlotSettings = () => {
                 forestPlot: {
                   ...config.forestPlot,
                   rightWidthOffset: e.target.value
+                }
+              })
+            }}
+          />
+        </label>
+
+        <label>
+          <span className='edit-label column-heading'>Chart Offset Right Mobile(%)</span>
+          <input
+            type='number'
+            min={0}
+            max={100}
+            value={config.forestPlot.rightWidthOffsetMobile || ''}
+            onChange={e => {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  rightWidthOffsetMobile: e.target.value
                 }
               })
             }}

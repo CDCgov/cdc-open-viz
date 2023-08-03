@@ -710,8 +710,6 @@ export default function LinearChart() {
           />
         )}
 
-        {console.log(width)}
-
         {/* X axis */}
         {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
           <AxisBottom

@@ -18,13 +18,8 @@ import chroma from 'chroma-js'
 import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
 import LinearChart from './components/LinearChart'
-import ForestPlot from './components/ForestPlot'
 
 import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
-
-import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
-
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import SparkLine from './components/SparkLine'
 import Legend from './components/Legend'
@@ -35,6 +30,8 @@ import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
 
 // Helpers
+import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'

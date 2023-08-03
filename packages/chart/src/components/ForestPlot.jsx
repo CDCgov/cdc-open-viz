@@ -13,9 +13,10 @@ import ConfigContext from '../ConfigContext'
 import { getFontSize } from '@cdc/core/helpers/cove/number'
 
 const ForestPlot = props => {
-  const { transformedData: data, updateConfig } = useContext(ConfigContext)
+  const { transformedData: data, updateConfig, dimensions } = useContext(ConfigContext)
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver, maxWidth, maxHeight } = props
   const { forestPlot, runtime, dataFormat } = config
+  const [screenWidth, screenHeight] = dimensions
 
   // Requirements for forest plot
   // - force legend to be hidden for this chart type
@@ -63,13 +64,14 @@ const ForestPlot = props => {
     .map(entry => entry[1])
     .filter(entry => entry.forestPlot === true)
 
-  console.log('width', width)
-
   const chartWidth = (Number(config.forestPlot.width) / 100) * width
   const rightOffset = (Number(config.forestPlot.rightWidthOffset) / 100) * width
   const leftOffset = (Number(config.forestPlot.leftWidthOffset) / 100) * width
 
-  const center = (chartWidth + leftOffset - rightOffset) / 2
+  const rightOffsetMobile = (Number(config.forestPlot.rightWidthOffsetMobile) / 100) * width
+  const leftOffsetMobile = (Number(config.forestPlot.leftWidthOffsetMobile) / 100) * width
+
+  const center = screenWidth < 480 ? (chartWidth + leftOffsetMobile - rightOffsetMobile) / 2 : (chartWidth + leftOffset - rightOffset) / 2
 
   return (
     <>
