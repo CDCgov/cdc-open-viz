@@ -908,7 +908,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         maximumFractionDigits: roundToPlace
       }
     }
-
+    console.log('###config.dataformat', config.dataFormat)
     if (axis === 'right') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.rightCommas ? true : false,
