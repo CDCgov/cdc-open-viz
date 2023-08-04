@@ -619,14 +619,18 @@ export default function LinearChart() {
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
+              const containsMultipleWords = inputString => /\s/.test(inputString)
+              const ismultiLabel = props.ticks.some(tick => containsMultipleWords(tick.value))
+
               // Calculate sumOfTickWidth here, before map function
               const fontSize = { small: 16, medium: 18, large: 20 }
               const defaultTickLength = 8
               const tickWidthMax = Math.max(...props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)))
               const marginTop = 20
+              const accumulator = ismultiLabel ? 180 : 100
 
               const textWidths = props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`))
-              const sumOfTickWidth = textWidths.reduce((a, b) => a + b, 100)
+              const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
               const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (props.ticks.length - 1)
 
               // Check if ticks are overlapping
@@ -678,7 +682,7 @@ export default function LinearChart() {
                             angle={tickRotation}
                             verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
                             textAnchor={tickRotation ? 'end' : 'middle'}
-                            width={areTicksTouching && !config.isResponsiveTicks ? limitedWidth : textWidth}
+                            width={areTicksTouching && !config.isResponsiveTicks && !config.xAxis.tickRotation ? limitedWidth : textWidth}
                             fill={config.xAxis.tickLabelColor}
                           >
                             {tick.formattedValue}
