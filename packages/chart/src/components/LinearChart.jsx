@@ -99,7 +99,7 @@ export default function LinearChart() {
       if (series[0]?.name) return series[0]?.name
       return originalColumnName
     }
-
+    if (value[0] === config.runtime.yAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.yAxis.dataKey ? `${config.runtime.yAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1], false)) : value[1]}`}</li>
     if (value[0] === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1], false)) : value[1]}`}</li>
     return <li className='tooltip-body'>{`${getSeriesNameFromLabel(value[0])}: ${formatNumber(value[1], 'left')}`}</li>
   }
@@ -163,6 +163,7 @@ export default function LinearChart() {
 
   // Tooltip helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinate = x => {
+    if (orientation === 'horizontal') return
     if (xScale.type === 'point') {
       // Find the closest x value by calculating the minimum distance
       let closestX = null
@@ -181,20 +182,42 @@ export default function LinearChart() {
       return closestX
     }
 
-    if (config.xAxis.type === 'categorical' || visualizationType === 'Combo') {
+    if (config.xAxis.type === 'categorical' || (visualizationType === 'Combo' && orientation !== 'horizontal')) {
       let eachBand = xScale.step()
       let numerator = x
       const index = Math.floor(Number(numerator) / eachBand)
       return xScale.domain()[index - 1] // fixes off by 1 error
     }
 
-    if (config.xAxis.type === 'date' && visualizationType !== 'Combo') {
+    if (config.xAxis.type === 'date' && visualizationType !== 'Combo' && orientation !== 'horizontal') {
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
       const x0 = xScale.invert(x)
       const index = bisectDate(config.data, x0, 1)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
       return val
     }
+  }
+
+  const getYScaleValues = (closestXScaleValue, includedSeries) => {
+    const formattedDate = formatDate(closestXScaleValue)
+
+    let dataToSearch
+    if (xAxis.type === 'categorical') {
+      dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
+    } else {
+      dataToSearch = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
+    }
+
+    // Return an empty array if no matching data is found.
+    if (!dataToSearch || dataToSearch.length === 0) {
+      return []
+    }
+
+    const yScaleValues = dataToSearch.map(object => {
+      return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
+    })
+
+    return yScaleValues
   }
 
   // visx tooltip hook
@@ -227,6 +250,59 @@ export default function LinearChart() {
       // eslint-disable-next-line no-console
       console.error(e.message)
     }
+  }
+
+  // Tooltip helper for getting data to the closest y value hovered.
+  const handleHorizontalMouseOver = (e, inputData) => {
+    const eventSvgCoords = localPoint(e)
+
+    if (!eventSvgCoords) return
+    const { x, y } = eventSvgCoords
+
+    // Function to get the closest y-axis value from the cursor's position
+    // Function to get the closest y-axis value from the cursor's position
+    const getClosestYValue = yPosition => {
+      let minDistance = Number.MAX_VALUE
+      let closestYValue = null
+
+      data.forEach((d, index) => {
+        const yPositionOnPlot = xScale(index)
+        console.log('ypositiononplot', yPositionOnPlot)
+        const distance = Math.abs(yPositionOnPlot - yPosition)
+
+        if (distance < minDistance) {
+          minDistance = distance
+          closestYValue = d[config.yAxis.dataKey]
+        }
+      })
+
+      console.log(closestYValue)
+      return closestYValue
+    }
+
+    const xValue = data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))[0]
+    console.log('closest y value: ', getClosestYValue(y))
+
+    let standardLoopItems = [
+      [config.yAxis.dataKey, getClosestYValue(y)],
+      ['Estimate', xValue]
+    ]
+
+    let initialTooltipData = standardLoopItems ? standardLoopItems : {}
+
+    let tooltipData = {}
+    tooltipData.data = initialTooltipData
+    tooltipData.dataXPosition = isEditor ? x - 300 + 10 : x + 10
+    tooltipData.dataYPosition = y
+
+    let tooltipInformation = {
+      tooltipData: tooltipData,
+      tooltipTop: 0,
+      tooltipValues: 'test',
+      tooltipLeft: x
+    }
+
+    showTooltip(tooltipInformation)
   }
 
   // todo: combine mouseover functions
@@ -781,7 +857,7 @@ export default function LinearChart() {
             getYAxisData={getYAxisData}
             animatedChart={animatedChart}
             visible={animatedChart}
-            handleTooltipMouseOver={handleTooltipMouseOver}
+            handleTooltipMouseOver={config.orientation === 'horizontal' ? handleHorizontalMouseOver : handleTooltipMouseOver}
             handleTooltipMouseOff={handleTooltipMouseOff}
             handleTooltipClick={handleTooltipClick}
             tooltipData={tooltipData}
