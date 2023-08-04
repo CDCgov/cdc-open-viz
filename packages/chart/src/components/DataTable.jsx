@@ -7,6 +7,7 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import Icon from '@cdc/core/components/ui/Icon'
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
 import ConfigContext from '../ConfigContext'
 
@@ -19,6 +20,7 @@ export default function DataTable() {
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
   const isLegendBottom = ['sm', 'xs', 'xxs'].includes(currentViewport)
+  const transform = new DataTransform()
 
   const DownloadButton = ({ data }, type) => {
     const fileName = `${config.title.substring(0, 50)}.csv`
@@ -134,6 +136,7 @@ export default function DataTable() {
         const newCol = {
           Header: resolveTableHeader(),
           Cell: ({ row }) => {
+            console.log('config row,d', config, row, d)
             let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
             let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
             let resolvedAxis = ''
@@ -148,9 +151,14 @@ export default function DataTable() {
 
             if (config.visualizationType !== 'Combo') resolvedAxis = 'left'
 
+            console.log('d[row] d[row.original] values', d[row], d[row.original], d[row.cells[row.index]])
+            console.log('left axis items config.series', leftAxisItems, rightAxisItems, config.series)
+
             return <>{numberFormatter(d[row.original], resolvedAxis)}</>
           },
-          id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
+          id: `${d[config.runtime.originalXAxis.dataKey]}`, //--${index}
+          //accessor: d[config.series.dataKey], //'Week',
+          sortType: 'custom',
           canSort: true
         }
 
@@ -222,7 +230,55 @@ export default function DataTable() {
     }),
     []
   )
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
+    {
+      columns: tableColumns,
+      data: tableData,
+      defaultColumn,
+      initialState: {
+        sortBy: [
+          {
+            id: tableColumns[0],
+            desc: true
+          }
+        ]
+      },
+      sortTypes: {
+        custom: (rowA, rowB, columnId) => {
+          // rowA.original - is the row data field name to access the value
+          // columnId = the column indicator
+          let dataKey = config.xAxis.dataKey
+          //debugger
+          let colObj = config.data.filter(obj => {
+            return obj[dataKey] === columnId
+          })
+          console.log('sort dataKey, colObj rowA.original, colObj[rowA.original]', dataKey, colObj, rowA.original, colObj[0][rowA.original])
+          //const a = transform.cleanDataPoint(config.data[rowA.id][rowA.original], true) // issue was that a was UNDEFINED therefore it CANT SORT
+          //const b = transform.cleanDataPoint(config.data[rowB.id][rowB.original], true)
+
+          // NOW we can get the sort values
+          const a = colObj[0][rowA.original] // issue was that a was UNDEFINED therefore it CANT SORT
+          const b = colObj[0][rowB.original]
+
+          console.log('sort rowA, rowB, a, b, column', rowA, rowB, a, b, columnId)
+          console.log('sort rowA.id, rowB.id, rowA.original, rowB.original', rowA.id, rowB.id, rowA.original, rowB.original)
+
+          if (a === undefined) {
+            return 0
+          }
+          if (!isNaN(Number(a)) && !isNaN(Number(b))) {
+            return Number(a) - Number(b)
+          }
+          return a.localeCompare(b)
+        }
+      }
+    },
+    useSortBy,
+    useBlockLayout,
+    useResizeColumns
+  )
+
+  console.log('CHART: columns, tableData', tableColumns, tableData)
 
   // sort continuous x axis scaling for data tables, ie. xAxis should read 1,2,3,4,5
   if (config.xAxis.type === 'continuous' && headerGroups) {
@@ -258,7 +314,9 @@ export default function DataTable() {
             <caption className='cdcdataviz-sr-only visually-hidden'>{config.table.caption ? config.table.caption : config.table.label ? config.table.label : 'Data Table'}</caption>
             <thead>
               {headerGroups.map((headerGroup, index) => (
-                <tr {...headerGroup.getHeaderGroupProps()} key={`headerGroups--${index}`}>
+                <tr {...headerGroup.getHeaderGroupProps()} key={`headerGroups`}>
+                  {' '}
+                  {/* --$index */}
                   {headerGroup.headers.map((column, index) => (
                     <th
                       tabIndex='0'
@@ -270,11 +328,7 @@ export default function DataTable() {
                       className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : 'sort'}
                       {...(column.isSorted ? (column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' }) : null)}
                     >
-                      {index === 0 ? (config.table.indexLabel ? config.table.indexLabel : column.render('Header')) : column.render('Header')}
-                      <button>
-                        <span className='cdcdataviz-sr-only'>{`Sort by ${typeof column.render('Header') === 'string' ? column.render('Header').toLowerCase() : column.render('Header')} in ${column.isSorted ? (column.isSortedDesc ? 'descending' : 'ascending') : 'no'} `} order</span>
-                      </button>
-                      <div {...column.getResizerProps()} className='resizer' />
+                      {column.render('Header')}
                     </th>
                   ))}
                 </tr>
