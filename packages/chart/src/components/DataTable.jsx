@@ -136,7 +136,6 @@ export default function DataTable() {
         const newCol = {
           Header: resolveTableHeader(),
           Cell: ({ row }) => {
-            console.log('config row,d', config, row, d)
             let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
             let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
             let resolvedAxis = ''
@@ -150,9 +149,6 @@ export default function DataTable() {
             })
 
             if (config.visualizationType !== 'Combo') resolvedAxis = 'left'
-
-            console.log('d[row] d[row.original] values', d[row], d[row.original], d[row.cells[row.index]])
-            console.log('left axis items config.series', leftAxisItems, rightAxisItems, config.series)
 
             return <>{numberFormatter(d[row.original], resolvedAxis)}</>
           },
@@ -235,33 +231,21 @@ export default function DataTable() {
       columns: tableColumns,
       data: tableData,
       defaultColumn,
-      initialState: {
-        sortBy: [
-          {
-            id: tableColumns[0],
-            desc: true
-          }
-        ]
-      },
       sortTypes: {
         custom: (rowA, rowB, columnId) => {
           // rowA.original - is the row data field name to access the value
           // columnId = the column indicator
           let dataKey = config.xAxis.dataKey
-          //debugger
           let colObj = config.data.filter(obj => {
             return obj[dataKey] === columnId
           })
-          console.log('sort dataKey, colObj rowA.original, colObj[rowA.original]', dataKey, colObj, rowA.original, colObj[0][rowA.original])
-          //const a = transform.cleanDataPoint(config.data[rowA.id][rowA.original], true) // issue was that a was UNDEFINED therefore it CANT SORT
-          //const b = transform.cleanDataPoint(config.data[rowB.id][rowB.original], true)
 
           // NOW we can get the sort values
-          const a = colObj[0][rowA.original] // issue was that a was UNDEFINED therefore it CANT SORT
-          const b = colObj[0][rowB.original]
+          const a = transform.cleanDataPoint(colObj[0][rowA.original]) // issue was that a was UNDEFINED therefore it CANT SORT
+          const b = transform.cleanDataPoint(colObj[0][rowB.original])
 
-          console.log('sort rowA, rowB, a, b, column', rowA, rowB, a, b, columnId)
-          console.log('sort rowA.id, rowB.id, rowA.original, rowB.original', rowA.id, rowB.id, rowA.original, rowB.original)
+          //console.log('sort rowA, rowB, a, b, column', rowA, rowB, a, b, columnId)
+          //console.log('sort rowA.id, rowB.id, rowA.original, rowB.original', rowA.id, rowB.id, rowA.original, rowB.original)
 
           if (a === undefined) {
             return 0
@@ -277,8 +261,6 @@ export default function DataTable() {
     useBlockLayout,
     useResizeColumns
   )
-
-  console.log('CHART: columns, tableData', tableColumns, tableData)
 
   // sort continuous x axis scaling for data tables, ie. xAxis should read 1,2,3,4,5
   if (config.xAxis.type === 'continuous' && headerGroups) {
