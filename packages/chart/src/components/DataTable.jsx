@@ -244,9 +244,6 @@ export default function DataTable() {
           const a = transform.cleanDataPoint(colObj[0][rowA.original]) // issue was that a was UNDEFINED therefore it CANT SORT
           const b = transform.cleanDataPoint(colObj[0][rowB.original])
 
-          //console.log('sort rowA, rowB, a, b, column', rowA, rowB, a, b, columnId)
-          //console.log('sort rowA.id, rowB.id, rowA.original, rowB.original', rowA.id, rowB.id, rowA.original, rowB.original)
-
           if (a === undefined) {
             return 0
           }
