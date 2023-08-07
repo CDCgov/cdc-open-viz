@@ -873,11 +873,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   // Format numeric data based on settings in config OR from passed in settings for Additional Columns
+  // - use only for old horizontal data - newer formatNumber is in helper/formatNumber
   const formatNumber = (num, axis, shouldAbbreviate = false, addColPrefix, addColSuffix, addColRoundTo) => {
     // if num is NaN return num
     if (isNaN(num) || !num) return num
     // Check if the input number is negative
     const isNegative = num < 0
+
+    if (axis === undefined || !axis) axis = 'left'
 
     // If the input number is negative, take the absolute value
     if (isNegative) {
@@ -893,8 +896,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
 
     let original = num
-    let stringFormattingOptions
-    if (axis === 'left') {
+    let stringFormattingOptions = {
+      useGrouping: commas ? true : false // for old chart data table to work right cant just leave this to undefined
+    }
+    if (axis === 'left' || axis === undefined) {
       let roundToPlace
       if (addColRoundTo !== undefined) {
         // if its an Additional Column
@@ -968,7 +973,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       result = addColPrefix + result
     } else {
       if (prefix && axis === 'left') {
-        result = prefix + result
+        result += prefix
       }
     }
 
@@ -980,6 +985,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       result += bottomPrefix
     }
 
+    // combine prefix and num
     result += num
 
     if (addColSuffix && axis === 'left') {

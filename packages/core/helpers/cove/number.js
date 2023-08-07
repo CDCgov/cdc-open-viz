@@ -31,6 +31,8 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
     num = Math.abs(num)
   }
 
+  console.log("### number.js formatNumber num", num)
+  
   // destructure dataFormat values
   let {
     dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix, bottomPrefix, bottomSuffix, bottomAbbreviated }

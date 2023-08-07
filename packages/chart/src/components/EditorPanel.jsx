@@ -138,6 +138,7 @@ const Regions = memo(({ config, updateConfig }) => {
     updateConfig({ ...config, regions })
   }
 
+  // only for Regions
   let updateField = (section, subsection, fieldName, value, i) => regionUpdate(fieldName, value, i)
 
   let removeColumn = i => {
