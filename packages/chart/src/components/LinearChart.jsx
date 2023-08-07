@@ -619,14 +619,18 @@ export default function LinearChart() {
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
+              const containsMultipleWords = inputString => /\s/.test(inputString)
+              const ismultiLabel = props.ticks.some(tick => containsMultipleWords(tick.value))
+
               // Calculate sumOfTickWidth here, before map function
               const fontSize = { small: 16, medium: 18, large: 20 }
               const defaultTickLength = 8
               const tickWidthMax = Math.max(...props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)))
               const marginTop = 20
+              const accumulator = ismultiLabel ? 180 : 100
 
               const textWidths = props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`))
-              const sumOfTickWidth = textWidths.reduce((a, b) => a + b, 100)
+              const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
               const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (props.ticks.length - 1)
 
               // Check if ticks are overlapping
@@ -652,16 +656,18 @@ export default function LinearChart() {
               // config.xAxis.size = dynamicMarginTop
               return (
                 <Group className='bottom-axis'>
-                  {props.ticks.map((tick, i) => {
+                  {props.ticks.map((tick, i, propsTicks) => {
                     // when using LogScale show major ticks values only
                     const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                     const tickLength = showTick === 'block' ? 16 : defaultTickLength
                     const to = { x: tick.to.x, y: tickLength }
                     let textWidth = getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                    let limitedWidth = 100 / propsTicks.length
                     //reset rotations by updating config
                     config.yAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
                     config.xAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'vertical' ? 0 : config.xAxis.tickRotation
                     //configure rotation
+
                     const tickRotation = config.isResponsiveTicks && areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : -Number(config.runtime.xAxis.tickRotation)
 
                     return (
@@ -676,7 +682,7 @@ export default function LinearChart() {
                             angle={tickRotation}
                             verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
                             textAnchor={tickRotation ? 'end' : 'middle'}
-                            width={textWidth}
+                            width={areTicksTouching && !config.isResponsiveTicks && !config.xAxis.tickRotation ? limitedWidth : textWidth}
                             fill={config.xAxis.tickLabelColor}
                           >
                             {tick.formattedValue}
@@ -897,9 +903,9 @@ export default function LinearChart() {
           <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
         </TooltipWithBounds>
       )}
-      {(config.orientation === 'horizontal' ||
-        config.visualizationType === 'Scatter Plot' ||
-        config.visualizationType === 'Box Plot') && <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
+      {(config.orientation === 'horizontal' || config.visualizationType === 'Scatter Plot' || config.visualizationType === 'Box Plot') && (
+        <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />
+      )}
       <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
   )
