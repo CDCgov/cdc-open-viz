@@ -508,8 +508,10 @@ export default function LinearChart() {
     }
   }
 
+  const random = Date.now()
+
   return isNaN(width) ? (
-    <></>
+    <React.Fragment></React.Fragment>
   ) : (
     <ErrorBoundary component='LinearChart'>
       <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
@@ -575,9 +577,9 @@ export default function LinearChart() {
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                        {!runtime.yAxis.hideTicks && <Line from={tick.from} to={config.useLogScale ? to : tick.to} stroke={config.yAxis.tickColor} display={runtime.horizontal ? 'none' : 'block'} />}
+                        {!runtime.yAxis.hideTicks && <Line key={`${tick.value}--hide-hideTicks`} from={tick.from} to={config.useLogScale ? to : tick.to} stroke={config.yAxis.tickColor} display={runtime.horizontal ? 'none' : 'block'} />}
 
-                        {runtime.yAxis.gridLines ? <Line display={config.useLogScale && showTicks} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
+                        {runtime.yAxis.gridLines ? <Line key={`${tick.value}--hide-hideGridLines`} display={config.useLogScale && showTicks} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
                         {orientation === 'horizontal' && visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
                           <Text
@@ -695,14 +697,18 @@ export default function LinearChart() {
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
+              const containsMultipleWords = inputString => /\s/.test(inputString)
+              const ismultiLabel = props.ticks.some(tick => containsMultipleWords(tick.value))
+
               // Calculate sumOfTickWidth here, before map function
               const fontSize = { small: 16, medium: 18, large: 20 }
               const defaultTickLength = 8
               const tickWidthMax = Math.max(...props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)))
               const marginTop = 20
+              const accumulator = ismultiLabel ? 180 : 100
 
               const textWidths = props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`))
-              const sumOfTickWidth = textWidths.reduce((a, b) => a + b, 100)
+              const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
               const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (props.ticks.length - 1)
 
               // Check if ticks are overlapping
@@ -754,7 +760,7 @@ export default function LinearChart() {
                             angle={tickRotation}
                             verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
                             textAnchor={tickRotation ? 'end' : 'middle'}
-                            width={areTicksTouching && !config.isResponsiveTicks ? limitedWidth : textWidth}
+                            width={areTicksTouching && !config.isResponsiveTicks && !config.xAxis.tickRotation ? limitedWidth : textWidth}
                             fill={config.xAxis.tickLabelColor}
                           >
                             {tick.formattedValue}
@@ -898,12 +904,6 @@ export default function LinearChart() {
           />
         )}
 
-        {/* y anchors */}
-        {config.yAxis.anchors &&
-          config.yAxis.anchors.map(anchor => {
-            return <Line strokeDasharray={handleLineType(anchor.lineStyle)} stroke='rgba(0,0,0,1)' className='customAnchor' from={{ x: 0 + config.yAxis.size, y: yScale(anchor.value) }} to={{ x: xMax, y: yScale(anchor.value) }} display={runtime.horizontal ? 'none' : 'block'} />
-          })}
-
         {/* Line chart */}
         {/* TODO: Make this just line or combo? */}
         {visualizationType !== 'Bar' && visualizationType !== 'Paired Bar' && visualizationType !== 'Box Plot' && visualizationType !== 'Area Chart' && visualizationType !== 'Scatter Plot' && visualizationType !== 'Deviation Bar' && visualizationType !== 'Forecasting' && (
@@ -914,27 +914,30 @@ export default function LinearChart() {
 
         {/* y anchors */}
         {config.yAxis.anchors &&
-          config.yAxis.anchors.map(anchor => {
+          config.yAxis.anchors.map((anchor, index) => {
             let anchorPosition = yScale(anchor.value)
+            if (!anchor.value) return
             const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
             const middleOffset = orientation === 'horizontal' && visualizationType === 'Bar' ? config.barHeight / 4 : 0
+
+            if (!anchorPosition) return
 
             return (
               // prettier-ignore
               <Line
-                key={anchor.value}
+                key={`yAxis-${anchor.value}--${index}`}
                 strokeDasharray={handleLineType(anchor.lineStyle)}
                 stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                 className='anchor-y'
                 from={{ x: 0 + padding, y: anchorPosition - middleOffset}}
-                to={{ x: width, y: anchorPosition - middleOffset }}
+                to={{ x: width - config.yAxis.rightAxisSize, y: anchorPosition - middleOffset }}
               />
             )
           })}
 
         {/* x anchors */}
         {config.xAxis.anchors &&
-          config.xAxis.anchors.map(anchor => {
+          config.xAxis.anchors.map((anchor, index) => {
             let newX = xAxis
             if (orientation === 'horizontal') {
               newX = yAxis
@@ -944,10 +947,12 @@ export default function LinearChart() {
 
             const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
 
+            if (!anchorPosition) return
+
             return (
               // prettier-ignore
               <Line
-                key={anchor.value}
+                key={`xAxis-${anchor.value}--${index}`}
                 strokeDasharray={handleLineType(anchor.lineStyle)}
                 stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                 fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
