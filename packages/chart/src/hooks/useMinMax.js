@@ -47,11 +47,12 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
       const highCIGroup = Math.max.apply(
         null,
         result.map(item => item[0])
-      ) // Extract ages from result
+      )
+
       const lowCIGroup = Math.min.apply(
         null,
         result.map(item => item[1])
-      ) // Extract ages from result
+      )
 
       if (highCIGroup > max) {
         max = highCIGroup

@@ -248,7 +248,7 @@ const SeriesDropdownConfidenceInterval = props => {
 
   return (
     <div className='edit-block'>
-      <h3>Confidence Interval Groups</h3>
+      <span className='edit-label column-heading'>Confidence Interval Groups</span>
       <fieldset>
         <Accordion allowZeroExpanded>
           {series?.confidenceIntervals?.map((ciGroup, ciIndex) => {
@@ -290,7 +290,7 @@ const SeriesDropdownConfidenceInterval = props => {
                   </>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <div className='input-group'>
+                  {/* <div className='input-group'>
                     <label htmlFor='showInTooltip'>Show In Tooltip</label>
                     <div className={'cove-input__checkbox--small'} onClick={e => updateShowInTooltip(e, index, ciIndex)}>
                       <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
@@ -298,7 +298,7 @@ const SeriesDropdownConfidenceInterval = props => {
                       </div>
                       <input className='cove-input--hidden' type='checkbox' name={'showInTooltip'} checked={showInTooltip ? showInTooltip : false} readOnly />
                     </div>
-                  </div>
+                  </div> */}
 
                   <InputSelect
                     initial='Select an option'
@@ -400,6 +400,38 @@ const SeriesInputName = props => {
   )
 }
 
+const SeriesDisplayInTooltip = props => {
+  const { series, index } = props
+  const { config, updateConfig } = useContext(ConfigContext)
+
+  const toggleTooltip = seriesIndex => {
+    let copiedSeries = [...config.series]
+
+    const showInTooltip = copiedSeries[seriesIndex].tooltip ? copiedSeries[seriesIndex].tooltip : false
+
+    copiedSeries[seriesIndex].tooltip = !copiedSeries[seriesIndex].tooltip
+
+    updateConfig({
+      ...config,
+      series: copiedSeries
+    })
+  }
+
+  return (
+    <>
+      <div className='input-group'>
+        <label htmlFor={`series-tooltip--${index}`}>Show In Tooltip</label>
+        <div className={'cove-input__checkbox--small'} onClick={e => toggleTooltip(index)}>
+          <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
+            {series.tooltip && <Check className='' style={{ fill: '#025eaa' }} />}
+          </div>
+          <input className='cove-input--hidden' type='checkbox' name={`series-tooltip--${index}`} checked={series.tooltip ? series.tooltip : false} readOnly />
+        </div>
+      </div>
+    </>
+  )
+}
+
 const SeriesButtonRemove = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const { series, index } = props
@@ -474,9 +506,10 @@ const SeriesItem = props => {
                   <Series.Dropdown.SeriesType series={series} index={i} />
                   <Series.Dropdown.AxisPosition series={series} index={i} />
                   <Series.Dropdown.LineType series={series} index={i} />
-                  <Series.Dropdown.ForecastingStage series={series} index={i} />
+                  {/* <Series.Dropdown.ForecastingStage series={series} index={i} /> */}
                   <Series.Dropdown.ForecastingColor series={series} index={i} />
                   <Series.Dropdown.ConfidenceInterval series={series} index={i} />
+                  <Series.Checkbox.DisplayInTooltip series={series} index={i} />
                 </AccordionItemPanel>
               )}
             </AccordionItem>
@@ -507,6 +540,9 @@ const Series = {
   },
   Input: {
     Name: SeriesInputName
+  },
+  Checkbox: {
+    DisplayInTooltip: SeriesDisplayInTooltip
   },
   Button: {
     Remove: SeriesButtonRemove

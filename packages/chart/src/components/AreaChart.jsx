@@ -1,126 +1,27 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, memo } from 'react'
 
 // cdc
 import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 // visx & d3
 import * as allCurves from '@visx/curve'
 import { AreaClosed, LinePath, Bar } from '@visx/shape'
 import { Group } from '@visx/group'
-import { useTooltip, useTooltipInPortal, defaultStyles, Tooltip } from '@visx/tooltip'
-import { localPoint } from '@visx/event'
-import { bisector } from 'd3-array'
 
-const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
+const AreaChart = ({ xScale, yScale, yMax, xMax, chartRef, handleTooltipMouseOver, handleTooltipMouseOff, tooltipData }) => {
   // enable various console logs in the file
   const DEBUG = false
-  const [chartPosition, setChartPosition] = useState(null)
-
-  useEffect(() => {
-    setChartPosition(chartRef.current.getBoundingClientRect())
-  }, [chartRef])
 
   // import data from context
-  const { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale } = useContext(ConfigContext)
-  const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
-
-  // import tooltip helpers
-  const { tooltipData, showTooltip, hideTooltip } = useTooltip()
-
-  // here we're inside of the svg,
-  // it appears we need to use TooltipInPortal.
-  const { TooltipInPortal } = useTooltipInPortal({
-    detectBounds: true,
-    // when tooltip containers are scrolled, this will correctly update the Tooltip position
-    scroll: true
-  })
+  const { transformedData: data, config, handleLineType, parseDate, seriesHighlight, colorScale, rawData } = useContext(ConfigContext)
 
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
   if (!data) return
-  let barThickness = xMax / data.length
-
-  // Tooltip helper for getting data to the closest date/category hovered.
-  const getXValueFromCoordinate = x => {
-    if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
-      let eachBand = xScale.step()
-      let numerator = x
-      const index = Math.floor(Number(numerator) / eachBand)
-      return xScale.domain()[index - 1] // fixes off by 1 error
-    }
-
-    if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
-      const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
-      const x0 = xScale.invert(x)
-      const index = bisectDate(config.data, x0, 1)
-      const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
-      return val
-    }
-  }
-
-  const handleMouseOver = (e, data) => {
-    // get the svg coordinates of the mouse
-    // and get the closest values
-    const eventSvgCoords = localPoint(e)
-    const { x, y } = eventSvgCoords
-
-    let closestXScaleValue = getXValueFromCoordinate(x)
-    let formattedDate = formatDate(closestXScaleValue)
-
-    let yScaleValues
-    if (config.xAxis.type === 'categorical') {
-      yScaleValues = data.filter(d => d[config.xAxis.dataKey] === closestXScaleValue)
-    } else {
-      yScaleValues = data.filter(d => formatDate(parseDate(d[config.xAxis.dataKey])) === formattedDate)
-    }
-
-    let seriesToInclude = []
-    let yScaleMaxValues = []
-    let itemsToLoop = [config.runtime.xAxis.dataKey, ...config.runtime.seriesKeys]
-
-    itemsToLoop.map(seriesKey => {
-      if (!seriesKey) return
-      if (!yScaleValues[0]) return
-      for (const item of Object.entries(yScaleValues[0])) {
-        if (item[0] === seriesKey) {
-          // let userUpdatedSeriesName = config.series.filter(series => series.dataKey === item[0])?.[0]?.name
-          // if (userUpdatedSeriesName) item[0] = userUpdatedSeriesName
-
-          seriesToInclude.push(item)
-        }
-      }
-    })
-
-    // filter out the series that aren't added to the map.
-    seriesToInclude.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series])))
-    if (!seriesToInclude) return
-
-    let tooltipDataFromSeries = Object.fromEntries(seriesToInclude) ? Object.fromEntries(seriesToInclude) : {}
-
-    let tooltipData = {}
-    tooltipData.data = tooltipDataFromSeries
-    tooltipData.dataXPosition = x + 20
-    tooltipData.dataYPosition = y - 100
-
-    let tooltipInformation = {
-      tooltipData: tooltipData,
-      tooltipTop: 0,
-      tooltipValues: yScaleValues,
-      tooltipLeft: x
-    }
-
-    showTooltip(tooltipInformation)
-  }
-
-  const TooltipListItem = ({ item }) => {
-    const [label, value] = item
-    return label === config.xAxis.dataKey ? `${label}: ${value}` : `${label}: ${formatNumber(value, 'left')}`
-  }
 
   const handleX = d => {
-    return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])
+    return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])
   }
 
   const handleY = (d, index, s = undefined) => {
@@ -148,6 +49,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
             } else {
               data.map(d => xScale(d[config.xAxis.dataKey]))
             }
+
             return (
               <React.Fragment key={index}>
                 {/* prettier-ignore */}
@@ -174,52 +76,39 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax, chartRef }) => {
                   yScale={yScale}
                   curve={curveType}
                   strokeDasharray={s.type ? handleLineType(s.type) : 0}
-                  />
-
-                {/* Transparent bar for tooltips */}
-                {/* prettier-ignore */}
-                <Bar
-                  width={ Number(xMax)}
-                  height={ Number(yMax)}
-                  fill={DEBUG ? 'red' : 'transparent'}
-                  fillOpacity={0.05}
-                  style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
-                  onMouseMove={e => handleMouseOver(e, data)}
-                  onMouseOut={hideTooltip}
-                  />
+                />
 
                 {/* circles that appear on hover */}
-                {tooltipData && Object.entries(tooltipData.data).length > 0 && (
+                {/* {tooltipData && Object.entries(tooltipData.data).length > 0 && (
                   <circle
                     cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
-                    cy={yScale(tooltipData.data[s.dataKey])}
+                    cy={yScale(tooltipData.data[index][1])}
                     r={4.5}
                     opacity={1}
                     fillOpacity={1}
                     fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000') : 'transparent'}
                     style={{ filter: 'unset', opacity: 1 }}
                   />
-                )}
-
-                {tooltipData && Object.entries(tooltipData.data).length > 0 && (
-                  <TooltipInPortal key={Math.random()} top={tooltipData.dataYPosition + chartPosition?.top} left={tooltipData.dataXPosition + chartPosition?.left} style={defaultStyles}>
-                    <ul style={{ listStyle: 'none', paddingLeft: 'unset', fontFamily: 'sans-serif', margin: 'auto', lineHeight: '1rem' }} data-tooltip-id={tooltip_id}>
-                      {typeof tooltipData === 'object' &&
-                        Object.entries(tooltipData.data).map(item => (
-                          <li style={{ padding: '2.5px 0' }}>
-                            <TooltipListItem item={item} />
-                          </li>
-                        ))}
-                    </ul>
-                  </TooltipInPortal>
-                )}
+                )} */}
               </React.Fragment>
             )
           })}
+
+          {/* Transparent bar for tooltips */}
+          {/* prettier-ignore */}
+          <Bar
+            width={ Number(xMax)}
+            height={ Number(yMax)}
+            fill={DEBUG ? 'red' : 'transparent'}
+            fillOpacity={0.05}
+            style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
+            onMouseMove={e => handleTooltipMouseOver(e, rawData)}
+            onMouseLeave={ handleTooltipMouseOff }
+            />
         </Group>
       </ErrorBoundary>
     )
   )
 }
 
-export default CoveAreaChart
+export default memo(AreaChart)

@@ -137,19 +137,19 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Waffle Chart' type='chart' subType='Waffle' icon={<WaffleChartIcon />} />
+              <IconButton label='Waffle Chart' type='waffle-chart' subType='Waffle' icon={<WaffleChartIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Highlight a piece of data in relationship to a data set.</Tooltip.Content>
           </Tooltip>
         </li>
-        {/* <li>
+        <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Gauge Chart' type='chart' subType='Gauge' icon={<GaugeChartIcon />} />
+              <IconButton label='Gauge Chart' type='waffle-chart' subType='Gauge' icon={<GaugeChartIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal scale.</Tooltip.Content>
           </Tooltip>
-        </li> */}
+        </li>
       </ul>
 
       <div className='heading-2'>Charts</div>
@@ -222,14 +222,14 @@ export default function ChooseTab() {
             <Tooltip.Content>Display an area chart</Tooltip.Content>
           </Tooltip>
         </li>
-        {/* <li>
+        <li>
           <Tooltip>
             <Tooltip.Target>
               <IconButton label='Forecast Chart' type='chart' subType='Forecasting' orientation='vertical' icon={<InfoIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Display a forecasting chart</Tooltip.Content>
           </Tooltip>
-        </li> */}
+        </li>
       </ul>
 
       <div className='heading-2'>Maps</div>

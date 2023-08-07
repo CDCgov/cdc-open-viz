@@ -1,0 +1,134 @@
+{
+  "title": "Chart Title",
+  "visualizationType": "Gauge",
+  "visualizationSubType": "linear",
+  "showPercent": true,
+  "showDenominator": true,
+  "valueDescription": "out of",
+  "content": "of cases occurred in the home",
+  "subtext": "Chart subtext or citation",
+  "orientation": "horizontal",
+  "data": [
+    {
+      "Insured Rate": "43",
+      "Coverage Status": "Insured",
+      "state": "Alabama",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "0",
+      "Coverage Status": "Uninsured",
+      "state": "Alaska",
+      "Year (Good filter option)": "2006",
+      "link": "",
+      "Verified": false
+    },
+    {
+      "Insured Rate": "72.7",
+      "Coverage Status": "Insured",
+      "state": "Arizona",
+      "Year (Good filter option)": "2008",
+      "link": "#lorem",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "78.7",
+      "Coverage Status": "Insured",
+      "state": "Arkansas",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "37.2",
+      "Coverage Status": "Insured",
+      "state": "California",
+      "Year (Good filter option)": "2018",
+      "link": "https://search.cdc.gov/search/?query=California&utf8=%E2%9C%93&affiliate=cdc-main",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "50.6",
+      "Coverage Status": "Insured",
+      "state": "Colorado",
+      "Year (Good filter option)": "2014",
+      "link": "",
+      "Verified": false
+    },
+    {
+      "Insured Rate": "83.2",
+      "Coverage Status": "Insured",
+      "state": "Connecticut",
+      "Year (Good filter option)": "2019",
+      "link": "",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "90",
+      "Coverage Status": "Insured",
+      "state": "Delaware",
+      "Year (Good filter option)": "2020",
+      "link": "",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "77.1",
+      "Coverage Status": "Insured",
+      "state": "District of Columbia",
+      "Year (Good filter option)": "2019",
+      "link": "https://search.cdc.gov/search/index.html?query=Washington+D.C.&sitelimit=&utf8=%E2%9C%93&affiliate=cdc-main",
+      "Verified": false
+    },
+    {
+      "Insured Rate": "83",
+      "Coverage Status": "Insured",
+      "state": "Florida",
+      "Year (Good filter option)": "2016",
+      "link": "",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "67.4",
+      "Coverage Status": "Insured",
+      "state": "Georgia",
+      "Year (Good filter option)": "2013",
+      "link": "",
+      "Verified": false
+    }
+  ],
+  "filters": [],
+  "fontSize": "",
+  "overallFontSize": "medium",
+  "dataColumn": "Insured Rate",
+  "dataFunction": "Count",
+  "dataConditionalColumn": "",
+  "dataConditionalOperator": "",
+  "dataConditionalComparate": "",
+  "invalidComparate": false,
+  "customDenom": false,
+  "dataDenom": "100",
+  "dataDenomColumn": "",
+  "dataDenomFunction": "",
+  "suffix": "%",
+  "roundToPlace": "0",
+  "shape": "circle",
+  "nodeWidth": "10",
+  "nodeSpacer": "2",
+  "theme": "theme-blue",
+  "type": "waffle-chart",
+  "visual": {
+    "border": true,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false
+  },
+  "dataUrl": "/examples/example-data.json",
+  "validated": 4.23,
+  "runtime": {
+    "uniqueId": 1690862969105,
+    "editorErrorMessage": ""
+  }
+}

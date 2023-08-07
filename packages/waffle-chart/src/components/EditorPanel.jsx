@@ -40,6 +40,7 @@ const EditorPanel = memo(props => {
 
   const [displayPanel, setDisplayPanel] = useState(true)
   const [showConfigConfirm, setShowConfigConfirm] = useState(false)
+  const inputSelectStyle = condition => (condition ? { backgroundColor: '#ffd2d2', color: '#d8000c' } : {})
 
   const updateField = (section, subsection, fieldName, newValue) => {
     // Top level
@@ -197,10 +198,7 @@ const EditorPanel = memo(props => {
   }
   //visualizationType
 
-  const approvedWaffleChartOptions = [
-    'Waffle'
-    // 'Gauge'
-  ]
+  const approvedWaffleChartOptions = ['Waffle', 'Gauge']
 
   const editorContent = (
     <Accordion>
@@ -211,7 +209,7 @@ const EditorPanel = memo(props => {
             {config.visualizationType === 'Gauge' && <InputSelect value={config.visualizationSubType} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['Linear']} className='cove-input' />}
           </div>
         </div>
-        <InputText value={config.title} fieldName='title' label='Title' placeholder='Waffle Chart Title' updateField={updateField} />
+        <InputText value={config.title} fieldName='title' label='Title' placeholder='Chart Title' updateField={updateField} />
         <InputText
           type='textarea'
           value={config.content}
@@ -234,7 +232,7 @@ const EditorPanel = memo(props => {
           value={config.subtext}
           fieldName='subtext'
           label='Subtext/Citation'
-          placeholder='Waffle Chart Subtext or Citation'
+          placeholder='Chart Subtext or Citation'
           updateField={updateField}
           tooltip={
             <Tooltip style={{ textTransform: 'none' }}>
@@ -250,19 +248,14 @@ const EditorPanel = memo(props => {
       </Accordion.Section>
 
       <Accordion.Section icon={!config.dataColumn || !config.dataFunction ? <WarningImage width='15' className='warning-icon' /> : ''} title='Data'>
-        {(!config.dataColumn || !config.dataFunction) && (
-          <div className='cove-accordion__panel-section'>
-            <p className='warning-text'>Please select numerator</p>
-          </div>
-        )}
         <h4 style={{ fontWeight: '600' }}>Numerator</h4>
         <div className='cove-accordion__panel-section'>
           <div className='cove-input-group'>
-            <InputSelect value={config.dataColumn || ''} fieldName='dataColumn' label='Data Column' updateField={updateField} initial='Select' options={getColumns()} className='cove-input' />
+            <InputSelect style={inputSelectStyle(!config.dataColumn)} value={config.dataColumn || ''} fieldName='dataColumn' label='Data Column' updateField={updateField} initial='Select' options={getColumns()} className='cove-input' />
           </div>
 
           <div className='cove-input-group'>
-            <InputSelect value={config.dataFunction || ''} fieldName='dataFunction' label='Data Function' updateField={updateField} initial='Select' options={DATA_FUNCTIONS} className='cove-input' />
+            <InputSelect style={inputSelectStyle(!config.dataFunction)} value={config.dataFunction || ''} fieldName='dataFunction' label='Data Function' updateField={updateField} initial='Select' options={DATA_FUNCTIONS} className='cove-input' />
           </div>
 
           <div className='cove-input-group'>
@@ -326,7 +319,7 @@ const EditorPanel = memo(props => {
             </div>
           </li>
         </ul>
-        {false && (
+        {config.visualizationType === 'Gauge' && (
           <>
             <hr className='cove-accordion__divider' />
             <div className='cove-accordion__panel-section reverse-labels'>

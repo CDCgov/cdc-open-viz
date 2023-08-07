@@ -19,8 +19,9 @@ export default function useRightAxis({ config, yMax = 0, data = [], updateConfig
 
   // if there is a bar series & the right axis doesn't include a negative number, default to zero
   const hasBarSeries = config.runtime?.barSeriesKeys?.length > 0
+  const hasLineSeries = config.runtime?.lineSeriesKeys?.length > 0
 
-  if (hasBarSeries && minValue > 0) {
+  if ((hasBarSeries || hasLineSeries) && minValue > 0) {
     minValue = 0
   }
 

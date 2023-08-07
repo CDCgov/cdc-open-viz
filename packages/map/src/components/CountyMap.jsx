@@ -9,7 +9,6 @@ import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import topoJSON from '../data/county-map.json'
-import { formatPrefix } from 'd3'
 import useMapLayers from '../hooks/useMapLayers'
 
 const sortById = (a, b) => {
@@ -379,8 +378,17 @@ const CountyMap = props => {
 
   return (
     <ErrorBoundary component='CountyMap'>
-      <canvas ref={canvasRef} aria-label={handleMapAriaLabels(state)} onMouseMove={canvasHover} onClick={canvasClick}></canvas>
-      <div ref={tooltipRef} id='canvas-tooltip' className='tooltip'></div>
+      <canvas
+        ref={canvasRef}
+        aria-label={handleMapAriaLabels(state)}
+        onMouseMove={canvasHover}
+        onMouseOut={() => {
+          tooltipRef.current.style.display = 'none'
+          tooltipRef.current.setAttribute('data-index', null)
+        }}
+        onClick={canvasClick}
+      ></canvas>
+      <div ref={tooltipRef} id='canvas-tooltip' className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})` }}></div>
       <button className={`btn btn--reset`} onClick={onReset} ref={resetButton} tabIndex='0'>
         Reset Zoom
       </button>
