@@ -24,20 +24,21 @@ export default function ConfigureTab({ containerEl }) {
           <CdcMap isEditor={true} isDebug={isDebug} config={config} hostname={hostname} setConfig={setTempConfig} containerEl={containerEl} />
         </ErrorBoundary>
       )
-    case 'chart':
+    case 'waffle-chart':
       if (config.visualizationType === 'Waffle' || config.visualizationType === 'Gauge') {
         return (
           <ErrorBoundary component='CdcWaffleChart'>
             <CdcWaffleChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
           </ErrorBoundary>
         )
-      } else {
-        return (
-          <ErrorBoundary component='CdcChart'>
-            <CdcChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
-          </ErrorBoundary>
-        )
       }
+      break
+    case 'chart':
+      return (
+        <ErrorBoundary component='CdcChart'>
+          <CdcChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
+        </ErrorBoundary>
+      )
     case 'dashboard':
       return (
         <ErrorBoundary component='CdcDashboard'>

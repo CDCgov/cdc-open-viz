@@ -15,6 +15,7 @@ export default {
   barStyle: '',
   roundingStyle: 'standard',
   tipRounding: 'top',
+  isResponsiveTicks: false,
   general: {
     showDownloadButton: false
   },
@@ -36,7 +37,7 @@ export default {
     tickLabelColor: '#333',
     tickColor: '#333',
     rightHideAxis: true,
-    rightAxisSize: 50,
+    rightAxisSize: 0,
     rightLabel: '',
     rightLabelOffsetSize: 0,
     rightAxisLabelColor: '#333',
@@ -107,7 +108,7 @@ export default {
     labelOffset: 65,
     axisPadding: 0,
     target: 0,
-    anchors: []
+    maxTickRotation: 0
   },
   table: {
     label: 'Data Table',
@@ -169,5 +170,8 @@ export default {
   useLogScale: false,
   filterBehavior: 'Filter Change',
   highlightedBarValues: [],
-  series: []
+  series: [],
+  tooltips: {
+    opacity: 90
+  }
 }

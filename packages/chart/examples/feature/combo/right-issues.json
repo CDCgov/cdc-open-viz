@@ -176,7 +176,7 @@
   "series": [
     {
       "dataKey": "Radius",
-      "type": "Bar"
+      "type": "Line"
     },
     {
       "dataKey": "Diameter",

@@ -1,15 +1,14 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { Group } from '@visx/group'
-import { BarGroup, BarStack } from '@visx/shape'
+import { BarGroup, BarStack, Bar } from '@visx/shape'
 import { Text } from '@visx/text'
 import chroma from 'chroma-js'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
-import { act } from 'react-dom/test-utils'
 
-export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
+const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible, handleTooltipMouseOver, handleTooltipMouseOff, handleTooltipClick }) => {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, tableData, formatDate, isNumber, getTextWidth, parseDate, setSharedFilter, setSharedFilterValue, dashboardConfig } = useContext(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const { orientation, visualizationSubType } = config
@@ -64,7 +63,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       if (!colorMap.has(values[i])) {
         colorMap.set(values[i], palettesArr[colorMap.size % palettesArr.length])
       }
-      // push the colosr to the result array
+      // push the color to the result array
       result.push(colorMap.get(values[i]))
     }
     return result
@@ -172,11 +171,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   }
 
-                  const tooltip = `<div>
-                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                  const {
+                    legend: { showLegendValuesTooltip },
+                    runtime: { seriesLabels }
+                  } = config
+
+                  const barStackTooltip = `<div>
+                  <p class="tooltip-heading"><strong>${xAxisTooltip}</strong></p>
+                  ${showLegendValuesTooltip && seriesLabels && hasMultipleSeries ? `${seriesLabels[bar.key] || ''}<br/>` : ''}
                   ${yAxisTooltip}<br />
-                  ${xAxisTooltip}
                     </div>`
+
                   return (
                     <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
                       <style>
@@ -201,7 +206,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
-                          data-tooltip-html={tooltip}
+                          data-tooltip-html={barStackTooltip}
                           data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                           onClick={e => {
                             e.preventDefault()
@@ -444,17 +449,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                       let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                       if (!hasMultipleSeries && config.runtime.horizontal) {
-                        xAxisTooltip = config.isLegendValue ? `${bar.key}: ${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                        xAxisTooltip = config.isLegendValue ? `<p className="tooltip-heading">${bar.key}: ${xAxisValue}</p>` : config.runtime.xAxis.label ? `<p className="tooltip-heading">${config.runtime.xAxis.label}: ${xAxisValue}</p>` : xAxisValue
                       }
                       if (!hasMultipleSeries && !config.runtime.horizontal) {
                         yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                       }
 
-                      const tooltip = `<div>
+                      const tooltip = `<ul>
                       ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
-                      ${yAxisTooltip}<br />
-                      ${xAxisTooltip}
-                        </div>`
+                      <li class="tooltip-heading">${yAxisTooltip}</li>
+                      <li class="tooltip-body">${xAxisTooltip}</li>
+                        </li></ul>`
 
                       const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                       const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
@@ -467,7 +472,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
                         if (isHighlightedBar) return 'transparent'
                         // loop through shared filters and get active values
-                        if (dashboardConfig && dashboardConfig?.dashboard.sharedFilters?.length > 0) {
+                        /* if (dashboardConfig && dashboardConfig?.dashboard.sharedFilters?.length > 0) {
                           let activeFilters = []
                           let backgroundColor = barColor
 
@@ -500,7 +505,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           }
                           checkForResetValue()
                           return backgroundColor
-                        }
+                        } */
                         return barColor
                       }
 
@@ -674,7 +679,12 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               : ''}
           </Group>
         )}
+
+        {/* tooltips */}
+        {orientation !== 'horizontal' && <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={false ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />}
       </Group>
     </ErrorBoundary>
   )
 }
+
+export default BarChart
