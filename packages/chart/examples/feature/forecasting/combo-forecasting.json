@@ -2,6 +2,7 @@
   "type": "chart",
   "title": "Forecasting Chart Example",
   "showTitle": true,
+  "showDownloadMediaButton": false,
   "theme": "theme-blue",
   "animate": true,
   "fontSize": "medium",
@@ -14,6 +15,10 @@
   "barStyle": "",
   "roundingStyle": "standard",
   "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "showDownloadButton": false
+  },
   "padding": {
     "left": 0,
     "right": 0
@@ -41,7 +46,11 @@
     "numTicks": "",
     "axisPadding": 0,
     "tickRotation": 0,
-    "anchors": [],
+    "anchors": [
+      {
+        "value": "10/15/2022"
+      }
+    ],
     "label": "Cases by Date of Report"
   },
   "boxplot": {
@@ -84,6 +93,12 @@
     "horizontal": 750
   },
   "xAxis": {
+    "anchors": [
+      {
+        "value": "500",
+        "lineStyle": "dashed-md"
+      }
+    ],
     "type": "date",
     "showTargetLabel": true,
     "targetLabel": "Target",
@@ -101,12 +116,7 @@
     "labelOffset": 65,
     "axisPadding": 0,
     "target": 0,
-    "anchors": [
-      {
-        "value": "10/19/2022",
-        "lineStyle": "dashed-md"
-      }
-    ],
+    "maxTickRotation": 0,
     "label": "",
     "dataKey": "date",
     "dateParseFormat": "%m/%d/%Y",
@@ -120,9 +130,14 @@
     "caption": "",
     "showDownloadUrl": false,
     "showDataTableLink": true,
+    "indexLabel": "",
+    "download": false,
+    "showVertical": false,
     "show": true
   },
   "orientation": "vertical",
+  "color": "pinkpurple",
+  "columns": {},
   "legend": {
     "behavior": "isolate",
     "singleRow": false,
@@ -162,9 +177,60 @@
   "visual": {
     "border": true,
     "accent": true,
-    "background": true
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false
   },
+  "useLogScale": false,
   "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "confirm",
+      "type": "Bar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "type",
+      "type": "Forecasting",
+      "axis": "Left",
+      "confidenceIntervals": [
+        {
+          "high": "upper_90",
+          "low": "lower_90"
+        },
+        {
+          "high": "upper_50",
+          "low": "lower_50"
+        },
+        {
+          "high": "upper_20",
+          "low": "lower_20"
+        }
+      ],
+      "stageColumn": "type",
+      "stageItem": "estimate",
+      "stages": [
+        {
+          "key": "estimate",
+          "color": "sequential-green"
+        },
+        {
+          "key": "estimate based on partial data",
+          "color": "sequential-orange-(MPX)"
+        },
+        {
+          "key": "forecast",
+          "color": "sequential-blue"
+        }
+      ],
+      "tooltip": true
+    }
+  ],
+  "tooltips": {
+    "opacity": 90
+  },
   "forecastingChart": {
     "showBars": false,
     "barColumn": "confirm",
@@ -200,46 +266,6 @@
   "dataUrl": "./examples/feature/forecasting/case_date_example.csv",
   "animateReplay": true,
   "visualizationType": "Combo",
-  "series": [
-    {
-      "dataKey": "confirm",
-      "type": "Bar",
-      "axis": "Left"
-    },
-    {
-      "dataKey": "type",
-      "type": "Forecasting",
-      "axis": "Left",
-      "confidenceIntervals": [
-        {
-          "high": "upper_90",
-          "low": "lower_90"
-        },
-        {
-          "high": "upper_50",
-          "low": "lower_50"
-        },
-        {
-          "high": "upper_20",
-          "low": "lower_20"
-        }
-      ],
-      "stageColumn": "type",
-      "stageItem": "estimate",
-      "stages": [
-        {
-          "key": "estimate",
-          "color": "sequential-green"
-        },
-        {
-          "key": "estimate based on partial data",
-          "color": "sequential-orange-(MPX)"
-        },
-        {
-          "key": "forecast",
-          "color": "sequential-blue"
-        }
-      ]
-    }
-  ]
+  "validated": 4.23,
+  "dynamicMarginTop": 0
 }
