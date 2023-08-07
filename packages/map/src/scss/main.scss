@@ -3,6 +3,7 @@
 @import 'variables';
 @import 'editor-panel';
 @import 'filters';
+@import '@cdc/core/styles/v2/components/ui/tooltip';
 
 .cdc-map-outer-container {
   position: relative;
@@ -20,7 +21,6 @@
 }
 
 .cdc-map-inner-container {
-  @import './tooltips';
   @import './map';
   @import './sidebar';
   @import './datatable';

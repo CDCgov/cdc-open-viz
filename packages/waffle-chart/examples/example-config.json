@@ -2,9 +2,9 @@
   "type": "waffle-chart",
   "dataUrl": "/examples/example-data.json",
   "filters": [],
-  "title": "Waffle Chart",
+  "title": "Chart Title",
   "content": "of cases occurred in the home",
-  "subtext": "Waffle chart subtext or citation",
+  "subtext": "Chart subtext or citation",
   "theme": "theme-blue",
   "suffix": "%"
 }

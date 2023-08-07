@@ -44,7 +44,7 @@
   {
     "name": "Pluto",
     "Radius": "200",
-    "Diameter": "-22",
+    "Diameter": "22",
     "distance": "0"
   }
 ]

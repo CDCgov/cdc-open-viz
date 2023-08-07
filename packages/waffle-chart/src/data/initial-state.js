@@ -1,5 +1,5 @@
 export default {
-  title: 'Waffle Chart',
+  title: 'Chart Title',
   visualizationType: 'Waffle',
   visualizationSubType: 'linear',
   showPercent: true,
