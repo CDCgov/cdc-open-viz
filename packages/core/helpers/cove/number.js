@@ -30,8 +30,6 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   if (isNegative) {
     num = Math.abs(num)
   }
-
-  console.log("### number.js formatNumber num", num)
   
   // destructure dataFormat values
   let {
