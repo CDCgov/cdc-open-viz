@@ -341,6 +341,7 @@ const DataTable = props => {
               {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
             >
               {text}
+              <span>{sortBy.column === column ? (sortBy.asc ? ' \u2193' : ' \u2191') : ''}</span>
               <button>
                 <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
               </button>
@@ -472,6 +473,7 @@ const DataTable = props => {
                   {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
                 >
                   {text}
+                  <span>{sortBy.column === column ? (sortBy.asc ? ' \u2193' : ' \u2191 ') : ''}</span>
                   <button>
                     <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
                   </button>

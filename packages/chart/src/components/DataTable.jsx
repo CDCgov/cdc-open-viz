@@ -36,19 +36,13 @@ export default function DataTable() {
       }
     }
 
+    // - trying to eliminate console error that occurs if formatted with prettier
+    // prettier-ignore
     switch (type) {
       case 'download':
-        return (
-          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border margin-sm`}>
-            Download Data (CSV)
-          </a>
-        )
+        return (<a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border margin-sm`}>Download Data (CSV)</a>)
       default:
-        return (
-          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`no-border`}>
-            Download Data (CSV)
-          </a>
-        )
+        return (<a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`no-border`}>Download Data (CSV)</a>)
     }
   }
 
@@ -231,6 +225,7 @@ export default function DataTable() {
       columns: tableColumns,
       data: tableData,
       defaultColumn,
+      disableSortRemove: true, // otherwise 3rd click on header removes sorting entirely
       sortTypes: {
         custom: (rowA, rowB, columnId) => {
           // rowA.original - is the row data field name to access the value
@@ -304,10 +299,11 @@ export default function DataTable() {
                       role='columnheader'
                       scope='col'
                       {...column.getHeaderProps(column.getSortByToggleProps())}
-                      className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : 'sort'}
-                      {...(column.isSorted ? (column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' }) : null)}
+                      className={column.isSorted && column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc'}
+                      {...(column.isSorted && column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' })}
                     >
                       {column.render('Header')}
+                      <span>{column.isSorted ? (column.isSortedDesc ? ' \u2191' : ' \u2193') : ''}</span>
                     </th>
                   ))}
                 </tr>
