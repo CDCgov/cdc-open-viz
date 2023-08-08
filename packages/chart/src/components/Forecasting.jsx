@@ -18,7 +18,7 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
   return (
     data && (
       <ErrorBoundary component='ForecastingChart'>
-        <Group className='forecasting-items' key='forecasting-items-wrapper' left={yAxis.size}>
+        <Group className='forecasting-items' key='forecasting-items-wrapper' left={Number(yAxis.size)}>
           {runtime.forecastingSeriesKeys?.map((group, index) => {
             if (!group || !group.stages) return false
             return group.stages.map((stage, stageIndex) => {
@@ -42,6 +42,7 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
                       return 'transparent'
                     }
 
+                    if (ciGroup.high === '' || ciGroup.low === '') return
                     return (
                       <Group key={`forecasting-areas--stage-${stage.key.replaceAll(' ', '-')}--group-${stageIndex}-${ciGroupIndex}`}>
                         {/* prettier-ignore */}
@@ -58,26 +59,10 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
                         {ciGroupIndex === 0 && (
                           <>
                             {/* prettier-ignore */}
-                            <LinePath
-                              data={groupData}
-                              x={ d => xScale(Date.parse(d[xAxis.dataKey])) }
-                              y={ d => yScale(d[ciGroup.high])}
-                              curve={curveMonotoneX}
-                              stroke={getStroke()}
-                              strokeWidth={1}
-                              strokeOpacity={1}
-                            />
+                            <LinePath data={groupData} x={d => Number(xScale(Date.parse(d[xAxis.dataKey])))} y={d => Number(yScale(d[ciGroup.high]))} curve={curveMonotoneX} stroke={getStroke()} strokeWidth={1} strokeOpacity={1} />
 
                             {/* prettier-ignore */}
-                            <LinePath
-                              data={groupData}
-                              x={ d => xScale(Date.parse(d[xAxis.dataKey])) }
-                              y={ d => yScale(d[ciGroup.low])}
-                              curve={curveMonotoneX}
-                              stroke={getStroke()}
-                              strokeWidth={1}
-                              strokeOpacity={1}
-                            />
+                            <LinePath data={groupData} x={d => Number(xScale(Date.parse(d[xAxis.dataKey])))} y={d => Number(yScale(d[ciGroup.low]))} curve={curveMonotoneX} stroke={getStroke()} strokeWidth={1} strokeOpacity={1} />
                           </>
                         )}
                       </Group>

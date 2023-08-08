@@ -137,7 +137,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Waffle Chart' type='chart' subType='Waffle' icon={<WaffleChartIcon />} />
+              <IconButton label='Waffle Chart' type='waffle-chart' subType='Waffle' icon={<WaffleChartIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Highlight a piece of data in relationship to a data set.</Tooltip.Content>
           </Tooltip>
@@ -145,7 +145,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Gauge Chart' type='chart' subType='Gauge' icon={<GaugeChartIcon />} />
+              <IconButton label='Gauge Chart' type='waffle-chart' subType='Gauge' icon={<GaugeChartIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal scale.</Tooltip.Content>
           </Tooltip>
