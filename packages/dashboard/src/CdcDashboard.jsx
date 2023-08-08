@@ -154,31 +154,40 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         const dataset = config.datasets[datasetKeys[i]]
         if (dataset.dataUrl && config.dashboard && config.dashboard.sharedFilters) {
           const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl)
-          let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
-          let qsParamsFitlerable = {}
+          let currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+          let updatedQSParams = {}
 
           let isUpdateNeeded = false
 
           config.dashboard.sharedFilters.forEach(filter => {
-            if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
-              if (!qsParamsFitlerable[filter.queryParameter]) {
-                qsParams[filter.queryParameter] = filter.active
-                qsParamsFitlerable[filter.queryParameter] = true
+            if (filter.type === 'url') {
+              if (updatedQSParams[filter.queryParameter]) {
+                updatedQSParams[filter.queryParameter] = updatedQSParams[filter.queryParameter] + filter.active
               } else {
-                qsParams[filter.queryParameter] = qsParams[filter.queryParameter] + filter.active
+                updatedQSParams[filter.queryParameter] = filter.active
               }
+            }
+          })
 
+          Object.keys(updatedQSParams).forEach(updatedParam => {
+            if (decodeURIComponent(updatedQSParams[updatedParam]) !== currentQSParams[updatedParam]) {
               isUpdateNeeded = true
             }
           })
 
           if (!isUpdateNeeded) return
 
-          let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(qsParams)
+          Object.keys(currentQSParams).forEach(currentParam => {
+            if (!updatedQSParams[currentParam]) {
+              updatedQSParams[currentParam] = currentQSParams[currentParam]
+            }
+          })
+
+          let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${Object.keys(updatedQSParams)
             .map((param, i) => {
               let qs = i === 0 ? '?' : '&'
               qs += param + '='
-              qs += qsParams[param]
+              qs += updatedQSParams[param]
               return qs
             })
             .join('')}`
