@@ -21,10 +21,6 @@ import LinearChart from './components/LinearChart'
 
 import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 
-import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
-
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-
 import SparkLine from './components/SparkLine'
 import Legend from './components/Legend'
 import defaults from './data/initial-state'
@@ -34,6 +30,8 @@ import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
 
 // Helpers
+import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
@@ -567,7 +565,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
     }
 
-    if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar'].includes(newConfig.visualizationType)) {
+    if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)) {
       newConfig.runtime.xAxis = newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis
       newConfig.runtime.horizontal = true
@@ -1018,11 +1016,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     'Box Plot': <LinearChart />,
     'Area Chart': <LinearChart />,
     'Scatter Plot': <LinearChart />,
-    'Deviation Bar': <LinearChart />
+    'Deviation Bar': <LinearChart />,
+    'Forest Plot': <LinearChart />
   }
 
   const missingRequiredSections = () => {
     if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
+    if (config.visualizationType === 'Forest Plot') return false // skip required checks for now.
     if (config.visualizationType === 'Pie') {
       if (undefined === config?.yAxis.dataKey) {
         return true

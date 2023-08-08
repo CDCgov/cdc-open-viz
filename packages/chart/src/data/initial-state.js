@@ -1,5 +1,6 @@
 export default {
   type: 'chart',
+  debugSvg: false,
   title: '',
   showTitle: true,
   showDownloadMediaButton: false,
@@ -173,5 +174,40 @@ export default {
   series: [],
   tooltips: {
     opacity: 90
+  },
+  forestPlot: {
+    startAt: 0,
+    width: 'auto',
+    colors: {
+      line: '',
+      shape: ''
+    },
+    estimateField: '',
+    estimateRadius: '',
+    lowerCiField: '',
+    upperCiField: '',
+    shape: '',
+    rowHeight: 20,
+    showZeroLine: false,
+    description: {
+      show: true,
+      text: 'description',
+      location: 0
+    },
+    result: {
+      show: true,
+      text: 'result',
+      location: 100
+    },
+    radius: {
+      min: 1,
+      max: 8,
+      scalingColumn: ''
+    },
+    regression: {
+      lower: 0,
+      upper: 0,
+      estimateField: 0
+    }
   }
 }
