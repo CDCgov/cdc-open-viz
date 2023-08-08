@@ -44,7 +44,7 @@ export default function LinearChart() {
   const getXAxisData = d => (runtime.xAxis.type === 'date' ? parseDate(d[runtime.originalXAxis.dataKey]).getTime() : d[runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = data.map(d => getXAxisData(d))
-
+  const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   // configure width
   let [width] = dimensions
   let originalWidth = width
@@ -684,7 +684,7 @@ export default function LinearChart() {
                             angle={tickRotation}
                             verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
                             textAnchor={tickRotation ? 'end' : 'middle'}
-                            width={areTicksTouching && !config.isResponsiveTicks && !config.xAxis.tickRotation ? limitedWidth : textWidth}
+                            width={areTicksTouching && !config.isResponsiveTicks && !Number(config[section].tickRotation) ? limitedWidth : textWidth}
                             fill={config.xAxis.tickLabelColor}
                           >
                             {tick.formattedValue}
