@@ -32,7 +32,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, chartRef, handleTooltipMouseOve
     data && (
       <ErrorBoundary component='AreaChart'>
         <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)}>
-          {(config.runtime.areaSeriesKeys || config.runtime.seriesKeys).map((s, index) => {
+          {(config.runtime.areaSeriesKeys || config.series).map((s, index) => {
             let seriesData = data.map(d => {
               return {
                 [config.xAxis.dataKey]: d[config.xAxis.dataKey],
