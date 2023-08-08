@@ -146,8 +146,7 @@ export default function DataTable() {
 
             return <>{numberFormatter(d[row.original], resolvedAxis)}</>
           },
-          id: `${d[config.runtime.originalXAxis.dataKey]}`, //--${index}
-          //accessor: d[config.series.dataKey], //'Week',
+          id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
           sortType: 'custom',
           canSort: true
         }
@@ -232,15 +231,17 @@ export default function DataTable() {
           // columnId = the column indicator
           let dataKey = config.xAxis.dataKey
           let colObj = config.data.filter(obj => {
-            return obj[dataKey] === columnId
+            return obj[dataKey] === columnId.split('--')[0] // have to remove index
           })
-
+          if (colObj === undefined || colObj[0] === undefined) {
+            return -1
+          }
           // NOW we can get the sort values
           const a = transform.cleanDataPoint(colObj[0][rowA.original]) // issue was that a was UNDEFINED therefore it CANT SORT
           const b = transform.cleanDataPoint(colObj[0][rowB.original])
 
           if (a === undefined) {
-            return 0
+            return -1
           }
           if (!isNaN(Number(a)) && !isNaN(Number(b))) {
             return Number(a) - Number(b)
