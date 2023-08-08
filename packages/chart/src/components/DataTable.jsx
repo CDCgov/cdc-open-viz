@@ -302,9 +302,8 @@ export default function DataTable() {
             <caption className='cdcdataviz-sr-only visually-hidden'>{config.table.caption ? config.table.caption : config.table.label ? config.table.label : 'Data Table'}</caption>
             <thead>
               {headerGroups.map((headerGroup, index) => (
-                <tr {...headerGroup.getHeaderGroupProps()} key={`headerGroups`}>
+                <tr {...headerGroup.getHeaderGroupProps()} key={`headerGroups--${index}`}>
                   {' '}
-                  {/* --$index */}
                   {headerGroup.headers.map((column, index) => (
                     <th
                       tabIndex='0'
