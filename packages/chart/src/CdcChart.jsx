@@ -563,9 +563,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.areaSeriesKeys = []
 
       newConfig.series.forEach(series => {
-        if (series.type === 'Area Chart') {
-          newConfig.runtime.areaSeriesKeys.push(series)
-        }
+        newConfig.runtime.areaSeriesKeys.push({ ...series, type: 'Area Chart' })
       })
     }
 
@@ -574,6 +572,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.yAxis = newConfig.xAxis
       newConfig.runtime.horizontal = true
       newConfig.orientation = 'horizontal'
+    } else if (['Box Plot', 'Scatter Plot', 'Area Chart'].includes(newConfig.visualizationType)) {
+      newConfig.runtime.xAxis = newConfig.xAxis
+      newConfig.runtime.yAxis = newConfig.yAxis
+      newConfig.runtime.horizontal = false
+      newConfig.orientation = 'vertical'
     } else {
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
