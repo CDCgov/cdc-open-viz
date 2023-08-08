@@ -1528,7 +1528,7 @@ const EditorPanel = () => {
                     <span className='edit-label column-heading'>Anchors</span>
                     <Accordion allowZeroExpanded>
                       {config.yAxis?.anchors?.map((anchor, index) => (
-                        <AccordionItem className='series-item series-item--chart'>
+                        <AccordionItem className='series-item series-item--chart' key={`yaxis-anchors-2-${index}`}>
                           <AccordionItemHeading className='series-item__title'>
                             <>
                               <AccordionItemButton className={'accordion__button accordion__button'}>
@@ -1654,7 +1654,7 @@ const EditorPanel = () => {
                     <span className='edit-label column-heading'>Anchors</span>
                     <Accordion allowZeroExpanded>
                       {config.xAxis?.anchors?.map((anchor, index) => (
-                        <AccordionItem className='series-item series-item--chart'>
+                        <AccordionItem className='series-item series-item--chart' key={`xaxis-anchors-${index}`}>
                           <AccordionItemHeading className='series-item__title'>
                             <>
                               <AccordionItemButton className={'accordion__button accordion__button'}>
@@ -2172,7 +2172,7 @@ const EditorPanel = () => {
                     <span className='edit-label column-heading'>Anchors</span>
                     <Accordion allowZeroExpanded>
                       {config.xAxis?.anchors?.map((anchor, index) => (
-                        <AccordionItem className='series-item series-item--chart'>
+                        <AccordionItem className='series-item series-item--chart' key={`xaxis-anchors-2-${index}`}>
                           <AccordionItemHeading className='series-item__title'>
                             <>
                               <AccordionItemButton className={'accordion__button accordion__button'}>
@@ -2298,7 +2298,7 @@ const EditorPanel = () => {
                     <span className='edit-label column-heading'>Anchors</span>
                     <Accordion allowZeroExpanded>
                       {config.yAxis?.anchors?.map((anchor, index) => (
-                        <AccordionItem className='series-item series-item--chart'>
+                        <AccordionItem className='series-item series-item--chart' key={`accordion-yaxis-anchors-${index}`}>
                           <AccordionItemHeading className='series-item__title'>
                             <>
                               <AccordionItemButton className={'accordion__button accordion__button'}>
