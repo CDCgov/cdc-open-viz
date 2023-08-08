@@ -89,7 +89,7 @@ export default function DataTable() {
           ]
         : [
             {
-              Header: '',
+              Header: ' ',
               Cell: ({ row }) => {
                 const getSeriesLabel = () => {
                   let userUpdatedSeriesName = config.series.filter(series => series.dataKey === row.original)?.[0]?.name
@@ -117,7 +117,9 @@ export default function DataTable() {
                   </>
                 )
               },
-              id: 'series-label'
+              id: 'series-label',
+              sortType: 'custom',
+              canSort: true
             }
           ]
     if (config.visualizationType !== 'Box Plot') {
@@ -315,7 +317,7 @@ export default function DataTable() {
                       {...(column.isSorted && column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' })}
                     >
                       {column.render('Header')}
-                      <span className={'sort-icon'}>{column.isSorted ? (column.isSortedDesc ? upIcon : downIcon) : ''}</span>
+                      {column.isSorted && <span className={'sort-icon'}>{column.isSortedDesc ? downIcon : upIcon}</span>}
                     </th>
                   ))}
                 </tr>
