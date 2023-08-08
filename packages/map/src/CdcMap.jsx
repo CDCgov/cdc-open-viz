@@ -1059,7 +1059,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     return formattedName
   }
 
-  // Attempts to find the corresponding value
+  // Attempts to find the corresponding valuex
   const displayGeoName = key => {
     let value = key
     // Map to first item in values array which is the preferred label
