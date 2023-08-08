@@ -219,6 +219,17 @@ export default function DataTable() {
     }),
     []
   )
+  const upIcon = (
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5'>
+      <path d='M0 5l5-5 5 5z' />
+    </svg>
+  )
+  const downIcon = (
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5'>
+      <path d='M0 0l5 5 5-5z' />
+    </svg>
+  )
+
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
     {
       columns: tableColumns,
@@ -304,7 +315,7 @@ export default function DataTable() {
                       {...(column.isSorted && column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' })}
                     >
                       {column.render('Header')}
-                      <span>{column.isSorted ? (column.isSortedDesc ? ' \u2191' : ' \u2193') : ''}</span>
+                      <span className={'sort-icon'}>{column.isSorted ? (column.isSortedDesc ? upIcon : downIcon) : ''}</span>
                     </th>
                   ))}
                 </tr>

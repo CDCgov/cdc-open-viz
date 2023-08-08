@@ -94,6 +94,7 @@ table.data-table {
       background-size: 10px 5px;
     }
 
+    /* doesnt work
     th.sort-asc,
     td.sort-asc {
       background-image: url(../assets/icon-caret-filled-up.svg);
@@ -102,6 +103,19 @@ table.data-table {
     th.sort-desc,
     td.sort-desc {
       background-image: url(../assets/icon-caret-filled-down.svg);
+    }
+    */
+
+    // format the white triangle sort icon in data table headers
+    .sort-icon {
+    fill: white;
+    width: 30px;
+    float: right;
+    align-self: center;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
     }
 
     th:last-child,
