@@ -30,7 +30,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   if (isNegative) {
     num = Math.abs(num)
   }
-
+  
   // destructure dataFormat values
   let {
     dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix, bottomPrefix, bottomSuffix, bottomAbbreviated }

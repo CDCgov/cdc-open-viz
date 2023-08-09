@@ -250,6 +250,26 @@ export class DataTransform {
     if (testing) console.log('## cleanedData =', cleanedupData)
     return cleanedupData
   }
+
+  // clean out %, $, commas from numbers when needing to do sorting!
+  cleanDataPoint(data, testing = false) {
+      if (testing) console.log('clean', data)
+      let cleaned = ''
+
+      // remove comma and dollar signs
+      if (testing) console.log('typeof data is ', typeof data)
+      let tmp = ''
+      if (typeof data === 'string') {
+        tmp = data!== null && data !== '' ? data.replace(/[,\$\%]/g, '') : ''
+      } else {
+        tmp = data !== null && data !== '' ? data : ''
+      }
+
+     cleaned = tmp
+
+      if (testing) console.log('## cleanedData =', cleaned)
+      return cleaned
+  }
 }
 
 export default DataTransform
