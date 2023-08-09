@@ -108,7 +108,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
                   fillOpacity={transparentArea ? 0.25 : 0.5}
                   data={seriesData}
                   x={d => handleX(d)}
-                  y={d => handleY(d, index, s)} // isBrush ? handleBrushY : 
+                  y={d => handleY(d, index, s)}
                   yScale={yScale}
                   curve={curveType}
                   strokeDasharray={s.type ? handleLineType(s.type) : 0}
