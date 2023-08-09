@@ -1,6 +1,6 @@
 {
   "type": "chart",
-  "title": "Example Area Chart - Apple Stock Data",
+  "title": "Example Area Chart - City Temperature Data",
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",

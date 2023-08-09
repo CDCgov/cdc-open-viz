@@ -49,7 +49,10 @@ export default function LinearChart() {
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime } = config
 
-  const getDate = d => new Date(d.Date)
+  const getDate = d => {
+    if (d.Date) return new Date(d.Date)
+    if (d.date) return new Date(d.date) // if its not upper case in the data file
+  }
 
   const initBrushData = () => {
     let brushFilteredData = new Set()
@@ -156,15 +159,15 @@ export default function LinearChart() {
   const onBrushChange = domain => {
     if (!domain) return
     const { x0, x1, y0, y1 } = domain
-    //console.log('## onBrushChange domain x0, x1', domain, x0, x1)
+    console.log('## onBrushChange domain x0, x1', domain, x0, x1)
     let brushFilteredData = []
     brushFilteredData = config.data.filter(s => {
       const x = getDate(s).getTime()
-      //console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
+      console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
       //const y = getStockValue(s)
       if (x > x0 && x < x1) {
         let date = formatDate(getXValueFromCoordinateDate(x))
-        //console.log('YES ADD', date)
+        console.log('YES ADD', date)
         return s
       }
     })
