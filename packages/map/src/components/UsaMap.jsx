@@ -372,11 +372,18 @@ const UsaMap = props => {
           </AlbersUsa>
         )}
       </svg>
+
       {territories.length > 0 && (
-        <section className='territories'>
-          <span className='label'>{state.general.territoriesLabel}</span>
-          {territories}
-        </section>
+        <>
+          <div className='two-col'>
+            <div>
+              <span className='territories-label label'>{state.general.territoriesLabel}</span>
+            </div>
+            <div>
+              <span className={window.visualViewport.width < 500 ? 'territories--mobile' : 'territories'}>{territories}</span>
+            </div>
+          </div>
+        </>
       )}
     </ErrorBoundary>
   )
