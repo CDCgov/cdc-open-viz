@@ -36,7 +36,7 @@
     "rightAxisTickLabelColor": "#333",
     "rightAxisTickColor": "#333",
     "isLegendValue": false,
-    "numTicks": "",
+    "numTicks": "4",
     "label": "Y Axis Example Label"
   },
   "topAxis": {
@@ -103,6 +103,60 @@
       "Data 5": "220",
       "Data 6": "300",
       "Date": "6/15/2016"
+    },
+    {
+      "Date": "7/15/2016",
+      "Data 1": "900",
+      "Data 2": "235",
+      "Data 3": "300",
+      "Data 4": "195",
+      "Data 5": "120",
+      "Data 6": "610"
+    },
+    {
+      "Date": "8/15/2016",
+      "Data 1": "3000",
+      "Data 2": "900",
+      "Data 3": "540",
+      "Data 4": "600",
+      "Data 5": "120",
+      "Data 6": "200"
+    },
+    {
+      "Date": "9/15/2016",
+      "Data 1": "700",
+      "Data 2": "200",
+      "Data 3": "590",
+      "Data 4": "900",
+      "Data 5": "400",
+      "Data 6": "650"
+    },
+    {
+      "Date": "10/15/2016",
+      "Data 1": "2200",
+      "Data 2": "360",
+      "Data 3": "930",
+      "Data 4": "880",
+      "Data 5": "760",
+      "Data 6": "420"
+    },
+    {
+      "Date": "11/15/2016",
+      "Data 1": "5000",
+      "Data 2": "1350",
+      "Data 3": "300",
+      "Data 4": "1150",
+      "Data 5": "230",
+      "Data 6": "600"
+    },
+    {
+      "Date": "12/15/2016",
+      "Data 1": "6000",
+      "Data 2": "3220",
+      "Data 3": "540",
+      "Data 4": "300",
+      "Data 5": "720",
+      "Data 6": "3000"
     }
   ],
   "heights": {
@@ -125,7 +179,7 @@
     "tickLabelColor": "#333",
     "tickColor": "#333",
     "isLegendValue": false,
-    "numTicks": "9",
+    "numTicks": "6",
     "dataKey": "Date",
     "label": "X Axis Example Label",
     "dateParseFormat": "%m/%d/%Y",
@@ -230,6 +284,60 @@
       "Data 4": "100",
       "Data 5": "220",
       "Data 6": "300"
+    },
+    {
+      "Date": "7/15/2016",
+      "Data 1": "900",
+      "Data 2": "235",
+      "Data 3": "300",
+      "Data 4": "195",
+      "Data 5": "120",
+      "Data 6": "610"
+    },
+    {
+      "Date": "8/15/2016",
+      "Data 1": "3000",
+      "Data 2": "900",
+      "Data 3": "540",
+      "Data 4": "600",
+      "Data 5": "120",
+      "Data 6": "200"
+    },
+    {
+      "Date": "9/15/2016",
+      "Data 1": "700",
+      "Data 2": "200",
+      "Data 3": "590",
+      "Data 4": "900",
+      "Data 5": "400",
+      "Data 6": "650"
+    },
+    {
+      "Date": "10/15/2016",
+      "Data 1": "2200",
+      "Data 2": "360",
+      "Data 3": "930",
+      "Data 4": "880",
+      "Data 5": "760",
+      "Data 6": "420"
+    },
+    {
+      "Date": "11/15/2016",
+      "Data 1": "5000",
+      "Data 2": "1350",
+      "Data 3": "300",
+      "Data 4": "1150",
+      "Data 5": "230",
+      "Data 6": "600"
+    },
+    {
+      "Date": "12/15/2016",
+      "Data 1": "6000",
+      "Data 2": "3220",
+      "Data 3": "540",
+      "Data 4": "300",
+      "Data 5": "720",
+      "Data 6": "3000"
     }
   ],
   "visualizationType": "Area Chart",
