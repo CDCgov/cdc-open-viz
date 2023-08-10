@@ -10,9 +10,9 @@ import { useHighlightedBars } from '../hooks/useHighlightedBars'
 import chroma from 'chroma-js'
 
 export const BarChartVertical = props => {
-  const { xScale, yScale, xMax, yMax, seriesScale } = props
+  const { xScale, yScale, xMax, yMax, seriesScale, getXAxisData, getYAxisData } = props
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getTextWidth } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, fontSize } = useBarChart()
+  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, fontSize, lollipopBarWidth, displayNumbersOnBar, lollipopShapeSize, isLabelBelowBar } = useBarChart()
   const { orientation } = config
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
