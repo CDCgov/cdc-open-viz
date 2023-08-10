@@ -21,10 +21,6 @@ import LinearChart from './components/LinearChart'
 
 import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 
-import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
-
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-
 import SparkLine from './components/SparkLine'
 import Legend from './components/Legend'
 import defaults from './data/initial-state'
@@ -34,6 +30,8 @@ import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
 
 // Helpers
+import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
@@ -563,17 +561,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.areaSeriesKeys = []
 
       newConfig.series.forEach(series => {
-        if (series.type === 'Area Chart') {
-          newConfig.runtime.areaSeriesKeys.push(series)
-        }
+        newConfig.runtime.areaSeriesKeys.push({ ...series, type: 'Area Chart' })
       })
     }
 
-    if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar'].includes(newConfig.visualizationType)) {
+    if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)) {
       newConfig.runtime.xAxis = newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis
       newConfig.runtime.horizontal = true
       newConfig.orientation = 'horizontal'
+    } else if (['Box Plot', 'Scatter Plot', 'Area Chart'].includes(newConfig.visualizationType)) {
+      newConfig.runtime.xAxis = newConfig.xAxis
+      newConfig.runtime.yAxis = newConfig.yAxis
+      newConfig.runtime.horizontal = false
+      newConfig.orientation = 'vertical'
     } else {
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
@@ -873,11 +874,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   // Format numeric data based on settings in config OR from passed in settings for Additional Columns
+  // - use only for old horizontal data - newer formatNumber is in helper/formatNumber
   const formatNumber = (num, axis, shouldAbbreviate = false, addColPrefix, addColSuffix, addColRoundTo) => {
     // if num is NaN return num
     if (isNaN(num) || !num) return num
     // Check if the input number is negative
     const isNegative = num < 0
+
+    if (axis === undefined || !axis) axis = 'left'
 
     // If the input number is negative, take the absolute value
     if (isNegative) {
@@ -893,8 +897,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
 
     let original = num
-    let stringFormattingOptions
-    if (axis === 'left') {
+    let stringFormattingOptions = {
+      useGrouping: commas ? true : false // for old chart data table to work right cant just leave this to undefined
+    }
+    if (axis === 'left' || axis === undefined) {
       let roundToPlace
       if (addColRoundTo !== undefined) {
         // if its an Additional Column
@@ -968,7 +974,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       result = addColPrefix + result
     } else {
       if (prefix && axis === 'left') {
-        result = prefix + result
+        result += prefix
       }
     }
 
@@ -980,6 +986,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       result += bottomPrefix
     }
 
+    // combine prefix and num
     result += num
 
     if (addColSuffix && axis === 'left') {
@@ -1015,11 +1022,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     'Box Plot': <LinearChart />,
     'Area Chart': <LinearChart />,
     'Scatter Plot': <LinearChart />,
-    'Deviation Bar': <LinearChart />
+    'Deviation Bar': <LinearChart />,
+    'Forest Plot': <LinearChart />
   }
 
   const missingRequiredSections = () => {
     if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
+    if (config.visualizationType === 'Forest Plot') return false // skip required checks for now.
     if (config.visualizationType === 'Pie') {
       if (undefined === config?.yAxis.dataKey) {
         return true

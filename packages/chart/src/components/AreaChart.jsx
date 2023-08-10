@@ -68,7 +68,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
       <svg>
         <ErrorBoundary component='AreaChart'>
           <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)} top={isBrush ? yMax * 1.3 : 0}>
-            {(config.runtime.areaSeriesKeys || config.runtime.seriesKeys).map((s, index) => {
+            {(config.runtime.areaSeriesKeys || config.series).map((s, index) => {
               let seriesData = data.map(d => {
                 return {
                   [config.xAxis.dataKey]: d[config.xAxis.dataKey],
