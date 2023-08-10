@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useRef, useState, useMemo } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -41,7 +41,6 @@ import useTopAxis from '../hooks/useTopAxis'
 import { curveMonotoneX } from '@visx/curve'
 
 // styles
-import { defaultStyles } from '@visx/tooltip'
 import '../scss/LinearChart.scss'
 
 export default function LinearChart() {
@@ -82,7 +81,6 @@ export default function LinearChart() {
 
   // configure width
   let [width] = dimensions
-  let originalWidth = width
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
     width = width * 0.73
   }
@@ -227,7 +225,7 @@ export default function LinearChart() {
       tick = 0
     }
 
-    if (!config.data[index] && visualizationType === 'Forest Plot') return
+    if (config.data && !config.data[index] && visualizationType === 'Forest Plot') return
     if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
     if (runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
     if (orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
