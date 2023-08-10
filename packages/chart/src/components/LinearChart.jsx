@@ -49,10 +49,7 @@ export default function LinearChart() {
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime } = config
 
-  const getDate = d => {
-    if (d.Date) return new Date(d.Date)
-    if (d.date) return new Date(d.date) // if its not upper case in the data file
-  }
+  const getDate = d => new Date(d[config.xAxis.dataKey])
 
   const initBrushData = () => {
     let brushFilteredData = new Set()
@@ -158,22 +155,24 @@ export default function LinearChart() {
 
   const onBrushChange = domain => {
     if (!domain) return
-    const { x0, x1, y0, y1 } = domain
+    const { x0, x1 } = domain
     console.log('## onBrushChange domain x0, x1', domain, x0, x1)
     let brushFilteredData = []
     brushFilteredData = config.data.filter(s => {
       const x = getDate(s).getTime()
       console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
-      //const y = getStockValue(s)
       if (x > x0 && x < x1) {
         let date = formatDate(getXValueFromCoordinateDate(x))
         console.log('YES ADD', date)
         return s
+      } else {
+        console.log('### x not within brush bounds', x)
       }
     })
 
     // dont let the number of points go below config.xAxis.numTicks ??? (TT)
-    if (undefined !== brushFilteredData && brushFilteredData.length) {
+    if (undefined !== brushFilteredData && brushFilteredData.length >= 1) {
+      console.log('Set new xAxisBrushdata to', brushFilteredData)
       setXAxisBrushData(brushFilteredData)
     }
   }
@@ -1048,7 +1047,6 @@ export default function LinearChart() {
                 brushDirection='horizontal'
                 initialBrushPosition={initialBrushPosition}
                 onChange={onBrushChange}
-                //onClick={() => setFilteredStock(stock)}
                 selectedBoxStyle={selectedBrushStyle}
                 useWindowMoveEvents
                 renderBrushHandle={props => <BrushHandle {...props} />}
