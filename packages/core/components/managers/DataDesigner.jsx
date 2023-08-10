@@ -244,7 +244,7 @@ const DataDesigner = props => {
             </>
           )}
 
-          {config.visualizationType === 'Forest Plot' && (
+          {config?.visualizationType === 'Forest Plot' && (
             <>
               <div className='mb-2'>
                 <div className='mb-1'>Which column represents the date/category column?</div>
