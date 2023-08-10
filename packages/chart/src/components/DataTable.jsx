@@ -280,7 +280,7 @@ export default function DataTable() {
         {config.table.download && <DownloadButton data={rawData} type='link' />}
       </MediaControls.Section>
 
-      <section style={{ marginTop: !isLegendBottom ? config.dynamicMarginTop + 'px' : '0px' }} id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
+      <section style={{ marginTop: !isLegendBottom ? config.dynamicMarginTop / 4 + 'px' : '0px' }} id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
         <div
           role='button'
           className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}

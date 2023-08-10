@@ -94,7 +94,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
 
-  if (isDebug) console.log('Chart config', config)
+  if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
   const DataTable = config?.table?.showVertical ? DataTable_vert : DataTable_horiz
 
@@ -1211,7 +1211,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
 
             {/* Description */}
-            {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
+            {description && config.visualizationType !== 'Spark Line' && <div className={'column ' + config.isResponsiveTicks ? 'subtext--responsive-ticks' : 'subtext'}>{parse(description)}</div>}
 
             {/* buttons */}
             <MediaControls.Section classes={['download-buttons']}>
@@ -1306,6 +1306,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     isNumber,
     getTextWidth,
     twoColorPalette,
+    isEditor,
     isDebug,
     setSharedFilter,
     setSharedFilterValue,
