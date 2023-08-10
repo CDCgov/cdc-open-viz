@@ -107,9 +107,6 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYA
     })
   }
 
-  // Using State
-  const [textWidth, setTextWidth] = useState(null)
-
   useEffect(() => {
     if (orientation === 'horizontal' && !config.yAxis.labelPlacement) {
       updateConfig({
@@ -254,6 +251,8 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYA
                     if (chroma.contrast(labelColor, bar.color) < 4.9) {
                       labelColor = '#FFFFFF'
                     }
+                    // calculate bar labels width px
+                    let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
 
                     return (
                       <>
@@ -308,13 +307,6 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYA
                               fill={labelColor}
                               textAnchor='middle'
                               verticalAnchor='middle'
-                              innerRef={e => {
-                                if (e) {
-                                  // use font sizes and padding to set the bar height
-                                  let elem = e.getBBox()
-                                  setTextWidth(elem.width)
-                                }
-                              }}
                             >
                               {xAxisValue}
                             </Text>
