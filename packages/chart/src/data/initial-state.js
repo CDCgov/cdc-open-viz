@@ -210,5 +210,9 @@ export default {
       upper: 0,
       estimateField: 0
     }
+  },
+  brush: {
+    pattern_id: 'brush_pattern',
+    accent_color: '#ddd'
   }
 }

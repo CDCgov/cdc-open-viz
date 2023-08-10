@@ -42,23 +42,17 @@ export default function LinearChart() {
   const { isEditor, isDashboard, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
 
   // todo: start destructuring this file for conciseness
-  const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
+  const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg, showChartBrush } = config
 
   const getDate = d => new Date(d[config.xAxis.dataKey])
 
   // Initialize Brush variables - here for now
   const [xAxisBrushData, setXAxisBrushData] = useState(data) // initBrushData
-  const PATTERN_ID = 'brush_pattern'
-  const accentColor = '#ddd' // color of pattern slants '#ddd' // '#f6acc8' // light pink crosshairs
-  const selectedBrushStyle = {
-    fill: `url(#${PATTERN_ID})`,
-    stroke: 'red', // GRADIENT_ID,
-    strokeWidth: 2 // does nothing
-  }
+  const { pattern_id, accent_color } = config.brush
+
   const styles = {
     border: '1px solid red'
   }
-
   // configure width
   let [width] = dimensions
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
@@ -80,7 +74,7 @@ export default function LinearChart() {
   const xMaxBrush = xMax
   let dynamicMarginTop = 0 || config.dynamicMarginTop
   const marginTop = 20
-  let yMaxBrush = config.isResponsiveTicks && config.showChartBrush ? yMax + config.dynamicMarginTop / 4 + marginTop : yMax
+  let yMaxBrush = config.isResponsiveTicks && showChartBrush ? yMax + config.dynamicMarginTop / 4 + marginTop : yMax
   const brushData = undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data
 
   // hooks  % states
@@ -673,7 +667,7 @@ export default function LinearChart() {
         }
       }
     }
-    if (config.showChartBrush) {
+    if (showChartBrush) {
       // need to account for SIZE (HEIGHT) which is mapped to padding?
       if (runtime.xAxis.size > 50) {
         tmpHeight -= runtime.xAxis.size - 50
@@ -702,7 +696,7 @@ export default function LinearChart() {
   ) : (
     <ErrorBoundary component='LinearChart'>
       {/* width has to accommodate brush handle on right if enabled */}
-      <svg width={config.showChartBrush ? width + 5 : width} height={getChartHeight} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
+      <svg width={showChartBrush ? width + 5 : width} height={getChartHeight} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
         <Bar width={width} height={getChartHeight} fill={'transparent'}></Bar>
         {/* Highlighted regions */}
         {config.regions
@@ -1090,10 +1084,10 @@ export default function LinearChart() {
           />
         )}
         {/* brush */}
-        {config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
+        {showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
           <>
             <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} height={yMaxBrush / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>
-              <PatternLines id={PATTERN_ID} height={8} width={8} stroke={accentColor} strokeWidth={1} orientation={['diagonal']} style={styles} />
+              <PatternLines id={pattern_id} height={8} width={8} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />
               <Brush
                 id='theBrush'
                 className='theBrush'
@@ -1108,7 +1102,7 @@ export default function LinearChart() {
                 brushDirection='horizontal'
                 initialBrushPosition={initialBrushPosition}
                 onChange={onBrushChange}
-                selectedBoxStyle={selectedBrushStyle}
+                selectedBoxStyle={{ fill: `url(#${pattern_id})` }}
                 useWindowMoveEvents
                 renderBrushHandle={props => <BrushHandle {...props} />}
                 style={styles}
