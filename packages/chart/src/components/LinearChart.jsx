@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useRef, useState, useMemo } from 'react'
+import React, { useContext, useEffect, useRef, useState, useMemo } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -6,14 +6,9 @@ import { bisector } from 'd3-array'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
 import { localPoint } from '@visx/event'
-import { scaleTime, scaleLinear, scaleLog } from '@visx/scale'
 import { Brush } from '@visx/brush'
-import { Bounds } from '@visx/brush/lib/types'
-import BaseBrush, { BaseBrushState, UpdateBrush } from '@visx/brush/lib/BaseBrush'
+import BaseBrush from '@visx/brush/lib/BaseBrush'
 import { PatternLines } from '@visx/pattern'
-import { LinearGradient } from '@visx/gradient'
-import { max, extent } from 'd3-array'
-import { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle'
 import { Text } from '@visx/text'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
@@ -31,6 +26,7 @@ import LineChart from './LineChart'
 import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
+import BrushHandle from './BrushHandle'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
@@ -38,10 +34,8 @@ import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
-import { curveMonotoneX } from '@visx/curve'
 
 // styles
-import { defaultStyles } from '@visx/tooltip'
 import '../scss/LinearChart.scss'
 
 export default function LinearChart() {
@@ -52,24 +46,10 @@ export default function LinearChart() {
 
   const getDate = d => new Date(d[config.xAxis.dataKey])
 
-  const initBrushData = () => {
-    let brushFilteredData = new Set()
-    config.data.filter(s => {
-      const x = getDate(s).getTime()
-      brushFilteredData.add(x) // just adds the time data x point not the entire data record
-    })
-    return brushFilteredData
-  }
-
   // Initialize Brush variables - here for now
   const [xAxisBrushData, setXAxisBrushData] = useState(data) // initBrushData
-  const brushMargin = { top: 10, bottom: 15, left: 50, right: 20 }
-  const chartSeparation = 30
   const PATTERN_ID = 'brush_pattern'
-  const GRADIENT_ID = 'brush_gradient'
   const accentColor = '#ddd' // color of pattern slants '#ddd' // '#f6acc8' // light pink crosshairs
-  const background = '#584153' // dark purple
-  const background2 = '#af8baf' // light purple
   const selectedBrushStyle = {
     fill: `url(#${PATTERN_ID})`,
     stroke: 'red', // GRADIENT_ID,
@@ -78,11 +58,9 @@ export default function LinearChart() {
   const styles = {
     border: '1px solid red'
   }
-  const compact = false // do we even need this?
 
   // configure width
   let [width] = dimensions
-  let originalWidth = width
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
     width = width * 0.73
   }
@@ -99,16 +77,10 @@ export default function LinearChart() {
     yMax = yMax + config.data.length * config.forestPlot.rowHeight
   }
 
-  // MIGHT NOT NEED ALL OF THESE
-  const innerHeight = height
-  const topChartBottomMargin = compact ? chartSeparation / 2 : chartSeparation + 10
-  const topChartHeight = 0.8 * innerHeight - topChartBottomMargin
-  const bottomChartHeight = innerHeight - topChartHeight - chartSeparation
   const xMaxBrush = xMax
-  let dynamicMarginTop = 0 || config.dynamicMarginTop // need to init this up top so calc for height can work
+  let dynamicMarginTop = 0 || config.dynamicMarginTop
   const marginTop = 20
   let yMaxBrush = config.isResponsiveTicks && config.showChartBrush ? yMax + config.dynamicMarginTop / 4 + marginTop : yMax
-  // account for brush data changes
   const brushData = undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data
 
   // hooks  % states
@@ -164,17 +136,13 @@ export default function LinearChart() {
   const onBrushChange = domain => {
     if (!domain) return
     const { x0, x1 } = domain
-    //console.log('## onBrushChange domain x0, x1', domain, x0, x1)
     let brushFilteredData = []
     brushFilteredData = config.data.filter(s => {
       const x = getDate(s).getTime()
-      //console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
       if (x > x0 && x < x1) {
         let date = formatDate(getXValueFromCoordinateDate(x))
-        //console.log('YES ADD', date)
         return s
       } else {
-        //console.log('### x not within brush bounds', x)
       }
     })
 
@@ -247,7 +215,6 @@ export default function LinearChart() {
 
   const countNumOfTicks = axis => {
     const { numTicks } = runtime[axis]
-    //console.log('xAxis, numTicks', config.runtime[axis], numTicks)
     let tickCount = undefined
 
     if (axis === 'yAxis') {
@@ -269,7 +236,6 @@ export default function LinearChart() {
 
     if (axis === 'xAxis') {
       tickCount = isHorizontal && !numTicks ? undefined : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
-      //console.log('xAxis TERNARY tickCount=', tickCount)
       if (isHorizontal && tickCount === undefined && !config.dataFormat.roundTo) {
         // then it is set to Auto
         // - check for small numbers situation
@@ -279,7 +245,6 @@ export default function LinearChart() {
           tickCount = 4 // same default as standalone components
         }
       }
-      //console.log('xAxis LAST tickCount=', tickCount)
     }
     return tickCount
   }
@@ -642,23 +607,6 @@ export default function LinearChart() {
       borderRadius: '4px',
       transform: `translate(${dataXPosition}px, ${Number(dataYPosition)}px)`
     }
-  }
-
-  // We need to manually offset the handles for them to be rendered at the right position
-  function BrushHandle(BrushHandleRenderProps) {
-    const x = BrushHandleRenderProps.x
-    const height = BrushHandleRenderProps.height
-    const isBrushActive = BrushHandleRenderProps.isBrushActive
-    const pathWidth = 8
-    const pathHeight = 15
-    if (!isBrushActive) {
-      return null
-    }
-    return (
-      <Group left={x + pathWidth / 2} top={(height - pathHeight) / 2}>
-        <path fill='#f2f2f2' d='M -4.5 0.5 L 3.5 0.5 L 3.5 15.5 L -4.5 15.5 L -4.5 0.5 M -1.5 4 L -1.5 12 M 0.5 4 L 0.5 12' stroke='#999999' strokeWidth='1' style={{ cursor: 'ew-resize' }} />
-      </Group>
-    )
   }
 
   // this controls where the brush handles are intiially
