@@ -86,7 +86,7 @@
     "horizontal": 750
   },
   "xAxis": {
-    "type": "date",
+    "type": "category",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
@@ -104,13 +104,13 @@
     "axisPadding": 0,
     "target": 0,
     "isLegendValue": false,
-    "dataKey": "Date",
+    "dataKey": "name",
     "label": "X Axis Example Label",
     "dateParseFormat": "%m/%d/%Y",
     "dateDisplayFormat": "%m/%d/%Y"
   },
   "table": {
-    "label": "Data Type by Date",
+    "label": "Data Type by Category Name",
     "expanded": false,
     "limitHeight": false,
     "height": "",
@@ -178,58 +178,58 @@
   "dataFileSourceType": "file",
   "formattedData": [
     {
-      "Data 1": "900",
-      "Data 2": "135",
-      "Data 3": "300",
-      "Data 4": "95",
-      "Data 5": "120",
-      "Data 6": "310",
-      "Date": "1/15/2016"
+      "name": "Jupiter",
+      "Radius": "10.97",
+      "Diameter": "25.1",
+      "distance": "0"
     },
     {
-      "Data 1": "4000",
-      "Data 2": "90",
-      "Data 3": "240",
-      "Data 4": "60",
-      "Data 5": "160",
-      "Data 6": "2000",
-      "Date": "2/15/2016"
+      "name": "Saturn",
+      "Radius": "9.14",
+      "Diameter": "18",
+      "distance": "0"
     },
     {
-      "Data 1": "500",
-      "Data 2": "300",
-      "Data 3": "290",
-      "Data 4": "100",
-      "Data 5": "200",
-      "Data 6": "250",
-      "Date": "3/15/2016"
+      "name": "Uranus",
+      "Radius": "-4",
+      "Diameter": "-30",
+      "distance": "0"
     },
     {
-      "Data 1": "1200",
-      "Data 2": "160",
-      "Data 3": "230",
-      "Data 4": "180",
-      "Data 5": "160",
-      "Data 6": "220",
-      "Date": "4/15/2016"
+      "name": "Neptune",
+      "Radius": "3.86",
+      "Diameter": "7",
+      "distance": "0"
     },
     {
-      "Data 1": "8000",
-      "Data 2": "350",
-      "Data 3": "300",
-      "Data 4": "150",
-      "Data 5": "130",
-      "Data 6": "100",
-      "Date": "5/15/2016"
+      "name": "Earth",
+      "Radius": "1",
+      "Diameter": "2",
+      "distance": "0"
     },
     {
-      "Data 1": "9000",
-      "Data 2": "220",
-      "Data 3": "320",
-      "Data 4": "100",
-      "Data 5": "220",
-      "Data 6": "300",
-      "Date": "6/15/2016"
+      "name": "Venus",
+      "Radius": "0.950",
+      "Diameter": "2",
+      "distance": "0"
+    },
+    {
+      "name": "Mars",
+      "Radius": "0.532",
+      "Diameter": "1",
+      "distance": "0"
+    },
+    {
+      "name": "Mercury",
+      "Radius": "0.383",
+      "Diameter": "0.7",
+      "distance": "0"
+    },
+    {
+      "name": "Pluto",
+      "Radius": "0.181",
+      "Diameter": "0.3",
+      "distance": "0"
     }
   ],
   "height": 300,
