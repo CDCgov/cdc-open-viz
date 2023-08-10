@@ -120,7 +120,7 @@ export default function LinearChart() {
       tick = 0
     }
 
-    if (!config.data[index] && visualizationType === 'Forest Plot') return // need bug fix here : !config.data[index]
+    if (config.data && !config.data[index] && visualizationType === 'Forest Plot') return
     if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
     if (runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
     if (orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
