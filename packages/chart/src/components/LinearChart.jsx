@@ -1,5 +1,4 @@
 import React, { forwardRef, useContext, useEffect, useRef, useState, useMemo } from 'react'
-import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -165,23 +164,24 @@ export default function LinearChart() {
   const onBrushChange = domain => {
     if (!domain) return
     const { x0, x1 } = domain
-    console.log('## onBrushChange domain x0, x1', domain, x0, x1)
+    //console.log('## onBrushChange domain x0, x1', domain, x0, x1)
     let brushFilteredData = []
     brushFilteredData = config.data.filter(s => {
       const x = getDate(s).getTime()
-      console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
+      //console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
       if (x > x0 && x < x1) {
         let date = formatDate(getXValueFromCoordinateDate(x))
-        console.log('YES ADD', date)
+        //console.log('YES ADD', date)
         return s
       } else {
-        console.log('### x not within brush bounds', x)
+        //console.log('### x not within brush bounds', x)
       }
     })
 
     // dont let the number of points go below config.xAxis.numTicks ??? (TT)
-    if (undefined !== brushFilteredData && brushFilteredData.length >= 1) {
-      console.log('Set new xAxisBrushdata to', brushFilteredData)
+    if (undefined !== brushFilteredData && brushFilteredData.length >= config.xAxis.numTicks) {
+      // leaving this here for now due to issues with visx tick marks that need debugging
+      if (isDebug) console.log('Set new xAxisBrushdata to', brushFilteredData)
       setXAxisBrushData(brushFilteredData)
     }
   }
@@ -732,7 +732,6 @@ export default function LinearChart() {
       } else {
         tmpHeight += 50 - runtime.xAxis.size
       }
-      //console.log('padding config.yAxis.size runtime.XAxis.size tmpHeight xtraBuffer', padding, config.yAxis.size, config.runtime.xAxis.size, tmpHeight, xtraBuffer)
       if (!config.isResponsiveTicks) {
         return runtime.xAxis.size > 50 ? (tmpHeight - xtraBuffer) * 1.3 : (tmpHeight + xtraBuffer) * 1.3
       } else {

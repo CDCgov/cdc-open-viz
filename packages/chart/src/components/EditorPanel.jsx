@@ -271,8 +271,8 @@ const EditorPanel = () => {
       series: newSeries
     })
 
-    // disable brush if categorical
-    if (config.xAxis.type === 'categorical') {
+    // disable brush if categorical - or - for now if not Area Chart
+    if (config.xAxis.type === 'categorical' || config.visualizationType !== 'Area Chart') {
       config.showChartBrush = false
     }
   }, [config.visualizationType]) // eslint-disable-line
