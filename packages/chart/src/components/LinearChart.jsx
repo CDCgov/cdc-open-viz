@@ -47,7 +47,6 @@ export default function LinearChart() {
 
   // configure width
   let [width] = dimensions
-  let originalWidth = width
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
     width = width * 0.73
   }

@@ -2,14 +2,13 @@ import React, { useContext, useEffect } from 'react'
 import ConfigContext from '../ConfigContext'
 
 export const useBarChart = () => {
-  const { config, colorPalettes, tableData, updateConfig } = useContext(ConfigContext)
+  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate } = useContext(ConfigContext)
   const { orientation } = config
 
   const isHorizontal = orientation === 'horizontal'
   const barBorderWidth = 1
   const lollipopBarWidth = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5
   const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
-
   const isLabelBelowBar = config.yAxis.labelPlacement === 'Below Bar'
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
@@ -136,6 +135,25 @@ export const useBarChart = () => {
     })
   }
 
+  const getHighlightedBarColorByValue = value => {
+    const match = config?.highlightedBarValues.filter(item => {
+      if (!item.value) return
+      return config.xAxis.type === 'date' ? formatDate(parseDate(item.value)) === value : item.value === value
+    })[0]
+
+    if (!match?.color) return `rgba(255, 102, 1)`
+    return match.color
+  }
+  const getHighlightedBarByValue = value => {
+    const match = config?.highlightedBarValues.filter(item => {
+      if (!item.value) return
+      return config.xAxis.type === 'date' ? formatDate(parseDate(item.value)) === value : item.value === value
+    })[0]
+
+    if (!match?.color) return false
+    return match
+  }
+
   return {
     isHorizontal,
     barBorderWidth,
@@ -153,6 +171,8 @@ export const useBarChart = () => {
     hasMultipleSeries,
     applyRadius,
     updateBars,
-    assignColorsToValues
+    assignColorsToValues,
+    getHighlightedBarColorByValue,
+    getHighlightedBarByValue
   }
 }
