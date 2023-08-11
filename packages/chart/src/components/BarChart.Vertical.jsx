@@ -52,15 +52,9 @@ export const BarChartVertical = props => {
                   }
 
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
-                  let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
-                  // Color code by category
-                  barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
 
                   let yAxisValue = formatNumber(bar.value, 'left')
                   let xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                  let labelColor = '#000000'
-                  // Set if background is transparent'
-                  labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor)
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
@@ -79,11 +73,18 @@ export const BarChartVertical = props => {
                   <li class="tooltip-body">${xAxisTooltip}</li>
                     </li></ul>`
 
+                  // configure colors
+                  let labelColor = '#000000'
+                  labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
+                  let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
+                  barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
                   const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
                   const highlightedBarColor = getHighlightedBarColorByValue(xAxisValue)
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
+                  const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
+                  const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
 
                   const background = () => {
                     if (isRegularLollipopColor) return barColor
@@ -91,11 +92,6 @@ export const BarChartVertical = props => {
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
-
-                  const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
-
-                  const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-
                   const finalStyle = {
                     background: background(),
                     borderColor,

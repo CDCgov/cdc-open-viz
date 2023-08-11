@@ -77,7 +77,7 @@ export const useBarChart = () => {
   }
 
   const assignColorsToValues = (barsCount, barIndex, currentBarColor) => {
-    if (!config.legend.colorCode && !config.series.length === 1) {
+    if (!config.legend.colorCode && config.series.length > 1) {
       return currentBarColor
     }
     const palettesArr = colorPalettes[config.palette]

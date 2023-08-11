@@ -50,9 +50,6 @@ export const BarChartHorizontal = props => {
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(0)
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const barWidth = config.barHeight
-                  let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
-                  // Color code by category
-                  barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
 
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
@@ -62,17 +59,6 @@ export const BarChartHorizontal = props => {
                   // check if bar text/value string fits into  each bars.
                   let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
                   let textFits = textWidth < barWidthHorizontal - 5 // minus padding 5
-                  let labelColor = '#000000'
-
-                  // Set label color
-                  if (barColor && labelColor) {
-                    if (chroma.contrast(labelColor, barColor) < 4.9) {
-                      labelColor = textFits ? '#FFFFFF' : '#000000'
-                    }
-                  }
-
-                  // Set if background is transparent'
-                  labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor)
 
                   // control text position
                   let textAnchor = textFits ? 'end' : 'start'
@@ -105,22 +91,30 @@ export const BarChartHorizontal = props => {
                   <li class="tooltip-body">${xAxisTooltip}</li>
                     </li></ul>`
 
+                  // configure colors
+                  let labelColor = '#000000'
+                  labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
+                  let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
+                  barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
                   const isHighlightedBar = highlightedBarValues?.includes(yAxisValue)
                   const highlightedBarColor = getHighlightedBarColorByValue(yAxisValue)
                   const highlightedBar = getHighlightedBarByValue(yAxisValue)
-
+                  const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
+                  const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
+                  // update label color
+                  if (barColor && labelColor) {
+                    if (chroma.contrast(labelColor, barColor) < 4.9) {
+                      labelColor = textFits ? '#FFFFFF' : '#000000'
+                    }
+                  }
                   const background = () => {
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
-
-                  const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
-                  const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-
                   const finalStyle = {
                     background: background(),
                     borderColor,
