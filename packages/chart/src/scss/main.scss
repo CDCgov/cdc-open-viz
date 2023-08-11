@@ -109,6 +109,9 @@
   .section-subtext {
     padding: 15px;
   }
+  .subtext--responsive-ticks {
+    margin-top: 3em;
+  }
 
   .legend-container {
     background: #fff;
@@ -702,4 +705,8 @@
   .visx-axis-tick:last-of-type {
     transform: translate(-20px, 0);
   }
+}
+
+.cdc-open-viz-module .debug {
+  border: 2px solid red;
 }

@@ -7,6 +7,7 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import Icon from '@cdc/core/components/ui/Icon'
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
 import ConfigContext from '../ConfigContext'
 
@@ -19,6 +20,7 @@ export default function DataTable() {
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
   const isLegendBottom = ['sm', 'xs', 'xxs'].includes(currentViewport)
+  const transform = new DataTransform()
 
   const DownloadButton = ({ data }, type) => {
     const fileName = `${config.title.substring(0, 50)}.csv`
@@ -34,19 +36,13 @@ export default function DataTable() {
       }
     }
 
+    // - trying to eliminate console error that occurs if formatted with prettier
+    // prettier-ignore
     switch (type) {
       case 'download':
-        return (
-          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border margin-sm`}>
-            Download Data (CSV)
-          </a>
-        )
+        return (<a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border margin-sm`}>Download Data (CSV)</a>)
       default:
-        return (
-          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`no-border`}>
-            Download Data (CSV)
-          </a>
-        )
+        return (<a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`no-border`}>Download Data (CSV)</a>)
     }
   }
 
@@ -93,7 +89,7 @@ export default function DataTable() {
           ]
         : [
             {
-              Header: '',
+              Header: ' ',
               Cell: ({ row }) => {
                 const getSeriesLabel = () => {
                   let userUpdatedSeriesName = config.series.filter(series => series.dataKey === row.original)?.[0]?.name
@@ -121,7 +117,9 @@ export default function DataTable() {
                   </>
                 )
               },
-              id: 'series-label'
+              id: 'series-label',
+              sortType: 'custom',
+              canSort: true
             }
           ]
     if (config.visualizationType !== 'Box Plot') {
@@ -151,6 +149,7 @@ export default function DataTable() {
             return <>{numberFormatter(d[row.original], resolvedAxis)}</>
           },
           id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
+          sortType: 'custom',
           canSort: true
         }
 
@@ -222,7 +221,52 @@ export default function DataTable() {
     }),
     []
   )
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
+  const upIcon = (
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5'>
+      <path d='M0 5l5-5 5 5z' />
+    </svg>
+  )
+  const downIcon = (
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5'>
+      <path d='M0 0l5 5 5-5z' />
+    </svg>
+  )
+
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
+    {
+      columns: tableColumns,
+      data: tableData,
+      defaultColumn,
+      disableSortRemove: true, // otherwise 3rd click on header removes sorting entirely
+      sortTypes: {
+        custom: (rowA, rowB, columnId) => {
+          // rowA.original - is the row data field name to access the value
+          // columnId = the column indicator
+          let dataKey = config.xAxis.dataKey
+          let colObj = config.data.filter(obj => {
+            return obj[dataKey] === columnId.split('--')[0] // have to remove index
+          })
+          if (colObj === undefined || colObj[0] === undefined) {
+            return -1
+          }
+          // NOW we can get the sort values
+          const a = transform.cleanDataPoint(colObj[0][rowA.original]) // issue was that a was UNDEFINED therefore it CANT SORT
+          const b = transform.cleanDataPoint(colObj[0][rowB.original])
+
+          if (a === undefined) {
+            return -1
+          }
+          if (!isNaN(Number(a)) && !isNaN(Number(b))) {
+            return Number(a) - Number(b)
+          }
+          return a.localeCompare(b)
+        }
+      }
+    },
+    useSortBy,
+    useBlockLayout,
+    useResizeColumns
+  )
 
   // sort continuous x axis scaling for data tables, ie. xAxis should read 1,2,3,4,5
   if (config.xAxis.type === 'continuous' && headerGroups) {
@@ -236,7 +280,7 @@ export default function DataTable() {
         {config.table.download && <DownloadButton data={rawData} type='link' />}
       </MediaControls.Section>
 
-      <section style={{ marginTop: !isLegendBottom ? config.dynamicMarginTop + 'px' : '0px' }} id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
+      <section style={{ marginTop: !isLegendBottom ? config.dynamicMarginTop / 4 + 'px' : '0px' }} id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
         <div
           role='button'
           className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}
@@ -259,6 +303,7 @@ export default function DataTable() {
             <thead>
               {headerGroups.map((headerGroup, index) => (
                 <tr {...headerGroup.getHeaderGroupProps()} key={`headerGroups--${index}`}>
+                  {' '}
                   {headerGroup.headers.map((column, index) => (
                     <th
                       tabIndex='0'
@@ -267,14 +312,11 @@ export default function DataTable() {
                       role='columnheader'
                       scope='col'
                       {...column.getHeaderProps(column.getSortByToggleProps())}
-                      className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : 'sort'}
-                      {...(column.isSorted ? (column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' }) : null)}
+                      className={column.isSorted && column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc'}
+                      {...(column.isSorted && column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' })}
                     >
-                      {index === 0 ? (config.table.indexLabel ? config.table.indexLabel : column.render('Header')) : column.render('Header')}
-                      <button>
-                        <span className='cdcdataviz-sr-only'>{`Sort by ${typeof column.render('Header') === 'string' ? column.render('Header').toLowerCase() : column.render('Header')} in ${column.isSorted ? (column.isSortedDesc ? 'descending' : 'ascending') : 'no'} `} order</span>
-                      </button>
-                      <div {...column.getResizerProps()} className='resizer' />
+                      {column.render('Header')}
+                      {column.isSorted && <span className={'sort-icon'}>{column.isSortedDesc ? downIcon : upIcon}</span>}
                     </th>
                   ))}
                 </tr>

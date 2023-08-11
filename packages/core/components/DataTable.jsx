@@ -341,6 +341,7 @@ const DataTable = props => {
               {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
             >
               {text}
+              {sortBy.column === column && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
               <button>
                 <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
               </button>
@@ -413,6 +414,17 @@ const DataTable = props => {
     return allRows
   }
 
+  const upIcon = (
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5'>
+      <path d='M0 5l5-5 5 5z' />
+    </svg>
+  )
+  const downIcon = (
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5'>
+      <path d='M0 0l5 5 5-5z' />
+    </svg>
+  )
+
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
     overflowY: 'scroll'
@@ -472,6 +484,7 @@ const DataTable = props => {
                   {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
                 >
                   {text}
+                  {sortBy.column === column && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
                   <button>
                     <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
                   </button>

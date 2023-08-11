@@ -21,6 +21,9 @@ import { useFilters } from '@cdc/core/components/Filters'
 import Series from './Series'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
+import ForestPlotSettings from './ForestPlotSettings'
+import { useEditorPermissions } from '../hooks/useEditorPermissions'
+
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -138,6 +141,7 @@ const Regions = memo(({ config, updateConfig }) => {
     updateConfig({ ...config, regions })
   }
 
+  // only for Regions
   let updateField = (section, subsection, fieldName, value, i) => regionUpdate(fieldName, value, i)
 
   let removeColumn = i => {
@@ -214,6 +218,35 @@ const EditorPanel = () => {
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
+  const {
+    enabledChartTypes,
+    visSupportsTooltipLines,
+    visSupportsNonSequentialPallete,
+    visSupportsSequentialPallete,
+    visSupportsReverseColorPalette,
+    visHasLabelOnData,
+    visHasNumbersOnBars,
+    visHasAnchors,
+    visHasBarBorders,
+    visHasDataCutoff,
+    visCanAnimate,
+    visHasLegend,
+    visSupportsDateCategoryAxisLabel,
+    visSupportsDateCategoryAxisLine,
+    visSupportsDateCategoryAxisTicks,
+    visSupportsDateCategoryTickRotation,
+    visSupportsDateCategoryNumTicks,
+    visSupportsRegions,
+    visSupportsFilters,
+    visSupportsValueAxisGridLines,
+    visSupportsValueAxisLine,
+    visSupportsValueAxisTicks,
+    visSupportsValueAxisLabels,
+    visSupportsBarSpace,
+    visSupportsBarThickness,
+    visSupportsDataCutoff
+  } = useEditorPermissions()
+
   // argument acts as props
   const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config, setConfig: updateConfig, filteredData: data, setFilteredData })
 
@@ -237,6 +270,11 @@ const EditorPanel = () => {
       ...config,
       series: newSeries
     })
+
+    // disable brush if categorical - or - for now if not Area Chart
+    if (config.xAxis.type === 'categorical' || config.visualizationType !== 'Area Chart') {
+      config.showChartBrush = false
+    }
   }, [config.visualizationType]) // eslint-disable-line
 
   // Scatter Plots default date/category axis is 'continuous'
@@ -635,6 +673,16 @@ const EditorPanel = () => {
     })
   }, [config.orientation])
 
+  // Set paired bars to be horizontal, even though that option doesn't display
+  useEffect(() => {
+    if (config.visualizationType === 'Paired Bar') {
+      updateConfig({
+        ...config,
+        orientation: 'horizontal'
+      })
+    }
+  }, []) // eslint-disable-line
+
   useEffect(() => {
     if (config.orientation === 'horizontal') {
       updateConfig({
@@ -643,6 +691,13 @@ const EditorPanel = () => {
       })
     }
   }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
+
+  /// temporary force orientation untill we support Vartical deviaton bar
+  useEffect(() => {
+    if (config.visualizationType === 'Deviation Bar') {
+      updateConfig({ ...config, orientation: 'horizontal' })
+    }
+  }, [config.visualizationType])
 
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
@@ -663,91 +718,6 @@ const EditorPanel = () => {
       </ul>
     )
   }, [config]) // eslint-disable-line
-
-  const visSupportsTooltipLines = () => {
-    const chartsWithTooltipGuides = ['Combo', 'Forecasting', 'Area Chart', 'Line', 'Bar']
-    if (chartsWithTooltipGuides.includes(config.visualizationType)) return true
-    return false
-  }
-
-  const visHasLegend = () => {
-    const { visualizationType } = config
-
-    switch (visualizationType) {
-      case 'Box Plot':
-        return false
-      default:
-        return true
-    }
-  }
-
-  const visCanAnimate = () => {
-    const { visualizationType } = config
-    switch (visualizationType) {
-      case 'Area Chart':
-        return false
-      case 'Scatter Plot':
-        return false
-      case 'Box Plot':
-        return false
-      default:
-        return true
-    }
-  }
-
-  const visHasDataCutoff = () => {
-    const { visualizationType } = config
-    switch (visualizationType) {
-      case 'Box Plot':
-        return false
-      case 'Pie':
-        return false
-      default:
-        return true
-    }
-  }
-
-  const visHasLabelOnData = () => {
-    const { visualizationType } = config
-    switch (visualizationType) {
-      case 'Area Chart':
-        return false
-      case 'Box Plot':
-        return false
-      case 'Pie':
-        return false
-      case 'Scatter Plot':
-        return false
-      default:
-        return true
-    }
-  }
-
-  const visHasAnchors = () => {
-    const { visualizationType } = config
-    switch (visualizationType) {
-      case 'Area Chart':
-        return true
-      case 'Combo':
-        return true
-      case 'Line':
-        return true
-      case 'Bar':
-        return true
-      case 'Scatter Plot':
-        return true
-      default:
-        return false
-    }
-  }
-
-  const visHasBarBorders = () => {
-    const { series, visualizationType } = config
-    if (visualizationType === 'Box Plot') return false
-    if (visualizationType === 'Scatter Plot') return false
-    if (visualizationType === 'Pie') return false
-    return series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar' || series.type === 'Deviation Bar')
-  }
 
   const handleSeriesChange = (idx1, idx2) => {
     let seriesOrder = config.series
@@ -818,21 +788,6 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
-  // prettier-ignore
-  const enabledChartTypes = [
-    'Area Chart',
-    'Bar',
-    'Box Plot',
-    'Combo',
-    'Deviation Bar',
-    'Forecasting',
-    'Line',
-    'Paired Bar',
-    'Pie',
-    'Scatter Plot',
-    'Spark Line'
-  ]
-
   const isLoadedFromUrl = config?.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
 
   // if isDebug = true, then try to set the category and data col to reduce clicking
@@ -877,7 +832,7 @@ const EditorPanel = () => {
   if (config.data && config.series) {
     Object.keys(config.data[0]).map(colName => {
       // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
-      const found = config?.series.some(el => el.dataKey === colName)
+      const found = config?.series.some(series => series.dataKey === colName)
       if (colName !== config.xAxis.dataKey && !found) {
         // if not the index then add it
         return columnsOptions.push(
@@ -953,7 +908,10 @@ const EditorPanel = () => {
           dataTable: false,
           tooltips: false,
           prefix: '',
-          suffix: ''
+          suffix: '',
+          forestPlot: false,
+          startingPoint: '0',
+          forestPlotAlignRight: false
         }
       }
     })
@@ -1040,7 +998,7 @@ const EditorPanel = () => {
                   <Select value={config.roundingStyle || 'standard'} fieldName='roundingStyle' label='rounding style' updateField={updateField} options={['standard', 'shallow', 'finger']} />
                 )}
                 {config.visualizationType === 'Bar' && config.orientation === 'horizontal' && <Select value={config.yAxis.labelPlacement || 'Below Bar'} section='yAxis' fieldName='labelPlacement' label='Label Placement' updateField={updateField} options={['Below Bar', 'On Date/Category Axis']} />}
-                {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') ? (
+                {visHasNumbersOnBars() ? (
                   <CheckBox value={config.yAxis.displayNumbersOnBar} section='yAxis' fieldName='displayNumbersOnBar' label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
                 ) : (
                   visHasLabelOnData() && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
@@ -1143,7 +1101,8 @@ const EditorPanel = () => {
                 {config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
               </AccordionItemPanel>
             </AccordionItem>
-            {config.visualizationType !== 'Pie' && (
+            {config.visualizationType === 'Forest Plot' && <ForestPlotSettings />}
+            {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && (
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
@@ -1345,7 +1304,7 @@ const EditorPanel = () => {
             <AccordionItem>
               <AccordionItemHeading>
                 <AccordionItemButton>
-                  {config.visualizationType !== 'Pie' ? (config.orientation !== 'horizontal' ? 'Left Value Axis' : 'Value Axis') : 'Data Format'}
+                  {config.visualizationType === 'Pie' ? 'Data Format' : config.orientation === 'vertical' ? 'Left Value Axis' : 'Value Axis'}
                   {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
                 </AccordionItemButton>
               </AccordionItemHeading>
@@ -1425,7 +1384,7 @@ const EditorPanel = () => {
                     {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                     {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
                     {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
-                    {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
+                    {visSupportsValueAxisGridLines() && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
                     <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
                     {config.visualizationSubType === 'regular' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
                   </>
@@ -1491,9 +1450,9 @@ const EditorPanel = () => {
 
                 {config.orientation === 'horizontal' ? ( // horizontal - x is vertical y is horizontal
                   <>
-                    <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
-                    <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />
-                    <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
+                    {visSupportsValueAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
+                    {visSupportsValueAxisLabels() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
+                    {visSupportsValueAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
                     <TextField value={config.xAxis.max} section='xAxis' fieldName='max' label='max value' type='number' placeholder='Auto' updateField={updateField} />
                     <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
                     <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='min value' placeholder='Auto' updateField={updateField} />
@@ -1839,14 +1798,16 @@ const EditorPanel = () => {
             <AccordionItem>
               <AccordionItemHeading>
                 <AccordionItemButton>
-                  {config.visualizationType !== 'Pie' ? (config.visualizationType === 'Bar' ? 'Date/Category Axis' : 'Date/Category Axis') : 'Segments'}
+                  {config.visualizationType === 'Pie' ? 'Segments' : 'Date/Category Axis'}
                   {!config.xAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
                 </AccordionItemButton>
               </AccordionItemHeading>
               <AccordionItemPanel>
                 {config.visualizationType !== 'Pie' && (
                   <>
-                    <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
+                    {config.visualizationType !== 'Forest Plot' && (
+                      <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
+                    )}
                     <Select
                       value={config.xAxis.dataKey || setCategoryAxis() || ''}
                       section='xAxis'
@@ -1968,6 +1929,22 @@ const EditorPanel = () => {
                         </p>
                         <TextField value={config.xAxis.dateParseFormat} section='xAxis' fieldName='dateParseFormat' placeholder='Ex. %Y-%m-%d' label='Date Parse Format' updateField={updateField} />
                         <TextField value={config.xAxis.dateDisplayFormat} section='xAxis' fieldName='dateDisplayFormat' placeholder='Ex. %Y-%m-%d' label='Date Display Format' updateField={updateField} />
+                        <CheckBox
+                          value={config.showChartBrush}
+                          fieldName='showChartBrush'
+                          label={'Show Axis Zoom'}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>When this option is checked, you can zoom into specific ranges on the x-axis. </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                          updateField={updateField}
+                        />
                       </>
                     )}
 
@@ -2025,7 +2002,8 @@ const EditorPanel = () => {
                         )}
                       </>
                     )}
-                    <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min='1' section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
+
+                    {visSupportsDateCategoryNumTicks() && <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min='1' section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />}
 
                     <TextField value={config.xAxis.size} type='number' min='0' section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />
 
@@ -2039,7 +2017,9 @@ const EditorPanel = () => {
                       </>
                     )}
                     {config.orientation === 'vertical' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
-                    {(config.orientation === 'horizontal' || !config.isResponsiveTicks) && <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                    {(config.orientation === 'horizontal' || !config.isResponsiveTicks) && visSupportsDateCategoryTickRotation() && (
+                      <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />
+                    )}
                     {config.orientation === 'vertical' && config.isResponsiveTicks && config.visualizationType !== 'Paired Bar' && (
                       <TextField
                         value={config.xAxis.maxTickRotation}
@@ -2065,8 +2045,8 @@ const EditorPanel = () => {
 
                     {config.orientation === 'horizontal' ? (
                       <>
-                        <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
-                        <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />
+                        {visSupportsDateCategoryAxisLine() && <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
+                        {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
                       </>
                     ) : (
                       <>
@@ -2419,7 +2399,7 @@ const EditorPanel = () => {
                 )}
               </AccordionItemPanel>
             </AccordionItem>
-            {config.visualizationType !== 'Pie' && config.visualizationType !== 'Paired Bar' && (
+            {visSupportsRegions() && (
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Regions</AccordionItemButton>
@@ -2519,6 +2499,50 @@ const EditorPanel = () => {
                               </label>
                             </li>
                                 */}
+
+                            {config.visualizationType === 'Forest Plot' && (
+                              <>
+                                <li>
+                                  <label className='checkbox'>
+                                    <input
+                                      type='checkbox'
+                                      checked={config.columns[val].forestPlot || false}
+                                      onChange={event => {
+                                        editColumn(val, 'forestPlot', event.target.checked)
+                                      }}
+                                    />
+                                    <span className='edit-label'>Show in Forest Plot</span>
+                                  </label>
+                                </li>
+                                <li>
+                                  <label className='checkbox'>
+                                    <input
+                                      type='checkbox'
+                                      checked={config.columns[val].forestPlotAlignRight || false}
+                                      onChange={event => {
+                                        editColumn(val, 'forestPlotAlignRight', event.target.checked)
+                                      }}
+                                    />
+                                    <span className='edit-label'>Align Right</span>
+                                  </label>
+                                </li>
+
+                                {!config.columns[val].forestPlotAlignRight && (
+                                  <li>
+                                    <label className='text'>
+                                      <span className='edit-label'>Forest Plot Starting Point</span>
+                                      <input
+                                        type='number'
+                                        value={config.columns[val].forestPlotStartingPoint || 0}
+                                        onChange={event => {
+                                          editColumn(val, 'forestPlotStartingPoint', event.target.value)
+                                        }}
+                                      />
+                                    </label>
+                                  </li>
+                                )}
+                              </>
+                            )}
                           </ul>
                         </fieldset>
                       ))}
@@ -2651,15 +2675,16 @@ const EditorPanel = () => {
                 </AccordionItemPanel>
               </AccordionItem>
             )}
-            <AccordionItem>
-              <AccordionItemHeading>
-                <AccordionItemButton>Filters</AccordionItemButton>
-              </AccordionItemHeading>
-              <AccordionItemPanel>
-                {config.filters && (
-                  <>
-                    {/* prettier-ignore */}
-                    <Select
+            {visSupportsFilters() && (
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Filters</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  {config.filters && (
+                    <>
+                      {/* prettier-ignore */}
+                      <Select
                         value={config.filterBehavior}
                         fieldName='filterBehavior'
                         label='Filter Behavior'
@@ -2676,128 +2701,129 @@ const EditorPanel = () => {
                           </Tooltip>
                         }
                         />
-                    <br />
-                  </>
-                )}
-                {config.filters && (
-                  <ul className='filters-list'>
-                    {/* Whether filters should apply onChange or Apply Button */}
+                      <br />
+                    </>
+                  )}
+                  {config.filters && (
+                    <ul className='filters-list'>
+                      {/* Whether filters should apply onChange or Apply Button */}
 
-                    {config.filters.map((filter, index) => {
-                      if (filter.type === 'url') return <></>
+                      {config.filters.map((filter, index) => {
+                        if (filter.type === 'url') return <></>
 
-                      return (
-                        <fieldset className='edit-block' key={index}>
-                          <button
-                            type='button'
-                            className='remove-column'
-                            onClick={() => {
-                              removeFilter(index)
-                            }}
-                          >
-                            Remove
-                          </button>
-                          <label>
-                            <span className='edit-label column-heading'>Filter</span>
-                            <select
-                              value={filter.columnName}
-                              onChange={e => {
-                                updateFilterProp('columnName', index, e.target.value)
+                        return (
+                          <fieldset className='edit-block' key={index}>
+                            <button
+                              type='button'
+                              className='remove-column'
+                              onClick={() => {
+                                removeFilter(index)
                               }}
                             >
-                              <option value=''>- Select Option -</option>
-                              {getFilters(true).map((dataKey, index) => (
-                                <option value={dataKey} key={index}>
-                                  {dataKey}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-
-                          <label>
-                            <span className='edit-showDropdown column-heading'>Show Filter Input</span>
-                            <input
-                              type='checkbox'
-                              checked={filter.showDropdown === undefined ? true : filter.showDropdown}
-                              onChange={e => {
-                                updateFilterProp('showDropdown', index, e.target.checked)
-                              }}
-                            />
-                          </label>
-
-                          <label>
-                            <span className='edit-label column-heading'>Filter Style</span>
-
-                            <select
-                              value={filter.filterStyle}
-                              onChange={e => {
-                                updateFilterProp('filterStyle', index, e.target.value)
-                              }}
-                            >
-                              {filterStyleOptions.map(item => {
-                                return <option value={item}>{item}</option>
-                              })}
-                            </select>
-                          </label>
-                          <label>
-                            <span className='edit-label column-heading'>Label</span>
-                            <input
-                              type='text'
-                              value={filter.label}
-                              onChange={e => {
-                                updateFilterProp('label', index, e.target.value)
-                              }}
-                            />
-                          </label>
-
-                          <label>
-                            <span className='edit-filterOrder column-heading'>Filter Order</span>
-                            <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
-                              {filterOrderOptions.map((option, index) => {
-                                return (
-                                  <option value={option.value} key={`filter-${index}`}>
-                                    {option.label}
+                              Remove
+                            </button>
+                            <label>
+                              <span className='edit-label column-heading'>Filter</span>
+                              <select
+                                value={filter.columnName}
+                                onChange={e => {
+                                  updateFilterProp('columnName', index, e.target.value)
+                                }}
+                              >
+                                <option value=''>- Select Option -</option>
+                                {getFilters(true).map((dataKey, index) => (
+                                  <option value={dataKey} key={index}>
+                                    {dataKey}
                                   </option>
-                                )
-                              })}
-                            </select>
+                                ))}
+                              </select>
+                            </label>
 
-                            {filter.order === 'cust' && (
-                              <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, config.filters[index])}>
-                                <Droppable droppableId='filter_order'>
-                                  {provided => (
-                                    <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-                                      {config.filters[index]?.values.map((value, index) => {
-                                        return (
-                                          <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
-                                            {(provided, snapshot) => (
-                                              <li>
-                                                <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                  {value}
-                                                </div>
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        )
-                                      })}
-                                      {provided.placeholder}
-                                    </ul>
-                                  )}
-                                </Droppable>
-                              </DragDropContext>
-                            )}
-                          </label>
-                        </fieldset>
-                      )
-                    })}
-                  </ul>
-                )}
-                {!config.filters && <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
-                <button type='button' onClick={addNewFilter} className='btn full-width'>
-                  Add Filter
-                </button>
-              </AccordionItemPanel>
-            </AccordionItem>
+                            <label>
+                              <span className='edit-showDropdown column-heading'>Show Filter Input</span>
+                              <input
+                                type='checkbox'
+                                checked={filter.showDropdown === undefined ? true : filter.showDropdown}
+                                onChange={e => {
+                                  updateFilterProp('showDropdown', index, e.target.checked)
+                                }}
+                              />
+                            </label>
+
+                            <label>
+                              <span className='edit-label column-heading'>Filter Style</span>
+
+                              <select
+                                value={filter.filterStyle}
+                                onChange={e => {
+                                  updateFilterProp('filterStyle', index, e.target.value)
+                                }}
+                              >
+                                {filterStyleOptions.map(item => {
+                                  return <option value={item}>{item}</option>
+                                })}
+                              </select>
+                            </label>
+                            <label>
+                              <span className='edit-label column-heading'>Label</span>
+                              <input
+                                type='text'
+                                value={filter.label}
+                                onChange={e => {
+                                  updateFilterProp('label', index, e.target.value)
+                                }}
+                              />
+                            </label>
+
+                            <label>
+                              <span className='edit-filterOrder column-heading'>Filter Order</span>
+                              <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
+                                {filterOrderOptions.map((option, index) => {
+                                  return (
+                                    <option value={option.value} key={`filter-${index}`}>
+                                      {option.label}
+                                    </option>
+                                  )
+                                })}
+                              </select>
+
+                              {filter.order === 'cust' && (
+                                <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, config.filters[index])}>
+                                  <Droppable droppableId='filter_order'>
+                                    {provided => (
+                                      <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
+                                        {config.filters[index]?.values.map((value, index) => {
+                                          return (
+                                            <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
+                                              {(provided, snapshot) => (
+                                                <li>
+                                                  <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                    {value}
+                                                  </div>
+                                                </li>
+                                              )}
+                                            </Draggable>
+                                          )
+                                        })}
+                                        {provided.placeholder}
+                                      </ul>
+                                    )}
+                                  </Droppable>
+                                </DragDropContext>
+                              )}
+                            </label>
+                          </fieldset>
+                        )
+                      })}
+                    </ul>
+                  )}
+                  {!config.filters && <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
+                  <button type='button' onClick={addNewFilter} className='btn full-width'>
+                    Add Filter
+                  </button>
+                </AccordionItemPanel>
+              </AccordionItem>
+            )}
             <AccordionItem>
               <AccordionItemHeading>
                 <AccordionItemButton>Visual</AccordionItemButton>
@@ -2863,77 +2889,85 @@ const EditorPanel = () => {
                     ))}
                   </ul>
                 </label>
-                <label>
-                  <span className='edit-label'>Chart Color Palette</span>
-                </label>
                 {/* eslint-enable */}
-                {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Deviation Bar' && (
+                {(visSupportsNonSequentialPallete() || visSupportsNonSequentialPallete()) && (
                   <>
-                    <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.isPaletteReversed} />
-                    <span>Sequential</span>
-                    <ul className='color-palette'>
-                      {sequential.map(palette => {
-                        const colorOne = {
-                          backgroundColor: colorPalettes[palette][2]
-                        }
+                    <label>
+                      <span className='edit-label'>Chart Color Palette</span>
+                    </label>
+                    {visSupportsReverseColorPalette() && <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={config.isPaletteReversed} />}
+                    {visSupportsSequentialPallete() && (
+                      <>
+                        <span>Sequential</span>
+                        <ul className='color-palette'>
+                          {sequential.map(palette => {
+                            const colorOne = {
+                              backgroundColor: colorPalettes[palette][2]
+                            }
 
-                        const colorTwo = {
-                          backgroundColor: colorPalettes[palette][3]
-                        }
+                            const colorTwo = {
+                              backgroundColor: colorPalettes[palette][3]
+                            }
 
-                        const colorThree = {
-                          backgroundColor: colorPalettes[palette][5]
-                        }
+                            const colorThree = {
+                              backgroundColor: colorPalettes[palette][5]
+                            }
 
-                        return (
-                          <button
-                            title={palette}
-                            key={palette}
-                            onClick={e => {
-                              e.preventDefault()
-                              updateConfig({ ...config, palette })
-                            }}
-                            className={config.palette === palette ? 'selected' : ''}
-                          >
-                            <span style={colorOne}></span>
-                            <span style={colorTwo}></span>
-                            <span style={colorThree}></span>
-                          </button>
-                        )
-                      })}
-                    </ul>
-                    <span>Non-Sequential</span>
-                    <ul className='color-palette'>
-                      {nonSequential.map(palette => {
-                        const colorOne = {
-                          backgroundColor: colorPalettes[palette][2]
-                        }
+                            return (
+                              <button
+                                title={palette}
+                                key={palette}
+                                onClick={e => {
+                                  e.preventDefault()
+                                  updateConfig({ ...config, palette })
+                                }}
+                                className={config.palette === palette ? 'selected' : ''}
+                              >
+                                <span style={colorOne}></span>
+                                <span style={colorTwo}></span>
+                                <span style={colorThree}></span>
+                              </button>
+                            )
+                          })}
+                        </ul>
+                      </>
+                    )}
+                    {visSupportsNonSequentialPallete() && (
+                      <>
+                        <span>Non-Sequential</span>
+                        <ul className='color-palette'>
+                          {nonSequential.map(palette => {
+                            const colorOne = {
+                              backgroundColor: colorPalettes[palette][2]
+                            }
 
-                        const colorTwo = {
-                          backgroundColor: colorPalettes[palette][4]
-                        }
+                            const colorTwo = {
+                              backgroundColor: colorPalettes[palette][4]
+                            }
 
-                        const colorThree = {
-                          backgroundColor: colorPalettes[palette][6]
-                        }
+                            const colorThree = {
+                              backgroundColor: colorPalettes[palette][6]
+                            }
 
-                        return (
-                          <button
-                            title={palette}
-                            key={palette}
-                            onClick={e => {
-                              e.preventDefault()
-                              updateConfig({ ...config, palette })
-                            }}
-                            className={config.palette === palette ? 'selected' : ''}
-                          >
-                            <span style={colorOne}></span>
-                            <span style={colorTwo}></span>
-                            <span style={colorThree}></span>
-                          </button>
-                        )
-                      })}
-                    </ul>
+                            return (
+                              <button
+                                title={palette}
+                                key={palette}
+                                onClick={e => {
+                                  e.preventDefault()
+                                  updateConfig({ ...config, palette })
+                                }}
+                                className={config.palette === palette ? 'selected' : ''}
+                              >
+                                <span style={colorOne}></span>
+                                <span style={colorTwo}></span>
+                                <span style={colorThree}></span>
+                              </button>
+                            )
+                          })}
+                        </ul>
+                      </>
+                    )}
                   </>
                 )}
                 {(config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') && (
@@ -2990,9 +3024,9 @@ const EditorPanel = () => {
                     />
                   </>
                 )}
-                {config.orientation === 'horizontal' && !config.isLollipopChart && config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label=' Bar Thickness' updateField={updateField} min='15' />}
+                {visSupportsBarThickness() && config.orientation === 'horizontal' && !config.isLollipopChart && config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label=' Bar Thickness' updateField={updateField} min='15' />}
                 {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') && <TextField value={config.barThickness} type='number' fieldName='barThickness' label='Bar Thickness' updateField={updateField} />}
-                {(config.orientation === 'horizontal' || config.visualizationType === 'Paired Bar') && <TextField type='number' value={config.barSpace || '15'} fieldName='barSpace' label='Bar Space' updateField={updateField} min='0' />}
+                {visSupportsBarSpace() && <TextField type='number' value={config.barSpace || '15'} fieldName='barSpace' label='Bar Space' updateField={updateField} min='0' />}
                 {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.topAxis.hasLine} section='topAxis' fieldName='hasLine' label='Add Top Axis Line' updateField={updateField} />}
 
                 {config.visualizationType === 'Spark Line' && (
