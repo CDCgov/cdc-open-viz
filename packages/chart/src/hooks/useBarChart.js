@@ -2,14 +2,13 @@ import React, { useContext, useEffect } from 'react'
 import ConfigContext from '../ConfigContext'
 
 export const useBarChart = () => {
-  const { config, colorPalettes, tableData, updateConfig } = useContext(ConfigContext)
+  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate } = useContext(ConfigContext)
   const { orientation } = config
 
   const isHorizontal = orientation === 'horizontal'
   const barBorderWidth = 1
   const lollipopBarWidth = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5
   const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
-
   const isLabelBelowBar = config.yAxis.labelPlacement === 'Below Bar'
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
@@ -77,7 +76,10 @@ export const useBarChart = () => {
     return style
   }
 
-  const assignColorsToValues = () => {
+  const assignColorsToValues = (barsCount, barIndex, currentBarColor) => {
+    if (!config.legend.colorCode && config.series.length > 1) {
+      return currentBarColor
+    }
     const palettesArr = colorPalettes[config.palette]
     const values = tableData.map(d => {
       return d[config.legend.colorCode]
@@ -85,7 +87,7 @@ export const useBarChart = () => {
     // Map to hold unique values and their  colors
     let colorMap = new Map()
     // Resultant array to hold colors  to the values
-    let result = []
+    let palette = []
 
     for (let i = 0; i < values.length; i++) {
       // If value not in map, add it and assign a color
@@ -93,11 +95,16 @@ export const useBarChart = () => {
         colorMap.set(values[i], palettesArr[colorMap.size % palettesArr.length])
       }
       // push the color to the result array
-      result.push(colorMap.get(values[i]))
+      palette.push(colorMap.get(values[i]))
     }
-    return result
-  }
 
+    // loop throghy existing colors and extend if needed
+    while (palette.length < barsCount) {
+      palette = palette.concat(palette)
+    }
+    const barColor = palette[barIndex]
+    return barColor
+  }
   const updateBars = defaultBars => {
     // function updates  stacked && regular && lollipop horizontal bars
     if (config.visualizationType !== 'Bar' && !isHorizontal) return defaultBars
@@ -136,6 +143,25 @@ export const useBarChart = () => {
     })
   }
 
+  const getHighlightedBarColorByValue = value => {
+    const match = config?.highlightedBarValues.filter(item => {
+      if (!item.value) return
+      return config.xAxis.type === 'date' ? formatDate(parseDate(item.value)) === value : item.value === value
+    })[0]
+
+    if (!match?.color) return `rgba(255, 102, 1)`
+    return match.color
+  }
+  const getHighlightedBarByValue = value => {
+    const match = config?.highlightedBarValues.filter(item => {
+      if (!item.value) return
+      return config.xAxis.type === 'date' ? formatDate(parseDate(item.value)) === value : item.value === value
+    })[0]
+
+    if (!match?.color) return false
+    return match
+  }
+
   return {
     isHorizontal,
     barBorderWidth,
@@ -153,6 +179,8 @@ export const useBarChart = () => {
     hasMultipleSeries,
     applyRadius,
     updateBars,
-    assignColorsToValues
+    assignColorsToValues,
+    getHighlightedBarColorByValue,
+    getHighlightedBarByValue
   }
 }
