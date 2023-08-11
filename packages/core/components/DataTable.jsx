@@ -145,15 +145,13 @@ const DataTable = props => {
   const DownloadButton = memo(() => {
     if (rawData !== undefined) {
       let csvData
-      if (config.type === 'chart' || config.general.type === 'bubble' || !config.table.showFullGeoNameInCSV) {
-        // Just Unparse
-        csvData = Papa.unparse(rawData)
-      } else if ((config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') || config.general.type === 'us-geocode') {
-        // Unparse + Add column for full Geo name
-        csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[config.columns.geo.name]), ...row })))
-      } else {
+      // only use fullGeoName on County maps and no other
+      if (config.general.geoType === 'us-county') {
         // Unparse + Add column for full Geo name along with State
         csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row })))
+      } else {
+        // Just Unparse
+        csvData = Papa.unparse(rawData)
       }
 
       const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
