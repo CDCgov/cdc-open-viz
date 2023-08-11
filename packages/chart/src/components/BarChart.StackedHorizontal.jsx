@@ -10,8 +10,8 @@ import chroma from 'chroma-js'
 
 const BarChartStackedHorizontal = props => {
   const { xScale, yScale, xMax, yMax } = props
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, animatedChart } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, isLabelBelowBar, displayNumbersOnBar } = useBarChart()
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, animatedChart, getTextWidth } = useContext(ConfigContext)
+  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, isLabelBelowBar, displayNumbersOnBar, fontSize } = useBarChart()
   const { orientation, visualizationSubType } = config
 
   return (
@@ -32,6 +32,7 @@ const BarChartStackedHorizontal = props => {
                 const style = applyRadius(barStack.index)
                 let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                 let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
                 if (!hasMultipleSeries) {
                   xAxisTooltip = config.isLegendValue ? `${bar.key}: ${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisTooltip
                 }
@@ -98,13 +99,6 @@ const BarChartStackedHorizontal = props => {
                           fill={labelColor}
                           textAnchor='middle'
                           verticalAnchor='middle'
-                          innerRef={e => {
-                            if (e) {
-                              // use font sizes and padding to set the bar height
-                              let elem = e.getBBox()
-                              setTextWidth(elem.width)
-                            }
-                          }}
                         >
                           {xAxisValue}
                         </Text>
