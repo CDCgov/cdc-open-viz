@@ -49,13 +49,10 @@ export const BarChartHorizontal = props => {
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(0)
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
-                  let palette = assignColorsToValues()
                   const barWidth = config.barHeight
                   let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
-                  while (palette.length < barGroups.length) {
-                    palette = palette.concat(palette)
-                  }
-                  if (config.legend.colorCode && config.series.length === 1) barColor = palette[barGroup.index]
+                  // Color code by category
+                  barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
 
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]

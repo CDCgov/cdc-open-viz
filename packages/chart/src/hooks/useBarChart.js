@@ -76,7 +76,10 @@ export const useBarChart = () => {
     return style
   }
 
-  const assignColorsToValues = () => {
+  const assignColorsToValues = (barsCount, barIndex, currentBarColor) => {
+    if (!config.legend.colorCode && !config.series.length === 1) {
+      return currentBarColor
+    }
     const palettesArr = colorPalettes[config.palette]
     const values = tableData.map(d => {
       return d[config.legend.colorCode]
@@ -84,7 +87,7 @@ export const useBarChart = () => {
     // Map to hold unique values and their  colors
     let colorMap = new Map()
     // Resultant array to hold colors  to the values
-    let result = []
+    let palette = []
 
     for (let i = 0; i < values.length; i++) {
       // If value not in map, add it and assign a color
@@ -92,11 +95,16 @@ export const useBarChart = () => {
         colorMap.set(values[i], palettesArr[colorMap.size % palettesArr.length])
       }
       // push the color to the result array
-      result.push(colorMap.get(values[i]))
+      palette.push(colorMap.get(values[i]))
     }
-    return result
-  }
 
+    // loop throghy existing colors and extend if needed
+    while (palette.length < barsCount) {
+      palette = palette.concat(palette)
+    }
+    const barColor = palette[barIndex]
+    return barColor
+  }
   const updateBars = defaultBars => {
     // function updates  stacked && regular && lollipop horizontal bars
     if (config.visualizationType !== 'Bar' && !isHorizontal) return defaultBars
