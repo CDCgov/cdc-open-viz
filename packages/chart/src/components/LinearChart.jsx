@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState, useMemo } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -216,8 +216,8 @@ export default function LinearChart() {
     }
     if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? value : key}`}</li>
 
-    if (value[0] === config.runtime.yAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.yAxis.dataKey ? `${config.runtime.yAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1], false)) : value[1]}`}</li>
-    if (value[0] === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1], false)) : value[1]}`}</li>
+    // if (value[0] === config.runtime.yAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.yAxis.dataKey ? `${config.runtime.yAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1], false)) : value[1]}`}</li>
+    // if (value[0] === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1], false)) : value[1]}`}</li>
     return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
   }
 
@@ -319,28 +319,6 @@ export default function LinearChart() {
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
       return val
     }
-  }
-
-  const getYScaleValues = (closestXScaleValue, includedSeries) => {
-    const formattedDate = formatDate(closestXScaleValue)
-
-    let dataToSearch
-    if (xAxis.type === 'categorical') {
-      dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
-    } else {
-      dataToSearch = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
-    }
-
-    // Return an empty array if no matching data is found.
-    if (!dataToSearch || dataToSearch.length === 0) {
-      return []
-    }
-
-    const yScaleValues = dataToSearch.map(object => {
-      return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
-    })
-
-    return yScaleValues
   }
 
   // visx tooltip hook

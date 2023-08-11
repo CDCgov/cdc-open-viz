@@ -2,9 +2,7 @@ import React, { useContext } from 'react'
 
 // visx
 import { Group } from '@visx/group'
-import { BarGroup, Bar } from '@visx/shape'
-
-// third party
+import { Bar } from '@visx/shape'
 
 // cdc
 import BarChartType from './BarChartType'
