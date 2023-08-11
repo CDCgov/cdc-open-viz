@@ -10,10 +10,10 @@ import { useHighlightedBars } from '../hooks/useHighlightedBars'
 import chroma from 'chroma-js'
 
 export const BarChartHorizontal = props => {
-  const { xScale, yScale, xMax, yMax, seriesScale, getYAxisData, getXAxisData } = props
+  const { xScale, yScale, yMax, seriesScale, getYAxisData, getXAxisData } = props
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getTextWidth } = useContext(ConfigContext)
   const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, fontSize, isLabelBelowBar, displayNumbersOnBar, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
-  const { orientation } = config
+
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   return (
@@ -124,7 +124,7 @@ export const BarChartHorizontal = props => {
                   }
 
                   return (
-                    <Group key={`${barGroup.index}--${index}--${orientation}`}>
+                    <Group key={`${barGroup.index}--${index}`}>
                       {/* This feels gross but inline transition was not working well*/}
                       <style>
                         {`

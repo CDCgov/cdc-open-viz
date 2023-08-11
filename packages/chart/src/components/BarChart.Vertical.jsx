@@ -13,7 +13,6 @@ export const BarChartVertical = props => {
   const { xScale, yScale, xMax, yMax, seriesScale, getXAxisData, getYAxisData } = props
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber } = useContext(ConfigContext)
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
-  const { orientation } = config
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   return (
@@ -101,7 +100,7 @@ export const BarChartVertical = props => {
                   }
 
                   return (
-                    <Group key={`${barGroup.index}--${index}--${orientation}`}>
+                    <Group key={`${barGroup.index}--${index}`}>
                       {/* This feels gross but inline transition was not working well*/}
                       <style>
                         {`
