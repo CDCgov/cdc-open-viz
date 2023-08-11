@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -6,9 +6,17 @@ import { bisector } from 'd3-array'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
 import { localPoint } from '@visx/event'
+import { scaleTime, scaleLinear, scaleLog } from '@visx/scale'
+import { Brush } from '@visx/brush'
+import { Bounds } from '@visx/brush/lib/types'
+import BaseBrush, { BaseBrushState, UpdateBrush } from '@visx/brush/lib/BaseBrush'
+import { PatternLines } from '@visx/pattern'
+import { LinearGradient } from '@visx/gradient'
+import { max, extent } from 'd3-array'
+import { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle'
 import { Text } from '@visx/text'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import { useTooltip, TooltipWithBounds, useTooltipInPortal } from '@visx/tooltip'
+import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 
 // CDC Components
 import AreaChart from './AreaChart'
@@ -20,6 +28,7 @@ import DeviationBar from './DeviationBar'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Forecasting from './Forecasting'
 import LineChart from './LineChart'
+import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
 
@@ -29,43 +38,84 @@ import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
+import { curveMonotoneX } from '@visx/curve'
 
 // styles
-import { defaultStyles } from '@visx/tooltip'
 import '../scss/LinearChart.scss'
 
 export default function LinearChart() {
-  const { isEditor, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth } = useContext(ConfigContext)
+  const { isEditor, isDashboard, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
 
   // todo: start destructuring this file for conciseness
-  const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime } = config
+  const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
 
-  // getters & functions
-  const getXAxisData = d => (runtime.xAxis.type === 'date' ? parseDate(d[runtime.originalXAxis.dataKey]).getTime() : d[runtime.originalXAxis.dataKey])
-  const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const xAxisDataMapped = data.map(d => getXAxisData(d))
+  const getDate = d => new Date(d[config.xAxis.dataKey])
+
+  const initBrushData = () => {
+    let brushFilteredData = new Set()
+    config.data.filter(s => {
+      const x = getDate(s).getTime()
+      brushFilteredData.add(x) // just adds the time data x point not the entire data record
+    })
+    return brushFilteredData
+  }
+
+  // Initialize Brush variables - here for now
+  const [xAxisBrushData, setXAxisBrushData] = useState(data) // initBrushData
+  const brushMargin = { top: 10, bottom: 15, left: 50, right: 20 }
+  const chartSeparation = 30
+  const PATTERN_ID = 'brush_pattern'
+  const GRADIENT_ID = 'brush_gradient'
+  const accentColor = '#ddd' // color of pattern slants '#ddd' // '#f6acc8' // light pink crosshairs
+  const background = '#584153' // dark purple
+  const background2 = '#af8baf' // light purple
+  const selectedBrushStyle = {
+    fill: `url(#${PATTERN_ID})`,
+    stroke: 'red', // GRADIENT_ID,
+    strokeWidth: 2 // does nothing
+  }
+  const styles = {
+    border: '1px solid red'
+  }
+  const compact = false // do we even need this?
 
   // configure width
   let [width] = dimensions
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
     width = width * 0.73
   }
-  //  configure height , yMax, xMAx
+  //  configure height , yMax, xMax
   const { horizontal: heightHorizontal } = config.heights
   const isHorizontal = orientation === 'horizontal'
   const shouldAbbreviate = true
-  const height = config.aspectRatio ? width * config.aspectRatio : config.heights[orientation]
+  let height = config.aspectRatio ? width * config.aspectRatio : config.visualizationType === 'Forest Plot' ? config.heights['vertical'] : config.heights[orientation]
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  const yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.size)
+  let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.size)
 
-  // hooks
-  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
+  if (config.visualizationType === 'Forest Plot') {
+    height = height + config.data.length * config.forestPlot.rowHeight
+    yMax = yMax + config.data.length * config.forestPlot.rowHeight
+  }
+
+  // MIGHT NOT NEED ALL OF THESE
+  const innerHeight = height
+  const topChartBottomMargin = compact ? chartSeparation / 2 : chartSeparation + 10
+  const topChartHeight = 0.8 * innerHeight - topChartBottomMargin
+  const bottomChartHeight = innerHeight - topChartHeight - chartSeparation
+  const xMaxBrush = xMax
+  let dynamicMarginTop = 0 || config.dynamicMarginTop // need to init this up top so calc for height can work
+  const marginTop = 20
+  let yMaxBrush = config.isResponsiveTicks && config.showChartBrush ? yMax + config.dynamicMarginTop / 4 + marginTop : yMax
+  // account for brush data changes
+  const brushData = undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data
+
+  // hooks  % states
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, brushData)
+  // make brush set one time up front on original data
+  const { minValue: minValueBrush, maxValue: maxValueBrush, existPositiveValue: existPositiveValueBrush, isAllLine: isAllLineBrush } = useMemo(() => useReduceData(config, data))
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
-  const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
-  const { min, max } = useMinMax(properties)
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding } = useScales({ ...properties, min, max })
 
   // refs
   const triggerRef = useRef()
@@ -73,6 +123,66 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
+  const brushRef = useRef(BaseBrush)
+
+  // getters & functions
+  const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getYAxisData = (d, seriesKey) => d[seriesKey]
+  const xAxisDataMapped = brushData.map(d => getXAxisData(d))
+  const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
+  const properties = { data: brushData, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
+  const { min, max } = useMinMax(properties)
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding } = useScales({ ...properties, min, max })
+
+  // values sent to Brush dont change after initial render
+  const isBrush = true
+  const xAxisDataMappedBrush = data.map(d => getXAxisData(d))
+  const propertiesBrush = { data, config, minValue: minValueBrush, maxValue: maxValueBrush, isAllLine: isAllLineBrush, existPositiveValue: existPositiveValueBrush, xAxisDataMapped: xAxisDataMappedBrush, xMax: xMaxBrush, yMax: yMaxBrush, isBrush }
+  const { min: minBrush, max: maxBrush } = useMinMax(propertiesBrush)
+  const { xScale: xScaleBrush, yScale: yScaleBrush, seriesScale: seriesScaleBrush, g1xScale: g1xScaleBrush, g2xScale: g2xScaleBrush, xScaleNoPadding: xScaleNoPaddingBrush, yScaleBrushTest } = useScales({ ...propertiesBrush, min: minBrush, max: maxBrush })
+
+  // Helper for getting data to the closest date/category hovered.
+  const getXValueFromCoordinateDate = x => {
+    if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
+      let eachBand = xScale.step()
+      let numerator = x
+      const index = Math.floor(Number(numerator) / eachBand)
+      return xScale.domain()[index - 1] // fixes off by 1 error
+    }
+
+    if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
+      const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
+      const x0 = xScale.invert(xScale(x)) // GETTING INVALID DATE ****
+      const index = bisectDate(config.data, x0, 1)
+      const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
+      return val
+    }
+  }
+
+  const onBrushChange = domain => {
+    if (!domain) return
+    const { x0, x1 } = domain
+    //console.log('## onBrushChange domain x0, x1', domain, x0, x1)
+    let brushFilteredData = []
+    brushFilteredData = config.data.filter(s => {
+      const x = getDate(s).getTime()
+      //console.log('# onBrushChange testing x0,x,x1, s', x0, x, x1, s)
+      if (x > x0 && x < x1) {
+        let date = formatDate(getXValueFromCoordinateDate(x))
+        //console.log('YES ADD', date)
+        return s
+      } else {
+        //console.log('### x not within brush bounds', x)
+      }
+    })
+
+    // dont let the number of points go below config.xAxis.numTicks ??? (TT)
+    if (undefined !== brushFilteredData && brushFilteredData.length >= config.xAxis.numTicks) {
+      // leaving this here for now due to issues with visx tick marks that need debugging
+      if (isDebug) console.log('Set new xAxisBrushdata to', brushFilteredData)
+      setXAxisBrushData(brushFilteredData)
+    }
+  }
 
   // a unique id is needed for tooltips.
   const tooltip_id = `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
@@ -85,7 +195,8 @@ export default function LinearChart() {
 
   // resolved an issue here with Object.entries, label no longer used.
   const TooltipListItem = ({ item }) => {
-    const [label, value] = item
+    const [index, keyValue] = item
+    const [key, value] = keyValue
 
     /**
      * find the original series and use the name property if available
@@ -98,16 +209,26 @@ export default function LinearChart() {
       if (series[0]?.name) return series[0]?.name
       return originalColumnName
     }
+
+    if (visualizationType === 'Forest Plot') {
+      if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${config.yAxis.type === 'date' ? formatDate(parseDate(key, false)) : value}`}</li>
+      return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
+    }
+    if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? value : key}`}</li>
+
     if (value[0] === config.runtime.yAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.yAxis.dataKey ? `${config.runtime.yAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1], false)) : value[1]}`}</li>
     if (value[0] === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formatDate(parseDate(value[1], false)) : value[1]}`}</li>
-    return <li className='tooltip-body'>{`${getSeriesNameFromLabel(value[0])}: ${formatNumber(value[1], 'left')}`}</li>
+    return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
   }
 
-  const handleLeftTickFormatting = tick => {
+  const handleLeftTickFormatting = (tick, index) => {
     if (config.useLogScale && tick === 0.1) {
       //when logarithmic scale applied change value of first tick
       tick = 0
     }
+
+    if (config.data && !config.data[index] && visualizationType === 'Forest Plot') return
+    if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
     if (runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
     if (orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
@@ -126,10 +247,11 @@ export default function LinearChart() {
 
   const countNumOfTicks = axis => {
     const { numTicks } = runtime[axis]
+    //console.log('xAxis, numTicks', config.runtime[axis], numTicks)
     let tickCount = undefined
 
     if (axis === 'yAxis') {
-      tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      tickCount = isHorizontal && !numTicks ? brushData.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
       // to fix edge case of small numbers with decimals
       if (tickCount === undefined && !config.dataFormat.roundTo) {
         // then it is set to Auto
@@ -147,6 +269,7 @@ export default function LinearChart() {
 
     if (axis === 'xAxis') {
       tickCount = isHorizontal && !numTicks ? undefined : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      //console.log('xAxis TERNARY tickCount=', tickCount)
       if (isHorizontal && tickCount === undefined && !config.dataFormat.roundTo) {
         // then it is set to Auto
         // - check for small numbers situation
@@ -156,6 +279,7 @@ export default function LinearChart() {
           tickCount = 4 // same default as standalone components
         }
       }
+      //console.log('xAxis LAST tickCount=', tickCount)
     }
     return tickCount
   }
@@ -181,7 +305,7 @@ export default function LinearChart() {
       return closestX
     }
 
-    if (config.xAxis.type === 'categorical' || (visualizationType === 'Combo' && orientation !== 'horizontal')) {
+    if (config.xAxis.type === 'categorical' || (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')) {
       let eachBand = xScale.step()
       let numerator = x
       const index = Math.floor(Number(numerator) / eachBand)
@@ -304,35 +428,103 @@ export default function LinearChart() {
     showTooltip(tooltipInformation)
   }
 
-  // todo: combine mouseover functions
-  const handleTooltipMouseOver = (e, data) => {
-    // get the svg coordinates of the mouse
-    // and get the closest values
+  // get the svg coordinates of the mouse
+  // and get the closest values
+  // cant do this in handleTooltipMouseOver bc isBrush set manually into the charts below
+  const disableMouseOver = (e, data) => {
+    return () => null
+  }
+
+  // Tooltip helper for getting data to the closest y value hovered.
+  const handleForestPlotMouseOver = (e, inputData) => {
     const eventSvgCoords = localPoint(e)
+
+    if (!eventSvgCoords) return
     const { x, y } = eventSvgCoords
 
-    let yScaleValues
-    let closestXScaleValue = getXValueFromCoordinate(x)
-    let formattedDate = formatDate(closestXScaleValue)
+    // Function to get the closest y-axis value from the cursor's position
+    // Function to get the closest y-axis value from the cursor's position
+    const getClosestYValue = yPosition => {
+      let minDistance = Number.MAX_VALUE
+      let closestYValue = null
 
-    //  keep track of the series.tooltip values
-    // and remember to push the xaxis data key on top
-    let includedSeries = config.series.filter(series => series.tooltip === true).map(item => item.dataKey)
-    includedSeries.push(config.xAxis.dataKey)
+      data.forEach((d, index) => {
+        const yPositionOnPlot = yScale(index)
+        const distance = Math.abs(yPositionOnPlot - yPosition)
 
-    if (xAxis.type === 'categorical') {
-      yScaleValues = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
-      yScaleValues = yScaleValues.map(object => {
-        return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
+        if (distance < minDistance) {
+          minDistance = distance
+          closestYValue = d[config.xAxis.dataKey]
+        }
       })
-    } else {
-      yScaleValues = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
-      yScaleValues = yScaleValues.map(object => {
-        return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
-      })
+      return closestYValue
     }
 
-    let seriesToInclude = []
+    const xValue = data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))[0][config.forestPlot.estimateField]
+
+    let standardLoopItems = [
+      [config.xAxis.dataKey, getClosestYValue(y)],
+      ['Estimate', xValue]
+    ]
+
+    let initialTooltipData = standardLoopItems ? standardLoopItems : {}
+
+    let tooltipData = {}
+    tooltipData.data = initialTooltipData
+    tooltipData.dataXPosition = isEditor ? x - 300 + 10 : x + 10
+    tooltipData.dataYPosition = y
+
+    let tooltipInformation = {
+      tooltipData: tooltipData,
+      tooltipTop: 0,
+      tooltipValues: 'test',
+      tooltipLeft: x
+    }
+
+    showTooltip(tooltipInformation)
+  }
+
+  /**
+   *
+   * @param {*} closestXScaleValue
+   * @param {*} includedSeries
+   * @returns an array of objects with the closest x and y series data items
+   * see example below
+   * [{
+        "Data 1": "foo",
+        "Data 2": "1350",
+        "Data 3": "300",
+        "Data 4": "950",
+        "Data 5": "1200",
+        "Data 6": "3100",
+        "Date": "1/15/2016"
+      }]
+   */
+  const getYScaleValues = (closestXScaleValue, includedSeries) => {
+    const formattedDate = formatDate(closestXScaleValue)
+
+    let dataToSearch
+    if (xAxis.type === 'categorical') {
+      dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
+    } else {
+      dataToSearch = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
+    }
+
+    // Return an empty array if no matching data is found.
+    if (!dataToSearch || dataToSearch.length === 0) {
+      return []
+    }
+
+    const yScaleValues = dataToSearch.map(object => {
+      return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
+    })
+
+    return yScaleValues
+  }
+
+  const getIncludedTooltipSeries = () => {
+    let standardLoopItems
+
     let stageColumns = []
     let ciItems = []
 
@@ -352,8 +544,6 @@ export default function LinearChart() {
       }
     })
 
-    let standardLoopItems = []
-
     if (!config.dashboard) {
       switch (visualizationType) {
         case 'Combo':
@@ -369,7 +559,7 @@ export default function LinearChart() {
           standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
           break
         default:
-          console.info('COVE: no visualization type found in handleMouseOver')
+          console.info('COVE: no visualization type found in handleTooltipMouseOver')
           break
       }
     }
@@ -378,12 +568,37 @@ export default function LinearChart() {
       standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...runtime?.lineSeriesKeys, ...stageColumns, ...ciItems]
     }
 
+    return standardLoopItems
+  }
+
+  // todo: combine mouseover functions
+  const handleTooltipMouseOver = async (e, data) => {
+    // get the svg coordinates of the mouse
+    const eventSvgCoords = localPoint(e)
+    const { x, y } = eventSvgCoords
+
+    // get the closest x value & format the date if
+    let closestXScaleValue = getXValueFromCoordinate(x)
+
+    //  keep track of the series that have tooltip.show equals true.
+    // and remember to push the xaxis data key on top
+    let includedSeries = config.series.filter(series => series.tooltip === true).map(item => item.dataKey)
+    includedSeries.push(config.xAxis.dataKey)
+
+    // returns ALL data closest object with key value paris of thes series.
+    const yScaleValues = getYScaleValues(closestXScaleValue, includedSeries)
+
+    // standard loop items format ['Date', 'Data 1', 'Data 2', 'Data 3', 'Data 4', 'Data 5', 'Data 6']
+    const standardLoopItems = getIncludedTooltipSeries()
+
+    let seriesToInclude = []
+
     standardLoopItems.map(seriesKey => {
       if (!seriesKey) return false
       if (!yScaleValues[0]) return false
-      for (const item of Object.entries(yScaleValues[0])) {
-        if (item[0] === seriesKey) {
-          seriesToInclude.push(item)
+      for (const series of Object.entries(yScaleValues[0])) {
+        if (series[0] === seriesKey) {
+          seriesToInclude.push(series)
         }
       }
     })
@@ -507,14 +722,118 @@ export default function LinearChart() {
     }
   }
 
-  const random = Date.now()
+  // We need to manually offset the handles for them to be rendered at the right position
+  function BrushHandle(BrushHandleRenderProps) {
+    const x = BrushHandleRenderProps.x
+    const height = BrushHandleRenderProps.height
+    const isBrushActive = BrushHandleRenderProps.isBrushActive
+    const pathWidth = 8
+    const pathHeight = 15
+    if (!isBrushActive) {
+      return null
+    }
+    return (
+      <Group left={x + pathWidth / 2} top={(height - pathHeight) / 2}>
+        <path fill='#f2f2f2' d='M -4.5 0.5 L 3.5 0.5 L 3.5 15.5 L -4.5 15.5 L -4.5 0.5 M -1.5 4 L -1.5 12 M 0.5 4 L 0.5 12' stroke='#999999' strokeWidth='1' style={{ cursor: 'ew-resize' }} />
+      </Group>
+    )
+  }
+
+  // this controls where the brush handles are intiially
+  // - 0, xMax basically have the handles flush to each end of the area
+  const initialBrushPosition = useMemo(
+    () => ({
+      start: { x: 0 },
+      end: { x: xMax }
+    }),
+    [xScale]
+  )
+
+  const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
+
+  const getChartHeight = useMemo(() => {
+    if (isNaN(height)) return 0
+
+    let tmpHeight = height // bc height is const
+    // I dont know why but the math setting height does not add up and needs adjustments
+    let xtraBuffer = 0
+    if (Number(runtime.xAxis.size) > 50) {
+      xtraBuffer = ((runtime.xAxis.size - 50) / 10) * 3.1
+      if (isEditor) {
+        if (!config.isResponsiveTicks) {
+          xtraBuffer -= 2 // dont know why but its off
+        } else {
+          xtraBuffer += ((runtime.xAxis.size - 60) / 10) * 3
+          if (Number(runtime.xAxis.size) > 80) {
+            xtraBuffer -= ((runtime.xAxis.size - 80) / 10) * 2 // yes subtract it
+          }
+        }
+      }
+      if (isDashboard) {
+        if (!config.isResponsiveTicks) {
+          xtraBuffer -= 2 // dont know why but its off
+        } else {
+          xtraBuffer += (runtime.xAxis.size - 50) / 10 // + 1
+          if (Number(runtime.xAxis.size) >= 80) {
+            xtraBuffer -= 2 // += ((runtime.xAxis.size - 80) / 10) * 2 // yes subtract it
+          }
+        }
+      }
+    }
+    if (Number(runtime.xAxis.size) < 50) {
+      xtraBuffer = ((50 - runtime.xAxis.size) / 10) * 4.2
+      if (isEditor) {
+        if (!config.isResponsiveTicks) {
+          xtraBuffer -= ((50 - runtime.xAxis.size) / 10) * 3 // dont know why but its off
+          if (Number(runtime.xAxis.size) < 25) {
+            xtraBuffer += 2
+          }
+        } else {
+          xtraBuffer += (60 - runtime.xAxis.size) / 10
+        }
+      }
+      if (isDashboard) {
+        if (!config.isResponsiveTicks) {
+          xtraBuffer -= (50 - runtime.xAxis.size) / 10 // * 3 // dont know why but its off
+          if (Number(runtime.xAxis.size) < 25) {
+            xtraBuffer += 2
+          }
+        } else {
+          xtraBuffer += ((50 - runtime.xAxis.size) / 10) * 2 + 1
+        }
+      }
+    }
+    if (config.showChartBrush) {
+      // need to account for SIZE (HEIGHT) which is mapped to padding?
+      if (runtime.xAxis.size > 50) {
+        tmpHeight -= runtime.xAxis.size - 50
+      } else {
+        tmpHeight += 50 - runtime.xAxis.size
+      }
+      if (!config.isResponsiveTicks) {
+        return runtime.xAxis.size > 50 ? (tmpHeight - xtraBuffer) * 1.3 : (tmpHeight + xtraBuffer) * 1.3
+      } else {
+        tmpHeight = (tmpHeight + dynamicMarginTop) * 1.3 - yMaxBrush * 0.25 - marginTop / 4
+        return runtime.xAxis.size > 50 ? tmpHeight - xtraBuffer : tmpHeight + xtraBuffer
+      }
+    } else {
+      return tmpHeight
+    }
+  })
+
+  const handleNumTicks = () => {
+    // On forest plots we need to return every "study" or y axis value.
+    if (config.visualizationType === 'Forest Plot') return config.data.length
+    return countNumOfTicks('yAxis')
+  }
 
   return isNaN(width) ? (
     <React.Fragment></React.Fragment>
   ) : (
     <ErrorBoundary component='LinearChart'>
-      <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
-        <Bar width={width} height={height} fill={'transparent'}></Bar>
+      {/* width has to accommodate brush handle on right if enabled */}
+      <svg width={config.showChartBrush ? width + 5 : width} height={getChartHeight} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
+        <Bar width={width} height={getChartHeight} fill={'transparent'}></Bar>
         {/* Highlighted regions */}
         {config.regions
           ? config.regions.map(region => {
@@ -558,10 +877,9 @@ export default function LinearChart() {
               )
             })
           : ''}
-
         {/* Y axis */}
-        {visualizationType !== 'Spark Line' && (
-          <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
+        {!['Spark Line', 'Forest Plot'].includes(visualizationType) && (
+          <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
             {props => {
               const axisCenter = runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
@@ -578,7 +896,7 @@ export default function LinearChart() {
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                         {!runtime.yAxis.hideTicks && <Line key={`${tick.value}--hide-hideTicks`} from={tick.from} to={config.useLogScale ? to : tick.to} stroke={config.yAxis.tickColor} display={runtime.horizontal ? 'none' : 'block'} />}
 
-                        {runtime.yAxis.gridLines ? <Line key={`${tick.value}--hide-hideGridLines`} display={config.useLogScale && showTicks} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
+                        {runtime.yAxis.gridLines ? <Line key={`${tick.value}--hide-hideGridLines`} display={(config.useLogScale && showTicks).toString()} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
                         {orientation === 'horizontal' && visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
                           <Text
@@ -624,7 +942,7 @@ export default function LinearChart() {
                       </Group>
                     )
                   })}
-                  {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={runtime.horizontal ? { x: 0, y: Number(heightHorizontal) } : props.axisToPoint} stroke='#000' />}
+                  {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={runtime.horizontal ? { x: 0, y: config.visualizationType === 'Forest Plot' ? height : Number(heightHorizontal) } : props.axisToPoint} stroke='#000' />}
                   {yScale.domain()[0] < 0 && <Line from={{ x: props.axisFromPoint.x, y: yScale(0) }} to={{ x: xMax, y: yScale(0) }} stroke='#333' />}
                   {visualizationType === 'Bar' && orientation === 'horizontal' && xScale.domain()[0] < 0 && <Line from={{ x: xScale(0), y: 0 }} to={{ x: xScale(0), y: yMax }} stroke='#333' strokeWidth={2} />}
                   <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${-1 * runtime.yAxis.size}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
@@ -635,7 +953,6 @@ export default function LinearChart() {
             }}
           </AxisLeft>
         )}
-
         {/* Right Axis */}
         {hasRightAxis && (
           <AxisRight scale={yScaleRight} left={Number(width - config.yAxis.rightAxisSize)} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
@@ -668,7 +985,6 @@ export default function LinearChart() {
             }}
           </AxisRight>
         )}
-
         {hasTopAxis && config.topAxis.hasLine && (
           <AxisTop
             stroke='#333'
@@ -681,11 +997,10 @@ export default function LinearChart() {
             })}
           />
         )}
-
         {/* X axis */}
         {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
           <AxisBottom
-            top={runtime.horizontal ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
+            top={runtime.horizontal && config.visualizationType !== 'Forest Plot' ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : config.visualizationType === 'Forest Plot' ? yMax + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
             left={Number(runtime.yAxis.size)}
             label={runtime.xAxis.label}
             tickFormat={handleBottomTickFormatting}
@@ -695,7 +1010,7 @@ export default function LinearChart() {
             tickStroke='#333'
           >
             {props => {
-              const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
+              const axisCenter = config.visualizationType !== 'Forest Plot' ? (props.axisToPoint.x - props.axisFromPoint.x) / 2 : width / 2
               const containsMultipleWords = inputString => /\s/.test(inputString)
               const ismultiLabel = props.ticks.some(tick => containsMultipleWords(tick.value))
 
@@ -703,7 +1018,7 @@ export default function LinearChart() {
               const fontSize = { small: 16, medium: 18, large: 20 }
               const defaultTickLength = 8
               const tickWidthMax = Math.max(...props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)))
-              const marginTop = 20
+              // const marginTop = 20 // moved to top bc need for yMax calcs
               const accumulator = ismultiLabel ? 180 : 100
 
               const textWidths = props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`))
@@ -728,9 +1043,9 @@ export default function LinearChart() {
                 }
               })
 
-              const dynamicMarginTop = areTicksTouching && config.isResponsiveTicks ? tickWidthMax + defaultTickLength + marginTop : 0
+              dynamicMarginTop = areTicksTouching && config.isResponsiveTicks ? tickWidthMax + defaultTickLength + marginTop : 0
               config.dynamicMarginTop = dynamicMarginTop
-              // config.xAxis.size = dynamicMarginTop
+
               return (
                 <Group className='bottom-axis'>
                   {props.ticks.map((tick, i, propsTicks) => {
@@ -759,7 +1074,7 @@ export default function LinearChart() {
                             angle={tickRotation}
                             verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
                             textAnchor={tickRotation ? 'end' : 'middle'}
-                            width={areTicksTouching && !config.isResponsiveTicks && !config.xAxis.tickRotation ? limitedWidth : textWidth}
+                            width={areTicksTouching && !config.isResponsiveTicks && !Number(config[section].tickRotation) ? limitedWidth : textWidth}
                             fill={config.xAxis.tickLabelColor}
                           >
                             {tick.formattedValue}
@@ -849,7 +1164,7 @@ export default function LinearChart() {
         {visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
         {visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
         {(visualizationType === 'Area Chart' || visualizationType === 'Combo') && (
-          <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleAreaTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} showTooltip={showTooltip} tooltipData={tooltipData} />
+          <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} brushData={brushData} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleAreaTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
         )}
         {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
           <BarChart
@@ -894,12 +1209,69 @@ export default function LinearChart() {
             xScale={xScale}
             yScale={yScale}
             width={xMax}
+            le
             height={yMax}
             xScaleNoPadding={xScaleNoPadding}
             chartRef={svgRef}
             getXValueFromCoordinate={getXValueFromCoordinate}
             handleTooltipMouseOver={handleTooltipMouseOver}
             handleTooltipMouseOff={handleTooltipMouseOff}
+            isBrush={false}
+          />
+        )}
+        {/* brush */}
+        {config.showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
+          <>
+            <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} height={yMaxBrush / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>
+              <PatternLines id={PATTERN_ID} height={8} width={8} stroke={accentColor} strokeWidth={1} orientation={['diagonal']} style={styles} />
+              <Brush
+                id='theBrush'
+                className='theBrush'
+                xScale={xScaleBrush}
+                yScale={yScaleBrush}
+                width={xMaxBrush}
+                height={yMaxBrush / 4}
+                margin={0}
+                handleSize={8}
+                innerRef={brushRef}
+                resizeTriggerAreas={['left', 'right']}
+                brushDirection='horizontal'
+                initialBrushPosition={initialBrushPosition}
+                onChange={onBrushChange}
+                selectedBoxStyle={selectedBrushStyle}
+                useWindowMoveEvents
+                renderBrushHandle={props => <BrushHandle {...props} />}
+                style={styles}
+              />
+            </AreaChart>
+          </>
+        )}
+
+        {/* y anchors */}
+        {config.yAxis.anchors &&
+          config.yAxis.anchors.map(anchor => {
+            return <Line strokeDasharray={handleLineType(anchor.lineStyle)} stroke='rgba(0,0,0,1)' className='customAnchor' from={{ x: 0 + config.yAxis.size, y: yScale(anchor.value) }} to={{ x: xMax, y: yScale(anchor.value) }} display={runtime.horizontal ? 'none' : 'block'} />
+          })}
+        {visualizationType === 'Forest Plot' && (
+          <ForestPlot
+            xScale={xScale}
+            yScale={yScale}
+            seriesScale={seriesScale}
+            width={xMax}
+            height={yMax}
+            maxWidth={width}
+            maxHeight={height}
+            getXAxisData={getXAxisData}
+            getYAxisData={getYAxisData}
+            animatedChart={animatedChart}
+            visible={animatedChart}
+            handleTooltipMouseOver={handleForestPlotMouseOver}
+            handleTooltipMouseOff={handleTooltipMouseOff}
+            handleTooltipClick={handleTooltipClick}
+            tooltipData={tooltipData}
+            showTooltip={showTooltip}
+            chartRef={svgRef}
+            config={config}
           />
         )}
 
@@ -915,8 +1287,9 @@ export default function LinearChart() {
         {config.yAxis.anchors &&
           config.yAxis.anchors.map((anchor, index) => {
             let anchorPosition = yScale(anchor.value)
+            // have to move up
+            // const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
             if (!anchor.value) return
-            const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
             const middleOffset = orientation === 'horizontal' && visualizationType === 'Bar' ? config.barHeight / 4 : 0
 
             if (!anchorPosition) return
@@ -933,7 +1306,6 @@ export default function LinearChart() {
               />
             )
           })}
-
         {/* x anchors */}
         {config.xAxis.anchors &&
           config.xAxis.anchors.map((anchor, index) => {
@@ -944,7 +1316,8 @@ export default function LinearChart() {
 
             let anchorPosition = newX.type === 'date' ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
 
-            const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
+            // have to move up
+            // const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
 
             if (!anchorPosition) return
 
