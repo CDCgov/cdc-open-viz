@@ -75,9 +75,9 @@ export const BarChartHorizontal = props => {
                     }
                   }
 
-                  // create new Index based on bar value for border Radius
+                  // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
-                  const style = applyRadius(newIndex)
+                  const borderRadius = applyRadius(newIndex)
 
                   let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -120,7 +120,7 @@ export const BarChartHorizontal = props => {
                     borderColor,
                     borderStyle: 'solid',
                     borderWidth,
-                    ...style
+                    ...borderRadius
                   }
 
                   return (
