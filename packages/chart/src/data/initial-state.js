@@ -4,7 +4,7 @@ export default {
   title: '',
   showTitle: true,
   showDownloadMediaButton: false,
-  showChartBrush: true,
+  showChartBrush: false,
   theme: 'theme-blue',
   animate: false,
   fontSize: 'medium',
