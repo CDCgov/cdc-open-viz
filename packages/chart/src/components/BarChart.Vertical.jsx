@@ -42,22 +42,19 @@ export const BarChartVertical = props => {
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                  let barHeight = isNumber(Math.abs(yScale(bar.value) - yScale(scaleVal))) ? Math.abs(yScale(bar.value) - yScale(scaleVal)) : 0
+                  let barHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                   let barGroupWidth = (xMax / barGroups.length) * (config.barThickness || 0.8)
                   let offset = ((xMax / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
-                  // ! Unsure if this should go back.
+                  // configure left side offset of lollipop bars
                   if (config.isLollipopChart) {
                     offset = xMax / barGroups.length / 2 - lollipopBarWidth / 2
                   }
-                  let palette = assignColorsToValues()
 
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
                   let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
-                  while (palette.length < barGroups.length) {
-                    palette = palette.concat(palette)
-                  }
-                  if (config.legend.colorCode && config.series.length === 1) barColor = palette[barGroup.index]
+                  // Color code by category
+                  barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
 
                   let yAxisValue = formatNumber(bar.value, 'left')
                   let xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
