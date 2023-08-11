@@ -1142,7 +1142,7 @@ export default function LinearChart() {
           />
         )}
         {/* brush */}
-        {showChartBrush && (config.visualizationType === 'Area Chart' || config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && (
+        {showChartBrush && config.visualizationType === 'Area Chart' && (
           <>
             <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} height={yMaxBrush / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>
               <PatternLines id={pattern_id} height={8} width={8} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />

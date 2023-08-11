@@ -63,6 +63,14 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
     return isBrush ? yScale(d[s.dataKey]) / 4 : yScale(d[s.dataKey])
   }
 
+  // prevents duplicate brush handles being rendered
+  const getFirstBrushHandleOnly = (children, index) => {
+    if (index === 0) {
+      return children
+    }
+    // else dont return the other brush handles
+  }
+
   return (
     data && (
       <svg>
@@ -113,20 +121,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
                   curve={curveType}
                   strokeDasharray={s.type ? handleLineType(s.type) : 0}
                 />
-
-                  {/* circles that appear on hover */}
-                  {/* !isBrush && tooltipData && Object.entries(tooltipData.data).length > 0 && (
-                  <circle
-                    cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
-                    cy={yScale(tooltipData.data[index][1])}
-                    r={4.5}
-                    opacity={1}
-                    fillOpacity={1}
-                    fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000') : 'transparent'}
-                    style={{ filter: 'unset', opacity: 1 }}
-                  />
-                  ) */}
-                  {children}
+                  {getFirstBrushHandleOnly(children, index)}
                 </React.Fragment>
               )
             })}
