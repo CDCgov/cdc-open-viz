@@ -37,6 +37,7 @@ import useTopAxis from '../hooks/useTopAxis'
 
 // styles
 import '../scss/LinearChart.scss'
+import withBrush from './withBrush'
 
 export default function LinearChart() {
   const { isEditor, isDashboard, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
@@ -742,6 +743,11 @@ export default function LinearChart() {
       return tmpHeight
     }
   })
+  // this is Example of usage High Order Components.
+  // nameing can be anything we want.
+  // or import AreaChart as AreaChartPure and pass it
+  //  const AreaChart = withBrush(AreaChartPure)
+  const AreaChartX = withBrush(AreaChart)
 
   const handleNumTicks = () => {
     // On forest plots we need to return every "study" or y axis value.
@@ -1085,9 +1091,9 @@ export default function LinearChart() {
         {visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
         {visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
         {visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
-        {(visualizationType === 'Area Chart' || visualizationType === 'Combo') && (
+        {/* {(visualizationType === 'Area Chart' || visualizationType === 'Combo') && (
           <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} brushData={brushData} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleAreaTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
-        )}
+        )} */}
         {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
           <BarChart
             xScale={xScale}
@@ -1142,7 +1148,10 @@ export default function LinearChart() {
           />
         )}
         {/* brush */}
-        {showChartBrush && config.visualizationType === 'Area Chart' && (
+        {(visualizationType === 'Area Chart' || visualizationType === 'Combo') && (
+          <AreaChartX xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} brushData={brushData} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleAreaTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
+        )}
+        {/* {showChartBrush && config.visualizationType === 'Area Chart' && (
           <>
             <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} height={yMaxBrush / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>
               <PatternLines id={pattern_id} height={8} width={8} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />
@@ -1167,7 +1176,7 @@ export default function LinearChart() {
               />
             </AreaChart>
           </>
-        )}
+        )} */}
 
         {/* y anchors */}
         {config.yAxis.anchors &&
