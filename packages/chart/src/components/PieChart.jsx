@@ -1,5 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react'
 import { animated, useTransition, interpolate } from 'react-spring'
+import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
+import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 
 import Pie from '@visx/shape/lib/shapes/Pie'
 import chroma from 'chroma-js'
@@ -16,16 +18,18 @@ const enterUpdateTransition = ({ startAngle, endAngle }) => ({
   endAngle
 })
 
-export default function PieChart(props) {
+const PieChart = props => {
   const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels } = useContext(ConfigContext)
-
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
-
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
+
+  // Tooltip Helpers
+  const { tooltipData, showTooltip, hideTooltip, tooltipOpen } = useTooltip()
+  const { handlePieTooltipMouseOver, tooltipStyles, TooltipListItem } = useCoveTooltip({ xScale: '', yScale: '', showTooltip, hideTooltip })
 
   // Make sure the chart is visible if in the editor
   /* eslint-disable react-hooks/exhaustive-deps */
@@ -82,7 +86,7 @@ export default function PieChart(props) {
           return (
             <Group key={key} style={{ opacity: config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1 ? 0.5 : 1 }}>
               {/* PIE SLICE */}
-              <animated.path d={pieSlicePath} fill={colorScale(arc.data[config.runtime.xAxis.dataKey])} onMouseEnter={(d, i) => console.log('mousing over', arc.data[config.xAxis.dataKey])} />
+              <animated.path d={pieSlicePath} fill={colorScale(arc.data[config.runtime.xAxis.dataKey])} onMouseEnter={e => handlePieTooltipMouseOver(e, arc.data[config.runtime.xAxis.dataKey], arc)} />
 
               {/* PIE TEXT */}
               {hasSpaceForLabel && (
@@ -140,6 +144,13 @@ export default function PieChart(props) {
         </Group>
       </svg>
       <div ref={triggerRef} />
+      {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
+        <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} style={tooltipStyles(tooltipData)} width={width}>
+          <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
+        </TooltipWithBounds>
+      )}
     </ErrorBoundary>
   )
 }
+
+export default PieChart
