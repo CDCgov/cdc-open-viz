@@ -670,7 +670,7 @@ export default function LinearChart() {
         {visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
         {visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
         {(visualizationType === 'Area Chart' || visualizationType === 'Combo') && (
-          <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} brushData={brushData} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleAreaTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
+          <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} brushData={brushData} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
         )}
         {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
           <BarChart
