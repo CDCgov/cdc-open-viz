@@ -203,8 +203,6 @@ export default function LinearChart() {
     handleTooltipMouseOver,
     handleTooltipClick,
     handleForestPlotMouseOver,
-    handleHorizontalMouseOver,
-    handleAreaTooltipMouseOver,
     handleTooltipMouseOff,
     tooltipStyles,
     TooltipListItem,
@@ -683,7 +681,7 @@ export default function LinearChart() {
             getYAxisData={getYAxisData}
             animatedChart={animatedChart}
             visible={animatedChart}
-            handleTooltipMouseOver={config.orientation === 'horizontal' ? handleHorizontalMouseOver : handleTooltipMouseOver}
+            handleTooltipMouseOver={handleTooltipMouseOver}
             handleTooltipMouseOff={handleTooltipMouseOff}
             handleTooltipClick={handleTooltipClick}
             tooltipData={tooltipData}
