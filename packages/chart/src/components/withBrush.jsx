@@ -9,6 +9,20 @@ import useMinMax from '../hooks/useMinMax'
 import useScales from '../hooks/useScales'
 import useReduceData from '../hooks/useReduceData'
 
+const BrushHandle = props => {
+  const { x, height, isBrushActive } = props
+  const pathWidth = 8
+  const pathHeight = 15
+  if (!isBrushActive) {
+    return null
+  }
+  return (
+    <Group left={x + pathWidth / 2} top={(height - pathHeight) / 2}>
+      <path fill='#f2f2f2' d='M -4.5 0.5 L 3.5 0.5 L 3.5 15.5 L -4.5 15.5 L -4.5 0.5 M -1.5 4 L -1.5 12 M 0.5 4 L 0.5 12' stroke='#999999' strokeWidth='1' style={{ cursor: 'ew-resize' }} />
+    </Group>
+  )
+}
+
 const withBrush = Component => {
   const styles = {
     border: '1px solid red'
@@ -54,13 +68,16 @@ const withBrush = Component => {
     const onBrushChange = domain => {
       if (!domain) return
       const { x0, x1 } = domain
+      console.log('domain x0, x1', domain, x0, x1)
       let brushFilteredData = []
       brushFilteredData = config.data.filter(s => {
         const x = getDate(s).getTime()
         if (x > x0 && x < x1) {
           let date = formatDate(getXValueFromCoordinateDate(x))
+          console.log('Yes add x', x)
           return s
         } else {
+          console.log('x not in range', x)
         }
       })
 
@@ -72,33 +89,38 @@ const withBrush = Component => {
       }
     }
 
-    if (!props.showChartBrush) {
-      return <Component {...props} />
-    }
+    //if (!config.showChartBrush) {
+    //return <Component {...props} />
+    //}
 
     return (
-      <Component className='brushChart' xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} height={yMax / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>
-        <PatternLines id={pattern_id} height={8} width={8} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />
-        <Brush
-          id='theBrush'
-          className='theBrush'
-          xScale={xScale}
-          yScale={yScale}
-          width={xMax}
-          height={yMax / 4}
-          margin={0}
-          handleSize={8}
-          innerRef={ref}
-          resizeTriggerAreas={['left', 'right']}
-          brushDirection='horizontal'
-          initialBrushPosition={initialBrushPosition}
-          onChange={onBrushChange}
-          selectedBoxStyle={{ fill: `url(#${pattern_id})` }}
-          useWindowMoveEvents
-          renderBrushHandle={props => <BrushHandle {...props} />}
-          style={styles}
-        />
-      </Component>
+      <>
+        <Component {...props} brushData={xAxisBrushData} />
+        config.showChartBrush && (
+        <Component className='brushChart' xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} height={yMax / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>
+          <PatternLines id={pattern_id} height={8} width={8} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />
+          <Brush
+            id='theBrush'
+            className='theBrush'
+            xScale={xScale}
+            yScale={yScale}
+            width={xMax}
+            height={yMax / 4}
+            margin={0}
+            handleSize={8}
+            innerRef={ref}
+            resizeTriggerAreas={['left', 'right']}
+            brushDirection='horizontal'
+            initialBrushPosition={initialBrushPosition}
+            onChange={onBrushChange}
+            selectedBoxStyle={{ fill: `url(#${pattern_id})` }}
+            useWindowMoveEvents
+            renderBrushHandle={props => <BrushHandle {...props} />}
+            style={styles}
+          />
+        </Component>
+        )
+      </>
     )
   }
 
@@ -106,17 +128,3 @@ const withBrush = Component => {
 }
 
 export default withBrush
-
-const BrushHandle = props => {
-  const { x, height, isBrushActive } = props
-  const pathWidth = 8
-  const pathHeight = 15
-  if (!isBrushActive) {
-    return null
-  }
-  return (
-    <Group left={x + pathWidth / 2} top={(height - pathHeight) / 2}>
-      <path fill='#f2f2f2' d='M -4.5 0.5 L 3.5 0.5 L 3.5 15.5 L -4.5 15.5 L -4.5 0.5 M -1.5 4 L -1.5 12 M 0.5 4 L 0.5 12' stroke='#999999' strokeWidth='1' style={{ cursor: 'ew-resize' }} />
-    </Group>
-  )
-}

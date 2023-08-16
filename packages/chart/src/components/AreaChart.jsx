@@ -20,14 +20,14 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
   // use brush data if it is passed in AND if this is NOT a brush chart
   data = !isBrush && undefined !== brushData && brushData.length ? brushData : data
 
-  if (isBrush && isDebug) console.log('###AREAchart BRUSH data, xScale, yScale, yMax, xMax', data, xScale, yScale, yMax, xMax)
+  if (isBrush && isDebug) console.log('###AREAchart BRUSH data in, yMax, xMax', data, yMax, xMax)
 
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
   if (!data) return
 
   // Tooltip helper for getting data to the closest date/category hovered.
-  const getXValueFromCoordinate = x => {
+  /*   const getXValueFromCoordinate = x => {
     if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
       let eachBand = xScale.step()
       let numerator = x
@@ -42,9 +42,9 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
       return val
     }
-  }
+  } */
 
-  const getXAxisDates = brushDataSet => {
+  /*   const getXAxisDates = brushDataSet => {
     if (undefined === brushDataSet || !brushDataSet) return
     let XAxisBrushDates = []
     brushDataSet.forEach(function convertDateTimeNumber(key, value, brushDataSet) {
@@ -53,7 +53,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
       XAxisBrushDates.push(date)
     })
     return XAxisBrushDates
-  }
+  } */
 
   const handleX = d => {
     return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])
@@ -83,7 +83,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
                   [s.dataKey]: d[s.dataKey]
                 }
               })
-
+              console.log('seriesData', seriesData)
               let curveType = allCurves[s.lineType]
               let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
               let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1
@@ -93,7 +93,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
               } else {
                 data.map(d => xScale(d[config.xAxis.dataKey]))
               }
-
+              console.log('data mapped', data)
               return (
                 <React.Fragment key={index}>
                   {/* prettier-ignore */}

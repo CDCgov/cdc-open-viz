@@ -92,7 +92,6 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
-  const brushRef = useRef(BaseBrush)
 
   // getters & functions
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
@@ -103,12 +102,9 @@ export default function LinearChart() {
   const { min, max } = useMinMax(properties)
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding } = useScales({ ...properties, min, max })
 
-  // values sent to Brush dont change after initial render
-  const isBrush = true
-  const xAxisDataMappedBrush = data.map(d => getXAxisData(d))
-  const propertiesBrush = { data, config, minValue: minValueBrush, maxValue: maxValueBrush, isAllLine: isAllLineBrush, existPositiveValue: existPositiveValueBrush, xAxisDataMapped: xAxisDataMappedBrush, xMax: xMaxBrush, yMax: yMaxBrush, isBrush }
-  const { min: minBrush, max: maxBrush } = useMinMax(propertiesBrush)
-  const { xScale: xScaleBrush, yScale: yScaleBrush, seriesScale: seriesScaleBrush, g1xScale: g1xScaleBrush, g2xScale: g2xScaleBrush, xScaleNoPadding: xScaleNoPaddingBrush, yScaleBrushTest } = useScales({ ...propertiesBrush, min: minBrush, max: maxBrush })
+  const updateBrushData = brushData => {
+    setXAxisBrushData(brushData)
+  }
 
   // Helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinateDate = x => {
@@ -125,27 +121,6 @@ export default function LinearChart() {
       const index = bisectDate(config.data, x0, 1)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
       return val
-    }
-  }
-
-  const onBrushChange = domain => {
-    if (!domain) return
-    const { x0, x1 } = domain
-    let brushFilteredData = []
-    brushFilteredData = config.data.filter(s => {
-      const x = getDate(s).getTime()
-      if (x > x0 && x < x1) {
-        let date = formatDate(getXValueFromCoordinateDate(x))
-        return s
-      } else {
-      }
-    })
-
-    // dont let the number of points go below config.xAxis.numTicks ??? (TT)
-    if (undefined !== brushFilteredData && brushFilteredData.length >= config.xAxis.numTicks) {
-      // leaving this here for now due to issues with visx tick marks that need debugging
-      if (isDebug) console.log('Set new xAxisBrushdata to', brushFilteredData)
-      setXAxisBrushData(brushFilteredData)
     }
   }
 
@@ -662,16 +637,6 @@ export default function LinearChart() {
     }
   }
 
-  // this controls where the brush handles are intiially
-  // - 0, xMax basically have the handles flush to each end of the area
-  const initialBrushPosition = useMemo(
-    () => ({
-      start: { x: 0 },
-      end: { x: xMax }
-    }),
-    [xScale]
-  )
-
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
 
   const getChartHeight = useMemo(() => {
@@ -744,10 +709,10 @@ export default function LinearChart() {
     }
   })
   // this is Example of usage High Order Components.
-  // nameing can be anything we want.
+  // naming can be anything we want.
   // or import AreaChart as AreaChartPure and pass it
   //  const AreaChart = withBrush(AreaChartPure)
-  const AreaChartX = withBrush(AreaChart)
+  const AreaChartwithBrush = withBrush(AreaChart)
 
   const handleNumTicks = () => {
     // On forest plots we need to return every "study" or y axis value.
@@ -1149,7 +1114,20 @@ export default function LinearChart() {
         )}
         {/* brush */}
         {(visualizationType === 'Area Chart' || visualizationType === 'Combo') && (
-          <AreaChartX xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} brushData={brushData} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleAreaTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
+          <AreaChartwithBrush
+            xScale={xScale}
+            yScale={yScale}
+            yMax={yMax}
+            xMax={xMax}
+            brushData={brushData}
+            chartRef={svgRef}
+            width={xMax}
+            height={yMax}
+            handleTooltipMouseOver={handleAreaTooltipMouseOver}
+            handleTooltipMouseOff={handleTooltipMouseOff}
+            tooltipData={tooltipData}
+            showTooltip={showTooltip}
+          />
         )}
         {/* {showChartBrush && config.visualizationType === 'Area Chart' && (
           <>
