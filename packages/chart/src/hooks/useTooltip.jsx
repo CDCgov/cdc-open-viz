@@ -10,158 +10,76 @@ export const useTooltip = props => {
   const { xScale, yScale, showTooltip, hideTooltip } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
 
-  // todo: combine mouse over functions
-  const handleAreaTooltipMouseOver = (e, data) => {
-    // get the svg coordinates of the mouse
-    // and get the closest values
-    const eventSvgCoords = localPoint(e)
+  /**
+   * Provides the tooltip information based on the tooltip data array and svg cursor coordinates
+   * @function getTooltipInformation
+   * @param {Array} tooltipDataArray - The array containing the tooltip data.
+   * @param {Object} eventSvgCoords - The object containing the SVG coordinates of the event.
+   * @return {Object} - The tooltip information with tooltip data.
+   */
+  const getTooltipInformation = (tooltipDataArray, eventSvgCoords) => {
     const { x, y } = eventSvgCoords
-    let closestXScaleValue = getXValueFromCoordinate(x)
-
-    let yScaleValues
-    if (config.xAxis.type === 'categorical') {
-      yScaleValues = data.filter(d => d[config.xAxis.dataKey] === closestXScaleValue)
-    } else {
-      let formattedDate = formatDate(closestXScaleValue)
-      yScaleValues = data.filter(d => formatDate(parseDate(d[config.xAxis.dataKey])) === formattedDate)
-    }
-
-    let seriesToInclude = []
-    let yScaleMaxValues = []
-    let itemsToLoop = [runtime.xAxis.dataKey, ...runtime.seriesKeys]
-
-    itemsToLoop.map(seriesKey => {
-      if (!seriesKey) return false
-      if (!yScaleValues[0]) return false
-      for (const item of Object.entries(yScaleValues[0])) {
-        if (item[0] === seriesKey) {
-          seriesToInclude.push(item)
-        }
-      }
-    })
-
-    // filter out the series that aren't added to the map.
-    seriesToInclude.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series])))
-    if (!seriesToInclude) return
-    let tooltipDataFromSeries = seriesToInclude ? seriesToInclude : {}
-
-    let tooltipData = {}
-    tooltipData.data = tooltipDataFromSeries
-    tooltipData.dataXPosition = x + 0
-    tooltipData.dataYPosition = y
-
-    let tooltipInformation = {
-      tooltipData: tooltipData,
-      tooltipTop: 0,
-      tooltipValues: yScaleValues,
-      tooltipLeft: x
-    }
-    showTooltip(tooltipInformation)
-  }
-
-  const handlePieTooltipMouseOver = (e, data, arc) => {
-    // get the svg coordinates of the mouse
-    const eventSvgCoords = localPoint(e)
-    const { x, y } = eventSvgCoords
-    console.log('testing')
-    let closestXScaleValue = data
-
-    //  keep track of the series that have tooltip.show equals true.
-    // and remember to push the xaxis data key on top
-    let includedSeries = config.series.map(item => item.dataKey)
-    includedSeries.push(config.xAxis.dataKey)
-
-    // returns ALL data closest object with key value paris of thes series.
-    const segmentData = [{ [config.xAxis.dataKey]: data, [config.runtime.yAxis.dataKey]: formatNumber(arc.data[config.runtime.yAxis.dataKey]), Percent: `${Math.round((((arc.endAngle - arc.startAngle) * 180) / Math.PI / 360) * 100) + '%'}` }]
-
-    // standard loop items format ['Date', 'Data 1', 'Data 2', 'Data 3', 'Data 4', 'Data 5', 'Data 6']
-    console.log('config', config.runtime)
-    const standardLoopItems = [config.xAxis.dataKey, config.runtime.yAxis.dataKey, 'Percent']
-
-    let seriesToInclude = []
-
-    standardLoopItems.map(seriesKey => {
-      if (!seriesKey) return false
-      if (!segmentData[0]) return false
-      for (const series of Object.entries(segmentData[0])) {
-        if (series[0] === seriesKey) {
-          seriesToInclude.push(series)
-        }
-      }
-    })
-
-    console.log('seriesToInclude', seriesToInclude)
-
-    // filter out the series that aren't added to the map.
-    if (!seriesToInclude) return
-    let initialTooltipData = seriesToInclude ? seriesToInclude : {}
-
+    let initialTooltipData = tooltipDataArray ? tooltipDataArray : {}
     let tooltipData = {}
     tooltipData.data = initialTooltipData
-    tooltipData.dataXPosition = isEditor ? x + 10 : x + 10
+    tooltipData.dataXPosition = x + 10
     tooltipData.dataYPosition = y
 
-    let tooltipInformation = {
-      tooltipData: tooltipData,
-      tooltipTop: 0,
-      tooltipValues: segmentData,
-      tooltipLeft: x
+    const tooltipInformation = {
+      tooltipData: tooltipData
     }
 
-    showTooltip(tooltipInformation)
+    return tooltipInformation
   }
 
-  // todo: combine mouseover functions
-  const handleTooltipMouseOver = async (e, data) => {
-    // get the svg coordinates of the mouse
+  /**
+   * Handles the mouse over event for the tooltip.
+   * @function handleTooltipMouseOver
+   * @param {Event} e - The event object.
+   * @return {void} - The tooltip information is displayed
+   */
+  const handleTooltipMouseOver = (e, additionalChartData) => {
     const eventSvgCoords = localPoint(e)
     const { x, y } = eventSvgCoords
 
-    // get the closest x value & format the date if
-    let closestXScaleValue = getXValueFromCoordinate(x)
+    // Additional data for pie charts
+    const { data: pieChartData, arc } = additionalChartData
 
-    //  keep track of the series that have tooltip.show equals true.
-    // and remember to push the xaxis data key on top
-    let includedSeries = config.series.filter(series => series.tooltip === true).map(item => item.dataKey)
+    const closestXScaleValue = getXValueFromCoordinate(x)
+
+    const includedSeries = visualizationType !== 'Pie' ? config.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.series.map(item => item.dataKey)
     includedSeries.push(config.xAxis.dataKey)
-
-    // returns ALL data closest object with key value paris of thes series.
     const yScaleValues = getYScaleValues(closestXScaleValue, includedSeries)
+    const xScaleValues = data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))
+    const resolvedScaleValues = orientation === 'vertical' ? yScaleValues : xScaleValues
 
-    // standard loop items format ['Date', 'Data 1', 'Data 2', 'Data 3', 'Data 4', 'Data 5', 'Data 6']
-    const standardLoopItems = getIncludedTooltipSeries()
+    console.log('resolvedYScaleValues', resolvedScaleValues)
 
-    let seriesToInclude = []
+    // Returns an array of arrays.
+    // ie. [ ['Date', '01/01/2023'], ['close', 300] ]
+    const tooltipDataArray =
+      visualizationType !== 'Pie'
+        ? getIncludedTooltipSeries()
+            .filter(Boolean)
+            .flatMap(seriesKey => {
+              return resolvedScaleValues[0][seriesKey] ? [[seriesKey, resolvedScaleValues[0][seriesKey]]] : []
+            })
+        : [
+            [config.xAxis.dataKey, pieChartData],
+            [config.runtime.yAxis.dataKey, formatNumber(arc.data[config.runtime.yAxis.dataKey])],
+            ['Percent', `${Math.round((((arc.endAngle - arc.startAngle) * 180) / Math.PI / 360) * 100) + '%'}`]
+          ]
 
-    standardLoopItems.map(seriesKey => {
-      if (!seriesKey) return false
-      if (!yScaleValues[0]) return false
-      for (const series of Object.entries(yScaleValues[0])) {
-        if (series[0] === seriesKey) {
-          seriesToInclude.push(series)
-        }
-      }
-    })
-
-    // filter out the series that aren't added to the map.
-    if (!seriesToInclude) return
-    let initialTooltipData = seriesToInclude ? seriesToInclude : {}
-
-    let tooltipData = {}
-    tooltipData.data = initialTooltipData
-    tooltipData.dataXPosition = isEditor ? x + 10 : x + 10
-    tooltipData.dataYPosition = y
-
-    let tooltipInformation = {
-      tooltipData: tooltipData,
-      tooltipTop: 0,
-      tooltipValues: yScaleValues,
-      tooltipLeft: x
-    }
-
+    if (!tooltipDataArray) return
+    const tooltipInformation = getTooltipInformation(tooltipDataArray, eventSvgCoords)
     showTooltip(tooltipInformation)
   }
 
+  /**
+   * Handles the mouse off event for the tooltip.
+   * @function handleTooltipMouseOff
+   * @returns {void} - The tooltip information is hidden
+   */
   const handleTooltipMouseOff = () => {
     if (config.visualizationType === 'Area Chart') {
       setTimeout(() => {
@@ -172,7 +90,11 @@ export const useTooltip = props => {
     }
   }
 
-  // Helper for getting data to the closest date/category hovered.
+  /**
+   * Helper for getting data to the closest date/category hovered.
+   * @function getXValueFromCoordinateDate
+   * @returns {String} - the closest x value to the cursor position
+   */
   const getXValueFromCoordinateDate = x => {
     if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
       let eachBand = xScale.step()
@@ -190,8 +112,13 @@ export const useTooltip = props => {
     }
   }
 
-  // Tooltip helper for getting data to the closest date/category hovered.
+  /**
+   * Helper for getting data to the closest date/category hovered.
+   * @function getXValueFromCoordinate
+   * @returns {String} - the closest x value to the cursor position
+   */
   const getXValueFromCoordinate = x => {
+    if (visualizationType === 'Pie') return
     if (orientation === 'horizontal') return
     if (xScale.type === 'point') {
       // Find the closest x value by calculating the minimum distance
@@ -227,66 +154,26 @@ export const useTooltip = props => {
     }
   }
 
-  // Tooltip helper for getting data to the closest y value hovered.
-  const handleHorizontalMouseOver = (e, inputData) => {
-    const eventSvgCoords = localPoint(e)
+  const getClosestYValue = yPosition => {
+    if (visualizationType === 'Pie') return
+    let minDistance = Number.MAX_VALUE
+    let closestYValue = null
 
-    if (!eventSvgCoords) return
-    const { x, y } = eventSvgCoords
+    data.forEach((d, index) => {
+      const yPositionOnPlot = yScale(d[config.xAxis.dataKey])
 
-    // Function to get the closest y-axis value from the cursor's position
-    // Function to get the closest y-axis value from the cursor's position
-    const getClosestYValue = yPosition => {
-      let minDistance = Number.MAX_VALUE
-      let closestYValue = null
+      const distance = Math.abs(yPositionOnPlot - yPosition)
 
-      data.forEach((d, index) => {
-        const yPositionOnPlot = yScale(d[config.xAxis.dataKey])
-
-        const distance = Math.abs(yPositionOnPlot - yPosition)
-
-        if (distance < minDistance) {
-          minDistance = distance
-          closestYValue = d[config.xAxis.dataKey]
-        }
-      })
-      return closestYValue
-    }
-
-    const xValue = data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))[0]
-
-    let standardLoopItems = getIncludedTooltipSeries()
-
-    let seriesToInclude = []
-
-    standardLoopItems.map(seriesKey => {
-      if (!seriesKey) return false
-      for (const series of Object.entries(xValue)) {
-        if (series[0] === seriesKey) {
-          seriesToInclude.push(series)
-        }
+      if (distance < minDistance) {
+        minDistance = distance
+        closestYValue = d[config.xAxis.dataKey]
       }
     })
-
-    let initialTooltipData = seriesToInclude ? seriesToInclude : {}
-
-    let tooltipData = {}
-    tooltipData.data = initialTooltipData
-    tooltipData.dataXPosition = isEditor ? x + 10 : x + 10
-    tooltipData.dataYPosition = y
-
-    let tooltipInformation = {
-      tooltipData: tooltipData,
-      tooltipTop: 0,
-      tooltipValues: 'test',
-      tooltipLeft: x
-    }
-
-    showTooltip(tooltipInformation)
+    return closestYValue
   }
 
   // Tooltip helper for getting data to the closest y value hovered.
-  const handleForestPlotMouseOver = (e, inputData) => {
+  const handleForestPlotMouseOver = e => {
     const eventSvgCoords = localPoint(e)
 
     if (!eventSvgCoords) return
@@ -342,7 +229,7 @@ export const useTooltip = props => {
    * @param {*} e
    * @param {*} data
    */
-  const handleTooltipClick = (e, data) => {
+  const handleTooltipClick = e => {
     try {
       // Get the closest x axis value from the pointer.
       // After getting the closest value, return the data entry with that x scale value.
@@ -364,30 +251,23 @@ export const useTooltip = props => {
   }
 
   /**
-   *
-   * @param {*} closestXScaleValue
-   * @param {*} includedSeries
-   * @returns an array of objects with the closest x and y series data items
-   * see example below
-   * [{
-        "Data 1": "foo",
-        "Data 2": "1350",
-        "Data 3": "300",
-        "Data 4": "950",
-        "Data 5": "1200",
-        "Data 6": "3100",
-        "Date": "1/15/2016"
-      }]
+   * Provides an array of objects with the closest y series data items
+   * @param {String} closestXScaleValue
+   * @param {Array} includedSeries
+   * @returns an array of objects with the closest y series data items
    */
   const getYScaleValues = (closestXScaleValue, includedSeries) => {
     const formattedDate = formatDate(closestXScaleValue)
 
     let dataToSearch
+
     if (xAxis.type === 'categorical') {
       dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
     } else {
       dataToSearch = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
     }
+
+    console.log('data to search', dataToSearch)
 
     // Return an empty array if no matching data is found.
     if (!dataToSearch || dataToSearch.length === 0) {
@@ -401,6 +281,12 @@ export const useTooltip = props => {
     return yScaleValues
   }
 
+  /**
+   * Retrieves an array of items to be included in a tooltip.
+   *
+   * @function getIncludedTooltipSeries
+   * @returns {Array} Array of items to be included in the tooltip.
+   */
   const getIncludedTooltipSeries = () => {
     let standardLoopItems
 
@@ -455,6 +341,11 @@ export const useTooltip = props => {
     return standardLoopItems
   }
 
+  /**
+   * Updates the tooltip style dynamically, primarily opacity and tooltip x/y positions
+   * @param {*} tooltipData
+   * @returns {Object} - tooltip styles
+   */
   const tooltipStyles = tooltipData => {
     const { dataXPosition, dataYPosition } = tooltipData
 
@@ -470,6 +361,9 @@ export const useTooltip = props => {
   const TooltipListItem = ({ item }) => {
     const [index, keyValue] = item
     const [key, value] = keyValue
+
+    console.log('key', key)
+    console.log('key', config.xAxis.dataKey)
 
     /**
      * find the original series and use the name property if available
@@ -501,10 +395,7 @@ export const useTooltip = props => {
     getXValueFromCoordinate,
     getXValueFromCoordinateDate,
     getYScaleValues,
-    handleAreaTooltipMouseOver,
     handleForestPlotMouseOver,
-    handleHorizontalMouseOver,
-    handlePieTooltipMouseOver,
     handleTooltipClick,
     handleTooltipMouseOff,
     handleTooltipMouseOver,

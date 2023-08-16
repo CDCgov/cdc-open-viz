@@ -29,7 +29,7 @@ const PieChart = props => {
 
   // Tooltip Helpers
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen } = useTooltip()
-  const { handlePieTooltipMouseOver, tooltipStyles, TooltipListItem } = useCoveTooltip({ xScale: '', yScale: '', showTooltip, hideTooltip })
+  const { handleTooltipMouseOver, tooltipStyles, TooltipListItem } = useCoveTooltip({ xScale: '', yScale: '', showTooltip, hideTooltip })
 
   // Make sure the chart is visible if in the editor
   /* eslint-disable react-hooks/exhaustive-deps */
@@ -50,7 +50,6 @@ const PieChart = props => {
   }, [dataRef?.isIntersecting, config.animate]) // eslint-disable-line
 
   const PieSlice = props => {
-    console.log('props here', props)
     const { arcs, path, getKey } = props
     const transitions = useTransition(arcs, getKey, {
       from: enterUpdateTransition,
@@ -86,7 +85,7 @@ const PieChart = props => {
           return (
             <Group key={key} style={{ opacity: config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1 ? 0.5 : 1 }}>
               {/* PIE SLICE */}
-              <animated.path d={pieSlicePath} fill={colorScale(arc.data[config.runtime.xAxis.dataKey])} onMouseEnter={e => handlePieTooltipMouseOver(e, arc.data[config.runtime.xAxis.dataKey], arc)} />
+              <animated.path d={pieSlicePath} fill={colorScale(arc.data[config.runtime.xAxis.dataKey])} onMouseEnter={e => handleTooltipMouseOver(e, { data: arc.data[config.runtime.xAxis.dataKey], arc: arc })} />
 
               {/* PIE TEXT */}
               {hasSpaceForLabel && (
@@ -110,7 +109,6 @@ const PieChart = props => {
   }
 
   const height = config.heights.vertical
-
   const radius = Math.min(width, height) / 2
   const centerY = height / 2
   const centerX = width / 2
