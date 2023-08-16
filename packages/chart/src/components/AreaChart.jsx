@@ -83,7 +83,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
                   [s.dataKey]: d[s.dataKey]
                 }
               })
-              console.log('seriesData', seriesData)
+
               let curveType = allCurves[s.lineType]
               let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
               let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1
@@ -93,7 +93,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
               } else {
                 data.map(d => xScale(d[config.xAxis.dataKey]))
               }
-              console.log('data mapped', data)
+
               return (
                 <React.Fragment key={index}>
                   {/* prettier-ignore */}

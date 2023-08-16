@@ -84,23 +84,17 @@ const withBrush = Component => {
     const onBrushChange = domain => {
       if (!domain) return
       const { x0, x1 } = domain
-      console.log('domain x0, x1', domain, x0, x1)
       let brushFilteredData = []
       brushFilteredData = config.data.filter(s => {
         const x = getDate(s).getTime()
         if (x > x0 && x < x1) {
           let date = formatDate(getXValueFromCoordinateDate(x))
-          console.log('Yes add x', x)
           return s
-        } else {
-          console.log('x not in range', x)
         }
       })
 
       // dont let the number of points go below config.xAxis.numTicks ??? (TT)
       if (undefined !== brushFilteredData && brushFilteredData.length >= config.xAxis.numTicks) {
-        // leaving this here for now due to issues with visx tick marks that need debugging
-        if (isDebug) console.log('Set new xAxisBrushdata to', brushFilteredData)
         setXAxisBrushData(brushFilteredData)
       }
     }
@@ -111,7 +105,6 @@ const withBrush = Component => {
 
     return (
       <>
-        {console.log('xAxisBrushData, yScale, xScale, xMax, yMax', xAxisBrushData, yScaleComp, xScaleComp, xMaxComp, yMaxComp)}
         <Component {...props} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} isBrush={false} />
         config.showChartBrush && (
         <Component className='brushChart' xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} height={yMax / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>

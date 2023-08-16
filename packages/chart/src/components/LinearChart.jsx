@@ -301,7 +301,6 @@ export default function LinearChart() {
 
       data.forEach((d, index) => {
         const yPositionOnPlot = xScale(index)
-        console.log('ypositiononplot', yPositionOnPlot)
         const distance = Math.abs(yPositionOnPlot - yPosition)
 
         if (distance < minDistance) {
@@ -309,13 +308,10 @@ export default function LinearChart() {
           closestYValue = d[config.yAxis.dataKey]
         }
       })
-
-      console.log(closestYValue)
       return closestYValue
     }
 
     const xValue = data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))[0]
-    console.log('closest y value: ', getClosestYValue(y))
 
     let standardLoopItems = [
       [config.yAxis.dataKey, getClosestYValue(y)],
