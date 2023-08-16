@@ -16,7 +16,7 @@ import AreaChart from './AreaChart'
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
 import CoveBoxPlot from './BoxPlot'
-import CoveScatterPlot from './ScatterPlot'
+import ScatterPlot from './ScatterPlot'
 import DeviationBar from './DeviationBar'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Forecasting from './Forecasting'
@@ -202,7 +202,6 @@ export default function LinearChart() {
   const {
     handleTooltipMouseOver,
     handleTooltipClick,
-    handleForestPlotMouseOver,
     handleTooltipMouseOff,
     tooltipStyles,
     TooltipListItem,
@@ -665,7 +664,21 @@ export default function LinearChart() {
         )}
         {visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
         {visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
-        {visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
+        {visualizationType === 'Scatter Plot' && (
+          <ScatterPlot
+            xScale={xScale}
+            yScale={yScale}
+            getXAxisData={getXAxisData}
+            getYAxisData={getYAxisData}
+            xMax={xMax}
+            yMax={yMax}
+            handleTooltipMouseOver={handleTooltipMouseOver}
+            handleTooltipMouseOff={handleTooltipMouseOff}
+            handleTooltipClick={handleTooltipClick}
+            tooltipData={tooltipData}
+            showTooltip={showTooltip}
+          />
+        )}
         {visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
         {(visualizationType === 'Area Chart' || visualizationType === 'Combo') && (
           <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} brushData={brushData} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
@@ -769,7 +782,7 @@ export default function LinearChart() {
             getYAxisData={getYAxisData}
             animatedChart={animatedChart}
             visible={animatedChart}
-            handleTooltipMouseOver={handleForestPlotMouseOver}
+            handleTooltipMouseOver={handleTooltipMouseOver}
             handleTooltipMouseOff={handleTooltipMouseOff}
             handleTooltipClick={handleTooltipClick}
             tooltipData={tooltipData}
