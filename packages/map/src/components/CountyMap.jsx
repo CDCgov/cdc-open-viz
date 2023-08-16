@@ -303,7 +303,7 @@ const CountyMap = props => {
 
         // Renders state/county
         const legendValues = geoData !== undefined ? applyLegendToRow(geoData) : false
-        context.fillStyle = legendValues ? legendValues[0] : '#EEE'
+        context.fillStyle = legendValues && state.general.type !== 'us-geocode' ? legendValues[0] : '#EEE'
         context.beginPath()
         path(geo)
         context.fill()
