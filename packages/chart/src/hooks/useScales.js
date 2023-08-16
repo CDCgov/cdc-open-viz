@@ -126,11 +126,11 @@ const useScales = properties => {
     const offset = 1.02 // Offset of the ticks/values from the Axis
     let groupOneMax = Math.max.apply(
       Math,
-      data.map(d => d[config.series[0].dataKey])
+      data.map(d => d[config.series[0]?.dataKey])
     )
     let groupTwoMax = Math.max.apply(
       Math,
-      data.map(d => d[config.series[1].dataKey])
+      data.map(d => d[config.series[1]?.dataKey])
     )
 
     // group one
