@@ -35,14 +35,30 @@ const withBrush = Component => {
     const xAxisDataMapped = data.map(d => getXAxisData(d))
 
     const [xAxisBrushData, setXAxisBrushData] = useState(data)
-    const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
+    const brushData = undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data
+
+    // for Brush, using original data
+    let { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
     const ref = useRef(BaseBrush)
     const isBrush = true
     const { xMax, yMax, svgRef, disableMouseOver } = props
     const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax, isBrush }
-    const { min, max } = useMinMax(properties)
+    let { min, max } = useMinMax(properties)
     const { xScale, yScale } = useScales({ ...properties, min, max })
 
+    // for Component using filtered brush data
+    const xMaxComp = xMax
+    let dynamicMarginTop = 0 || config.dynamicMarginTop
+    const marginTop = 20
+    let yMaxComp = config.isResponsiveTicks && showChartBrush ? yMax + config.dynamicMarginTop / 4 + marginTop : yMax
+    {/* prettier-ignore */ }
+    ;({ minValue, maxValue } = useReduceData(config, brushData))
+    const xAxisDataMappedComp = brushData.map(d => getXAxisData(d))
+    const propsComp = { data: brushData, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped: xAxisDataMappedComp, xMax: xMaxComp, yMax: yMaxComp, isBrush }
+    {/* prettier-ignore */}
+    ;({ min, max } = useMinMax(propsComp))
+    const { xScale: xScaleComp, yScale: yScaleComp } = useScales({ ...propsComp, min, max })
+    //debugger
     const initialBrushPosition = {
       start: { x: 0 },
       end: { x: xMax }
@@ -89,13 +105,14 @@ const withBrush = Component => {
       }
     }
 
-    //if (!config.showChartBrush) {
-    //return <Component {...props} />
-    //}
+    if (!config.showChartBrush) {
+      return <Component {...props} />
+    }
 
     return (
       <>
-        <Component {...props} brushData={xAxisBrushData} />
+        {console.log('xAxisBrushData, yScale, xScale, xMax, yMax', xAxisBrushData, yScaleComp, xScaleComp, xMaxComp, yMaxComp)}
+        <Component {...props} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} isBrush={false} />
         config.showChartBrush && (
         <Component className='brushChart' xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} height={yMax / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>
           <PatternLines id={pattern_id} height={8} width={8} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />

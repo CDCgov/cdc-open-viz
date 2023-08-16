@@ -102,10 +102,6 @@ export default function LinearChart() {
   const { min, max } = useMinMax(properties)
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding } = useScales({ ...properties, min, max })
 
-  const updateBrushData = brushData => {
-    setXAxisBrushData(brushData)
-  }
-
   // Helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinateDate = x => {
     if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
