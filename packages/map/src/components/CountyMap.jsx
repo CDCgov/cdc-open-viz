@@ -271,7 +271,7 @@ const CountyMap = props => {
 
       // Centers the projection on the paramter passed
       if (focus.center) {
-        projection.scale(canvas.width * 2.5)
+        projection.scale(canvas.width * (focus.id === '72' ? 10 : 2.5))
         let offset = projection(focus.center)
         projection.translate([-offset[0] + canvas.width, -offset[1] + canvas.height])
       }
