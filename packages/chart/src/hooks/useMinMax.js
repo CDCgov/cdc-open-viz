@@ -73,7 +73,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     }
   }
 
-  // this should not apply to bar charts if there is not negative CI data
+  // this should not apply to bar charts if there is negative CI data
   if (((config.visualizationType === 'Bar' && ciYMin >= 0) || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
     min = 0
   }
