@@ -729,6 +729,9 @@ const EditorPanel = () => {
   if (config.isLollipopChart && config?.series?.length > 1) {
     config.runtime.editorErrorMessage = 'Lollipop charts must use only one data series'
   }
+  if (config.visualizationType === 'Paired Bar' && config?.series?.length !== 2) {
+    config.runtime.editorErrorMessage = 'Paired Bar charts must use exactly two data series'
+  }
 
   if (config.isLollipopChart && config?.series?.length === 0) {
     config.runtime.editorErrorMessage = 'Add a data series'
