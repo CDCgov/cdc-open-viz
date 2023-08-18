@@ -26,35 +26,6 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
   // Turn DEBUG on for additional context.
   if (!data) return
 
-  // Tooltip helper for getting data to the closest date/category hovered.
-  /*   const getXValueFromCoordinate = x => {
-    if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
-      let eachBand = xScale.step()
-      let numerator = x
-      const index = Math.floor(Number(numerator) / eachBand)
-      return xScale.domain()[index - 1] // fixes off by 1 error
-    }
-
-    if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
-      const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
-      const x0 = xScale.invert(x)
-      const index = bisectDate(config.data, x0, 1)
-      const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
-      return val
-    }
-  } */
-
-  /*   const getXAxisDates = brushDataSet => {
-    if (undefined === brushDataSet || !brushDataSet) return
-    let XAxisBrushDates = []
-    brushDataSet.forEach(function convertDateTimeNumber(key, value, brushDataSet) {
-      let tmp = getXValueFromCoordinate(xScale(value))
-      let date = formatDate(tmp)
-      XAxisBrushDates.push(date)
-    })
-    return XAxisBrushDates
-  } */
-
   const handleX = d => {
     return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])
   }

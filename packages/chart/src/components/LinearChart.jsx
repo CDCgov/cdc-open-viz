@@ -312,10 +312,9 @@ export default function LinearChart() {
       return tmpHeight
     }
   })
+
   // this is Example of usage High Order Components.
   // naming can be anything we want.
-  // or import AreaChart as AreaChartPure and pass it
-  //  const AreaChart = withBrush(AreaChartPure)
   const AreaChartwithBrush = withBrush(AreaChart)
 
   const handleNumTicks = () => {
@@ -744,32 +743,6 @@ export default function LinearChart() {
             showTooltip={showTooltip}
           />
         )}
-        {/* {showChartBrush && config.visualizationType === 'Area Chart' && (
-          <>
-            <AreaChart className='brushChart' xScale={xScaleBrush} yScale={yScaleBrush} yMax={yMaxBrush} xMax={xMaxBrush} height={yMaxBrush / 4} chartRef={svgRef} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} isDebug={isDebug} isBrush={true}>
-              <PatternLines id={pattern_id} height={8} width={8} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />
-              <Brush
-                id='theBrush'
-                className='theBrush'
-                xScale={xScaleBrush}
-                yScale={yScaleBrush}
-                width={xMaxBrush}
-                height={yMaxBrush / 4}
-                margin={0}
-                handleSize={8}
-                innerRef={brushRef}
-                resizeTriggerAreas={['left', 'right']}
-                brushDirection='horizontal'
-                initialBrushPosition={initialBrushPosition}
-                onChange={onBrushChange}
-                selectedBoxStyle={{ fill: `url(#${pattern_id})` }}
-                useWindowMoveEvents
-                renderBrushHandle={props => <BrushHandle {...props} />}
-                style={styles}
-              />
-            </AreaChart>
-          </>
-        )} */}
 
         {/* y anchors */}
         {config.yAxis.anchors &&
