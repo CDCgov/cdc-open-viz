@@ -7,7 +7,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   }
 
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
-  const minRequiredCIPadding = 1 //1.15 // regardless of Editor if CI data, there must be 10% padding added
+  const minRequiredCIPadding = 1.15 // regardless of Editor if CI data, there must be 10% padding added
   
   // do validation bafore applying t0 charts
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
@@ -16,6 +16,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   min = enteredMinValue && isMinValid ? enteredMinValue : minValue
   max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
+  let ciYMin = 0
   if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Deviation Bar') {
     let ciYMax = 0
     if (config.hasOwnProperty('confidenceKeys')) {
@@ -27,9 +28,10 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
       // check the min if lower confidence 
       let lowerCIValues = data.map(function (d) {
-        return d[config.confidenceKeys.lower]
+        // if no lower CI then we need lowerCIValues to have nothing in it
+        return d[config.confidenceKeys.lower] !== undefined ? d[config.confidenceKeys.lower] : ''
       })
-      let ciYMin = Math.min.apply(Math, lowerCIValues)
+      ciYMin = Math.min.apply(Math, lowerCIValues)
       if (ciYMin < min) min = ciYMin * minRequiredCIPadding // adjust the min + 10% padding for negative numbers to separate from axis
     }
   }
@@ -71,8 +73,8 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     }
   }
 
-  // this should not apply to bar charts
-  if (config.visualizationType === 'Combo' && !isAllLine && min > 0) {
+  // this should not apply to bar charts if there is not negative CI data
+  if (((config.visualizationType === 'Bar' && ciYMin >= 0) || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
     min = 0
   }
 
