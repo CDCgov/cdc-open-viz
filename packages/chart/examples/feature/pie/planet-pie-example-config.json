@@ -1,7 +1,7 @@
 {
   "title": "Planet Radius (Pie Example)",
   "dataUrl": "/examples/feature/__data__/planet-example-data.json",
-  "animate": true,
+  "animate": false,
   "animateReplay": true,
   "visualizationType": "Pie",
   "palette": "qualitative-soft",

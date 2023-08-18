@@ -86,7 +86,7 @@
     "horizontal": 750
   },
   "xAxis": {
-    "type": "category",
+    "type": "categorical",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
