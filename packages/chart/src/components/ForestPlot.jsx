@@ -13,7 +13,7 @@ import ConfigContext from '../ConfigContext'
 import { getFontSize } from '@cdc/core/helpers/cove/number'
 
 const ForestPlot = props => {
-  const { transformedData: data, updateConfig, dimensions } = useContext(ConfigContext)
+  const { transformedData: data, updateConfig, dimensions, rawData } = useContext(ConfigContext)
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver, maxWidth, maxHeight } = props
   const { forestPlot, runtime, dataFormat } = config
   const [screenWidth, screenHeight] = dimensions
@@ -64,24 +64,22 @@ const ForestPlot = props => {
     .map(entry => entry[1])
     .filter(entry => entry.forestPlot === true)
 
-  const chartWidth = (Number(config.forestPlot.width) / 100) * width
-  const rightOffset = (Number(config.forestPlot.rightWidthOffset) / 100) * width
-  const leftOffset = (Number(config.forestPlot.leftWidthOffset) / 100) * width
+  console.log(forestPlot.rightWidthOffset)
+  const rightOffset = forestPlot.rightWidthOffset !== 0 ? (Number(forestPlot.rightWidthOffset) / 100) * width : width
+  const leftOffset = forestPlot.leftWidthOffset !== 0 ? (Number(forestPlot.leftWidthOffset) / 100) * width : width
+  const chartWidth = width - rightOffset - leftOffset
 
-  const rightOffsetMobile = (Number(config.forestPlot.rightWidthOffsetMobile) / 100) * width
-  const leftOffsetMobile = (Number(config.forestPlot.leftWidthOffsetMobile) / 100) * width
-
-  const center = screenWidth < 480 ? (chartWidth + leftOffsetMobile - rightOffsetMobile) / 2 : (chartWidth + leftOffset - rightOffset) / 2
+  console.log('chartWidth', chartWidth)
 
   return (
     <>
       <Group>
         {forestPlot.title !== '' && (
-          <Text className={`forest-plot--title`} x={center} y={0} textAnchor='middle' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+          <Text className={`forest-plot--title`} x={xScale(0)} y={0} textAnchor='middle' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
             {forestPlot.title}
           </Text>
         )}
-        {forestPlot.regression.showBaseLine && <Line from={{ x: xScale(forestPlot.regression.estimateField), y: 0 + topMarginOffset }} to={{ x: xScale(forestPlot.regression.estimateField), y: height }} className='forestplot__baseline' stroke={forestPlot.regression.baseLineColor} />}
+        {forestPlot.regression.showBaseLine && <Line from={{ x: xScale(forestPlot.regression.estimateField), y: 0 + topMarginOffset }} to={{ x: xScale(forestPlot.regression.estimateField), y: height }} className='forestplot__baseline' stroke={forestPlot.regression.baseLineColor || 'black'} />}
         {forestPlot.showZeroLine && <Line from={{ x: xScale(0), y: 0 + topMarginOffset }} to={{ x: xScale(0), y: height }} className='forestplot__zero-line' stroke='gray' strokeDasharray={'5 5'} />}
 
         {data.map((d, i) => {
@@ -155,7 +153,7 @@ const ForestPlot = props => {
 
       {/* column data */}
       {columnsOnChart.map(column => {
-        return data.map((d, i) => {
+        return rawData.map((d, i) => {
           return (
             <Text className={`${d[column.name]}`} x={column.forestPlotAlignRight ? width : column.forestPlotStartingPoint} y={yScale(i)} textAnchor={column.forestPlotAlignRight ? 'end' : 'start'} verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={'black'}>
               {d[column.name]}
