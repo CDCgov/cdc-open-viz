@@ -96,7 +96,7 @@
     "minBubbleSize": 1,
     "maxBubbleSize": 20,
     "extraBubbleBorder": false,
-    "cityStyle": "circle",
+    "cityStyle": "pin",
     "geoCodeCircleSize": 2,
     "showBubbleZeros": false
   },
