@@ -179,6 +179,7 @@ const CountyMap = props => {
             break
           }
         }
+
         // If a state is hovered and it is not an unfocused state, search only the counties within that state for the county hovered
         if (hoveredState && (!focus.id || focus.id === hoveredState) && countyIndecies[hoveredState]) {
           for (let i = countyIndecies[hoveredState][0]; i <= countyIndecies[hoveredState][1]; i++) {
@@ -230,10 +231,19 @@ const CountyMap = props => {
       let hoveredGeoIndex
       for (let i = 0; i < runtimeKeys.length; i++) {
         const pixelCoords = projection([data[runtimeKeys[i]][state.columns.longitude.name], data[runtimeKeys[i]][state.columns.latitude.name]])
-        if (pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
+        if (state.visual.cityStyle === 'circle' && pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
           hoveredGeo = data[runtimeKeys[i]]
           hoveredGeoIndex = i
           break
+        }
+
+        if (state.visual.cityStyle === 'pin' && pixelCoords) {
+          const distance = Math.hypot(pixelCoords[0] - x, pixelCoords[1] - y)
+          if (distance < 15) {
+            hoveredGeo = data[runtimeKeys[i]]
+            hoveredGeoIndex = i
+            break
+          }
         }
       }
 
@@ -333,6 +343,33 @@ const CountyMap = props => {
         })
       }
 
+      const drawPin = (pin, ctx) => {
+        ctx.save()
+        ctx.translate(pin.x, pin.y)
+        ctx.beginPath()
+        ctx.moveTo(0, 0)
+        ctx.bezierCurveTo(2, -10, -20, -25, 0, -30)
+        ctx.bezierCurveTo(20, -25, -2, -10, 0, 0)
+        ctx.fillStyle = pin.color
+        ctx.fill()
+        ctx.strokeStyle = 'black'
+        ctx.lineWidth = 1.5
+        ctx.stroke()
+        ctx.beginPath()
+        ctx.arc(0, -21, 3, 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.fill()
+        ctx.restore()
+      }
+
+      const drawCircle = (circle, context) => {
+        context.fillStyle = circle.color
+        context.beginPath()
+        context.arc(circle.x, circle.y, circle.geoRadius, 0, 2 * Math.PI)
+        context.fill()
+        context.stroke()
+      }
+
       if (state.general.type === 'us-geocode') {
         context.strokeStyle = 'black'
         const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
@@ -342,12 +379,13 @@ const CountyMap = props => {
 
           if (pixelCoords) {
             const legendValues = data[key] !== undefined ? applyLegendToRow(data[key]) : false
-            if (legendValues) {
-              context.fillStyle = legendValues[0]
-              context.beginPath()
-              context.arc(pixelCoords[0], pixelCoords[1], geoRadius, 0, 2 * Math.PI)
-              context.fill()
-              context.stroke()
+            if (legendValues && state.visual.cityStyle === 'circle') {
+              const circle = { x: pixelCoords[0], y: pixelCoords[1], color: legendValues[0], geoRadius }
+              drawCircle(circle, context)
+            }
+            if (legendValues && state.visual.cityStyle === 'pin') {
+              const pin = { x: pixelCoords[0], y: pixelCoords[1], color: legendValues[0] }
+              drawPin(pin, context)
             }
           }
         })
