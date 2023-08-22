@@ -194,7 +194,6 @@
   },
   "forestPlot": {
     "startAt": "0",
-    "width": "100",
     "colors": {
       "line": "",
       "shape": ""
@@ -226,8 +225,7 @@
       "description": "",
       "upper": "-10",
       "lower": "#87c4c3",
-      "estimateField": "-10",
-      "baseLineColor": "#87c4c3"
+      "estimateField": "-10"
     },
     "hasZeroLine": true,
     "lower": "Lower",

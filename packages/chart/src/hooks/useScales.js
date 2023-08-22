@@ -172,13 +172,13 @@ const useScales = properties => {
     if (screenWidth > 480) {
       xScale = scaleLinear({
         domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
-        range: [leftWidthOffset, Number(config.forestPlot.startAt) + Number(config.forestPlot.width === 'auto' || config.forestPlot.width === '' ? xMax : (Number(config.forestPlot.width) / 100) * xMax - rightWidthOffset)],
+        range: [leftWidthOffset, xMax - rightWidthOffset],
         type: 'linear'
       })
     } else {
       xScale = scaleLinear({
         domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
-        range: [leftWidthOffsetMobile, Number(config.forestPlot.startAt) + Number(config.forestPlot.width === 'auto' || config.forestPlot.width === '' ? xMax : (Number(config.forestPlot.width) / 100) * xMax - rightWidthOffsetMobile)],
+        range: [leftWidthOffsetMobile, rightWidthOffsetMobile],
         type: 'linear'
       })
     }
