@@ -165,13 +165,13 @@ export const BarChartHorizontal = props => {
                             verticalAnchor='middle'
                             textAnchor={textAnchor}
                           >
-                            {xAxisValue}
+                            {yAxisValue}
                           </Text>
                         )}
                         {config.isLollipopChart && displayNumbersOnBar && (
-                          <Text
+                          <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
-                            x={bar.y} // padding
+                            x={bar.y}
                             y={0}
                             fill={'#000000'}
                             dx={textPaddingLollipop}
