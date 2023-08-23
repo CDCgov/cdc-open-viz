@@ -100,33 +100,8 @@ export default function LinearChart() {
   const { min, max } = useMinMax(properties)
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding } = useScales({ ...properties, min, max })
 
-  // values sent to Brush dont change after initial render
-  const isBrush = true
-  const xAxisDataMappedBrush = data.map(d => getXAxisData(d))
-  const propertiesBrush = { data, config, minValue: minValueBrush, maxValue: maxValueBrush, isAllLine: isAllLineBrush, existPositiveValue: existPositiveValueBrush, xAxisDataMapped: xAxisDataMappedBrush, xMax: xMaxBrush, yMax: yMaxBrush, isBrush }
-  const { min: minBrush, max: maxBrush } = useMinMax(propertiesBrush)
-  const { xScale: xScaleBrush, yScale: yScaleBrush, seriesScale: seriesScaleBrush, g1xScale: g1xScaleBrush, g2xScale: g2xScaleBrush, xScaleNoPadding: xScaleNoPaddingBrush, yScaleBrushTest } = useScales({ ...propertiesBrush, min: minBrush, max: maxBrush })
-
-  const onBrushChange = domain => {
-    if (!domain) return
-    const { x0, x1 } = domain
-    let brushFilteredData = []
-    brushFilteredData = config.data.filter(s => {
-      const x = getDate(s).getTime()
-      if (x > x0 && x < x1) {
-        let date = formatDate(getXValueFromCoordinateDate(x))
-        return s
-      } else {
-      }
-    })
-
-    // dont let the number of points go below config.xAxis.numTicks ??? (TT)
-    if (undefined !== brushFilteredData && brushFilteredData.length >= config.xAxis.numTicks) {
-      // leaving this here for now due to issues with visx tick marks that need debugging
-      if (isDebug) console.log('Set new xAxisBrushdata to', brushFilteredData)
-      setXAxisBrushData(brushFilteredData)
-    }
-  }
+  console.log('LINEARCHART seriesScale', seriesScale)
+  //console.log('LINEARCHART seriesScaleBrush', seriesScaleBrush)
 
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
@@ -316,6 +291,7 @@ export default function LinearChart() {
   // this is Example of usage High Order Components.
   // naming can be anything we want.
   const AreaChartwithBrush = withBrush(AreaChart)
+  const BarChartwithBrush = withBrush(BarChart, seriesScale)
 
   const handleNumTicks = () => {
     // On forest plots we need to return every "study" or y axis value.
@@ -673,8 +649,9 @@ export default function LinearChart() {
           />
         )}
         {visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
+
         {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
-          <BarChart
+          <BarChartwithBrush
             xScale={xScale}
             yScale={yScale}
             seriesScale={seriesScale}
@@ -682,6 +659,7 @@ export default function LinearChart() {
             yMax={yMax}
             getXAxisData={getXAxisData}
             getYAxisData={getYAxisData}
+            brushData={brushData}
             animatedChart={animatedChart}
             visible={animatedChart}
             handleTooltipMouseOver={handleTooltipMouseOver}
@@ -723,7 +701,6 @@ export default function LinearChart() {
             getXValueFromCoordinate={getXValueFromCoordinate}
             handleTooltipMouseOver={handleTooltipMouseOver}
             handleTooltipMouseOff={handleTooltipMouseOff}
-            isBrush={false}
           />
         )}
         {/* brush */}

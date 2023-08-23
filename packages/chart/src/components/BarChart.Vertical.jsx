@@ -10,11 +10,20 @@ import { useHighlightedBars } from '../hooks/useHighlightedBars'
 import chroma from 'chroma-js'
 
 export const BarChartVertical = props => {
-  const { xScale, yScale, xMax, yMax, seriesScale } = props
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
+  const { brushData, xScale, yScale, xMax, yMax, seriesScale, isBrush } = props
+  const { colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
+  let { transformedData: data } = useContext(ConfigContext)
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
+  // use brush data if it is passed in AND if Brush enabled
+  data = config.showChartBrush && undefined !== brushData && brushData.length ? brushData : data
+  //console.log('### BarVertical xScale', xScale)
+  //console.log('### BarVertical yscale,data', yScale, data)
+  console.log('### BarVertical seriesScale', seriesScale)
+  //console.log('### BarVertical config.runtime.barSeriesKeys', config.runtime.barSeriesKeys)
+  //console.log('### BarVertical config.runtime.seriesKeys', config.runtime.seriesKeys)
+  //console.log('### BarVertical config.runtime.originalXAxis.dataKey', config.runtime.originalXAxis.dataKey)
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
@@ -23,7 +32,7 @@ export const BarChartVertical = props => {
         <BarGroup
           data={data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
-          height={yMax}
+          height={isBrush ? yMax / 6 : yMax}
           x0={d => d[config.runtime.originalXAxis.dataKey]}
           x0Scale={xScale}
           x1Scale={seriesScale}

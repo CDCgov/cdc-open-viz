@@ -28,6 +28,7 @@ const withBrush = Component => {
     border: '1px solid red'
   }
   const BrushComponent = props => {
+    console.log('##### BrushComponent props', props)
     const { transformedData: data, config, isDebug, parseDate, formatDate } = useContext(ConfigContext)
     const { pattern_id, accent_color } = config.brush
     const getDate = d => new Date(d[config.xAxis.dataKey])
@@ -41,7 +42,7 @@ const withBrush = Component => {
     let { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
     const ref = useRef(BaseBrush)
     const isBrush = true
-    const { xMax, yMax, svgRef, disableMouseOver } = props
+    const { xMax, yMax, svgRef, disableMouseOver, seriesScale } = props
     const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax, isBrush }
     let { min, max } = useMinMax(properties)
     const { xScale, yScale } = useScales({ ...properties, min, max })
@@ -103,11 +104,12 @@ const withBrush = Component => {
       return <Component {...props} />
     }
 
+    //console.log('withBRUSH xScaleComp, yScaleComp', xScaleComp, yScaleComp)
+    console.log('#### withBRUSH called, seriesScale props', props)
     return (
       <>
-        <Component {...props} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} isBrush={false} />
-        config.showChartBrush && (
-        <Component className='brushChart' xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} height={yMax / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>
+        <Component {...props} seriesScale={seriesScale} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} />
+        <Component className='brushChart' seriesScale={seriesScale} xScale={xScale} yScale={yScale} yMax={250} xMax={xMax} height={yMax / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>
           <PatternLines id={pattern_id} height={8} width={8} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />
           <Brush
             id='theBrush'
@@ -129,7 +131,6 @@ const withBrush = Component => {
             style={styles}
           />
         </Component>
-        )
       </>
     )
   }

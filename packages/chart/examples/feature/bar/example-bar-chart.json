@@ -170,7 +170,7 @@
       "showVertical": false,
       "show": true
     },
-    "orientation": "horizontal",
+    "orientation": "vertical",
     "color": "pinkpurple",
     "columns": {},
     "legend": {
@@ -286,9 +286,7 @@
       "seriesLabels": {
         "Data 1": "Data 1"
       },
-      "seriesLabelsAll": [
-        "Data 1"
-      ],
+      "seriesLabelsAll": ["Data 1"],
       "originalXAxis": {
         "anchors": [],
         "type": "categorical",
@@ -311,9 +309,7 @@
         "dataKey": "Date",
         "label": "X Axis Example Label"
       },
-      "seriesKeys": [
-        "Data 1"
-      ],
+      "seriesKeys": ["Data 1"],
       "xAxis": {
         "hideAxis": false,
         "displayNumbersOnBar": false,
@@ -443,7 +439,6 @@
     "showVertical": false,
     "show": true
   },
-  "orientation": "horizontal",
   "color": "pinkpurple",
   "columns": {},
   "legend": {
