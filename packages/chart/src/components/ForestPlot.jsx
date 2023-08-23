@@ -64,12 +64,9 @@ const ForestPlot = props => {
     .map(entry => entry[1])
     .filter(entry => entry.forestPlot === true)
 
-  console.log(forestPlot.rightWidthOffset)
   const rightOffset = forestPlot.rightWidthOffset !== 0 ? (Number(forestPlot.rightWidthOffset) / 100) * width : width
   const leftOffset = forestPlot.leftWidthOffset !== 0 ? (Number(forestPlot.leftWidthOffset) / 100) * width : width
   const chartWidth = width - rightOffset - leftOffset
-
-  console.log('chartWidth', chartWidth)
 
   return (
     <>

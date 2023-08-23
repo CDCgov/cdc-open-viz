@@ -178,7 +178,7 @@ const useScales = properties => {
     } else {
       xScale = scaleLinear({
         domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
-        range: [leftWidthOffsetMobile, rightWidthOffsetMobile],
+        range: [leftWidthOffsetMobile, xMax - rightWidthOffsetMobile],
         type: 'linear'
       })
     }
