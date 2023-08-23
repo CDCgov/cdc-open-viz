@@ -272,7 +272,7 @@ const ForestPlotSettings = () => {
             type='number'
             min={0}
             max={100}
-            value={config.forestPlot.leftWidthOffset || ''}
+            value={config.forestPlot.leftWidthOffset || 0}
             onChange={e => {
               updateConfig({
                 ...config,
@@ -291,7 +291,7 @@ const ForestPlotSettings = () => {
             type='number'
             min={0}
             max={100}
-            value={config.forestPlot.leftWidthOffsetMobile || ''}
+            value={config.forestPlot.leftWidthOffsetMobile || 0}
             onChange={e => {
               updateConfig({
                 ...config,
@@ -310,7 +310,7 @@ const ForestPlotSettings = () => {
             type='number'
             min={0}
             max={100}
-            value={config.forestPlot.rightWidthOffset || ''}
+            value={config.forestPlot.rightWidthOffset || 0}
             onChange={e => {
               updateConfig({
                 ...config,
@@ -329,7 +329,7 @@ const ForestPlotSettings = () => {
             type='number'
             min={0}
             max={100}
-            value={config.forestPlot.rightWidthOffsetMobile || ''}
+            value={config.forestPlot.rightWidthOffsetMobile || 0}
             onChange={e => {
               updateConfig({
                 ...config,

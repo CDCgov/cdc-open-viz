@@ -1,9 +1,10 @@
 {
   "type": "chart",
   "debugSvg": false,
-  "title": "Forest Plot Example",
+  "title": "",
   "showTitle": true,
   "showDownloadMediaButton": false,
+  "showChartBrush": false,
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
@@ -25,11 +26,11 @@
     "right": 5
   },
   "yAxis": {
-    "hideAxis": true,
+    "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "50",
+    "size": 50,
     "gridLines": false,
     "enablePadding": false,
     "min": "",
@@ -44,13 +45,10 @@
     "rightAxisLabelColor": "#333",
     "rightAxisTickLabelColor": "#333",
     "rightAxisTickColor": "#333",
-    "numTicks": "8",
+    "numTicks": "",
     "axisPadding": 0,
-    "tickRotation": "45",
-    "anchors": [],
-    "dataKey": "N",
-    "labelPlacement": "On Date/Category Axis",
-    "label": "The entire chart width centered x axis title"
+    "tickRotation": 0,
+    "anchors": []
   },
   "boxplot": {
     "plots": [],
@@ -101,21 +99,19 @@
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "0",
+    "size": 0,
     "tickRotation": 0,
     "min": "",
     "max": "",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "numTicks": "10",
-    "labelOffset": "60",
+    "numTicks": "",
+    "labelOffset": 65,
     "axisPadding": 0,
     "target": 0,
     "maxTickRotation": 0,
-    "dataKey": "Author(s) and Year",
-    "label": "",
-    "labelPlacement": "On Date/Category Axis"
+    "dataKey": "Author(s) and Year"
   },
   "table": {
     "label": "Data Table",
@@ -132,18 +128,7 @@
   },
   "orientation": "horizontal",
   "color": "pinkpurple",
-  "columns": {
-    "additionalColumn4": {
-      "label": "Result",
-      "dataTable": true,
-      "tooltips": false,
-      "prefix": "",
-      "suffix": "",
-      "name": "Result",
-      "forestPlotAlignRight": true,
-      "forestPlot": true
-    }
-  },
+  "columns": {},
   "legend": {
     "behavior": "isolate",
     "singleRow": false,
@@ -158,7 +143,7 @@
     "hide": true
   },
   "exclusions": {
-    "active": true,
+    "active": false,
     "keys": []
   },
   "palette": "qualitative-bold",
@@ -193,7 +178,8 @@
     "opacity": 90
   },
   "forestPlot": {
-    "startAt": "0",
+    "startAt": 0,
+    "width": "auto",
     "colors": {
       "line": "",
       "shape": ""
@@ -203,8 +189,8 @@
     "lowerCiField": "",
     "upperCiField": "",
     "shape": "circle",
-    "rowHeight": "20",
-    "showZeroLine": true,
+    "rowHeight": 20,
+    "showZeroLine": false,
     "description": {
       "show": true,
       "text": "description",
@@ -217,28 +203,25 @@
     },
     "radius": {
       "min": 1,
-      "max": 5,
-      "scalingColumn": "Estimate"
+      "max": 8,
+      "scalingColumn": ""
     },
     "regression": {
-      "showBaseLine": true,
-      "description": "",
-      "upper": "-10",
-      "lower": "#87c4c3",
-      "estimateField": "-10"
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
     },
-    "hasZeroLine": true,
+    "leftWidthOffset": "17",
+    "rightWidthOffset": "30",
     "lower": "Lower",
     "upper": "Upper",
-    "null": {
-      "rowHeight": "31"
-    },
-    "title": "Plot Title 2",
-    "padding": "200",
-    "leftWidthOffset": "15",
-    "rightWidthOffset": "25",
-    "leftWidthOffsetMobile": "45",
-    "rightWidthOffsetMobile": "45"
+    "rightWidthOffsetMobile": "0",
+    "title": "test",
+    "leftWidthOffsetMobile": "51"
+  },
+  "brush": {
+    "pattern_id": "brush_pattern",
+    "accent_color": "#ddd"
   },
   "datasets": {},
   "visualizationType": "Forest Plot",
@@ -474,7 +457,7 @@
       "Result": "14 [-168.5, 196.5]"
     }
   ],
-  "dataFileName": "data.csv",
+  "dataFileName": "valid-forest-plot-data.csv",
   "dataFileSourceType": "file",
   "formattedData": [
     {

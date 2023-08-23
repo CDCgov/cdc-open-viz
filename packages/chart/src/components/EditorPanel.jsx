@@ -973,6 +973,21 @@ const EditorPanel = () => {
     handleUpdateHighlightedBorderWidth
    } = useHighlightedBars(config, updateConfig)
 
+  const updateSeriesTooltip = (column, event) => {
+    console.log('tooltip value', event)
+
+    let updatedColumns = config.columns
+
+    updatedColumns[column].tooltips = event
+
+    console.log('updatedColumns', updatedColumns)
+
+    updateConfig({
+      ...config,
+      columns: updatedColumns
+    })
+  }
+
   return (
     <ErrorBoundary component='EditorPanel'>
       {config.newViz && <Confirm />}
@@ -2515,6 +2530,18 @@ const EditorPanel = () => {
                                       }}
                                     />
                                     <span className='edit-label'>Show in Forest Plot</span>
+                                  </label>
+                                </li>
+                                <li>
+                                  <label className='checkbox'>
+                                    <input
+                                      type='checkbox'
+                                      checked={config.columns[val].tooltips || false}
+                                      onChange={event => {
+                                        updateSeriesTooltip(val, event.target.checked)
+                                      }}
+                                    />
+                                    <span className='edit-label'>Show in tooltip</span>
                                   </label>
                                 </li>
                                 <li>

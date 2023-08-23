@@ -5,6 +5,8 @@ import ConfigContext from '../ConfigContext'
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 
+import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
+
 export const useTooltip = props => {
   const { transformedData: data, config, formatNumber, capitalize, formatDate, parseDate, rawData } = useContext(ConfigContext)
   const { xScale, yScale, showTooltip, hideTooltip } = props
@@ -68,10 +70,33 @@ export const useTooltip = props => {
 
     const getTooltipDataArray = () => {
       if (visualizationType === 'Forest Plot') {
-        return [
-          [config.xAxis.dataKey, getClosestYValue(y)],
-          ['Estimate', forestPlotXValue]
-        ]
+        const columns = config.columns
+        const columnsWithTooltips = []
+
+        for (const [colKeys, colVals] of Object.entries(columns)) {
+          const formattingParams = {
+            addColPrefix: config.columns[colKeys].prefix,
+            addColSuffix: config.columns[colKeys].suffix,
+            addColRoundTo: config.columns[colKeys].roundToPlace ? config.columns[colKeys].roundToPlace : '',
+            addColCommas: config.columns[colKeys].commas
+          }
+
+          let closestValue = getClosestYValue(y, colVals.name)
+
+          const formattedValue = formatColNumber(closestValue, 'left', true, config, formattingParams)
+
+          if (colVals.tooltips) {
+            columnsWithTooltips.push([colVals.label, formattedValue])
+          }
+        }
+
+        const tooltipItems = []
+        tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
+
+        columnsWithTooltips.forEach(columnData => {
+          tooltipItems.push([columnData[0], columnData[1]])
+        })
+        return tooltipItems
       }
 
       if (visualizationType === 'Pie') {
@@ -177,19 +202,19 @@ export const useTooltip = props => {
     }
   }
 
-  const getClosestYValue = yPosition => {
+  const getClosestYValue = (yPosition, key) => {
     if (visualizationType === 'Pie') return
     let minDistance = Number.MAX_VALUE
     let closestYValue = null
 
-    data.forEach((d, index) => {
+    rawData.forEach((d, index) => {
       const yPositionOnPlot = visualizationType !== 'Forest Plot' ? yScale(d[config.xAxis.dataKey]) : yScale(index)
 
       const distance = Math.abs(yPositionOnPlot - yPosition)
 
       if (distance < minDistance) {
         minDistance = distance
-        closestYValue = d[config.xAxis.dataKey]
+        closestYValue = key ? d[key] : d[config.xAxis.dataKey]
       }
     })
     return closestYValue

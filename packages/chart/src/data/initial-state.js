@@ -209,7 +209,9 @@ export default {
       lower: 0,
       upper: 0,
       estimateField: 0
-    }
+    },
+    leftWidthOffset: 0,
+    rightWidthOffset: 0
   },
   brush: {
     pattern_id: 'brush_pattern',
