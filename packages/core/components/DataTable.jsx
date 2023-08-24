@@ -394,9 +394,9 @@ const DataTable = props => {
 
               let addColParams = isAdditionalColumn(column)
               if (addColParams) {
-                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config, addColParams)
+                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams)
               } else {
-                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config)
+                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config)
               }
             }
 
