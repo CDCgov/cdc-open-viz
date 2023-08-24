@@ -813,7 +813,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Map' />
-                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={_updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true} />
+                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={_updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true} showLoader={false} />
               </>
             )
             break
@@ -958,6 +958,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   setConfig={newConfig => {
                                     updateChildConfig(col.widget, newConfig)
                                   }}
+                                  showLoader={false}
                                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                                   setSharedFilterValue={setSharedFilterValue}
                                   isDashboard={true}
