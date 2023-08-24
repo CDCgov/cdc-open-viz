@@ -312,7 +312,7 @@ const Filters = props => {
       delete filtersToLoop.fromHash
 
       return filtersToLoop.map((singleFilter, outerIndex) => {
-        if(singleFilter.showDropdown === false) return
+        if (singleFilter.showDropdown === false) return
 
         const values = []
         const pillValues = []
@@ -417,7 +417,8 @@ Filters.propTypes = {
   // exclusions
   excludedData: PropTypes.array,
   // function for filtering the data
-  filterData: PropTypes.func
+  filterData: PropTypes.func,
+  dimensions: PropTypes.array
 }
 
 export default Filters

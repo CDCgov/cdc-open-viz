@@ -2,25 +2,8 @@
   "dashboard": {
     "sharedFilters": [
       {
-        "key": "Location",
-        "usedBy": [
-          "chart1",
-          "map1"
-        ],
-        "type": "urlfilter",
-        "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/poc/locations",
-          "valueSelector": "LocationAbbr",
-          "textSelector": "LocationDesc"
-        },
-        "queryParameter": "location",
-        "resetLabel": "- Select -",
-        "showDropdown": true
-      },
-      {
         "key": "Topics",
         "usedBy": [
-          "chart1",
           "map1"
         ],
         "type": "urlfilter",
@@ -36,7 +19,6 @@
       {
         "key": "Indicators",
         "usedBy": [
-          "chart1",
           "map1"
         ],
         "type": "urlfilter",
@@ -57,9 +39,7 @@
       {
         "width": 12,
         "widget": "map1"
-      },
-      {},
-      {}
+      }
     ]
   ],
   "visualizations": {
@@ -98,14 +78,14 @@
       "color": "pinkpurple",
       "columns": {
         "geo": {
-          "name": "state",
-          "label": "Location",
+          "name": "LocationDesc",
+          "label": "LocationDesc",
           "tooltip": false,
           "dataTable": true
         },
         "primary": {
-          "name": "Insured Rate",
-          "label": "Data Label",
+          "name": "DataValue",
+          "label": "Value",
           "prefix": "",
           "suffix": "%",
           "dataTable": true,
@@ -138,21 +118,7 @@
         "singleRow": false,
         "showSpecialClassesLast": false,
         "dynamicDescription": false
-      },
-      "formattedData": [
-        {
-          "Insured Rate": 43,
-          "state": "Alabama"
-        },
-        {
-          "Insured Rate": 63,
-          "state": "Georgia"
-        },
-        {
-          "Insured Rate": 53,
-          "state": "Florida"
-        }
-      ]
+      }
     }
   },
   "table": {
