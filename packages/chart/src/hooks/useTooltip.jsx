@@ -43,6 +43,7 @@ export const useTooltip = props => {
    * @return {void} - The tooltip information is displayed
    */
   const handleTooltipMouseOver = (e, additionalChartData) => {
+    e.stopPropagation()
     const eventSvgCoords = localPoint(e)
     const { x, y } = eventSvgCoords
 
@@ -130,6 +131,7 @@ export const useTooltip = props => {
    */
   const handleTooltipMouseOff = () => {
     if (config.visualizationType === 'Area Chart') {
+      console.log('HERE IN OFF')
       setTimeout(() => {
         hideTooltip()
       }, 3000)
