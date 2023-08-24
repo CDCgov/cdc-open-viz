@@ -6,7 +6,21 @@ export const useEditorPermissions = () => {
   const { visualizationType, series, orientation } = config
 
   // Overall support for the chart types
-  const enabledChartTypes = ['Area Chart', 'Bar', 'Box Plot', 'Combo', 'Deviation Bar', 'Forecasting', 'Forest Plot', 'Line', 'Paired Bar', 'Pie', 'Scatter Plot', 'Spark Line']
+  // prettier-ignore
+  const enabledChartTypes = [
+    'Area Chart',
+    'Bar',
+    'Box Plot',
+    'Combo',
+    'Deviation Bar',
+    'Forecasting',
+    // 'Forest Plot',
+    'Line',
+    'Paired Bar',
+    'Pie',
+    'Scatter Plot',
+    'Spark Line'
+]
 
   const visHasLabelOnData = () => {
     const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot']
