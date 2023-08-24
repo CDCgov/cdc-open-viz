@@ -1119,20 +1119,20 @@ const EditorPanel = props => {
   }, [runtimeLegend]) // eslint-disable-line
 
   // if no state choice by default show alabama
-  useEffect(() => {
-    if (!state.general.statePicked) {
-      setState({
-        ...state,
-        general: {
-          ...general,
-          statePicked: {
-            fipsCode: '01',
-            stateName: 'Alabama'
-          }
-        }
-      })
-    }
-  }, []) // eslint-disable-line
+  // useEffect(() => {
+  //   if (!state.general.statePicked) {
+  //     setState({
+  //       ...state,
+  //       general: {
+  //         ...general,
+  //         statePicked: {
+  //           fipsCode: '01',
+  //           stateName: 'Alabama'
+  //         }
+  //       }
+  //     })
+  //   }
+  // }, []) // eslint-disable-line
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1503,7 +1503,7 @@ const EditorPanel = props => {
                   <label>
                     <span className='edit-label column-heading'>State Selector</span>
                     <select
-                      value={state.general.hasOwnProperty('statePicked') ? state.general.statePicked.stateName : { fipsCode: '04', stateName: 'Alabama' }}
+                      value={state.general.statePicked.stateName}
                       onChange={event => {
                         handleEditorChanges('chooseState', event.target.value)
                       }}
