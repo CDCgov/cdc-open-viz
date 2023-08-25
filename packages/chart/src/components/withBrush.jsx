@@ -3,11 +3,12 @@ import BaseBrush from '@visx/brush/lib/BaseBrush'
 import { Group } from '@visx/group'
 import { PatternLines } from '@visx/pattern'
 import { bisector } from 'd3-array'
-import { useRef, useContext, useState } from 'react'
+import { useRef, useContext, useState, Fragment } from 'react'
 import ConfigContext from '../ConfigContext'
 import useMinMax from '../hooks/useMinMax'
 import useScales from '../hooks/useScales'
 import useReduceData from '../hooks/useReduceData'
+import { ScaleSVG } from '@visx/responsive'
 
 const BrushHandle = props => {
   const { x, height, isBrushActive } = props
@@ -25,7 +26,7 @@ const BrushHandle = props => {
 
 const withBrush = Component => {
   const styles = {
-    border: '1px solid red'
+    border: '2px solid red'
   }
   const BrushComponent = props => {
     console.log('##### BrushComponent props', props)
@@ -42,7 +43,9 @@ const withBrush = Component => {
     let { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
     const ref = useRef(BaseBrush)
     const isBrush = true
-    const { xMax, yMax, svgRef, disableMouseOver, seriesScale } = props
+    const { xMax, yMax, svgRef, seriesScale, height } = props
+    console.log('heaight ', height)
+    let origHeight = height
     const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax, isBrush }
     let { min, max } = useMinMax(properties)
     const { xScale, yScale } = useScales({ ...properties, min, max })
@@ -51,7 +54,7 @@ const withBrush = Component => {
     const xMaxComp = xMax
     let dynamicMarginTop = 0 || config.dynamicMarginTop
     const marginTop = 20
-    let yMaxComp = config.isResponsiveTicks && showChartBrush ? yMax + config.dynamicMarginTop / 4 + marginTop : yMax
+    let yMaxComp = config.isResponsiveTicks && config.showChartBrush && isBrush ? yMax + config.dynamicMarginTop / 4 + marginTop : yMax
     {/* prettier-ignore */ }
     ;({ minValue, maxValue } = useReduceData(config, brushData))
     const xAxisDataMappedComp = brushData.map(d => getXAxisData(d))
@@ -59,7 +62,7 @@ const withBrush = Component => {
     {/* prettier-ignore */}
     ;({ min, max } = useMinMax(propsComp))
     const { xScale: xScaleComp, yScale: yScaleComp } = useScales({ ...propsComp, min, max })
-    //debugger
+
     const initialBrushPosition = {
       start: { x: 0 },
       end: { x: xMax }
@@ -104,13 +107,35 @@ const withBrush = Component => {
       return <Component {...props} />
     }
 
+    const disableMouseOver = () => {
+      return false
+    }
+
     //console.log('withBRUSH xScaleComp, yScaleComp', xScaleComp, yScaleComp)
-    console.log('#### withBRUSH called, seriesScale props', props)
+    console.log('#### withBRUSH called, seriesScale props, origHeight', props, origHeight)
     return (
       <>
-        <Component {...props} seriesScale={seriesScale} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} />
-        <Component className='brushChart' seriesScale={seriesScale} xScale={xScale} yScale={yScale} yMax={250} xMax={xMax} height={yMax / 4} chartRef={svgRef} handleTooltipMouseOver={disableMouseOver} handleTooltipMouseOff={disableMouseOver} isDebug={isDebug} isBrush={true}>
-          <PatternLines id={pattern_id} height={8} width={8} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />
+        <Fragment>{/* <Component {...props} seriesScale={seriesScale} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} /> */}</Fragment>
+
+        {/* <text>Brush should appear next</text> */}
+        <Component
+          id={'brush-chart'}
+          className='brush-chart'
+          hideBottomAxis
+          hideLeftAxis
+          seriesScale={seriesScale}
+          xScale={xScale}
+          yScale={yScale}
+          yMax={yMax}
+          xMax={xMax}
+          height={yMax / 5}
+          chartRef={svgRef}
+          handleTooltipMouseOver={disableMouseOver}
+          handleTooltipMouseOff={disableMouseOver}
+          isDebug={isDebug}
+          isBrush={true}
+        >
+          <PatternLines id={pattern_id} height={38} width={18} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />
           <Brush
             id='theBrush'
             className='theBrush'

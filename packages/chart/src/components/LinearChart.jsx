@@ -24,6 +24,7 @@ import LineChart from './LineChart'
 import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
+import withBrush from './withBrush'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
@@ -35,7 +36,6 @@ import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 
 // styles
 import '../scss/LinearChart.scss'
-import withBrush from './withBrush'
 
 export default function LinearChart() {
   const { isEditor, isDashboard, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
@@ -61,6 +61,7 @@ export default function LinearChart() {
   const { horizontal: heightHorizontal } = config.heights
   const isHorizontal = orientation === 'horizontal'
   const shouldAbbreviate = true
+  // original height without added Brush
   let height = config.aspectRatio ? width * config.aspectRatio : config.visualizationType === 'Forest Plot' ? config.heights['vertical'] : config.heights[orientation]
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.size)
@@ -261,7 +262,7 @@ export default function LinearChart() {
       }
       if (isDashboard) {
         if (!config.isResponsiveTicks) {
-          xtraBuffer -= (50 - runtime.xAxis.size) / 10 // * 3 // dont know why but its off
+          xtraBuffer -= (50 - runtime.xAxis.size) / 10 // dont know why but its off
           if (Number(runtime.xAxis.size) < 25) {
             xtraBuffer += 2
           }
@@ -291,7 +292,7 @@ export default function LinearChart() {
   // this is Example of usage High Order Components.
   // naming can be anything we want.
   const AreaChartwithBrush = withBrush(AreaChart)
-  const BarChartwithBrush = withBrush(BarChart, seriesScale)
+  const BarChartwithBrush = withBrush(BarChart, seriesScale, height)
 
   const handleNumTicks = () => {
     // On forest plots we need to return every "study" or y axis value.
@@ -668,6 +669,7 @@ export default function LinearChart() {
             tooltipData={tooltipData}
             showTooltip={showTooltip}
             chartRef={svgRef}
+            height={yMax}
           />
         )}
         {(visualizationType === 'Line' || visualizationType === 'Combo') && (

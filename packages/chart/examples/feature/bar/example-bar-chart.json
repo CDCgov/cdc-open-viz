@@ -3,6 +3,7 @@
   "title": "Example Bar Chart",
   "showTitle": true,
   "showDownloadMediaButton": false,
+  "showChartBrush": true,
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
@@ -138,7 +139,7 @@
     },
     "xAxis": {
       "anchors": [],
-      "type": "categorical",
+      "type": "date",
       "showTargetLabel": true,
       "targetLabel": "Target",
       "hideAxis": false,
@@ -289,7 +290,7 @@
       "seriesLabelsAll": ["Data 1"],
       "originalXAxis": {
         "anchors": [],
-        "type": "categorical",
+        "type": "date",
         "showTargetLabel": true,
         "targetLabel": "Target",
         "hideAxis": false,
@@ -334,7 +335,9 @@
         "axisPadding": 0,
         "tickRotation": 0,
         "anchors": [],
-        "label": "Y Axis Example Label"
+        "label": "Y Axis Example Label",
+        "dateParseFormat": "%m/%d/%Y",
+        "dateDisplayFormat": "%m/%d/%Y"
       },
       "yAxis": {
         "anchors": [],
@@ -407,7 +410,7 @@
   },
   "xAxis": {
     "anchors": [],
-    "type": "categorical",
+    "type": "date",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
@@ -425,7 +428,9 @@
     "axisPadding": 0,
     "target": 0,
     "dataKey": "Date",
-    "label": "X Axis Example Label"
+    "label": "X Axis Example Label",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y"
   },
   "table": {
     "label": "Data Type by Date",

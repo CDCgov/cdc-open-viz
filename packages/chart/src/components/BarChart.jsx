@@ -9,18 +9,18 @@ import BarChartType from './BarChartType'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 
-const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, handleTooltipClick, brushData, children, isBrush }) => {
+const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, handleTooltipClick, brushData, children, isBrush, height }) => {
   const { transformedData: data, config, isDebug } = useContext(ConfigContext)
-
+  console.log('### BarCHART origHeight', height)
   //if (config.showChartBrush && isDebug) console.log('###BARchart BRUSH data in, yMax, xMax, xScale, yScale', data, yMax, xMax, xScale, yScale)
   if (config.showChartBrush && isDebug) console.log('###BARchart BRUSH data in, seriesScale, data', seriesScale, data)
-  //debugger
+
   return (
     <ErrorBoundary component='BarChart'>
       <Group left={parseFloat(config.runtime.yAxis.size)}>
         <BarChartType.StackedVertical xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} />
         <BarChartType.StackedHorizontal xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} />
-        <BarChartType.Vertical xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} seriesScale={seriesScale} isBrush={isBrush} />
+        <BarChartType.Vertical xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} seriesScale={seriesScale} isBrush={isBrush} origHeight={height} />
         <BarChartType.Horizontal xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} seriesScale={seriesScale} />
 
         {/* tooltips */}

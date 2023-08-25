@@ -10,7 +10,7 @@ import { useHighlightedBars } from '../hooks/useHighlightedBars'
 import chroma from 'chroma-js'
 
 export const BarChartVertical = props => {
-  const { brushData, xScale, yScale, xMax, yMax, seriesScale, isBrush } = props
+  const { brushData, xScale, yScale, xMax, yMax, seriesScale, origHeight, isBrush } = props
   const { colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
   let { transformedData: data } = useContext(ConfigContext)
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
@@ -18,12 +18,19 @@ export const BarChartVertical = props => {
 
   // use brush data if it is passed in AND if Brush enabled
   data = config.showChartBrush && undefined !== brushData && brushData.length ? brushData : data
-  //console.log('### BarVertical xScale', xScale)
+  console.log('### BarVertical isBrush', isBrush)
   //console.log('### BarVertical yscale,data', yScale, data)
   console.log('### BarVertical seriesScale', seriesScale)
   //console.log('### BarVertical config.runtime.barSeriesKeys', config.runtime.barSeriesKeys)
   //console.log('### BarVertical config.runtime.seriesKeys', config.runtime.seriesKeys)
   //console.log('### BarVertical config.runtime.originalXAxis.dataKey', config.runtime.originalXAxis.dataKey)
+  console.log('### BarVertical origHeight', origHeight)
+  // How to calculate how far to move down?
+  // top chart height + bottom margin by ticks + padding???
+  const getTop = () => {
+    return isBrush ? origHeight * 3 : 0
+  }
+
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
@@ -32,7 +39,7 @@ export const BarChartVertical = props => {
         <BarGroup
           data={data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
-          height={isBrush ? yMax / 6 : yMax}
+          height={isBrush ? yMax : yMax}
           x0={d => d[config.runtime.originalXAxis.dataKey]}
           x0Scale={xScale}
           x1Scale={seriesScale}
@@ -43,7 +50,7 @@ export const BarChartVertical = props => {
         >
           {barGroups => {
             return updateBars(barGroups).map((barGroup, index) => (
-              <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={(xMax / barGroups.length) * barGroup.index}>
+              <Group top={getTop()} className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={(xMax / barGroups.length) * barGroup.index}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
@@ -108,6 +115,11 @@ export const BarChartVertical = props => {
                     ...borderRadius
                   }
 
+                  // this is only doing something on COmbo
+                  // .. how can we do this for bar chart
+                  const brushBarHeight = () => {
+                    return isBrush ? barHeight * 2 : barHeight
+                  }
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
                       {/* This feels gross but inline transition was not working well*/}
@@ -115,7 +127,7 @@ export const BarChartVertical = props => {
                         {`
                         .linear #barGroup${barGroup.index},
                         .Combo #barGroup${barGroup.index} {
-                          transform-origin: 0 ${barY + barHeight}px;
+                          transform-origin: 0 ${barY + brushBarHeight}px;
                         }
                       `}
                       </style>
@@ -124,9 +136,9 @@ export const BarChartVertical = props => {
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                           x={barWidth * bar.index + offset}
-                          y={barY}
+                          y={isBrush ? barY / 4 + 200 : barY} // rethink this 200px offset ... how not to hardcode
                           width={barWidth}
-                          height={barHeight}
+                          height={isBrush ? barHeight / 4 : barHeight}
                           style={finalStyle}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
