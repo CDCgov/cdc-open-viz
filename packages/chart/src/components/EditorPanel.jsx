@@ -1007,6 +1007,7 @@ const EditorPanel = () => {
               </AccordionItemHeading>
               <AccordionItemPanel>
                 <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />
+                {config.visualizationType === 'Area Chart' && <CheckBox value={config.area?.isStacked} section='area' fieldName='isStacked' label={'Stacked Area Chart'} updateField={updateField} />}
                 {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
                 {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
                 {config.visualizationType === 'Deviation Bar' && <Select label='Orientation' options={['horizontal']} />}
