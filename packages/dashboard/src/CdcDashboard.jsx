@@ -418,7 +418,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     setConfig(updatedConfig)
   }
 
-  const Filters = ({hide}) => {
+  const Filters = ({ hide }) => {
     const changeFilterActive = (index, value) => {
       let dashboardConfig = { ...config.dashboard }
 
@@ -634,15 +634,13 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           {/* Title */}
           {title && (
             <div role='heading' aria-level='3' className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>
-              {title}
+              {parse(title)}
             </div>
           )}
           {/* Description */}
           {description && <div className='subtext'>{parse(description)}</div>}
           {/* Filters */}
-          {config.dashboard.sharedFilters && Object.keys(config.visualizations).filter(vizKey => config.visualizations[vizKey].visualizationType === 'filter-dropdowns').length === 0 && (
-            <Filters />
-          )}
+          {config.dashboard.sharedFilters && Object.keys(config.visualizations).filter(vizKey => config.visualizations[vizKey].visualizationType === 'filter-dropdowns').length === 0 && <Filters />}
 
           {/* Visualizations */}
           {config.rows &&
@@ -757,9 +755,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   isDashboard={true}
                                 />
                               )}
-                              {visualizationConfig.type === 'filter-dropdowns' && (
-                                <Filters hide={visualizationConfig.hide} />
-                              )}
+                              {visualizationConfig.type === 'filter-dropdowns' && <Filters hide={visualizationConfig.hide} />}
                             </div>
                           </React.Fragment>
                         )
