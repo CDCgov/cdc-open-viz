@@ -10,7 +10,7 @@ import { useHighlightedBars } from '../hooks/useHighlightedBars'
 import chroma from 'chroma-js'
 
 export const BarChartVertical = props => {
-  const { brushData, xScale, yScale, xMax, yMax, seriesScale, origHeight, isBrush } = props
+  const { brushData, xScale, yScale, xMax, yMax, seriesScale, origHeight, isBrush, children } = props
   const { colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
   let { transformedData: data } = useContext(ConfigContext)
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
@@ -18,7 +18,7 @@ export const BarChartVertical = props => {
 
   // use brush data if it is passed in AND if Brush enabled
   data = config.showChartBrush && undefined !== brushData && brushData.length ? brushData : data
-  console.log('### BarVertical isBrush', isBrush)
+  console.log('### BarVertical isBrush, children', isBrush, children)
   //console.log('### BarVertical yscale,data', yScale, data)
   console.log('### BarVertical seriesScale', seriesScale)
   //console.log('### BarVertical config.runtime.barSeriesKeys', config.runtime.barSeriesKeys)
@@ -35,7 +35,7 @@ export const BarChartVertical = props => {
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
     config.orientation === 'vertical' && (
-      <Group>
+      <React.Fragment>
         <BarGroup
           data={data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
@@ -218,7 +218,8 @@ export const BarChartVertical = props => {
               )
             })
           : ''}
-      </Group>
+        {children}
+      </React.Fragment>
     )
   )
 }

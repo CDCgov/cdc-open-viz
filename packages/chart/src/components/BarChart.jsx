@@ -20,7 +20,7 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, handleTooltipMouseO
       <Group left={parseFloat(config.runtime.yAxis.size)}>
         <BarChartType.StackedVertical xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} />
         <BarChartType.StackedHorizontal xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} />
-        <BarChartType.Vertical xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} seriesScale={seriesScale} isBrush={isBrush} origHeight={height} />
+        <BarChartType.Vertical xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} seriesScale={seriesScale} isBrush={isBrush} origHeight={height} children={children} />
         <BarChartType.Horizontal xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} seriesScale={seriesScale} />
 
         {/* tooltips */}

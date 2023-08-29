@@ -10,10 +10,17 @@ import useScales from '../hooks/useScales'
 import useReduceData from '../hooks/useReduceData'
 import { ScaleSVG } from '@visx/responsive'
 
+// this is just the rectangle part you drag
 const BrushHandle = props => {
-  const { x, height, isBrushActive } = props
+  let { x, height, isBrushActive } = props
   const pathWidth = 8
   const pathHeight = 15
+
+  // test messing with x
+  x = 100
+  height = 700
+  console.log('BrushHandle x, height, isBrushActive=', x, height, isBrushActive)
+
   if (!isBrushActive) {
     return null
   }
@@ -28,6 +35,7 @@ const withBrush = Component => {
   const styles = {
     border: '2px solid red'
   }
+
   const BrushComponent = props => {
     console.log('##### BrushComponent props', props)
     const { transformedData: data, config, isDebug, parseDate, formatDate } = useContext(ConfigContext)
@@ -63,6 +71,7 @@ const withBrush = Component => {
     ;({ min, max } = useMinMax(propsComp))
     const { xScale: xScaleComp, yScale: yScaleComp } = useScales({ ...propsComp, min, max })
 
+    // you can also specify y position but AreaChart did not require it at all
     const initialBrushPosition = {
       start: { x: 0 },
       end: { x: xMax }
@@ -103,6 +112,7 @@ const withBrush = Component => {
       }
     }
 
+    // if brush not enabled, just return the chart with no brush
     if (!config.showChartBrush) {
       return <Component {...props} />
     }
@@ -112,10 +122,10 @@ const withBrush = Component => {
     }
 
     //console.log('withBRUSH xScaleComp, yScaleComp', xScaleComp, yScaleComp)
-    console.log('#### withBRUSH called, seriesScale props, origHeight', props, origHeight)
+    console.log('#### withBRUSH called, seriesScale props, origHeight, pattern_id, accent_color', props, origHeight, pattern_id, accent_color)
     return (
       <>
-        <Fragment>{/* <Component {...props} seriesScale={seriesScale} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} /> */}</Fragment>
+        {<Component {...props} seriesScale={seriesScale} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} />}
 
         {/* <text>Brush should appear next</text> */}
         <Component
@@ -135,7 +145,7 @@ const withBrush = Component => {
           isDebug={isDebug}
           isBrush={true}
         >
-          <PatternLines id={pattern_id} height={38} width={18} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />
+          <PatternLines id={pattern_id} height={138} width={18} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />
           <Brush
             id='theBrush'
             className='theBrush'
