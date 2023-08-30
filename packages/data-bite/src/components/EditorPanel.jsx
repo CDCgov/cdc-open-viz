@@ -181,6 +181,7 @@ const EditorPanel = memo(() => {
     // Pass up to Editor if needed
     if (setParentConfig) {
       const newConfig = convertStateToConfig()
+      delete newConfig.newViz
 
       setParentConfig(newConfig)
     }
