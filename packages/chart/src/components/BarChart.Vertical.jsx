@@ -10,7 +10,7 @@ import { useHighlightedBars } from '../hooks/useHighlightedBars'
 import chroma from 'chroma-js'
 
 export const BarChartVertical = props => {
-  const { brushData, xScale, yScale, xMax, yMax, seriesScale, origHeight, isBrush, children } = props
+  const { brushData, xScale, yScale, xMax, yMax, seriesScale, origHeight, totalHeight, isBrush, children } = props
   const { colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
   let { transformedData: data } = useContext(ConfigContext)
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
@@ -18,24 +18,27 @@ export const BarChartVertical = props => {
 
   // use brush data if it is passed in AND if Brush enabled
   data = config.showChartBrush && undefined !== brushData && brushData.length ? brushData : data
-  console.log('### BarVertical isBrush, children', isBrush, children)
+  //console.log('### BarVertical isBrush, children', isBrush, children)
   //console.log('### BarVertical yscale,data', yScale, data)
-  console.log('### BarVertical seriesScale', seriesScale)
+  //console.log('### BarVertical seriesScale', seriesScale)
   //console.log('### BarVertical config.runtime.barSeriesKeys', config.runtime.barSeriesKeys)
   //console.log('### BarVertical config.runtime.seriesKeys', config.runtime.seriesKeys)
   //console.log('### BarVertical config.runtime.originalXAxis.dataKey', config.runtime.originalXAxis.dataKey)
-  console.log('### BarVertical origHeight', origHeight)
+  //console.log('### BarVertical origHeight, totalHeight', origHeight, totalHeight)
   // How to calculate how far to move down?
   // top chart height + bottom margin by ticks + padding???
   const getTop = () => {
     return isBrush ? origHeight * 3 : 0
+  }
+  const getBrushTop = () => {
+    return totalHeight - origHeight + 15 // where do we get 15?  Is that padding somewhere?  Should be dynamic?
   }
 
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
     config.orientation === 'vertical' && (
-      <React.Fragment>
+      <Group>
         <BarGroup
           data={data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
@@ -218,8 +221,8 @@ export const BarChartVertical = props => {
               )
             })
           : ''}
-        {children}
-      </React.Fragment>
+        <Group top={getBrushTop()}>{children}</Group>
+      </Group>
     )
   )
 }

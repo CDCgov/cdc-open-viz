@@ -47,7 +47,7 @@ export default function LinearChart() {
 
   // Initialize Brush variables - here for now
   const [xAxisBrushData, setXAxisBrushData] = useState(data) // initBrushData
-  const { pattern_id, accent_color } = config.brush
+  const { patternId, accentColor } = config.brush
 
   const styles = {
     border: '1px solid red'
@@ -305,7 +305,7 @@ export default function LinearChart() {
   ) : (
     <ErrorBoundary component='LinearChart'>
       {/* width has to accommodate brush handle on right if enabled */}
-      <svg width={showChartBrush ? width + 5 : width} height={getChartHeight + 300} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
+      <svg width={showChartBrush ? width + 5 : width} height={getChartHeight} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
         <Bar width={width} height={getChartHeight} fill={'transparent'}></Bar>
         {/* Highlighted regions */}
         {config.regions
@@ -670,6 +670,7 @@ export default function LinearChart() {
             showTooltip={showTooltip}
             chartRef={svgRef}
             height={yMax}
+            totalHeight={getChartHeight}
           />
         )}
         {(visualizationType === 'Line' || visualizationType === 'Combo') && (
@@ -707,20 +708,22 @@ export default function LinearChart() {
         )}
         {/* brush */}
         {(visualizationType === 'Area Chart' || visualizationType === 'Combo') && (
-          <AreaChartwithBrush
-            xScale={xScale}
-            yScale={yScale}
-            yMax={yMax}
-            xMax={xMax}
-            brushData={brushData}
-            chartRef={svgRef}
-            width={xMax}
-            height={yMax}
-            handleTooltipMouseOver={handleTooltipMouseOver}
-            handleTooltipMouseOff={handleTooltipMouseOff}
-            tooltipData={tooltipData}
-            showTooltip={showTooltip}
-          />
+          <>
+            <AreaChartwithBrush
+              xScale={xScale}
+              yScale={yScale}
+              yMax={yMax}
+              xMax={xMax}
+              brushData={brushData}
+              chartRef={svgRef}
+              width={xMax}
+              height={yMax}
+              handleTooltipMouseOver={handleTooltipMouseOver}
+              handleTooltipMouseOff={handleTooltipMouseOff}
+              tooltipData={tooltipData}
+              showTooltip={showTooltip}
+            />
+          </>
         )}
 
         {/* y anchors */}

@@ -1,14 +1,14 @@
+import { PatternLines } from '@visx/pattern'
 import { Brush } from '@visx/brush'
 import BaseBrush from '@visx/brush/lib/BaseBrush'
 import { Group } from '@visx/group'
-import { PatternLines } from '@visx/pattern'
 import { bisector } from 'd3-array'
-import { useRef, useContext, useState, Fragment } from 'react'
+import { useRef, useContext, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import useMinMax from '../hooks/useMinMax'
 import useScales from '../hooks/useScales'
 import useReduceData from '../hooks/useReduceData'
-import { ScaleSVG } from '@visx/responsive'
+import { ScaleSVG } from '@visx/responsive' // I could not get ScaleSVG to work but it could be a better long term option
 
 // this is just the rectangle part you drag
 const BrushHandle = props => {
@@ -16,9 +16,6 @@ const BrushHandle = props => {
   const pathWidth = 8
   const pathHeight = 15
 
-  // test messing with x
-  x = 100
-  height = 700
   console.log('BrushHandle x, height, isBrushActive=', x, height, isBrushActive)
 
   if (!isBrushActive) {
@@ -33,32 +30,33 @@ const BrushHandle = props => {
 
 const withBrush = Component => {
   const styles = {
-    border: '2px solid red'
+    border: '2px solid red' // doesnt do anything
   }
 
   const BrushComponent = props => {
-    console.log('##### BrushComponent props', props)
     const { transformedData: data, config, isDebug, parseDate, formatDate } = useContext(ConfigContext)
-    const { pattern_id, accent_color } = config.brush
+    const { patternId, accentColor } = config.brush
     const getDate = d => new Date(d[config.xAxis.dataKey])
     const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
     const xAxisDataMapped = data.map(d => getXAxisData(d))
+    console.log('##### BrushComponent props, config.brush', props, config.brush)
 
     const [xAxisBrushData, setXAxisBrushData] = useState(data)
     const brushData = undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data
 
     // for Brush, using original data
     let { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
-    const ref = useRef(BaseBrush)
+    const brushRef = useRef(BaseBrush)
     const isBrush = true
-    const { xMax, yMax, svgRef, seriesScale, height } = props
-    console.log('heaight ', height)
+    // totalHeight is the height of the entire parent svg with both chart and brush chart
+    const { xMax, yMax, svgRef, seriesScale, height, totalHeight } = props
+    console.log('height, totalHeight ', height, totalHeight)
     let origHeight = height
     const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax, isBrush }
     let { min, max } = useMinMax(properties)
     const { xScale, yScale } = useScales({ ...properties, min, max })
 
-    // for Component using filtered brush data
+    // for incoming Component, using filtered brush data
     const xMaxComp = xMax
     let dynamicMarginTop = 0 || config.dynamicMarginTop
     const marginTop = 20
@@ -71,11 +69,20 @@ const withBrush = Component => {
     ;({ min, max } = useMinMax(propsComp))
     const { xScale: xScaleComp, yScale: yScaleComp } = useScales({ ...propsComp, min, max })
 
+    const selectedBrushStyle = {
+      fill: `url(#${patternId})`, // 'blue', // `url(#${pattern_id})`, //
+      fillOpacity: 0.5,
+      stroke: 'white' //{ accent_color }
+    }
+
+    // this controls where the brush handles are initially
+    // - 0, xMax basically have the handles flush to each end of the area
     // you can also specify y position but AreaChart did not require it at all
     const initialBrushPosition = {
       start: { x: 0 },
       end: { x: xMax }
     }
+
     // Helper for getting data to the closest date/category hovered.
     const getXValueFromCoordinateDate = x => {
       if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
@@ -94,14 +101,17 @@ const withBrush = Component => {
       }
     }
 
-    const onBrushChange = domain => {
+    const onBrushChange = (domain, ...props) => {
       if (!domain) return
       const { x0, x1 } = domain
+      console.log('onBrushChange DOMAIN in = x0,x1  props', x0, x1, props)
       let brushFilteredData = []
       brushFilteredData = config.data.filter(s => {
         const x = getDate(s).getTime()
+        console.log('onBrushChange x0,x,x1', x0, x, x1)
         if (x > x0 && x < x1) {
           let date = formatDate(getXValueFromCoordinateDate(x))
+          console.log('onBrushChange in range get date', date)
           return s
         }
       })
@@ -122,12 +132,10 @@ const withBrush = Component => {
     }
 
     //console.log('withBRUSH xScaleComp, yScaleComp', xScaleComp, yScaleComp)
-    console.log('#### withBRUSH called, seriesScale props, origHeight, pattern_id, accent_color', props, origHeight, pattern_id, accent_color)
+    console.log('#### withBRUSH called, seriesScale props, origHeight, patternId, accentColor', props, origHeight, patternId, accentColor)
     return (
       <>
-        {<Component {...props} seriesScale={seriesScale} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} />}
-
-        {/* <text>Brush should appear next</text> */}
+        <Component {...props} seriesScale={seriesScale} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} />
         <Component
           id={'brush-chart'}
           className='brush-chart'
@@ -144,8 +152,10 @@ const withBrush = Component => {
           handleTooltipMouseOff={disableMouseOver}
           isDebug={isDebug}
           isBrush={true}
+          totalHeight={totalHeight}
         >
-          <PatternLines id={pattern_id} height={138} width={18} stroke={accent_color} strokeWidth={1} orientation={['diagonal']} style={styles} />
+          {/* WARNING: Dont change height and width of PatternLines or they will disappear (TT) */}
+          <PatternLines id={patternId} height={8} width={8} stroke={accentColor} strokeWidth={1} orientation={['diagonal']} />
           <Brush
             id='theBrush'
             className='theBrush'
@@ -155,12 +165,12 @@ const withBrush = Component => {
             height={yMax / 4}
             margin={0}
             handleSize={8}
-            innerRef={ref}
+            innerRef={brushRef}
             resizeTriggerAreas={['left', 'right']}
             brushDirection='horizontal'
             initialBrushPosition={initialBrushPosition}
             onChange={onBrushChange}
-            selectedBoxStyle={{ fill: `url(#${pattern_id})` }}
+            selectedBoxStyle={selectedBrushStyle}
             useWindowMoveEvents
             renderBrushHandle={props => <BrushHandle {...props} />}
             style={styles}

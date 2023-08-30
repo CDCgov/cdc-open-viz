@@ -212,7 +212,8 @@ export default {
     }
   },
   brush: {
-    pattern_id: 'brush_pattern',
-    accent_color: '#ddd'
+    patternId: 'brush_pattern',
+    accentColor: '#ddd',
+    heightRatio: 0.25
   }
 }
