@@ -681,11 +681,11 @@ export default function LinearChart() {
           />
         )}
         {visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
-        {((visualizationType === 'Area Chart' && !config.area.isStacked) || visualizationType === 'Combo') && (
+        {((visualizationType === 'Area Chart' && config.visualizationSubType === 'regular') || visualizationType === 'Combo') && (
           <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} brushData={brushData} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
         )}
 
-        {((visualizationType === 'Area Chart' && config.area.isStacked) || visualizationType === 'Combo') && (
+        {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') || visualizationType === 'Combo') && (
           <AreaChartStacked xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} brushData={brushData} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
         )}
         {(visualizationType === 'Bar' || visualizationType === 'Combo') && (

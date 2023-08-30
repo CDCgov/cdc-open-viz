@@ -28,15 +28,16 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisDa
     }
   }
 
+  const strokeWidth = 2
+
   // data.map(d => console.log(yScale(d[config.runtime.seriesKeys[0]])))
   return (
     data && (
       <svg height={Number(yMax)}>
         <ErrorBoundary component='AreaChartStacked'>
-          <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)} height={Number(yMax)} style={{ overflow: 'hidden' }}>
-            <AreaStack data={data} keys={config.runtime.seriesKeys} x0={d => handleDateCategory(d.data[config.xAxis.dataKey])} y0={d => Number(yScale(d[0]))} y1={d => Number(yScale(d[1]))} top={1200} curve={allCurves['curveNatural']}>
+          <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size) + strokeWidth / 2} height={Number(yMax)} style={{ overflow: 'hidden' }}>
+            <AreaStack data={data} keys={config.runtime.seriesKeys} x0={d => handleDateCategory(d.data[config.xAxis.dataKey])} y0={d => Number(yScale(d[0]))} y1={d => Number(yScale(d[1]))} curve={allCurves['curveNatural']}>
               {({ stacks, path }) => {
-                console.log('STACKS', stacks)
                 return stacks.map((stack, stackIndex) => {
                   let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(stack.key) === -1
                   let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(stack.key) !== -1
