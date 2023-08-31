@@ -4,9 +4,6 @@ import React, { useContext, useEffect, useRef, useState, useMemo } from 'react'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
-import { Brush } from '@visx/brush'
-import BaseBrush from '@visx/brush/lib/BaseBrush'
-import { PatternLines } from '@visx/pattern'
 import { Text } from '@visx/text'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
@@ -24,7 +21,6 @@ import LineChart from './LineChart'
 import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
-import BrushHandle from './BrushHandle'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
@@ -45,9 +41,6 @@ export default function LinearChart() {
 
   const getDate = d => new Date(d[config.xAxis.dataKey])
 
-  const styles = {
-    border: '1px solid red'
-  }
   // configure width
   let [width] = dimensions
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
