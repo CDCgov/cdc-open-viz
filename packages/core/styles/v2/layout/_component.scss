@@ -24,9 +24,9 @@
     border: none !important;
   }
 
-  .cdc-data-bite-inner-container:not(.component--has-title) .cove-component__content:not(.no-borders) {
-    border-top: 1px solid #ccc;
-  }
+  // .cdc-data-bite-inner-container:not(.component--has-title) .cove-component__content:not(.no-borders) {
+  //   border-top: 1px solid #ccc;
+  // }
 
   .cove-component__content:not(.component--hideBackgroundColor) {
     background: $lightestGray;
