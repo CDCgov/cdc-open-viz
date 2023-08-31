@@ -81,9 +81,9 @@ $theme: (
     // Header
     .theme-#{$theme-name} {
       background-color: string.unquote(nth($theme-colors, 1));
-      border-color: string.unquote(nth($theme-colors, 2));
-      border-bottom-style: solid;
-      border-bottom-width: 4px;
+      // border-color: string.unquote(nth($theme-colors, 2));
+      // border-bottom-style: solid;
+      // border-bottom-width: 4px;
     }
 
     &.theme-#{$theme-name} {
@@ -102,9 +102,9 @@ $theme: (
         border-top: 1px solid #ccc;
       }
 
-      .cove-component__header {
-        border-color: string.unquote(nth($theme-colors, 2));
-      }
+      // .cove-component__header {
+      //   border-color: string.unquote(nth($theme-colors, 2));
+      // }
 
       .cove-component__content.component--has-accent {
         border-left: 0.5rem solid string.unquote(nth($theme-colors, 1)) !important;
@@ -132,9 +132,9 @@ $theme: (
         border-top: 1px solid #ccc;
       }
 
-      .cove-component__header {
-        border-color: string.unquote(nth($theme-colors, 2));
-      }
+      // .cove-component__header {
+      //   border-color: string.unquote(nth($theme-colors, 2));
+      // }
 
       .cove-component__content.component--has-accent {
         border-left: 0.5rem solid string.unquote(nth($theme-colors, 1)) !important;
