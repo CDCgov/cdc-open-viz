@@ -15,7 +15,12 @@ export default function useDataVizClasses(config) {
   let innerContainerClasses = ['cove-component__inner']
   let contentClasses = ['cove-component__content']
 
-  config.title && innerContainerClasses.push('component--has-title')
+  const { visualizationType, title, showTitle } = config
+
+  if (visualizationType === 'Spark Line' || visualizationType === 'chart') {
+    if (title && showTitle) contentClasses.push('component--has-title')
+  }
+  config.title && config.visualizationType !== 'chart' && config.visualizationType !== 'Spark Line' && contentClasses.push('component--has-title')
   config.subtext && innerContainerClasses.push('component--has-subtext')
   config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
   config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
