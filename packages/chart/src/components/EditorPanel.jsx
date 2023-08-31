@@ -553,15 +553,9 @@ const EditorPanel = () => {
     })
 
     if (filter) {
+      const { lower, upper } = config.confidenceKeys || {}
       Object.keys(columns).forEach(key => {
-        if (
-          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
-          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))
-          /*
-            TODO: Resolve errors when config keys exist, but have no value
-              Proposal:  (((confidenceUpper && confidenceLower) || confidenceUpper || confidenceLower) && Object.keys(config.confidenceKeys).includes(key))
-          */
-        ) {
+        if ((config.series && config.series.filter(series => series.dataKey === key).length > 0) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key) && ((lower && upper) || lower || upper) && key !== lower && key !== upper)) {
           delete columns[key]
         }
       })
