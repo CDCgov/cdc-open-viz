@@ -29,13 +29,9 @@ const BrushHandle = props => {
 }
 
 const withBrush = Component => {
-  const styles = {
-    border: '2px solid red' // doesnt do anything
-  }
-
   const BrushComponent = props => {
     const { transformedData: data, config, isDebug, parseDate, formatDate } = useContext(ConfigContext)
-    const { patternId, accentColor } = config.brush
+    const { patternId, accentColor, heightRatio } = config.brush
     const getDate = d => new Date(d[config.xAxis.dataKey])
     const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
     const xAxisDataMapped = data.map(d => getXAxisData(d))
@@ -60,7 +56,7 @@ const withBrush = Component => {
     const xMaxComp = xMax
     let dynamicMarginTop = 0 || config.dynamicMarginTop
     const marginTop = 20
-    let yMaxComp = config.isResponsiveTicks && config.showChartBrush && isBrush ? yMax + config.dynamicMarginTop / 4 + marginTop : yMax
+    let yMaxComp = config.isResponsiveTicks && config.showChartBrush && isBrush ? yMax + config.dynamicMarginTop * heightRatio + marginTop : yMax
     {/* prettier-ignore */ }
     ;({ minValue, maxValue } = useReduceData(config, brushData))
     const xAxisDataMappedComp = brushData.map(d => getXAxisData(d))
@@ -135,7 +131,7 @@ const withBrush = Component => {
     console.log('#### withBRUSH called, seriesScale props, origHeight, patternId, accentColor', props, origHeight, patternId, accentColor)
     return (
       <>
-        <Component {...props} seriesScale={seriesScale} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} />
+        {/* <Component {...props} seriesScale={seriesScale} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} /> */}
         <Component
           id={'brush-chart'}
           className='brush-chart'
@@ -153,6 +149,7 @@ const withBrush = Component => {
           isDebug={isDebug}
           isBrush={true}
           totalHeight={totalHeight}
+          data={data}
         >
           {/* WARNING: Dont change height and width of PatternLines or they will disappear (TT) */}
           <PatternLines id={patternId} height={8} width={8} stroke={accentColor} strokeWidth={1} orientation={['diagonal']} />
@@ -162,7 +159,7 @@ const withBrush = Component => {
             xScale={xScale}
             yScale={yScale}
             width={xMax}
-            height={yMax / 4}
+            height={yMax * heightRatio}
             margin={0}
             handleSize={8}
             innerRef={brushRef}
@@ -173,7 +170,6 @@ const withBrush = Component => {
             selectedBoxStyle={selectedBrushStyle}
             useWindowMoveEvents
             renderBrushHandle={props => <BrushHandle {...props} />}
-            style={styles}
           />
         </Component>
       </>

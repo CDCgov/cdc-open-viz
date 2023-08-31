@@ -28,17 +28,18 @@ export const BarChartVertical = props => {
   // How to calculate how far to move down?
   // top chart height + bottom margin by ticks + padding???
   const getTop = () => {
-    return isBrush ? origHeight * 3 : 0
+    return isBrush ? origHeight * 2 + 25 : 0 // where do we get 25?  Is that padding somewhere?  Should be dynamic? (TT)
   }
   const getBrushTop = () => {
-    return totalHeight - origHeight + 15 // where do we get 15?  Is that padding somewhere?  Should be dynamic?
+    return totalHeight - origHeight
   }
-
+  const rand = Math.random().toString(16).substr(2, 8)
+  const groupId = `barchart-vertical-${rand}`
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
     config.orientation === 'vertical' && (
-      <Group>
+      <Group id={groupId}>
         <BarGroup
           data={data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}

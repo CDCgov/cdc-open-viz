@@ -652,26 +652,48 @@ export default function LinearChart() {
         {visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
 
         {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
-          <BarChartwithBrush
-            xScale={xScale}
-            yScale={yScale}
-            seriesScale={seriesScale}
-            xMax={xMax}
-            yMax={yMax}
-            getXAxisData={getXAxisData}
-            getYAxisData={getYAxisData}
-            brushData={brushData}
-            animatedChart={animatedChart}
-            visible={animatedChart}
-            handleTooltipMouseOver={handleTooltipMouseOver}
-            handleTooltipMouseOff={handleTooltipMouseOff}
-            handleTooltipClick={handleTooltipClick}
-            tooltipData={tooltipData}
-            showTooltip={showTooltip}
-            chartRef={svgRef}
-            height={yMax}
-            totalHeight={getChartHeight}
-          />
+          <>
+            <BarChart
+              xScale={xScale}
+              yScale={yScale}
+              seriesScale={seriesScale}
+              xMax={xMax}
+              yMax={yMax}
+              getXAxisData={getXAxisData}
+              getYAxisData={getYAxisData}
+              brushData={brushData}
+              animatedChart={animatedChart}
+              visible={animatedChart}
+              handleTooltipMouseOver={handleTooltipMouseOver}
+              handleTooltipMouseOff={handleTooltipMouseOff}
+              handleTooltipClick={handleTooltipClick}
+              tooltipData={tooltipData}
+              showTooltip={showTooltip}
+              chartRef={svgRef}
+              height={yMax}
+              totalHeight={getChartHeight}
+            />
+            <BarChartwithBrush
+              xScale={xScale}
+              yScale={yScale}
+              seriesScale={seriesScale}
+              xMax={xMax}
+              yMax={yMax}
+              getXAxisData={getXAxisData}
+              getYAxisData={getYAxisData}
+              brushData={brushData}
+              animatedChart={animatedChart}
+              visible={animatedChart}
+              handleTooltipMouseOver={handleTooltipMouseOver}
+              handleTooltipMouseOff={handleTooltipMouseOff}
+              handleTooltipClick={handleTooltipClick}
+              tooltipData={tooltipData}
+              showTooltip={showTooltip}
+              chartRef={svgRef}
+              height={yMax}
+              totalHeight={getChartHeight}
+            />
+          </>
         )}
         {(visualizationType === 'Line' || visualizationType === 'Combo') && (
           <LineChart
