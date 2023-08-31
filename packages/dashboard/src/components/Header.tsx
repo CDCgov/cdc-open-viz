@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react'
 
 import ConfigContext from '../ConfigContext'
-import type { APIFilter, SharedFilter } from '../CdcDashboard'
+import type { APIFilter } from '../types/APIFilter'
+import type { SharedFilter } from '../types/SharedFilter'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -167,14 +168,14 @@ const Header = (props: HeaderProps) => {
       overlay?.actions.toggleOverlay()
     }
 
-    const updateFilterProp = (name, index, value) => {
+    const updateFilterProp = (name, _index, value) => {
       // @TODO this should be refactored into a reducer function.
       // it's unsafe to directly set objects w/o guardrails
       let newFilter = { ...filter }
 
       newFilter[name] = value
 
-      overlay?.actions.openOverlay(filterModal(newFilter, index))
+      overlay?.actions.openOverlay(filterModal(newFilter, _index))
     }
 
     const addFilterUsedBy = (filter, index, value) => {
@@ -195,6 +196,10 @@ const Header = (props: HeaderProps) => {
       const _filter = filter.apiFilter || { apiEndpoint: '', valueSelector: '', textSelector: '' }
       const newAPIFilter: APIFilter = { ..._filter, [key]: value }
       overlay?.actions.openOverlay(filterModal({ ...filter, apiFilter: newAPIFilter }, index))
+    }
+
+    const valuesFromTarget = (event: React.ChangeEvent<HTMLSelectElement>): string[] => {
+      return Array.from(event.target.selectedOptions, option => option.value)
     }
 
     return (
@@ -283,12 +288,23 @@ const Header = (props: HeaderProps) => {
                   />
                 </label>
                 <label>
-                  <span className='edit-label column-heading'>Parent Filter: </span>
-                  <select
-                    value={filter.parent || ''}
+                  <span className='edit-label column-heading'>Heirarchy Lookup: </span>
+                  <input
+                    type='text'
+                    value={filter.apiFilter?.heirarchyLookup}
                     onChange={e => {
-                      updateFilterProp('parent', index, e.target.value)
+                      updateAPIFilter('heirarchyLookup', e.target.value)
                     }}
+                  />
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Filter Parent(s): </span>
+                  <select
+                    value={filter.parents || []}
+                    onChange={e => {
+                      updateFilterProp('parents', index, valuesFromTarget(e))
+                    }}
+                    multiple
                   >
                     <option value=''>Select a filter</option>
                     {config.dashboard.sharedFilters &&
@@ -392,10 +408,11 @@ const Header = (props: HeaderProps) => {
                 <label>
                   <span className='edit-label column-heading'>Parent Filter: </span>
                   <select
-                    value={filter.parent || ''}
+                    value={filter.parents || []}
                     onChange={e => {
-                      updateFilterProp('parent', index, e.target.value)
+                      updateFilterProp('parents', index, e.target.value)
                     }}
+                    multiple
                   >
                     <option value=''>Select a filter</option>
                     {config.dashboard.sharedFilters &&
