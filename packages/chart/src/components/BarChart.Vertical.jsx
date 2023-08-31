@@ -33,6 +33,14 @@ export const BarChartVertical = props => {
   const getBrushTop = () => {
     return totalHeight - origHeight
   }
+  // prevents duplicate brush handles being rendered
+  const getFirstBrushHandleOnly = (children, index) => {
+    //if (index === 0) {
+    return children
+    //}
+    // else dont return the other brush handles
+  }
+
   const rand = Math.random().toString(16).substr(2, 8)
   const groupId = `barchart-vertical-${rand}`
   return (
@@ -197,6 +205,9 @@ export const BarChartVertical = props => {
           }}
         </BarGroup>
 
+        {/* this renders the brush if this is a brush chart */}
+        <Group top={getBrushTop()}> {getFirstBrushHandleOnly(children)}</Group>
+
         {Object.keys(config.confidenceKeys).length > 0
           ? data.map(d => {
               let xPos, yPos
@@ -222,7 +233,6 @@ export const BarChartVertical = props => {
               )
             })
           : ''}
-        <Group top={getBrushTop()}>{children}</Group>
       </Group>
     )
   )
