@@ -20,6 +20,8 @@ export default function useDataVizClasses(config) {
   if (visualizationType === 'Spark Line' || visualizationType === 'chart') {
     if (title && showTitle) contentClasses.push('component--has-title')
   }
+
+  config.showTitle && contentClasses.push('component--has-title')
   config.title && config.visualizationType !== 'chart' && config.visualizationType !== 'Spark Line' && contentClasses.push('component--has-title')
   config.subtext && innerContainerClasses.push('component--has-subtext')
   config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
