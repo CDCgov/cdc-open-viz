@@ -703,6 +703,11 @@ export default function LinearChart() {
             <Line from={{ x: 0, y: tooltipData.dataYPosition }} to={{ x: xMax, y: tooltipData.dataYPosition }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='horizontal-tooltip-line' />
           </Group>
         )}
+        {config.filters.values.length === 0 && data.length === 0 && (
+          <Text x={Number(config.yAxis.size) + Number(xMax / 2)} y={height / 2} textAnchor='middle'>
+            {config.chartMessage.noData}
+          </Text>
+        )}
       </svg>
       {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
         <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} style={tooltipStyles(tooltipData)} width={width}>
