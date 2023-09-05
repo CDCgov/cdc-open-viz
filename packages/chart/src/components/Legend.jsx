@@ -124,7 +124,7 @@ const Legend = () => {
     // DEV-4161: replaceable series name in the legend
     const hasNewSeriesName = config.series.map(s => s.name).filter(item => item).length > 0
     if (hasNewSeriesName) {
-      let palette = colorPalettes[config.palette]
+      let palette = config.customColors || colorPalettes[config.palette]
 
       while (tableData.length > palette.length) {
         palette = palette.concat(palette)
@@ -188,17 +188,14 @@ const Legend = () => {
 
                   if (runtime.seriesLabels) {
                     let index = config.runtime.seriesLabelsAll.indexOf(itemName)
-                    itemName = config.runtime.seriesKeys[index]
-
+                    itemName = config.runtime.seriesLabelsAll[index]
                     if (runtime?.forecastingSeriesKeys?.length > 0) {
                       itemName = label.text
                     }
                   }
-
                   if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
                     className += ' inactive'
                   }
-
                   return (
                     <LegendItem
                       className={className}

@@ -155,9 +155,11 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYA
             {barStacks =>
               barStacks.reverse().map(barStack =>
                 barStack.bars.map(bar => {
-                  let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
-                  let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
+                  const keyToHighLight = config.series.find(s => s.dataKey === bar.key && s.name)
+                  let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(keyToHighLight?.name ?? bar.key) === -1
+                  let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(keyToHighLight?.name ?? bar.key) !== -1
                   let barThickness = xMax / barStack.bars.length
+                  const barColor = colorScale(keyToHighLight?.name ?? bar.key)
                   let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
                   let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
                   // tooltips
@@ -203,7 +205,7 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYA
                           y={bar.y}
                           width={barThicknessAdjusted}
                           height={bar.height}
-                          style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
+                          style={{ background: barColor, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tooltip-html={barStackTooltip}
@@ -232,8 +234,10 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYA
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
-                    let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
-                    let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
+                    const keyToHighLight = config.series.find(s => s.dataKey === bar.key && s.name)
+                    const barColor = colorScale(keyToHighLight?.name ?? bar.key)
+                    let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(keyToHighLight?.name ?? bar.key) === -1
+                    let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(keyToHighLight?.name ?? bar.key) !== -1
                     config.barHeight = Number(config.barHeight)
                     let labelColor = '#000000'
                     // tooltips
@@ -274,7 +278,7 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYA
                             y={bar.y}
                             width={bar.width}
                             height={bar.height}
-                            style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
+                            style={{ background: barColor, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
                             opacity={transparentBar ? 0.5 : 1}
                             display={displayBar ? 'block' : 'none'}
                             data-tooltip-html={tooltip}
@@ -378,9 +382,9 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYA
                       let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
 
                       highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
-
-                      let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
-                      let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
+                      const keyToHighLight = config.series.find(s => s.dataKey === bar.key && s.name)
+                      let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(keyToHighLight?.name ?? bar.key) === -1
+                      let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(keyToHighLight?.name ?? bar.key) !== -1
                       let barHeight = orientation === 'horizontal' ? config.barHeight : isNumber(Math.abs(yScale(bar.value) - yScale(scaleVal))) ? Math.abs(yScale(bar.value) - yScale(scaleVal)) : 0
                       let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                       let barGroupWidth = ((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (config.barThickness || 0.8)
@@ -394,7 +398,9 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYA
                       let palette = assignColorsToValues()
 
                       let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
-                      let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key)
+
+                      const barColor = colorScale(keyToHighLight?.name ?? bar.key)
+
                       while (palette.length < barGroups.length) {
                         palette = palette.concat(palette)
                       }

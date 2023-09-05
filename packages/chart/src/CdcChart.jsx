@@ -754,7 +754,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
 
       palette = palette.slice(0, numberOfKeys)
-
       newColorScale = () =>
         scaleOrdinal({
           domain: config.runtime.seriesLabelsAll,
@@ -786,9 +785,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     let newHighlight = label.datum
     if (config.runtime.seriesLabels) {
-      for (let i = 0; i < config.runtime.seriesKeys.length; i++) {
-        if (config.runtime.seriesLabels[config.runtime.seriesKeys[i]] === label.datum) {
-          newHighlight = config.runtime.seriesKeys[i]
+      for (let i = 0; i < config.series.length; i++) {
+        console.log(config.series[i]?.name)
+        if (config.runtime.seriesLabelsAll[i] === label.datum) {
+          newHighlight = config.runtime.seriesLabelsAll[i]
           break
         }
       }
@@ -811,9 +811,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         newSeriesHighlight.push(matchingSeries[0].dataKey)
       }
     }
-
-    pushDataKeyBySeriesName(label)
-
+    console.log(newSeriesHighlight, 'BEFORE')
+    // pushDataKeyBySeriesName(label)
+    console.log(newSeriesHighlight, 'AFTER')
     setSeriesHighlight(newSeriesHighlight)
   }
 
