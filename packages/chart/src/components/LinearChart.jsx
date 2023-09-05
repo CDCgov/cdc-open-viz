@@ -889,7 +889,7 @@ export default function LinearChart() {
 
         {chartHasTooltipGuides && showTooltip && tooltipData && config.visual.verticalHoverLine && (
           <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
-            <Line from={{ x: tooltipData.dataXPosition, y: 0 }} to={{ x: tooltipData.dataXPosition, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
+            <Line from={{ x: tooltipData.dataXPosition - 10, y: 0 }} to={{ x: tooltipData.dataXPosition - 10, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
           </Group>
         )}
 
