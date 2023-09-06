@@ -230,7 +230,7 @@ export default function LinearChart() {
   }
 
   // todo: combine mouseover functions
-  const handleTooltipMouseOver = (e, data) => {
+  const handleTooltipMouseOver = (e, tableData) => {
     // get the svg coordinates of the mouse
     // and get the closest values
     const eventSvgCoords = localPoint(e)
@@ -246,12 +246,12 @@ export default function LinearChart() {
     includedSeries.push(config.xAxis.dataKey)
 
     if (xAxis.type === 'categorical') {
-      yScaleValues = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
+      yScaleValues = tableData.filter(d => d[xAxis.dataKey] === closestXScaleValue)
       yScaleValues = yScaleValues.map(object => {
         return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
       })
     } else {
-      yScaleValues = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
+      yScaleValues = tableData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
       yScaleValues = yScaleValues.map(object => {
         return Object.fromEntries(Object.entries(object).filter(([key, value]) => includedSeries.includes(key)))
       })
