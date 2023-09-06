@@ -8,7 +8,7 @@ import { bisector } from 'd3-array'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 
 export const useTooltip = props => {
-  const { transformedData: data, config, formatNumber, capitalize, formatDate, parseDate, rawData } = useContext(ConfigContext)
+  const { tableData: data, config, formatNumber, capitalize, formatDate, parseDate } = useContext(ConfigContext)
   const { xScale, yScale, showTooltip, hideTooltip } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
 
@@ -209,7 +209,7 @@ export const useTooltip = props => {
     let minDistance = Number.MAX_VALUE
     let closestYValue = null
 
-    rawData.forEach((d, index) => {
+    data.forEach((d, index) => {
       const yPositionOnPlot = visualizationType !== 'Forest Plot' ? yScale(d[config.xAxis.dataKey]) : yScale(index)
 
       const distance = Math.abs(yPositionOnPlot - yPosition)
@@ -266,7 +266,7 @@ export const useTooltip = props => {
       if (xAxis.type === 'categorical') {
         dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
       } else {
-        dataToSearch = rawData.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
+        dataToSearch = data.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
       }
 
       // Return an empty array if no matching data is found.
