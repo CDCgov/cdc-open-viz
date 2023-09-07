@@ -1593,13 +1593,11 @@ const EditorPanel = props => {
                       <select
                         value={state.hexMap.arrowGroupColumnName ? state.hexMap.arrowGroupColumnName : 'select'}
                         onChange={event => {
-                          let vals = [...new Set(state.data.map(d => d[state.hexMap.arrowGroupColumnName]))]
                           setState({
                             ...state,
                             hexMap: {
                               ...state.hexMap,
-                              arrowGroupColumnName: event.target.value,
-                              arrowGroupColumnValues: vals
+                              arrowGroupColumnName: event.target.value
                             }
                           })
                         }}
@@ -1610,7 +1608,7 @@ const EditorPanel = props => {
                     {state.hexMap.arrowGroupColumnName && (
                       <>
                         <ul>
-                          {state.hexMap.arrowGroupColumnValues.map((arrowGroup, arrowGroupIndex) => (
+                          {[...new Set(state.data.map(d => d[state.hexMap.arrowGroupColumnName]))].map((arrowGroup, arrowGroupIndex) => (
                             <li>{arrowGroup}</li>
                           ))}
                         </ul>

@@ -63,13 +63,22 @@
       "tooltip": true
     },
     "geosInRegion": {
-      "name": ""
+      "name": "Intensity Level",
+      "dataTable": true
     },
     "latitude": {
       "name": ""
     },
     "longitude": {
       "name": ""
+    },
+    "additionalColumn3": {
+      "label": "New Column",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Trajectory"
     }
   },
   "legend": {
@@ -94,8 +103,7 @@
     "categoryValuesOrder": [
       "Low",
       "Medium",
-      "High",
-      ""
+      "High"
     ]
   },
   "filters": [],
@@ -139,6 +147,17 @@
   "map": {
     "layers": []
   },
+  "hexMap": {
+    "type": "arrows",
+    "arrowGroupColumnName": "Trajectory",
+    "arrowGroupColumnKeys": [],
+    "arrowGroupColumnValues": [
+      "Increasing",
+      "Decreasing",
+      "No Change",
+      ""
+    ]
+  },
   "filterBehavior": "Filter Change",
   "sharing": {
     "enabled": false,
@@ -153,7 +172,7 @@
   "data": [
     {
       "STATE": "AL",
-      "Rate": 10,
+      "Rate": "10",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -161,7 +180,7 @@
     },
     {
       "STATE": "AK",
-      "Rate": 12,
+      "Rate": "12",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -169,7 +188,7 @@
     },
     {
       "STATE": "AS",
-      "Rate": 14,
+      "Rate": "14",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -177,7 +196,7 @@
     },
     {
       "STATE": "AZ",
-      "Rate": 9,
+      "Rate": "9",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -185,7 +204,7 @@
     },
     {
       "STATE": "AR",
-      "Rate": 17,
+      "Rate": "17",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -201,7 +220,7 @@
     },
     {
       "STATE": "CO",
-      "Rate": 22,
+      "Rate": "22",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -209,7 +228,7 @@
     },
     {
       "STATE": "CT",
-      "Rate": 10,
+      "Rate": "10",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -217,7 +236,7 @@
     },
     {
       "STATE": "DE",
-      "Rate": 12,
+      "Rate": "12",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -225,7 +244,7 @@
     },
     {
       "STATE": "District of Columbia",
-      "Rate": 14,
+      "Rate": "14",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -233,7 +252,7 @@
     },
     {
       "STATE": "FL",
-      "Rate": 9,
+      "Rate": "9",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -241,7 +260,7 @@
     },
     {
       "STATE": "GA",
-      "Rate": 17,
+      "Rate": "17",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -249,7 +268,7 @@
     },
     {
       "STATE": "GU",
-      "Rate": 20,
+      "Rate": "20",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -257,7 +276,7 @@
     },
     {
       "STATE": "HI",
-      "Rate": 22,
+      "Rate": "22",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -273,7 +292,7 @@
     },
     {
       "STATE": "IL",
-      "Rate": 12,
+      "Rate": "12",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -281,7 +300,7 @@
     },
     {
       "STATE": "IN",
-      "Rate": 14,
+      "Rate": "14",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -289,7 +308,7 @@
     },
     {
       "STATE": "IA",
-      "Rate": 9,
+      "Rate": "9",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -305,7 +324,7 @@
     },
     {
       "STATE": "KY",
-      "Rate": 20,
+      "Rate": "20",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -313,7 +332,7 @@
     },
     {
       "STATE": "LA",
-      "Rate": 22,
+      "Rate": "22",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Low",
@@ -321,7 +340,7 @@
     },
     {
       "STATE": "ME",
-      "Rate": 10,
+      "Rate": "10",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -329,7 +348,7 @@
     },
     {
       "STATE": "MH",
-      "Rate": 12,
+      "Rate": "12",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -345,7 +364,7 @@
     },
     {
       "STATE": "MA",
-      "Rate": 9,
+      "Rate": "9",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -353,7 +372,7 @@
     },
     {
       "STATE": "MI",
-      "Rate": 17,
+      "Rate": "17",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -361,7 +380,7 @@
     },
     {
       "STATE": "FM",
-      "Rate": 20,
+      "Rate": "20",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -369,7 +388,7 @@
     },
     {
       "STATE": "MN",
-      "Rate": 22,
+      "Rate": "22",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -377,7 +396,7 @@
     },
     {
       "STATE": "MS",
-      "Rate": 10,
+      "Rate": "10",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -385,7 +404,7 @@
     },
     {
       "STATE": "MO",
-      "Rate": 11,
+      "Rate": "11",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -393,7 +412,7 @@
     },
     {
       "STATE": "MT",
-      "Rate": 14,
+      "Rate": "14",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -401,7 +420,7 @@
     },
     {
       "STATE": "NE",
-      "Rate": 9,
+      "Rate": "9",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -409,7 +428,7 @@
     },
     {
       "STATE": "NV",
-      "Rate": 17,
+      "Rate": "17",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -417,7 +436,7 @@
     },
     {
       "STATE": "NH",
-      "Rate": 20,
+      "Rate": "20",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -425,7 +444,7 @@
     },
     {
       "STATE": "NJ",
-      "Rate": 28,
+      "Rate": "28",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -433,7 +452,7 @@
     },
     {
       "STATE": "NM",
-      "Rate": 10,
+      "Rate": "10",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -441,7 +460,7 @@
     },
     {
       "STATE": "NY",
-      "Rate": 12,
+      "Rate": "12",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -449,7 +468,7 @@
     },
     {
       "STATE": "NC",
-      "Rate": 14,
+      "Rate": "14",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -457,7 +476,7 @@
     },
     {
       "STATE": "ND",
-      "Rate": 9,
+      "Rate": "9",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -465,7 +484,7 @@
     },
     {
       "STATE": "MP",
-      "Rate": 17,
+      "Rate": "17",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -481,7 +500,7 @@
     },
     {
       "STATE": "OK",
-      "Rate": 22,
+      "Rate": "22",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -489,7 +508,7 @@
     },
     {
       "STATE": "OR",
-      "Rate": 10,
+      "Rate": "10",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "Medium",
@@ -497,7 +516,7 @@
     },
     {
       "STATE": "PW",
-      "Rate": 12,
+      "Rate": "12",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -505,7 +524,7 @@
     },
     {
       "STATE": "PA",
-      "Rate": 14,
+      "Rate": "14",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -513,7 +532,7 @@
     },
     {
       "STATE": "PR",
-      "Rate": 6,
+      "Rate": "6",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -521,7 +540,7 @@
     },
     {
       "STATE": "RI",
-      "Rate": 17,
+      "Rate": "17",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -529,7 +548,7 @@
     },
     {
       "STATE": "SC",
-      "Rate": 20,
+      "Rate": "20",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -537,7 +556,7 @@
     },
     {
       "STATE": "SD",
-      "Rate": 22,
+      "Rate": "22",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -545,7 +564,7 @@
     },
     {
       "STATE": "TN",
-      "Rate": 10,
+      "Rate": "10",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -553,7 +572,7 @@
     },
     {
       "STATE": "TX",
-      "Rate": 12,
+      "Rate": "12",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -561,7 +580,7 @@
     },
     {
       "STATE": "VT",
-      "Rate": 9,
+      "Rate": "9",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -569,7 +588,7 @@
     },
     {
       "STATE": "VI",
-      "Rate": 17,
+      "Rate": "17",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -577,7 +596,7 @@
     },
     {
       "STATE": "VA",
-      "Rate": 20,
+      "Rate": "20",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -585,7 +604,7 @@
     },
     {
       "STATE": "WA",
-      "Rate": 22,
+      "Rate": "22",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "",
@@ -593,7 +612,7 @@
     },
     {
       "STATE": "WV",
-      "Rate": 10,
+      "Rate": "10",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -601,7 +620,7 @@
     },
     {
       "STATE": "WI",
-      "Rate": 12,
+      "Rate": "12",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "",
@@ -609,7 +628,7 @@
     },
     {
       "STATE": "WY",
-      "Rate": 14,
+      "Rate": "14",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -617,7 +636,7 @@
     },
     {
       "STATE": "Los Angeles",
-      "Rate": 14,
+      "Rate": "14",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -625,7 +644,7 @@
     },
     {
       "STATE": "Atlanta",
-      "Rate": 12,
+      "Rate": "12",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -633,7 +652,7 @@
     },
     {
       "STATE": "Boston",
-      "Rate": 20,
+      "Rate": "20",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -641,7 +660,7 @@
     },
     {
       "STATE": "New York City",
-      "Rate": 22,
+      "Rate": "22",
       "Location": "School",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -649,7 +668,7 @@
     },
     {
       "STATE": "Dallas",
-      "Rate": 18,
+      "Rate": "18",
       "Location": "Work",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -657,7 +676,7 @@
     },
     {
       "STATE": "Seattle",
-      "Rate": 17,
+      "Rate": "17",
       "Location": "Home",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
@@ -665,7 +684,7 @@
     },
     {
       "STATE": "New Orleans",
-      "Rate": 14,
+      "Rate": "14",
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/",
       "Intensity Level": "High",
