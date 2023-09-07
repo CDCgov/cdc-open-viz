@@ -15,7 +15,7 @@ import MediaControls from '@cdc/core/components/MediaControls'
 
 export default function DataTable() {
   const { rawData, tableData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, currentViewport } = useContext(ConfigContext)
-
+  console.log('DataTable chat data from context= data,rawData', data, rawData)
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
@@ -124,6 +124,7 @@ export default function DataTable() {
           ]
     if (config.visualizationType !== 'Box Plot') {
       data.forEach((d, index) => {
+        //console.log('d iterated on', d)
         const resolveTableHeader = () => {
           if (config.runtime[section].type === 'date') return formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
           if (config.runtime[section].type === 'continuous') return numberFormatter(d[config.runtime.originalXAxis.dataKey], 'bottom')
@@ -132,6 +133,7 @@ export default function DataTable() {
         const newCol = {
           Header: resolveTableHeader(),
           Cell: ({ row }) => {
+            //console.log('row passed to cell', row)
             let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
             let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
             let resolvedAxis = ''
@@ -145,10 +147,11 @@ export default function DataTable() {
             })
 
             if (config.visualizationType !== 'Combo') resolvedAxis = 'left'
-
+            //let temp = numberFormatter(d[row.original], resolvedAxis)
+            //debugger
             return <>{numberFormatter(d[row.original], resolvedAxis)}</>
           },
-          id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
+          id: `${d[config.runtime.originalXAxis.dataKey]}`, // --${index}
           sortType: 'custom',
           canSort: true
         }
@@ -240,22 +243,58 @@ export default function DataTable() {
       disableSortRemove: true, // otherwise 3rd click on header removes sorting entirely
       sortTypes: {
         custom: (rowA, rowB, columnId) => {
-          // rowA.original - is the row data field name to access the value
-          // columnId = the column indicator
-          let dataKey = config.xAxis.dataKey
-          let colObj = config.data.filter(obj => {
-            return obj[dataKey] === columnId.split('--')[0] // have to remove index
-          })
-          if (colObj === undefined || colObj[0] === undefined) {
-            return -1
-          }
-          // NOW we can get the sort values
-          const a = transform.cleanDataPoint(colObj[0][rowA.original]) // issue was that a was UNDEFINED therefore it CANT SORT
-          const b = transform.cleanDataPoint(colObj[0][rowB.original])
+          // NOTE:
+          // 1) rowA and rowB are coming in with all values undefined
+          // - if it passed the values we could just use the columnId to get the correct sort value
+          // but since it's not there we have to go through a bunch of code to get it because
+          // we also do not know the Y axis data key (TT)
+          // 2). if formattedData did not truncate the strings we could get it from there
+          // but Hispanic or Latino is truncated to just Hispanic as the key
+          // and 'White, Non-Hispanic/Latino' gets truncated to remove the /Latino
 
-          if (a === undefined) {
+          // rowA.original - is the row data field name to access the value
+          // columnId = the column indicator typically date or date--index
+          let tmpA = rowA // just for looking at data
+          let tmpB = rowB
+          let tmpFormatData = config.formattedData
+          let configD = config
+
+          //debugger
+          let a, b
+          if (columnId === 'series-label') {
+            // comparing strings
+            a = rowA.original
+            b = rowB.original
+            return a.localeCompare(b)
+          }
+
+          let dataKey = config.xAxis.dataKey
+          let columnIdIndexRemoved = columnId.split('--')[0]
+          //get all the data from that column
+          let colData = config.data.filter(obj => {
+            return obj[dataKey] === columnIdIndexRemoved // have to remove index
+          })
+          if (colData === undefined || colData[0] === undefined) {
             return -1
           }
+          const getSpecificCellData = (array, value) => {
+            return array.filter(data => JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1)
+          }
+          let rowA_cellObj = getSpecificCellData(colData, rowA.original)
+          let rowB_cellObj = getSpecificCellData(colData, rowB.original)
+
+          let rowA_valueObj = Object.values(rowA_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowA.original)
+          let rowB_valueObj = Object.values(rowB_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowB.original)
+
+          // NOW we can get the sort values from the cell object
+          let tmplen = rowA_valueObj.length
+          a = rowA_valueObj.length > 1 ? rowA_valueObj[rowA.id] : rowA_valueObj[0]
+          b = rowB_valueObj.length > 1 ? rowB_valueObj[rowB.id] : rowB_valueObj[0]
+          //debugger
+          // force null and undefined to the bottom
+          a = a === null || a === undefined ? '' : transform.cleanDataPoint(a)
+          b = b === null || b === undefined ? '' : transform.cleanDataPoint(b)
+
           if (!isNaN(Number(a)) && !isNaN(Number(b))) {
             return Number(a) - Number(b)
           }
