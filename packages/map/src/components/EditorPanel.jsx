@@ -1416,6 +1416,8 @@ const EditorPanel = props => {
   }
   if (isDebug) setGeoColumn()
 
+  const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'None']
+
   return (
     <ErrorBoundary component='EditorPanel'>
       {state?.runtime?.editorErrorMessage.length > 0 && <Error />}
@@ -1593,11 +1595,13 @@ const EditorPanel = props => {
                       <select
                         value={state.hexMap.arrowGroupColumnName ? state.hexMap.arrowGroupColumnName : 'select'}
                         onChange={event => {
+                          let cols = [...new Set(state.data.map(d => d[event.target.value]))]
                           setState({
                             ...state,
                             hexMap: {
                               ...state.hexMap,
-                              arrowGroupColumnName: event.target.value
+                              arrowGroupColumnName: event.target.value,
+                              arrowGroupColumns: cols
                             }
                           })
                         }}
@@ -1605,11 +1609,38 @@ const EditorPanel = props => {
                         {columnsOptions}
                       </select>
                     </label>
-                    {state.hexMap.arrowGroupColumnName && (
+                    {state.hexMap.arrowGroupColumnName && state.hexMap.arrowGroupColumns && (
                       <>
                         <ul>
-                          {[...new Set(state.data.map(d => d[state.hexMap.arrowGroupColumnName]))].map((arrowGroup, arrowGroupIndex) => (
-                            <li>{arrowGroup}</li>
+                          {state.hexMap.arrowGroupColumns.map((arrowGroup, arrowGroupIndex) => (
+                            <label>
+                              <span className='edit-label column-heading'>{arrowGroup}</span>
+                              <select
+                                value={state.hexMap.arrowGroups[arrowGroupIndex]?.shape || 'select'}
+                                onChange={event => {
+                                  let copy = state.hexMap.arrowGroups
+                                  const data = event.target.options[event.target.selectedIndex].dataset
+                                  console.log('SHAPE', data)
+
+                                  copy[arrowGroupIndex] = { key: arrowGroup, shape: data.shape }
+                                  setState({
+                                    ...state,
+                                    hexMap: {
+                                      ...state.hexMap,
+                                      arrowGroups: copy
+                                    }
+                                  })
+                                }}
+                              >
+                                {shapeOptions.map((shape, shapeIndex) => {
+                                  return (
+                                    <option value={String(shape).toLowerCase().replace(' ', '-')} data-key={arrowGroup} data-shape={shape} data-shapeIndex={shapeIndex}>
+                                      {shape}
+                                    </option>
+                                  )
+                                })}
+                              </select>
+                            </label>
                           ))}
                         </ul>
                       </>

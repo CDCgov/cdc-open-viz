@@ -974,13 +974,9 @@ const EditorPanel = () => {
    } = useHighlightedBars(config, updateConfig)
 
   const updateSeriesTooltip = (column, event) => {
-    console.log('tooltip value', event)
-
     let updatedColumns = config.columns
 
     updatedColumns[column].tooltips = event
-
-    console.log('updatedColumns', updatedColumns)
 
     updateConfig({
       ...config,
