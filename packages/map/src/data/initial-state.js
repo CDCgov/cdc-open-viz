@@ -102,7 +102,8 @@ export default {
   hexMap: {
     type: '',
     arrowGroupColumnName: '',
-    arrowGroupColumnKeys: []
+    arrowGroupColumnKeys: [],
+    arrowGroups: []
   },
   filterBehavior: 'Filter Change'
 }
