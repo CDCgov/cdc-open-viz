@@ -186,7 +186,7 @@ export class DataTransform {
           Object.keys(standardizedMapped).forEach(key => {
             standardized.push(standardizedMapped[key])
           })
-
+console.log("standardized=",standardized)
           return standardized
         }
       } else {
@@ -257,7 +257,6 @@ export class DataTransform {
       let cleaned = ''
 
       // remove comma and dollar signs
-      if (testing) console.log('typeof data is ', typeof data)
       let tmp = ''
       if (typeof data === 'string') {
         tmp = data!== null && data !== '' ? data.replace(/[,\$\%]/g, '') : ''
@@ -265,10 +264,8 @@ export class DataTransform {
         tmp = data !== null && data !== '' ? data : ''
       }
 
-     cleaned = tmp
-
-      if (testing) console.log('## cleanedData =', cleaned)
-      return cleaned
+      if (testing) console.log('## cleanedData =', tmp)
+      return tmp
   }
 }
 
