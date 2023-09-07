@@ -21,6 +21,8 @@ import BoxPlotIcon from '@cdc/core/assets/icon-chart-box-whisker.svg'
 import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
 import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
 import InfoIcon from '@cdc/core/assets/icon-info.svg'
+import ForestPlotIcon from '@cdc/core/assets/icon-chart-forest-plot.svg'
+import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
 
 export default function ChooseTab() {
   const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(ConfigContext)
@@ -225,11 +227,20 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Forecast Chart' type='chart' subType='Forecasting' orientation='vertical' icon={<InfoIcon />} />
+              <IconButton label='Forecast Chart' type='chart' subType='Forecasting' orientation='vertical' icon={<ForecastIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Display a forecasting chart</Tooltip.Content>
           </Tooltip>
         </li>
+
+        {/* <li>
+          <Tooltip>
+            <Tooltip.Target>
+              <IconButton label='Forest Plot' type='chart' subType='Forest Plot' orientation='vertical' icon={<ForestPlotIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Display a forest plot</Tooltip.Content>
+          </Tooltip>
+        </li> */}
       </ul>
 
       <div className='heading-2'>Maps</div>
