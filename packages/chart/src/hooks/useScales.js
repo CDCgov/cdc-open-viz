@@ -1,7 +1,13 @@
 import { scaleBand, scaleLinear, scaleLog, scalePoint, scaleTime } from '@visx/scale'
+import { useContext } from 'react'
+import ConfigContext from '../ConfigContext'
+// TODO move props in
 
 const useScales = properties => {
   let { xAxisDataMapped, xMax, yMax, min, max, config, data } = properties
+  const { rawData, dimensions } = useContext(ConfigContext)
+
+  const [screenWidth, screenHeight] = dimensions
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
@@ -120,11 +126,11 @@ const useScales = properties => {
     const offset = 1.02 // Offset of the ticks/values from the Axis
     let groupOneMax = Math.max.apply(
       Math,
-      data.map(d => d[config.series[0].dataKey])
+      data.map(d => d[config.series[0]?.dataKey])
     )
     let groupTwoMax = Math.max.apply(
       Math,
-      data.map(d => d[config.series[1].dataKey])
+      data.map(d => d[config.series[1]?.dataKey])
     )
 
     // group one
@@ -139,6 +145,43 @@ const useScales = properties => {
       range: [xMax / 2, xMax],
       nice: true
     })
+  }
+
+  if (visualizationType === 'Forest Plot') {
+    const resolvedYRange = () => {
+      if (config.forestPlot.regression.showDiamond || config.forestPlot.regression.description) {
+        return [0 + config.forestPlot.rowHeight * 2, yMax - config.forestPlot.rowHeight]
+      } else {
+        return [0 + config.forestPlot.rowHeight * 2, yMax]
+      }
+    }
+
+    yScale = scaleLinear({
+      domain: [0, rawData.length],
+      range: resolvedYRange()
+    })
+
+    const xAxisPadding = 5
+
+    const leftWidthOffset = (Number(config.forestPlot.leftWidthOffset) / 100) * xMax
+    const rightWidthOffset = (Number(config.forestPlot.rightWidthOffset) / 100) * xMax
+
+    const rightWidthOffsetMobile = (Number(config.forestPlot.rightWidthOffsetMobile) / 100) * xMax
+    const leftWidthOffsetMobile = (Number(config.forestPlot.leftWidthOffsetMobile) / 100) * xMax
+
+    if (screenWidth > 480) {
+      xScale = scaleLinear({
+        domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
+        range: [leftWidthOffset, xMax - rightWidthOffset],
+        type: 'linear'
+      })
+    } else {
+      xScale = scaleLinear({
+        domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
+        range: [leftWidthOffsetMobile, xMax - rightWidthOffsetMobile],
+        type: 'linear'
+      })
+    }
   }
 
   return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding }

@@ -145,15 +145,13 @@ const DataTable = props => {
   const DownloadButton = memo(() => {
     if (rawData !== undefined) {
       let csvData
-      if (config.type === 'chart' || config.general.type === 'bubble' || !config.table.showFullGeoNameInCSV) {
-        // Just Unparse
-        csvData = Papa.unparse(rawData)
-      } else if ((config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') || config.general.type === 'us-geocode') {
-        // Unparse + Add column for full Geo name
-        csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row[config.columns.geo.name]), ...row })))
-      } else {
+      // only use fullGeoName on County maps and no other
+      if (config.general.geoType === 'us-county') {
         // Unparse + Add column for full Geo name along with State
         csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row })))
+      } else {
+        // Just Unparse
+        csvData = Papa.unparse(rawData)
       }
 
       const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
@@ -341,6 +339,7 @@ const DataTable = props => {
               {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
             >
               {text}
+              {sortBy.column === column && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
               <button>
                 <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
               </button>
@@ -395,9 +394,9 @@ const DataTable = props => {
 
               let addColParams = isAdditionalColumn(column)
               if (addColParams) {
-                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config, addColParams)
+                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams)
               } else {
-                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, true, config)
+                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config)
               }
             }
 
@@ -412,6 +411,17 @@ const DataTable = props => {
     })
     return allRows
   }
+
+  const upIcon = (
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5'>
+      <path d='M0 5l5-5 5 5z' />
+    </svg>
+  )
+  const downIcon = (
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5'>
+      <path d='M0 0l5 5 5-5z' />
+    </svg>
+  )
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
@@ -472,6 +482,7 @@ const DataTable = props => {
                   {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
                 >
                   {text}
+                  {sortBy.column === column && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
                   <button>
                     <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
                   </button>

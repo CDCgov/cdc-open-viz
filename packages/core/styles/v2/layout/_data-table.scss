@@ -150,16 +150,6 @@
     background-size: 10px 5px;
   }
 
-  .sort-asc {
-    //TODO find fix
-    //background-image: url(~@cdc/core/assets/icon-caret-filled-up.svg);
-  }
-
-  .sort-desc {
-    //TODO find fix
-    //background-image: url(~@cdc/core/assets/icon-caret-filled-down.svg);
-  }
-
   .resizer {
     cursor: e-resize;
     width: 10px;
@@ -170,6 +160,7 @@
     touch-action: none;
   }
 }
+
 
 .cove-data-table__footer {
   margin-top: 1rem;
