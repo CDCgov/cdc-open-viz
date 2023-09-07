@@ -1,0 +1,362 @@
+{
+  "dashboard": {
+    "theme": "theme-green",
+    "sharedFilters": [
+      {
+        "key": "Location",
+        "usedBy": [
+          "chart1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/poc/locations",
+          "valueSelector": "LocationAbbr",
+          "textSelector": "LocationDesc"
+        },
+        "queryParameter": "locationabbr",
+        "resetLabel": "- Select -",
+        "showDropdown": true
+      },
+      {
+        "key": "Category",
+        "usedBy": [
+          "chart1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/poc/topics",
+          "valueSelector": "TopicID",
+          "textSelector": "Topic"
+        },
+        "queryParameter": "topicid",
+        "resetLabel": "- Select -",
+        "showDropdown": true
+      },
+      {
+        "key": "Indicator",
+        "usedBy": [
+          "chart1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/poc/indicators",
+          "valueSelector": "IndicatorID",
+          "textSelector": "Indicator"
+        },
+        "queryParameter": "indicatorid",
+        "resetLabel": "- Select -",
+        "showDropdown": true,
+        "parents": ["Category"]
+      },
+      {
+        "key": "Year",
+        "usedBy": [
+          "chart"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/Filters",
+          "valueSelector": "Year",
+          "textSelector": "Year",
+          "heirarchyLookup": "Years"
+          
+        },
+        "queryParameter": "year",
+        "resetLabel": "- Select -",
+        "showDropdown": true,
+        "parents": ["Category", "Indicator"]
+      },
+      {
+        "key": "View By",
+        "usedBy": [
+          "chart1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/Filters",
+          "valueSelector": "StratificationCategoryId",
+          "textSelector": "StratificationCategory",
+          "heirarchyLookup": "StratificationCategories",
+          "defaultValue": "AGE"
+        },
+        "queryParameter": "stratificationcategoryid",
+        "resetLabel": "- Select -",
+        "showDropdown": true,
+        "parents": ["Category", "Indicator"]
+      },
+      {
+        "key": "Data Type",
+        "usedBy": [
+          "chart1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/Filters",
+          "valueSelector": "DataValueTypeId",
+          "textSelector": "DataValueType",
+          "heirarchyLookup": "DataValueTypes"
+          
+        },
+        "queryParameter": "datavaluetypeid",
+        "resetLabel": "- Select -",
+        "showDropdown": true,
+        "parents": ["Category", "Indicator"]
+      }
+    ]
+  },
+  "rows": [
+    [
+      {
+        "width": 12,
+        "widget": "filters"
+      }
+    ],
+    [
+      {
+        "width": 12,
+        "widget": "header"
+      }
+    ],
+    [
+      {
+        "width": 12,
+        "widget": "subfilters"
+      }
+    ],
+    [
+      {
+        "width": 12,
+        "widget": "chart1"
+      }
+    ]
+  ],
+  "visualizations": {
+    "filters": {
+      "type": "filter-dropdowns",
+      "visualizationType": "filter-dropdowns",
+      "hide": [ 3, 4, 5 ]
+    },
+    "header": {
+      "type": "markup-include",
+      "title": "Explore CDI Data by Location",
+      "srcUrl": "",
+      "theme": "theme-green"
+    },
+    "subfilters": {
+      "type": "filter-dropdowns",
+      "visualizationType": "filter-dropdowns",
+      "hide": [ 0, 1, 2 ],
+      "autoLoad": true
+    },
+    "chart1": {
+      "type": "chart",
+      "title": "",
+      "showTitle": false,
+      "defaultData": false,
+      "dataKey": "data3",
+      "showDownloadMediaButton": false,
+      "theme": "theme-blue",
+      "animate": false,
+      "fontSize": "medium",
+      "lineDatapointStyle": "hover",
+      "barHasBorder": "false",
+      "isLollipopChart": false,
+      "lollipopShape": "circle",
+      "lollipopColorStyle": "two-tone",
+      "visualizationSubType": "regular",
+      "barStyle": "",
+      "roundingStyle": "standard",
+      "tipRounding": "top",
+      "isResponsiveTicks": false,
+      "general": {
+        "showDownloadButton": false
+      },
+      "padding": {
+        "left": 5,
+        "right": 5
+      },
+      "yAxis": {
+        "hideAxis": false,
+        "displayNumbersOnBar": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 50,
+        "gridLines": false,
+        "enablePadding": false,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "rightHideAxis": true,
+        "rightAxisSize": 0,
+        "rightLabel": "",
+        "rightLabelOffsetSize": 0,
+        "rightAxisLabelColor": "#333",
+        "rightAxisTickLabelColor": "#333",
+        "rightAxisTickColor": "#333",
+        "numTicks": "",
+        "axisPadding": 0,
+        "tickRotation": 0,
+        "anchors": []
+      },
+      "boxplot": {
+        "plots": [],
+        "borders": "true",
+        "firstQuartilePercentage": 25,
+        "thirdQuartilePercentage": 75,
+        "boxWidthPercentage": 40,
+        "plotOutlierValues": false,
+        "plotNonOutlierValues": true,
+        "legend": {
+          "showHowToReadText": false,
+          "howToReadText": ""
+        },
+        "labels": {
+          "q1": "Lower Quartile",
+          "q2": "q2",
+          "q3": "Upper Quartile",
+          "q4": "q4",
+          "minimum": "Minimum",
+          "maximum": "Maximum",
+          "mean": "Mean",
+          "median": "Median",
+          "sd": "Standard Deviation",
+          "iqr": "Interquartile Range",
+          "total": "Total",
+          "outliers": "Outliers",
+          "values": "Values",
+          "lowerBounds": "Lower Bounds",
+          "upperBounds": "Upper Bounds"
+        }
+      },
+      "topAxis": {
+        "hasLine": false
+      },
+      "isLegendValue": false,
+      "barThickness": 0.35,
+      "barHeight": 25,
+      "barSpace": 15,
+      "heights": {
+        "vertical": 300,
+        "horizontal": 750
+      },
+      "xAxis": {
+        "anchors": [],
+        "type": "categorical",
+        "showTargetLabel": true,
+        "targetLabel": "Target",
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 75,
+        "tickRotation": 0,
+        "min": "",
+        "max": "",
+        "labelColor": "#333",
+        "tickLabelColor": "#333",
+        "tickColor": "#333",
+        "numTicks": "",
+        "labelOffset": 65,
+        "axisPadding": 0,
+        "target": 0,
+        "maxTickRotation": 0,
+        "dataKey": "Stratification"
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": false,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "indexLabel": "",
+        "download": false,
+        "showVertical": true,
+        "show": true
+      },
+      "orientation": "vertical",
+      "color": "pinkpurple",
+      "columns": {},
+      "legend": {
+        "behavior": "isolate",
+        "singleRow": false,
+        "colorCode": "Stratification",
+        "reverseLabelOrder": false,
+        "description": "",
+        "dynamicLegend": false,
+        "dynamicLegendDefaultText": "Show All",
+        "dynamicLegendItemLimit": 5,
+        "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+        "dynamicLegendChartMessage": "Select Options from the Legend",
+        "showLegendValuesTooltip": false
+      },
+      "exclusions": {
+        "active": false,
+        "keys": []
+      },
+      "palette": "sequential-bluereverse",
+      "isPaletteReversed": true,
+      "twoColor": {
+        "palette": "monochrome-1",
+        "isPaletteReversed": false
+      },
+      "labels": false,
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "",
+        "abbreviated": false,
+        "bottomSuffix": "",
+        "bottomPrefix": "",
+        "bottomAbbreviated": false
+      },
+      "confidenceKeys": {
+        "upper": "HighConfidenceLimit",
+        "lower": "LowConfidenceLimit"
+      },
+      "visual": {
+        "border": true,
+        "accent": true,
+        "background": true,
+        "verticalHoverLine": false,
+        "horizontalHoverLine": false
+      },
+      "useLogScale": false,
+      "filterBehavior": "Filter Change",
+      "highlightedBarValues": [],
+      "series": [
+        {
+          "dataKey": "DataValue",
+          "type": "Bar",
+          "axis": "Left",
+          "tooltip": true
+        }
+      ],
+      "tooltips": {
+        "opacity": 90
+      },
+      "datasets": {},
+      "visualizationType": "Bar",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "validated": 4.23,
+      "dynamicMarginTop": 0,
+      "regions": [
+        {}
+      ]
+    }
+  },
+  "type": "dashboard",
+  "datasets": {
+    "data3": {
+      "dataUrl": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/TableData"
+    }
+  },
+  "filterBehavior": "Apply Button",
+  "runtime": {},
+  "uuid": 1684783370106
+}

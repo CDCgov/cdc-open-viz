@@ -19,7 +19,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
       commonjsOptions: {
         include: [/@cdc\/core/, /node_modules/]
       },
-      sourcemap: false,
+      sourcemap: true,
       lib: {
         entry: `src/${componentName}`,
         formats: ['es'],

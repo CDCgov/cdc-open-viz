@@ -191,7 +191,7 @@ const Header = (props: HeaderProps) => {
       }
     }
 
-    const updateAPIFilter = (key: keyof APIFilter, value: string) => {
+    const updateAPIFilter = (key: keyof APIFilter, value: string | boolean) => {
       const _filter = filter.apiFilter || { apiEndpoint: '', valueSelector: '', textSelector: '' }
       const newAPIFilter: APIFilter = { ..._filter, [key]: value }
       overlay?.actions.openOverlay(filterModal({ ...filter, apiFilter: newAPIFilter }, index))
@@ -298,6 +298,26 @@ const Header = (props: HeaderProps) => {
                         }
                       })}
                   </select>
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Auto Load: </span>
+                  <input
+                    type='checkbox'
+                    checked={filter.apiFilter?.autoLoad}
+                    onChange={e => {
+                      updateAPIFilter('autoLoad', !filter.apiFilter?.autoLoad)
+                    }}
+                  />
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Default Value: </span>
+                  <input
+                    type='text'
+                    value={filter.apiFilter?.defaultValue}
+                    onChange={e => {
+                      updateAPIFilter('defaultValue', e.target.value)
+                    }}
+                  />
                 </label>
               </>
             )}
