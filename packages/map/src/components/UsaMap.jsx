@@ -12,8 +12,13 @@ import CityList from './CityList'
 import BubbleList from './BubbleList'
 import { supportedCities, supportedStates } from '../data/supported-geos'
 import { geoAlbersUsa } from 'd3-composite-projections'
+import { Group } from '@visx/group'
+import { Text } from '@visx/text'
+
+import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
 
 import useMapLayers from '../hooks/useMapLayers'
+import Icon from '@cdc/core/components/ui/Icon'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -303,11 +308,48 @@ const UsaMap = props => {
           styles.cursor = 'pointer'
         }
 
+        const getArrowDirection = (geoData, geo) => {
+          let centroid = projection(geoCentroid(geo))
+
+          console.log('geos', geoData[state.hexMap.arrowGroupColumnName])
+          console.log('geos', centroid)
+
+          const iconSize = 8
+
+          return (
+            <>
+              {geoData[state.hexMap.arrowGroupColumnName] === 'Decreasing' && (
+                <Group top={centroid[1] - 5} left={centroid[0] - iconSize} fill={'black'} textAnchor='start'>
+                  <AiOutlineArrowDown />
+                </Group>
+              )}
+              {geoData[state.hexMap.arrowGroupColumnName] === 'Increasing' && (
+                <Group top={centroid[1] - 5} left={centroid[0] - iconSize} fill={'black'} textAnchor='start'>
+                  {/* <path d='M12,8l-6,6l1.4,1.4l4.6-4.6l4.6,4.6L18,14L12,8z' /> */}
+                  <AiOutlineArrowUp />
+                </Group>
+                //     <Text transform={`translate(${centroid})`} fill={'black'} stroke={'black'} height={5} width={5}>
+                // </Text>
+              )}
+
+              {geoData[state.hexMap.arrowGroupColumnName] === 'No Change' && (
+                <Group top={centroid[1] - 5} left={centroid[0] - iconSize} fill={'black'} textAnchor='start'>
+                  {/* <path d='M12,8l-6,6l1.4,1.4l4.6-4.6l4.6,4.6L18,14L12,8z' /> */}
+                  <AiOutlineArrowRight />
+                </Group>
+                //     <Text transform={`translate(${centroid})`} fill={'black'} stroke={'black'} height={5} width={5}>
+                // </Text>
+              )}
+            </>
+          )
+        }
+
         return (
           <g data-name={geoName} key={key}>
             <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
+              {isHex && state.hexMap.type === 'arrows' && getArrowDirection(geoData, geo)}
             </g>
           </g>
         )
