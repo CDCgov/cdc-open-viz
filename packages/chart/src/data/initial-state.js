@@ -1,8 +1,10 @@
 export default {
   type: 'chart',
+  debugSvg: false,
   title: '',
   showTitle: true,
   showDownloadMediaButton: false,
+  showChartBrush: false,
   theme: 'theme-blue',
   animate: false,
   fontSize: 'medium',
@@ -173,5 +175,46 @@ export default {
   series: [],
   tooltips: {
     opacity: 90
+  },
+  forestPlot: {
+    startAt: 0,
+    width: 'auto',
+    colors: {
+      line: '',
+      shape: ''
+    },
+    estimateField: '',
+    estimateRadius: '',
+    lowerCiField: '',
+    upperCiField: '',
+    shape: '',
+    rowHeight: 20,
+    showZeroLine: false,
+    description: {
+      show: true,
+      text: 'description',
+      location: 0
+    },
+    result: {
+      show: true,
+      text: 'result',
+      location: 100
+    },
+    radius: {
+      min: 1,
+      max: 8,
+      scalingColumn: ''
+    },
+    regression: {
+      lower: 0,
+      upper: 0,
+      estimateField: 0
+    },
+    leftWidthOffset: 0,
+    rightWidthOffset: 0
+  },
+  brush: {
+    pattern_id: 'brush_pattern',
+    accent_color: '#ddd'
   }
 }
