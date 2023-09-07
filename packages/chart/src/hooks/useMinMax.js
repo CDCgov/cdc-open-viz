@@ -7,7 +7,8 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   }
 
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
-
+  const minRequiredCIPadding = 1.15 // regardless of Editor if CI data, there must be 10% padding added
+  
   // do validation bafore applying t0 charts
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
   const isMinValid = config.useLogScale ? enteredMinValue >= 0 : (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
@@ -15,6 +16,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   min = enteredMinValue && isMinValid ? enteredMinValue : minValue
   max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
+  let ciYMin = 0
   if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Deviation Bar') {
     let ciYMax = 0
     if (config.hasOwnProperty('confidenceKeys')) {
@@ -22,7 +24,15 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
         return d[config.confidenceKeys.upper]
       })
       ciYMax = Math.max.apply(Math, upperCIValues)
-      if (ciYMax > max) max = ciYMax // bump up the max
+      if (ciYMax > max) max = ciYMax * minRequiredCIPadding // bump up the max plus some padding always
+
+      // check the min if lower confidence 
+      let lowerCIValues = data.map(function (d) {
+        // if no lower CI then we need lowerCIValues to have nothing in it
+        return d[config.confidenceKeys.lower] !== undefined ? d[config.confidenceKeys.lower] : ''
+      })
+      ciYMin = Math.min.apply(Math, lowerCIValues)
+      if (ciYMin < min) min = ciYMin * minRequiredCIPadding // adjust the min + 10% padding for negative numbers to separate from axis
     }
   }
 
@@ -63,9 +73,11 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     }
   }
 
-  if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
+  // this should not apply to bar charts if there is negative CI data
+  if (((config.visualizationType === 'Bar' && ciYMin >= 0) || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
     min = 0
   }
+
   if (config.visualizationType === 'Combo' && isAllLine) {
     if ((enteredMinValue === undefined || enteredMinValue === null || enteredMinValue === '') && min > 0) {
       min = 0

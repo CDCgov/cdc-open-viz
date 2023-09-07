@@ -172,6 +172,9 @@ export const stateFipsToTwoDigit = {
   54: 'WV',
   55: 'WI',
   56: 'WY',
+  60: 'AS',
+  66: 'GU',
+  69: 'MP',
   72: 'PR',
   78: 'VI'
 }
