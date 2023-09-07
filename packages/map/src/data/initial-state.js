@@ -99,5 +99,10 @@ export default {
   map: {
     layers: []
   },
+  hexMap: {
+    type: '',
+    arrowGroupColumnName: '',
+    arrowGroupColumnKeys: []
+  },
   filterBehavior: 'Filter Change'
 }

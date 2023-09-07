@@ -1564,6 +1564,64 @@ const EditorPanel = props => {
                     <span className='edit-label'>Display As Hex Map</span>
                   </label>
                 )}
+
+                {state.general.displayAsHex && (
+                  <label className='checkbox mt-4'>
+                    <input
+                      type='checkbox'
+                      checked={state.hexMap.type === 'arrows'}
+                      onChange={event => {
+                        console.log('event', event.target.checked)
+                        setState({
+                          ...state,
+                          hexMap: {
+                            ...state.hexMap,
+                            type: event.target.checked ? 'arrows' : 'standard'
+                          }
+                        })
+                      }}
+                    />
+                    <span className='edit-label'>Display Arrows on Map</span>
+                  </label>
+                )}
+
+                {state.general.displayAsHex && state.hexMap.type === 'arrows' && (
+                  <fieldset className='edit-block'>
+                    ---
+                    <label>
+                      <span className='edit-label column-heading'>Arrow Column</span>
+                      <select
+                        value={state.hexMap.arrowGroupColumnName ? state.hexMap.arrowGroupColumnName : 'select'}
+                        onChange={event => {
+                          let vals = [...new Set(state.data.map(d => d[state.hexMap.arrowGroupColumnName]))]
+                          setState({
+                            ...state,
+                            hexMap: {
+                              ...state.hexMap,
+                              arrowGroupColumnName: event.target.value,
+                              arrowGroupColumnValues: vals
+                            }
+                          })
+                        }}
+                      >
+                        {columnsOptions}
+                      </select>
+                    </label>
+                    {state.hexMap.arrowGroupColumnName && (
+                      <>
+                        <ul>
+                          {state.hexMap.arrowGroupColumnValues.map((arrowGroup, arrowGroupIndex) => (
+                            <li>{arrowGroup}</li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                    ---
+                    <button className='btn full-width' onClick={e => console.log('adding arrows')}>
+                      Add Arrows to Hex Map
+                    </button>
+                  </fieldset>
+                )}
                 {'us' === state.general.geoType && 'bubble' !== state.general.type && false === state.general.displayAsHex && (
                   <label className='checkbox'>
                     <input

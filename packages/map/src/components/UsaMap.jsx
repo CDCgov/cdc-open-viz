@@ -197,7 +197,7 @@ const UsaMap = props => {
     }
 
     let x = 0,
-      y = 5
+      y = state.hexMap.type === 'arrows' ? -10 : 5
 
     // used to nudge/move some of the labels for better readability
     if (nudges[abbr] && false === isHex) {
