@@ -1,6 +1,9 @@
 export default {
   type: 'chart',
   debugSvg: false,
+  chartMessage: {
+    noData: 'No Data Available'
+  },
   title: '',
   showTitle: true,
   showDownloadMediaButton: false,
