@@ -1550,7 +1550,7 @@ const CdcMap = ({
     isDebug
   }
 
-  if (!mapProps.data || !state.data) return <></>
+  if (!mapProps.data || !state.data) return <Loading />
 
   const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading
 

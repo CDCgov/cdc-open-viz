@@ -8,7 +8,7 @@ import '../../styles/v2/components/modal.scss'
 
 //Define the "slots" to be populated by subcomponents
 const ModalHeader = () => null
-const ModalContent = (children) => children
+const ModalContent = () => null
 const ModalFooter = () => null
 
 const Modal = ({ fontTheme = 'dark', headerBgColor = '#fff', showDividerTop = true, showDividerBottom = true, showClose = true, children, override = null }) => {

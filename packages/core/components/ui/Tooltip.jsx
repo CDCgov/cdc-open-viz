@@ -6,8 +6,8 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 // Styles
 import '../../styles/v2/components/ui/tooltip.scss'
 
-const TooltipTarget = children => children
-const TooltipContent = children => children
+const TooltipTarget = () => null
+const TooltipContent = () => null
 
 const Tooltip = ({ place = 'top', trigger = 'hover', float = false, shadow = true, border = false, children, style, ...attributes }) => {
   const tooltipTargetChildren = children.find(el => el.type === TooltipTarget)
