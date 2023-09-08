@@ -8,8 +8,10 @@ export default async function (url, visualizationType = '') {
     const regex = /(?:\.([^.]+))?$/
     const ext = regex.exec(path)[1]
 
+    let data = []
+
     if ('csv' === ext) {
-      return await fetch(url.href)
+      data = await fetch(url.href)
         .then(response => response.text())
         .then(responseText => {
           // for every comma NOT inside quotes, replace with a pipe delimiter
@@ -29,9 +31,13 @@ export default async function (url, visualizationType = '') {
           })
           return parsedCsv.data
         })
-    } else {
-      return await fetch(url.href).then(response => response.json())
     }
+
+    if ('json' === ext) {
+      data = await fetch(url.href).then(response => response.json())
+    }
+
+    return data
   } catch {
     // If we can't parse it, still attempt to fetch it
     try {
