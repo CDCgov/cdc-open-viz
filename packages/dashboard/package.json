@@ -1,6 +1,6 @@
 {
   "name": "@cdc/dashboard",
-  "version": "4.23.6",
+  "version": "4.23.8",
   "description": "React component for combining multiple visualizations into a single dashboard",
   "moduleName": "CdcDashboard",
   "main": "dist/cdcdashboard",
@@ -25,13 +25,13 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@cdc/chart": "^4.23.6",
-    "@cdc/core": "^4.23.6",
-    "@cdc/data-bite": "^4.23.6",
-    "@cdc/filtered-text": "^4.23.6",
-    "@cdc/map": "^4.23.6",
-    "@cdc/markup-include": "^4.23.6",
-    "@cdc/waffle-chart": "^4.23.6",
+    "@cdc/chart": "^4.23.8",
+    "@cdc/core": "^4.23.8",
+    "@cdc/data-bite": "^4.23.8",
+    "@cdc/filtered-text": "^4.23.8",
+    "@cdc/map": "^4.23.8",
+    "@cdc/markup-include": "^4.23.8",
+    "@cdc/waffle-chart": "^4.23.8",
     "html-react-parser": "^3.0.8",
     "js-base64": "^2.5.2",
     "papaparse": "^5.3.0",
@@ -47,5 +47,5 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa"
+  "gitHead": "6c7ac5215dcf3bc1cc7d199089c8c2e75f53a93e"
 }
