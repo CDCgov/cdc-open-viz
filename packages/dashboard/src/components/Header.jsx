@@ -1,37 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react'
 
 import ConfigContext from '../ConfigContext'
-import type { APIFilter } from '../types/APIFilter'
-import type { SharedFilter } from '../types/SharedFilter'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
-import Icon from '@cdc/core/components/ui/Icon'
-import Select from '@cdc/core/components/ui/Select'
 
-type HeaderProps = {
-  setPreview?: any
-  tabSelected: any
-  setTabSelected: any
-  back?: any
-  subEditor?: any
-}
-
-export const FilterBehavior = {
-  Apply: 'Apply Button',
-  OnChange: 'Filter Change'
-}
-
-const Header = (props: HeaderProps) => {
-  const { setPreview, tabSelected, setTabSelected, back, subEditor } = props
+const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = null }) => {
   const { config, updateConfig, setParentConfig } = useContext(ConfigContext)
 
   const { overlay } = useGlobalContext()
 
-  const [columns, setColumns] = useState<string[]>([])
+  const [columns, setColumns] = useState([])
 
   const transform = new DataTransform()
 
@@ -56,8 +37,8 @@ const Header = (props: HeaderProps) => {
     let dashboardConfig = { ...config.dashboard }
 
     dashboardConfig.sharedFilters = dashboardConfig.sharedFilters || []
-    const newFilter: SharedFilter = { key: 'Dashboard Filter ' + (dashboardConfig.sharedFilters.length + 1) }
-    dashboardConfig.sharedFilters.push(newFilter)
+
+    dashboardConfig.sharedFilters.push({ key: 'Dashboard Filter ' + (dashboardConfig.sharedFilters.length + 1), values: [] })
 
     updateConfig({ ...config, dashboard: dashboardConfig })
   }
@@ -69,12 +50,12 @@ const Header = (props: HeaderProps) => {
     dashboardConfig.sharedFilters.splice(index, 1)
 
     Object.keys(visualizations).forEach(vizKey => {
-      if (visualizations[vizKey].visualizationType === 'filter-dropdowns' && visualizations[vizKey].hide && visualizations[vizKey].hide.length > 0) {
-        if (visualizations[vizKey].hide.indexOf(index) !== -1) {
+      if(visualizations[vizKey].visualizationType === 'filter-dropdowns' && visualizations[vizKey].hide && visualizations[vizKey].hide.length > 0){
+        if(visualizations[vizKey].hide.indexOf(index) !== -1){
           visualizations[vizKey].hide.splice(visualizations[vizKey].hide.indexOf(index), 1)
         }
         visualizations[vizKey].hide.forEach((hideIndex, i) => {
-          if (hideIndex > index) {
+          if(hideIndex > index){
             visualizations[vizKey].hide[i] = hideIndex - 1
           }
         })
@@ -84,7 +65,7 @@ const Header = (props: HeaderProps) => {
     // Ensures URL filters refresh after filter removal
     if (dashboardConfig.datasets) {
       Object.keys(dashboardConfig.datasets).forEach(datasetKey => {
-        dashboardConfig.datasets[datasetKey].runtimeDataUrl = ''
+        delete dashboardConfig.datasets[datasetKey].runtimeDataUrl
       })
     }
 
@@ -124,28 +105,23 @@ const Header = (props: HeaderProps) => {
 
   useEffect(() => {
     const runSetColumns = async () => {
-      if (config.filterBehavior === FilterBehavior.Apply) return
       let columns = {}
       let dataKeys = Object.keys(config.datasets)
 
       for (let i = 0; i < dataKeys.length; i++) {
-        let _dataSet = config.datasets[dataKeys[i]]
-        if (!_dataSet.data && _dataSet.dataUrl) {
+        if (!config.datasets[dataKeys[i]].data && config.datasets[dataKeys[i]].dataUrl) {
           config.datasets[dataKeys[i]].data = await fetchRemoteData(config.datasets[dataKeys[i]].dataUrl)
-          _dataSet = config.datasets[dataKeys[i]]
-          if (_dataSet.dataDescription) {
+          if (config.datasets[dataKeys[i]].dataDescription) {
             try {
-              config.datasets[dataKeys[i]].data = transform.autoStandardize(_dataSet.data)
-              _dataSet = config.datasets[dataKeys[i]]
-              config.datasets[dataKeys[i]].data = transform.developerStandardize(_dataSet.data, _dataSet.dataDescription)
-              _dataSet = config.datasets[dataKeys[i]]
+              config.datasets[dataKeys[i]].data = transform.autoStandardize(config.datasets[dataKeys[i]].data)
+              config.datasets[dataKeys[i]].data = transform.developerStandardize(config.datasets[dataKeys[i]].data, config.datasets[dataKeys[i]].dataDescription)
             } catch (e) {
               //Data not able to be standardized, leave as is
             }
           }
         }
 
-        if (_dataSet.data) {
+        if (config.datasets[dataKeys[i]].data) {
           config.datasets[dataKeys[i]].data.forEach(row => {
             Object.keys(row).forEach(columnName => (columns[columnName] = true))
           })
@@ -158,7 +134,7 @@ const Header = (props: HeaderProps) => {
     runSetColumns()
   }, [config.datasets])
 
-  const filterModal = (filter: SharedFilter, index) => {
+  const filterModal = (filter, index) => {
     const saveChanges = () => {
       let tempConfig = { ...config.dashboard }
       tempConfig.sharedFilters[index] = filter
@@ -168,14 +144,20 @@ const Header = (props: HeaderProps) => {
       overlay?.actions.toggleOverlay()
     }
 
-    const updateFilterProp = (name, _index, value) => {
-      // @TODO this should be refactored into a reducer function.
-      // it's unsafe to directly set objects w/o guardrails
+    const updateFilterProp = (name, index, value) => {
       let newFilter = { ...filter }
 
       newFilter[name] = value
 
-      overlay?.actions.openOverlay(filterModal(newFilter, _index))
+      overlay?.actions.openOverlay(filterModal(newFilter, index))
+    }
+
+    const updateFilterPropByFunction = (index, func) => {
+      let newFilter = { ...filter }
+
+      newFilter = func(newFilter)
+
+      overlay?.actions.openOverlay(filterModal(newFilter, index))
     }
 
     const addFilterUsedBy = (filter, index, value) => {
@@ -192,14 +174,44 @@ const Header = (props: HeaderProps) => {
       }
     }
 
-    const updateAPIFilter = (key: keyof APIFilter, value: string) => {
-      const _filter = filter.apiFilter || { apiEndpoint: '', valueSelector: '', textSelector: '' }
-      const newAPIFilter: APIFilter = { ..._filter, [key]: value }
-      overlay?.actions.openOverlay(filterModal({ ...filter, apiFilter: newAPIFilter }, index))
+    const updateLabel = (e, value) => {
+      let newLabels = filter.labels || {}
+
+      newLabels[value] = e.target.value
+
+      updateFilterProp('labels', index, newLabels)
     }
 
-    const valuesFromTarget = (event: React.ChangeEvent<HTMLSelectElement>): string[] => {
-      return Array.from(event.target.selectedOptions, option => option.value)
+    const removeValue = valueIndex => {
+      let newLabels = filter.labels || {}
+      let newValues = filter.values || []
+
+      delete newLabels[filter.values[valueIndex]]
+      newValues.splice(valueIndex, 1)
+
+      updateFilterPropByFunction(index, newFilter => {
+        newFilter.labels = newLabels
+        newFilter.orderedValue = newValues
+        return newFilter
+      })
+    }
+
+    const addNewValue = e => {
+      e.preventDefault()
+      if (!filter.values || filter.values.indexOf(e.target[0].value) === -1) {
+        let newValues = filter.values || []
+        newValues.push(e.target[0].value)
+
+        updateFilterPropByFunction(index, newFilter => {
+          newFilter.values = newValues
+          if (!newFilter.active) {
+            newFilter.active = e.target[0].value
+          }
+          return newFilter
+        })
+
+        e.target[0].value = ''
+      }
     }
 
     return (
@@ -217,14 +229,13 @@ const Header = (props: HeaderProps) => {
               Remove Filter
             </button>
             <label>
-              <span className='edit-label column-heading'>Filter Type: </span>
-              <select defaultValue={filter.type || ''} onChange={e => updateFilterProp('type', index, e.target.value)}>
-                <option value=''>- Select Option -</option>
-                <option value='urlfilter'>URL</option>
-                <option value='datafilter'>Data</option>
+              <span className='edit-label column-heading'>Filter Type:</span>
+              <select defaultValue={filter.type || 'data'} onChange={e => updateFilterProp('type', index, e.target.value)}>
+                <option value='url'>URL</option>
+                <option value='data'>Data</option>
               </select>
             </label>
-            {filter.type === 'urlfilter' && (
+            {filter.type === 'url' && (
               <>
                 <label>
                   <span className='edit-label column-heading'>Label: </span>
@@ -236,88 +247,42 @@ const Header = (props: HeaderProps) => {
                     }}
                   />
                 </label>
-                {config.filterBehavior !== FilterBehavior.Apply && (
-                  <label>
-                    <span className='edit-label column-heading'>URL to Filter: </span>
-                    <select defaultValue={filter.datasetKey || ''} onChange={e => updateFilterProp('datasetKey', index, e.target.value)}>
-                      <option value=''>- Select Option -</option>
-                      {Object.keys(config.datasets).map(datasetKey => {
-                        if (config.datasets[datasetKey].dataUrl) {
-                          return (
-                            <option key={datasetKey} value={datasetKey}>
-                              {config.datasets[datasetKey].dataUrl.substring(0, 50)}
-                            </option>
-                          )
-                        }
-                        return <React.Fragment key={datasetKey}></React.Fragment>
-                      })}
-                    </select>
-                  </label>
-                )}
+                <label>
+                  <span className='edit-label column-heading'>URL to Filter: </span>
+                  <select defaultValue={filter.datasetKey || ''} onChange={e => updateFilterProp('datasetKey', index, e.target.value)}>
+                    <option value=''>- Select Option -</option>
+                    {Object.keys(config.datasets).map(datasetKey => {
+                      if (config.datasets[datasetKey].dataUrl) {
+                        return (
+                          <option key={datasetKey} value={datasetKey}>
+                            {config.datasets[datasetKey].dataUrl.substring(0, 50)}
+                          </option>
+                        )
+                      }
+                      return <React.Fragment key={datasetKey}></React.Fragment>
+                    })}
+                  </select>
+                </label>
                 <label>
                   <span className='edit-label column-heading'>Query string parameter</span> <input type='text' defaultValue={filter.queryParameter} onChange={e => updateFilterProp('queryParameter', index, e.target.value)} />
                 </label>
-                <label>
-                  <span className='edit-label column-heading'>Filter API Endpoint: </span>
-                  <input
-                    type='text'
-                    value={filter.apiFilter?.apiEndpoint}
-                    onChange={e => {
-                      updateAPIFilter('apiEndpoint', e.target.value)
-                    }}
-                  />
-                </label>
-                <label>
-                  <span className='edit-label column-heading'>Text Selector: </span>
-                  <input
-                    type='text'
-                    value={filter.apiFilter?.textSelector}
-                    onChange={e => {
-                      updateAPIFilter('textSelector', e.target.value)
-                    }}
-                  />
-                </label>
-                <label>
-                  <span className='edit-label column-heading'>Value Selector: </span>
-                  <input
-                    type='text'
-                    value={filter.apiFilter?.valueSelector}
-                    onChange={e => {
-                      updateAPIFilter('valueSelector', e.target.value)
-                    }}
-                  />
-                </label>
-                <label>
-                  <span className='edit-label column-heading'>Heirarchy Lookup: </span>
-                  <input
-                    type='text'
-                    value={filter.apiFilter?.heirarchyLookup}
-                    onChange={e => {
-                      updateAPIFilter('heirarchyLookup', e.target.value)
-                    }}
-                  />
-                </label>
-                <label>
-                  <span className='edit-label column-heading'>Filter Parent(s): </span>
-                  <select
-                    value={filter.parents || []}
-                    onChange={e => {
-                      updateFilterProp('parents', index, valuesFromTarget(e))
-                    }}
-                    multiple
-                  >
-                    <option value=''>Select a filter</option>
-                    {config.dashboard.sharedFilters &&
-                      config.dashboard.sharedFilters.map(sharedFilter => {
-                        if (sharedFilter.key !== filter.key && sharedFilter.type !== 'datafilter') {
-                          return <option>{sharedFilter.key}</option>
-                        }
-                      })}
-                  </select>
-                </label>
+                <span className='edit-label column-heading'>Values</span>{' '}
+                <ul className='value-list'>
+                  {filter.values &&
+                    filter.values.map((value, valueIndex) => (
+                      <li>
+                        {value}
+                        <input type='text' value={filter.labels ? filter.labels[value] : undefined} onChange={e => updateLabel(e, value)} />
+                        <button onClick={() => removeValue(valueIndex)}>X</button>
+                      </li>
+                    ))}
+                </ul>
+                <form onSubmit={addNewValue}>
+                  <input type='text' /> <button type='submit'>Add New Value</button>
+                </form>
               </>
             )}
-            {filter.type === 'datafilter' && (
+            {filter.type !== 'url' && (
               <>
                 <label>
                   <span className='edit-label column-heading'>Filter: </span>
@@ -367,7 +332,7 @@ const Header = (props: HeaderProps) => {
                   </select>
                 </label>
                 <label>
-                  <span className='edit-label column-heading'>Used By: </span>
+                  <span className='edit-label column-heading'>Used By:</span>
                   <ul>
                     {filter.usedBy &&
                       filter.usedBy.map(vizKey => (
@@ -399,34 +364,16 @@ const Header = (props: HeaderProps) => {
                   <span className='edit-label column-heading'>Reset Label: </span>
                   <input
                     type='text'
-                    value={filter.resetLabel || ''}
+                    value={filter.resetLabel ? filter.resetLabel : ''}
                     onChange={e => {
                       updateFilterProp('resetLabel', index, e.target.value)
                     }}
                   />
                 </label>
-                <label>
-                  <span className='edit-label column-heading'>Parent Filter: </span>
-                  <select
-                    value={filter.parents || []}
-                    onChange={e => {
-                      updateFilterProp('parents', index, e.target.value)
-                    }}
-                    multiple
-                  >
-                    <option value=''>Select a filter</option>
-                    {config.dashboard.sharedFilters &&
-                      config.dashboard.sharedFilters.map(sharedFilter => {
-                        if (sharedFilter.key !== filter.key && sharedFilter.type !== 'urlfilter') {
-                          return <option>{sharedFilter.key}</option>
-                        }
-                      })}
-                  </select>
-                </label>
               </>
             )}
           </fieldset>
-          <button type='button' className='btn btn-primary' style={{ display: 'inline-block', marginRight: '1em' }} onClick={overlay?.actions.toggleOverlay}>
+          <button type='button' className='btn btn-primary' style={{ display: 'inline-block', 'margin-right': '1em' }} onClick={overlay?.actions.toggleOverlay}>
             Cancel
           </button>
           <button type='button' className='btn btn-primary' style={{ display: 'inline-block' }} onClick={saveChanges}>
@@ -438,7 +385,7 @@ const Header = (props: HeaderProps) => {
   }
 
   return (
-    <div aria-level={2} role='heading' className={`editor-heading${subEditor ? ' sub-dashboard-viz' : ''}`}>
+    <div aria-level='2' role='heading' className={`editor-heading${subEditor ? ' sub-dashboard-viz' : ''}`}>
       {subEditor ? (
         <div className='heading-1 back-to' onClick={back} style={{ cursor: 'pointer' }}>
           <span>&#8592;</span> Back to Dashboard
@@ -506,27 +453,6 @@ const Header = (props: HeaderProps) => {
                     </span>
                   ))}
                 <button onClick={addNewFilter}>Add New Filter</button>
-
-                <Select
-                  value={config.filterBehavior}
-                  fieldName='filterBehavior'
-                  label='Filter Behavior'
-                  initial='- Select Option -'
-                  onchange={e => {
-                    updateConfig({ ...config, filterBehavior: e.target.value })
-                  }}
-                  options={Object.values(FilterBehavior)}
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' base='' size='' color='' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
               </>
             )}
             {tabSelected === 2 && (
@@ -561,7 +487,7 @@ const Header = (props: HeaderProps) => {
                     <input type='checkbox' defaultChecked={config.table.limitHeight} onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)} />
                     Limit Table Height
                   </label>
-                  {config.table.limitHeight && <input className='table-height-input' type='text' placeholder='Height (px)' defaultValue={config.table.height} onChange={e => changeConfigValue('table', 'height', e.target.value)} />}
+                  {config.table.limitHeight && <input class='table-height-input' type='text' placeholder='Height (px)' defaultValue={config.table.height} onChange={e => changeConfigValue('table', 'height', e.target.value)} />}
                 </div>
 
                 <div className='wrap'>
