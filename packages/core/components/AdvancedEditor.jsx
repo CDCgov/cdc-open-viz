@@ -26,7 +26,7 @@ export const AdvancedEditor = ({ loadConfig, state, convertStateToConfig }) => {
     'markup-include': ['Markup Include', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/Markup-Include.html', <MarkupIncludeIcon />]
   }
 
-  if (!state.type) return <></>
+  if (!state.type) return
   return (
     <>
       <a href={typeLookup[state.type][1]} target='_blank' rel='noopener noreferrer' className='guidance-link'>

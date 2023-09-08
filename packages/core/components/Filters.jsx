@@ -417,8 +417,7 @@ Filters.propTypes = {
   // exclusions
   excludedData: PropTypes.array,
   // function for filtering the data
-  filterData: PropTypes.func,
-  dimensions: PropTypes.array
+  filterData: PropTypes.func
 }
 
 export default Filters
