@@ -1616,13 +1616,13 @@ const EditorPanel = props => {
                             <label>
                               <span className='edit-label column-heading'>{arrowGroup}</span>
                               <select
-                                value={state.hexMap.arrowGroups[arrowGroupIndex]?.shape || 'select'}
+                                value={state.hexMap.arrowGroups?.[arrowGroupIndex]?.value}
                                 onChange={event => {
                                   let copy = state.hexMap.arrowGroups
                                   const data = event.target.options[event.target.selectedIndex].dataset
                                   console.log('SHAPE', data)
 
-                                  copy[arrowGroupIndex] = { key: arrowGroup, shape: data.shape }
+                                  copy[arrowGroupIndex] = { key: arrowGroup, shape: data.shape, value: data.value }
                                   setState({
                                     ...state,
                                     hexMap: {
@@ -1634,7 +1634,7 @@ const EditorPanel = props => {
                               >
                                 {shapeOptions.map((shape, shapeIndex) => {
                                   return (
-                                    <option value={String(shape).toLowerCase().replace(' ', '-')} data-key={arrowGroup} data-shape={shape} data-shapeIndex={shapeIndex}>
+                                    <option value={String(shape).toLowerCase().replace(' ', '-')} data-key={arrowGroup} data-shape={shape} data-value={String(shape).toLowerCase().replace(' ', '-')}>
                                       {shape}
                                     </option>
                                   )

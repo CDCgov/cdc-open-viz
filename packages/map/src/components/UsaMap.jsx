@@ -315,24 +315,18 @@ const UsaMap = props => {
 
           return (
             <>
-              {geoData[state.hexMap.arrowGroupColumnName] === 'Decreasing' && (
-                <Group top={centroid[1] - 5} left={centroid[0] - iconSize} fill={'black'} textAnchor='start'>
-                  <AiOutlineArrowDown />
-                </Group>
-              )}
-              {geoData[state.hexMap.arrowGroupColumnName] === 'Increasing' && (
-                <Group top={centroid[1] - 5} left={centroid[0] - iconSize} fill={'black'} textAnchor='start'>
-                  <AiOutlineArrowUp />
-                </Group>
-              )}
-
-              {geoData[state.hexMap.arrowGroupColumnName] === 'No Change' && (
-                <Group top={centroid[1] - 5} left={centroid[0] - iconSize} fill={'black'} textAnchor='start'>
-                  <AiOutlineArrowRight />
-                </Group>
-                //     <Text transform={`translate(${centroid})`} fill={'black'} stroke={'black'} height={5} width={5}>
-                // </Text>
-              )}
+              {state.hexMap.arrowGroups.map((group, groupIndex) => {
+                console.log('group', group)
+                if (group.key === geoData[state.hexMap.arrowGroupColumnName]) {
+                  return (
+                    <Group top={centroid[1] - 5} left={centroid[0] - iconSize} fill={'black'} textAnchor='start'>
+                      {group.shape === 'Arrow Down' && <AiOutlineArrowDown />}
+                      {group.shape === 'Arrow Up' && <AiOutlineArrowUp />}
+                      {group.shape === 'Arrow Right' && <AiOutlineArrowRight />}
+                    </Group>
+                  )
+                }
+              })}
             </>
           )
         }
