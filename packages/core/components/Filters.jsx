@@ -386,7 +386,7 @@ const Filters = props => {
               {filterStyle === 'tab' && !mobileFilterStyle && <Filters.Tabs tabs={tabValues} />}
               {filterStyle === 'pill' && !mobileFilterStyle && <Filters.Pills pills={pillValues} />}
               {filterStyle === 'tab bar' && !mobileFilterStyle && <Filters.TabBar filter={singleFilter} index={outerIndex} />}
-              {(filterStyle === 'dropdown' || mobileFilterStyle) && <Filters.Dropdown index={outerIndex} label={label} active={active} filters={values} />}
+              {(filterStyle === 'dropdown' || mobileFilterStyle) && <Filters.Dropdown filter={singleFilter} index={outerIndex} label={label} active={active} filters={values} />}
             </>
           </div>
         )
@@ -394,7 +394,7 @@ const Filters = props => {
     }
   }
 
-  if (visualizationConfig?.filters?.length === 0 || props?.filteredData?.length === 0) return
+  if (visualizationConfig?.filters?.length === 0) return
   return (
     <Filters>
       <Filters.Section>

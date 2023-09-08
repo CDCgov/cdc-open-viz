@@ -12,7 +12,7 @@ import useRightAxis from '../hooks/useRightAxis'
 const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, showTooltip, seriesStyle = 'Line', svgRef, handleTooltipClick, tooltipData }) => {
   // Not sure why there's a redraw here.
 
-  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType, dashboardConfig } = useContext(ConfigContext)
+  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType, dashboardConfig, tableData } = useContext(ConfigContext)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
   if (!handleTooltipMouseOver) return
@@ -77,7 +77,7 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                   isNumber(d[seriesKey]) && (
                     <Group key={`series-${seriesKey}-point-${dataIndex}`} className='checkwidth'>
                       {/* tooltips */}
-                      <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
+                      <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, tableData)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
 
                       {/* Render legend */}
                       <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>

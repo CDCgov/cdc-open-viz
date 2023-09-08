@@ -10,6 +10,7 @@ import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 
 // CDC Components
 import AreaChart from './AreaChart'
+import AreaChartStacked from './AreaChart.Stacked'
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
 import CoveBoxPlot from './BoxPlot'
@@ -552,8 +553,11 @@ export default function LinearChart() {
           />
         )}
         {visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
-        {(visualizationType === 'Area Chart' || visualizationType === 'Combo') && (
+        {((visualizationType === 'Area Chart' && config.visualizationSubType === 'regular') || visualizationType === 'Combo') && (
           <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
+        )}
+        {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') || visualizationType === 'Combo') && (
+          <AreaChartStacked xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
         )}
         {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
           <BarChart
@@ -702,6 +706,11 @@ export default function LinearChart() {
           <Group key='tooltipLine-horizontal' className='horizontal-tooltip-line' left={config.yAxis.size ? config.yAxis.size : 0}>
             <Line from={{ x: 0, y: tooltipData.dataYPosition }} to={{ x: xMax, y: tooltipData.dataYPosition }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='horizontal-tooltip-line' />
           </Group>
+        )}
+        {config.filters && config.filters.values.length === 0 && data.length === 0 && (
+          <Text x={Number(config.yAxis.size) + Number(xMax / 2)} y={height / 2} textAnchor='middle'>
+            {config.chartMessage.noData}
+          </Text>
         )}
       </svg>
       {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
