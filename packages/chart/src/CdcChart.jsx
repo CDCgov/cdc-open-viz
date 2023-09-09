@@ -570,7 +570,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.yAxis = newConfig.xAxis
       newConfig.runtime.horizontal = true
       newConfig.orientation = 'horizontal'
-    } else if (['Box Plot', 'Scatter Plot', 'Area Chart'].includes(newConfig.visualizationType)) {
+    } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType)) {
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
       newConfig.runtime.horizontal = false
