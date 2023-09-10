@@ -1475,10 +1475,8 @@ const CdcMap = ({
     const hashLegend = generateRuntimeLegendHash()
 
     // Legend - Update when runtimeData does
-    if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
-      const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
-      setRuntimeLegend(legend)
-    }
+    const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
+    setRuntimeLegend(legend)
   }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses]) // eslint-disable-line
 
   useEffect(() => {
