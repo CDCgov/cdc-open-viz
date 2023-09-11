@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import * as d3 from 'd3'
 
+// Types
+import { Config } from './types/Config'
+
 // IE11
 import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
@@ -119,12 +122,12 @@ const getUniqueValues = (data, columnName) => {
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
   const transform = new DataTransform()
-  const [state, setState] = useState({ ...initialState })
+  const [state, setState] = useState<Config | null>({ ...initialState })
   const [loading, setLoading] = useState(true)
   const [currentViewport, setCurrentViewport] = useState()
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
-  const [runtimeData, setRuntimeData] = useState({ init: true })
+  const [runtimeData, setRuntimeData] = useState<any[] | {}>({ init: true })
   const [modal, setModal] = useState(null)
   const [accessibleStatus, setAccessibleStatus] = useState('')
   const [filteredCountryCode, setFilteredCountryCode] = useState()
