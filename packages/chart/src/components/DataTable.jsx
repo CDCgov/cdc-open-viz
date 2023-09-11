@@ -303,7 +303,7 @@ export default function DataTable() {
         }
       },
       initialState: {
-        sortBy: [{ id: 'series-label', desc: false }] // default sort on 1st column
+        sortBy: [{ id: 'series-label', desc: false }] // default sort on 1st column -
       }
     },
     useSortBy,
