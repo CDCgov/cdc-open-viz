@@ -1654,6 +1654,7 @@ const CdcMap = ({
 
               {general.showSidebar && 'navigation' !== general.type && (
                 <Sidebar
+                  state={state}
                   viewport={currentViewport}
                   legend={state.legend}
                   runtimeLegend={runtimeLegend}

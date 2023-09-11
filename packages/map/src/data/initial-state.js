@@ -101,9 +101,13 @@ export default {
   },
   hexMap: {
     type: '',
-    arrowGroupColumnName: '',
-    arrowGroupColumnKeys: [],
-    arrowGroups: []
+    shapeGroups: [
+      {
+        legendTitle: '',
+        legendDescription: '',
+        items: [{ key: '', shape: 'Arrow up', column: '', operator: '=', value: '' }]
+      }
+    ]
   },
   filterBehavior: 'Filter Change'
 }

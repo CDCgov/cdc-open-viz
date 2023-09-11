@@ -31,6 +31,8 @@ import useMapLayers from '../hooks/useMapLayers'
 
 import { useFilters } from '@cdc/core/components/Filters'
 
+import HexSetting from './HexShapeSettings'
+
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
 
@@ -1416,8 +1418,6 @@ const EditorPanel = props => {
   }
   if (isDebug) setGeoColumn()
 
-  const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'None']
-
   return (
     <ErrorBoundary component='EditorPanel'>
       {state?.runtime?.editorErrorMessage.length > 0 && <Error />}
@@ -1553,104 +1553,11 @@ const EditorPanel = props => {
                     </label>
                   </div>
                 </label>
-                {/* SubType */}
-                {'us' === state.general.geoType && 'data' === state.general.type && (
-                  <label className='checkbox mt-4'>
-                    <input
-                      type='checkbox'
-                      checked={state.general.displayAsHex}
-                      onChange={event => {
-                        handleEditorChanges('displayAsHex', event.target.checked)
-                      }}
-                    />
-                    <span className='edit-label'>Display As Hex Map</span>
-                  </label>
-                )}
 
-                {state.general.displayAsHex && (
-                  <label className='checkbox mt-4'>
-                    <input
-                      type='checkbox'
-                      checked={state.hexMap.type === 'arrows'}
-                      onChange={event => {
-                        console.log('event', event.target.checked)
-                        setState({
-                          ...state,
-                          hexMap: {
-                            ...state.hexMap,
-                            type: event.target.checked ? 'arrows' : 'standard'
-                          }
-                        })
-                      }}
-                    />
-                    <span className='edit-label'>Display Arrows on Map</span>
-                  </label>
-                )}
+                <HexSetting.DisplayAsHexMap state={state} setState={setState} handleEditorChanges={handleEditorChanges} />
+                <HexSetting.DisplayShapesOnHex state={state} setState={setState} />
+                <HexSetting.ShapeColumns state={state} setState={setState} columnsOptions={columnsOptions} />
 
-                {state.general.displayAsHex && state.hexMap.type === 'arrows' && (
-                  <fieldset className='edit-block'>
-                    ---
-                    <label>
-                      <span className='edit-label column-heading'>Arrow Column</span>
-                      <select
-                        value={state.hexMap.arrowGroupColumnName ? state.hexMap.arrowGroupColumnName : 'select'}
-                        onChange={event => {
-                          let cols = [...new Set(state.data.map(d => d[event.target.value]))]
-                          setState({
-                            ...state,
-                            hexMap: {
-                              ...state.hexMap,
-                              arrowGroupColumnName: event.target.value,
-                              arrowGroupColumns: cols
-                            }
-                          })
-                        }}
-                      >
-                        {columnsOptions}
-                      </select>
-                    </label>
-                    {state.hexMap.arrowGroupColumnName && state.hexMap.arrowGroupColumns && (
-                      <>
-                        <ul>
-                          {state.hexMap.arrowGroupColumns.map((arrowGroup, arrowGroupIndex) => (
-                            <label>
-                              <span className='edit-label column-heading'>{arrowGroup}</span>
-                              <select
-                                value={state.hexMap.arrowGroups?.[arrowGroupIndex]?.value}
-                                onChange={event => {
-                                  let copy = state.hexMap.arrowGroups
-                                  const data = event.target.options[event.target.selectedIndex].dataset
-                                  console.log('SHAPE', data)
-
-                                  copy[arrowGroupIndex] = { key: arrowGroup, shape: data.shape, value: data.value }
-                                  setState({
-                                    ...state,
-                                    hexMap: {
-                                      ...state.hexMap,
-                                      arrowGroups: copy
-                                    }
-                                  })
-                                }}
-                              >
-                                {shapeOptions.map((shape, shapeIndex) => {
-                                  return (
-                                    <option value={String(shape).toLowerCase().replace(' ', '-')} data-key={arrowGroup} data-shape={shape} data-value={String(shape).toLowerCase().replace(' ', '-')}>
-                                      {shape}
-                                    </option>
-                                  )
-                                })}
-                              </select>
-                            </label>
-                          ))}
-                        </ul>
-                      </>
-                    )}
-                    ---
-                    <button className='btn full-width' onClick={e => console.log('adding arrows')}>
-                      Add Arrows to Hex Map
-                    </button>
-                  </fieldset>
-                )}
                 {'us' === state.general.geoType && 'bubble' !== state.general.type && false === state.general.displayAsHex && (
                   <label className='checkbox'>
                     <input
