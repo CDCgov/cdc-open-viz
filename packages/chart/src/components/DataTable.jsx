@@ -15,7 +15,7 @@ import MediaControls from '@cdc/core/components/MediaControls'
 
 export default function DataTable() {
   const { rawData, tableData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, currentViewport } = useContext(ConfigContext)
-  console.log('DataTable chat data from context= data,rawData', data, rawData)
+  //console.log('DataTable chat data from context= data,rawData', data, rawData)
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
@@ -153,7 +153,8 @@ export default function DataTable() {
           },
           id: `${d[config.runtime.originalXAxis.dataKey]}`, // --${index}
           sortType: 'custom',
-          canSort: true
+          canSort: true,
+          defaultCanSort: true
         }
 
         newTableColumns.push(newCol)
@@ -188,7 +189,7 @@ export default function DataTable() {
         return newTableColumns.push(newCol)
       })
     }
-
+    console.log('newTableColumns', newTableColumns)
     return newTableColumns
   }, [config, colorScale]) // eslint-disable-line
 
@@ -300,6 +301,9 @@ export default function DataTable() {
           }
           return a.localeCompare(b)
         }
+      },
+      initialState: {
+        sortBy: [{ id: 'series-label', desc: false }] // default sort 1st column
       }
     },
     useSortBy,
