@@ -95,7 +95,7 @@
       }
     ],
     "unified": false,
-    "singleColumn": false,
+    "singleColumn": true,
     "dynamicDescription": false,
     "descriptions": {},
     "singleRow": false,
@@ -148,7 +148,7 @@
     "layers": []
   },
   "hexMap": {
-    "type": "arrows",
+    "type": "shapes",
     "arrowGroupColumnName": "Trajectory",
     "arrowGroupColumnKeys": [],
     "arrowGroupColumnValues": [
@@ -156,6 +156,37 @@
       "Decreasing",
       "No Change",
       ""
+    ],
+    "arrowGroups": [
+      {
+        "key": "Location",
+        "shape": "",
+        "column": "",
+        "operator": "=",
+        "value": "Georgia"
+      }
+    ],
+    "shapeGroups": [
+      {
+        "legendTitle": "Intensity Levels",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "Intensity Level",
+            "shape": "Arrow Down",
+            "column": "",
+            "operator": "=",
+            "value": "Low"
+          },
+          {
+            "key": "Intensity Level",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": "High"
+          }
+        ]
+      }
     ]
   },
   "filterBehavior": "Filter Change",

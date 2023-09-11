@@ -202,7 +202,7 @@ const UsaMap = props => {
     }
 
     let x = 0,
-      y = state.hexMap.type === 'arrows' ? -10 : 5
+      y = state.hexMap.type === 'shapes' ? -10 : 5
 
     // used to nudge/move some of the labels for better readability
     if (nudges[abbr] && false === isHex) {
@@ -315,17 +315,22 @@ const UsaMap = props => {
 
           return (
             <>
-              {state.hexMap.arrowGroups.map((group, groupIndex) => {
-                console.log('group', group)
-                if (group.key === geoData[state.hexMap.arrowGroupColumnName]) {
-                  return (
-                    <Group top={centroid[1] - 5} left={centroid[0] - iconSize} fill={'black'} textAnchor='start'>
-                      {group.shape === 'Arrow Down' && <AiOutlineArrowDown />}
-                      {group.shape === 'Arrow Up' && <AiOutlineArrowUp />}
-                      {group.shape === 'Arrow Right' && <AiOutlineArrowRight />}
-                    </Group>
-                  )
-                }
+              {state.hexMap.shapeGroups.map((group, groupIndex) => {
+                return group.items.map((item, itemIndex) => {
+                  if (item.operator === '=') {
+                    console.log('group', item.value)
+                    console.log('geoData', geoData)
+                    if (geoData[item.key] === item.value) {
+                      return (
+                        <Group top={centroid[1] - 5} left={centroid[0] - iconSize} fill={'black'} textAnchor='start'>
+                          {item.shape === 'Arrow Down' && <AiOutlineArrowDown />}
+                          {item.shape === 'Arrow Up' && <AiOutlineArrowUp />}
+                          {item.shape === 'Arrow Right' && <AiOutlineArrowRight />}
+                        </Group>
+                      )
+                    }
+                  }
+                })
               })}
             </>
           )
@@ -336,7 +341,7 @@ const UsaMap = props => {
             <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
-              {isHex && state.hexMap.type === 'arrows' && getArrowDirection(geoData, geo)}
+              {isHex && state.hexMap.type === 'shapes' && getArrowDirection(geoData, geo)}
             </g>
           </g>
         )
