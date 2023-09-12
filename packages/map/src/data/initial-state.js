@@ -99,5 +99,15 @@ export default {
   map: {
     layers: []
   },
+  hexMap: {
+    type: '',
+    shapeGroups: [
+      {
+        legendTitle: '',
+        legendDescription: '',
+        items: [{ key: '', shape: 'Arrow up', column: '', operator: '=', value: '' }]
+      }
+    ]
+  },
   filterBehavior: 'Filter Change'
 }

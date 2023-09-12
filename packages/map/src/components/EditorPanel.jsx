@@ -31,6 +31,8 @@ import useMapLayers from '../hooks/useMapLayers'
 
 import { useFilters } from '@cdc/core/components/Filters'
 
+import HexSetting from './HexShapeSettings'
+
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
 
@@ -1551,19 +1553,11 @@ const EditorPanel = props => {
                     </label>
                   </div>
                 </label>
-                {/* SubType */}
-                {'us' === state.general.geoType && 'data' === state.general.type && (
-                  <label className='checkbox mt-4'>
-                    <input
-                      type='checkbox'
-                      checked={state.general.displayAsHex}
-                      onChange={event => {
-                        handleEditorChanges('displayAsHex', event.target.checked)
-                      }}
-                    />
-                    <span className='edit-label'>Display As Hex Map</span>
-                  </label>
-                )}
+
+                <HexSetting.DisplayAsHexMap state={state} setState={setState} handleEditorChanges={handleEditorChanges} />
+                <HexSetting.DisplayShapesOnHex state={state} setState={setState} />
+                <HexSetting.ShapeColumns state={state} setState={setState} columnsOptions={columnsOptions} />
+
                 {'us' === state.general.geoType && 'bubble' !== state.general.type && false === state.general.displayAsHex && (
                   <label className='checkbox'>
                     <input

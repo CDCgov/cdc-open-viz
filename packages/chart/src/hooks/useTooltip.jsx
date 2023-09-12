@@ -133,7 +133,6 @@ export const useTooltip = props => {
    */
   const handleTooltipMouseOff = () => {
     if (config.visualizationType === 'Area Chart') {
-      console.log('HERE IN OFF')
       setTimeout(() => {
         hideTooltip()
       }, 3000)
