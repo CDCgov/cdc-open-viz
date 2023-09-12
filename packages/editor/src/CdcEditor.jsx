@@ -97,10 +97,43 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
     }
   }, [])
 
+  const stripConfig = configToStrip => {
+    let strippedConfig = {...configToStrip}
+
+    if(strippedConfig.type === 'dashboard'){
+      if(strippedConfig.datasets){
+        Object.keys(strippedConfig.datasets).forEach(datasetKey => {
+          delete strippedConfig.datasets[datasetKey].formattedData;
+          if(strippedConfig.datasets[datasetKey].dataUrl){
+            delete strippedConfig.datasets[datasetKey].data;
+          }
+        })
+      }
+      if(strippedConfig.visualizations){
+        Object.keys(strippedConfig.visualizations).forEach(vizKey => {
+          delete strippedConfig.visualizations[vizKey].runtime;
+          delete strippedConfig.visualizations[vizKey].formattedData;
+          delete strippedConfig.visualizations[vizKey].data;
+        })
+      }
+    } else {
+      delete strippedConfig.runtime;
+      delete strippedConfig.formattedData;
+      if(strippedConfig.dataUrl){
+        delete strippedConfig.data;
+      }
+    }
+
+    return strippedConfig
+  }
+
   // Temp Config is for changes made in the components proper - to prevent render cycles. Regular config is for changes made in the first two tabs.
   useEffect(() => {
     if (null !== tempConfig) {
-      const parsedData = JSON.stringify(tempConfig)
+      // Remove runtime/unnecessary items from config before saving to WCMS, performance optimization
+      let strippedConfig = stripConfig(tempConfig)
+
+      const parsedData = JSON.stringify(strippedConfig)
       // Emit the data in a regular JS event so it can be consumed by anything.
       const event = new CustomEvent('updateVizConfig', { detail: parsedData, bubbles: true })
       window.dispatchEvent(event)
@@ -108,7 +141,9 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
   }, [tempConfig])
 
   useEffect(() => {
-    const parsedData = JSON.stringify(config)
+    let strippedConfig = stripConfig(config)
+
+    const parsedData = JSON.stringify(strippedConfig)
     // Emit the data in a regular JS event so it can be consumed by anything.
     const event = new CustomEvent('updateVizConfig', { detail: parsedData })
     window.dispatchEvent(event)
