@@ -98,12 +98,15 @@ export default function DeviationBar({ height, xScale, animatedChart }) {
   useEffect(() => {
     barRefs.current.forEach((bar, i) => {
       if (config.animate && animatedChart) {
+        const maxValue = maxVal
+        // Normalize target to be between 0 and 100
+        const normalizedTarget = (target / maxValue) * 100
         // Initial state
         bar.style.opacity = '0'
-        bar.style.transform = `translate(${target / 1.07}%) scale(0, 1)`
+        bar.style.transform = `translate(${normalizedTarget / 1.07}%) scale(0, 1)`
         // Animate to final state
         setTimeout(() => {
-          bar.style.transition = 'all 0.5s ease'
+          bar.style.transition = 'all 0.6s ease'
           bar.style.opacity = '1'
           bar.style.transform = 'translate(0) scale(1)'
         }, 0)
