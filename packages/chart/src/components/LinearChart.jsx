@@ -535,7 +535,7 @@ export default function LinearChart() {
             </AxisBottom>
           </>
         )}
-        {visualizationType === 'Deviation Bar' && <DeviationBar xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
+        {visualizationType === 'Deviation Bar' && <DeviationBar animatedChart={animatedChart} xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
         {visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
         {visualizationType === 'Scatter Plot' && (
           <ScatterPlot
