@@ -669,14 +669,6 @@
     padding: 1em;
   }
 
-  .cove-component__content:not(.no-borders) {
-    border: 1px solid $lightGray;
-  }
-
-  .cove-component__header ~ .cove-component__content:not(.no-borders) {
-    border-top: none !important;
-  }
-
   .subtext {
     margin-top: 0px;
   }
