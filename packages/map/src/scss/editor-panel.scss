@@ -127,6 +127,67 @@
       @import '@cdc/core/styles/v2/layout/tooltip.scss';
     }
 
+    .cove-input-group,
+    .cove-accordion__small-inputs {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      width: 100%;
+
+      > {
+        .cove-input {
+          position: relative;
+          flex: 1 1 auto;
+          width: 1%;
+          min-width: 0;
+        }
+
+        .cove-input__label {
+          display: none;
+        }
+      }
+
+      &:not(.clear) {
+        > {
+          :not(:first-child) {
+            margin-left: -1px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+          }
+
+          :not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+          }
+        }
+      }
+
+      &.clear {
+        &[flow='left'] > {
+          :first-child {
+            border: 0;
+            left: 0;
+          }
+        }
+
+        &[flow='right'] > {
+          :last-child {
+            border: 0;
+            right: 0;
+          }
+        }
+
+        .cove-input-group__label {
+          position: absolute;
+          background-color: transparent;
+          height: 100%;
+          pointer-events: none;
+          user-select: none;
+        }
+      }
+    }
+
     .remove-column {
       font-size: 13px;
     }
