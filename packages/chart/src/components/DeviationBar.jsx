@@ -1,18 +1,15 @@
 import { Line } from '@visx/shape'
 import { Group } from '@visx/group'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import chroma from 'chroma-js'
 
-export default function DeviationBar({ height, xScale }) {
+export default function DeviationBar({ height, xScale, animatedChart }) {
   const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig, parseDate, formatDate } = useContext(ConfigContext)
-
-  if (!config || config?.series?.length !== 1 || config.orientation !== 'horizontal') return
-
   const { barStyle, tipRounding, roundingStyle, twoColor } = config
-
+  const barRefs = useRef([])
   const radius = roundingStyle === 'standard' ? '8px' : roundingStyle === 'shallow' ? '5px' : roundingStyle === 'finger' ? '15px' : '0px'
   const fontSize = { small: 16, medium: 18, large: 20 }
   const isRounded = config.barStyle === 'rounded'
@@ -85,6 +82,42 @@ export default function DeviationBar({ height, xScale }) {
     }
   }, [config.barStyle])
 
+  useEffect(() => {
+    const handleResize = () => {
+      barRefs.current.forEach(bar => {
+        bar.style.transition = 'none'
+        bar.style.transform = 'translate(0) scale(1)'
+      })
+    }
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
+  useEffect(() => {
+    barRefs.current.forEach((bar, i) => {
+      if (config.animate && animatedChart) {
+        // Initial state
+        bar.style.opacity = '0'
+        bar.style.transform = `translate(${target / 1.07}%) scale(0, 1)`
+        // Animate to final state
+        setTimeout(() => {
+          bar.style.transition = 'all 0.5s ease'
+          bar.style.opacity = '1'
+          bar.style.transform = 'translate(0) scale(1)'
+        }, 0)
+      } else {
+        // Keep the bar in the final state without animation
+        bar.style.transition = 'none'
+        bar.style.opacity = '1'
+        bar.style.transform = 'translate(0) scale(1)'
+      }
+    })
+  }, [config.animate, animatedChart, target])
+
+  if (!config || config?.series?.length !== 1) return <></>
+
   return (
     <ErrorBoundary component='Deviation Bar'>
       <Group left={Number(config.xAxis.size)}>
@@ -122,7 +155,6 @@ export default function DeviationBar({ height, xScale }) {
           const fill = isBarColorDark ? '#FFFFFF' : '#000000'
 
           let textProps = getTextProps(config.isLollipopChart, textFits, lollipopShapeSize, fill)
-
           // tooltips
           const xAxisValue = formatNumber(barValue, 'left')
           const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[index][config.runtime.originalXAxis.dataKey])) : data[index][config.runtime.originalXAxis.dataKey]
@@ -135,7 +167,16 @@ export default function DeviationBar({ height, xScale }) {
 
           return (
             <Group key={`deviation-bar-${config.orientation}-${seriesKey}-${index}`}>
-              <foreignObject x={barX} y={barY} width={barWidth} height={barHeight} style={{ border: `${borderWidth}px solid #333`, backgroundColor: barColor[barPosition], ...borderRadius }} data-tooltip-html={tooltip} data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} />
+              <foreignObject
+                ref={el => (barRefs.current[index] = el)}
+                x={barX}
+                y={barY}
+                width={barWidth}
+                height={barHeight}
+                style={{ border: `${borderWidth}px solid #333`, backgroundColor: barColor[barPosition], ...borderRadius }}
+                data-tooltip-html={tooltip}
+                data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+              />
               {config.yAxis.displayNumbersOnBar && (
                 <Text verticalAnchor='middle' x={textX} y={textY} {...textProps[barPosition]}>
                   {formatNumber(d[seriesKey], 'left')}
