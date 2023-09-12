@@ -247,7 +247,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
         <div className='widget__content'>
           {data.rowIdx !== undefined && (
             <div className='widget-menu'>
-              {((data.dataKey && data.dataDescription && data.formattedData) || type === 'markup-include') && type !== 'filter-dropdowns' && (
+              {((data.dataKey && data.dataDescription && (data.formattedData || (config.datasets[data.dataKey] && transform.autoStandardize(config.datasets[data.dataKey].data, data.dataDescription)))) || type === 'markup-include') && type !== 'filter-dropdowns' && (
                 <button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
                   {iconHash['tools']}
                 </button>
