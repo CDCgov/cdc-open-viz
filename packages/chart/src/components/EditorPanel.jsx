@@ -727,6 +727,9 @@ const EditorPanel = () => {
     config.runtime.editorErrorMessage = 'Paired Bar charts must use exactly two data series'
   }
 
+  if (config.visualizationType === 'Deviation Bar' && config?.series?.length !== 1) {
+    config.runtime.editorErrorMessage = 'Deviation Bar charts must use exactly one data series'
+  }
   if (config.isLollipopChart && config?.series?.length === 0) {
     config.runtime.editorErrorMessage = 'Add a data series'
   }
