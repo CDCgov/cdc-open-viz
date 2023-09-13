@@ -186,7 +186,7 @@ export class DataTransform {
           Object.keys(standardizedMapped).forEach(key => {
             standardized.push(standardizedMapped[key])
           })
-console.log("standardized=",standardized)
+
           return standardized
         }
       } else {
