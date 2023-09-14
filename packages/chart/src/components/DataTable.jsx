@@ -129,9 +129,6 @@ const DataTable = props => {
     if (config.visualizationType !== 'Box Plot') {
       data.forEach((d, index) => {
         const resolveTableHeader = () => {
-          //let test1 = parseDate(d[config.runtime.originalXAxis.dataKey])
-          //let test2 = formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
-          //console.log('test1, test2', test1, test2)
           if (config.runtime[section].type === 'date') return formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
           if (config.runtime[section].type === 'continuous') return numberFormatter(d[config.runtime.originalXAxis.dataKey], 'bottom')
           return d[config.runtime.originalXAxis.dataKey]
@@ -265,7 +262,7 @@ const DataTable = props => {
           let tmpB = rowB
           let tmpFormatData = config.formattedData
           let configD = config
-
+          //debugger
           let a, b
           if (columnId === 'series-label') {
             // comparing strings
@@ -278,24 +275,31 @@ const DataTable = props => {
           let columnIdIndexRemoved = columnId.split('--')[0]
           //get all the data from that column
           let colData = runtimeData.filter(obj => {
-            console.log('obj', obj) //[datakey=], columnIdIndexRemoved', obj, obj[dataKey], columnIdIndexRemoved)
+            //console.log('obj', obj) //[datakey=], columnIdIndexRemoved', obj, obj[dataKey], columnIdIndexRemoved)
             // problem is dates can be in different formats
             if (config.xAxis.type === 'date' && !isNaN(Date.parse(obj[dataKey])) && !isNaN(Date.parse(columnIdIndexRemoved))) {
-              let dataDateDeformatted = formatDatePure(config.xAxis.dateParseFormat, parseDatePure(config.xAxis.dateParseFormat, obj[dataKey])) //formatDate(config.xAxis.dateDisplayFormat, obj[dataKey]) //formatDate(config.xAxis.dateDisplayFormat,
-              let colHeadDate = columnIdIndexRemoved
+              //let dataDateDeformatted = formatDatePure(config.xAxis.dateParseFormat, parseDatePure(config.xAxis.dateParseFormat, obj[dataKey])) //formatDate(config.xAxis.dateDisplayFormat, obj[dataKey]) //formatDate(config.xAxis.dateDisplayFormat,
+              //let colHeadDate = columnIdIndexRemoved
               //let t3 = obj[dataKey] === formatDatePure(parseDatePure(config.xAxis.dateParseFormat, columnIdIndexRemoved))
               //if (t3) debugger
-              console.log('obj[dataKey], dateDisplay', obj[dataKey], config.xAxis.dateDisplayFormat)
+              //console.log('obj[dataKey], dateDisplay', obj[dataKey], config.xAxis.dateDisplayFormat)
               //console.log('- t1, t2, t3 ', t1, t2, t3)
-              console.log('config.xAxis.dataParseFormat', config.xAxis.dateParseFormat)
-              console.log('config.xAxis.dataDisplayFormat', config.xAxis.dateDisplayFormat)
-              console.log('dataDateDeformatted, colHeadDate', dataDateDeformatted, colHeadDate)
-              return dataDateDeformatted === colHeadDate
+              //console.log('config.xAxis.dataParseFormat', config.xAxis.dateParseFormat)
+              //console.log('config.xAxis.dataDisplayFormat', config.xAxis.dateDisplayFormat)
+              //let t1 = parseDate(obj[dataKey]).getTime() // new Date(dataDateDeformatted)
+              //let t2 = parseDate(columnIdIndexRemoved).getTime() //new Date(colHeadDate)
+              //console.log('dataDateDeformatted, colHeadDate', dataDateDeformatted, colHeadDate)
+              //let t3 = t1 === t2
+              //console.log('dataDateDeformatted, t1, t2, t3 add to colData?', obj[dataKey], t1, t2, t3, columnIdIndexRemoved)
+
+              // must convert to datetime number to compare
+              return parseDate(obj[dataKey]).getTime() === parseDate(columnIdIndexRemoved).getTime()
             } else {
               return obj[dataKey] === columnIdIndexRemoved // have to remove index
             }
           })
-          //debugger
+
+          //console.log('colData=', colData)
           if (colData === undefined || colData[0] === undefined) {
             return -1
           }
@@ -320,7 +324,7 @@ const DataTable = props => {
 
           // REMOVE the following:
           // - value equal to column date
-          // - values not in .original
+          // - value that is the .original
           // - any data still in that's not really a number
           let rowA_valueObj = Object.values(rowA_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowA.original && !isNaN(value))
           let rowB_valueObj = Object.values(rowB_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowB.original && !isNaN(value))
@@ -332,11 +336,66 @@ const DataTable = props => {
           // force null and undefined to the bottom
           a = a === null || a === undefined ? '' : transform.cleanDataPoint(a)
           b = b === null || b === undefined ? '' : transform.cleanDataPoint(b)
-          //debugger
-          if (!isNaN(Number(a)) && !isNaN(Number(b))) {
-            return Number(a) - Number(b)
+          if (a === '' || a === null) {
+            if (b === '' || b === null) {
+              return 0 // Both empty/null
+            }
+            return -1 // Sort a to an index lower than b
           }
-          return a.localeCompare(b)
+          if (b === '' || b === null) {
+            if (a === '' || a === null) {
+              return 0 // Both empty/null
+            }
+            return 1 // Sort b to an index lower than a
+          }
+          // End code for forcing NULLS to bottom
+
+          // convert any strings that are actually numbers to proper data type
+          const aNum = Number(a)
+
+          if (!Number.isNaN(aNum)) {
+            a = aNum
+          }
+
+          const bNum = Number(b)
+
+          if (!Number.isNaN(bNum)) {
+            b = bNum
+          }
+          // remove iso code prefixes
+          if (typeof a === 'string') {
+            a = a.replace('us-', '')
+            a = displayGeoName(a)
+          }
+
+          if (typeof b === 'string') {
+            b = b.replace('us-', '')
+            b = displayGeoName(b)
+          }
+
+          // force any string values to lowercase
+          a = typeof a === 'string' ? a.toLowerCase() : a
+          b = typeof b === 'string' ? b.toLowerCase() : b
+
+          // When comparing a number to a string, always send string to bottom
+          if (typeof a === 'number' && typeof b === 'string') {
+            return 1
+          }
+
+          if (typeof b === 'number' && typeof a === 'string') {
+            return -1
+          }
+
+          // Return either 1 or -1 to indicate a sort priority
+          if (a > b) {
+            return 1
+          }
+          if (a < b) {
+            return -1
+          }
+          // returning 0, undefined or any falsey value will use subsequent sorts or
+          // the index as a tiebreaker
+          return 0
         }
       },
       initialState: {
