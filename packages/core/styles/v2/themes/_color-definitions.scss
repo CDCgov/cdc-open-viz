@@ -1,4 +1,5 @@
 @use 'sass:string';
+@import './../../variables';
 
 $theme: (
   'amber': (
@@ -87,61 +88,42 @@ $theme: (
     }
 
     &.theme-#{$theme-name} {
-      .cove-component__content:not(.no-borders).component--has-borderColorTheme {
-        border-left: 1px solid string.unquote(nth($theme-colors, 1));
-        border-right: 1px solid string.unquote(nth($theme-colors, 1));
-        border-bottom: 1px solid string.unquote(nth($theme-colors, 1));
-      }
+      /// area that appears underneath the title of the component.
+      .cove-component__content {
+        /// when there are borders on a component
+        &:not(.no-borders) {
+          /// borders are the theme color
+          &.component--has-borderColorTheme {
+            border: 1px solid string.unquote(nth($theme-colors, 1));
+          }
+          /// using default border color to draw borders
+          &:not(.component--has-borderColorTheme) {
+            border: 1px solid $lightGray;
+          }
+          &.component--has-title {
+            border-top: none !important;
+          }
+        }
 
-      // when component doesn't have a title add border top
-      .cove-component__inner:not(.component--has-title) .cove-component__content.component--has-borderColorTheme:not(.no-borders) {
-        border-top: 1px solid string.unquote(nth($theme-colors, 1));
-      }
+        /// left accent bar
+        &.component--has-accent {
+          border-left: 0.5rem solid string.unquote(nth($theme-colors, 1)) !important;
+        }
 
-      .cove-component__inner:not(.component--has-title) .cove-component__content {
-        border-top: 1px solid #ccc;
+        /// Apply a background color
+        &.component--has-background:not(.component--hideBackgroundColor) {
+          background: string.unquote(nth($theme-colors, 3));
+        }
       }
 
       .cove-component__header {
         border-color: string.unquote(nth($theme-colors, 2));
-      }
-
-      .cove-component__content.component--has-accent {
-        border-left: 0.5rem solid string.unquote(nth($theme-colors, 1)) !important;
-      }
-
-      .cove-component__content.component--has-background:not(.component--hideBackgroundColor) {
-        background: string.unquote(nth($theme-colors, 3));
       }
     }
 
     &.theme-#{$theme-name} {
-      .cove-component__content:not(.no-borders).component--has-borderColorTheme {
-        border-left: 1px solid string.unquote(nth($theme-colors, 1));
-        border-right: 1px solid string.unquote(nth($theme-colors, 1));
-        border-bottom: 1px solid string.unquote(nth($theme-colors, 1));
-      }
-
-      // when component doesn't have a title add border top
-      .cove-component__inner:not(.component--has-title) .cove-component__content.component--has-borderColorTheme:not(.no-borders) {
-        border-top: 1px solid string.unquote(nth($theme-colors, 1));
-      }
-
-      // should probably be in color definitions but logically makes sense here.
-      .cove-component__inner:not(.component--has-title) .cove-component__content {
-        border-top: 1px solid #ccc;
-      }
-
       .cove-component__header {
         border-color: string.unquote(nth($theme-colors, 2));
-      }
-
-      .cove-component__content.component--has-accent {
-        border-left: 0.5rem solid string.unquote(nth($theme-colors, 1)) !important;
-      }
-
-      .cove-component__content.component--has-background:not(.component--hideBackgroundColor) {
-        background: string.unquote(nth($theme-colors, 3));
       }
     }
   }

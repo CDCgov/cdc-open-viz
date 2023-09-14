@@ -1,0 +1,66 @@
+STATE,Rate,Location,URL,Intensity Level,Trajectory
+AL,10,Home,https://www.cdc.gov/,Low,Increasing
+AK,12,Vehicle,https://www.cdc.gov/,Low,Increasing
+AS,14,Work,https://www.cdc.gov/,Low,Increasing
+AZ,9,School,https://www.cdc.gov/,Low,Increasing
+AR,17,School,https://www.cdc.gov/,Low,Increasing
+CA,*,Work,https://www.cdc.gov/,Low,Increasing
+CO,22,Vehicle,https://www.cdc.gov/,Low,Increasing
+CT,10,Home,https://www.cdc.gov/,Low,Increasing
+DE,12,Home,https://www.cdc.gov/,Low,Increasing
+District of Columbia,14,Home,https://www.cdc.gov/,Low,Increasing
+FL,9,Vehicle,https://www.cdc.gov/,Low,Increasing
+GA,17,Work,https://www.cdc.gov/,Low,Increasing
+GU,20,School,https://www.cdc.gov/,Low,Increasing
+HI,22,School,https://www.cdc.gov/,Low,Increasing
+ID,*,Work,https://www.cdc.gov/,Low,Increasing
+IL,12,Vehicle,https://www.cdc.gov/,Low,Increasing
+IN,14,Home,https://www.cdc.gov/,Low,Increasing
+IA,9,Home,https://www.cdc.gov/,Low,Increasing
+KS,NA,Home,https://www.cdc.gov/,Low,Increasing
+KY,20,Vehicle,https://www.cdc.gov/,Low,Increasing
+LA,22,Work,https://www.cdc.gov/,Low,Increasing
+ME,10,School,https://www.cdc.gov/,Medium,Decreasing
+MH,12,School,https://www.cdc.gov/,Medium,Decreasing
+MD,*,Work,https://www.cdc.gov/,Medium,Decreasing
+MA,9,Vehicle,https://www.cdc.gov/,Medium,Decreasing
+MI,17,Home,https://www.cdc.gov/,Medium,Decreasing
+FM,20,Home,https://www.cdc.gov/,Medium,Decreasing
+MN,22,Home,https://www.cdc.gov/,Medium,Decreasing
+MS,10,Vehicle,https://www.cdc.gov/,Medium,Decreasing
+MO,11,Work,https://www.cdc.gov/,Medium,Decreasing
+MT,14,School,https://www.cdc.gov/,Medium,Decreasing
+NE,9,School,https://www.cdc.gov/,Medium,Decreasing
+NV,17,Work,https://www.cdc.gov/,Medium,Decreasing
+NH,20,Vehicle,https://www.cdc.gov/,Medium,Decreasing
+NJ,28,Home,https://www.cdc.gov/,Medium,Decreasing
+NM,10,Home,https://www.cdc.gov/,Medium,Decreasing
+NY,12,Home,https://www.cdc.gov/,Medium,Decreasing
+NC,14,Vehicle,https://www.cdc.gov/,Medium,Decreasing
+ND,9,Work,https://www.cdc.gov/,Medium,Decreasing
+MP,17,School,https://www.cdc.gov/,Medium,Decreasing
+OH,NA,School,https://www.cdc.gov/,Medium,Decreasing
+OK,22,Work,https://www.cdc.gov/,Medium,Decreasing
+OR,10,Vehicle,https://www.cdc.gov/,Medium,Decreasing
+PW,12,Home,https://www.cdc.gov/,High,No Change
+PA,14,Home,https://www.cdc.gov/,High,No Change
+PR,6,Home,https://www.cdc.gov/,High,No Change
+RI,17,Vehicle,https://www.cdc.gov/,High,No Change
+SC,20,Work,https://www.cdc.gov/,High,No Change
+SD,22,School,https://www.cdc.gov/,High,No Change
+TN,10,School,https://www.cdc.gov/,High,No Change
+TX,12,Work,https://www.cdc.gov/,High,No Change
+VT,9,Home,https://www.cdc.gov/,High,No Change
+VI,17,Vehicle,https://www.cdc.gov/,High,No Change
+VA,20,Work,https://www.cdc.gov/,High,No Change
+WA,22,School,https://www.cdc.gov/,,No Change
+WV,10,School,https://www.cdc.gov/,High,No Change
+WI,12,Work,https://www.cdc.gov/,,No Change
+WY,14,Home,https://www.cdc.gov/,High,
+Los Angeles,14,Vehicle,https://www.cdc.gov/,High,No Change
+Atlanta,12,Work,https://www.cdc.gov/,High,No Change
+Boston,20,School,https://www.cdc.gov/,High,No Change
+New York City,22,School,https://www.cdc.gov/,High,No Change
+Dallas,18,Work,https://www.cdc.gov/,High,No Change
+Seattle,17,Home,https://www.cdc.gov/,High,No Change
+New Orleans,14,Vehicle,https://www.cdc.gov/,High,

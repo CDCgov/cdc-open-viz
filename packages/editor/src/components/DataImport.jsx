@@ -512,7 +512,7 @@ export default function DataImport() {
   } else {
     previewData = config.data
     configureData = config
-    readyToConfigure = !!config.formattedData
+    readyToConfigure = !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data, config.dataDescription))
   }
 
   // Box plots skip the data description steps.

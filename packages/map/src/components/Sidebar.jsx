@@ -4,9 +4,10 @@ import parse from 'html-react-parser'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
+import HexSetting from './HexShapeSettings'
 
 const Sidebar = props => {
-  const { legend, runtimeFilters, columns, setAccessibleStatus, changeFilterActive, resetLegendToggles, runtimeLegend, setRuntimeLegend, prefix, suffix, viewport, displayDataAsText } = props
+  const { state, legend, runtimeFilters, columns, setAccessibleStatus, changeFilterActive, resetLegendToggles, runtimeLegend, setRuntimeLegend, prefix, suffix, viewport, displayDataAsText } = props
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -109,39 +110,42 @@ const Sidebar = props => {
 
   return (
     <ErrorBoundary component='Sidebar'>
-      <aside id='legend' className={classNames.join(' ')} role='region' aria-label='Legend' tabIndex='0'>
-        <section className='legend-section' aria-label='Map Legend'>
-          {runtimeLegend.disabledAmt > 0 && (
-            <button
-              onClick={e => {
-                e.preventDefault()
-                resetLegendToggles()
-                setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
-              }}
-              className='clear btn'
-            >
-              Clear
-            </button>
-          )}
-          {legend.title && <span className='heading-2'>{parse(legend.title)}</span>}
-          {legend.dynamicDescription === false && legend.description && <p>{parse(legend.description)}</p>}
-          {legend.dynamicDescription === true &&
-            runtimeFilters.map((filter, idx) => {
-              const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
+      <div className='legend-wrapper'>
+        <aside id='legend' className={classNames.join(' ')} role='region' aria-label='Legend' tabIndex='0'>
+          <section className='legend-section' aria-label='Map Legend'>
+            {runtimeLegend.disabledAmt > 0 && (
+              <button
+                onClick={e => {
+                  e.preventDefault()
+                  resetLegendToggles()
+                  setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
+                }}
+                className='clear btn'
+              >
+                Clear
+              </button>
+            )}
+            {legend.title && <span className='heading-2'>{parse(legend.title)}</span>}
+            {legend.dynamicDescription === false && legend.description && <p>{parse(legend.description)}</p>}
+            {legend.dynamicDescription === true &&
+              runtimeFilters.map((filter, idx) => {
+                const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
 
-              // Do we have a custom description for this?
-              const desc = legend.descriptions[lookupStr] || ''
+                // Do we have a custom description for this?
+                const desc = legend.descriptions[lookupStr] || ''
 
-              if (desc.length > 0) {
-                return <p key={`dynamic-description-${lookupStr}`}>{desc}</p>
-              }
-              return true
-            })}
-          <ul className={columnLogic} aria-label='Legend items'>
-            {legendList}
-          </ul>
-        </section>
-      </aside>
+                if (desc.length > 0) {
+                  return <p key={`dynamic-description-${lookupStr}`}>{desc}</p>
+                }
+                return true
+              })}
+            <ul className={columnLogic} aria-label='Legend items'>
+              {legendList}
+            </ul>
+          </section>
+        </aside>
+        <HexSetting.Legend state={state} runtimeLegend={runtimeLegend} viewport={viewport} />
+      </div>
     </ErrorBoundary>
   )
 }

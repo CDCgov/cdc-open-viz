@@ -1475,10 +1475,8 @@ const CdcMap = ({
     const hashLegend = generateRuntimeLegendHash()
 
     // Legend - Update when runtimeData does
-    if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
-      const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
-      setRuntimeLegend(legend)
-    }
+    const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
+    setRuntimeLegend(legend)
   }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses]) // eslint-disable-line
 
   useEffect(() => {
@@ -1550,7 +1548,7 @@ const CdcMap = ({
     isDebug
   }
 
-  if (!mapProps.data || !state.data) return <Loading />
+  if (!mapProps.data || !state.data) return <></>
 
   const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading
 
@@ -1612,7 +1610,7 @@ const CdcMap = ({
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                 <div role='heading' className={'map-title ' + general.headerColor} tabIndex='0' aria-level='2'>
-                  <sup>{general.superTitle}</sup>
+                  {general.superTitle && <sup>{parse(general.superTitle)}</sup>}
                   <div>{parse(title)}</div>
                 </div>
               </header>
@@ -1654,6 +1652,7 @@ const CdcMap = ({
 
               {general.showSidebar && 'navigation' !== general.type && (
                 <Sidebar
+                  state={state}
                   viewport={currentViewport}
                   legend={state.legend}
                   runtimeLegend={runtimeLegend}

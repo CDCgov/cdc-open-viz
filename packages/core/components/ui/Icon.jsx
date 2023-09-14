@@ -67,7 +67,7 @@ const iconHash = {
   'filter-dropdowns': iconDropdowns
 }
 
-const Icon = ({ display = null, base, alt = '', size, color, style, ...attributes }) => {
+const Icon = ({ display = '', base, alt = '', size, color, style, ...attributes }) => {
   const IconObj = iconHash[display] || null
 
   const filteredAttrs = { ...attributes }

@@ -553,15 +553,9 @@ const EditorPanel = () => {
     })
 
     if (filter) {
+      const { lower, upper } = config.confidenceKeys || {}
       Object.keys(columns).forEach(key => {
-        if (
-          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
-          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))
-          /*
-            TODO: Resolve errors when config keys exist, but have no value
-              Proposal:  (((confidenceUpper && confidenceLower) || confidenceUpper || confidenceLower) && Object.keys(config.confidenceKeys).includes(key))
-          */
-        ) {
+        if ((config.series && config.series.filter(series => series.dataKey === key).length > 0) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key) && ((lower && upper) || lower || upper) && key !== lower && key !== upper)) {
           delete columns[key]
         }
       })
@@ -733,6 +727,9 @@ const EditorPanel = () => {
     config.runtime.editorErrorMessage = 'Paired Bar charts must use exactly two data series'
   }
 
+  if (config.visualizationType === 'Deviation Bar' && config?.series?.length !== 1) {
+    config.runtime.editorErrorMessage = 'Deviation Bar charts must use exactly one data series'
+  }
   if (config.isLollipopChart && config?.series?.length === 0) {
     config.runtime.editorErrorMessage = 'Add a data series'
   }
@@ -974,13 +971,9 @@ const EditorPanel = () => {
    } = useHighlightedBars(config, updateConfig)
 
   const updateSeriesTooltip = (column, event) => {
-    console.log('tooltip value', event)
-
     let updatedColumns = config.columns
 
     updatedColumns[column].tooltips = event
-
-    console.log('updatedColumns', updatedColumns)
 
     updateConfig({
       ...config,
@@ -1007,7 +1000,9 @@ const EditorPanel = () => {
               </AccordionItemHeading>
               <AccordionItemPanel>
                 <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />
-                {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
+                {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && (
+                  <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />
+                )}
                 {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
                 {config.visualizationType === 'Deviation Bar' && <Select label='Orientation' options={['horizontal']} />}
                 {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
