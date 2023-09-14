@@ -1,0 +1,52 @@
+[
+  {
+    "Current Week Positivity": "20",
+    "State": "REGION 1",
+    "Change": "0.2"
+  },
+  {
+    "Current Week Positivity": "27",
+    "State": "region 2",
+    "Change": "-0.5"
+  },
+  {
+    "Current Week Positivity": "26",
+    "State": "region 3",
+    "Change": "-.08"
+  },
+  {
+    "Current Week Positivity": "30",
+    "State": "region 4",
+    "Change": "0.8"
+  },
+  {
+    "Current Week Positivity": "14",
+    "State": "region 5",
+    "Change": "0.5"
+  },
+  {
+    "Current Week Positivity": "25",
+    "State": "region 6",
+    "Change": "0.05"
+  },
+  {
+    "Current Week Positivity": "0",
+    "State": "region 7",
+    "Change": "0"
+  },
+  {
+    "Current Week Positivity": "14",
+    "State": "region 8",
+    "Change": "-1.2"
+  },
+  {
+    "Current Week Positivity": "28",
+    "State": "region 9",
+    "Change": "1.5"
+  },
+  {
+    "Current Week Positivity": "12",
+    "State": "region 10",
+    "Change": "0.5"
+  }
+]
