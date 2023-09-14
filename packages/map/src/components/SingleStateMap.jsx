@@ -5,9 +5,9 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoPath } from 'd3-geo'
 import { feature, mesh } from 'topojson-client'
 import { CustomProjection } from '@visx/geo'
+import Loading from '@cdc/core/components/Loading'
 import colorPalettes from '../../../core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
-import testJSON from '../data/county-map.json'
 import CityList from './CityList'
 
 // SVG ITEMS
@@ -15,9 +15,33 @@ const WIDTH = 880
 const HEIGHT = 500
 const PADDING = 25
 
-// DATA
-let { features: counties } = feature(testJSON, testJSON.objects.counties)
-let { features: states } = feature(testJSON, testJSON.objects.states)
+const getTopoData = (year) => {
+  return new Promise((resolve, reject) => {
+    const resolveWithTopo = response => {
+      let topoData = {};
+
+      topoData.year = year || 'default'; //TODO
+      topoData.fulljson = response;
+      topoData.counties = feature(response, response.objects.counties).features
+      topoData.states = feature(response, response.objects.states).features
+
+      resolve(topoData);
+    }
+
+    switch (year){
+      case '2022':
+        import('../data/cb_2022_us_county_20m.json').then(resolveWithTopo);
+        break;
+      default:
+        import('../data/cb_2015_us_county_20m.json').then(resolveWithTopo);
+        break;
+    }
+  });
+}
+
+const isTopoReady = (topoData, state) => {
+  return topoData.year && (!state.general.countyCensusYear || state.general.countyCensusYear === topoData.year);
+}
 
 const SingleStateMap = props => {
   const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, runtimeLegend, generateColorsArray, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
@@ -30,19 +54,29 @@ const SingleStateMap = props => {
   const [translate, setTranslate] = useState()
   const [scale, setScale] = useState()
   const [strokeWidth, setStrokeWidth] = useState(0.75)
+  const [ topoData, setTopoData ] = useState({});
   let mapColorPalette = colorPalettes[state.color] || '#fff'
   let focusedBorderColor = mapColorPalette[3]
 
   const path = geoPath().projection(projection)
 
+  useEffect(() => {
+    console.log('here');
+    getTopoData(state.general.countyCensusYear).then(response => {
+      console.log('here2');
+      setTopoData(response);
+    })
+  }, [state.general.countyCensusYear])
+
   // When choosing a state changes...
   useEffect(() => {
+    if(!isTopoReady(topoData, state)) return
     if (state.general.hasOwnProperty('statePicked')) {
       let statePicked = state.general.statePicked.stateName
-      let statePickedData = states.find(s => s.properties.name === statePicked)
+      let statePickedData = topoData.states.find(s => s.properties.name === statePicked)
       setStateToShow(statePickedData)
 
-      let countiesFound = counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode)
+      let countiesFound = topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode)
 
       setCountiesToShow(countiesFound)
 
@@ -64,7 +98,10 @@ const SingleStateMap = props => {
       setTranslate([x, y])
       setScale(newScaleWithHypot)
     }
-  }, [state.general.statePicked])
+  }, [state.general.statePicked, topoData.year])
+
+  
+  if (!isTopoReady(topoData, state)) return <Loading />
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
@@ -74,12 +111,12 @@ const SingleStateMap = props => {
     let geosJsx = []
 
     const StateOutput = () => {
-      let geo = testJSON.objects.states.geometries.filter(s => {
+      let geo = topoData.fulljson.objects.states.geometries.filter(s => {
         return s.id === statePassed.id
       })
 
       // const stateLine = path(mesh(testJSON, lines ))
-      let stateLines = path(mesh(testJSON, geo[0]))
+      let stateLines = path(mesh(topoData.fulljson, geo[0]))
       return (
         <g key={'single-state'} className='single-state' style={{ fill: '#E6E6E6' }} stroke={geoStrokeColor} strokeWidth={0.95 / scale}>
           <path tabIndex={-1} className='state-path' d={stateLines} />
@@ -189,7 +226,7 @@ const SingleStateMap = props => {
           </CustomProjection>
         </svg>
       )}
-      {!stateToShow && 'No State Picked'}
+      {!state.general.statePicked && 'No State Picked'}
     </ErrorBoundary>
   )
 }

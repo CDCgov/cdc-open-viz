@@ -758,6 +758,15 @@ const EditorPanel = props => {
           }
         })
         break
+      case 'countyCensusYear':
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            countyCensusYear: value
+          }
+        })
+        break
       case 'filterBehavior':
         setState({
           ...state,
@@ -1496,6 +1505,20 @@ const EditorPanel = props => {
                     >
                       <option value='us'>US State-Level</option>
                       <option value='us-county'>US County-Level</option>
+                    </select>
+                  </label>
+                )}
+                {(state.general.geoType === 'us-county' || state.general.geoType === 'single-state') && (
+                  <label>
+                    <span className='edit-label column-heading'>County Census Year</span>
+                    <select
+                      value={state.general.countyCensusYear || 'Default'}
+                      onChange={event => {
+                        handleEditorChanges('countyCensusYear', event.target.value)
+                      }}
+                    >
+                      <option value='2022'>2022</option>
+                      <option value='Default'>Default</option>
                     </select>
                   </label>
                 )}
