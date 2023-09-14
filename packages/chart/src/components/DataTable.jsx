@@ -8,7 +8,6 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import Icon from '@cdc/core/components/ui/Icon'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import { parseDate as parseDatePure, formatDate as formatDatePure } from '@cdc/core/helpers/cove/date'
 
 import ConfigContext from '../ConfigContext'
 
@@ -248,7 +247,8 @@ const DataTable = props => {
       sortTypes: {
         custom: (rowA, rowB, columnId) => {
           // NOTE:
-          // 1) rowA and rowB are coming in with all values undefined
+          // 1) Main issue causing all this code:
+          //     rowA and rowB are coming in with all values undefined
           // - if it passed the values we could just use the columnId to get the correct sort value
           // but since it's not there we have to go through a bunch of code to get it because
           // we also do not know the Y axis data key (TT)
@@ -258,11 +258,6 @@ const DataTable = props => {
 
           // rowA.original - is the row data field name to access the value
           // columnId = the column indicator typically date or date--index
-          let tmpA = rowA // just for looking at data
-          let tmpB = rowB
-          let tmpFormatData = config.formattedData
-          let configD = config
-          //debugger
           let a, b
           if (columnId === 'series-label') {
             // comparing strings
@@ -275,23 +270,8 @@ const DataTable = props => {
           let columnIdIndexRemoved = columnId.split('--')[0]
           //get all the data from that column
           let colData = runtimeData.filter(obj => {
-            //console.log('obj', obj) //[datakey=], columnIdIndexRemoved', obj, obj[dataKey], columnIdIndexRemoved)
             // problem is dates can be in different formats
             if (config.xAxis.type === 'date' && !isNaN(Date.parse(obj[dataKey])) && !isNaN(Date.parse(columnIdIndexRemoved))) {
-              //let dataDateDeformatted = formatDatePure(config.xAxis.dateParseFormat, parseDatePure(config.xAxis.dateParseFormat, obj[dataKey])) //formatDate(config.xAxis.dateDisplayFormat, obj[dataKey]) //formatDate(config.xAxis.dateDisplayFormat,
-              //let colHeadDate = columnIdIndexRemoved
-              //let t3 = obj[dataKey] === formatDatePure(parseDatePure(config.xAxis.dateParseFormat, columnIdIndexRemoved))
-              //if (t3) debugger
-              //console.log('obj[dataKey], dateDisplay', obj[dataKey], config.xAxis.dateDisplayFormat)
-              //console.log('- t1, t2, t3 ', t1, t2, t3)
-              //console.log('config.xAxis.dataParseFormat', config.xAxis.dateParseFormat)
-              //console.log('config.xAxis.dataDisplayFormat', config.xAxis.dateDisplayFormat)
-              //let t1 = parseDate(obj[dataKey]).getTime() // new Date(dataDateDeformatted)
-              //let t2 = parseDate(columnIdIndexRemoved).getTime() //new Date(colHeadDate)
-              //console.log('dataDateDeformatted, colHeadDate', dataDateDeformatted, colHeadDate)
-              //let t3 = t1 === t2
-              //console.log('dataDateDeformatted, t1, t2, t3 add to colData?', obj[dataKey], t1, t2, t3, columnIdIndexRemoved)
-
               // must convert to datetime number to compare
               return parseDate(obj[dataKey]).getTime() === parseDate(columnIdIndexRemoved).getTime()
             } else {
@@ -299,7 +279,6 @@ const DataTable = props => {
             }
           })
 
-          //console.log('colData=', colData)
           if (colData === undefined || colData[0] === undefined) {
             return -1
           }
