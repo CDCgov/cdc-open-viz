@@ -45,6 +45,11 @@ const DataTable = props => {
     a = a === null || a === undefined ? '' : a
     b = b === null || b === undefined ? '' : b
 
+    // check for dates first
+    if (!isNaN(Date.parse(a)) && !isNaN(Date.parse(b))) {
+      return Date.parse(a) - Date.parse(b)
+    }
+
     // convert any strings that are actually numbers to proper data type
     const aNum = Number(a)
 
@@ -86,6 +91,7 @@ const DataTable = props => {
       b = Number(b)
     }
 
+    console.log('a,b', a, b)
     // When comparing a number to a string, always send string to bottom
     if (typeof a === 'number' && typeof b === 'string') {
       return 1

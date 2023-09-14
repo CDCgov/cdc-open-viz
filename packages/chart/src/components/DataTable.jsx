@@ -151,7 +151,7 @@ export default function DataTable() {
             //debugger
             return <>{numberFormatter(d[row.original], resolvedAxis)}</>
           },
-          id: `${d[config.runtime.originalXAxis.dataKey]}`, // --${index}
+          id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
           sortType: 'custom',
           canSort: true,
           defaultCanSort: true
@@ -284,18 +284,18 @@ export default function DataTable() {
           let rowA_cellObj = getSpecificCellData(colData, rowA.original)
           let rowB_cellObj = getSpecificCellData(colData, rowB.original)
 
-          let rowA_valueObj = Object.values(rowA_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowA.original)
-          let rowB_valueObj = Object.values(rowB_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowB.original)
+          let rowA_valueObj = Object.values(rowA_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowA.original && !isNaN(value))
+          let rowB_valueObj = Object.values(rowB_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowB.original && !isNaN(value))
 
           // NOW we can get the sort values from the cell object
           let tmplen = rowA_valueObj.length
           a = rowA_valueObj.length > 1 ? rowA_valueObj[rowA.id] : rowA_valueObj[0]
           b = rowB_valueObj.length > 1 ? rowB_valueObj[rowB.id] : rowB_valueObj[0]
-          //debugger
+
           // force null and undefined to the bottom
           a = a === null || a === undefined ? '' : transform.cleanDataPoint(a)
           b = b === null || b === undefined ? '' : transform.cleanDataPoint(b)
-
+          //debugger
           if (!isNaN(Number(a)) && !isNaN(Number(b))) {
             return Number(a) - Number(b)
           }
