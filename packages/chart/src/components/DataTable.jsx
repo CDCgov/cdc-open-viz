@@ -267,7 +267,7 @@ const DataTable = props => {
           }
 
           let dataKey = config.xAxis.dataKey
-          let columnIdIndexRemoved = columnId.split('--')[0]
+          let columnIdIndexRemoved = columnId.split('--')[0] // have to remove index for compare
           //get all the data from that column
           let colData = runtimeData.filter(obj => {
             // problem is dates can be in different formats
