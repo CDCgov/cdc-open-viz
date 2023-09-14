@@ -12,24 +12,16 @@
 aside {
   background-color: #fff;
   z-index: 6;
+  margin-right: 1em;
   border-top: $lightGray 1px solid;
   @include breakpointClass(md) {
     &.bottom {
       border: #c2c2c2 1px solid;
     }
     &.side {
-      z-index: 1;
-      box-sizing: content-box;
-      max-width: 450px;
       margin-top: 2em;
       margin-bottom: 2em;
-      align-self: flex-start;
-      z-index: 4;
-      right: 1em;
       border: $lightGray 1px solid;
-      width: 50%;
-      top: 2em;
-      right: 1em;
     }
   }
 
@@ -68,22 +60,33 @@ aside {
     }
     ul {
       list-style: none;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-column-gap: 1.5em;
+      &.vertical-sorted {
+        display: block;
+        column-count: 2;
+        column-width: 100%;
+        column-gap: 1.5em;
+        column-fill: balance;
+      }
+      &.single-column {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+      &.single-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(9em, 1fr));
+        grid-column-gap: 1em;
+      }
+
       button {
         font-size: unset;
         background: transparent;
       }
       li {
-        flex-shrink: 0;
-        display: inline-block;
-        padding-right: 1em;
-        padding-bottom: 1em;
-        vertical-align: middle;
-        transition: 0.1s opacity;
-        display: flex;
-        // align-items: center;
+        margin-bottom: 0.7em;
+        white-space: nowrap;
         &.single-legend {
           cursor: pointer;
         }
@@ -92,61 +95,6 @@ aside {
         }
         &.disabled {
           opacity: 0.4;
-        }
-      }
-    }
-  }
-
-  &.side.single-column {
-    @include breakpointClass(md) {
-      width: 25%;
-      min-width: 200px;
-      .legend-section ul {
-        flex-direction: column;
-        li {
-          width: 100%;
-          &:nth-last-of-type(-n + 2) {
-            padding-bottom: 1em;
-          }
-          &:last-child {
-            padding-bottom: 0;
-          }
-        }
-      }
-    }
-  }
-
-  &.bottom.single-row {
-    width: 100%;
-    .legend-section ul {
-      flex-direction: row;
-      align-items: baseline;
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      li {
-        justify-items: center;
-        line-break: loose;
-        align-items: center;
-        width: auto;
-        padding-right: 1em;
-        padding-bottom: 1em;
-        display: inline-block;
-        & > span {
-          margin: 0 !important;
-        }
-      }
-    }
-  }
-
-  @include breakpointClass(sm) {
-    .legend-section ul {
-      align-items: flex-start;
-      justify-content: space-between;
-      li {
-        width: 48%;
-        padding-right: 0.5em;
-        &:nth-last-of-type(-n + 2) {
-          padding-bottom: 0;
         }
       }
     }
