@@ -91,7 +91,6 @@ const DataTable = props => {
       b = Number(b)
     }
 
-    console.log('a,b', a, b)
     // When comparing a number to a string, always send string to bottom
     if (typeof a === 'number' && typeof b === 'string') {
       return 1
