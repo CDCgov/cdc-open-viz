@@ -8,14 +8,18 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import Icon from '@cdc/core/components/ui/Icon'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import { parseDate as parseDatePure, formatDate as formatDatePure } from '@cdc/core/helpers/cove/date'
 
 import ConfigContext from '../ConfigContext'
 
 import MediaControls from '@cdc/core/components/MediaControls'
 
-export default function DataTable() {
+const DataTable = props => {
+  // had to pass in runtimeData as prop to get the raw prop names in the inbound data (TT)
+  const { runtimeData, isDebug } = props
+
   const { rawData, tableData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, currentViewport } = useContext(ConfigContext)
-  //console.log('DataTable chat data from context= data,rawData', data, rawData)
+
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
@@ -124,8 +128,10 @@ export default function DataTable() {
           ]
     if (config.visualizationType !== 'Box Plot') {
       data.forEach((d, index) => {
-        //console.log('d iterated on', d)
         const resolveTableHeader = () => {
+          //let test1 = parseDate(d[config.runtime.originalXAxis.dataKey])
+          //let test2 = formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
+          //console.log('test1, test2', test1, test2)
           if (config.runtime[section].type === 'date') return formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
           if (config.runtime[section].type === 'continuous') return numberFormatter(d[config.runtime.originalXAxis.dataKey], 'bottom')
           return d[config.runtime.originalXAxis.dataKey]
@@ -133,7 +139,6 @@ export default function DataTable() {
         const newCol = {
           Header: resolveTableHeader(),
           Cell: ({ row }) => {
-            //console.log('row passed to cell', row)
             let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
             let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
             let resolvedAxis = ''
@@ -147,8 +152,7 @@ export default function DataTable() {
             })
 
             if (config.visualizationType !== 'Combo') resolvedAxis = 'left'
-            //let temp = numberFormatter(d[row.original], resolvedAxis)
-            //debugger
+
             return <>{numberFormatter(d[row.original], resolvedAxis)}</>
           },
           id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
@@ -189,7 +193,7 @@ export default function DataTable() {
         return newTableColumns.push(newCol)
       })
     }
-    console.log('newTableColumns', newTableColumns)
+
     return newTableColumns
   }, [config, colorScale]) // eslint-disable-line
 
@@ -235,7 +239,9 @@ export default function DataTable() {
       <path d='M0 0l5 5 5-5z' />
     </svg>
   )
-
+  const getSpecificCellData = (array, value) => {
+    return array.filter(data => JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1)
+  }
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
     {
       columns: tableColumns,
@@ -260,7 +266,6 @@ export default function DataTable() {
           let tmpFormatData = config.formattedData
           let configD = config
 
-          //debugger
           let a, b
           if (columnId === 'series-label') {
             // comparing strings
@@ -272,23 +277,55 @@ export default function DataTable() {
           let dataKey = config.xAxis.dataKey
           let columnIdIndexRemoved = columnId.split('--')[0]
           //get all the data from that column
-          let colData = config.data.filter(obj => {
-            return obj[dataKey] === columnIdIndexRemoved // have to remove index
+          let colData = runtimeData.filter(obj => {
+            console.log('obj', obj) //[datakey=], columnIdIndexRemoved', obj, obj[dataKey], columnIdIndexRemoved)
+            // problem is dates can be in different formats
+            if (config.xAxis.type === 'date' && !isNaN(Date.parse(obj[dataKey])) && !isNaN(Date.parse(columnIdIndexRemoved))) {
+              let dataDateDeformatted = formatDatePure(config.xAxis.dateParseFormat, parseDatePure(config.xAxis.dateParseFormat, obj[dataKey])) //formatDate(config.xAxis.dateDisplayFormat, obj[dataKey]) //formatDate(config.xAxis.dateDisplayFormat,
+              let colHeadDate = columnIdIndexRemoved
+              //let t3 = obj[dataKey] === formatDatePure(parseDatePure(config.xAxis.dateParseFormat, columnIdIndexRemoved))
+              //if (t3) debugger
+              console.log('obj[dataKey], dateDisplay', obj[dataKey], config.xAxis.dateDisplayFormat)
+              //console.log('- t1, t2, t3 ', t1, t2, t3)
+              console.log('config.xAxis.dataParseFormat', config.xAxis.dateParseFormat)
+              console.log('config.xAxis.dataDisplayFormat', config.xAxis.dateDisplayFormat)
+              console.log('dataDateDeformatted, colHeadDate', dataDateDeformatted, colHeadDate)
+              return dataDateDeformatted === colHeadDate
+            } else {
+              return obj[dataKey] === columnIdIndexRemoved // have to remove index
+            }
           })
+          //debugger
           if (colData === undefined || colData[0] === undefined) {
             return -1
           }
-          const getSpecificCellData = (array, value) => {
-            return array.filter(data => JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1)
-          }
+
           let rowA_cellObj = getSpecificCellData(colData, rowA.original)
           let rowB_cellObj = getSpecificCellData(colData, rowB.original)
 
+          // - ** REMOVE any data points NOT selected in the data series ***
+          // I dont understand why not selected data series are still sent down in the data
+          // - would be better to scrub outside of here (TT)
+          let newRowA_cellObj = []
+          let newRowB_cellObj = []
+          if (config.runtime.seriesKeys) {
+            config.runtime.seriesKeys.forEach(seriesKey => {
+              if (seriesKey in rowA_cellObj[0]) newRowA_cellObj.push(rowA_cellObj[0][seriesKey])
+              if (seriesKey in rowB_cellObj[0]) newRowB_cellObj.push(rowB_cellObj[0][seriesKey])
+            })
+            // copy back over
+            rowA_cellObj[0] = newRowA_cellObj
+            rowB_cellObj[0] = newRowB_cellObj
+          }
+
+          // REMOVE the following:
+          // - value equal to column date
+          // - values not in .original
+          // - any data still in that's not really a number
           let rowA_valueObj = Object.values(rowA_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowA.original && !isNaN(value))
           let rowB_valueObj = Object.values(rowB_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowB.original && !isNaN(value))
 
           // NOW we can get the sort values from the cell object
-          let tmplen = rowA_valueObj.length
           a = rowA_valueObj.length > 1 ? rowA_valueObj[rowA.id] : rowA_valueObj[0]
           b = rowB_valueObj.length > 1 ? rowB_valueObj[rowB.id] : rowB_valueObj[0]
 
@@ -415,3 +452,5 @@ export default function DataTable() {
     </ErrorBoundary>
   )
 }
+
+export default DataTable
