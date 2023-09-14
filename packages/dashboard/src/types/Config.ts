@@ -11,6 +11,7 @@ export type Visualization = {
   editing: boolean
   type: 'chart' | 'map' | 'data-bite' | 'waffle-chart' | 'markup-include' | 'filtered-text' | 'filter-dropdowns'
   newViz: boolean
+  openModal: boolean
   hide: any[]
   autoLoad: boolean
   table: {
@@ -18,6 +19,7 @@ export type Visualization = {
   }
   general: any
   title: string
+  uid: string
   usesSharedFilter: any
 }
 
