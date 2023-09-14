@@ -622,7 +622,8 @@ const EditorPanel = props => {
           legend: {
             ...state.legend,
             singleColumn: !state.legend.singleColumn,
-            singleRow: false
+            singleRow: false,
+            verticalSorted: false
           }
         })
         break
@@ -632,6 +633,18 @@ const EditorPanel = props => {
           legend: {
             ...state.legend,
             singleRow: !state.legend.singleRow,
+            singleColumn: false,
+            verticalSorted: false
+          }
+        })
+        break
+      case 'verticalSortedLegend':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            verticalSorted: !state.legend.verticalSorted,
+            singleRow: false,
             singleColumn: false
           }
         })
@@ -2230,6 +2243,16 @@ const EditorPanel = props => {
                       <span className='edit-label'>Single Row Legend</span>
                     </label>
                   )}
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={legend.verticalSorted}
+                      onChange={event => {
+                        handleEditorChanges('verticalSortedLegend', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Vertical sorted legend</span>
+                  </label>
                   {/* always show */}
                   {
                     <label className='checkbox'>
