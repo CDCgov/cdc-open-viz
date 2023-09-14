@@ -126,26 +126,21 @@
     &__inner {
       &.bottom {
         display: grid;
-        grid-template-columns: auto auto;
+        grid-template-columns: 1fr 1fr;
+        grid-column-gap: 1.5em;
+      }
+      &.vertical-sorted {
+        display: block;
+        column-count: 2;
+        column-width: 100%;
+        column-gap: 1.5em;
+        column-fill: balance;
       }
 
       &.single-row {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-
-        & > div {
-          padding: 0 1.2em 1em 0;
-        }
-
-        & div > span {
-          margin-right: 0 !important;
-        }
-
-        & > div.legend-item {
-          margin: 0 !important;
-        }
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(6em, 1fr));
+        grid-column-gap: 1em;
       }
     }
 
@@ -177,6 +172,7 @@
       text-align: left;
       align-items: flex-start !important;
       user-select: none;
+      white-space: nowrap;
     }
 
     .legend-item > .legend-item {
