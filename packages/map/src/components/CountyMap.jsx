@@ -138,7 +138,11 @@ const CountyMap = props => {
   const tooltipRef = useRef()
 
   // If runtimeData is not defined, show loader
-  if (!data || !isTopoReady(topoData, state)) return <Loading />
+  if (!data || !isTopoReady(topoData, state)) {
+    return <div style={{height: 300}}>
+      <Loading />
+    </div>
+  }
 
   const runtimeKeys = Object.keys(data)
 
