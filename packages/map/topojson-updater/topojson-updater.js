@@ -20,6 +20,32 @@ const directories = (await readdir(shapefileFolderPath, { withFileTypes: true })
     .map(dirent => dirent.name)
     .filter(dirent => dirent.indexOf('county') !== -1);
 
+const updateSupportedCountiesJSON = () => {
+  const topoFiles = fs.readdirSync(`${outputFolderPath}`).filter(file => file.indexOf('cb_') === 0);
+
+  let supportedCounties = {};
+
+  topoFiles.forEach(topoFile => {
+    const topo = JSON.parse(fs.readFileSync(`${outputFolderPath}/${topoFile}`));
+
+    topo.objects.counties.geometries.forEach(geometry => {
+      if(!supportedCounties[geometry.id]) supportedCounties[geometry.id] = geometry.properties.name;
+    })
+  })
+
+  let supportedCountiesFile = JSON.parse(fs.readFileSync(`${outputFolderPath}/supported-counties.json`))
+
+  Object.keys(supportedCounties).forEach(supportedCounty => {
+    if(!supportedCountiesFile[supportedCounty]) supportedCountiesFile[supportedCounty] = supportedCounties[supportedCounty];
+  })
+
+  fs.writeFile(`${outputFolderPath}/supported-counties.json`, JSON.stringify(supportedCountiesFile), err => {
+    if (err) {
+      console.error(err);
+    }
+  });
+};
+
 const processShapefile = (i) => {
   const countyDirectory = directories[i];
   const stateDirectory = directories[i].replace('county', 'state');
@@ -68,6 +94,8 @@ const processShapefile = (i) => {
                   }
                   if(i < directories.length - 1){
                     processShapefile(i + 1);
+                  } else {
+                    updateSupportedCountiesJSON();
                   }
                 });
               });
@@ -84,5 +112,11 @@ const processShapefile = (i) => {
     }
 }
 
-processShapefile(0);
+if(directories.length > 0){
+  processShapefile(0);
+} else {
+  updateSupportedCountiesJSON();
+}
+
+
 
