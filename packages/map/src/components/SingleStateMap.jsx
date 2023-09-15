@@ -114,7 +114,11 @@ const SingleStateMap = props => {
   }, [state.general.statePicked, topoData.year])
 
   
-  if (!isTopoReady(topoData, state)) return <Loading />
+  if (!isTopoReady(topoData, state)) {
+    return <div style={{height: `${HEIGHT}px`}}>
+      <Loading />
+    </div>
+  }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
