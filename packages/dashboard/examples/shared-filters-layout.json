@@ -51,7 +51,7 @@
       {
         "key": "Year",
         "usedBy": [
-          "chart"
+          "chart1"
         ],
         "type": "urlfilter",
         "apiFilter": {
@@ -59,10 +59,8 @@
           "valueSelector": "Year",
           "textSelector": "Year",
           "heirarchyLookup": "Years"
-          
         },
         "queryParameter": "year",
-        "resetLabel": "- Select -",
         "showDropdown": true,
         "parents": ["Category", "Indicator"]
       },
@@ -80,7 +78,6 @@
           "defaultValue": "AGE"
         },
         "queryParameter": "stratificationcategoryid",
-        "resetLabel": "- Select -",
         "showDropdown": true,
         "parents": ["Category", "Indicator"]
       },
@@ -98,7 +95,6 @@
           
         },
         "queryParameter": "datavaluetypeid",
-        "resetLabel": "- Select -",
         "showDropdown": true,
         "parents": ["Category", "Indicator"]
       }

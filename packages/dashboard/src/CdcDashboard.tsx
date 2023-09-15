@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 
 // IE11
 // import 'core-js/stable'
@@ -29,18 +29,17 @@ import CdcFilteredText from '@cdc/filtered-text'
 import Grid from './components/Grid'
 import Header, { FilterBehavior } from './components/Header'
 import defaults from './data/initial-state'
-import Widget from './components/Widget'
 import DataTable from './components/DataTable'
 import MediaControls from '@cdc/core/components/MediaControls'
 
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
-import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
 import { SharedFilter } from './types/SharedFilter'
 import { APIFilter } from './types/APIFilter'
 import { DataSet } from './types/DataSet'
 import { Config, Visualization } from './types/Config'
+import VisualizationsPanel from './components/VisualizationsPanel'
 
 type DropdownOptions = Record<'value' | 'text', string>[]
 
@@ -50,62 +49,6 @@ type APIFilterDropdowns = {
 }
 
 /* eslint-disable react-hooks/exhaustive-deps */
-
-const addVisualization = (type, subType) => {
-  let modalWillOpen = type !== 'markup-include'
-  let newVisualizationConfig: Partial<Visualization> = {
-    newViz: true,
-    openModal: modalWillOpen,
-    uid: type + Date.now(),
-    type
-  }
-
-  switch (type) {
-    case 'chart':
-      newVisualizationConfig.visualizationType = subType
-      break
-    case 'map':
-      newVisualizationConfig.general = {}
-      newVisualizationConfig.general.geoType = subType
-      break
-    case 'data-bite' || 'waffle-chart' || 'markup-include' || 'filtered-text':
-      newVisualizationConfig.visualizationType = type
-      break
-    default:
-      newVisualizationConfig.visualizationType = type
-      break
-  }
-
-  return newVisualizationConfig
-}
-
-const VisualizationsPanel = ({ loadConfig, config }) => (
-  <div className='visualizations-panel'>
-    <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
-    <span className='subheading-3'>Chart</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('chart', 'Bar')} type='Bar' />
-      <Widget addVisualization={() => addVisualization('chart', 'Line')} type='Line' />
-      <Widget addVisualization={() => addVisualization('chart', 'Pie')} type='Pie' />
-    </div>
-    <span className='subheading-3'>Map</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('map', 'us')} type='us' />
-      <Widget addVisualization={() => addVisualization('map', 'world')} type='world' />
-      <Widget addVisualization={() => addVisualization('map', 'single-state')} type='single-state' />
-    </div>
-    <span className='subheading-3'>Misc.</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('data-bite', '')} type='data-bite' />
-      <Widget addVisualization={() => addVisualization('waffle-chart', '')} type='waffle-chart' />
-      <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
-      <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
-      <Widget addVisualization={() => addVisualization('filter-dropdowns', '')} type='filter-dropdowns' />
-    </div>
-    <span className='subheading-3'>Advanced</span>
-    <AdvancedEditor loadConfig={loadConfig} state={config} convertStateToConfig={undefined} />
-  </div>
-)
 
 export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, isDebug = false, setConfig: setParentConfig }) {
   const [config, setConfig] = useState<Config | null>(configObj ?? null)
@@ -117,6 +60,22 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const [tabSelected, setTabSelected] = useState(0)
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+
+  const inNoDataState = useMemo(() => {
+    const vals = Object.values(data)
+    if (!vals.length) return true
+    return vals.some(val => val === undefined)
+  }, [data])
+
+  const getAutoLoadVisualization = (): Visualization | undefined => {
+    if (!config) return
+    const autoLoadViz = Object.values(config.visualizations).filter(vis => {
+      return vis.autoLoad && vis.type === 'filter-dropdowns'
+    })
+    if (autoLoadViz.length === 0) return
+    if (autoLoadViz.length > 1) throw new Error('Only one filter row can be autoloaded')
+    return autoLoadViz[0]
+  }
 
   const transform = new DataTransform()
 
@@ -164,26 +123,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     return apiEndpoint + (heirarchyLookup || '')
   }
 
-  const getAutoLoadFilters = (): Visualization | undefined => {
+  const setAutoLoadDefaultValue = (sharedFilterIndex: number, filterDropdowns: DropdownOptions) => {
     if (!config) return
-    const autoLoadFilters = Object.values(config.visualizations).filter(vis => {
-      return vis.autoLoad && vis.type === 'filter-dropdowns'
-    })
-    if (autoLoadFilters.length === 0) return
-    if (autoLoadFilters.length > 1) throw new Error('Only one filter row can be autoloaded')
-    return autoLoadFilters[0]
-  }
-
-  const setDefaultValue = (sharedFilterIndex: number, filterDropdowns: DropdownOptions) => {
-    if (!config) return
-    const autoLoadFilters = getAutoLoadFilters()
-    if (!autoLoadFilters) return // no autoLoading happening
-    const notIncludedInAutoLoad = autoLoadFilters.hide
+    const autoLoadViz = getAutoLoadVisualization()
+    if (!autoLoadViz) return // no autoLoading happening
+    const notIncludedInAutoLoad = autoLoadViz.hide
     if (notIncludedInAutoLoad.includes(sharedFilterIndex)) {
       // we don't want to auto load it
       return
     } else {
       const sharedFilter = config.dashboard.sharedFilters[sharedFilterIndex]
+      if (sharedFilter.active) return // a value has already been selected.
       const filterParents = config.dashboard.sharedFilters.filter(f => sharedFilter.parents?.includes(f.key))
       const notAllParentFiltersSelected = filterParents.some(p => !p.active)
       if (filterParents && notAllParentFiltersSelected) return
@@ -232,7 +182,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             const apiFilter = filterLookup.get(_key) as APIFilter
             const _filterValues = getFilterValues(data, apiFilter)
             setAPIFilterDropdowns(dropdowns => ({ ...dropdowns, [_key]: _filterValues }))
-            setDefaultValue(index, _filterValues)
+            setAutoLoadDefaultValue(index, _filterValues)
           })
       })
     }
@@ -587,7 +537,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     }
   }
 
-  const changeFilterActive = (index, value) => {
+  const changeFilterActive = (index: number, value: string) => {
     if (!config) return
     let dashboardConfig = { ...config.dashboard }
 
@@ -615,17 +565,38 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     }
   }
 
-  const handleOnChange = (index, value) => {
+  const handleOnChange = (index: number, value: string) => {
     if (!config) return
     changeFilterActive(index, value)
     if (config.filterBehavior === FilterBehavior.Apply) {
-      const autoLoadFilters = getAutoLoadFilters()
-      const isAutoSelectFilter = !autoLoadFilters?.hide.includes(index)
+      const autoLoadViz = getAutoLoadVisualization()
+      if (!autoLoadViz) return // nothing left to do for regular filter behavior.
+      const isAutoSelectFilter = !autoLoadViz.hide.includes(index)
       const missingFilterSelections = config.dashboard.sharedFilters.some(f => !f.active)
       if (isAutoSelectFilter && !missingFilterSelections) {
         // a dropdown has been selected that doesn't
         // require the Go Button
         reloadURLData()
+      } else {
+        // A parent filter was selected, reset filters by:
+        // set auto select filter dropdowns to null
+        const autoSelectFilters = config.dashboard.sharedFilters.filter((_, _index) => !autoLoadViz?.hide.includes(_index))
+        const dropdownFilterKeys = autoSelectFilters.map(filter => getApiFilterKey(filter.apiFilter!))
+        const newApiDropdowns = { ...apiFilterDropdowns }
+        dropdownFilterKeys.forEach(key => (newApiDropdowns[key] = null))
+        setAPIFilterDropdowns(newApiDropdowns)
+        // remove active from sharedFilters that are autoLoading
+        const dashboardConfig = { ...config.dashboard }
+        dashboardConfig.sharedFilters[index].active = value
+        const newSharedFilters = config.dashboard.sharedFilters.map((filter, _index) => {
+          const _isAutoSelectFilter = !autoLoadViz?.hide.includes(_index)
+          if (_isAutoSelectFilter) filter.active = ''
+          return filter
+        })
+        setConfig({ ...config, dashboard: { ...config.dashboard, sharedFilters: newSharedFilters } })
+        // setData to empty object because we no longer have a data state.
+        setData({})
+        setFilteredData({})
       }
     }
   }
@@ -637,7 +608,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       <>
         {config.dashboard.sharedFilters.map((singleFilter, filterIndex) => {
           if ((singleFilter.type !== 'urlfilter' && !singleFilter.showDropdown) || (hide && hide.indexOf(filterIndex) !== -1)) return <></>
-          const endpoint = singleFilter.apiFilter?.apiEndpoint
           const values: JSX.Element[] = []
           if (singleFilter.resetLabel) {
             values.push(
@@ -711,7 +681,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   if (loading || !config) return <Loading />
 
   let body: JSX.Element | null = null
-
   // Editor mode
   if (isEditor && !preview) {
     let subVisualizationEditing = false
@@ -819,11 +788,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             )
             break
           case 'filter-dropdowns':
-            body = (
+            const hideFilter = visualizationConfig.autoLoad && inNoDataState
+            body = !hideFilter ? (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Filter Dropdowns' />
                 <Filters hide={visualizationConfig.hide} autoLoad={visualizationConfig.autoLoad} />
               </>
+            ) : (
+              <></>
             )
             break
           default:
@@ -897,7 +869,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                             {visualizationConfig.dataKey} (Go to Table)
                           </a>
                         )
-
+                        const hideFilter = visualizationConfig.autoLoad && inNoDataState
                         return (
                           <React.Fragment key={`vis__${index}__${colIndex}`}>
                             <div className={`dashboard-col dashboard-col-${col.width}`}>
@@ -981,7 +953,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                   configUrl={undefined}
                                 />
                               )}
-                              {visualizationConfig.type === 'filter-dropdowns' && <Filters hide={visualizationConfig.hide} autoLoad={visualizationConfig.autoLoad} />}
+                              {visualizationConfig.type === 'filter-dropdowns' && !hideFilter && <Filters hide={visualizationConfig.hide} autoLoad={visualizationConfig.autoLoad} />}
                             </div>
                           </React.Fragment>
                         )

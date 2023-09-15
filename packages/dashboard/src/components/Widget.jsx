@@ -177,49 +177,61 @@ const Widget = ({ data = {}, addVisualization, type }) => {
     )
   }
 
-  const filterHideModal = (configureData) => {
-
+  const FilterHideModal = configureData => {
+    const currentVizKey = Object.keys(visualizations).find(vizKey => vizKey === configureData.uid)
+    const currentViz = config.visualizations && config.visualizations[currentVizKey]
     const onFilterHideChange = (e, index) => {
-      const visualizations = {...config.visualizations}
+      const visualizations = { ...config.visualizations }
 
-      const currentVizKey = Object.keys(visualizations).find(vizKey => vizKey === configureData.uid)
-
-      if(currentVizKey){
+      if (currentVizKey) {
         const currentVizConfig = visualizations[currentVizKey]
 
-        if(currentVizConfig){
-          if(!currentVizConfig.hide) currentVizConfig.hide = []
-          if(!e.target.checked && currentVizConfig.hide.indexOf(index) === -1) {
+        if (currentVizConfig) {
+          if (!currentVizConfig.hide) currentVizConfig.hide = []
+          if (!e.target.checked && currentVizConfig.hide.indexOf(index) === -1) {
             visualizations[currentVizKey].hide.push(index)
-          } else if(e.target.checked && currentVizConfig.hide.indexOf(index) !== -1) {
+          } else if (e.target.checked && currentVizConfig.hide.indexOf(index) !== -1) {
             visualizations[currentVizKey].hide.splice(currentVizConfig.hide.indexOf(index), 1)
           }
         }
       }
 
-      updateConfig({...config, visualizations})
+      updateConfig({ ...config, visualizations })
     }
-    
+
+    const vizWithAutoLoad = Object.keys(config.visualizations).find(vizKey => config.visualizations[vizKey].autoLoad)
+    const onToggleAutoLoad = e => {
+      if (currentViz) {
+        currentViz.autoLoad = e.target.checked
+        updateConfig({ ...config, visualizations: { ...visualizations, [currentVizKey]: currentViz } })
+      }
+    }
+
     overlay?.actions.toggleOverlay()
 
+    const showAutoLoadCheckbox = !vizWithAutoLoad || vizWithAutoLoad === currentVizKey
     return (
       <Modal>
         <Modal.Content>
-          <div>
-            Choose which filters to display:
-          </div>
+          <div>Choose which filters to display:</div>
 
-          {config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0 && config.dashboard.sharedFilters.map((sharedFilter, index) => (
+          {config.dashboard.sharedFilters &&
+            config.dashboard.sharedFilters.length > 0 &&
+            config.dashboard.sharedFilters.map((sharedFilter, index) => (
+              <label>
+                <input type='checkbox' defaultChecked={!configureData.hide || configureData.hide.indexOf(index) === -1} onChange={e => onFilterHideChange(e, index)} />
+                {sharedFilter.key}
+              </label>
+            ))}
+
+          {(!config.dashboard.sharedFilters || config.dashboard.sharedFilters.length === 0) && <>No dashboard filters added yet.</>}
+
+          {showAutoLoadCheckbox && (
             <label>
-              <input type="checkbox" defaultChecked={!configureData.hide || configureData.hide.indexOf(index) === -1} onChange={(e) => onFilterHideChange(e, index)} />
-              {sharedFilter.key}
+              Make Autoload:
+              <input type='checkbox' defaultChecked={currentViz?.autoLoad} onChange={onToggleAutoLoad} />
             </label>
-          ))}
-
-          {(!config.dashboard.sharedFilters || config.dashboard.sharedFilters.length === 0) && (
-            <>No dashboard filters added yet.</>
           )}
-
           <div>
             <button style={{ margin: '1em' }} className='cove-button' onClick={() => overlay?.actions.toggleOverlay()}>
               Continue
@@ -232,7 +244,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
 
   useEffect(() => {
     if (data.openModal) {
-      overlay?.actions.openOverlay(type === 'filter-dropdowns' ? filterHideModal(dataRef.current) : dataDesignerModal(dataRef.current))
+      overlay?.actions.openOverlay(type === 'filter-dropdowns' ? FilterHideModal(dataRef.current) : dataDesignerModal(dataRef.current))
 
       visualizations[data.uid].openModal = false
 
@@ -257,7 +269,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
                   title='Configure Data'
                   className='btn btn-configure'
                   onClick={() => {
-                    overlay?.actions.openOverlay(type === 'filter-dropdowns' ? filterHideModal(data) : dataDesignerModal(data))
+                    overlay?.actions.openOverlay(type === 'filter-dropdowns' ? FilterHideModal(data) : dataDesignerModal(data))
                   }}
                 >
                   {iconHash['gear']}
@@ -270,7 +282,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
           )}
           {iconHash[type]}
           <span>{labelHash[type]}</span>
-          {data.newViz && type !== 'filter-dropdowns'  && (
+          {data.newViz && type !== 'filter-dropdowns' && (
             <span onClick={editWidget} className='config-needed'>
               Configuration needed
             </span>
