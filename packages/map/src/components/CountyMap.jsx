@@ -50,8 +50,23 @@ const getTopoData = (year) => {
       case '2022':
         import('../data/cb_2022_us_county_20m.json').then(resolveWithTopo);
         break;
-      default:
+      case '2021':
+        import('../data/cb_2021_us_county_20m.json').then(resolveWithTopo);
+        break;
+      case '2020':
+        import('../data/cb_2020_us_county_20m.json').then(resolveWithTopo);
+        break;
+      case '2015':
         import('../data/cb_2015_us_county_20m.json').then(resolveWithTopo);
+        break;
+      case '2014':
+        import('../data/cb_2014_us_county_20m.json').then(resolveWithTopo);
+        break;
+      case '2013':
+        import('../data/cb_2013_us_county_20m.json').then(resolveWithTopo);
+        break;
+      default:
+        import('../data/cb_2019_us_county_20m.json').then(resolveWithTopo);
         break;
     }
   });
