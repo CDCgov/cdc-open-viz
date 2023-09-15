@@ -1,7 +1,7 @@
 {
   "name": "topojson-updater",
   "version": "0.0.1",
-  "description": "Node script to fetch shapefile data from census.gov, convert to topojson, and format/optimize for use in COVE",
+  "description": "Node script to convert shapefile data from census.gov to topojson, and format/optimize for use in COVE",
   "type": "module",
   "main": "./topojson-updater.js",
   "scripts": {
