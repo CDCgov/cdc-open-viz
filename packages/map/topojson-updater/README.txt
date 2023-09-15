@@ -13,3 +13,5 @@ Usage
 4. Confirm a new json file for each year has been added to packages/map/src/data
 5. Update switch statements in CountyMap.jsx and SingleStateMap.jsx with the corresponding year -> file import mapping
 6. Add <option> tag for year in the countyCensusYear selector in packages/map/components/EditorPanel.jsx
+
+Note: List of changes to county lines is provided by the census and can be used to determine if new files are needed for years: https://www.census.gov/programs-surveys/geography/technical-documentation/county-changes.2010.html#list-tab-957819518
