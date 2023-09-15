@@ -2585,7 +2585,7 @@ const EditorPanel = props => {
                     />
                     <span className='edit-label'>Include Full Geo Name in CSV Download</span>
                   </label>
-                  {/* <label className='checkbox'>
+                  <label className='checkbox'>
                       <input
                         type='checkbox'
                         checked={state.general.showDownloadImgButton}
@@ -2594,7 +2594,7 @@ const EditorPanel = props => {
                         }}
                       />
                       <span className='edit-label'>Enable Image Download</span>
-                    </label> */}
+                    </label>
                   {/* <label className='checkbox'>
                       <input
                         type='checkbox'
