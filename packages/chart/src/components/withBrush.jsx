@@ -3,7 +3,7 @@ import { Brush } from '@visx/brush'
 import BaseBrush from '@visx/brush/lib/BaseBrush'
 import { Group } from '@visx/group'
 import { bisector } from 'd3-array'
-import { useRef, useContext, useState } from 'react'
+import { useRef, useContext, useState, useCallback, useEffect } from 'react'
 import ConfigContext from '../ConfigContext'
 import useMinMax from '../hooks/useMinMax'
 import useScales from '../hooks/useScales'
@@ -16,7 +16,16 @@ const BrushHandle = props => {
   const pathWidth = 8
   const pathHeight = 15
 
-  console.log('BrushHandle x, height, isBrushActive=', x, height, isBrushActive)
+  //console.log('BrushHandle x, height', x, height, props)
+
+  useEffect(() => {
+    let classNameParts = props.className.split('-')
+    let whichBrushHandle = classNameParts[classNameParts.length - 1]
+
+    console.log('BrushHandle whichBrushHandle', whichBrushHandle, x, props)
+    // will now set 'left' or 'right' brush handle 'x' state value
+    props.sendToParent(whichBrushHandle, x) // store the x
+  }, [props.x])
 
   if (!isBrushActive) {
     return null
@@ -35,9 +44,13 @@ const withBrush = Component => {
     const getDate = d => new Date(d[config.xAxis.dataKey])
     const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
     const xAxisDataMapped = data.map(d => getXAxisData(d))
-    console.log('##### BrushComponent props, config.brush', props, config.brush)
 
     const [xAxisBrushData, setXAxisBrushData] = useState(data)
+    const [brushLoc, setBrushLoc] = useState({
+      left: 0,
+      right: 0
+    })
+
     const brushData = undefined !== xAxisBrushData && xAxisBrushData.length ? xAxisBrushData : data
 
     // for Brush, using original data
@@ -46,7 +59,7 @@ const withBrush = Component => {
     const isBrush = true
     // totalHeight is the height of the entire parent svg with both chart and brush chart
     const { xMax, yMax, svgRef, seriesScale, height, totalHeight } = props
-    console.log('height, totalHeight ', height, totalHeight)
+    //console.log('height, totalHeight ', height, totalHeight)
     let origHeight = height
     const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax, isBrush }
     let { min, max } = useMinMax(properties)
@@ -61,7 +74,7 @@ const withBrush = Component => {
     ;({ minValue, maxValue } = useReduceData(config, brushData))
     const xAxisDataMappedComp = brushData.map(d => getXAxisData(d))
     const propsComp = { data: brushData, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped: xAxisDataMappedComp, xMax: xMaxComp, yMax: yMaxComp, isBrush }
-    {/* prettier-ignore */}
+    {/* prettier-ignore */ }
     ;({ min, max } = useMinMax(propsComp))
     const { xScale: xScaleComp, yScale: yScaleComp } = useScales({ ...propsComp, min, max })
 
@@ -79,6 +92,15 @@ const withBrush = Component => {
       end: { x: xMax }
     }
 
+    const setBrushLocation = (key, value) => {
+      // set the x locations from child into the state
+      // then in onBrushChange use those left and right x values to filter the data
+      let locObj = brushLoc
+      locObj[key] = value
+      console.log('locObj set key value', locObj, key, value)
+      setBrushLoc(locObj)
+    }
+
     // Helper for getting data to the closest date/category hovered.
     const getXValueFromCoordinateDate = x => {
       if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
@@ -87,9 +109,10 @@ const withBrush = Component => {
         const index = Math.floor(Number(numerator) / eachBand)
         return xScale.domain()[index - 1] // fixes off by 1 error
       }
-
+      debugger
       if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
         const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
+        if (x < 0) x = 0 // dont allow negative values
         const x0 = xScale.invert(xScale(x)) // GETTING INVALID DATE ****
         const index = bisectDate(config.data, x0, 1)
         const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
@@ -97,14 +120,35 @@ const withBrush = Component => {
       }
     }
 
-    const onBrushChange = (domain, ...props) => {
+    const onBrushChange = domain => {
       if (!domain) return
-      const { x0, x1 } = domain
-      console.log('onBrushChange DOMAIN in = x0,x1  props', x0, x1, props)
+      let { x0, x1 } = domain // works for AREA CHART but not bar chart
+      //console.log('onBrushChange DOMAIN in = x0,x1  props', x0, x1)
+      //debugger
+      console.log('#### onBrushChange brushLocation', brushLoc)
+
+      if (x0 === 0 && x1 === 0) {
+        // just BAR CHART for now
+        // then get the x values from state
+        // *****
+        // and convert them from x value like 264 to long x domain value like 1654567888
+        // --- Murad, I'm not sure how to convert it though and have run out of time
+        // the code below does NOT convert it properly so that the comparison to x below works
+        // *****
+        x0 = brushLoc.left
+        x1 = brushLoc.right
+
+        // OR
+        //
+        // just use inbound x0 and x1 to figure out how that lines to xAxis tick marks
+        // and use that to filter down the data points instead of the method below
+      }
+      //console.log('onBrushChange DOMAIN in = x0,x1', x0, x1)
       let brushFilteredData = []
+      // now take the brush handle locations and filter the data
       brushFilteredData = config.data.filter(s => {
         const x = getDate(s).getTime()
-        console.log('onBrushChange x0,x,x1', x0, x, x1)
+        console.log('onBrushChange s, x0,x,x1', s, x0, x, x1)
         if (x > x0 && x < x1) {
           let date = formatDate(getXValueFromCoordinateDate(x))
           console.log('onBrushChange in range get date', date)
@@ -128,7 +172,7 @@ const withBrush = Component => {
     }
 
     //console.log('withBRUSH xScaleComp, yScaleComp', xScaleComp, yScaleComp)
-    console.log('#### withBRUSH called, seriesScale props, origHeight, patternId, accentColor', props, origHeight, patternId, accentColor)
+    //console.log('#### withBRUSH called, seriesScale props, origHeight, patternId, accentColor', props, origHeight, patternId, accentColor)
     return (
       <>
         {/* <Component {...props} seriesScale={seriesScale} brushData={xAxisBrushData} xScale={xScaleComp} yScale={yScaleComp} width={xMaxComp} height={yMaxComp} /> */}
@@ -169,7 +213,7 @@ const withBrush = Component => {
             onChange={onBrushChange}
             selectedBoxStyle={selectedBrushStyle}
             useWindowMoveEvents
-            renderBrushHandle={props => <BrushHandle {...props} />}
+            renderBrushHandle={props => <BrushHandle {...props} sendToParent={setBrushLocation} />}
           />
         </Component>
       </>

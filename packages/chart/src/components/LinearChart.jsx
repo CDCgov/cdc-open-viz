@@ -101,9 +101,6 @@ export default function LinearChart() {
   const { min, max } = useMinMax(properties)
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding } = useScales({ ...properties, min, max })
 
-  console.log('LINEARCHART seriesScale', seriesScale)
-  //console.log('LINEARCHART seriesScaleBrush', seriesScaleBrush)
-
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
   useEffect(() => {
