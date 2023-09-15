@@ -13,12 +13,9 @@ aside {
   background-color: #fff;
   z-index: 6;
   margin-right: 1em;
-  border-top: $lightGray 1px solid;
+
   @include breakpointClass(md) {
-    &.bottom {
-      border: #c2c2c2 1px solid;
-    }
-    &.side {
+    & > section {
       margin-top: 2em;
       margin-bottom: 2em;
       border: $lightGray 1px solid;
@@ -61,6 +58,8 @@ aside {
     ul {
       list-style: none;
       display: grid;
+      min-width: max-content;
+      min-height: max-content;
       grid-template-columns: 1fr 1fr;
       grid-column-gap: 1.5em;
       &.vertical-sorted {
@@ -75,9 +74,15 @@ aside {
         grid-template-columns: 1fr;
       }
       &.single-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(9em, 1fr));
-        grid-column-gap: 1em;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        min-width: auto;
+        & > li {
+          margin: 0.3em 1em;
+        }
       }
 
       button {
