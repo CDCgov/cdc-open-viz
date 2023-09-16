@@ -20,7 +20,7 @@ const getTopoData = (year) => {
     const resolveWithTopo = response => {
       let topoData = {};
 
-      topoData.year = year || 'default'; //TODO
+      topoData.year = year || 'default';
       topoData.fulljson = response;
       topoData.counties = feature(response, response.objects.counties).features
       topoData.states = feature(response, response.objects.states).features
@@ -54,8 +54,23 @@ const getTopoData = (year) => {
   });
 }
 
+const getCurrentTopoYear = (state) => {
+  let currentYear = state.general.countyCensusYear;
+
+  if(state.general.filterControlsCountyYear && state.filters && state.filters.length > 0){
+    let yearFilter = state.filters.filter(filter => filter.columnName === state.general.filterControlsCountyYear);
+    if(yearFilter.length > 0 && yearFilter[0].active){
+      currentYear = yearFilter[0].active
+    }
+  }
+
+  return currentYear || 'default';
+}
+
 const isTopoReady = (topoData, state) => {
-  return topoData.year && (!state.general.countyCensusYear || state.general.countyCensusYear === topoData.year);
+  let currentYear = getCurrentTopoYear(state);
+
+  return topoData.year && (!currentYear || currentYear === topoData.year);
 }
 
 const SingleStateMap = props => {
@@ -76,10 +91,14 @@ const SingleStateMap = props => {
   const path = geoPath().projection(projection)
 
   useEffect(() => {
-    getTopoData(state.general.countyCensusYear).then(response => {
-      setTopoData(response);
-    })
-  }, [state.general.countyCensusYear])
+    let currentYear = getCurrentTopoYear(state);
+
+    if(currentYear !== topoData.year){
+      getTopoData(currentYear).then(response => {
+        setTopoData(response);
+      })
+    }
+  }, [state.general.countyCensusYear, JSON.stringify(state.filters)])
 
   // When choosing a state changes...
   useEffect(() => {
@@ -113,7 +132,6 @@ const SingleStateMap = props => {
     }
   }, [state.general.statePicked, topoData.year])
 
-  
   if (!isTopoReady(topoData, state)) {
     return <div style={{height: `${HEIGHT}px`}}>
       <Loading />
