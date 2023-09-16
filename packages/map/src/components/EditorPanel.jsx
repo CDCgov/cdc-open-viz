@@ -767,6 +767,15 @@ const EditorPanel = props => {
           }
         })
         break
+      case 'filterControlsCountyYear':
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            filterControlsCountyYear: value
+          }
+        })
+        break
       case 'filterBehavior':
         setState({
           ...state,
@@ -1524,6 +1533,20 @@ const EditorPanel = props => {
                       <option value='2015'>2015</option>
                       <option value='2014'>2014</option>
                       <option value='2013'>2013</option>
+                    </select>
+                  </label>
+                )}
+                {(state.general.geoType === 'us-county' || state.general.geoType === 'single-state') && (
+                  <label>
+                    <span className='edit-label column-heading'>Filter Controlling County Census Year</span>
+                    <select
+                      value={state.general.filterControlsCountyYear || ''}
+                      onChange={event => {
+                        handleEditorChanges('filterControlsCountyYear', event.target.value)
+                      }}
+                    >
+                      <option value=''>None</option>
+                      {state.filters && state.filters.map(filter => <option>{filter.columnName}</option>)}
                     </select>
                   </label>
                 )}

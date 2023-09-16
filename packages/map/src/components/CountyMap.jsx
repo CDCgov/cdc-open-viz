@@ -21,7 +21,7 @@ const getTopoData = (year) => {
     const resolveWithTopo = response => {
       let topoData = {};
 
-      topoData.year = year || 'default'; //TODO
+      topoData.year = year || 'default';
       topoData.counties = feature(response, response.objects.counties).features
       topoData.states = feature(response, response.objects.states).features
       topoData.states.sort(sortById)
@@ -72,8 +72,23 @@ const getTopoData = (year) => {
   });
 }
 
+const getCurrentTopoYear = (state) => {
+  let currentYear = state.general.countyCensusYear;
+
+  if(state.general.filterControlsCountyYear && state.filters && state.filters.length > 0){
+    let yearFilter = state.filters.filter(filter => filter.columnName === state.general.filterControlsCountyYear);
+    if(yearFilter.length > 0 && yearFilter[0].active){
+      currentYear = yearFilter[0].active
+    }
+  }
+
+  return currentYear || 'default';
+}
+
 const isTopoReady = (topoData, state) => {
-  return topoData.year && (!state.general.countyCensusYear || state.general.countyCensusYear === topoData.year);
+  let currentYear = getCurrentTopoYear(state);
+
+  return topoData.year && (!currentYear || currentYear === topoData.year);
 }
 
 // Ensures county map is only rerendered when it needs to (when one of the variables below is updated)
@@ -108,10 +123,14 @@ const CountyMap = props => {
   })
 
   useEffect(() => {
-    getTopoData(state.general.countyCensusYear).then(response => {
-      setTopoData(response);
-    })
-  }, [state.general.countyCensusYear])
+    let currentYear = getCurrentTopoYear(state);
+
+    if(currentYear !== topoData.year){
+      getTopoData(currentYear).then(response => {
+        setTopoData(response);
+      })
+    }
+  }, [state.general.countyCensusYear, JSON.stringify(state.filters)])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
   // The resize function so it includes the latest state variables
