@@ -80,7 +80,6 @@ const SingleStateMap = props => {
   const cityListProjection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
   const [stateToShow, setStateToShow] = useState(null)
-  const [countiesToShow, setCountiesToShow] = useState(null)
   const [translate, setTranslate] = useState()
   const [scale, setScale] = useState()
   const [strokeWidth, setStrokeWidth] = useState(0.75)
@@ -107,10 +106,6 @@ const SingleStateMap = props => {
       let statePicked = state.general.statePicked.stateName
       let statePickedData = topoData.states.find(s => s.properties.name === statePicked)
       setStateToShow(statePickedData)
-
-      let countiesFound = topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode)
-
-      setCountiesToShow(countiesFound)
 
       const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
       const newProjection = projection.fitExtent(
@@ -241,7 +236,7 @@ const SingleStateMap = props => {
         <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
           <rect className='background center-container ocean' width={WIDTH} height={HEIGHT} fillOpacity={1} fill='white'></rect>
           <CustomProjection
-            data={[{ states: stateToShow, counties: countiesToShow }]}
+            data={[{ states: stateToShow, counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode) }]}
             projection={geoAlbersUsaTerritories}
             fitExtent={[
               [
