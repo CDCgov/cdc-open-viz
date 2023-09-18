@@ -12,24 +12,13 @@
 aside {
   background-color: #fff;
   z-index: 6;
-  border-top: $lightGray 1px solid;
+  margin-right: 1em;
+
   @include breakpointClass(md) {
-    &.bottom {
-      border: #c2c2c2 1px solid;
-    }
-    &.side {
-      z-index: 1;
-      box-sizing: content-box;
-      max-width: 450px;
+    & > section {
       margin-top: 2em;
       margin-bottom: 2em;
-      align-self: flex-start;
-      z-index: 4;
-      right: 1em;
       border: $lightGray 1px solid;
-      width: 50%;
-      top: 2em;
-      right: 1em;
     }
   }
 
@@ -41,23 +30,26 @@ aside {
       padding-bottom: 0;
       display: inline-block;
     }
-    .heading-2 + p, .heading-2 + ul, p + ul, p + p {
+    .heading-2 + p,
+    .heading-2 + ul,
+    p + ul,
+    p + p {
       padding-top: 1em;
     }
     .clear {
-      font-size: .75em;
+      font-size: 0.75em;
       color: rgba(0, 0, 0, 0.6);
       position: absolute;
       right: 1em;
       background: rgba(0, 0, 0, 0.1);
       text-transform: uppercase;
-      transition: .2s all;
-      padding: .2em .5em;
-      border: rgba(0,0,0,.2) 1px solid;
+      transition: 0.2s all;
+      padding: 0.2em 0.5em;
+      border: rgba(0, 0, 0, 0.2) 1px solid;
       &:hover {
         text-decoration: none;
-        background: rgba(0,0,0,.15);
-        transition: .2s all;
+        background: rgba(0, 0, 0, 0.15);
+        transition: 0.2s all;
       }
     }
     p {
@@ -65,19 +57,41 @@ aside {
     }
     ul {
       list-style: none;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      button { font-size: unset; background: transparent; }
-      li {
-        flex-shrink: 0;
-        display: inline-block;
-        padding-right: 1em;
-        padding-bottom: 1em;
-        vertical-align: middle;
-        transition: .1s opacity;
+      display: grid;
+      min-width: max-content;
+      min-height: max-content;
+      grid-template-columns: 1fr 1fr;
+      grid-column-gap: 1.5em;
+      &.vertical-sorted {
+        display: block;
+        column-count: 2;
+        column-width: 100%;
+        column-gap: 1.5em;
+        column-fill: balance;
+      }
+      &.single-column {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+      &.single-row {
         display: flex;
-        // align-items: center;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        min-width: auto;
+        & > li {
+          margin: 0.3em 1em;
+        }
+      }
+
+      button {
+        font-size: unset;
+        background: transparent;
+      }
+      li {
+        margin-bottom: 0.7em;
+        white-space: nowrap;
         &.single-legend {
           cursor: pointer;
         }
@@ -85,62 +99,7 @@ aside {
           flex-shrink: 0;
         }
         &.disabled {
-          opacity: .4;
-        }
-      }
-    }
-  }
-
-  &.side.single-column {
-    @include breakpointClass(md) {
-      width: 25%;
-      min-width: 200px;
-      .legend-section ul {
-        flex-direction: column;
-        li {
-          width: 100%;
-          &:nth-last-of-type(-n+2) {
-            padding-bottom: 1em;
-          }
-          &:last-child {
-            padding-bottom: 0;
-          }
-        }
-      }
-    }
-  }
-  
-  &.bottom.single-row {
-      width: 100%;
-      .legend-section ul {
-        flex-direction: row;
-        align-items: baseline;
-        justify-content:flex-start;
-        flex-wrap: wrap;
-        li {
-          justify-items: center;
-          line-break:loose;
-          align-items: center;
-          width: auto;
-          padding-right: 1em;
-          padding-bottom: 1em;
-          display: inline-block;
-          & > span {
-            margin: 0 !important;
-          }
-        }
-      }
-  };
-
-  @include breakpointClass(sm) {
-    .legend-section ul {
-      align-items: flex-start;
-      justify-content: space-between;
-      li {
-        width: 48%;
-        padding-right: .5em;
-        &:nth-last-of-type(-n+2) {
-          padding-bottom: 0
+          opacity: 0.4;
         }
       }
     }
@@ -150,15 +109,15 @@ aside {
     padding: 0 1em 1em;
     .heading-3 {
       font-weight: bold;
-      margin-bottom: .5em;
+      margin-bottom: 0.5em;
     }
     form {
-      margin-top: .5em;
+      margin-top: 0.5em;
       line-height: 2em;
       display: flex;
       align-items: flex-end;
       section + section {
-        margin-left: .75em;
+        margin-left: 0.75em;
       }
       select {
         display: block;
