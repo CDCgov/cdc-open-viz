@@ -273,7 +273,7 @@ const WaffleChart = ({ config, isEditor, link }) => {
   const gaugeHeight = 35
 
   const xScale = scaleLinear({
-    domain: [0, config.dataDenom],
+    domain: [0, waffleDenominator],
     range: [0, gaugeWidth]
   })
   const gaugeColor = themeColor[theme]
@@ -300,7 +300,7 @@ const WaffleChart = ({ config, isEditor, link }) => {
                   <svg height={gaugeHeight} width={'100%'}>
                     <Group>
                       <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={gaugeWidth} height={gaugeHeight} fill='#fff' />
-                      <Bar x={0} y={0} width={xScale(dataPercentage)} height={gaugeHeight} fill={gaugeColor} />
+                      <Bar x={0} y={0} width={xScale(config.showPercent ? dataPercentage : waffleNumerator)} height={gaugeHeight} fill={gaugeColor} />
                     </Group>
                   </svg>
                   <div className={'cove-gauge-chart__subtext'}>{parse(subtext)}</div>
