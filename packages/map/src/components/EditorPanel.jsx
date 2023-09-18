@@ -1747,6 +1747,25 @@ const EditorPanel = props => {
                       {columnsOptions}
                     </select>
                   </label>
+                  {state.general.type === 'us-geocode' && (
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.general.convertFipsCodes}
+                        onChange={event => {
+                          setState({
+                            ...state,
+                            general: {
+                              ...state.general,
+                              convertFipsCodes: event.target.checked
+                            }
+                          })
+                        }}
+                      />
+                      <span className='edit-label'>Convert FIPS Codes to Geography Name</span>
+                    </label>
+                  )}
+
                   <label className='checkbox'>
                     <input
                       type='checkbox'
@@ -2609,15 +2628,15 @@ const EditorPanel = props => {
                     <span className='edit-label'>Include Full Geo Name in CSV Download</span>
                   </label>
                   <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.general.showDownloadImgButton}
-                        onChange={event => {
-                          handleEditorChanges('toggleDownloadImgButton', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>Enable Image Download</span>
-                    </label>
+                    <input
+                      type='checkbox'
+                      checked={state.general.showDownloadImgButton}
+                      onChange={event => {
+                        handleEditorChanges('toggleDownloadImgButton', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Enable Image Download</span>
+                  </label>
                   {/* <label className='checkbox'>
                       <input
                         type='checkbox'
