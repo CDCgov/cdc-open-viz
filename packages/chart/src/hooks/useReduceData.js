@@ -9,7 +9,7 @@ function useReduceData(config, data) {
     let max = Math.max(...data.map(d => Math.max(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
 
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && isBar)) && config.visualizationSubType === 'stacked') {
-      const yTotals = data.map(sumYValues(config.runtime.seriesKeys))
+      const yTotals = data.map(sumYValues(config.runtime.seriesKeys)).filter(num => !isNaN(num))
       max = Math.max(...yTotals)
     }
 
