@@ -46,37 +46,50 @@ const getTopoData = (year) => {
       resolve(topoData);
     }
 
-    switch (year){
-      case '2022':
-        import('../data/cb_2022_us_county_20m.json').then(resolveWithTopo);
-        break;
-      case '2021':
-        import('../data/cb_2021_us_county_20m.json').then(resolveWithTopo);
-        break;
-      case '2020':
-        import('../data/cb_2020_us_county_20m.json').then(resolveWithTopo);
-        break;
-      case '2015':
-        import('../data/cb_2015_us_county_20m.json').then(resolveWithTopo);
-        break;
-      case '2014':
-        import('../data/cb_2014_us_county_20m.json').then(resolveWithTopo);
-        break;
-      case '2013':
-        import('../data/cb_2013_us_county_20m.json').then(resolveWithTopo);
-        break;
-      default:
-        import('../data/cb_2019_us_county_20m.json').then(resolveWithTopo);
-        break;
+    const numericYear = parseInt(year)
+
+    if(isNaN(numericYear)){
+      import('../data/cb_2019_us_county_20m.json').then(resolveWithTopo);
+    } else if(numericYear > 2022){
+      import('../data/cb_2022_us_county_20m.json').then(resolveWithTopo);
+    } else if(numericYear < 2013){
+      import('../data/cb_2013_us_county_20m.json').then(resolveWithTopo);
+    } else {
+      switch (numericYear){
+        case 2022:
+          import('../data/cb_2022_us_county_20m.json').then(resolveWithTopo);
+          break;
+        case 2021:
+          import('../data/cb_2021_us_county_20m.json').then(resolveWithTopo);
+          break;
+        case 2020:
+          import('../data/cb_2020_us_county_20m.json').then(resolveWithTopo);
+          break;
+        case 2018:
+        case 2017:
+        case 2016:
+        case 2015:
+          import('../data/cb_2015_us_county_20m.json').then(resolveWithTopo);
+          break;
+        case 2014:
+          import('../data/cb_2014_us_county_20m.json').then(resolveWithTopo);
+          break;
+        case 2013:
+          import('../data/cb_2013_us_county_20m.json').then(resolveWithTopo);
+          break;
+        default:
+          import('../data/cb_2019_us_county_20m.json').then(resolveWithTopo);
+          break;
+      }
     }
   });
 }
 
-const getCurrentTopoYear = (state) => {
+const getCurrentTopoYear = (state, runtimeFilters) => {
   let currentYear = state.general.countyCensusYear;
 
-  if(state.general.filterControlsCountyYear && state.filters && state.filters.length > 0){
-    let yearFilter = state.filters.filter(filter => filter.columnName === state.general.filterControlsCountyYear);
+  if(state.general.filterControlsCountyYear && runtimeFilters && runtimeFilters.length > 0){
+    let yearFilter = runtimeFilters.filter(filter => filter.columnName === state.general.filterControlsCountyYear);
     if(yearFilter.length > 0 && yearFilter[0].active){
       currentYear = yearFilter[0].active
     }
@@ -85,8 +98,8 @@ const getCurrentTopoYear = (state) => {
   return currentYear || 'default';
 }
 
-const isTopoReady = (topoData, state) => {
-  let currentYear = getCurrentTopoYear(state);
+const isTopoReady = (topoData, state, runtimeFilters) => {
+  let currentYear = getCurrentTopoYear(state, runtimeFilters);
 
   return topoData.year && (!currentYear || currentYear === topoData.year);
 }
@@ -105,7 +118,7 @@ function CountyMapChecks(prevState, nextState) {
 }
 
 const CountyMap = props => {
-  const { state, runtimeLegend, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels } = props
+  const { state, runtimeLegend, runtimeFilters, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels } = props
 
   const [focus, setFocus] = useState({})
   const [ topoData, setTopoData ] = useState({});
@@ -123,7 +136,7 @@ const CountyMap = props => {
   })
 
   useEffect(() => {
-    let currentYear = getCurrentTopoYear(state);
+    let currentYear = getCurrentTopoYear(state, runtimeFilters);
 
     if(currentYear !== topoData.year){
       getTopoData(currentYear).then(response => {
@@ -134,17 +147,17 @@ const CountyMap = props => {
         setTopoData(response);
       })
     }
-  }, [state.general.countyCensusYear, JSON.stringify(state.filters)])
+  }, [state.general.countyCensusYear, JSON.stringify(runtimeFilters)])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
   // The resize function so it includes the latest state variables
   useEffect(() => {
-    if(isTopoReady(topoData, state)){
+    if(isTopoReady(topoData, state, runtimeFilters)){
       drawCanvas()
     }
 
     const onResize = () => {
-      if (canvasRef.current && isTopoReady(topoData, state)) {
+      if (canvasRef.current && isTopoReady(topoData, state, runtimeFilters)) {
         drawCanvas()
       }
     }
@@ -161,7 +174,7 @@ const CountyMap = props => {
   const tooltipRef = useRef()
 
   // If runtimeData is not defined, show loader
-  if (!data || !isTopoReady(topoData, state)) {
+  if (!data || !isTopoReady(topoData, state, runtimeFilters)) {
     return <div style={{height: 300}}>
       <Loading />
     </div>
