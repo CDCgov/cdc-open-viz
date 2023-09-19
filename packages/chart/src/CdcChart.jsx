@@ -1182,7 +1182,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Filters */}
             {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} isNumber={isNumber} dimensions={dimensions} />}
             {/* Visualization */}
-            {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
+            {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
             <div
               style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
@@ -1193,7 +1193,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {/* Sparkline */}
               {config.visualizationType === 'Spark Line' && (
                 <>
-                  {description && <div className='subtext'>{parse(description)}</div>}
+                  {config?.introText && (
+                    <section className='introText' style={{ padding: '15px 0 35px' }}>
+                      {parse(config.introText)}
+                    </section>
+                  )}
+
                   <div style={sparkLineStyles}>
                     <ParentSize>
                       {parent => (
@@ -1203,6 +1208,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                       )}
                     </ParentSize>
                   </div>
+                  {description && (
+                    <div className='subtext' style={{ padding: '35px 0 15px' }}>
+                      {parse(description)}
+                    </div>
+                  )}
                 </>
               )}
               {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
