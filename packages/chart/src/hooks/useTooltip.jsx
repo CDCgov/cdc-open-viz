@@ -50,8 +50,6 @@ export const useTooltip = props => {
     // Additional data for pie charts
     const { data: pieChartData, arc } = additionalChartData
 
-    console.log('x', x)
-
     const closestXScaleValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
 
     const includedSeries = visualizationType !== 'Pie' ? config.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.series.map(item => item.dataKey)

@@ -120,10 +120,7 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                 x={d => xScale(getXAxisData(d))}
                 y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                 stroke={
-                  colorScale && !config.legend.dynamicLegend
-                    ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey)
-                    : // is dynamic legend
-                    config.legend.dynamicLegend
+                  colorScale
                     ? colorPalettes[config.palette][index]
                     : // fallback
                       '#000'
