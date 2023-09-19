@@ -375,11 +375,17 @@ const SeriesInputName = props => {
     let series = [...config.series]
     let seriesLabelsCopy = { ...config.runtime.seriesLabels }
     series[i].name = value
-    seriesLabelsCopy[series[i].dataKey] = series[i].name
+    seriesLabelsCopy[series[i].dataKey] = series[i].name ? series[i].name : series[i].dataKey
+
+    console.log('new config.runtime.seriesLabels', seriesLabelsCopy)
 
     let newConfig = {
       ...config,
-      series
+      series,
+      runtime: {
+        ...config.runtime,
+        seriesLabels: seriesLabelsCopy
+      }
     }
 
     updateConfig(newConfig)
