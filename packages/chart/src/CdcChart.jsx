@@ -394,8 +394,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.name || series.label || series.dataKey)
+            newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
+            newConfig.runtime.seriesLabelsAll.push(series.name || series.dataKey)
             return series.dataKey
           })
         : []
@@ -776,7 +776,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     const newSeriesHighlight = []
 
     // If we're highlighting all the series, reset them
-    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend && config.visualizationType !== 'Forecasting') {
+    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
       highlightReset()
       return
     }
@@ -806,25 +806,21 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
      * - pushes series.dataKey into the series highlight based on the found series.name
      * @param {String} value
      */
-    const pushDataKeyBySeriesName = value => {
-      let matchingSeries = config.series.filter(series => series.name === value.text)
-      if (matchingSeries?.length > 0) {
-        newSeriesHighlight.push(matchingSeries[0].dataKey)
-      }
-    }
+    // const pushDataKeyBySeriesName = value => {
+    //   let matchingSeries = config.series.filter(series => series.name === value.text)
+    //   if (matchingSeries?.length > 0) {
+    //     newSeriesHighlight.push(matchingSeries[0].dataKey)
+    //   }
+    // }
 
-    pushDataKeyBySeriesName(label)
+    // pushDataKeyBySeriesName(label)
 
     setSeriesHighlight(newSeriesHighlight)
   }
 
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
-    if (config.legend.dynamicLegend && dynamicLegendItems) {
-      setSeriesHighlight(dynamicLegendItems.map(item => item.text))
-    } else {
-      setSeriesHighlight([])
-    }
+    setSeriesHighlight([])
   }
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
