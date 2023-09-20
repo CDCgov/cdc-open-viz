@@ -3,7 +3,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 function useReduceData(config, data) {
   const isBar = config.series.every(({ type }) => type === 'Bar')
   const isAllLine = config.series.every(({ type }) => ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg'].includes(type))
-  const sumYValues = seriesKeys => xValue => seriesKeys.reduce((yTotal, k) => yTotal + Number(xValue[k]), 0)
+  const sumYValues = seriesKeys => xValue => seriesKeys.reduce((yTotal, k) => (isNaN(Number(xValue[k])) ? yTotal : yTotal + Number(xValue[k])), 0)
 
   const getMaxValueFromData = () => {
     let max = Math.max(...data.map(d => Math.max(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
