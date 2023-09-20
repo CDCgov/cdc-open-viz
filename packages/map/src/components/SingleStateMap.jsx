@@ -110,7 +110,7 @@ const SingleStateMap = props => {
         setTopoData(response);
       })
     }
-  }, [state.general.countyCensusYear, JSON.stringify(runtimeFilters)])
+  }, [state.general.countyCensusYear, state.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
 
   // When choosing a state changes...
   useEffect(() => {
