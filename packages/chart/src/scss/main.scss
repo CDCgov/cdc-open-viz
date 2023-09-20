@@ -172,6 +172,9 @@
       text-align: left;
       align-items: flex-start !important;
       user-select: none;
+    }
+
+    .vertical-sorted:not(.single-row) .legend-item {
       white-space: nowrap;
     }
 
