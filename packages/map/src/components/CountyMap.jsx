@@ -147,7 +147,7 @@ const CountyMap = props => {
         setTopoData(response);
       })
     }
-  }, [state.general.countyCensusYear, JSON.stringify(runtimeFilters)])
+  }, [state.general.countyCensusYear, state.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
   // The resize function so it includes the latest state variables
