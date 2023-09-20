@@ -17,6 +17,7 @@ export default {
     hasRegions: false,
     fullBorder: false,
     type: 'data',
+    convertFipsCodes: true,
     palette: {
       isReversed: false
     },
