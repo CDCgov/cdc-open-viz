@@ -204,7 +204,6 @@ const DataTable = props => {
       return sortVal
     })
   }
-  console.log(sortBy, 'rowsrows[')
 
   const genMapRows = rows => {
     const allrows = rows.map(row => {
@@ -393,50 +392,6 @@ const DataTable = props => {
       </tr>
     ))
   }
-
-  // const genChartRows = rows => {
-  //   const allRows = rows.map(row => {
-  //     return (
-  //       <tr role='row'>
-  //         {dataSeriesColumns().map(column => {
-  //           const rowObj = runtimeData[row]
-  //           let cellValue // placeholder for formatting below
-  //           let labelValue = rowObj[column] // just raw X axis string
-  //           if (column === config.xAxis.dataKey) {
-  //             // not the prettiest, but helper functions work nicely here.
-  //             cellValue = <>{config.xAxis.type === 'date' ? formatDate(config.xAxis.dateDisplayFormat, parseDate(config.xAxis.dateParseFormat, labelValue)) : labelValue}</>
-  //           } else {
-  //             let resolvedAxis = 'left'
-  //             let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
-  //             let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
-
-  //             leftAxisItems.map(leftSeriesItem => {
-  //               if (leftSeriesItem.dataKey === column) resolvedAxis = 'left'
-  //             })
-
-  //             rightAxisItems.map(rightSeriesItem => {
-  //               if (rightSeriesItem.dataKey === column) resolvedAxis = 'right'
-  //             })
-
-  //             let addColParams = isAdditionalColumn(column)
-  //             if (addColParams) {
-  //               cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams)
-  //             } else {
-  //               cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config)
-  //             }
-  //           }
-
-  //           return (
-  //             <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`}>
-  //               {cellValue}
-  //             </td>
-  //           )
-  //         })}
-  //       </tr>
-  //     )
-  //   })
-  //   return allRows
-  // }
 
   const upIcon = (
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5'>
