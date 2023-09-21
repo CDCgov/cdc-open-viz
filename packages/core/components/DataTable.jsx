@@ -162,6 +162,25 @@ const DataTable = props => {
   }
 
   let rows = []
+  const customSortX = (a, b) => {
+    const isDateA = Date.parse(a)
+    const isDateB = Date.parse(b)
+
+    const isNumberA = !isNaN(a)
+    const isNumberB = !isNaN(b)
+
+    if (isDateA && isDateB) {
+      return sortBy.asc ? new Date(a) - new Date(b) : new Date(b) - new Date(a)
+    }
+    if (isNumberA && isNumberB) {
+      return sortBy.asc ? Number(a) - Number(b) : Number(b) - Number(a)
+    }
+    if (typeof a === 'string' && typeof b === 'string') {
+      return sortBy.asc ? a.localeCompare(b) : b.localeCompare(a)
+    }
+
+    return 0
+  }
 
   if (config.type === 'map') {
     rows = Object.keys(runtimeData).sort((a, b) => {
@@ -175,21 +194,16 @@ const DataTable = props => {
       return -1
     })
   } else {
-    rows = [...runtimeData].sort((a, b) => {
+    rows = runtimeData.sort((a, b) => {
       let sortVal = 0
 
       if (sortBy.column !== null) {
-        sortVal = customSort(a[sortBy.column], b[sortBy.column])
-      }
-
-      if (!sortBy.asc) {
-        sortVal = -sortVal
+        sortVal = customSortX(a[sortBy.column], b[sortBy.column])
       }
 
       return sortVal
     })
   }
-  console.log(rows, 'ROWS')
   console.log(sortBy, 'rowsrows[')
 
   const genMapRows = rows => {
@@ -533,7 +547,7 @@ const DataTable = props => {
           <div className='table-container' style={limitHeight}>
             <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={config?.data?.length ? config.data.length : '-1'}>
               <caption className='cdcdataviz-sr-only'>{caption}</caption>
-              <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{config.type === 'map' ? genMapHeader(columns) : genChartHeader(columns, runtimeData)}</thead>
+              <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{config.type === 'map' ? genMapHeader(columns) : genChartHeader(columns, rows)}</thead>
               <tbody>{config.type === 'map' ? genMapRows(rows) : genChartRows(rows)}</tbody>
             </table>
 
