@@ -28,7 +28,7 @@ const DataTable = props => {
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
-  const [sortBy, setSortBy] = useState({ column: config.type === 'map' ? 'geo' : 'date', asc: false })
+  const [sortBy, setSortBy] = useState({ column: config.type === 'map' ? 'geo' : null, asc: false })
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
@@ -37,78 +37,33 @@ const DataTable = props => {
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
   const customSort = (a, b) => {
-    const digitRegex = /\d+/
+    // Check for null or undefined
+    // Convert to number if it's a numeric string
+    a = isNaN(a) ? a : parseFloat(a)
+    b = isNaN(b) ? b : parseFloat(b)
 
-    const hasNumber = value => digitRegex.test(value)
+    // Check for dates
+    const dateA = Date.parse(a)
+    const dateB = Date.parse(b)
+    if (!isNaN(dateA) && !isNaN(dateB)) return dateA - dateB
 
-    // force null and undefined to the bottom
-    a = a === null || a === undefined ? '' : a
-    b = b === null || b === undefined ? '' : b
+    // Check for numbers
+    const numA = Number(a)
+    const numB = Number(b)
+    if (!isNaN(numA) && !isNaN(numB)) return numA - numB
 
-    // check for dates first
-    if (!isNaN(Date.parse(a)) && !isNaN(Date.parse(b))) {
-      return Date.parse(a) - Date.parse(b)
+    // Check for strings
+    if (typeof a === 'string' && typeof b === 'string') {
+      const cleanA = a.toLowerCase().replace('us-', '')
+      const cleanB = b.toLowerCase().replace('us-', '')
+      return cleanA.localeCompare(cleanB)
     }
 
-    // convert any strings that are actually numbers to proper data type
-    const aNum = Number(a)
+    // Check for mixed types
+    if (typeof a === 'number' && typeof b === 'string') return -1
+    if (typeof a === 'string' && typeof b === 'number') return 1
 
-    if (!Number.isNaN(aNum)) {
-      a = aNum
-    }
-
-    const bNum = Number(b)
-
-    if (!Number.isNaN(bNum)) {
-      b = bNum
-    }
-
-    // remove iso code prefixes
-    if (typeof a === 'string') {
-      a = a.replace('us-', '')
-      a = displayGeoName(a)
-    }
-
-    if (typeof b === 'string') {
-      b = b.replace('us-', '')
-      b = displayGeoName(b)
-    }
-
-    // force any string values to lowercase
-    a = typeof a === 'string' ? a.toLowerCase() : a
-    b = typeof b === 'string' ? b.toLowerCase() : b
-
-    // If the string contains a number, remove the text from the value and only sort by the number. Only uses the first number it finds.
-    if (typeof a === 'string' && hasNumber(a) === true) {
-      a = a.match(digitRegex)[0]
-
-      a = Number(a)
-    }
-
-    if (typeof b === 'string' && hasNumber(b) === true) {
-      b = b.match(digitRegex)[0]
-
-      b = Number(b)
-    }
-
-    // When comparing a number to a string, always send string to bottom
-    if (typeof a === 'number' && typeof b === 'string') {
-      return 1
-    }
-
-    if (typeof b === 'number' && typeof a === 'string') {
-      return -1
-    }
-
-    // Return either 1 or -1 to indicate a sort priority
-    if (a > b) {
-      return 1
-    }
-    if (a < b) {
-      return -1
-    }
-    // returning 0, undefined or any falsey value will use subsequent sorts or
-    // the index as a tiebreaker
+    // Default: consider them equal
     return 0
   }
 
@@ -206,19 +161,36 @@ const DataTable = props => {
       break
   }
 
-  const rows = Object.keys(runtimeData).sort((a, b) => {
-    let sortVal
-    if (config.type === 'map' && config.columns) {
-      sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
-    }
-    if (config.type === 'chart') {
-      sortVal = customSort(runtimeData[a][sortBy.column], runtimeData[b][sortBy.column])
-    }
-    if (!sortBy.asc) return sortVal
-    if (sortVal === 0) return 0
-    if (sortVal < 0) return 1
-    return -1
-  })
+  let rows = []
+
+  if (config.type === 'map') {
+    rows = Object.keys(runtimeData).sort((a, b) => {
+      let sortVal
+      if (config.columns) {
+        sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
+      }
+      if (!sortBy.asc) return sortVal
+      if (sortVal === 0) return 0
+      if (sortVal < 0) return 1
+      return -1
+    })
+  } else {
+    rows = [...runtimeData].sort((a, b) => {
+      let sortVal = 0
+
+      if (sortBy.column !== null) {
+        sortVal = customSort(a[sortBy.column], b[sortBy.column])
+      }
+
+      if (!sortBy.asc) {
+        sortVal = -sortVal
+      }
+
+      return sortVal
+    })
+  }
+  console.log(rows, 'ROWS')
+  console.log(sortBy, 'rowsrows[')
 
   const genMapRows = rows => {
     const allrows = rows.map(row => {
@@ -333,11 +305,11 @@ const DataTable = props => {
               role='columnheader'
               scope='col'
               onClick={() => {
-                setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                setSortBy({ column: column, asc: !sortBy.asc })
               }}
               onKeyDown={e => {
                 if (e.keyCode === 13) {
-                  setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                  setSortBy({ column: column, asc: !sortBy.asc })
                 }
               }}
               className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
@@ -374,48 +346,83 @@ const DataTable = props => {
   }
 
   const genChartRows = rows => {
-    const allRows = rows.map(row => {
-      return (
-        <tr role='row'>
-          {dataSeriesColumns().map(column => {
-            const rowObj = runtimeData[row]
-            let cellValue // placeholder for formatting below
-            let labelValue = rowObj[column] // just raw X axis string
-            if (column === config.xAxis.dataKey) {
-              // not the prettiest, but helper functions work nicely here.
-              cellValue = <>{config.xAxis.type === 'date' ? formatDate(config.xAxis.dateDisplayFormat, parseDate(config.xAxis.dateParseFormat, labelValue)) : labelValue}</>
+    return rows.map((row, index) => (
+      <tr key={index} role='row'>
+        {dataSeriesColumns().map(column => {
+          let cellValue
+          const labelValue = row[column]
+
+          if (column === config.xAxis.dataKey) {
+            cellValue = <>{config.xAxis.type === 'date' ? formatDate(config.xAxis.dateDisplayFormat, parseDate(config.xAxis.dateParseFormat, labelValue)) : labelValue}</>
+          } else {
+            let resolvedAxis = 'left'
+            const leftAxisItems = config.series.filter(item => item?.axis === 'Left')
+            const rightAxisItems = config.series.filter(item => item?.axis === 'Right')
+
+            if (leftAxisItems.some(item => item.dataKey === column)) resolvedAxis = 'left'
+            if (rightAxisItems.some(item => item.dataKey === column)) resolvedAxis = 'right'
+
+            const addColParams = isAdditionalColumn(column)
+            if (addColParams) {
+              cellValue = formatNumber(row[column], resolvedAxis, false, config, addColParams)
             } else {
-              let resolvedAxis = 'left'
-              let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
-              let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
-
-              leftAxisItems.map(leftSeriesItem => {
-                if (leftSeriesItem.dataKey === column) resolvedAxis = 'left'
-              })
-
-              rightAxisItems.map(rightSeriesItem => {
-                if (rightSeriesItem.dataKey === column) resolvedAxis = 'right'
-              })
-
-              let addColParams = isAdditionalColumn(column)
-              if (addColParams) {
-                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams)
-              } else {
-                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config)
-              }
+              cellValue = formatNumber(row[column], resolvedAxis, false, config)
             }
+          }
 
-            return (
-              <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`}>
-                {cellValue}
-              </td>
-            )
-          })}
-        </tr>
-      )
-    })
-    return allRows
+          return (
+            <td tabIndex='0' role='gridcell' key={`${labelValue}--${index}`}>
+              {cellValue}
+            </td>
+          )
+        })}
+      </tr>
+    ))
   }
+
+  // const genChartRows = rows => {
+  //   const allRows = rows.map(row => {
+  //     return (
+  //       <tr role='row'>
+  //         {dataSeriesColumns().map(column => {
+  //           const rowObj = runtimeData[row]
+  //           let cellValue // placeholder for formatting below
+  //           let labelValue = rowObj[column] // just raw X axis string
+  //           if (column === config.xAxis.dataKey) {
+  //             // not the prettiest, but helper functions work nicely here.
+  //             cellValue = <>{config.xAxis.type === 'date' ? formatDate(config.xAxis.dateDisplayFormat, parseDate(config.xAxis.dateParseFormat, labelValue)) : labelValue}</>
+  //           } else {
+  //             let resolvedAxis = 'left'
+  //             let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
+  //             let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
+
+  //             leftAxisItems.map(leftSeriesItem => {
+  //               if (leftSeriesItem.dataKey === column) resolvedAxis = 'left'
+  //             })
+
+  //             rightAxisItems.map(rightSeriesItem => {
+  //               if (rightSeriesItem.dataKey === column) resolvedAxis = 'right'
+  //             })
+
+  //             let addColParams = isAdditionalColumn(column)
+  //             if (addColParams) {
+  //               cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams)
+  //             } else {
+  //               cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config)
+  //             }
+  //           }
+
+  //           return (
+  //             <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`}>
+  //               {cellValue}
+  //             </td>
+  //           )
+  //         })}
+  //       </tr>
+  //     )
+  //   })
+  //   return allRows
+  // }
 
   const upIcon = (
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5'>
