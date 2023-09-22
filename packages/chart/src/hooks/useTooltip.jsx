@@ -170,7 +170,7 @@ export const useTooltip = props => {
   const getXValueFromCoordinate = x => {
     if (visualizationType === 'Pie') return
     if (orientation === 'horizontal') return
-    if (xScale.type === 'point' || xAxis.type === 'continuous') {
+    if (xScale.type === 'point' || xAxis.type === 'continuous' || xAxis.type === 'date') {
       // Find the closest x value by calculating the minimum distance
       let closestX = null
       let minDistance = Number.MAX_VALUE

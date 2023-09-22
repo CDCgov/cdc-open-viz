@@ -92,6 +92,7 @@ export default {
     horizontal: 750
   },
   xAxis: {
+    sortDates: false,
     anchors: [],
     type: 'categorical',
     showTargetLabel: true,
