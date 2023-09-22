@@ -48,7 +48,7 @@ const useScales = properties => {
   }
 
   // handle Area chart
-  if (config.xAxis.type === 'date') {
+  if (config.xAxis.type === 'date' && config.visualizationType !== 'Bar') {
     xScale = scaleTime({
       domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)],
       range: [0, xMax]
