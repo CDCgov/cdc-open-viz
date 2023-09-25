@@ -141,6 +141,18 @@ aside {
     }
   }
 
+  .bottom .legend-container__ul--single-column:not(.vertical-sorted) {
+    display: inline-block;
+
+    @include breakpoint(md) {
+      display: flex;
+    }
+
+    .legend-container__li {
+      width: 100%;
+    }
+  }
+
   &.side .legend-container .legend-container__ul--single-column {
     @include breakpointClass(md) {
       width: 25%;
