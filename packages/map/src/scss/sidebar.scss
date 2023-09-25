@@ -116,7 +116,8 @@ aside {
       }
 
       &:not(.vertical-sorted, .legend-container__ul--single-column) {
-        @include breakpoint(md) {
+        width: 100%;
+        @include breakpoint(sm) {
           .legend-container__li {
             width: 50%;
           }
