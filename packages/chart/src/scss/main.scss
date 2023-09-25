@@ -131,8 +131,11 @@
       }
       &.vertical-sorted {
         display: block;
-        column-count: 2;
-        column-width: 100%;
+
+        @include breakpoint(md) {
+          column-count: 2;
+          column-width: 100%;
+        }
         column-gap: 1.5em;
         column-fill: balance;
       }

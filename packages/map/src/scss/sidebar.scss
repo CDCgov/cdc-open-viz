@@ -114,6 +114,14 @@ aside {
       &.vertical-sorted {
         flex-direction: column;
       }
+
+      &:not(.vertical-sorted, .legend-container__ul--single-column) {
+        @include breakpoint(md) {
+          .legend-container__li {
+            width: 50%;
+          }
+        }
+      }
       .legend-container__li {
         flex-shrink: 0;
         display: inline-block;
