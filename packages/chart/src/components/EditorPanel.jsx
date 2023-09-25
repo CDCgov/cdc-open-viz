@@ -2687,7 +2687,12 @@ const EditorPanel = () => {
                   <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={updateField} options={['highlight', 'isolate']} />
                   <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
                   <Select value={config.legend.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
-                  {config.legend.position === 'bottom' && <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />}
+                  {config.legend.position === 'bottom' && (
+                    <>
+                      <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />
+                      <CheckBox value={config.legend.verticalSorted} section='legend' fieldName='verticalSorted' label='Vertical sorted Legend' updateField={updateField} />
+                    </>
+                  )}
                   <TextField type='textarea' value={config.legend.description} updateField={updateField} section='legend' fieldName='description' label='Legend Description' />
                 </AccordionItemPanel>
               </AccordionItem>

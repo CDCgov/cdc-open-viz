@@ -141,7 +141,8 @@ export default {
     dynamicLegendItemLimit: 5,
     dynamicLegendItemLimitMessage: 'Dynamic Legend Item Limit Hit.',
     dynamicLegendChartMessage: 'Select Options from the Legend',
-    lineMode: false
+    lineMode: false,
+    verticalSorted: false
   },
   exclusions: {
     active: false,
