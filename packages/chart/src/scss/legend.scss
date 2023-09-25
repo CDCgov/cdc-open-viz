@@ -24,13 +24,17 @@ aside {
       right: 1em;
 
       ul.vertical-sorted {
-        column-count: 2;
-        column-fill: balance;
+        @include breakpoint(md) {
+          column-count: 2;
+          column-fill: balance;
+        }
       }
 
       ul:not(.vertical-sorted) {
-        column-count: initial;
-        column-fill: initial;
+        @include breakpoint(md) {
+          column-count: initial;
+          column-fill: initial;
+        }
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
@@ -40,8 +44,10 @@ aside {
     &.bottom {
       ul.legend-container__ul.vertical-sorted {
         display: block;
-        column-count: 2;
-        column-fill: balance;
+        @include breakpoint(md) {
+          column-count: 2;
+          column-fill: balance;
+        }
       }
 
       ul.legend-container__ul {
