@@ -315,7 +315,7 @@ export const useTooltip = props => {
       if (!config.dashboard) {
         switch (visualizationType) {
           case 'Combo':
-            standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...runtime?.lineSeriesKeys, ...stageColumns, ...ciItems]
+            standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys, ...stageColumns, ...ciItems]
             break
           case 'Forecasting':
             standardLoopItems = [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
