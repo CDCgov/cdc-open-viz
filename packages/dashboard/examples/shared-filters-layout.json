@@ -266,11 +266,11 @@
         "height": "",
         "caption": "",
         "showDownloadUrl": false,
-        "showDataTableLink": true,
+        "showDataTableLink": false,
         "indexLabel": "",
         "download": false,
         "showVertical": true,
-        "show": true
+        "show": false
       },
       "orientation": "vertical",
       "color": "pinkpurple",

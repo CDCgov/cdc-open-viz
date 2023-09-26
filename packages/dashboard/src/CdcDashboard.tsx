@@ -137,7 +137,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       const filterParents = config.dashboard.sharedFilters.filter(f => sharedFilter.parents?.includes(f.key))
       const notAllParentFiltersSelected = filterParents.some(p => !p.active)
       if (filterParents && notAllParentFiltersSelected) return
-      let defaultValue = sharedFilter.apiFilter!.defaultValue || filterDropdowns[0].value
+      const defaultFilterDropdown = filterDropdowns.find(({ value }) => value === sharedFilter.apiFilter!.defaultValue)
+      let defaultValue = defaultFilterDropdown?.value || filterDropdowns[0].value
       changeFilterActive(sharedFilterIndex, defaultValue)
     }
   }
