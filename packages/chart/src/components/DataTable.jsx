@@ -13,7 +13,10 @@ import ConfigContext from '../ConfigContext'
 
 import MediaControls from '@cdc/core/components/MediaControls'
 
-export default function DataTable() {
+const DataTable = props => {
+  // had to pass in runtimeData as prop to get the raw prop names in the inbound data (TT)
+  const { runtimeData, isDebug } = props
+
   const { rawData, tableData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, currentViewport } = useContext(ConfigContext)
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
@@ -150,7 +153,8 @@ export default function DataTable() {
           },
           id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
           sortType: 'custom',
-          canSort: true
+          canSort: true,
+          defaultCanSort: true
         }
 
         newTableColumns.push(newCol)
@@ -231,7 +235,9 @@ export default function DataTable() {
       <path d='M0 0l5 5 5-5z' />
     </svg>
   )
-
+  const getSpecificCellData = (array, value) => {
+    return array.filter(data => JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1)
+  }
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
     {
       columns: tableColumns,
@@ -240,27 +246,139 @@ export default function DataTable() {
       disableSortRemove: true, // otherwise 3rd click on header removes sorting entirely
       sortTypes: {
         custom: (rowA, rowB, columnId) => {
-          // rowA.original - is the row data field name to access the value
-          // columnId = the column indicator
-          let dataKey = config.xAxis.dataKey
-          let colObj = config.data.filter(obj => {
-            return obj[dataKey] === columnId.split('--')[0] // have to remove index
-          })
-          if (colObj === undefined || colObj[0] === undefined) {
-            return -1
-          }
-          // NOW we can get the sort values
-          const a = transform.cleanDataPoint(colObj[0][rowA.original]) // issue was that a was UNDEFINED therefore it CANT SORT
-          const b = transform.cleanDataPoint(colObj[0][rowB.original])
+          // NOTE:
+          // 1) Main issue causing all this code:
+          //     rowA and rowB are coming in with all values undefined
+          // - if it passed the values we could just use the columnId to get the correct sort value
+          // but since it's not there we have to go through a bunch of code to get it because
+          // we also do not know the Y axis data key (TT)
+          // 2). if formattedData did not truncate the strings we could get it from there
+          // but Hispanic or Latino is truncated to just Hispanic as the key
+          // and 'White, Non-Hispanic/Latino' gets truncated to remove the /Latino
 
-          if (a === undefined) {
+          // rowA.original - is the row data field name to access the value
+          // columnId = the column indicator typically date or date--index
+          let a, b
+          if (columnId === 'series-label') {
+            // comparing strings
+            a = rowA.original
+            b = rowB.original
+            return a.localeCompare(b)
+          }
+
+          let dataKey = config.xAxis.dataKey
+          let columnIdIndexRemoved = columnId.split('--')[0] // have to remove index for compare
+          //get all the data from that column
+          let colData = runtimeData.filter(obj => {
+            // problem is dates can be in different formats
+            if (config.xAxis.type === 'date' && !isNaN(Date.parse(obj[dataKey])) && !isNaN(Date.parse(columnIdIndexRemoved))) {
+              // must convert to datetime number to compare
+              return parseDate(obj[dataKey]).getTime() === parseDate(columnIdIndexRemoved).getTime()
+            } else {
+              return obj[dataKey] === columnIdIndexRemoved // have to remove index
+            }
+          })
+
+          if (colData === undefined || colData[0] === undefined) {
             return -1
           }
-          if (!isNaN(Number(a)) && !isNaN(Number(b))) {
-            return Number(a) - Number(b)
+
+          let rowA_cellObj = getSpecificCellData(colData, rowA.original)
+          let rowB_cellObj = getSpecificCellData(colData, rowB.original)
+
+          // - ** REMOVE any data points NOT selected in the data series ***
+          // I dont understand why not selected data series are still sent down in the data
+          // - would be better to scrub outside of here (TT)
+          let newRowA_cellObj = []
+          let newRowB_cellObj = []
+          if (config.runtime.seriesKeys) {
+            config.runtime.seriesKeys.forEach(seriesKey => {
+              if (seriesKey in rowA_cellObj[0]) newRowA_cellObj.push(rowA_cellObj[0][seriesKey])
+              if (seriesKey in rowB_cellObj[0]) newRowB_cellObj.push(rowB_cellObj[0][seriesKey])
+            })
+            // copy back over
+            rowA_cellObj[0] = newRowA_cellObj
+            rowB_cellObj[0] = newRowB_cellObj
           }
-          return a.localeCompare(b)
+
+          // REMOVE the following:
+          // - value equal to column date
+          // - value that is the .original
+          // - any data still in that's not really a number
+          let rowA_valueObj = Object.values(rowA_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowA.original && !isNaN(value))
+          let rowB_valueObj = Object.values(rowB_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowB.original && !isNaN(value))
+
+          // NOW we can get the sort values from the cell object
+          a = rowA_valueObj.length > 1 ? rowA_valueObj[rowA.id] : rowA_valueObj[0]
+          b = rowB_valueObj.length > 1 ? rowB_valueObj[rowB.id] : rowB_valueObj[0]
+
+          // force null and undefined to the bottom
+          a = a === null || a === undefined ? '' : transform.cleanDataPoint(a)
+          b = b === null || b === undefined ? '' : transform.cleanDataPoint(b)
+          if (a === '' || a === null) {
+            if (b === '' || b === null) {
+              return 0 // Both empty/null
+            }
+            return -1 // Sort a to an index lower than b
+          }
+          if (b === '' || b === null) {
+            if (a === '' || a === null) {
+              return 0 // Both empty/null
+            }
+            return 1 // Sort b to an index lower than a
+          }
+          // End code for forcing NULLS to bottom
+
+          // convert any strings that are actually numbers to proper data type
+          const aNum = Number(a)
+
+          if (!Number.isNaN(aNum)) {
+            a = aNum
+          }
+
+          const bNum = Number(b)
+
+          if (!Number.isNaN(bNum)) {
+            b = bNum
+          }
+          // remove iso code prefixes
+          if (typeof a === 'string') {
+            a = a.replace('us-', '')
+            a = displayGeoName(a)
+          }
+
+          if (typeof b === 'string') {
+            b = b.replace('us-', '')
+            b = displayGeoName(b)
+          }
+
+          // force any string values to lowercase
+          a = typeof a === 'string' ? a.toLowerCase() : a
+          b = typeof b === 'string' ? b.toLowerCase() : b
+
+          // When comparing a number to a string, always send string to bottom
+          if (typeof a === 'number' && typeof b === 'string') {
+            return 1
+          }
+
+          if (typeof b === 'number' && typeof a === 'string') {
+            return -1
+          }
+
+          // Return either 1 or -1 to indicate a sort priority
+          if (a > b) {
+            return 1
+          }
+          if (a < b) {
+            return -1
+          }
+          // returning 0, undefined or any falsey value will use subsequent sorts or
+          // the index as a tiebreaker
+          return 0
         }
+      },
+      initialState: {
+        sortBy: [{ id: 'series-label', desc: false }] // default sort on 1st column -
       }
     },
     useSortBy,
@@ -372,3 +490,5 @@ export default function DataTable() {
     </ErrorBoundary>
   )
 }
+
+export default DataTable

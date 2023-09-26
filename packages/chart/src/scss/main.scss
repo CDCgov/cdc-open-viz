@@ -179,6 +179,7 @@
       text-align: left;
       align-items: flex-start !important;
       user-select: none;
+      white-space: nowrap;
     }
 
     .vertical-sorted:not(.single-row) .legend-item {

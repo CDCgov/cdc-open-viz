@@ -86,7 +86,39 @@ const Sidebar = props => {
     e.preventDefault()
     resetLegendToggles()
     setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
+    if (undefined === singleFilter.active) return null
+
+    singleFilter.values.forEach((filterOption, idx) => {
+      values.push(
+        <option key={idx} value={filterOption}>
+          {filterOption}
+        </option>
+      )
+    })
   }
+
+    return (
+      <section className='filter-col' key={idx}>
+        {singleFilter.label?.length > 0 && <label htmlFor={`filter-${idx}`}>{singleFilter.label}</label>}
+        <select
+          id={`filter-${idx}`}
+          className='filter-select'
+          aria-label='select filter'
+          value={singleFilter.active}
+          onChange={val => {
+            changeFilterActive(idx, val.target.value)
+            setAccessibleStatus(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`)
+          }}
+        >
+          {values}
+        </select>
+      </section>
+    )
+  })
+
+  const columnLogic = legend.position === 'side' && legend.singleColumn ? 'single-column' : legend.position === 'bottom' && legend.singleRow ? 'single-row' : legend.verticalSorted && !legend.singleRow ? 'vertical-sorted' : ''
+
+  const classNames = [`${legend.position}`, `${columnLogic}`, `cdcdataviz-sr-focusable`, `${viewport}`]
 
   return (
     <ErrorBoundary component='Sidebar'>
