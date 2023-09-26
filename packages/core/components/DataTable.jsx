@@ -37,18 +37,28 @@ const DataTable = props => {
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
   const customSort = (a, b) => {
-    const isDateA = Date.parse(a)
-    const isDateB = Date.parse(b)
+    const isDateA = !isNaN(new Date(a).getTime())
+    const isDateB = !isNaN(new Date(b).getTime())
 
-    const isNumberA = !isNaN(a)
-    const isNumberB = !isNaN(b)
+    const isNumberA = !isNaN(parseFloat(a))
+    const isNumberB = !isNaN(parseFloat(b))
 
+    // If both are valid dates
     if (isDateA && isDateB) {
       return sortBy.asc ? new Date(a) - new Date(b) : new Date(b) - new Date(a)
     }
+
+    // If both are valid numbers or number-like strings
     if (isNumberA && isNumberB) {
-      return sortBy.asc ? Number(a) - Number(b) : Number(b) - Number(a)
+      return sortBy.asc ? parseFloat(a) - parseFloat(b) : parseFloat(b) - parseFloat(a)
     }
+
+    // If neither are valid dates or numbers
+    if (!isDateA && !isDateB && !isNumberA && !isNumberB) {
+      return 0
+    }
+
+    // If both are strings
     if (typeof a === 'string' && typeof b === 'string') {
       return sortBy.asc ? a.localeCompare(b) : b.localeCompare(a)
     }
