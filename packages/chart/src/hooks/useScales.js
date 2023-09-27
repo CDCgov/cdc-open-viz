@@ -48,8 +48,8 @@ const useScales = properties => {
   }
 
   // handle Area chart
-  if (config.visualizationType === 'Area Chart' && config.xAxis.type === 'date') {
-    xScale = scaleLinear({
+  if (config.xAxis.type === 'date' && config.xAxis.sortDates) {
+    xScale = scaleTime({
       domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)],
       range: [0, xMax]
     })

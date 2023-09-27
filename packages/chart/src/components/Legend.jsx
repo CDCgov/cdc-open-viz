@@ -6,6 +6,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 
 import useLegendClasses from './../hooks/useLegendClasses'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
+import { Line } from '@visx/shape'
 
 // * FILE REVIEW *
 // TODO: fix eslint-disable jsxa11y issues
@@ -28,7 +29,8 @@ const Legend = () => {
     highlightReset,
     transformedData: data,
     colorPalettes,
-    currentViewport
+    currentViewport,
+    handleLineType
   } = useContext(ConfigContext)
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
@@ -165,7 +167,6 @@ const Legend = () => {
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
-
   if (!legend) return null
 
   return (
@@ -213,7 +214,14 @@ const Legend = () => {
                         highlight(label)
                       }}
                     >
-                      <LegendCircle fill={label.value} />
+                      {config.visualizationType === 'Line' && config.legend.lineMode ? (
+                        <svg width={40} height={20}>
+                          <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={label.value} strokeWidth={2} strokeDasharray={handleLineType(config.series[i]?.type ? config.series[i]?.type : '')} />
+                        </svg>
+                      ) : (
+                        <LegendCircle fill={label.value} />
+                      )}
+
                       <LegendLabel align='left' margin='0 0 0 4px'>
                         {label.text}
                       </LegendLabel>
