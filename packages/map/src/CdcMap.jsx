@@ -1077,6 +1077,7 @@ const CdcMap = ({
 
   // Attempts to find the corresponding value
   const displayGeoName = key => {
+    if (!state.general.convertFipsCodes) return key
     let value = key
     // Map to first item in values array which is the preferred label
     if (stateKeys.includes(value)) {
@@ -1654,6 +1655,7 @@ const CdcMap = ({
 
               {general.showSidebar && 'navigation' !== general.type && (
                 <Sidebar
+                  state={state}
                   viewport={currentViewport}
                   legend={state.legend}
                   runtimeLegend={runtimeLegend}

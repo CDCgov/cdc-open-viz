@@ -622,7 +622,8 @@ const EditorPanel = props => {
           legend: {
             ...state.legend,
             singleColumn: !state.legend.singleColumn,
-            singleRow: false
+            singleRow: false,
+            verticalSorted: false
           }
         })
         break
@@ -632,6 +633,18 @@ const EditorPanel = props => {
           legend: {
             ...state.legend,
             singleRow: !state.legend.singleRow,
+            singleColumn: false,
+            verticalSorted: false
+          }
+        })
+        break
+      case 'verticalSortedLegend':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            verticalSorted: !state.legend.verticalSorted,
+            singleRow: false,
             singleColumn: false
           }
         })
@@ -1734,6 +1747,25 @@ const EditorPanel = props => {
                       {columnsOptions}
                     </select>
                   </label>
+                  {state.general.type === 'us-geocode' && (
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.general.convertFipsCodes}
+                        onChange={event => {
+                          setState({
+                            ...state,
+                            general: {
+                              ...state.general,
+                              convertFipsCodes: event.target.checked
+                            }
+                          })
+                        }}
+                      />
+                      <span className='edit-label'>Convert FIPS Codes to Geography Name</span>
+                    </label>
+                  )}
+
                   <label className='checkbox'>
                     <input
                       type='checkbox'
@@ -2230,6 +2262,16 @@ const EditorPanel = props => {
                       <span className='edit-label'>Single Row Legend</span>
                     </label>
                   )}
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={legend.verticalSorted}
+                      onChange={event => {
+                        handleEditorChanges('verticalSortedLegend', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Vertical sorted legend</span>
+                  </label>
                   {/* always show */}
                   {
                     <label className='checkbox'>
@@ -2585,16 +2627,16 @@ const EditorPanel = props => {
                     />
                     <span className='edit-label'>Include Full Geo Name in CSV Download</span>
                   </label>
-                  {/* <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.general.showDownloadImgButton}
-                        onChange={event => {
-                          handleEditorChanges('toggleDownloadImgButton', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>Enable Image Download</span>
-                    </label> */}
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={state.general.showDownloadImgButton}
+                      onChange={event => {
+                        handleEditorChanges('toggleDownloadImgButton', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Enable Image Download</span>
+                  </label>
                   {/* <label className='checkbox'>
                       <input
                         type='checkbox'
