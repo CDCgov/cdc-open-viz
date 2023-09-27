@@ -1,14 +1,6 @@
-.map-container.world aside.side {
-  border-top: 0;
-}
-@include breakpointClass(md) {
-  .map-container.world aside.side {
-    border-top: $lightGray 1px solid;
-    position: absolute;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 10px 18px;
-  }
-}
-
+// Notes - copied in from map > sidebar.scss
+// should be placed in a more global area eventually.
+// Had to remove/edit some styles to make the legend look proper.
 aside {
   background-color: #fff;
   z-index: 6;
@@ -27,17 +19,22 @@ aside {
       z-index: 4;
       right: 1em;
       border: $lightGray 1px solid;
+      width: 50%;
       top: 2em;
       right: 1em;
 
       ul.vertical-sorted {
-        column-count: 2;
-        column-fill: balance;
+        @include breakpoint(md) {
+          column-count: 2;
+          column-fill: balance;
+        }
       }
 
       ul:not(.vertical-sorted) {
-        column-count: initial;
-        column-fill: initial;
+        @include breakpoint(md) {
+          column-count: initial;
+          column-fill: initial;
+        }
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
@@ -47,8 +44,10 @@ aside {
     &.bottom {
       ul.legend-container__ul.vertical-sorted {
         display: block;
-        column-count: 2;
-        column-fill: balance;
+        @include breakpoint(md) {
+          column-count: 2;
+          column-fill: balance;
+        }
       }
 
       ul.legend-container__ul {
@@ -69,7 +68,7 @@ aside {
     }
   }
 
-  .legend-container {
+  &.legend-container {
     padding: 1em;
     position: relative;
     .legend-container__title {
@@ -88,11 +87,13 @@ aside {
       color: rgba(0, 0, 0, 0.6);
       position: absolute;
       right: 1em;
+      top: 1em;
       background: rgba(0, 0, 0, 0.1);
       text-transform: uppercase;
       transition: 0.2s all;
       padding: 0.2em 0.5em;
       border: rgba(0, 0, 0, 0.2) 1px solid;
+      color: rgba(0, 0, 0, 0.6) !important;
       &:hover {
         text-decoration: none;
         background: rgba(0, 0, 0, 0.15);
@@ -105,22 +106,9 @@ aside {
     .legend-container__ul {
       list-style: none;
       padding-top: 1em;
-      button {
-        font-size: unset;
-        background: transparent;
-      }
 
       &.vertical-sorted {
         flex-direction: column;
-      }
-
-      &:not(.vertical-sorted, .legend-container__ul--single-column) {
-        width: 100%;
-        @include breakpoint(sm) {
-          .legend-container__li {
-            width: 50%;
-          }
-        }
       }
       .legend-container__li {
         flex-shrink: 0;
@@ -137,18 +125,6 @@ aside {
           opacity: 0.4;
         }
       }
-    }
-  }
-
-  .bottom .legend-container__ul--single-column:not(.vertical-sorted) {
-    display: inline-block;
-
-    @include breakpoint(md) {
-      display: flex;
-    }
-
-    .legend-container__li {
-      width: 100%;
     }
   }
 
