@@ -92,6 +92,7 @@ export default {
     horizontal: 750
   },
   xAxis: {
+    sortDates: false,
     anchors: [],
     type: 'categorical',
     showTargetLabel: true,
@@ -140,8 +141,8 @@ export default {
     dynamicLegendItemLimit: 5,
     dynamicLegendItemLimitMessage: 'Dynamic Legend Item Limit Hit.',
     dynamicLegendChartMessage: 'Select Options from the Legend',
-    verticalSorted: false,
-    lineMode: false
+    lineMode: false,
+    verticalSorted: false
   },
   exclusions: {
     active: false,
