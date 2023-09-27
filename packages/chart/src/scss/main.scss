@@ -131,16 +131,23 @@
       }
       &.vertical-sorted {
         display: block;
-        column-count: 2;
-        column-width: 100%;
+
+        @include breakpoint(md) {
+          column-count: 2;
+          column-width: 100%;
+        }
         column-gap: 1.5em;
         column-fill: balance;
       }
 
       &.single-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(6em, 1fr));
-        grid-column-gap: 1em;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        .legend-item {
+          flex-basis: auto;
+        }
       }
     }
 
@@ -172,6 +179,10 @@
       text-align: left;
       align-items: flex-start !important;
       user-select: none;
+      white-space: nowrap;
+    }
+
+    .vertical-sorted:not(.single-row) .legend-item {
       white-space: nowrap;
     }
 
