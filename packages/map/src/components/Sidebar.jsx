@@ -95,7 +95,6 @@ const Sidebar = props => {
         </option>
       )
     })
-  }
 
     return (
       <section className='filter-col' key={idx}>
@@ -114,7 +113,7 @@ const Sidebar = props => {
         </select>
       </section>
     )
-  })
+  }
 
   const columnLogic = legend.position === 'side' && legend.singleColumn ? 'single-column' : legend.position === 'bottom' && legend.singleRow ? 'single-row' : legend.verticalSorted && !legend.singleRow ? 'vertical-sorted' : ''
 
