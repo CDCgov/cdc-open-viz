@@ -1,0 +1,111 @@
+import { ArgsTable, Meta, Canvas, Story } from '@storybook/blocks';
+
+import Icon from '../Icon'
+import Label from '../../element/Label'
+import iconHash from '../../../data/iconHash.js'
+
+<Meta
+  title="Components/UI/Icon"
+  component={Icon}
+/>
+
+export const Template = ({ ...args }) => <Icon {...args} />
+
+# Icon Component
+The Icon component allows you to reference, and insert, a pre-defined svg image anywhere in your code. A full list of available icons can be found below.
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example"
+         args={{
+           display: 'mapFolded',
+           size: 120,
+           color: '#60a4d5',
+           style: {
+             display: 'block',
+             marginLeft: 'auto',
+             marginRight: 'auto'
+           },
+           base: true
+         }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+<br/>
+<br/>
+
+## Display Options
+By default, the Icon component displays the svg inside a styled span which inherits your current font color and size.
+
+```html
+<span class="cove-icon">
+    <svg ... />
+</span>
+```
+
+If you prefer to use just the base svg - without the wrapping span - simply add the `base` property to the component.
+```jsx
+  <Icon display="iconHash" base />
+```
+
+<br/>
+<br/>
+
+## Available Icons
+
+<br/>
+
+<div className="cove-grid cove-grid--gap--3">
+  [//]: # (Automatically generate icon list from hash)
+  {Object.entries(iconHash).map(([ key ]) => (
+    <div className="icon-grid cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 mb-1" key={key}>
+      <div className="icon-demo">
+        <Icon display={key} base/>
+      </div>
+      <Label upperCase={false}>{key}</Label>
+    </div>
+  ))}
+</div>
+
+<style>
+{`
+  @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+  .icon-grid {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .icon-demo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 1/1;
+    color: #43556f;
+  }
+
+  .icon-demo svg {
+    width: 55px;
+    max-height: 40px;
+    flex: 1 1 auto;
+  }
+
+  .icon-grid .cove-label {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+    color: rgb(100, 116, 139);
+    font-family: sans-serif;
+    font-size: 14px;
+    cursor: text;
+    user-select: text;
+  }
+`}
+</style>

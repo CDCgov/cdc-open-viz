@@ -1,0 +1,82 @@
+import { Canvas, Meta, Story } from '@storybook/blocks';
+
+<Meta title="CSS Systems/Grid"/>
+<style>
+{`
+  .cove-grid--demo-square {
+    background-color: rgb(58 86 155 / 25%);
+    width: 100%;
+    aspect-ratio: 1/1;
+  }
+`}
+</style>
+
+# Grid System
+COVE uses a customized, responsive CSS grid system for displaying grid-based layouts.
+
+Unlike most CSS grid systems, this uses a pure `grid` solution vs `flex`
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Grid">
+    {Grid.bind({})}
+  </Story>
+</Canvas>
+
+The grid system allows users to create a CSS grid using the `.cove-grid` class name, as well as several other class names to modify the grid:
+
+To create different grid gaps, use the `.cove-grid--gap--#` class, where `#` is replaced by the number of cove-grid-gap-offsets to use. This sets grid gaps for both columns and rows simultaneously.
+```html
+<div class="cove-grid cove-grid--gap--2">
+  <div class="cove-grid__col--6">Column 1</div>
+  <div class="cove-grid__col--6">Column 2</div>
+</div>
+```
+
+To modify the number of columns, append `--#` followed by the desired number of columns to the `.cove-grid__col` class name.
+```html
+<div class="cove-grid">
+  <div class="cove-grid__col--3">Column 1</div>
+  <div class="cove-grid__col--9">Column 2</div>
+</div>
+```
+
+To modify the number of rows, append `--#` followed by the desired number of rows to the `.cove-grid__row` class name.
+```html
+<div class="cove-grid">
+<div class="cove-grid__row--3">Row 1</div>
+<div class="cove-grid__row--9">Row 2</div>
+</div>
+```
+
+To create a column offset, append `--#` followed by the number of columns you want to offset to the `.cove-grid__col-offset` class name.
+```html
+<div class="cove-grid">
+  <div class="cove-grid__col--4">Column 1</div>
+  <div class="cove-grid__col-offset--2">Column 2</div>
+  <div class="cove-grid__col--6">Column 3</div>
+</div>
+```
+
+To create a row offset, append `--#` followed by the number of rows you want to offset to the `.cove-grid__row-offset` class name.
+```html
+<div class="cove-grid">
+  <div class="cove-grid__row--4">Row 1</div>
+  <div class="cove-grid__row-offset--2">Row 2</div>
+  <div class="cove-grid__row--6">Row 3</div>
+</div>
+```
+
+export const Grid = ({ ...args }) => <div className="cove-grid cove-grid--gap--2">
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+  <div className="cove-grid__col--4 cove-grid__col--md-3 cove-grid__col--lg-2 cove-grid--demo-square"/>
+</div>
