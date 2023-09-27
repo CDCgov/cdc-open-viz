@@ -4,9 +4,10 @@ import parse from 'html-react-parser'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 const Sidebar = props => {
-  const { legend, runtimeFilters, columns, setAccessibleStatus, changeFilterActive, resetLegendToggles, runtimeLegend, setRuntimeLegend, prefix, suffix, viewport, displayDataAsText } = props
+  const { legend, runtimeFilters, columns, setAccessibleStatus, changeFilterActive, resetLegendToggles, runtimeLegend, setRuntimeLegend, prefix, suffix, viewport, displayDataAsText, state } = props
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -57,9 +58,16 @@ const Sidebar = props => {
       legendLabel = entry.label || entry.value
     }
 
+    const handleListItemClass = () => {
+      let classes = ['legend-container__li']
+      if (disabled) classes.push('legend-container__li--disabled')
+      if (entry.hasOwnProperty('special')) classes.push('legend-container__li--special-class')
+      return classes
+    }
+
     return (
       <li
-        className={disabled ? 'disabled single-legend' : 'single-legend'}
+        className={handleListItemClass().join(' ')}
         key={idx}
         title={`Legend item ${legendLabel} - Click to disable`}
         onClick={() => {
@@ -71,9 +79,13 @@ const Sidebar = props => {
     )
   })
 
-  const filtersList = runtimeFilters.map((singleFilter, idx) => {
-    const values = []
+  const { legendClasses } = useDataVizClasses(state, viewport)
+  console.log('legendClasses', legendClasses)
 
+  const handleReset = e => {
+    e.preventDefault()
+    resetLegendToggles()
+    setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
     if (undefined === singleFilter.active) return null
 
     singleFilter.values.forEach((filterOption, idx) => {
@@ -101,30 +113,23 @@ const Sidebar = props => {
         </select>
       </section>
     )
-  })
+  }
 
-  const columnLogic = legend.position === 'side' && legend.singleColumn ? 'single-column' : legend.position === 'bottom' && legend.singleRow ? 'single-row' : ''
+  const columnLogic = legend.position === 'side' && legend.singleColumn ? 'single-column' : legend.position === 'bottom' && legend.singleRow ? 'single-row' : legend.verticalSorted && !legend.singleRow ? 'vertical-sorted' : ''
 
   const classNames = [`${legend.position}`, `${columnLogic}`, `cdcdataviz-sr-focusable`, `${viewport}`]
 
   return (
     <ErrorBoundary component='Sidebar'>
-      <aside id='legend' className={classNames.join(' ')} role='region' aria-label='Legend' tabIndex='0'>
-        <section className='legend-section' aria-label='Map Legend'>
+      <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex='0'>
+        <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
           {runtimeLegend.disabledAmt > 0 && (
-            <button
-              onClick={e => {
-                e.preventDefault()
-                resetLegendToggles()
-                setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
-              }}
-              className='clear btn'
-            >
+            <button onClick={handleReset} className={legendClasses.resetButton.join(' ') || ''}>
               Clear
             </button>
           )}
-          {legend.title && <span className='heading-2'>{parse(legend.title)}</span>}
-          {legend.dynamicDescription === false && legend.description && <p>{parse(legend.description)}</p>}
+          {legend.title && <span className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</span>}
+          {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>}
           {legend.dynamicDescription === true &&
             runtimeFilters.map((filter, idx) => {
               const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
@@ -133,11 +138,15 @@ const Sidebar = props => {
               const desc = legend.descriptions[lookupStr] || ''
 
               if (desc.length > 0) {
-                return <p key={`dynamic-description-${lookupStr}`}>{desc}</p>
+                return (
+                  <p key={`dynamic-description-${lookupStr}`} className={`dynamic-legend-description-${lookupStr}`}>
+                    {desc}
+                  </p>
+                )
               }
               return true
             })}
-          <ul className={columnLogic} aria-label='Legend items'>
+          <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
             {legendList}
           </ul>
         </section>

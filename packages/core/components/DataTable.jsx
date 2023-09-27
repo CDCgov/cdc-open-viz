@@ -37,6 +37,25 @@ const DataTable = props => {
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
   const customSort = (a, b) => {
+    const isDateA = Date.parse(a)
+    const isDateB = Date.parse(b)
+
+    const isNumberA = !isNaN(a)
+    const isNumberB = !isNaN(b)
+
+    if (isDateA && isDateB) {
+      return sortBy.asc ? new Date(a) - new Date(b) : new Date(b) - new Date(a)
+    }
+    if (isNumberA && isNumberB) {
+      return sortBy.asc ? Number(a) - Number(b) : Number(b) - Number(a)
+    }
+    if (typeof a === 'string' && typeof b === 'string') {
+      return sortBy.asc ? a.localeCompare(b) : b.localeCompare(a)
+    }
+
+    return 0
+  }
+  const customSortX = (a, b) => {
     const digitRegex = /\d+/
 
     const hasNumber = value => digitRegex.test(value)
@@ -44,6 +63,11 @@ const DataTable = props => {
     // force null and undefined to the bottom
     a = a === null || a === undefined ? '' : a
     b = b === null || b === undefined ? '' : b
+
+    // check for dates first
+    if (!isNaN(Date.parse(a)) && !isNaN(Date.parse(b))) {
+      return Date.parse(a) - Date.parse(b)
+    }
 
     // convert any strings that are actually numbers to proper data type
     const aNum = Number(a)
@@ -202,17 +226,18 @@ const DataTable = props => {
   }
 
   const rows = Object.keys(runtimeData).sort((a, b) => {
-    let sortVal
+    let sortVal = 0
     if (config.type === 'map' && config.columns) {
       sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
     }
     if (config.type === 'chart') {
       sortVal = customSort(runtimeData[a][sortBy.column], runtimeData[b][sortBy.column])
     }
-    if (!sortBy.asc) return sortVal
-    if (sortVal === 0) return 0
-    if (sortVal < 0) return 1
-    return -1
+    return sortVal
+    // if (!sortBy.asc) return sortVal
+    // if (sortVal === 0) return 0
+    // if (sortVal < 0) return 1
+    // return -1
   })
 
   const genMapRows = rows => {
