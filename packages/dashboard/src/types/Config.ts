@@ -1,4 +1,4 @@
-import { DataSet } from './Dataset'
+import { DataSet } from './DataSet'
 import { SharedFilter } from './SharedFilter'
 
 export type Visualization = {
