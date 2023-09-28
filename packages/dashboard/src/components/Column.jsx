@@ -22,7 +22,7 @@ const Column = ({ data, rowIdx, colIdx }) => {
   }))
 
   const widget = data.widget ? visualizations[data.widget] : null
-  if (!widget.uid) widget.uid = data.widget
+  if (widget && !widget.uid) widget.uid = data.widget
 
   let classNames = ['builder-column', 'column-size--' + data.width]
 

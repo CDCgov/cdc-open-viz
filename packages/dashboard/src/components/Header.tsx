@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react'
 
 import ConfigContext from '../ConfigContext'
-import type { APIFilter, SharedFilter } from '../CdcDashboard'
+import type { APIFilter } from '../types/APIFilter'
+import type { SharedFilter } from '../types/SharedFilter'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -285,7 +286,7 @@ const Header = (props: HeaderProps) => {
                 <label>
                   <span className='edit-label column-heading'>Parent Filter: </span>
                   <select
-                    value={filter.parent || ''}
+                    value={filter.parents || []}
                     onChange={e => {
                       updateFilterProp('parent', index, e.target.value)
                     }}
@@ -412,7 +413,7 @@ const Header = (props: HeaderProps) => {
                 <label>
                   <span className='edit-label column-heading'>Parent Filter: </span>
                   <select
-                    value={filter.parent || ''}
+                    value={filter.parents || []}
                     onChange={e => {
                       updateFilterProp('parent', index, e.target.value)
                     }}

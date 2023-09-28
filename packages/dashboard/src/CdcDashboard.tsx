@@ -117,7 +117,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     return dataset
   }
 
-  const getVizKeys = (_config): string[] => Object.keys(config?.visualizations || {})
+  const getVizKeys = (_config): string[] => Object.keys(_config?.visualizations || {})
 
   const getApiFilterKey = ({ apiEndpoint, heirarchyLookup }: APIFilter) => {
     return apiEndpoint + (heirarchyLookup || '')
@@ -604,6 +604,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
   const Filters = ({ hide, autoLoad }: { hide?: number[]; autoLoad?: boolean }) => {
     if (!config) return <></>
+    const isLegacyFilter = !config.filterBehavior
     const isAutoLoadRow = config.filterBehavior === FilterBehavior.Apply && autoLoad
     return (
       <>
@@ -659,7 +660,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           )
         })}
 
-        {!isAutoLoadRow && <button onClick={applyFilters}>GO!</button>}
+        {!isLegacyFilter && !isAutoLoadRow && <button onClick={applyFilters}>GO!</button>}
       </>
     )
   }
