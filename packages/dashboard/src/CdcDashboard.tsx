@@ -433,12 +433,31 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     setConfig(newConfig)
   }
 
-  // Gets filer values from dataset
-  const generateValuesForFilter = (columnName, _data = data) => {
+  // Gets filter values from API response
+  const generateValuesForAPIFilter = (columnName, _data = data): string[] => {
     type Row = { [key: string]: any }
     return Object.values(_data)
       .filter(row => row && !!(row as Row)[columnName])
       .map(row => (row as Row)[columnName])
+  }
+
+  // Gets filter values from dataset
+  const generateValuesForFilter = (columnName, _data = data) => {
+    if (config?.filterBehavior === FilterBehavior.Apply) {
+      return generateValuesForAPIFilter(columnName, _data)
+    }
+    const values: string[] = []
+
+    Object.keys(data).forEach(key => {
+      data[key].forEach(row => {
+        const value = row[columnName]
+        if (value && false === values.includes(value)) {
+          values.push(value)
+        }
+      })
+    })
+
+    return values
   }
 
   const updateConfig = (newConfig, dataOverride?: Record<string, DataSet>) => {
