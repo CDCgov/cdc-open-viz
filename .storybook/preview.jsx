@@ -22,7 +22,8 @@ export const parameters = {
     source: {
       excludeDecorators: true
     }
-  }
+  },
+  fetchMock: { mocks: [] }
 }
 
 export const decorators = [

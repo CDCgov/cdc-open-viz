@@ -50,92 +50,7 @@ type APIFilterDropdowns = {
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
-<<<<<<< HEAD
 export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, isDebug = false, setConfig: setParentConfig }) {
-=======
-const addVisualization = (type, subType) => {
-  let modalWillOpen = type === 'markup-include' ? false : true
-  type VisConfig = {
-    newViz: boolean
-    openModal: boolean
-    uid: string
-    type: string
-    visualizationType?: string
-    general?: { geoType?: string }
-  }
-  let newVisualizationConfig: VisConfig = {
-    newViz: true,
-    openModal: modalWillOpen,
-    uid: type + Date.now(),
-    type
-  }
-
-  switch (type) {
-    case 'chart':
-      newVisualizationConfig.visualizationType = subType
-      break
-    case 'map':
-      newVisualizationConfig.general = {}
-      newVisualizationConfig.general.geoType = subType
-      break
-    case 'data-bite':
-      newVisualizationConfig.visualizationType = type
-      break
-    case 'waffle-chart':
-      newVisualizationConfig.visualizationType = type
-      break
-    case 'markup-include':
-      newVisualizationConfig.visualizationType = type
-      break
-    case 'filtered-text':
-      newVisualizationConfig.visualizationType = type
-      break
-    default:
-      newVisualizationConfig.visualizationType = type
-      break
-  }
-
-  return newVisualizationConfig
-}
-
-const VisualizationsPanel = ({ loadConfig, config }) => (
-  <div className='visualizations-panel'>
-    <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
-    <span className='subheading-3'>Chart</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('chart', 'Bar')} type='Bar' />
-      <Widget addVisualization={() => addVisualization('chart', 'Line')} type='Line' />
-      <Widget addVisualization={() => addVisualization('chart', 'Pie')} type='Pie' />
-    </div>
-    <span className='subheading-3'>Map</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('map', 'us')} type='us' />
-      <Widget addVisualization={() => addVisualization('map', 'world')} type='world' />
-      <Widget addVisualization={() => addVisualization('map', 'single-state')} type='single-state' />
-    </div>
-    <span className='subheading-3'>Misc.</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('data-bite', '')} type='data-bite' />
-      <Widget addVisualization={() => addVisualization('waffle-chart', '')} type='waffle-chart' />
-      <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
-      <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
-      <Widget addVisualization={() => addVisualization('filter-dropdowns', '')} type='filter-dropdowns' />
-    </div>
-    <span className='subheading-3'>Advanced</span>
-    <AdvancedEditor loadConfig={loadConfig} state={config} convertStateToConfig={undefined} />
-  </div>
-)
-
-type CdcDashboardTypes = {
-  configUrl: string
-  config?: Config
-  isEditor: boolean
-  isDebug: boolean
-  setConfig: Function
-}
-
-export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, isDebug = false, setConfig: setParentConfig }: CdcDashboardTypes) {
->>>>>>> bebb5e02 (stable storybook)
   const [config, setConfig] = useState<Config | null>(configObj ?? null)
   const [data, setData] = useState({})
   const [filteredData, setFilteredData] = useState({})
@@ -734,8 +649,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             })
           } else {
             // Data Filter
+<<<<<<< HEAD
             singleFilter.values!.forEach((filterOption, index) => {
               const labeledOpt = singleFilter.labels && singleFilter.labels[filterOption]
+=======
+            singleFilter.values?.forEach((filterOption, index) => {
+>>>>>>> 5bd55818 (added api-mocking library)
               values.push(
                 <option key={`${singleFilter.key}-option-${index}`} value={filterOption}>
                   {labeledOpt || filterOption}
