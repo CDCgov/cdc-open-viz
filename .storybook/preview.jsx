@@ -7,19 +7,7 @@ export const parameters = {
   options: {
     storySort: {
       includeNames: true,
-      order: [
-        'Introduction',
-        'Contributions',
-        'Guides',
-        'CSS Systems',
-        'Visualizations',
-        'Components',
-        'Store',
-        [ 'COVE Store', 'Slices', [ 'globalSlice', 'visConfigSlice', 'dataSlice' ] ],
-        'Hooks',
-        'Helpers',
-        [ 'configHelpers', [ 'configHelpers', '*' ], 'CoveHelper', 'DataTransform', [ 'DataTransform Class', '*' ], 'coveUpdateWorker', 'validateFipsCodeLength', '*', 'Custom Events' ]
-      ]
+      order: ['Introduction', 'Contributions', 'Guides', 'Components']
     }
   },
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -38,9 +26,9 @@ export const parameters = {
 }
 
 export const decorators = [
-  (Story) => (
-    <div className="cove cove-storybook">
-      <Story/>
+  Story => (
+    <div className='cove cove-storybook'>
+      <Story />
     </div>
   )
 ]
