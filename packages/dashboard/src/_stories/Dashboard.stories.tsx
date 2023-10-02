@@ -5,6 +5,7 @@ import TestExampleData from '../../examples/test-example.json'
 import SharedFiltersData from '../../examples/shared-filters.json'
 
 import Dashboard, { Config } from '../CdcDashboard'
+import { userEvent, within, fireEvent, waitFor } from '@storybook/testing-library'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -23,6 +24,10 @@ export const TestExample: Story = {
   args: {
     config: TestExampleData as unknown as Config
   }
+}
+
+const sleep = ms => {
+  return new Promise(r => setTimeout(r, ms))
 }
 
 export const SharedFilters: Story = {
@@ -54,6 +59,19 @@ export const SharedFilters: Story = {
         }
       ]
     }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    // play is running before full rendering is complete so sleep function
+    // is needed to delay the execution.
+    // possible related bug: https://github.com/storybookjs/storybook/issues/18258
+    await sleep(1000)
+    const topicsFilter = canvas.getByLabelText('Topics', { selector: 'select' })
+    await user.selectOptions(topicsFilter, ['topicId'])
+    const indicatorsFilter = canvas.getByLabelText('Indicators', { selector: 'select' })
+    await user.selectOptions(indicatorsFilter, ['indicatorID'])
+    await user.click(canvas.getByText('GO!'))
   }
 }
 
