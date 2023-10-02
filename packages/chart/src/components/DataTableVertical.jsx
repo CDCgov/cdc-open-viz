@@ -5,12 +5,11 @@ import Icon from '@cdc/core/components/ui/Icon'
 import Loading from '@cdc/core/components/Loading'
 
 function DataTableVertical({ tabbingId }) {
-  const { tableData, rawData, currentViewport, config, formatDate, parseDate, formatNumber } = useContext(ConfigContext)
-  const { table, xAxis, runtime } = config
-
   const [selectedHeader, setSelectedHeader] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
   const [expanded, setExpanded] = useState(false)
+  const { tableData, rawData, currentViewport, config, formatDate, parseDate, formatNumber } = useContext(ConfigContext)
+  const { table, xAxis, runtime } = config
   const additionalColumns = Object.values(config?.columns || {}).filter(column => column?.dataTable)
   const additionalKeys = additionalColumns.map(column => column?.name)
   const currentKeys = [xAxis.dataKey, ...config?.runtime.seriesKeys, ...additionalKeys]
@@ -33,21 +32,10 @@ function DataTableVertical({ tabbingId }) {
   }
   const formatCell = (value, header) => {
     const shouldAbbreviate = true
-    let formattedValue = null
-    if (xAxis.type === 'date' && header === xAxis.dataKey) {
-      formattedValue = formatDate(parseDate(value))
-    }
-    if (additionalColumns.some(c => c.name === header)) {
-      additionalColumns.forEach(c => {
-        if (c.name === header) {
-          formattedValue = formatNumber(value, 'left', shouldAbbreviate, c.prefix, c.suffix, c.roundToPlace)
-        }
-      })
-    } else {
-      formattedValue = formatNumber(value, 'left', shouldAbbreviate)
-    }
-
-    return formattedValue
+    if (xAxis.type === 'date' && header === xAxis.dataKey) return formatDate(parseDate(value))
+    const columnMatch = additionalColumns.find(c => c.name === header)
+    if (columnMatch) return formatNumber(value, 'left', shouldAbbreviate, columnMatch.prefix, columnMatch.suffix, columnMatch.roundToPlace)
+    return formatNumber(value, 'left', shouldAbbreviate)
   }
 
   const updateHeaderText = header => {
@@ -110,10 +98,10 @@ function DataTableVertical({ tabbingId }) {
     return <Loading />
   }
 
-  const sortedData = [...data].sort(customSort)
+  const sortedData = JSON.parse(JSON.stringify(data)).sort(customSort)
   return (
     <ErrorBoundary component='Chart-Data-table-vertical'>
-      <section id={tabbingId.replace('#', '')} className={`data-table-container ${currentViewport}`}>
+      <section hidden={!config.table.show} id={tabbingId.replace('#', '')} className={`data-table-container ${currentViewport}`}>
         <div className={`data-table-heading ${expanded ? '' : 'collapsed'}`} onClick={toggleExpanded} tabIndex='0' onKeyDown={handleKeyDown}>
           <Icon display={expanded ? 'minus' : 'plus'} base />
           {table.label}
@@ -150,7 +138,7 @@ function DataTableVertical({ tabbingId }) {
 export default DataTableVertical
 
 const ArrowIcon = ({ sortOrder, display }) => (
-  <div style={{ display: display ? 'block' : 'none' }} className='sort-icon'>
+  <div hidden={!display} className='sort-icon'>
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5'>
       {sortOrder === 'asc' ? <path d='M0 5l5-5 5 5z' /> : <path d='M0 0l5 5 5-5z' />}
     </svg>

@@ -43,6 +43,7 @@ import './scss/main.scss'
 // load both then config below determines which to use
 import DataTable_horiz from './components/DataTable'
 import DataTable_vert from '@cdc/core/components/DataTable'
+import DataTableVertical from './components/DataTableVertical'
 
 const generateColorsArray = (color = '#000000', special = false) => {
   let colorObj = chroma(color)
@@ -1226,36 +1227,40 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             </MediaControls.Section>
 
             {/* Data Table */}
-            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
-              <DataTable
-                config={config}
-                rawData={config.data}
-                runtimeData={filteredData || excludedData}
-                //navigationHandler={navigationHandler} // do we need this? What does it do?
-                expandDataTable={config.table.expanded}
-                //headerColor={general.headerColor} // have this in map but not chart
-                columns={config.columns}
-                showDownloadButton={config.general.showDownloadButton}
-                runtimeLegend={dynamicLegendItems}
-                displayDataAsText={displayDataAsText}
-                displayGeoName={displayGeoName}
-                applyLegendToRow={applyLegendToRow}
-                tableTitle={config.table.label}
-                indexTitle={config.table.indexLabel}
-                vizTitle={title}
-                viewport={currentViewport}
-                parseDate={parseDate}
-                formatDate={formatDate}
-                formatNumber={formatNumber}
-                tabbingId={handleChartTabbing}
-                showDownloadImgButton={config.showDownloadImgButton}
-                showDownloadPdfButton={config.showDownloadPdfButton}
-                innerContainerRef={innerContainerRef}
-                outerContainerRef={outerContainerRef}
-                imageRef={imageId}
-                isDebug={isDebug}
-                isEditor={isEditor}
-              />
+            {config.xAxis.dataKey && config.visualizationType !== 'Spark Line' && (
+              <>
+                <DataTableVertical tabbingId={handleChartTabbing} />
+
+                <DataTable
+                  config={config}
+                  rawData={config.data}
+                  runtimeData={filteredData || excludedData}
+                  //navigationHandler={navigationHandler} // do we need this? What does it do?
+                  expandDataTable={config.table.expanded}
+                  //headerColor={general.headerColor} // have this in map but not chart
+                  columns={config.columns}
+                  showDownloadButton={config.general.showDownloadButton}
+                  runtimeLegend={dynamicLegendItems}
+                  displayDataAsText={displayDataAsText}
+                  displayGeoName={displayGeoName}
+                  applyLegendToRow={applyLegendToRow}
+                  tableTitle={config.table.label}
+                  indexTitle={config.table.indexLabel}
+                  vizTitle={title}
+                  viewport={currentViewport}
+                  parseDate={parseDate}
+                  formatDate={formatDate}
+                  formatNumber={formatNumber}
+                  tabbingId={handleChartTabbing}
+                  showDownloadImgButton={config.showDownloadImgButton}
+                  showDownloadPdfButton={config.showDownloadPdfButton}
+                  innerContainerRef={innerContainerRef}
+                  outerContainerRef={outerContainerRef}
+                  imageRef={imageId}
+                  isDebug={isDebug}
+                  isEditor={isEditor}
+                />
+              </>
             )}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
             {/* show pdf or image button */}

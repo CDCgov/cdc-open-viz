@@ -108,14 +108,15 @@ table.data-table {
 
     // format the white triangle sort icon in data table headers
     .sort-icon {
-    fill: white;
-    width: 30px;
-    float: right;
-    align-self: center;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+      fill: white;
+      width: 30px;
+      float: right;
+      align-self: center;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: all 0.5s linear;
     }
 
     th:last-child,
