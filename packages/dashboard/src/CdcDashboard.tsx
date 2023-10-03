@@ -448,8 +448,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     }
     const values: string[] = []
 
-    Object.keys(data).forEach(key => {
-      data[key].forEach(row => {
+    Object.keys(_data).forEach(key => {
+      _data[key].forEach(row => {
         const value = row[columnName]
         if (value && false === values.includes(value)) {
           values.push(value)
