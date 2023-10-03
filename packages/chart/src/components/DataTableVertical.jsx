@@ -3,13 +3,15 @@ import React, { useState, useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 import Icon from '@cdc/core/components/ui/Icon'
 import Loading from '@cdc/core/components/Loading'
+import Papa from 'papaparse'
+import MediaControls from '@cdc/core/components/MediaControls'
 
 function DataTableVertical({ tabbingId }) {
   const [selectedHeader, setSelectedHeader] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
   const [expanded, setExpanded] = useState(false)
   const { tableData, rawData, currentViewport, config, formatDate, parseDate, formatNumber } = useContext(ConfigContext)
-  const { table, xAxis, runtime } = config
+  const { table, xAxis, runtime, visualizationType, regions } = config
   const additionalColumns = Object.values(config?.columns || {}).filter(column => column?.dataTable)
   const additionalKeys = additionalColumns.map(column => column?.name)
   const currentKeys = [xAxis.dataKey, ...config?.runtime.seriesKeys, ...additionalKeys]
@@ -39,7 +41,7 @@ function DataTableVertical({ tabbingId }) {
   }
 
   const updateHeaderText = header => {
-    let addedHeader = {}
+    const addedHeader = {}
     additionalColumns.forEach(c => (header === c.name ? (addedHeader[header] = c.label || header) : null))
     const seriesLabels = { ...runtime?.seriesLabels, ...addedHeader }
     return header === xAxis.dataKey ? table.indexLabel : seriesLabels[header]
@@ -97,12 +99,18 @@ function DataTableVertical({ tabbingId }) {
   if (!data || !data.length) {
     return <Loading />
   }
+  const ariaLabel = ['Accessible data table. This table is currently collapsed visually but can still be read using a screen reader.', 'Accessible data table.']
 
   const sortedData = JSON.parse(JSON.stringify(data)).sort(customSort)
+
   return (
     <ErrorBoundary component='Chart-Data-table-vertical'>
-      <section hidden={!config.table.show} id={tabbingId.replace('#', '')} className={`data-table-container ${currentViewport}`}>
-        <div className={`data-table-heading ${expanded ? '' : 'collapsed'}`} onClick={toggleExpanded} tabIndex='0' onKeyDown={handleKeyDown}>
+      <MediaControls.Section classes={['download-links']}>
+        <MediaControls.Link config={config} />
+        <DownloadButton fileName={`${config.title || 'data-table'}.csv`} data={rawData} display={config.table.download && rawData} />
+      </MediaControls.Section>
+      <section hidden={!config.table.show} id={tabbingId.replace('#', '')} className={`data-table-container ${currentViewport}`} aria-label={ariaLabel[+expanded]}>
+        <div role='button' className={`data-table-heading ${expanded ? '' : 'collapsed'}`} onClick={toggleExpanded} tabIndex='0' onKeyDown={handleKeyDown}>
           <Icon display={expanded ? 'minus' : 'plus'} base />
           {table.label}
         </div>
@@ -112,7 +120,7 @@ function DataTableVertical({ tabbingId }) {
             <thead>
               <tr>
                 {headers.map((header, index) => (
-                  <th role='columnheader' scope='col' className='sort' onClick={handleHeaderChange.bind(this, header)} key={index}>
+                  <th aria-label={`${updateHeaderText(header)} sorted in ${sortOrder === 'asc' ? 'ascending' : 'descending'} order`} role='columnheader' scope='col' className='sort' onClick={handleHeaderChange.bind(this, header)} key={index}>
                     <ArrowIcon sortOrder={sortOrder} display={selectedHeader === header} />
                     {updateHeaderText(header)}
                   </th>
@@ -130,12 +138,44 @@ function DataTableVertical({ tabbingId }) {
             </tbody>
           </table>
         </div>
+        <RegionsTable data={regions ?? []} display={config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot'} />
       </section>
     </ErrorBoundary>
   )
 }
 
 export default DataTableVertical
+
+const RegionsTable = ({ data, display }) => {
+  return (
+    <section hidden={!display}>
+      <table className='region-table data-table'>
+        <caption className='visually-hidden'>Table of the highlighted regions in the visualization</caption>
+        <thead>
+          <tr>
+            <th>Region Name</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((region, index) => {
+            if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+            // region.from and region.to had formatDate(parseDate()) on it
+            // but they returned undefined - removed both for now (TT)
+            return (
+              <tr key={`row-${region.label}--${index}`}>
+                <td>{region.label}</td>
+                <td>{region.from}</td>
+                <td>{region.to}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </section>
+  )
+}
 
 const ArrowIcon = ({ sortOrder, display }) => (
   <div hidden={!display} className='sort-icon'>
@@ -144,3 +184,14 @@ const ArrowIcon = ({ sortOrder, display }) => (
     </svg>
   </div>
 )
+
+const DownloadButton = ({ data, display, fileName }) => {
+  const skipId = `btn__${Math.random().toString(16).substr(2, 8)}`
+  const blob = new Blob([Papa.unparse(data)], { type: 'text/csv;charset=utf-8;' })
+
+  return (
+    <a hidden={!display} download={fileName} onClick={() => window.navigator.msSaveBlob && navigator.msSaveBlob(blob, fileName)} href={URL.createObjectURL(blob)} id={skipId}>
+      Download Data (CSV)
+    </a>
+  )
+}
