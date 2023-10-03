@@ -289,6 +289,7 @@ const Filters = props => {
       <select
         id={`filter-${outerIndex}`}
         name={label}
+        aria-label={label}
         className='filter-select'
         data-index='0'
         value={active}
@@ -382,7 +383,7 @@ const Filters = props => {
         return (
           <div className={classList.join(' ')} key={outerIndex}>
             <>
-              {label && <label htmlFor={label}>{label}</label>}
+              {label && <label htmlFor={`filter-${outerIndex}`}>{label}</label>}
               {filterStyle === 'tab' && !mobileFilterStyle && <Filters.Tabs tabs={tabValues} />}
               {filterStyle === 'pill' && !mobileFilterStyle && <Filters.Pills pills={pillValues} />}
               {filterStyle === 'tab bar' && !mobileFilterStyle && <Filters.TabBar filter={singleFilter} index={outerIndex} />}
