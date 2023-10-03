@@ -1077,6 +1077,7 @@ const CdcMap = ({
 
   // Attempts to find the corresponding value
   const displayGeoName = key => {
+    if (!state.general.convertFipsCodes) return key
     let value = key
     // Map to first item in values array which is the preferred label
     if (stateKeys.includes(value)) {

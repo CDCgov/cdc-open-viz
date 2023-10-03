@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { Config } from './CdcDashboard'
+import type { Config } from './types/Config'
 type ConfigCTX = {
   config: Config
   updateConfig: any

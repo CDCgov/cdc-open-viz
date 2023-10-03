@@ -2,7 +2,7 @@
   "dashboard": {
     "sharedFilters": [
       {
-        "key": "Topics",
+        "key": "Category",
         "usedBy": [
           "map1"
         ],
@@ -17,9 +17,9 @@
         "showDropdown": true
       },
       {
-        "key": "Indicators",
+        "key": "Indicator",
         "usedBy": [
-          "map1"
+          "chart1"
         ],
         "type": "urlfilter",
         "apiFilter": {
@@ -30,7 +30,57 @@
         "queryParameter": "indicatorid",
         "resetLabel": "- Select -",
         "showDropdown": true,
-        "parent": "Topics"
+        "parents": ["Category"]
+      },
+      {
+        "key": "Year",
+        "usedBy": [
+          "map1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/Filters",
+          "valueSelector": "Year",
+          "textSelector": "Year",
+          "heirarchyLookup": "Years"
+        },
+        "queryParameter": "year",
+        "resetLabel": "- Select -",
+        "showDropdown": true,
+        "parents": ["Category", "Indicator"]
+      },
+      {
+        "key": "View By",
+        "usedBy": [
+          "map1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/Filters",
+          "valueSelector": "StratificationCategoryId",
+          "textSelector": "StratificationCategory",
+          "heirarchyLookup": "StratificationCategories"
+        },
+        "resetLabel": "- Select -",
+        "queryParameter": "stratificationcategoryid",
+        "showDropdown": true,
+        "parents": ["Category", "Indicator"]
+      },
+      {
+        "key": "Stratification",
+        "usedBy": [
+          "map1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/stratifications",
+          "valueSelector": "StratificationId",
+          "textSelector": "Stratification"
+        },
+        "resetLabel": "- Select -",
+        "queryParameter": "stratificationid",
+        "showDropdown": true,
+        "parents": ["Category", "Indicator", "View By"]
       }
     ]
   },
@@ -62,7 +112,7 @@
         "expandDataTable": true,
         "showDownloadMediaButton": false,
         "displayAsHex": false,
-        "displayStateLabels": false,
+        "displayStateLabels": true,
         "territoriesAlwaysShow": false,
         "language": "en",
         "geoLabelOverride": "",
@@ -75,11 +125,11 @@
         "hideGeoColumnInTooltip": false,
         "hidePrimaryColumnInTooltip": false
       },
-      "color": "pinkpurple",
+      "color": "greenBlue",
       "columns": {
         "geo": {
-          "name": "LocationDesc",
-          "label": "LocationDesc",
+          "name": "LocationAbbr",
+          "label": "Location",
           "tooltip": false,
           "dataTable": true
         },
@@ -91,6 +141,24 @@
           "dataTable": true,
           "tooltip": true
         },
+        "additionalColumn1": {
+          "label": "Low Confidence Limit",
+          "dataTable": true,
+          "tooltips": false,
+          "prefix": "",
+          "suffix": "%",
+          "name": "LowConfidenceLimit",
+          "tooltip": true
+      },
+      "additionalColumn2": {
+          "label": "High Confidence Limit",
+          "dataTable": true,
+          "tooltips": false,
+          "prefix": "",
+          "suffix": "%",
+          "name": "HighConfidenceLimit",
+          "tooltip": true
+      },
         "navigate": {
           "name": "link",
           "tooltip": false,
@@ -104,33 +172,25 @@
         }
       },
       "legend": {
-        "numberOfItems": 3,
-        "position": "side",
-        "title": "Legend Title",
-        "description": "Legend Text",
-        "type": "equalnumber",
-        "specialClasses": [
-          "N/A"
-        ],
         "descriptions": {},
+        "specialClasses": [
+            "NA"
+        ],
         "unified": false,
         "singleColumn": false,
-        "singleRow": false,
-        "showSpecialClassesLast": false,
-        "dynamicDescription": false
+        "dynamicDescription": false,
+        "type": "equalnumber",
+        "numberOfItems": 4,
+        "position": "side",
+        "title": "Crude Prevalence",
+        "separateZero": true
       }
     }
-  },
-  "table": {
-    "downloadImageButton": true,
-    "downloadPdfButton": true,
-    "download": true,
-    "show": true
   },
   "type": "dashboard",
   "datasets": {
     "data3": {
-      "dataUrl": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/TableData?StratificationCategoryId=OVERALL&DataValueTypeId=CRDMEDN&Year=2019"
+      "dataUrl": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/TableData?DataValueTypeId=CRDMEDN"
     }
   },
   "filterBehavior": "Apply Button",

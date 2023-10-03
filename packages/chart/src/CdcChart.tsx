@@ -43,6 +43,7 @@ import './scss/main.scss'
 // load both then config below determines which to use
 import DataTable_horiz from './components/DataTable'
 import DataTable_vert from '@cdc/core/components/DataTable'
+import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 
 const generateColorsArray = (color = '#000000', special = false) => {
   let colorObj = chroma(color)
@@ -78,17 +79,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
-  const [config, setConfig] = useState({})
+  const [config, setConfig] = useState<any>({})
   const [stateData, setStateData] = useState(config.data || [])
-  const [excludedData, setExcludedData] = useState()
-  const [filteredData, setFilteredData] = useState()
-  const [seriesHighlight, setSeriesHighlight] = useState([])
+  const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
+  const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
+  const [seriesHighlight, setSeriesHighlight] = useState<any[]>([])
   const [currentViewport, setCurrentViewport] = useState('lg')
-  const [dimensions, setDimensions] = useState([])
-  const [externalFilters, setExternalFilters] = useState(null)
+  const [dimensions, setDimensions] = useState<[number?, number?]>([])
+  const [externalFilters, setExternalFilters] = useState<any[]>()
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
-  const [dynamicLegendItems, setDynamicLegendItems] = useState([])
+  const [dynamicLegendItems, setDynamicLegendItems] = useState<any[]>([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   let legendMemo = useRef(new Map()) // map collection
@@ -164,12 +165,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         })
         .join('')}`
 
-      let data
+      let data: any[] = []
 
       try {
-        const regex = /(?:\.([^.]+))?$/
-
-        const ext = regex.exec(dataUrl.pathname)[1]
+        const ext = getFileExtension(dataUrl.pathname)
         if ('csv' === ext) {
           data = await fetch(dataUrlFinal)
             .then(response => response.text())
@@ -250,15 +249,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let response = configObj || (await (await fetch(configUrl)).json())
 
     // If data is included through a URL, fetch that and store
-    let data = response.formattedData || response.data || {}
+    let data: any[] = response.formattedData || response.data || []
 
     const urlFilters = response.filters ? (response.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
 
     if (response.dataUrl && !urlFilters) {
       try {
-        const regex = /(?:\.([^.]+))?$/
-
-        const ext = regex.exec(response.dataUrl)[1]
+        const ext = getFileExtension(response.dataUrl)
         if ('csv' === ext) {
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
             .then(response => response.text())
@@ -323,7 +320,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     updateConfig(processedConfig, data)
   }
 
-  const updateConfig = (newConfig, dataOverride = undefined) => {
+  const updateConfig = (newConfig, dataOverride?: any[]) => {
     let data = dataOverride || stateData
 
     // Deeper copy
@@ -333,7 +330,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     })
 
-    let newExcludedData
+    let newExcludedData: any[] = []
 
     if (newConfig.exclusions && newConfig.exclusions.active) {
       if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
@@ -365,7 +362,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setExcludedData(newExcludedData)
 
     // After data is grabbed, loop through and generate filter column values if there are any
-    let currentData
+    let currentData: any[] = []
     if (newConfig.filters) {
       newConfig.filters.forEach((filter, index) => {
         let filterValues = []
@@ -394,8 +391,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.name || series.label || series.dataKey)
+            newConfig.runtime.seriesLabels[series.dataKey] = series.name || series.label || series.dataKey
+            newConfig.runtime.seriesLabelsAll.push(series.name || series.dataKey)
             return series.dataKey
           })
         : []
@@ -412,8 +409,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
 
       const groups = uniqueArray(allKeys)
-      let tableData = []
-      const plots = []
+      let tableData: any[] = []
+      const plots: any[] = []
 
       /**
        * Calculates the first quartile (q1) and third quartile (q3) from an array of integers or decimals.
@@ -449,13 +446,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       // group specific statistics
       // prevent re-renders
       if (!groups) return
-      groups.forEach((g, index) => {
+      groups.forEach(g => {
         try {
           if (!g) throw new Error('No groups resolved in box plots')
 
           // filter data by group
           let filteredData = newExcludedData ? newExcludedData.filter(item => item[newConfig.xAxis.dataKey] === g) : data.filter(item => item[newConfig.xAxis.dataKey] === g)
-          let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
+          let filteredDataValues: number[] = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
 
           // Sort the data for upcoming functions.
           let sortedData = filteredDataValues.sort((a, b) => a - b)
@@ -484,19 +481,20 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           let nonOutliers = filteredDataValues
 
           nonOutliers = nonOutliers.filter(item => !outliers.includes(item))
-
+          const minValue: number = d3.min<number>(filteredDataValues) || 0
+          const _colMin = d3.max<number>([minValue, q1 - 1.5 * iqr])
           plots.push({
             columnCategory: g,
             columnMax: d3.min([d3.max(filteredDataValues), q1 + 1.5 * iqr]),
             columnThirdQuartile: Number(q3).toFixed(newConfig.dataFormat.roundTo),
             columnMedian: Number(d3.median(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnFirstQuartile: q1.toFixed(newConfig.dataFormat.roundTo),
-            columnMin: d3.max([d3.min(filteredDataValues), q1 - 1.5 * iqr]),
+            columnMin: _colMin,
             columnTotal: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
             columnSd: Number(d3.deviation(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnMean: Number(d3.mean(filteredDataValues)).toFixed(newConfig.dataFormat.roundTo),
             columnIqr: Number(iqr).toFixed(newConfig.dataFormat.roundTo),
-            columnLowerBounds: d3.max([d3.min(filteredDataValues), q1 - 1.5 * iqr]),
+            columnLowerBounds: _colMin,
             columnUpperBounds: d3.min([d3.max(sortedData), q1 + 1.5 * iqr]),
             columnOutliers: outliers,
             values: filteredDataValues,
@@ -511,10 +509,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       // this appears to be the easiest option instead of running logic against the datatable cell...
       tableData = JSON.parse(JSON.stringify(plots))
       tableData.map(table => {
-        delete table.columnIqr
-        delete table.nonOutlierValues
-        delete table.columnLowerBounds
-        delete table.columnUpperBounds
+        table.columnIqr = undefined
+        table.nonOutlierValues = undefined
+        table.columnLowerBounds = undefined
+        table.columnUpperBounds = undefined
         return null // resolve eslint
       })
 
@@ -587,7 +585,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const filterData = (filters, data) => {
-    let filteredData = []
+    let filteredData: any[] = []
 
     data.forEach(row => {
       let add = true
@@ -607,7 +605,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Gets filter values from dataset
   const generateValuesForFilter = (columnName, data = this.state.data) => {
-    const values = []
+    const values: any[] = []
 
     data.forEach(row => {
       const value = row[columnName]
@@ -697,7 +695,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
    */
   useEffect(() => {
     const handleFilterData = e => {
-      let tmp = []
+      let tmp: any[] = []
       tmp.push(e.detail)
       setExternalFilters(tmp)
     }
@@ -773,10 +771,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = label => {
-    const newSeriesHighlight = []
+    const newSeriesHighlight: any[] = []
 
     // If we're highlighting all the series, reset them
-    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend && config.visualizationType !== 'Forecasting') {
+    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
       highlightReset()
       return
     }
@@ -806,25 +804,21 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
      * - pushes series.dataKey into the series highlight based on the found series.name
      * @param {String} value
      */
-    const pushDataKeyBySeriesName = value => {
-      let matchingSeries = config.series.filter(series => series.name === value.text)
-      if (matchingSeries?.length > 0) {
-        newSeriesHighlight.push(matchingSeries[0].dataKey)
-      }
-    }
+    // const pushDataKeyBySeriesName = value => {
+    //   let matchingSeries = config.series.filter(series => series.name === value.text)
+    //   if (matchingSeries?.length > 0) {
+    //     newSeriesHighlight.push(matchingSeries[0].dataKey)
+    //   }
+    // }
 
-    pushDataKeyBySeriesName(label)
+    // pushDataKeyBySeriesName(label)
 
     setSeriesHighlight(newSeriesHighlight)
   }
 
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
-    if (config.legend.dynamicLegend && dynamicLegendItems) {
-      setSeriesHighlight(dynamicLegendItems.map(item => item.text))
-    } else {
-      setSeriesHighlight([])
-    }
+    setSeriesHighlight([])
   }
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
@@ -849,7 +843,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   function getTextWidth(text, font) {
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
-
+    if (!context) {
+      console.error('2d context not found')
+      return
+    }
     context.font = font || getComputedStyle(document.body).font
 
     return Math.ceil(context.measureText(text).width)
@@ -897,7 +894,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
 
     let original = num
-    let stringFormattingOptions = {
+    let stringFormattingOptions: any = {
       useGrouping: commas ? true : false // for old chart data table to work right cant just leave this to undefined
     }
     if (axis === 'left' || axis === undefined) {
@@ -1146,6 +1143,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const clean = data => {
     // cleaning is deleting data we need in forecasting charts.
+    if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
   }
@@ -1180,9 +1178,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} isNumber={isNumber} dimensions={dimensions} />}
+            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
             {/* Visualization */}
-            {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
+            {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
             <div
               style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
@@ -1193,7 +1191,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {/* Sparkline */}
               {config.visualizationType === 'Spark Line' && (
                 <>
-                  {description && <div className='subtext'>{parse(description)}</div>}
+                  {config?.introText && (
+                    <section className='introText' style={{ padding: '15px 0 35px' }}>
+                      {parse(config.introText)}
+                    </section>
+                  )}
+
                   <div style={sparkLineStyles}>
                     <ParentSize>
                       {parent => (
@@ -1203,6 +1206,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                       )}
                     </ParentSize>
                   </div>
+                  {description && (
+                    <div className='subtext' style={{ padding: '35px 0 15px' }}>
+                      {parse(description)}
+                    </div>
+                  )}
                 </>
               )}
               {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
