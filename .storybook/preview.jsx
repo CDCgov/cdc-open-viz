@@ -1,13 +1,11 @@
 import React from 'react'
 import { previewTheme } from './coveSbThemes'
 
-import '../packages/core/styles/v2/main.scss'
-
 export const parameters = {
   options: {
     storySort: {
       includeNames: true,
-      order: ['Introduction', 'Contributions', 'Guides', 'Components']
+      order: ['Introduction', 'Contributions', 'Guides', 'Components', ['Atoms', 'Molecules', 'Organisms', 'Templates', 'Pages']]
     }
   },
   actions: { argTypesRegex: '^on[A-Z].*' },

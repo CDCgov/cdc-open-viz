@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import DataDesigner from '../DataDesigner'
 
 const meta: Meta<typeof DataDesigner> = {
-  title: 'Components/Organism/DataDesigner',
+  title: 'Components/Organisms/DataDesigner',
   component: DataDesigner
 }
 
