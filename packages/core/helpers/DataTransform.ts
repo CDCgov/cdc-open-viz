@@ -1,4 +1,7 @@
+type DataArray = Record<string,any>[]
+
 export class DataTransform {
+  constants: any
   constructor() {
     this.constants = {
       errorMessageEmtpyData: 'Your data file is empty.',
@@ -11,7 +14,7 @@ export class DataTransform {
 
   //Performs standardizations that can be completed automatically without use input
   autoStandardize(data) {
-    const errorsFound = []
+    const errorsFound: any[] = []
 
     // Empty data
     if (0 === data.length) {
@@ -30,7 +33,7 @@ export class DataTransform {
 
     //Convert array of arrays, to array of objects
     if (data.filter(row => row.constructor !== Object).length > 0) {
-      let standardizedData = []
+      let standardizedData: Record<string, any>[] = []
       for (let row = 1; row < data.length; row++) {
         let standardizedRow = {}
         data[row].forEach((datum, col) => {
@@ -66,9 +69,9 @@ export class DataTransform {
         }
 
         let standardizedMapped = {}
-        let standardized = []
+        let standardized: string[] = []
         data.forEach(row => {
-          let nonNumericKeys = []
+          let nonNumericKeys: any[] = []
           Object.keys(row).forEach(key => {
             if (key !== description.seriesKey && isNaN(parseFloat(row[key]))) {
               nonNumericKeys.push(key)
@@ -95,10 +98,10 @@ export class DataTransform {
 
         return standardized
       } else {
-        let standardized = []
+        let standardized: {key: string, value: any}[] = []
 
         data.forEach(row => {
-          let nonNumericKeys = []
+          let nonNumericKeys: string[] = []
           Object.keys(row).forEach(key => {
             if (isNaN(parseFloat(row[key]))) {
               nonNumericKeys.push(key)
@@ -124,7 +127,7 @@ export class DataTransform {
       if (description.seriesKey !== undefined && description.xKey !== undefined && (description.valueKey !== undefined || (description.valueKeys !== undefined && description.valueKeys.length > 0))) {
         if (description.valueKeys !== undefined) {
           let standardizedMapped = {}
-          let standardized = []
+          let standardized: string[] = []
           let valueKeys = description.valueKeys
           if (description.ignoredKeys && description.ignoredKeys.length > 0) {
             valueKeys = valueKeys.concat(description.ignoredKeys)
@@ -132,7 +135,7 @@ export class DataTransform {
 
           data.forEach(row => {
             valueKeys.forEach(valueKey => {
-              let extraKeys = []
+              let extraKeys: string[] = []
               let uniqueKey = row[description.xKey] + '|' + valueKey
               Object.keys(row).forEach(key => {
                 if (key !== description.xKey && key !== description.seriesKey && valueKeys.indexOf(key) === -1) {
@@ -161,10 +164,10 @@ export class DataTransform {
           return standardized
         } else {
           let standardizedMapped = {}
-          let standardized = []
+          let standardized: any[] = []
 
           data.forEach(row => {
-            let extraKeys = []
+            let extraKeys: string[] = []
             let uniqueKey = row[description.xKey]
             Object.keys(row).forEach(key => {
               if (key !== description.xKey && key !== description.seriesKey && key !== description.valueKey) {
@@ -213,8 +216,9 @@ export class DataTransform {
     * Set testing = true if you need to see before and after data
     *
     */
-  cleanData(data, excludeKey, testing = false) {
-    let cleanedupData = []
+  cleanData(data: DataArray, excludeKey, testing = false): DataArray {
+    let cleanedupData: DataArray = []
+    if(!Array.isArray(data)) debugger;
     if (testing) console.log('## Data to clean=', data)
     if (excludeKey === undefined) {
       console.log('COVE: cleanData excludeKey undefined')
@@ -224,19 +228,23 @@ export class DataTransform {
       if (testing) console.log('clean', i, ' d', d)
       let cleaned = {}
       Object.keys(d).forEach(function (key) {
+        const value = d[key];
         if (key === excludeKey) {
           // pass thru
-          cleaned[key] = d[key]
+          cleaned[key] = value
         } else {
           // remove comma and dollar signs
-          if (testing) console.log('typeof d[key] is ', typeof d[key])
+          if (testing) console.log('typeof value is ', typeof value)
           let tmp = ''
-          if (typeof d[key] === 'string') {
-            tmp = d[key] !== null && d[key] !== '' ? d[key].replace(/[,\$]/g, '') : ''
+          const removeCommasAndDollars = (num: string) => num.replace(/[,\$]/g, '')
+          if (typeof value === 'string') {
+            tmp = value ? removeCommasAndDollars(value) : ''
           } else {
-            tmp = d[key] !== null && d[key] !== '' ? d[key] : ''
+            tmp = value ? value : ''
           }
-          if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
+          // UNSAFE_isANumber: matches for any string of digits optionally interrupted by a period.
+          const UNSAFE_isANumber = (num: any) => /\d+\.?\d*/.test(num)
+          if (!isNaN(parseFloat(tmp)) || UNSAFE_isANumber(tmp)) {
             cleaned[key] = tmp
           } else {
             cleaned[key] = ''
