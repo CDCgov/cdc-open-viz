@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react'
 
 import ConfigContext from '../ConfigContext'
-import type { APIFilter, SharedFilter } from '../CdcDashboard'
+import type { APIFilter } from '../types/APIFilter'
+import type { SharedFilter } from '../types/SharedFilter'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -191,7 +192,7 @@ const Header = (props: HeaderProps) => {
       }
     }
 
-    const updateAPIFilter = (key: keyof APIFilter, value: string) => {
+    const updateAPIFilter = (key: keyof APIFilter, value: string | boolean) => {
       const _filter = filter.apiFilter || { apiEndpoint: '', valueSelector: '', textSelector: '' }
       const newAPIFilter: APIFilter = { ..._filter, [key]: value }
       overlay?.actions.openOverlay(filterModal({ ...filter, apiFilter: newAPIFilter }, index))
@@ -285,7 +286,7 @@ const Header = (props: HeaderProps) => {
                 <label>
                   <span className='edit-label column-heading'>Parent Filter: </span>
                   <select
-                    value={filter.parent || ''}
+                    value={filter.parents || []}
                     onChange={e => {
                       updateFilterProp('parent', index, e.target.value)
                     }}
@@ -298,6 +299,26 @@ const Header = (props: HeaderProps) => {
                         }
                       })}
                   </select>
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Auto Load: </span>
+                  <input
+                    type='checkbox'
+                    checked={filter.apiFilter?.autoLoad}
+                    onChange={e => {
+                      updateAPIFilter('autoLoad', !filter.apiFilter?.autoLoad)
+                    }}
+                  />
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Default Value: </span>
+                  <input
+                    type='text'
+                    value={filter.apiFilter?.defaultValue}
+                    onChange={e => {
+                      updateAPIFilter('defaultValue', e.target.value)
+                    }}
+                  />
                 </label>
               </>
             )}
@@ -392,7 +413,7 @@ const Header = (props: HeaderProps) => {
                 <label>
                   <span className='edit-label column-heading'>Parent Filter: </span>
                   <select
-                    value={filter.parent || ''}
+                    value={filter.parents || []}
                     onChange={e => {
                       updateFilterProp('parent', index, e.target.value)
                     }}

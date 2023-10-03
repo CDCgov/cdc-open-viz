@@ -50,8 +50,6 @@ export const useTooltip = props => {
     // Additional data for pie charts
     const { data: pieChartData, arc } = additionalChartData
 
-    console.log('x', x)
-
     const closestXScaleValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
 
     const includedSeries = visualizationType !== 'Pie' ? config.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.series.map(item => item.dataKey)
@@ -171,7 +169,7 @@ export const useTooltip = props => {
   const getXValueFromCoordinate = x => {
     if (visualizationType === 'Pie') return
     if (orientation === 'horizontal') return
-    if (xScale.type === 'point' || xAxis.type === 'continuous') {
+    if (xScale.type === 'point' || xAxis.type === 'continuous' || xAxis.type === 'date') {
       // Find the closest x value by calculating the minimum distance
       let closestX = null
       let minDistance = Number.MAX_VALUE
@@ -316,7 +314,7 @@ export const useTooltip = props => {
       if (!config.dashboard) {
         switch (visualizationType) {
           case 'Combo':
-            standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.barSeriesKeys, ...runtime?.lineSeriesKeys, ...stageColumns, ...ciItems]
+            standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys, ...stageColumns, ...ciItems]
             break
           case 'Forecasting':
             standardLoopItems = [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
