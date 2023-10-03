@@ -46,6 +46,9 @@ module.exports = {
   docs: {
     autodocs: "tag"
   },
+  typescript: {
+    reactDocgen: false // https://github.com/storybookjs/storybook/issues/22164#issuecomment-1603627308
+  },
   viteFinal: async (config) => {
     const _config = mergeConfig<Record<string, any>, Record<string, any>>(config, generateViteConfig('storybook'))
     const flatMapped = _config.plugins.flatMap(p => p);
