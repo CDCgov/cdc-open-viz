@@ -4,7 +4,8 @@ import DefaultData from '../../examples/default.json'
 import TestExampleData from '../../examples/test-example.json'
 import SharedFiltersData from '../../examples/shared-filters.json'
 
-import Dashboard, { Config } from '../CdcDashboard'
+import Dashboard from '../CdcDashboard'
+import { Config } from '../types/Config'
 import { userEvent, within, fireEvent, waitFor } from '@storybook/testing-library'
 
 const meta: Meta<typeof Dashboard> = {

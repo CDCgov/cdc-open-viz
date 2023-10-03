@@ -50,7 +50,15 @@ type APIFilterDropdowns = {
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
-export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, isDebug = false, setConfig: setParentConfig }) {
+type CdcDashboardTypes = {
+  configUrl: string
+  config?: Config
+  isEditor: boolean
+  isDebug: boolean
+  setConfig: Function
+}
+
+export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, isDebug = false, setConfig: setParentConfig }: CdcDashboardTypes) {
   const [config, setConfig] = useState<Config | null>(configObj ?? null)
   const [data, setData] = useState({})
   const [filteredData, setFilteredData] = useState({})
@@ -649,12 +657,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             })
           } else {
             // Data Filter
-<<<<<<< HEAD
-            singleFilter.values!.forEach((filterOption, index) => {
-              const labeledOpt = singleFilter.labels && singleFilter.labels[filterOption]
-=======
             singleFilter.values?.forEach((filterOption, index) => {
->>>>>>> 5bd55818 (added api-mocking library)
+              const labeledOpt = singleFilter.labels && singleFilter.labels[filterOption]
               values.push(
                 <option key={`${singleFilter.key}-option-${index}`} value={filterOption}>
                   {labeledOpt || filterOption}
