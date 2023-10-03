@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect, memo, useContext } from 'react'
 
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -19,6 +19,7 @@ import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react
 
 import useMapLayers from '../hooks/useMapLayers'
 import Icon from '@cdc/core/components/ui/Icon'
+import ConfigContext from '../context'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -77,7 +78,20 @@ const nudges = {
 }
 
 const UsaMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, titleCase, handleCircleClick, setSharedFilterValue, handleMapAriaLabels } = props
+  // prettier-ignore
+  const {
+      applyLegendToRow,
+      applyTooltipsToGeo,
+      data,
+      displayGeoName,
+      geoClickHandler,
+      handleCircleClick,
+      handleMapAriaLabels,
+      setSharedFilterValue,
+      state,
+      supportedTerritories,
+      titleCase,
+    } = useContext(ConfigContext)
 
   let isFilterValueSupported = false
 

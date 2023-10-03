@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from 'react'
+import { useState, useEffect, memo, useContext } from 'react'
 
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -9,6 +9,7 @@ import colorPalettes from '../../../core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import testJSON from '../data/county-map.json'
 import CityList from './CityList'
+import ConfigContext from '../context'
 
 // SVG ITEMS
 const WIDTH = 880
@@ -20,7 +21,22 @@ let { features: counties } = feature(testJSON, testJSON.objects.counties)
 let { features: states } = feature(testJSON, testJSON.objects.states)
 
 const SingleStateMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, runtimeLegend, generateColorsArray, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
+  // prettier-ignore
+  const {
+    state,
+    applyTooltipsToGeo,
+    data,
+    geoClickHandler,
+    applyLegendToRow,
+    displayGeoName,
+    supportedTerritories,
+    runtimeLegend,
+    generateColorsArray,
+    handleMapAriaLabels,
+    titleCase,
+    setSharedFilterValue,
+    isFilterValueSupported
+  } = useContext(ConfigContext)
 
   const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const cityListProjection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])

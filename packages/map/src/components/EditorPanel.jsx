@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react'
+import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
 
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
@@ -32,6 +32,7 @@ import useMapLayers from '../hooks/useMapLayers'
 import { useFilters } from '@cdc/core/components/Filters'
 
 import HexSetting from './HexShapeSettings'
+import ConfigContext from '../context'
 
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -69,8 +70,23 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
   )
 }
 
+// Todo: move to useReducer, seperate files out.
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend, changeFilterActive, isDebug, setRuntimeFilters } = props
+  // prettier-ignore
+  const {
+    changeFilterActive,
+    columnsInData = [],
+    isDashboard,
+    isDebug,
+    isEditor,
+    loadConfig,
+    runtimeFilters,
+    runtimeLegend,
+    setParentConfig,
+    setRuntimeFilters,
+    setState,
+    state,
+  } = useContext(ConfigContext)
 
   const { general, columns, legend, table, tooltips } = state
 
