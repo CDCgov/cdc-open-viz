@@ -5,9 +5,9 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoPath } from 'd3-geo'
 import { feature, mesh } from 'topojson-client'
 import { CustomProjection } from '@visx/geo'
+import Loading from '@cdc/core/components/Loading'
 import colorPalettes from '../../../core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
-import testJSON from '../data/county-map.json'
 import CityList from './CityList'
 
 // SVG ITEMS
@@ -15,36 +15,110 @@ const WIDTH = 880
 const HEIGHT = 500
 const PADDING = 25
 
-// DATA
-let { features: counties } = feature(testJSON, testJSON.objects.counties)
-let { features: states } = feature(testJSON, testJSON.objects.states)
+const getTopoData = (year) => {
+  return new Promise((resolve, reject) => {
+    const resolveWithTopo = response => {
+      let topoData = {};
+
+      topoData.year = year || 'default';
+      topoData.fulljson = response;
+      topoData.counties = feature(response, response.objects.counties).features
+      topoData.states = feature(response, response.objects.states).features
+
+      resolve(topoData);
+    }
+
+    const numericYear = parseInt(year)
+
+    if(isNaN(numericYear)){
+      import('../data/cb_2019_us_county_20m.json').then(resolveWithTopo);
+    } else if(numericYear > 2022){
+      import('../data/cb_2022_us_county_20m.json').then(resolveWithTopo);
+    } else if(numericYear < 2013){
+      import('../data/cb_2013_us_county_20m.json').then(resolveWithTopo);
+    } else {
+      switch (numericYear){
+        case 2022:
+          import('../data/cb_2022_us_county_20m.json').then(resolveWithTopo);
+          break;
+        case 2021:
+          import('../data/cb_2021_us_county_20m.json').then(resolveWithTopo);
+          break;
+        case 2020:
+          import('../data/cb_2020_us_county_20m.json').then(resolveWithTopo);
+          break;
+        case 2018:
+        case 2017:
+        case 2016:
+        case 2015:
+          import('../data/cb_2015_us_county_20m.json').then(resolveWithTopo);
+          break;
+        case 2014:
+          import('../data/cb_2014_us_county_20m.json').then(resolveWithTopo);
+          break;
+        case 2013:
+          import('../data/cb_2013_us_county_20m.json').then(resolveWithTopo);
+          break;
+        default:
+          import('../data/cb_2019_us_county_20m.json').then(resolveWithTopo);
+          break;
+      }
+    }
+  });
+}
+
+const getCurrentTopoYear = (state, runtimeFilters) => {
+  let currentYear = state.general.countyCensusYear;
+
+  if(state.general.filterControlsCountyYear && runtimeFilters && runtimeFilters.length > 0){
+    let yearFilter = runtimeFilters.filter(filter => filter.columnName === state.general.filterControlsCountyYear);
+    if(yearFilter.length > 0 && yearFilter[0].active){
+      currentYear = yearFilter[0].active
+    }
+  }
+
+  return currentYear || 'default';
+}
+
+const isTopoReady = (topoData, state, runtimeFilters) => {
+  let currentYear = getCurrentTopoYear(state, runtimeFilters);
+
+  return topoData.year && (!currentYear || currentYear === topoData.year);
+}
 
 const SingleStateMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, runtimeLegend, generateColorsArray, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
+  const { state, runtimeFilters, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, runtimeLegend, generateColorsArray, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
 
   const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const cityListProjection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
   const [stateToShow, setStateToShow] = useState(null)
-  const [countiesToShow, setCountiesToShow] = useState(null)
   const [translate, setTranslate] = useState()
   const [scale, setScale] = useState()
   const [strokeWidth, setStrokeWidth] = useState(0.75)
+  const [ topoData, setTopoData ] = useState({});
   let mapColorPalette = colorPalettes[state.color] || '#fff'
   let focusedBorderColor = mapColorPalette[3]
 
   const path = geoPath().projection(projection)
 
+  useEffect(() => {
+    let currentYear = getCurrentTopoYear(state, runtimeFilters);
+
+    if(currentYear !== topoData.year){
+      getTopoData(currentYear).then(response => {
+        setTopoData(response);
+      })
+    }
+  }, [state.general.countyCensusYear, state.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
+
   // When choosing a state changes...
   useEffect(() => {
+    if(!isTopoReady(topoData, state, runtimeFilters)) return
     if (state.general.hasOwnProperty('statePicked')) {
       let statePicked = state.general.statePicked.stateName
-      let statePickedData = states.find(s => s.properties.name === statePicked)
+      let statePickedData = topoData.states.find(s => s.properties.name === statePicked)
       setStateToShow(statePickedData)
-
-      let countiesFound = counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode)
-
-      setCountiesToShow(countiesFound)
 
       const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
       const newProjection = projection.fitExtent(
@@ -64,7 +138,13 @@ const SingleStateMap = props => {
       setTranslate([x, y])
       setScale(newScaleWithHypot)
     }
-  }, [state.general.statePicked])
+  }, [state.general.statePicked, topoData.year])
+
+  if (!isTopoReady(topoData, state, runtimeFilters)) {
+    return <div style={{height: `${HEIGHT}px`}}>
+      <Loading />
+    </div>
+  }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
@@ -74,12 +154,12 @@ const SingleStateMap = props => {
     let geosJsx = []
 
     const StateOutput = () => {
-      let geo = testJSON.objects.states.geometries.filter(s => {
+      let geo = topoData.fulljson.objects.states.geometries.filter(s => {
         return s.id === statePassed.id
       })
 
       // const stateLine = path(mesh(testJSON, lines ))
-      let stateLines = path(mesh(testJSON, geo[0]))
+      let stateLines = path(mesh(topoData.fulljson, geo[0]))
       return (
         <g key={'single-state'} className='single-state' style={{ fill: '#E6E6E6' }} stroke={geoStrokeColor} strokeWidth={0.95 / scale}>
           <path tabIndex={-1} className='state-path' d={stateLines} />
@@ -169,7 +249,7 @@ const SingleStateMap = props => {
         <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' role='img' aria-label={handleMapAriaLabels(state)}>
           <rect className='background center-container ocean' width={WIDTH} height={HEIGHT} fillOpacity={1} fill='white'></rect>
           <CustomProjection
-            data={[{ states: stateToShow, counties: countiesToShow }]}
+            data={[{ states: stateToShow, counties: topoData.counties.filter(c => c.id.substring(0, 2) === state.general.statePicked.fipsCode) }]}
             projection={geoAlbersUsaTerritories}
             fitExtent={[
               [
@@ -189,7 +269,7 @@ const SingleStateMap = props => {
           </CustomProjection>
         </svg>
       )}
-      {!stateToShow && 'No State Picked'}
+      {!state.general.statePicked && 'No State Picked'}
     </ErrorBoundary>
   )
 }
