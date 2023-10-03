@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo, useRef } from 'react'
+import React, { useEffect, useState, memo, useRef, useContext } from 'react'
 
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import { feature } from 'topojson-client'
@@ -10,6 +10,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import topoJSON from '../data/county-map.json'
 import useMapLayers from '../hooks/useMapLayers'
+import ConfigContext from '../context'
 
 const sortById = (a, b) => {
   if (a.id < b.id) return -1
@@ -43,20 +44,19 @@ states.forEach(state => {
   countyIndecies[state.id] = [minIndex, maxIndex]
 })
 
-// Ensures county map is only rerendered when it needs to (when one of the variables below is updated)
-function CountyMapChecks(prevState, nextState) {
-  const equalNumberOptIn = prevState.state.general.equalNumberOptIn && nextState.state.general.equalNumberOptIn
-  const equalColumnName = prevState.state.general.type && nextState.state.general.type
-  const equalNavColumn = prevState.state.columns.navigate && nextState.state.columns.navigate
-  const equalLegend = prevState.runtimeLegend === nextState.runtimeLegend
-  const equalBorderColors = prevState.state.general.geoBorderColor === nextState.state.general.geoBorderColor // update when geoborder color changes
-  const equalData = prevState.data === nextState.data // update when data changes
-  const equalTooltipBehavior = prevState.state.tooltips.appearanceType === nextState.state.tooltips.appearanceType
-  return equalData && equalBorderColors && equalLegend && equalColumnName && equalNavColumn && equalNumberOptIn && equalTooltipBehavior ? true : false
-}
-
 const CountyMap = props => {
-  const { state, runtimeLegend, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels } = props
+  // prettier-ignore
+  const {
+      applyLegendToRow,
+      applyTooltipsToGeo,
+      containerEl,
+      data,
+      displayGeoName,
+      geoClickHandler,
+      handleMapAriaLabels,
+      runtimeLegend,
+      state,
+  } = useContext(ConfigContext)
 
   // CREATE STATE LINES
   const projection = geoAlbersUsaTerritories()
@@ -434,4 +434,4 @@ const CountyMap = props => {
   )
 }
 
-export default memo(CountyMap, CountyMapChecks)
+export default CountyMap

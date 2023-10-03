@@ -1,14 +1,31 @@
 //TODO: COVE Refactor This is LEGEND-ary
-import React from 'react'
+import React, { useContext } from 'react'
 import parse from 'html-react-parser'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import HexSetting from './HexShapeSettings'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import ConfigContext from '../context'
 
 const Sidebar = props => {
-  const { legend, runtimeFilters, columns, setAccessibleStatus, changeFilterActive, resetLegendToggles, runtimeLegend, setRuntimeLegend, prefix, suffix, viewport, displayDataAsText, state } = props
+  // prettier-ignore
+  const {
+    changeFilterActive,
+    columns,
+    displayDataAsText,
+    prefix,
+    resetLegendToggles,
+    runtimeFilters,
+    runtimeLegend,
+    setAccessibleStatus,
+    setRuntimeLegend,
+    state,
+    suffix,
+    viewport,
+  } = useContext(ConfigContext)
+
+  const { legend } = state
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -81,7 +98,6 @@ const Sidebar = props => {
   })
 
   const { legendClasses } = useDataVizClasses(state, viewport)
-  console.log('legendClasses', legendClasses)
 
   const handleReset = e => {
     e.preventDefault()
