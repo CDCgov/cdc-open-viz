@@ -32,7 +32,7 @@ const Tooltip = ({ place = 'top', trigger = 'hover', float = false, shadow = tru
       {/* prettier-ignore */}
       <ReactTooltip
         id={uid}
-        anchorId={uid}
+        //anchorId={uid}
         className={'cove-tooltip__content' + (' place-' + place) + (!float ? ' cove-tooltip__content--animated' : '') + (trigger === 'click' ? ' interactive' : '') + (border ? (' cove-tooltip--border') : '') + (shadow ? ' has-shadow' : '')}
         globalEventOff="click"
       >
