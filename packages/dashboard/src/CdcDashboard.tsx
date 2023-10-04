@@ -1088,6 +1088,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
                   <DataTable
                     config={config}
+                    dataConfig={config.datasets[datasetKey]}
                     rawData={config.datasets[datasetKey].data}
                     runtimeData={filteredTableData || config.datasets[datasetKey].data || []}
                     expandDataTable={config.table.expanded}

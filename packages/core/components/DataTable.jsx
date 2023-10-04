@@ -15,7 +15,7 @@ import Loading from '@cdc/core/components/Loading'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
-  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, colorScale, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, isDebug } = props
+  const { config, dataConfig, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, colorScale, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, isDebug } = props
 
   /* eslint-disable no-console */
   if (isDebug) {
@@ -607,7 +607,7 @@ const DataTable = props => {
     return (
       <ErrorBoundary component='DataTable'>
         <MediaControls.Section classes={['download-links']}>
-          <MediaControls.Link config={config} />
+          <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />
           {(config.table.download || config.general?.showDownloadButton) && <DownloadButton />}
         </MediaControls.Section>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
