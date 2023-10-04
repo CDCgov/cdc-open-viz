@@ -170,7 +170,7 @@ const DataTable = props => {
     if (rawData !== undefined) {
       let csvData
       // only use fullGeoName on County maps and no other
-      if (config.general.geoType === 'us-county') {
+      if (config.general?.geoType === 'us-county') {
         // Unparse + Add column for full Geo name along with State
         csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row })))
       } else {
@@ -231,7 +231,7 @@ const DataTable = props => {
     if (config.type === 'map' && config.columns) {
       sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
     }
-    if (config.type === 'chart') {
+    if (config.type === 'chart' || config.type === 'dashboard') {
       sortVal = customSort(runtimeData[a][sortBy.column], runtimeData[b][sortBy.column])
     }
     return sortVal
@@ -298,20 +298,24 @@ const DataTable = props => {
   const dataSeriesColumns = () => {
     let tmpSeriesColumns
     if (config.visualizationType !== 'Pie') {
-      tmpSeriesColumns = config?.table?.showVertical ? [config.xAxis.dataKey] : [] //, ...config.runtime.seriesLabelsAll
-      config.series.forEach(element => {
-        tmpSeriesColumns.push(element.dataKey)
-      })
+      tmpSeriesColumns = config?.table?.showVertical ? [config.xAxis?.dataKey] : [] //, ...config.runtime.seriesLabelsAll
+      if(config.series){
+        config.series.forEach(element => {
+          tmpSeriesColumns.push(element.dataKey)
+        })
+      } else if(runtimeData && runtimeData.length > 0) {
+        tmpSeriesColumns = Object.keys(runtimeData[0]);
+      }
     } else {
-      tmpSeriesColumns = [config.xAxis.dataKey, config.yAxis.dataKey] //Object.keys(runtimeData[0])
+      tmpSeriesColumns = [config.xAxis?.dataKey, config.yAxis?.dataKey] //Object.keys(runtimeData[0])
     }
 
     // then add the additional Columns
-    if (Object.keys(config.columns).length > 0) {
+    if (config.columns && Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
         var value = config.columns[key]
         // add if not the index AND it is enabled to be added to data table
-        if (value.name !== config.xAxis.dataKey && value.dataTable === true) {
+        if (value.name !== config.xAxis?.dataKey && value.dataTable === true) {
           tmpSeriesColumns.push(value.name)
         }
       })
@@ -323,7 +327,7 @@ const DataTable = props => {
   const dataSeriesColumnsSorted = () => {
     return dataSeriesColumns().sort((a, b) => {
       if(sortBy.column === '__series__') return -1 * customSort(a, b);
-      let row = runtimeData.find(d => d[config.xAxis.dataKey] === sortBy.column);
+      let row = runtimeData.find(d => d[config.xAxis?.dataKey] === sortBy.column);
       if(!row) return 0;
       return -1 * customSort(row[a], row[b]);
     })
@@ -331,7 +335,7 @@ const DataTable = props => {
 
   const getLabel = name => {
     let custLabel = ''
-    if (Object.keys(config.columns).length > 0) {
+    if (config.columns && Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
         var tmpColumn = config.columns[key]
         // add if not the index AND it is enabled to be added to data table
@@ -345,13 +349,13 @@ const DataTable = props => {
 
   const getSeriesName = column => {
     // If a user sets the name on a series use that.
-    let userUpdatedSeriesName = config.series.filter(series => series.dataKey === column)?.[0]?.name
+    let userUpdatedSeriesName = config.series ? config.series.filter(series => series.dataKey === column)?.[0]?.name : ''
     if (userUpdatedSeriesName) return userUpdatedSeriesName
 
     if (config.runtimeSeriesLabels && config.runtimeSeriesLabels[column]) return config.runtimeSeriesLabels[column]
 
     let custLabel = getLabel(column) ? getLabel(column) : column
-    let text = column === config.xAxis.dataKey ? config.table.indexLabel : custLabel
+    let text = column === config.xAxis?.dataKey ? config.table.indexLabel : custLabel
 
     return text
   }
@@ -396,7 +400,7 @@ const DataTable = props => {
       return (
         <tr>
           {['__series__', ...Object.keys(runtimeData)].map(row => {
-            let column = config.xAxis.dataKey;
+            let column = config.xAxis?.dataKey;
             let text = row !== '__series__' ? getChartCellValue(row, column) : '__series__'
 
             return (
@@ -434,31 +438,33 @@ const DataTable = props => {
   const isAdditionalColumn = column => {
     let inthere = false
     let formattingParams = {}
-    Object.keys(config.columns).forEach(keycol => {
-      if (config.columns[keycol].name === column) {
-        inthere = true
-        formattingParams = {
-          addColPrefix: config.columns[keycol].prefix,
-          addColSuffix: config.columns[keycol].suffix,
-          addColRoundTo: config.columns[keycol].roundToPlace ? config.columns[keycol].roundToPlace : '',
-          addColCommas: config.columns[keycol].commas
+    if(config.columns){
+      Object.keys(config.columns).forEach(keycol => {
+        if (config.columns[keycol].name === column) {
+          inthere = true
+          formattingParams = {
+            addColPrefix: config.columns[keycol].prefix,
+            addColSuffix: config.columns[keycol].suffix,
+            addColRoundTo: config.columns[keycol].roundToPlace ? config.columns[keycol].roundToPlace : '',
+            addColCommas: config.columns[keycol].commas
+          }
         }
-      }
-    })
+      })
+    }
     return formattingParams
   }
 
-  const getChartCellValue = (row, column, labelValueParam) => {
+  const getChartCellValue = (row, column) => {
     const rowObj = runtimeData[row]
     let cellValue // placeholder for formatting below
     let labelValue = rowObj[column] // just raw X axis string
-    if (column === config.xAxis.dataKey) {
+    if (column === config.xAxis?.dataKey) {
       // not the prettiest, but helper functions work nicely here.
-      cellValue = config.xAxis.type === 'date' ? formatDate(config.xAxis.dateDisplayFormat, parseDate(config.xAxis.dateParseFormat, labelValue)) : labelValue
+      cellValue = config.xAxis?.type === 'date' ? formatDate(config.xAxis?.dateDisplayFormat, parseDate(config.xAxis?.dateParseFormat, labelValue)) : labelValue
     } else {
       let resolvedAxis = 'left'
-      let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
-      let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
+      let leftAxisItems = config.series ? config.series.filter(item => item?.axis === 'Left') : []
+      let rightAxisItems = config.series ? config.series.filter(item => item?.axis === 'Right') : []
 
       leftAxisItems.map(leftSeriesItem => {
         if (leftSeriesItem.dataKey === column) resolvedAxis = 'left'
@@ -470,9 +476,9 @@ const DataTable = props => {
 
       let addColParams = isAdditionalColumn(column)
       if (addColParams) {
-        cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams)
+        cellValue = config.dataFormat ? formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams) : runtimeData[row][column]
       } else {
-        cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config)
+        cellValue = config.dataFormat ? formatNumber(runtimeData[row][column], resolvedAxis, false, config) : runtimeData[row][column]
       }
     }
 
@@ -481,7 +487,7 @@ const DataTable = props => {
 
   const getChartCell = (row, column) => {
     return (
-      <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`}>
+      <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime?.originalXAxis?.dataKey]}--${row}`}>
         {getChartCellValue(row, column)}
       </td>
     )
@@ -561,7 +567,7 @@ const DataTable = props => {
               if (column !== 'geo') {
                 text = columns[column].label ? columns[column].label : columns[column].name
               } else {
-                text = config.type === 'map' ? indexTitle : config.xAxis.dataKey
+                text = config.type === 'map' ? indexTitle : config.xAxis?.dataKey
               }
               if (config.type === 'map' && (text === undefined || text === '')) {
                 text = 'Location'
@@ -602,7 +608,7 @@ const DataTable = props => {
       <ErrorBoundary component='DataTable'>
         <MediaControls.Section classes={['download-links']}>
           <MediaControls.Link config={config} />
-          {(config.table.download || config.general.showDownloadButton) && <DownloadButton />}
+          {(config.table.download || config.general?.showDownloadButton) && <DownloadButton />}
         </MediaControls.Section>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
