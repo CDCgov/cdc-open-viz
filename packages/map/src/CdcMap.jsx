@@ -1508,6 +1508,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     applyLegendToRow,
     applyTooltipsToGeo,
     closeModal,
+    columnsInData: state?.data?.[0] ? Object.keys(state.data[0]) : [],
     currentViewport,
     data: runtimeData,
     displayDataAsText,
@@ -1524,8 +1525,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     isEditor,
     navigationHandler,
     position,
+    resetLegendToggles,
     runtimeFilters,
     runtimeLegend,
+    setAccessibleStatus,
     setFilteredCountryCode,
     setPosition,
     setRuntimeData,
@@ -1616,9 +1619,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               </a>
 
               {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-              <section className='outline-none' ref={mapSvg} tabIndex='0'>
+              <section className='outline-none geography-container' ref={mapSvg} tabIndex='0' style={{ width: '100%' }}>
                 {currentViewport && (
-                  <section className='geography-container' ref={mapSvg}>
+                  <>
                     {modal && <Modal />}
                     {'single-state' === geoType && <SingleStateMap />}
                     {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap />}
@@ -1626,7 +1629,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                     {'world' === geoType && <WorldMap />}
                     {'us-county' === geoType && <CountyMap />}
                     {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
-                  </section>
+                  </>
                 )}
               </section>
 
