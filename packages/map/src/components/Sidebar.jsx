@@ -24,6 +24,7 @@ const Sidebar = props => {
   } = useContext(ConfigContext)
 
   const { legend } = state
+  console.log('state', state)
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -165,7 +166,7 @@ const Sidebar = props => {
             </ul>
           </section>
         </aside>
-        {state.hexMap.arrowGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <HexSetting.Legend state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}
+        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <HexSetting.Legend state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}
       </div>
     </ErrorBoundary>
   )
