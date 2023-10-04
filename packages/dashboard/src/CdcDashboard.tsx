@@ -50,7 +50,15 @@ type APIFilterDropdowns = {
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
-export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, isDebug = false, setConfig: setParentConfig }) {
+type CdcDashboardTypes = {
+  configUrl: string
+  config?: Config
+  isEditor: boolean
+  isDebug: boolean
+  setConfig: Function
+}
+
+export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, isDebug = false, setConfig: setParentConfig }: CdcDashboardTypes) {
   const [config, setConfig] = useState<Config | null>(configObj ?? null)
   const [data, setData] = useState({})
   const [filteredData, setFilteredData] = useState({})
@@ -649,7 +657,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             })
           } else {
             // Data Filter
-            singleFilter.values!.forEach((filterOption, index) => {
+            singleFilter.values?.forEach((filterOption, index) => {
               const labeledOpt = singleFilter.labels && singleFilter.labels[filterOption]
               values.push(
                 <option key={`${singleFilter.key}-option-${index}`} value={filterOption}>
@@ -987,8 +995,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
           {/* Image or PDF Inserts */}
           <section className='download-buttons'>
-            {config.table.downloadImageButton && <MediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
-            {config.table.downloadPdfButton && <MediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
+            {config.table?.downloadImageButton && <MediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
+            {config.table?.downloadPdfButton && <MediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
           </section>
 
           {/* Data Table */}
