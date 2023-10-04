@@ -24,7 +24,6 @@ const Sidebar = props => {
   } = useContext(ConfigContext)
 
   const { legend } = state
-  console.log('state', state)
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
