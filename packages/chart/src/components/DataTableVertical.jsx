@@ -13,7 +13,7 @@ function DataTableVertical({ display }) {
   const [sortOrder, setSortOrder] = useState(null)
   const [expanded, setExpanded] = useState(false)
 
-  // create keys & data flows
+  // create keys & data flow
   const { tableData, rawData, currentViewport, config, formatDate, parseDate, formatNumber } = useContext(ConfigContext)
   const { table, xAxis, yAxis, runtime, regions, visualizationType } = config
   const additionalColumns = Object.values(config?.columns || {}).filter(column => column?.dataTable)
