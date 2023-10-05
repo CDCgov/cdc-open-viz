@@ -244,6 +244,8 @@ const EditorPanel = () => {
     visSupportsValueAxisLabels,
     visSupportsBarSpace,
     visSupportsBarThickness,
+    visSupportsFootnotes,
+    visSupportsSuperTitle,
     visSupportsDataCutoff
   } = useEditorPermissions()
 
@@ -1039,30 +1041,33 @@ const EditorPanel = () => {
                   }
                 />
                 <CheckBox value={config.showTitle} fieldName='showTitle' label='Show Title' updateField={updateField} />
-                <TextField
-                  value={config.superTitle}
-                  updateField={updateField}
-                  fieldName='superTitle'
-                  label='Super Title'
-                  placeholder='Super Title'
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>Super Title</p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
+
+                {visSupportsSuperTitle() && (
+                  <TextField
+                    value={config.superTitle}
+                    updateField={updateField}
+                    fieldName='superTitle'
+                    label='Super Title'
+                    placeholder='Super Title'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Super Title</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                )}
 
                 <TextField
                   type='textarea'
                   value={config.introText}
                   updateField={updateField}
                   fieldName='introText'
-                  label='Intro Text'
+                  label='Message'
                   tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>
@@ -1076,10 +1081,10 @@ const EditorPanel = () => {
                 />
 
                 <TextField
-                  type='textarea'
+                  type='text'
                   value={config.description}
                   fieldName='description'
-                  label='Subtext'
+                  label='Subtext/Citation'
                   updateField={updateField}
                   tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
@@ -1093,23 +1098,25 @@ const EditorPanel = () => {
                   }
                 />
 
-                <TextField
-                  type='textarea'
-                  value={config.footnotes}
-                  updateField={updateField}
-                  fieldName='footnotes'
-                  label='Footnotes'
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>Footnotes</p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
+                {visSupportsFootnotes() && (
+                  <TextField
+                    type='textarea'
+                    value={config.footnotes}
+                    updateField={updateField}
+                    fieldName='footnotes'
+                    label='Footnotes'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Footnotes</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                )}
 
                 {config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
               </AccordionItemPanel>

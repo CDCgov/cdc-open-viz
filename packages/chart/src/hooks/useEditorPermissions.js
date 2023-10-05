@@ -22,6 +22,18 @@ export const useEditorPermissions = () => {
     'Spark Line'
 ]
 
+  const visSupportsSuperTitle = () => {
+    const disabledCharts = ['Spark Line']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsFootnotes = () => {
+    const disabledCharts = ['Spark Line']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
   const visHasLabelOnData = () => {
     const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot']
     if (disabledCharts.includes(visualizationType)) return false
@@ -213,6 +225,8 @@ export const useEditorPermissions = () => {
     visSupportsValueAxisLine,
     visSupportsValueAxisLabels,
     visSupportsBarSpace,
-    visSupportsBarThickness
+    visSupportsBarThickness,
+    visSupportsFootnotes,
+    visSupportsSuperTitle
   }
 }

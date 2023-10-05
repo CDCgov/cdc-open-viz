@@ -1712,7 +1712,7 @@ const EditorPanel = props => {
                   updateField={updateField}
                   section='general'
                   fieldName='introText'
-                  label='Intro Text'
+                  label='Message'
                   tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>

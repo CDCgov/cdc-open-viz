@@ -296,14 +296,14 @@ const WaffleChart = ({ config, isEditor, link }) => {
                     {config.showPercent ? dataPercentage : waffleNumerator}
                     {suffix ? suffix + ' ' : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
                   </div>
-                  <div className='cove-gauge-chart__data--text'>{parse(content)}</div>
+                  <div className='cove-gauge-chart__data--text introText'>{parse(content)}</div>
                   <svg height={gaugeHeight} width={'100%'}>
                     <Group>
                       <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={gaugeWidth} height={gaugeHeight} fill='#fff' />
                       <Bar x={0} y={0} width={xScale(waffleNumerator)} height={gaugeHeight} fill={gaugeColor} />
                     </Group>
                   </svg>
-                  <div className={'cove-gauge-chart__subtext'}>{parse(subtext)}</div>
+                  <div className={'cove-gauge-chart__subtext subtext'}>{parse(subtext)}</div>
                 </div>
               </div>
             )}
@@ -325,7 +325,7 @@ const WaffleChart = ({ config, isEditor, link }) => {
                     )}
                     <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
 
-                    {subtext && <div className='cove-waffle-chart__subtext'>{parse(subtext)}</div>}
+                    {subtext && <div className='cove-waffle-chart__subtext subtext'>{parse(subtext)}</div>}
                   </div>
                 )}
               </div>
@@ -425,7 +425,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   let content = <Loading />
 
   if (loading === false) {
-    let classNames = ['cove', 'type-waffle-chart', currentViewport, config.theme, 'font-' + config.overallFontSize]
+    let classNames = ['cove', 'cdc-open-viz-module', 'type-waffle-chart', currentViewport, config.theme, 'font-' + config.overallFontSize]
 
     if (isEditor) {
       classNames.push('is-editor')

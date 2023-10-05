@@ -27,6 +27,8 @@ import ExternalIcon from './images/external-link.svg'
 
 // Sass
 import './scss/main.scss'
+
+// TODO: combine in scss.
 import './scss/btn.scss'
 
 // Core
