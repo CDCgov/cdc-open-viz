@@ -181,6 +181,8 @@ export const APIFiltersChart: Story = {
     const indicatorsFilter = canvas.getByLabelText('Indicator', { selector: 'select' })
     await user.selectOptions(indicatorsFilter, ['indicatorID'])
     await user.click(canvas.getByText('GO!'))
+    const yearFilter = canvas.getByLabelText('Year', { selector: 'select' })
+    await user.selectOptions(yearFilter, ['1999'])
   }
 }
 
