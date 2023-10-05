@@ -41,8 +41,7 @@ import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 import './scss/main.scss'
 // load both then config below determines which to use
-import DataTable_horiz from './components/DataTable'
-import DataTable_vert from '@cdc/core/components/DataTable'
+import DataTable from './components/DataTable'
 import DataTableVertical from './components/DataTableVertical'
 
 const generateColorsArray = (color = '#000000', special = false) => {
@@ -92,19 +91,16 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
-  let legendMemo = useRef(new Map()) // map collection
-  let innerContainerRef = useRef()
+  let legendMemo = useRef(new Map())
 
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
-
-  const DataTable = config?.table?.showVertical ? DataTable_vert : DataTable_horiz
 
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
-    if (!title || title === '') title = 'Chart Title'
+    if (!title || title === '') title = 'Chart title'
   }
 
   if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
@@ -1111,45 +1107,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return formattedValue
   }
 
-  // this is passed DOWN into the various components
-  // then they do a lookup based on the bin number as index into here (TT)
-  const applyLegendToRow = rowObj => {
-    try {
-      if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
-      // Navigation map
-      if ('navigation' === config.type) {
-        let mapColorPalette = colorPalettes[config.color] || colorPalettes['bluegreenreverse']
-        return generateColorsArray(mapColorPalette[3])
-      }
-
-      let hash = hashObj(rowObj)
-
-      if (legendMemo.current.has(hash)) {
-        let idx = legendMemo.current.get(hash)
-        if (runtimeLegend[idx]?.disabled) return false
-
-        // DEV-784 changed to use bin prop to get color instead of idx
-        // bc we re-order legend when showSpecialClassesLast is checked
-        let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
-        return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
-      }
-
-      // Fail state
-      return generateColorsArray()
-    } catch (e) {
-      console.error('COVE: ', e) // eslint-disable-line
-    }
-  }
-
   const clean = data => {
-    // cleaning is deleting data we need in forecasting charts.
     if (config.visualizationType === 'Forecasting') return data
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
-  }
-
-  // required for DataTable
-  const displayGeoName = key => {
-    return key
   }
 
   // Prevent render if loading
@@ -1229,37 +1189,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Data Table */}
             {config.xAxis.dataKey && config.visualizationType !== 'Spark Line' && (
               <>
-                <DataTableVertical tabbingId={handleChartTabbing} />
-
-                <DataTable
-                  config={config}
-                  rawData={config.data}
-                  runtimeData={filteredData || excludedData}
-                  //navigationHandler={navigationHandler} // do we need this? What does it do?
-                  expandDataTable={config.table.expanded}
-                  //headerColor={general.headerColor} // have this in map but not chart
-                  columns={config.columns}
-                  showDownloadButton={config.general.showDownloadButton}
-                  runtimeLegend={dynamicLegendItems}
-                  displayDataAsText={displayDataAsText}
-                  displayGeoName={displayGeoName}
-                  applyLegendToRow={applyLegendToRow}
-                  tableTitle={config.table.label}
-                  indexTitle={config.table.indexLabel}
-                  vizTitle={title}
-                  viewport={currentViewport}
-                  parseDate={parseDate}
-                  formatDate={formatDate}
-                  formatNumber={formatNumber}
-                  tabbingId={handleChartTabbing}
-                  showDownloadImgButton={config.showDownloadImgButton}
-                  showDownloadPdfButton={config.showDownloadPdfButton}
-                  innerContainerRef={innerContainerRef}
-                  outerContainerRef={outerContainerRef}
-                  imageRef={imageId}
-                  isDebug={isDebug}
-                  isEditor={isEditor}
-                />
+                <DataTableVertical display={config.table.showVertical} />
+                <DataTable display={!config.table.showVertical} />
               </>
             )}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
@@ -1285,8 +1216,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setConfig,
     rawData: stateData ?? {},
     excludedData: excludedData,
-    transformedData: clean(filteredData || excludedData), // do this right before passing to components
-    tableData: filteredData || excludedData, // do not clean table data
+    transformedData: clean(filteredData || excludedData),
+    tableData: filteredData || excludedData,
     unfilteredData: stateData,
     seriesHighlight,
     colorScale,

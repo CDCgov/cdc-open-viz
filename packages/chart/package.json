@@ -46,6 +46,7 @@
     "d3-time-format": "^3.0.0",
     "html-react-parser": "^3.0.8",
     "js-base64": "^2.5.2",
+    "luxon": "^3.4.3",
     "papaparse": "^5.3.0",
     "react-accessible-accordion": "^3.3.4",
     "react-icons": "^4.10.1",

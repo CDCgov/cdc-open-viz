@@ -1,24 +1,16 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react'
+import React, { useContext, useEffect, useState, useMemo, Fragment } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
-import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
-
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import Icon from '@cdc/core/components/ui/Icon'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-
 import ConfigContext from '../ConfigContext'
-
 import MediaControls from '@cdc/core/components/MediaControls'
 
-const DataTable = props => {
-  // had to pass in runtimeData as prop to get the raw prop names in the inbound data (TT)
-  const { runtimeData, isDebug } = props
-
+const DataTable = ({ display }) => {
   const { rawData, tableData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, currentViewport } = useContext(ConfigContext)
-
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
@@ -31,21 +23,25 @@ const DataTable = props => {
     const csvData = Papa.unparse(data)
 
     const saveBlob = () => {
-      //@ts-ignore
       if (typeof window.navigator.msSaveBlob === 'function') {
         const dataBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
-        //@ts-ignore
         window.navigator.msSaveBlob(dataBlob, fileName)
       }
     }
 
-    // - trying to eliminate console error that occurs if formatted with prettier
-    // prettier-ignore
     switch (type) {
       case 'download':
-        return (<a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border margin-sm`}>Download Data (CSV)</a>)
+        return (
+          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border margin-sm`}>
+            Download Data (CSV)
+          </a>
+        )
       default:
-        return (<a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`no-border`}>Download Data (CSV)</a>)
+        return (
+          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`no-border`}>
+            Download Data (CSV)
+          </a>
+        )
     }
   }
 
@@ -243,39 +239,23 @@ const DataTable = props => {
       columns: tableColumns,
       data: tableData,
       defaultColumn,
-      disableSortRemove: true, // otherwise 3rd click on header removes sorting entirely
+      disableSortRemove: true,
       sortTypes: {
         custom: (rowA, rowB, columnId) => {
-          // NOTE:
-          // 1) Main issue causing all this code:
-          //     rowA and rowB are coming in with all values undefined
-          // - if it passed the values we could just use the columnId to get the correct sort value
-          // but since it's not there we have to go through a bunch of code to get it because
-          // we also do not know the Y axis data key (TT)
-          // 2). if formattedData did not truncate the strings we could get it from there
-          // but Hispanic or Latino is truncated to just Hispanic as the key
-          // and 'White, Non-Hispanic/Latino' gets truncated to remove the /Latino
-
-          // rowA.original - is the row data field name to access the value
-          // columnId = the column indicator typically date or date--index
           let a, b
           if (columnId === 'series-label') {
-            // comparing strings
             a = rowA.original
             b = rowB.original
             return a.localeCompare(b)
           }
 
           let dataKey = config.xAxis.dataKey
-          let columnIdIndexRemoved = columnId.split('--')[0] // have to remove index for compare
-          //get all the data from that column
-          let colData = runtimeData.filter(obj => {
-            // problem is dates can be in different formats
+          let columnIdIndexRemoved = columnId.split('--')[0]
+          let colData = data.filter(obj => {
             if (config.xAxis.type === 'date' && !isNaN(Date.parse(obj[dataKey])) && !isNaN(Date.parse(columnIdIndexRemoved))) {
-              // must convert to datetime number to compare
               return parseDate(obj[dataKey]).getTime() === parseDate(columnIdIndexRemoved).getTime()
             } else {
-              return obj[dataKey] === columnIdIndexRemoved // have to remove index
+              return obj[dataKey] === columnIdIndexRemoved
             }
           })
 
@@ -285,10 +265,6 @@ const DataTable = props => {
 
           let rowA_cellObj = getSpecificCellData(colData, rowA.original)
           let rowB_cellObj = getSpecificCellData(colData, rowB.original)
-
-          // - ** REMOVE any data points NOT selected in the data series ***
-          // I dont understand why not selected data series are still sent down in the data
-          // - would be better to scrub outside of here (TT)
           let newRowA_cellObj = []
           let newRowB_cellObj = []
           if (config.runtime.seriesKeys) {
@@ -300,36 +276,26 @@ const DataTable = props => {
             rowA_cellObj[0] = newRowA_cellObj
             rowB_cellObj[0] = newRowB_cellObj
           }
-
-          // REMOVE the following:
-          // - value equal to column date
-          // - value that is the .original
-          // - any data still in that's not really a number
           let rowA_valueObj = Object.values(rowA_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowA.original && !isNaN(value))
           let rowB_valueObj = Object.values(rowB_cellObj[0]).filter(value => value !== columnIdIndexRemoved && value !== rowB.original && !isNaN(value))
 
-          // NOW we can get the sort values from the cell object
           a = rowA_valueObj.length > 1 ? rowA_valueObj[rowA.id] : rowA_valueObj[0]
           b = rowB_valueObj.length > 1 ? rowB_valueObj[rowB.id] : rowB_valueObj[0]
 
-          // force null and undefined to the bottom
           a = a === null || a === undefined ? '' : transform.cleanDataPoint(a)
           b = b === null || b === undefined ? '' : transform.cleanDataPoint(b)
           if (a === '' || a === null) {
             if (b === '' || b === null) {
-              return 0 // Both empty/null
+              return 0
             }
-            return -1 // Sort a to an index lower than b
+            return -1
           }
           if (b === '' || b === null) {
             if (a === '' || a === null) {
-              return 0 // Both empty/null
+              return 0
             }
-            return 1 // Sort b to an index lower than a
+            return 1
           }
-          // End code for forcing NULLS to bottom
-
-          // convert any strings that are actually numbers to proper data type
           const aNum = Number(a)
 
           if (!Number.isNaN(aNum)) {
@@ -372,8 +338,7 @@ const DataTable = props => {
           if (a < b) {
             return -1
           }
-          // returning 0, undefined or any falsey value will use subsequent sorts or
-          // the index as a tiebreaker
+
           return 0
         }
       },
@@ -389,6 +354,10 @@ const DataTable = props => {
   // sort continuous x axis scaling for data tables, ie. xAxis should read 1,2,3,4,5
   if (config.xAxis.type === 'continuous' && headerGroups) {
     data.sort((a, b) => a[config.xAxis.dataKey] - b[config.xAxis.dataKey])
+  }
+
+  if (!display) {
+    return <Fragment />
   }
 
   return (

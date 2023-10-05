@@ -1,22 +1,25 @@
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, Fragment } from 'react'
 import ConfigContext from '../ConfigContext'
 import Icon from '@cdc/core/components/ui/Icon'
 import Loading from '@cdc/core/components/Loading'
 import Papa from 'papaparse'
 import MediaControls from '@cdc/core/components/MediaControls'
+import { DateTime } from 'luxon'
 
-function DataTableVertical({ tabbingId }) {
+function DataTableVertical({ display }) {
+  // register states
   const [selectedHeader, setSelectedHeader] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
   const [expanded, setExpanded] = useState(false)
+
+  // create keys & data flow
   const { tableData, rawData, currentViewport, config, formatDate, parseDate, formatNumber } = useContext(ConfigContext)
-  const { table, xAxis, runtime, visualizationType, regions } = config
+  const { table, xAxis, runtime, regions } = config
   const additionalColumns = Object.values(config?.columns || {}).filter(column => column?.dataTable)
   const additionalKeys = additionalColumns.map(column => column?.name)
   const currentKeys = [xAxis.dataKey, ...config?.runtime.seriesKeys, ...additionalKeys]
-
-  // filter tableData by seriesKeys && additionalColumnKeys && xAxis dataKey
+  const ariaLabel = ['Accessible data table. This table is currently collapsed visually but can still be read using a screen reader.', 'Accessible data table.']
   const data = tableData.map(d => currentKeys.reduce((acc, key) => (d[key] !== undefined ? { ...acc, [key]: d[key] } : acc), {}))
   const headers = Object.keys(data[0])
 
@@ -47,6 +50,18 @@ function DataTableVertical({ tabbingId }) {
     return header === xAxis.dataKey ? table.indexLabel : seriesLabels[header]
   }
 
+  const dateSorter = date => {
+    date = String(date).toUpperCase()
+    const formats = getFormats()
+    for (let format of formats) {
+      const dt = DateTime.fromFormat(date, format)
+      if (dt.isValid) {
+        return dt
+      }
+    }
+    return DateTime.invalid('Unknown format')
+  }
+
   const customSort = (a, b) => {
     let valueA = a[selectedHeader]
     let valueB = b[selectedHeader]
@@ -58,17 +73,14 @@ function DataTableVertical({ tabbingId }) {
     const trimmedA = String(valueA).trim()
     const trimmedB = String(valueB).trim()
 
-    // Check if it's a valid date format
-    const dateRegex = /^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/\d{4}$/
+    const dateA = dateSorter(trimmedA)
+    const dateB = dateSorter(trimmedB)
 
-    const isDateA = dateRegex.test(trimmedA)
-    const isDateB = dateRegex.test(trimmedB)
-
-    if (isDateA && isDateB) {
-      const dateObjectA = new Date(trimmedA)
-      const dateObjectB = new Date(trimmedB)
-      return sortOrder === 'asc' ? dateObjectA - dateObjectB : dateObjectB - dateObjectA
+    // sort dates
+    if (dateA.isValid && dateB.isValid) {
+      return sortOrder === 'asc' ? dateA.valueOf() - dateB.valueOf() : dateB.valueOf() - dateA.valueOf()
     }
+
     // Check if values are numbers
     const isNumA = !isNaN(Number(valueA)) && valueA !== undefined && valueA !== null && trimmedA !== ''
     const isNumB = !isNaN(Number(valueB)) && valueB !== undefined && valueB !== null && trimmedB !== ''
@@ -96,10 +108,13 @@ function DataTableVertical({ tabbingId }) {
     return sortOrder === 'asc' ? trimmedA.localeCompare(trimmedB) : trimmedB.localeCompare(trimmedA)
   }
 
+  if (!display) {
+    return <Fragment />
+  }
+
   if (!data || !data.length) {
     return <Loading />
   }
-  const ariaLabel = ['Accessible data table. This table is currently collapsed visually but can still be read using a screen reader.', 'Accessible data table.']
 
   const sortedData = JSON.parse(JSON.stringify(data)).sort(customSort)
 
@@ -109,12 +124,12 @@ function DataTableVertical({ tabbingId }) {
         <MediaControls.Link config={config} />
         <DownloadButton fileName={`${config.title || 'data-table'}.csv`} data={rawData} display={config.table.download && rawData} />
       </MediaControls.Section>
-      <section hidden={!config.table.show} id={tabbingId.replace('#', '')} className={`data-table-container ${currentViewport}`} aria-label={ariaLabel[+expanded]}>
+      <section hidden={!config.table.show} className={`data-table-container ${currentViewport}`} aria-label={ariaLabel[+expanded]}>
         <div role='button' className={`data-table-heading ${expanded ? '' : 'collapsed'}`} onClick={toggleExpanded} tabIndex='0' onKeyDown={handleKeyDown}>
           <Icon display={expanded ? 'minus' : 'plus'} base />
           {table.label}
         </div>
-        <div className='table-container'>
+        <div style={{ maxHeight: table.limitHeight && `${table.height}px`, overflowY: 'scroll' }} className='table-container'>
           <table role='table' aria-live='assertive' hidden={!expanded} className='data-table' aria-rowcount={config?.data?.length ?? '-1'}>
             <caption className='cdcdataviz-sr-only'>{table.caption ? table.caption : `Data table showing data for the ${config.type} figure.`}</caption>
             <thead>
@@ -161,8 +176,6 @@ const RegionsTable = ({ data, display }) => {
         <tbody>
           {data.map((region, index) => {
             if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
-            // region.from and region.to had formatDate(parseDate()) on it
-            // but they returned undefined - removed both for now (TT)
             return (
               <tr key={`row-${region.label}--${index}`}>
                 <td>{region.label}</td>
@@ -190,8 +203,37 @@ const DownloadButton = ({ data, display, fileName }) => {
   const blob = new Blob([Papa.unparse(data)], { type: 'text/csv;charset=utf-8;' })
 
   return (
-    <a hidden={!display} download={fileName} onClick={() => window.navigator.msSaveBlob && navigator.msSaveBlob(blob, fileName)} href={URL.createObjectURL(blob)} id={skipId}>
+    <a aria-label='Download this data in a CSV file format.' hidden={!display} download={fileName} onClick={() => window.navigator.msSaveBlob && navigator.msSaveBlob(blob, fileName)} href={URL.createObjectURL(blob)} id={skipId}>
       Download Data (CSV)
     </a>
   )
+}
+
+const getFormats = () => {
+  const a1 = ['MMM-dd-yyyy', 'MMM-d-yyyy', 'MMM-dd-yy', 'MMM-d-yy']
+  const a2 = ['MMM.dd.yyyy', 'MMM.d.yyyy', 'MMM.dd.yy', 'MMM.d.yy']
+  const a3 = ['MMM/dd/yyyy', 'MMM/d/yyyy', 'MMM/dd/yy', 'MMM/d/yy']
+
+  const b1 = ['dd-MMM-yyyy', 'd-MMM-yyyy', 'dd-MMM-yy', 'd-MMM-yy']
+  const b2 = ['dd/MMM/yyyy', 'd/MMM/yyyy', 'dd/MMM/yy', 'd/MMM/yy']
+  const b3 = ['dd.MMM.yyyy', 'd.MMM.yyyy', 'dd.MMM.yy', 'd.MMM.yy']
+
+  const c1 = ['MMMM-dd-yyyy', 'MMMM-d-yyyy', 'MMMM-dd-yy', 'MMMM-d-yy']
+  const c2 = ['MMMM/dd/yyyy', 'MMMM/d/yyyy', 'MMMM/dd/yy', 'MMMM/d/yy']
+  const c3 = ['MMMM.dd.yyyy', 'MMMM.d.yyyy', 'MMMM.dd.yy', 'MMMM.d.yy']
+
+  const d1 = ['dd-MMMM-yyyy', 'd-MMMM-yyyy', 'dd-MMMM-yy', 'd-MMMM-yy']
+  const d2 = ['dd/MMMM/yyyy', 'd/MMMM/yyyy', 'dd/MMMM/yy', 'd/MMMM/yy']
+  const d3 = ['dd.MMMM.yyyy', 'd.MMMM.yyyy', 'dd.MMMM.yy', 'd.MMMM.yy']
+
+  const e1 = ['MMM-yyyy', 'MMM-yy', 'MMMM-yyyy', 'MMMM-yy']
+  const e2 = ['MMM/yyyy', 'MMM/yy', 'MMMM/yyyy', 'MMMM/yy']
+  const e3 = ['MMM.yyyy', 'MMM.yy', 'MMMM.yyyy', 'MMMM.yy']
+  const e4 = ['yyyy-MMM', 'yy-MMM', 'yyyy-MMMM', 'yy-MMMM']
+  const e5 = ['yyyy/MMM', 'yy/MMM', 'yyyy/MMMM', 'yy/MMMM']
+  const e6 = ['yyyy.MMM', 'yy.MMM', 'yyyy.MMMM', 'yy.MMMM']
+
+  const x = ['mm/d/yyyy', 'mm/dd/yyyy', 'm/dd/yyyy', 'm/d/yyyy', 'm/d/yy', 'mm/dd/yy', 'm/dd/yy', 'mm/d/yy']
+
+  return [].concat(a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3, e1, e2, e3, e4, e5, e6, x)
 }
