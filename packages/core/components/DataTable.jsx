@@ -34,6 +34,8 @@ const DataTable = props => {
 
   const fileName = `${vizTitle || 'data-table'}.csv`
 
+  const isVertical = config.type === 'dashboard' || config.table?.showVertical;
+
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
   const customSort = (a, b) => {
@@ -226,7 +228,7 @@ const DataTable = props => {
   }
 
   const rawRows = Object.keys(runtimeData);
-  const rows = config?.table?.showVertical ? rawRows.sort((a, b) => {
+  const rows = isVertical ? rawRows.sort((a, b) => {
     let sortVal = 0
     if (config.type === 'map' && config.columns) {
       sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
@@ -298,7 +300,7 @@ const DataTable = props => {
   const dataSeriesColumns = () => {
     let tmpSeriesColumns
     if (config.visualizationType !== 'Pie') {
-      tmpSeriesColumns = config?.table?.showVertical ? [config.xAxis?.dataKey] : [] //, ...config.runtime.seriesLabelsAll
+      tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey] : [] //, ...config.runtime.seriesLabelsAll
       if(config.series){
         config.series.forEach(element => {
           tmpSeriesColumns.push(element.dataKey)
@@ -362,7 +364,7 @@ const DataTable = props => {
 
   const genChartHeader = (columns, data) => {
     if (!data) return
-    if(config?.table?.showVertical){
+    if(isVertical){
       return (
         <tr>
           {dataSeriesColumns().map(column => {
@@ -494,7 +496,7 @@ const DataTable = props => {
   }
 
   const genChartRows = rows => {
-    if(config?.table?.showVertical){
+    if(isVertical){
       const allRows = rows.map(row => {
         return (
           <tr role='row'>
@@ -630,7 +632,7 @@ const DataTable = props => {
             {tableTitle}
           </div>
           <div className='table-container' style={limitHeight}>
-            <table height={expanded ? null : 0} role='table' aria-live='assertive' className={`${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${config?.table?.showVertical ? '' : ' horizontal'}`} hidden={!expanded} aria-rowcount={config?.data?.length ? config.data.length : '-1'}>
+            <table height={expanded ? null : 0} role='table' aria-live='assertive' className={`${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`} hidden={!expanded} aria-rowcount={config?.data?.length ? config.data.length : '-1'}>
               <caption className='cdcdataviz-sr-only'>{caption}</caption>
               <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{config.type === 'map' ? genMapHeader(columns) : genChartHeader(columns, runtimeData)}</thead>
               <tbody>{config.type === 'map' ? genMapRows(rows) : genChartRows(rows)}</tbody>
