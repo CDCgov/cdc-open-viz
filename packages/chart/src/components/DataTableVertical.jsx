@@ -15,13 +15,15 @@ function DataTableVertical({ display }) {
 
   // create keys & data flow
   const { tableData, rawData, currentViewport, config, formatDate, parseDate, formatNumber } = useContext(ConfigContext)
-  const { table, xAxis, runtime, regions } = config
+  const { table, xAxis, yAxis, runtime, regions, visualizationType } = config
   const additionalColumns = Object.values(config?.columns || {}).filter(column => column?.dataTable)
   const additionalKeys = additionalColumns.map(column => column?.name)
-  const currentKeys = [xAxis.dataKey, ...config?.runtime.seriesKeys, ...additionalKeys]
+  const pieChartKey = visualizationType === 'Pie' ? yAxis.dataKey : null
+  const currentKeys = [xAxis.dataKey, pieChartKey, ...config?.runtime.seriesKeys, ...additionalKeys]
   const ariaLabel = ['Accessible data table. This table is currently collapsed visually but can still be read using a screen reader.', 'Accessible data table.']
   const data = tableData.map(d => currentKeys.reduce((acc, key) => (d[key] !== undefined ? { ...acc, [key]: d[key] } : acc), {}))
   const headers = Object.keys(data[0])
+  console.log(headers, 'headers')
 
   // functions & handlers
   const toggleExpanded = () => setExpanded(prev => !prev)
@@ -46,7 +48,8 @@ function DataTableVertical({ display }) {
   const updateHeaderText = header => {
     const addedHeader = {}
     additionalColumns.forEach(c => (header === c.name ? (addedHeader[header] = c.label || header) : null))
-    const seriesLabels = { ...runtime?.seriesLabels, ...addedHeader }
+    const seriesLabels = { ...runtime?.seriesLabels, [pieChartKey]: pieChartKey, ...addedHeader }
+    console.log(seriesLabels, 'seriesLabels')
     return header === xAxis.dataKey ? table.indexLabel : seriesLabels[header]
   }
 
