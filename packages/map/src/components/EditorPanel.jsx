@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react'
+import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
 
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
@@ -32,6 +32,7 @@ import useMapLayers from '../hooks/useMapLayers'
 import { useFilters } from '@cdc/core/components/Filters'
 
 import HexSetting from './HexShapeSettings'
+import ConfigContext from '../context'
 
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -69,8 +70,23 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
   )
 }
 
+// Todo: move to useReducer, seperate files out.
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, runtimeFilters, runtimeLegend, changeFilterActive, isDebug, setRuntimeFilters } = props
+  // prettier-ignore
+  const {
+    changeFilterActive,
+    columnsInData = [],
+    isDashboard,
+    isDebug,
+    isEditor,
+    loadConfig,
+    runtimeFilters,
+    runtimeLegend,
+    setParentConfig,
+    setRuntimeFilters,
+    setState,
+    state,
+  } = useContext(ConfigContext)
 
   const { general, columns, legend, table, tooltips } = state
 
@@ -768,6 +784,24 @@ const EditorPanel = props => {
           general: {
             ...state.general,
             territoriesAlwaysShow: value
+          }
+        })
+        break
+      case 'countyCensusYear':
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            countyCensusYear: value
+          }
+        })
+        break
+      case 'filterControlsCountyYear':
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            filterControlsCountyYear: value
           }
         })
         break
@@ -1509,6 +1543,39 @@ const EditorPanel = props => {
                     >
                       <option value='us'>US State-Level</option>
                       <option value='us-county'>US County-Level</option>
+                    </select>
+                  </label>
+                )}
+                {(state.general.geoType === 'us-county' || state.general.geoType === 'single-state') && (
+                  <label>
+                    <span className='edit-label column-heading'>County Census Year</span>
+                    <select
+                      value={state.general.countyCensusYear || '2019'}
+                      onChange={event => {
+                        handleEditorChanges('countyCensusYear', event.target.value)
+                      }}
+                    >
+                      <option value='2022'>2022</option>
+                      <option value='2021'>2021</option>
+                      <option value='2020'>2020</option>
+                      <option value='2019'>2019</option>
+                      <option value='2015'>2015</option>
+                      <option value='2014'>2014</option>
+                      <option value='2013'>2013</option>
+                    </select>
+                  </label>
+                )}
+                {(state.general.geoType === 'us-county' || state.general.geoType === 'single-state') && (
+                  <label>
+                    <span className='edit-label column-heading'>Filter Controlling County Census Year</span>
+                    <select
+                      value={state.general.filterControlsCountyYear || ''}
+                      onChange={event => {
+                        handleEditorChanges('filterControlsCountyYear', event.target.value)
+                      }}
+                    >
+                      <option value=''>None</option>
+                      {state.filters && state.filters.map(filter => <option>{filter.columnName}</option>)}
                     </select>
                   </label>
                 )}

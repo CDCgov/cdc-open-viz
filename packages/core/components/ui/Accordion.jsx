@@ -8,7 +8,7 @@ import Tooltip from './Tooltip'
 import '../../styles/v2/components/accordion.scss'
 
 //Define the "slots" to be populated by subcomponents
-const AccordionSection = () => null
+const AccordionSection = children => children
 
 const Accordion = ({ children }) => {
   const childNodes = Children.toArray(children)

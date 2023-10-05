@@ -1,6 +1,5 @@
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect, memo, useContext } from 'react'
 
-import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoCentroid, geoPath } from 'd3-geo'
 import { feature } from 'topojson-client'
@@ -18,19 +17,100 @@ import { Text } from '@visx/text'
 import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
 
 import useMapLayers from '../hooks/useMapLayers'
-import Icon from '@cdc/core/components/ui/Icon'
+import ConfigContext from '../context'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
 
-const Hexagon = ({ label, text, stroke, strokeWidth, textColor, ...props }) => {
+// todo: combine hexagonLabel & geoLabel functions
+// todo: move geoLabel functions outside of components for reusability
+const Hexagon = ({ label, text, stroke, strokeWidth, textColor, territory, territoryData, ...props }) => {
+  const { state } = useContext(ConfigContext)
+
+  // Labels
+  const hexagonLabel = (geo, bgColor = '#FFFFFF', projection) => {
+    let centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
+
+    let abbr = geo?.properties?.iso ? geo.properties.iso : geo.uid
+
+    const getArrowDirection = (geoData, geo, isTerritory = false) => {
+      if (!isTerritory) {
+        centroid = projection(geoCentroid(geo))
+      }
+
+      return (
+        <>
+          {state.hexMap.shapeGroups.map((group, groupIndex) => {
+            return group.items.map((item, itemIndex) => {
+              if (item.operator === '=') {
+                if (geoData[item.key] === item.value) {
+                  return (
+                    <Group style={{ transform: `translate(36%, 50%)`, fill: 'currentColor' }}>
+                      {item.shape === 'Arrow Down' && <AiOutlineArrowDown size={12} stroke='none' fontWeight={100} />}
+                      {item.shape === 'Arrow Up' && <AiOutlineArrowUp size={12} stroke='none' fontWeight={100} />}
+                      {item.shape === 'Arrow Right' && <AiOutlineArrowRight size={12} stroke='none' fontWeight={100} />}
+                    </Group>
+                  )
+                }
+              }
+            })
+          })}
+        </>
+      )
+    }
+
+    if (undefined === abbr) return null
+
+    let textColor = '#FFF'
+
+    // Dynamic text color
+    if (chroma.contrast(textColor, bgColor) < 3.5) {
+      textColor = '#202020' // dark gray
+    }
+
+    // always make HI black since it is off to the side
+    if (abbr === 'US-HI') {
+      textColor = '#000'
+    }
+
+    let x = 0,
+      y = state.hexMap.type === 'shapes' ? -10 : 5
+
+    // used to nudge/move some of the labels for better readability
+    if (nudges[abbr] && false === isHex) {
+      x += nudges[abbr][0]
+      y += nudges[abbr][1]
+    }
+
+    if (undefined === offsets[abbr] || isHex) {
+      let y = state.hexMap.type === 'shapes' ? '30%' : '50%'
+      return (
+        <>
+          <Text fontSize={14} x={'50%'} y={y} style={{ fill: 'currentColor', stroke: 'initial', fontWeight: 400, opacity: 1, fillOpacity: 1 }} textAnchor='middle' verticalAnchor='middle'>
+            {abbr.substring(3)}
+          </Text>
+          {state.general.displayAsHex && state.hexMap.type === 'shapes' && getArrowDirection(territoryData, geo, true)}
+        </>
+      )
+    }
+
+    let [dx, dy] = offsets[abbr]
+
+    return (
+      <g>
+        <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />
+        <text x={4} strokeWidth='0' fontSize={13} style={{ fill: '#202020' }} alignmentBaseline='middle' transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
+          {abbr.substring(3)}
+        </text>
+      </g>
+    )
+  }
+
   return (
-    <svg viewBox='0 0 45 51'>
+    <svg viewBox='0 0 45 51' className='territory-wrapper--hex'>
       <g {...props}>
         <polygon stroke={stroke} strokeWidth={strokeWidth} points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702' />
-        <text textAnchor='middle' dominantBaseline='middle' x='50%' y='54%' fill={text}>
-          {label}
-        </text>
+        {state.general.displayAsHex && hexagonLabel(territoryData ? territoryData : geo, stroke, false)}
       </g>
     </svg>
   )
@@ -77,7 +157,20 @@ const nudges = {
 }
 
 const UsaMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, titleCase, handleCircleClick, setSharedFilterValue, handleMapAriaLabels } = props
+  // prettier-ignore
+  const {
+      applyLegendToRow,
+      applyTooltipsToGeo,
+      data,
+      displayGeoName,
+      geoClickHandler,
+      handleCircleClick,
+      handleMapAriaLabels,
+      setSharedFilterValue,
+      state,
+      supportedTerritories,
+      titleCase,
+    } = useContext(ConfigContext)
 
   let isFilterValueSupported = false
 
@@ -179,58 +272,9 @@ const UsaMap = props => {
         }
       }
 
-      return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
+      return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} territory={territory} territoryData={territoryData} />
     }
   })
-
-  const geoLabel = (geo, bgColor = '#FFFFFF', projection) => {
-    let centroid = projection(geoCentroid(geo))
-    let abbr = geo.properties.iso
-
-    if (undefined === abbr) return null
-
-    let textColor = '#FFF'
-
-    // Dynamic text color
-    if (chroma.contrast(textColor, bgColor) < 3.5) {
-      textColor = '#202020' // dark gray
-    }
-
-    // always make HI black since it is off to the side
-    if (abbr === 'US-HI') {
-      textColor = '#000'
-    }
-
-    let x = 0,
-      y = state.hexMap.type === 'shapes' ? -10 : 5
-
-    // used to nudge/move some of the labels for better readability
-    if (nudges[abbr] && false === isHex) {
-      x += nudges[abbr][0]
-      y += nudges[abbr][1]
-    }
-
-    if (undefined === offsets[abbr] || isHex) {
-      return (
-        <g transform={`translate(${centroid})`}>
-          <text x={x} y={y} fontSize={14} strokeWidth='0' style={{ fill: textColor }} textAnchor='middle'>
-            {abbr.substring(3)}
-          </text>
-        </g>
-      )
-    }
-
-    let [dx, dy] = offsets[abbr]
-
-    return (
-      <g>
-        <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />
-        <text x={4} strokeWidth='0' fontSize={13} style={{ fill: '#202020' }} alignmentBaseline='middle' transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
-          {abbr.substring(3)}
-        </text>
-      </g>
-    )
-  }
 
   let pathGenerator = geoPath().projection(geoAlbersUsa().translate(translate))
   const { pathArray } = useMapLayers(state, '', pathGenerator)
@@ -308,10 +352,17 @@ const UsaMap = props => {
           styles.cursor = 'pointer'
         }
 
-        const getArrowDirection = (geoData, geo) => {
+        const getArrowDirection = (geoData, geo, bgColor) => {
           let centroid = projection(geoCentroid(geo))
 
           const iconSize = 8
+
+          let textColor = '#FFF'
+
+          // Dynamic text color
+          if (chroma.contrast(textColor, bgColor) < 3.5) {
+            textColor = '#202020' // dark gray
+          }
 
           return (
             <>
@@ -322,7 +373,7 @@ const UsaMap = props => {
                     console.log('geoData', geoData)
                     if (geoData[item.key] === item.value) {
                       return (
-                        <Group top={centroid[1] - 5} left={centroid[0] - iconSize} fill={'black'} textAnchor='start'>
+                        <Group top={centroid[1] - 5} left={centroid[0] - iconSize} color={textColor} textAnchor='start'>
                           {item.shape === 'Arrow Down' && <AiOutlineArrowDown />}
                           {item.shape === 'Arrow Up' && <AiOutlineArrowUp />}
                           {item.shape === 'Arrow Right' && <AiOutlineArrowRight />}
@@ -341,7 +392,7 @@ const UsaMap = props => {
             <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
-              {isHex && state.hexMap.type === 'shapes' && getArrowDirection(geoData, geo)}
+              {isHex && state.hexMap.type === 'shapes' && getArrowDirection(geoData, geo, legendColors[0])}
             </g>
           </g>
         )
@@ -391,6 +442,55 @@ const UsaMap = props => {
       })
     }
     return geosJsx
+  }
+
+  const geoLabel = (geo, bgColor = '#FFFFFF', projection) => {
+    let centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
+    let abbr = geo.properties.iso
+
+    if (undefined === abbr) return null
+
+    let textColor = '#FFF'
+
+    // Dynamic text color
+    if (chroma.contrast(textColor, bgColor) < 3.5) {
+      textColor = '#202020' // dark gray
+    }
+
+    // always make HI black since it is off to the side
+    if (abbr === 'US-HI' && !state.general.displayAsHex) {
+      textColor = '#000'
+    }
+
+    let x = 0,
+      y = state.hexMap.type === 'shapes' && state.general.displayAsHex ? -10 : 5
+
+    // used to nudge/move some of the labels for better readability
+    if (nudges[abbr] && false === isHex) {
+      x += nudges[abbr][0]
+      y += nudges[abbr][1]
+    }
+
+    if (undefined === offsets[abbr] || isHex) {
+      return (
+        <g transform={`translate(${centroid})`}>
+          <text x={x} y={y} fontSize={14} strokeWidth='0' style={{ fill: textColor }} textAnchor='middle'>
+            {abbr.substring(3)}
+          </text>
+        </g>
+      )
+    }
+
+    let [dx, dy] = offsets[abbr]
+
+    return (
+      <g>
+        <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />
+        <text x={4} strokeWidth='0' fontSize={13} style={{ fill: '#202020' }} alignmentBaseline='middle' transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
+          {abbr.substring(3)}
+        </text>
+      </g>
+    )
   }
 
   return (
