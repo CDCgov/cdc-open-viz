@@ -25,7 +25,7 @@ function DataTableVertical({ display }) {
   const headers = Object.keys(data[0])
   console.log(headers, 'headers')
 
-  // functions & handlers
+  // functions & handlerss
   const toggleExpanded = () => setExpanded(prev => !prev)
   const handleKeyDown = e => e.keyCode === 13 && toggleExpanded()
 
