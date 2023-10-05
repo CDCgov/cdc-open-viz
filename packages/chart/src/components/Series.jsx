@@ -4,6 +4,7 @@ import ConfigContext from '../ConfigContext'
 // Core
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import Check from '@cdc/core/assets/icon-check.svg'
+import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 import Icon from '@cdc/core/components/ui/Icon'
 
@@ -36,22 +37,22 @@ const SeriesDropdownLineType = props => {
   const { series, index } = props
 
   // Run a quick test to determine if we should even show this.
-  const supportsLineType = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type))
+  const supportsLineType = () => {
+    let supported = false
+    if (config.visualizationSubType === 'stacked') return supported
+    const supportedCharts = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart']
+    if (supportedCharts.some(item => item.includes(series.type))) {
+      supported = true
+    }
+    return supported
+  }
 
-  if (!supportsLineType) return
+  if (!supportsLineType()) return
 
   const changeLineType = (i, value) => {
     let series = [...config.series]
     series[i].lineType = value
     updateConfig({ ...config, series })
-  }
-
-  const approvedCurveTypes = {
-    Linear: 'curveLinear',
-    Cardinal: 'curveCardinal',
-    Natural: 'curveNatural',
-    'Monotone X': 'curveMonotoneX',
-    Step: 'curveStep'
   }
 
   let options = []
@@ -376,8 +377,6 @@ const SeriesInputName = props => {
     let seriesLabelsCopy = { ...config.runtime.seriesLabels }
     series[i].name = value
     seriesLabelsCopy[series[i].dataKey] = series[i].name ? series[i].name : series[i].dataKey
-
-    console.log('new config.runtime.seriesLabels', seriesLabelsCopy)
 
     let newConfig = {
       ...config,
