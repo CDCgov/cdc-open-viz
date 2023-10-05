@@ -23,6 +23,7 @@ import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 import ForestPlotSettings from './ForestPlotSettings'
 import { useEditorPermissions } from '../hooks/useEditorPermissions'
+import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -1004,6 +1005,9 @@ const EditorPanel = () => {
                 <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />
                 {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && (
                   <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />
+                )}
+                {config.visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked' && (
+                  <Select value={config.stackedAreaChartLineType || 'Linear'} fieldName='stackedAreaChartLineType' label='Stacked Area Chart Line Type' updateField={updateField} options={Object.keys(approvedCurveTypes)} />
                 )}
                 {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
                 {config.visualizationType === 'Deviation Bar' && <Select label='Orientation' options={['horizontal']} />}
