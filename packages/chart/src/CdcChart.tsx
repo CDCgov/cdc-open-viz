@@ -41,8 +41,7 @@ import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 import './scss/main.scss'
 // load both then config below determines which to use
-import DataTable_horiz from './components/DataTable'
-import DataTable_vert from '@cdc/core/components/DataTable'
+import DataTable from '@cdc/core/components/DataTable'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 
 const generateColorsArray = (color = '#000000', special = false) => {
@@ -96,8 +95,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let innerContainerRef = useRef()
 
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
-
-  const DataTable = config?.table?.showVertical ? DataTable_vert : DataTable_horiz
 
   // Destructure items from config for more readable JSX
   let { legend, title, description, visualizationType } = config
@@ -1255,6 +1252,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 innerContainerRef={innerContainerRef}
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
+                colorScale={colorScale}
                 isDebug={isDebug}
                 isEditor={isEditor}
               />

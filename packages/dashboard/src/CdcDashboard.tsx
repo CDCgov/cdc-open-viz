@@ -29,7 +29,7 @@ import CdcFilteredText from '@cdc/filtered-text'
 import Grid from './components/Grid'
 import Header, { FilterBehavior } from './components/Header'
 import defaults from './data/initial-state'
-import DataTable from './components/DataTable'
+import DataTable from '@cdc/core/components/DataTable'
 import MediaControls from '@cdc/core/components/MediaControls'
 
 import './scss/main.scss'
@@ -1000,7 +1000,22 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           </section>
 
           {/* Data Table */}
-          {config.table && config.data && <DataTable data={config.data} config={config} imageRef={imageId} />}
+          {config.table && config.data &&
+            <DataTable
+              config={config}
+              rawData={config.data}
+              runtimeData={config.data || []}
+              expandDataTable={config.table.expanded}
+              showDownloadButton={config.table.download}
+              tableTitle={config.dashboard.title || ''}
+              viewport={currentViewport}
+              tabbingId={config.dashboard.title || ''}
+              outerContainerRef={outerContainerRef}
+              imageRef={imageId}
+              isDebug={isDebug}
+              isEditor={isEditor}
+            />
+          }
           {config.table &&
             config.datasets &&
             Object.keys(config.datasets).map(datasetKey => {
@@ -1040,7 +1055,21 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-                  <DataTable data={filteredTableData || config.datasets[datasetKey].data || []} downloadData={config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
+                  <DataTable
+                    config={config}
+                    dataConfig={config.datasets[datasetKey]}
+                    rawData={config.datasets[datasetKey].data}
+                    runtimeData={filteredTableData || config.datasets[datasetKey].data || []}
+                    expandDataTable={config.table.expanded}
+                    showDownloadButton={config.table.download}
+                    tableTitle={datasetKey}
+                    viewport={currentViewport}
+                    tabbingId={datasetKey}
+                    outerContainerRef={outerContainerRef}
+                    imageRef={imageId}
+                    isDebug={isDebug}
+                    isEditor={isEditor}
+                  />
                 </div>
               )
             })}
