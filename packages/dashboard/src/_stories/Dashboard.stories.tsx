@@ -2,11 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import DefaultData from '../../examples/default.json'
 import TestExampleData from '../../examples/test-example.json'
-import SharedFiltersData from '../../examples/shared-filters.json'
+import APIFiltersMapData from './_mock/api-filter-map.json'
+import APIFiltersChartData from './_mock/api-filter-chart.json'
 
 import Dashboard from '../CdcDashboard'
 import { Config } from '../types/Config'
-import { userEvent, within, fireEvent, waitFor } from '@storybook/testing-library'
+import { userEvent, within } from '@storybook/testing-library'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -31,35 +32,112 @@ const sleep = ms => {
   return new Promise(r => setTimeout(r, ms))
 }
 
-export const SharedFilters: Story = {
+const fetchMock = {
+  mocks: [
+    {
+      matcher: {
+        name: 'topicsFilter',
+        url: 'path:/api/poc/topics'
+      },
+      response: {
+        status: 200,
+        body: [{ TopicID: 'topicId', Topic: 'Some Topic' }]
+      }
+    },
+    {
+      matcher: {
+        name: 'indicatorsFilter',
+        url: 'path:/api/poc/indicators'
+      },
+      response: {
+        status: 200,
+        body: [{ IndicatorID: 'indicatorID', Indicator: 'Some Indicator' }]
+      }
+    },
+    {
+      matcher: {
+        name: 'filters',
+        url: 'path:/api/POC/Filters'
+      },
+      response: {
+        status: 200,
+        body: {
+          Years: [{ Year: 1999 }],
+          DataValueTypes: [{ DataValueType: 'Some Data Value Type', DataValueTypeId: 'dataValueTypeId' }],
+          StratificationCategories: [{ StratificationCategoryId: 'stratCategoryId', StratificationCategory: 'Some Strat Category' }]
+        }
+      }
+    },
+    {
+      matcher: {
+        name: 'stratifications',
+        url: 'path:/api/POC/stratifications'
+      },
+      response: {
+        status: 200,
+        body: [
+          {
+            StratificationId: 'stratId',
+            Stratification: 'Some Strat'
+          }
+        ]
+      }
+    },
+    {
+      matcher: {
+        name: 'locations',
+        url: 'path:/api/poc/locations'
+      },
+      response: {
+        status: 200,
+        body: [
+          {
+            LocationAbbr: 'MS',
+            LocationDesc: 'Mississippi'
+          }
+        ]
+      }
+    },
+    {
+      matcher: {
+        name: 'tableData',
+        url: 'path:/api/POC/TableData'
+      },
+      response: {
+        status: 200,
+        body: [
+          {
+            LocationAbbr: 'MS',
+            LocationDesc: 'Mississippi',
+            IndicatorID: 'ALC04',
+            TopicID: 'ALC',
+            DataSource: null,
+            Indicator: null,
+            StratificationCategory: 'Overall',
+            Stratification: 'Overall',
+            StratificationId1: 'OVR',
+            StratificationCategoryId: 'OVERALL',
+            YearStart: null,
+            YearEnd: 2019,
+            DataValue: 2,
+            DataValueUnit: 'Number',
+            LowConfidenceLimit: 1.6,
+            HighConfidenceLimit: 2.9,
+            DataValueType: null,
+            DataValueTypeID: 'CRDMEDN'
+          }
+        ]
+      }
+    }
+  ]
+}
+
+export const APIFiltersMap: Story = {
   args: {
-    config: SharedFiltersData as unknown as Config
+    config: APIFiltersMapData as unknown as Config
   },
   parameters: {
-    fetchMock: {
-      mocks: [
-        {
-          matcher: {
-            name: 'topicsFilter',
-            url: 'path:/api/poc/topics'
-          },
-          response: {
-            status: 200,
-            body: [{ TopicID: 'topicId', Topic: 'Some Topic' }]
-          }
-        },
-        {
-          matcher: {
-            name: 'indicatorsFilter',
-            url: 'path:/api/poc/indicators'
-          },
-          response: {
-            status: 200,
-            body: [{ IndicatorID: 'indicatorID', Indicator: 'Some Indicator' }]
-          }
-        }
-      ]
-    }
+    fetchMock
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
@@ -68,9 +146,39 @@ export const SharedFilters: Story = {
     // is needed to delay the execution.
     // possible related bug: https://github.com/storybookjs/storybook/issues/18258
     await sleep(1000)
-    const topicsFilter = canvas.getByLabelText('Topics', { selector: 'select' })
+    const topicsFilter = canvas.getByLabelText('Category', { selector: 'select' })
     await user.selectOptions(topicsFilter, ['topicId'])
-    const indicatorsFilter = canvas.getByLabelText('Indicators', { selector: 'select' })
+    const indicatorsFilter = canvas.getByLabelText('Indicator', { selector: 'select' })
+    await user.selectOptions(indicatorsFilter, ['indicatorID'])
+    const yearsFilter = canvas.getByLabelText('Year', { selector: 'select' })
+    await user.selectOptions(yearsFilter, ['1999'])
+    const stratCategoryFilter = canvas.getByLabelText('View By', { selector: 'select' })
+    await user.selectOptions(stratCategoryFilter, ['stratCategoryId'])
+    const stratFilter = canvas.getByLabelText('Stratification', { selector: 'select' })
+    await user.selectOptions(stratFilter, ['stratId'])
+    await user.click(canvas.getByText('GO!'))
+  }
+}
+
+export const APIFiltersChart: Story = {
+  args: {
+    config: APIFiltersChartData as unknown as Config
+  },
+  parameters: {
+    fetchMock
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    // play is running before full rendering is complete so sleep function
+    // is needed to delay the execution.
+    // possible related bug: https://github.com/storybookjs/storybook/issues/18258
+    await sleep(1000)
+    const locationFilter = canvas.getByLabelText('Location', { selector: 'select' })
+    await user.selectOptions(locationFilter, ['MS'])
+    const topicsFilter = canvas.getByLabelText('Category', { selector: 'select' })
+    await user.selectOptions(topicsFilter, ['topicId'])
+    const indicatorsFilter = canvas.getByLabelText('Indicator', { selector: 'select' })
     await user.selectOptions(indicatorsFilter, ['indicatorID'])
     await user.click(canvas.getByText('GO!'))
   }

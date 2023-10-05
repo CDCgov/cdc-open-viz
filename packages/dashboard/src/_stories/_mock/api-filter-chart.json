@@ -9,7 +9,7 @@
         ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/poc/locations",
+          "apiEndpoint": "http://test.gov/api/poc/locations",
           "valueSelector": "LocationAbbr",
           "textSelector": "LocationDesc"
         },
@@ -24,7 +24,7 @@
         ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/poc/topics",
+          "apiEndpoint": "http://test.gov/api/poc/topics",
           "valueSelector": "TopicID",
           "textSelector": "Topic"
         },
@@ -39,7 +39,7 @@
         ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/poc/indicators",
+          "apiEndpoint": "http://test.gov/api/poc/indicators",
           "valueSelector": "IndicatorID",
           "textSelector": "Indicator"
         },
@@ -55,7 +55,7 @@
         ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/Filters",
+          "apiEndpoint": "http://test.gov/api/POC/Filters",
           "valueSelector": "Year",
           "textSelector": "Year",
           "heirarchyLookup": "Years"
@@ -71,7 +71,7 @@
         ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/Filters",
+          "apiEndpoint": "http://test.gov/api/POC/Filters",
           "valueSelector": "StratificationCategoryId",
           "textSelector": "StratificationCategory",
           "heirarchyLookup": "StratificationCategories",
@@ -88,7 +88,7 @@
         ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/Filters",
+          "apiEndpoint": "http://test.gov/api/POC/Filters",
           "valueSelector": "DataValueTypeId",
           "textSelector": "DataValueType",
           "heirarchyLookup": "DataValueTypes"
@@ -349,7 +349,7 @@
   "type": "dashboard",
   "datasets": {
     "data3": {
-      "dataUrl": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/TableData"
+      "dataUrl": "http://test.gov/api/POC/TableData"
     }
   },
   "filterBehavior": "Apply Button",
