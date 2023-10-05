@@ -30,6 +30,16 @@ div.data-table-heading {
   }
 }
 
+table.horizontal {
+  tr {
+    display: flex;
+  }
+
+  th, td {
+    min-width: 200px;
+  }
+}
+
 table.data-table {
   width: 100%;
   background: #fff;

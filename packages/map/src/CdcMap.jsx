@@ -27,6 +27,8 @@ import ExternalIcon from './images/external-link.svg'
 
 // Sass
 import './scss/main.scss'
+
+// TODO: combine in scss.
 import './scss/btn.scss'
 
 // Core
@@ -115,23 +117,7 @@ const getUniqueValues = (data, columnName) => {
   return Object.keys(result)
 }
 
-const CdcMap = ({
-  className,
-  config,
-  navigationHandler: customNavigationHandler,
-  isDashboard = false,
-  isEditor = false,
-  isDebug = false,
-  configUrl,
-  logo = '',
-  // if you need to test the logo overlay, you can use this url below:
-  // 'https://upload.wikimedia.org/wikipedia/commons/4/45/US-CDC-Logo.png',
-  setConfig,
-  setSharedFilter,
-  setSharedFilterValue,
-  hostname = 'localhost:8080',
-  link
-}) => {
+const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
@@ -1493,7 +1479,7 @@ const CdcMap = ({
 
   // Destructuring for more readable JSX
   const { general, tooltips, table } = state
-  let { title, subtext = '' } = general
+  let { title, subtext = '', geoType } = general
 
   // if no title AND in editor then set a default
   if (isEditor) {
@@ -1521,32 +1507,44 @@ const CdcMap = ({
 
   // Props passed to all map types
   const mapProps = {
-    state,
-    data: runtimeData,
+    applyLegendToRow,
     applyTooltipsToGeo,
     closeModal,
-    navigationHandler,
-    geoClickHandler,
-    applyLegendToRow,
-    displayGeoName,
-    runtimeLegend,
-    generateColorsArray,
-    titleCase,
-    setState,
-    setRuntimeData,
-    generateRuntimeData,
-    setFilteredCountryCode,
-    filteredCountryCode,
-    position,
-    setPosition,
-    setSharedFilterValue,
-    hasZoom: state.general.allowMapZoom,
-    handleMapAriaLabels,
-    runtimeFilters,
-    setRuntimeFilters,
-    innerContainerRef,
+    columnsInData: state?.data?.[0] ? Object.keys(state.data[0]) : [],
     currentViewport,
-    isDebug
+    data: runtimeData,
+    displayDataAsText,
+    displayGeoName,
+    filteredCountryCode,
+    generateColorsArray,
+    generateRuntimeData,
+    geoClickHandler,
+    handleMapAriaLabels,
+    hasZoom: state.general.allowMapZoom,
+    innerContainerRef,
+    isDashboard,
+    isDebug,
+    isEditor,
+    navigationHandler,
+    position,
+    resetLegendToggles,
+    runtimeFilters,
+    runtimeLegend,
+    setAccessibleStatus,
+    setFilteredCountryCode,
+    setPosition,
+    setRuntimeData,
+    setRuntimeLegend,
+    setRuntimeFilters,
+    setSharedFilterValue,
+    setState,
+    state,
+    supportedCities,
+    supportedCounties,
+    supportedCountries,
+    supportedTerritories,
+    titleCase,
+    viewport: currentViewport
   }
 
   if (!mapProps.data || !state.data) return <></>
@@ -1587,21 +1585,7 @@ const CdcMap = ({
   return (
     <ConfigContext.Provider value={mapProps}>
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
-        {isEditor && (
-          <EditorPanel
-            isDashboard={isDashboard}
-            isDebug={isDebug}
-            state={state}
-            setState={setState}
-            loadConfig={loadConfig}
-            setParentConfig={setConfig}
-            setRuntimeFilters={setRuntimeFilters}
-            runtimeFilters={runtimeFilters}
-            runtimeLegend={runtimeLegend}
-            columnsInData={Object.keys(state.data[0])}
-            changeFilterActive={changeFilterActive}
-          />
-        )}
+        {isEditor && <EditorPanel />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
@@ -1637,39 +1621,21 @@ const CdcMap = ({
               </a>
 
               {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-              <section className='geography-container outline-none' ref={mapSvg} tabIndex='0'>
+              <section className='outline-none geography-container' ref={mapSvg} tabIndex='0' style={{ width: '100%' }}>
                 {currentViewport && (
-                  <section className='geography-container' ref={mapSvg}>
-                    {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
-                    {'single-state' === general.geoType && <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                    {'us' === general.geoType && 'us-geocode' !== state.general.type && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                    {'us-region' === general.geoType && <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                    {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
-                    {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
+                  <>
+                    {modal && <Modal />}
+                    {'single-state' === geoType && <SingleStateMap />}
+                    {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap />}
+                    {'us-region' === geoType && <UsaRegionMap />}
+                    {'world' === geoType && <WorldMap />}
+                    {'us-county' === geoType && <CountyMap />}
                     {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
-                  </section>
+                  </>
                 )}
               </section>
 
-              {general.showSidebar && 'navigation' !== general.type && (
-                <Sidebar
-                  state={state}
-                  viewport={currentViewport}
-                  legend={state.legend}
-                  runtimeLegend={runtimeLegend}
-                  setRuntimeLegend={setRuntimeLegend}
-                  runtimeFilters={runtimeFilters}
-                  columns={state.columns}
-                  sharing={state.sharing}
-                  prefix={state.columns.primary.prefix}
-                  suffix={state.columns.primary.suffix}
-                  setState={setState}
-                  resetLegendToggles={resetLegendToggles}
-                  changeFilterActive={changeFilterActive}
-                  setAccessibleStatus={setAccessibleStatus}
-                  displayDataAsText={displayDataAsText}
-                />
-              )}
+              {general.showSidebar && 'navigation' !== general.type && <Sidebar />}
             </div>
 
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
