@@ -1192,7 +1192,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {config.visualizationType === 'Spark Line' && (
                 <>
                   {config?.introText && (
-                    <section className='introText' style={{ padding: '15px 0 35px' }}>
+                    <section className='introText' style={{ padding: '0px 0 35px' }}>
                       {parse(config.introText)}
                     </section>
                   )}
