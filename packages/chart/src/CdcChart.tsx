@@ -1193,15 +1193,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                       {parse(config.introText)}
                     </section>
                   )}
-
-                  <div style={sparkLineStyles}>
-                    <ParentSize>
-                      {parent => (
-                        <>
-                          <SparkLine width={parent.width} height={parent.height} />
-                        </>
-                      )}
-                    </ParentSize>
+                  <div style={{ height: `${config.heights.vertical}px` || '100px', ...sparkLineStyles }}>
+                    <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                   </div>
                   {description && (
                     <div className='subtext' style={{ padding: '35px 0 15px' }}>
