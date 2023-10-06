@@ -16,16 +16,16 @@
   <script>
     window.CONFIG_TYPE = 'PRODUCTION';
     window.LOGLEVEL = 'info';
-    window.FRAMEWORK_OPTIONS = undefined;
+    window.FRAMEWORK_OPTIONS = {};
     window.CHANNEL_OPTIONS = {};
-    window.FEATURES = {"warnOnLegacyHierarchySeparator":true,"buildStoriesJson":false,"storyStoreV7":true,"breakingChangesV7":true,"argTypeTargetsV7":true,"legacyDecoratorFileOrder":false};
-    window.STORIES = [{"titlePrefix":"","directory":"./_stories","files":"*.mdx","importPathMatcher":"^\\.[\\\\/](?:_stories\\/(?!\\.)(?=.)[^/]*?\\.mdx)$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/*.stories.@(js|jsx|ts|tsx)","importPathMatcher":"^\\.[\\\\/](?:packages(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)_stories\\/(?!\\.)(?=.)[^/]*?\\.stories\\.(js|jsx|ts|tsx))$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/*.mdx","importPathMatcher":"^\\.[\\\\/](?:packages(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)_stories\\/(?!\\.)(?=.)[^/]*?\\.mdx)$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/**/*.mdx","importPathMatcher":"^\\.[\\\\/](?:packages(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)_stories(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)(?!\\.)(?=.)[^/]*?\\.mdx)$"}];
+    window.FEATURES = {"warnOnLegacyHierarchySeparator":true,"buildStoriesJson":false,"storyStoreV7":true,"argTypeTargetsV7":true,"legacyDecoratorFileOrder":false};
+    window.STORIES = [{"titlePrefix":"","directory":"./_stories","files":"*.mdx","importPathMatcher":"^\\.[\\\\/](?:_stories[\\\\/](?!\\.)(?=.)[^\\\\/]*?\\.mdx)$"},{"titlePrefix":"","directory":"./packages","files":"**/_stories/*.stories.@(js|jsx|ts|tsx)","importPathMatcher":"^\\.[\\\\/](?:packages(?:[\\\\/](?!\\.)(?:(?:(?!(?:^|[\\\\/])\\.).)*?)[\\\\/]|[\\\\/]|$)_stories[\\\\/](?!\\.)(?=.)[^\\\\/]*?\\.stories\\.(js|jsx|ts|tsx))$"}];
     window.DOCS_OPTIONS = {"docsMode":true,"defaultName":"Docs","autodocs":"tag"};
-    window.SERVER_CHANNEL_URL = undefined;
 
     // We do this so that "module && module.hot" etc. in Storybook source code
     // doesn't fail (it will simply be disabled)
     window.module = undefined;
+    window.global = window;
   </script>
   <base target="_parent" />
 
@@ -372,8 +372,10 @@
   color: #3a569b !important;
 }
 </style>
-
-  <script type="module" crossorigin src="./assets/iframe-9bfe7737.js"></script>
+<link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/contrib/libs/bootstrap/latest/css/bootstrap.min.css?_=39423">
+<link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/4.0/assets/css/app.min.css?_=39423">
+  <script type="module" crossorigin src="./storybook.js"></script>
+  
 </head>
 
 <body>

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../.storybook/storybook-styles.css"],
-  "sourcesContent": ["#storybook-explorer-tree .sidebar-subheading button,\n#storybook-explorer-tree .sidebar-subheading button:focus {\n  color: #3a569b;\n}\n\n#storybook-explorer-tree a[data-nodetype=\"document\"] > svg {\n  color: #49b0f8\n}\n\n#storybook-explorer-tree a[data-nodetype=\"document\"][data-selected=\"true\"] > svg {\n  color: #fff\n}\n\n.sto-4ii5m {\n  display: none !important;\n}\n\n.search-result-item--label {\n  color: #a3a3a3 !important;\n}\n\n.search-result-item--label .sto-1xkb16p {\n  color: #005eaa !important;\n}\n"],
-  "mappings": "AAAA,8GAEE,cAGF,uDACE,cAGF,2EACE,WAGF,WACE,uBAGF,2BACE,wBAGF,wCACE",
-  "names": []
-}
