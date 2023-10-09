@@ -1,4 +1,4 @@
-import{M as a,d as i}from"./index-3ae4f89d.js";import{j as n,a as s,F as u}from"./jsx-runtime-91a467a5.js";import{u as c}from"./index-1d576ef5.js";import"./iframe-7422cb91.js";import"../sb-preview/runtime.js";import"./chunk-6P7RB4HF-36fee097.js";import"./index-8db94870.js";import"./_commonjsHelpers-042e6b4d.js";import"./index-80ae7d84.js";import"./index-d37d4223.js";import"./index-356e4a49.js";const l=`# Contributing to COVE
+import{M as a,d as i}from"./index-44deb343.js";import{j as n,a as s,F as u}from"./jsx-runtime-91a467a5.js";import{u as c}from"./index-1d576ef5.js";import"./iframe-34914215.js";import"../sb-preview/runtime.js";import"./chunk-6P7RB4HF-36fee097.js";import"./index-8db94870.js";import"./_commonjsHelpers-042e6b4d.js";import"./index-80ae7d84.js";import"./index-d37d4223.js";import"./index-356e4a49.js";const l=`# Contributing to COVE
 
 Table of Contents
 
@@ -92,4 +92,4 @@ Steps for submitting a pull request:
 The COVE team thanks you for considering our project. Once your pull request is accepted and merged through our internal release process, you'll be able to see your updates on the main branch and npm.
 `;function r(e){return s(u,{children:[n(a,{title:"Contributions"}),`
 `,n(i,{children:l})]})}function p(e={}){const{wrapper:o}=Object.assign({},c(),e.components);return o?n(o,{...e,children:n(r,{...e})}):r()}const h=()=>{throw new Error("Docs-only story")};h.parameters={docsOnly:!0};const t={title:"Contributions",tags:["stories-mdx"],includeStories:["__page"]};t.parameters=t.parameters||{};t.parameters.docs={...t.parameters.docs||{},page:p};const _=["__page"];export{_ as __namedExportsOrder,h as __page,t as default};
-//# sourceMappingURL=Contributions.stories-8eca13c9.js.map
+//# sourceMappingURL=Contributions.stories-1eed1fd4.js.map

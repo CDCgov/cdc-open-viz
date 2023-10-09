@@ -1,4 +1,4 @@
-import{M as t}from"./index-3ae4f89d.js";import{j as n,a as i,F as d}from"./jsx-runtime-91a467a5.js";import{u as c}from"./index-1d576ef5.js";import"./iframe-7422cb91.js";import"../sb-preview/runtime.js";import"./chunk-6P7RB4HF-36fee097.js";import"./index-8db94870.js";import"./_commonjsHelpers-042e6b4d.js";import"./index-80ae7d84.js";import"./index-d37d4223.js";import"./index-356e4a49.js";function l(o){const e=Object.assign({h1:"h1",h2:"h2",p:"p",ul:"ul",li:"li",strong:"strong",pre:"pre",code:"code",em:"em",ol:"ol"},c(),o.components);return i(d,{children:[n(t,{title:"Guides/New Icons"}),`
+import{M as t}from"./index-44deb343.js";import{j as n,a as i,F as d}from"./jsx-runtime-91a467a5.js";import{u as c}from"./index-1d576ef5.js";import"./iframe-34914215.js";import"../sb-preview/runtime.js";import"./chunk-6P7RB4HF-36fee097.js";import"./index-8db94870.js";import"./_commonjsHelpers-042e6b4d.js";import"./index-80ae7d84.js";import"./index-d37d4223.js";import"./index-356e4a49.js";function l(o){const e=Object.assign({h1:"h1",h2:"h2",p:"p",ul:"ul",li:"li",strong:"strong",pre:"pre",code:"code",em:"em",ol:"ol"},c(),o.components);return i(d,{children:[n(t,{title:"Guides/New Icons"}),`
 `,n(e.h1,{id:"adding-new-icons",children:"Adding New Icons"}),`
 `,n("br",{}),`
 `,n(e.h2,{id:"svg-formatting--markup",children:"SVG Formatting & Markup"}),`
@@ -93,4 +93,4 @@ import{M as t}from"./index-3ae4f89d.js";import{j as n,a as i,F as d}from"./jsx-r
 `,i(e.li,{children:["Add your new icon to the Icon component documentation located at ",n(e.code,{children:"./packages/core/components/ui/_stories/Icon.stories.mdx"})," and test to ensure it is functioning properly."]}),`
 `,n(e.li,{children:"You're done!"}),`
 `]})]})}function s(o={}){const{wrapper:e}=Object.assign({},c(),o.components);return e?n(e,{...o,children:n(l,{...o})}):l(o)}const a=()=>{throw new Error("Docs-only story")};a.parameters={docsOnly:!0};const r={title:"Guides/New Icons",tags:["stories-mdx"],includeStories:["__page"]};r.parameters=r.parameters||{};r.parameters.docs={...r.parameters.docs||{},page:s};const k=["__page"];export{k as __namedExportsOrder,a as __page,r as default};
-//# sourceMappingURL=Guide.NewIcons.stories-0194fb78.js.map
+//# sourceMappingURL=Guide.NewIcons.stories-250c5c0c.js.map
