@@ -815,6 +815,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
+    try {
+      const legend = document.getElementById('legend')
+      if (!legend) throw new Error('No legend available to set previous focus on.')
+      legend.focus()
+    } catch (e) {
+      console.error('COVE:', e.message)
+    }
     setSeriesHighlight([])
   }
 
@@ -869,6 +876,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Format numeric data based on settings in config OR from passed in settings for Additional Columns
   // - use only for old horizontal data - newer formatNumber is in helper/formatNumber
+  // TODO: we should combine various formatNumber functions across this project.
   const formatNumber = (num, axis, shouldAbbreviate = false, addColPrefix, addColSuffix, addColRoundTo) => {
     // if num is NaN return num
     if (isNaN(num) || !num) return num
@@ -1138,6 +1146,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }
 
+  // TODO: should be part of the DataTransform class.
   const clean = data => {
     // cleaning is deleting data we need in forecasting charts.
     if (!Array.isArray(data)) return []
