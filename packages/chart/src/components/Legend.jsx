@@ -8,13 +8,6 @@ import useLegendClasses from './../hooks/useLegendClasses'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 import { Line } from '@visx/shape'
 
-// * FILE REVIEW *
-// TODO: fix eslint-disable jsxa11y issues
-
-// * ADDITIONAL NOTES *
-// > recently removed dynamic legend items as they weren't used
-// > recently removed boxplots, they don't provide any legend settings
-
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const Legend = () => {
   // prettier-ignore
