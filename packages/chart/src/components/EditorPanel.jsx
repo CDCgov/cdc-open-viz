@@ -3079,24 +3079,39 @@ const EditorPanel = () => {
                   </>
                 )}
 
-                {
-                  <label>
-                    <span className='edit-label column-heading'>Tooltip Opacity</span>
-                    <input
-                      type='number'
-                      value={config.tooltips.opacity ? config.tooltips.opacity : 100}
-                      onChange={e =>
-                        updateConfig({
-                          ...config,
-                          tooltips: {
-                            ...config.tooltips,
-                            opacity: e.target.value
-                          }
-                        })
-                      }
-                    />
-                  </label>
-                }
+                <label>
+                  <span className='edit-label column-heading'>Tooltip Opacity</span>
+                  <input
+                    type='number'
+                    value={config.tooltips.opacity ? config.tooltips.opacity : 100}
+                    onChange={e =>
+                      updateConfig({
+                        ...config,
+                        tooltips: {
+                          ...config.tooltips,
+                          opacity: e.target.value
+                        }
+                      })
+                    }
+                  />
+                </label>
+
+                <label>
+                  <span className='edit-label column-heading'>No Data Message</span>
+                  <input
+                    type='text'
+                    value={config.chartMessage.noData ? config.chartMessage.noData : ''}
+                    onChange={e =>
+                      updateConfig({
+                        ...config,
+                        chartMessage: {
+                          ...config.chartMessage,
+                          noData: e.target.value
+                        }
+                      })
+                    }
+                  />
+                </label>
               </AccordionItemPanel>
             </AccordionItem>
             {/* Spark Line has no data table */}
