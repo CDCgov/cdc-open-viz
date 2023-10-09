@@ -33,35 +33,35 @@ a.setChannel(i);
 window.__STORYBOOK_ADDONS_CHANNEL__ = i;
 window.CONFIG_TYPE === "DEVELOPMENT" && (window.__STORYBOOK_SERVER_CHANNEL__ = i);
 const p = {
-  "./_stories/Introduction.stories..mdx": async () => import("./storybook-3b9eeff7.es.js"),
-  "./_stories/Guide.NewStories.stories.mdx": async () => import("./storybook-e74fa047.es.js"),
-  "./_stories/Guide.NewIcons.stories.mdx": async () => import("./storybook-404ba7ba.es.js"),
-  "./_stories/Guide.NewComponents.stories.mdx": async () => import("./storybook-11a9c9ab.es.js"),
-  "./_stories/Contributions.stories.mdx": async () => import("./storybook-0f73f2cf.es.js"),
-  "./packages/waffle-chart/src/_stories/WaffleChart.stories.tsx": async () => import("./storybook-7978630f.es.js"),
-  "./packages/dashboard/src/_stories/Dashboard.stories.tsx": async () => import("./storybook-b920370c.es.js"),
-  "./packages/core/components/ui/_stories/Icon.stories.tsx": async () => import("./storybook-94af10bb.es.js"),
-  "./packages/core/components/ui/_stories/Accordion.stories.tsx": async () => import("./storybook-8876173b.es.js"),
-  "./packages/core/components/managers/_stories/DataDesigner.stories.tsx": async () => import("./storybook-403f4f97.es.js"),
-  "./packages/core/components/elements/_stories/Card.stories.tsx": async () => import("./storybook-fbcc978e.es.js"),
-  "./packages/core/components/elements/_stories/Button.stories.tsx": async () => import("./storybook-409b3ae6.es.js")
+  "./_stories/Introduction.stories..mdx": async () => import("./storybook-2504294c.es.js"),
+  "./_stories/Guide.NewStories.stories.mdx": async () => import("./storybook-32acfc5c.es.js"),
+  "./_stories/Guide.NewIcons.stories.mdx": async () => import("./storybook-0e20a356.es.js"),
+  "./_stories/Guide.NewComponents.stories.mdx": async () => import("./storybook-c3374811.es.js"),
+  "./_stories/Contributions.stories.mdx": async () => import("./storybook-1ca13f85.es.js"),
+  "./packages/waffle-chart/src/_stories/WaffleChart.stories.tsx": async () => import("./storybook-8bba6105.es.js"),
+  "./packages/dashboard/src/_stories/Dashboard.stories.tsx": async () => import("./storybook-9d7a4969.es.js"),
+  "./packages/core/components/ui/_stories/Icon.stories.tsx": async () => import("./storybook-5fe28cfe.es.js"),
+  "./packages/core/components/ui/_stories/Accordion.stories.tsx": async () => import("./storybook-b5910382.es.js"),
+  "./packages/core/components/managers/_stories/DataDesigner.stories.tsx": async () => import("./storybook-f4764563.es.js"),
+  "./packages/core/components/elements/_stories/Card.stories.tsx": async () => import("./storybook-c3fcb730.es.js"),
+  "./packages/core/components/elements/_stories/Button.stories.tsx": async () => import("./storybook-8b93f887.es.js")
 };
 async function O(t) {
   return p[t]();
 }
 const { composeConfigs: m, PreviewWeb: d, ClientApi: u } = __STORYBOOK_MODULE_PREVIEW_API__, l = async () => {
   const t = await Promise.all([
-    import("./storybook-06b0f87c.es.js"),
-    import("./storybook-c8133e4e.es.js"),
+    import("./storybook-ed3a63bb.es.js"),
+    import("./storybook-834bc10f.es.js"),
     import("./storybook-f74a5d48.es.js"),
-    import("./storybook-8ffc2fb4.es.js"),
+    import("./storybook-fc97499a.es.js"),
     import("./storybook-6d6b1c34.es.js"),
     import("./storybook-2d321ed0.es.js"),
-    import("./storybook-e1239275.es.js"),
+    import("./storybook-9e57a0de.es.js"),
     import("./storybook-b7e238f0.es.js"),
     import("./storybook-dfe67e85.es.js"),
     import("./storybook-485a2296.es.js"),
-    import("./storybook-1631767c.es.js")
+    import("./storybook-2eeebb3d.es.js")
   ]);
   return m(t);
 };
