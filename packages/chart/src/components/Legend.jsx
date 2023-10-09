@@ -7,6 +7,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import useLegendClasses from './../hooks/useLegendClasses'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 import { Line } from '@visx/shape'
+import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
 
 // * FILE REVIEW *
 // TODO: fix eslint-disable jsxa11y issues
@@ -92,7 +93,7 @@ const Legend = () => {
       // loop through each stage/group/area on the chart and create a label
       config.runtime?.forecastingSeriesKeys?.map((outerGroup, index) => {
         return outerGroup?.stages?.map((stage, index) => {
-          let colorValue = colorPalettes[stage.color]?.[2] ? colorPalettes[stage.color]?.[2] : '#ccc'
+          let colorValue = sequentialPalettes[stage.color]?.[2] ? sequentialPalettes[stage.color]?.[2] : colorPalettes[stage.color]?.[2] ? colorPalettes[stage.color]?.[2] : '#ccc'
 
           const newLabel = {
             datum: stage.key,

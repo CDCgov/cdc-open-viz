@@ -3,7 +3,7 @@ import React, { useContext } from 'react'
 // cdc
 import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChart, sequentialPalettes } from '@cdc/core/data/colorPalettes'
 
 // visx & d3
 import { curveMonotoneX } from '@visx/curve'
@@ -30,15 +30,15 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
               return (
                 <Group className={`forecasting-areas-combo-${index}`} key={`forecasting-areas--stage-${stage.key.replaceAll(' ', '-')}-${index}`}>
                   {group.confidenceIntervals?.map((ciGroup, ciGroupIndex) => {
-                    const palette = colorPalettesChart[stage.color]
+                    const palette = sequentialPalettes[stage.color] || colorPalettesChart[stage.color] || false
 
                     const getFill = () => {
-                      if (displayArea) return palette[ciGroupIndex] ? palette[ciGroupIndex] : 'transparent'
+                      if (displayArea) return palette[1] ? palette[1] : 'transparent'
                       return 'transparent'
                     }
 
                     const getStroke = () => {
-                      if (displayArea) return palette[2] ? palette[2] : 'transparent'
+                      if (displayArea) return palette[1] ? palette[1] : 'transparent'
                       return 'transparent'
                     }
 
