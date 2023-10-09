@@ -102,7 +102,8 @@ const SingleStateMap = props => {
     handleMapAriaLabels,
     titleCase,
     setSharedFilterValue,
-    isFilterValueSupported
+    isFilterValueSupported,
+    runtimeFilters
   } = useContext(ConfigContext)
 
   const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
