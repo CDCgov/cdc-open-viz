@@ -117,6 +117,7 @@ const CountyMap = props => {
       handleMapAriaLabels,
       runtimeLegend,
       state,
+      runtimeFilters
   } = useContext(ConfigContext)
 
   // CREATE STATE LINES
