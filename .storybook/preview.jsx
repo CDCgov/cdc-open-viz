@@ -1,4 +1,3 @@
-import React from 'react'
 import { previewTheme } from './coveSbThemes'
 
 export const parameters = {
