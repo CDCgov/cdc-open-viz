@@ -8,7 +8,7 @@
         ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/poc/topics",
+          "apiEndpoint": "http://test.gov/api/poc/topics",
           "valueSelector": "TopicID",
           "textSelector": "Topic"
         },
@@ -23,7 +23,7 @@
         ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/poc/indicators",
+          "apiEndpoint": "http://test.gov/api/poc/indicators",
           "valueSelector": "IndicatorID",
           "textSelector": "Indicator"
         },
@@ -39,7 +39,7 @@
         ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/Filters",
+          "apiEndpoint": "http://test.gov/api/POC/Filters",
           "valueSelector": "Year",
           "textSelector": "Year",
           "heirarchyLookup": "Years"
@@ -56,7 +56,7 @@
         ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/Filters",
+          "apiEndpoint": "http://test.gov/api/POC/Filters",
           "valueSelector": "StratificationCategoryId",
           "textSelector": "StratificationCategory",
           "heirarchyLookup": "StratificationCategories"
@@ -73,7 +73,7 @@
         ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/stratifications",
+          "apiEndpoint": "http://test.gov/api/POC/stratifications",
           "valueSelector": "StratificationId",
           "textSelector": "Stratification"
         },
@@ -190,7 +190,7 @@
   "type": "dashboard",
   "datasets": {
     "data3": {
-      "dataUrl": "https://edav-poc-api-dev.apps.ecpaas-dev.cdc.gov/api/POC/TableData?DataValueTypeId=CRDMEDN"
+      "dataUrl": "http://test.gov/api/POC/TableData?DataValueTypeId=CRDMEDN"
     }
   },
   "filterBehavior": "Apply Button",

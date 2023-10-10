@@ -23,6 +23,7 @@ import { useHighlightedBars } from '../hooks/useHighlightedBars'
 
 import ForestPlotSettings from './ForestPlotSettings'
 import { useEditorPermissions } from '../hooks/useEditorPermissions'
+import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -244,6 +245,8 @@ const EditorPanel = () => {
     visSupportsValueAxisLabels,
     visSupportsBarSpace,
     visSupportsBarThickness,
+    visSupportsFootnotes,
+    visSupportsSuperTitle,
     visSupportsDataCutoff
   } = useEditorPermissions()
 
@@ -1003,6 +1006,9 @@ const EditorPanel = () => {
                 {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && (
                   <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />
                 )}
+                {config.visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked' && (
+                  <Select value={config.stackedAreaChartLineType || 'Linear'} fieldName='stackedAreaChartLineType' label='Stacked Area Chart Line Type' updateField={updateField} options={Object.keys(approvedCurveTypes)} />
+                )}
                 {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
                 {config.visualizationType === 'Deviation Bar' && <Select label='Orientation' options={['horizontal']} />}
                 {(config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
@@ -1039,30 +1045,33 @@ const EditorPanel = () => {
                   }
                 />
                 <CheckBox value={config.showTitle} fieldName='showTitle' label='Show Title' updateField={updateField} />
-                <TextField
-                  value={config.superTitle}
-                  updateField={updateField}
-                  fieldName='superTitle'
-                  label='Super Title'
-                  placeholder='Super Title'
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>Super Title</p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
+
+                {visSupportsSuperTitle() && (
+                  <TextField
+                    value={config.superTitle}
+                    updateField={updateField}
+                    fieldName='superTitle'
+                    label='Super Title'
+                    placeholder='Super Title'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Super Title</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                )}
 
                 <TextField
                   type='textarea'
                   value={config.introText}
                   updateField={updateField}
                   fieldName='introText'
-                  label='Intro Text'
+                  label='Message'
                   tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>
@@ -1076,10 +1085,10 @@ const EditorPanel = () => {
                 />
 
                 <TextField
-                  type='textarea'
+                  type='text'
                   value={config.description}
                   fieldName='description'
-                  label='Subtext'
+                  label='Subtext/Citation'
                   updateField={updateField}
                   tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
@@ -1093,23 +1102,25 @@ const EditorPanel = () => {
                   }
                 />
 
-                <TextField
-                  type='textarea'
-                  value={config.footnotes}
-                  updateField={updateField}
-                  fieldName='footnotes'
-                  label='Footnotes'
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>Footnotes</p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
+                {visSupportsFootnotes() && (
+                  <TextField
+                    type='textarea'
+                    value={config.footnotes}
+                    updateField={updateField}
+                    fieldName='footnotes'
+                    label='Footnotes'
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Footnotes</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                )}
 
                 {config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
               </AccordionItemPanel>
@@ -3068,24 +3079,39 @@ const EditorPanel = () => {
                   </>
                 )}
 
-                {
-                  <label>
-                    <span className='edit-label column-heading'>Tooltip Opacity</span>
-                    <input
-                      type='number'
-                      value={config.tooltips.opacity ? config.tooltips.opacity : 100}
-                      onChange={e =>
-                        updateConfig({
-                          ...config,
-                          tooltips: {
-                            ...config.tooltips,
-                            opacity: e.target.value
-                          }
-                        })
-                      }
-                    />
-                  </label>
-                }
+                <label>
+                  <span className='edit-label column-heading'>Tooltip Opacity</span>
+                  <input
+                    type='number'
+                    value={config.tooltips.opacity ? config.tooltips.opacity : 100}
+                    onChange={e =>
+                      updateConfig({
+                        ...config,
+                        tooltips: {
+                          ...config.tooltips,
+                          opacity: e.target.value
+                        }
+                      })
+                    }
+                  />
+                </label>
+
+                <label>
+                  <span className='edit-label column-heading'>No Data Message</span>
+                  <input
+                    type='text'
+                    value={config.chartMessage.noData ? config.chartMessage.noData : ''}
+                    onChange={e =>
+                      updateConfig({
+                        ...config,
+                        chartMessage: {
+                          ...config.chartMessage,
+                          noData: e.target.value
+                        }
+                      })
+                    }
+                  />
+                </label>
               </AccordionItemPanel>
             </AccordionItem>
             {/* Spark Line has no data table */}

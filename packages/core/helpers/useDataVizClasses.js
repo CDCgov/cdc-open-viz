@@ -40,8 +40,7 @@ export default function useDataVizClasses(config, viewport = null) {
   config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
   let sparkLineStyles = {
-    width: '100%',
-    height: '100px'
+    width: '100%'
   }
 
   // Starting work on combining legend classes.

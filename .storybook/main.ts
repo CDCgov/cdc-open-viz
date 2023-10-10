@@ -1,30 +1,9 @@
-import path from 'path';
-import { mergeConfig } from'vite'
-import generateViteConfig from '../generateViteConfig'
+import { mergeConfig } from 'vite'
+import type { StorybookConfig } from '@storybook/react-vite';
+import react from '@vitejs/plugin-react'
+import svgr from 'vite-plugin-svgr' // Svg Support
 
-const removeDuplicatePlugins = (plugins) => {
-  const memo = {};
-  const newList: string[] = []
-  plugins.forEach(plugin => {
-    if(!memo[plugin.name]) {
-      memo[plugin.name] = true;
-      newList.push(plugin)
-    }
-    return;
-  });
-  return newList;
-}
-
-function createEntries(config) {
-  const packages = ['core', 'dasboard', 'waffle-chart']
-  return packages.map(_package => {
-    const relativePath = path.relative(config.root, path.resolve(__dirname, `../packages/${_package}/src`))
-    return `${relativePath}/**/*.{tsx|jsx|js|ts}`
-  })
-  
-}
-
-module.exports = {
+const config: StorybookConfig = {
   stories: [
     '../_stories/*.mdx',
     '../packages/**/_stories/*.stories.@(js|jsx|ts|tsx)',
@@ -37,7 +16,11 @@ module.exports = {
   ],
   staticDirs: ['./assets'],
   framework: {
-    name: "@storybook/react-vite"
+    name: "@storybook/react-vite",
+    options: {}
+  },
+  features: {
+    storyStoreV7: true
   },
   core: {
     builder: '@storybook/builder-vite',
@@ -49,16 +32,40 @@ module.exports = {
   typescript: {
     reactDocgen: false // https://github.com/storybookjs/storybook/issues/22164#issuecomment-1603627308
   },
-  viteFinal: async (config) => {
-    const _config = mergeConfig<Record<string, any>, Record<string, any>>(config, generateViteConfig('storybook'))
-    const flatMapped = _config.plugins.flatMap(p => p);
-    _config.plugins = removeDuplicatePlugins(flatMapped);
-    _config.optimizeDeps = { // to fix long load time: https://github.com/storybookjs/builder-vite/issues/173
-      ...config.optimizeDeps,
-      // Entries are specified relative to the root
-      entries: [createEntries(config)],
-      include: [...(config?.optimizeDeps?.include ?? []), "history", "preact", "@mdx-js/preact", "@storybook/addon-docs/blocks"],
+  viteFinal: async (config, {configType}) => {
+    console.log("Storybook build mode: ", configType)
+
+    const plugins = [
+      react({jsxRuntime: 'classic'}), //https://github.com/babel/babel/discussions/13013
+      svgr({
+        exportAsDefault: true
+      }),
+    ]
+
+    if(configType === 'DEVELOPMENT') { // run Storybook locally
+      return mergeConfig(config, plugins)
     }
-    return _config;
+
+    return mergeConfig(config, {
+      commonjsOptions: {
+        include: [/@cdc\/core/, /node_modules/]
+      },
+      build: {
+        sourcemap: false,
+        lib: {
+          entry: `src/storybook`,
+          formats: ['es'],
+          fileName: format => `storybook.js`
+        },
+        rollupOptions: {
+          output: {
+            chunkFileNames: `storybook-[hash].[format].js`,
+          }
+        },
+      },
+      plugins
+    })
   }
 };
+
+export default config;

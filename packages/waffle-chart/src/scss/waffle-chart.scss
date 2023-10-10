@@ -8,9 +8,9 @@
   }
 }
 
-.cove .waffle-chart .cove-component__header {
-  font-size: unset;
-}
+// .cove .waffle-chart .cove-component__header {
+//   font-size: unset;
+// }
 
 //@each $theme, $color in $theme-colors {
 //  .cdc-waffle-chart.theme-#{$theme} #{&} {
@@ -45,9 +45,9 @@
       align-items: flex-start;
     }
 
-    &__subtext {
-      font-size: 0.75em;
-    }
+    // &__subtext {
+    //   font-size: 0.75em;
+    // }
     &__text {
       line-height: 1.25em;
       width: 100%;
@@ -80,10 +80,6 @@
     flex: 1 1 0;
     min-width: 175px;
     margin-bottom: 1rem;
-  }
-
-  .cove-waffle-chart__subtext {
-    font-size: 0.75em;
   }
 
   .cove-waffle-chart__data {

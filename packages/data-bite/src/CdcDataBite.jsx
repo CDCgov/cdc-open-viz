@@ -87,7 +87,7 @@ const CdcDataBite = props => {
     let response = configObj || (await (await fetch(configUrl)).json())
 
     // If data is included through a URL, fetch that and store
-    let responseData = response.data ?? {}
+    let responseData = response.data ?? []
 
     if (response.dataUrl) {
       response.dataUrl = `${response.dataUrl}?${cacheBustingString()}`
@@ -272,7 +272,9 @@ const CdcDataBite = props => {
         if (typeof value === 'number') numericalData.push(value)
       })
     } else {
-      numericalData = config.data.map(item => Number(item[config.dataColumn]))
+      if (config.dataColumn && config.data) {
+        numericalData = config.data.map(item => Number(item[config.dataColumn]))
+      }
     }
 
     switch (dataFunction) {

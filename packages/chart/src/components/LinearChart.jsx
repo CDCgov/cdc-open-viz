@@ -210,7 +210,7 @@ export default function LinearChart() {
     <React.Fragment></React.Fragment>
   ) : (
     <ErrorBoundary component='LinearChart'>
-      <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} tabIndex={0} ref={svgRef}>
+      <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} ref={svgRef}>
         <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
         {config.regions
           ? config.regions.map(region => {
@@ -708,7 +708,7 @@ export default function LinearChart() {
           </Group>
         )}
         {config.filters && config.filters.values.length === 0 && data.length === 0 && (
-          <Text x={Number(config.yAxis.size) + Number(xMax / 2)} y={height / 2} textAnchor='middle'>
+          <Text x={Number(config.yAxis.size) + Number(xMax / 2)} y={height / 2 - config.xAxis.size / 2} textAnchor='middle'>
             {config.chartMessage.noData}
           </Text>
         )}
