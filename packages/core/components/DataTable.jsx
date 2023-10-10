@@ -555,8 +555,8 @@ const DataTable = props => {
       ? [config.yAxis.dataKey]
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])
-        : config.runtime.seriesKeys),
-    [config.runtime.seriesKeys]) // eslint-disable-line
+        : config.runtime?.seriesKeys),
+    [config.runtime?.seriesKeys]) // eslint-disable-line
 
   if (config.visualizationType !== 'Box Plot') {
     const genMapHeader = columns => {
