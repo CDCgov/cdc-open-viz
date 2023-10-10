@@ -44,8 +44,9 @@ const HexSettingDisplayAsHexMap = props => {
   const { state, handleEditorChanges } = props
 
   return (
-    'us' === state.general.geoType &&
-    'data' === state.general.type && (
+    state.general.geoType === 'us' &&
+    state.general.type !== ' navigation' &&
+    state.general.type !== 'bubble' && (
       <label className='checkbox mt-4'>
         <input
           type='checkbox'
