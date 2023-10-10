@@ -213,9 +213,9 @@ const LinearChart = props => {
     <React.Fragment></React.Fragment>
   ) : (
     // div needed for tooltip container
-    <div>
-      <ErrorBoundary component='LinearChart'>
-        <svg width={width} height={height} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} ref={svgRef}>
+    <ErrorBoundary component='LinearChart'>
+      <div style={{ width: width, height: height, overflow: 'visible' }}>
+        <svg width={'100%'} height={'100%'} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} ref={svgRef} style={{ overflow: 'visible' }}>
           <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
           {config.regions
             ? config.regions.map(region => {
@@ -727,8 +727,8 @@ const LinearChart = props => {
           <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />
         )}
         <div className='animation-trigger' ref={triggerRef} />
-      </ErrorBoundary>
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }
 

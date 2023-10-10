@@ -26,7 +26,7 @@ export const useTooltip = props => {
 
     const tooltipData = {
       data: initialTooltipData,
-      dataXPosition: x,
+      dataXPosition: x + 10,
       dataYPosition: y
     }
 
