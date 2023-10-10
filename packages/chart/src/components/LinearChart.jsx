@@ -708,7 +708,7 @@ export default function LinearChart() {
           </Group>
         )}
         {config.filters && config.filters.values.length === 0 && data.length === 0 && (
-          <Text x={Number(config.yAxis.size) + Number(xMax / 2)} y={height / 2} textAnchor='middle'>
+          <Text x={Number(config.yAxis.size) + Number(xMax / 2)} y={height / 2 - config.xAxis.size / 2} textAnchor='middle'>
             {config.chartMessage.noData}
           </Text>
         )}
