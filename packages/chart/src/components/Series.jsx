@@ -11,7 +11,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { Draggable } from '@hello-pangea/dnd'
-import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChart, sequentialPalettes } from '@cdc/core/data/colorPalettes'
 
 const SeriesContext = React.createContext()
 
@@ -219,6 +219,10 @@ const SeriesDropdownForecastColor = props => {
   // Hide AxisPositionDropdown in certain cases.
   if (!series) return
 
+  const allowedForecastingColors = () => {
+    return Object.keys(sequentialPalettes)
+  }
+
   return series?.stages?.map((stage, stageIndex) => (
     <InputSelect
       key={`${stage}--${stageIndex}`}
@@ -236,7 +240,7 @@ const SeriesDropdownForecastColor = props => {
           series: copyOfSeries
         })
       }}
-      options={Object.keys(colorPalettesChart)}
+      options={Object.keys(sequentialPalettes)}
     />
   ))
 }

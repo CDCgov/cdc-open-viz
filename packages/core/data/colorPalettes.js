@@ -1,3 +1,4 @@
+import { update } from 'lodash'
 import { updatePaletteNames } from '../helpers/updatePaletteNames'
 
 const colorPalettesMap = {
@@ -63,6 +64,16 @@ export const colorPalettes3 = {
   'complementary-5': ['#df168c', '#1EB386']
 }
 
+const sequentialColors = {
+  'Sequential Blue': ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6', '#2171B5', '#084594'],
+  'Sequential Blue Two': ['#D5F6F9', '#99E2ED', '#5FB6D1', '#3189B0', '#116091', '#0A3E72'],
+  'Sequential Blue Three': ['#F5FEFF', '#E1FBFF', '#C0F2FD', '#94E2ED', '#5EBAD4', '#3695BE', '#2273A0', '#0E5181', '#093460'],
+  'Sequential Orange': ['#FFEFCF', '#FFD49C', '#F7A866', '#EB7723', '#B95117', '#862B0B'],
+  'Sequential Orange Two': ['#FFFDF0', '#FFF7DC', '#FFE9C2', '#FFD097', '#F7A866', '#EB7723', '#B95117', '#853209', '#661F00'],
+  'Sequential Green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32']
+}
+
+export const sequentialPalettes = sequentialColors
 export const colorPalettesChart = updatePaletteNames(colorPalettes2)
 const colorPalettes = updatePaletteNames(colorPalettesMap)
 export const twoColorPalette = updatePaletteNames(colorPalettes3)
