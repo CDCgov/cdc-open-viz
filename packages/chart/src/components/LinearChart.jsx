@@ -154,9 +154,6 @@ const LinearChart = props => {
   // Tooltip Helpers
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip()
 
-  console.log('TOOLTIPDATA', tooltipData)
-  console.log('TOOLTIPLEFT', tooltipLeft)
-
   // prettier-ignore
   const {
     handleTooltipMouseOver,
@@ -212,8 +209,8 @@ const LinearChart = props => {
   return isNaN(width) ? (
     <React.Fragment></React.Fragment>
   ) : (
-    // div needed for tooltip container
     <ErrorBoundary component='LinearChart'>
+      {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
       <div style={{ width: width, height: height, overflow: 'visible' }}>
         <svg width={'100%'} height={'100%'} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} ref={svgRef} style={{ overflow: 'visible' }}>
           <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
