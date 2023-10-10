@@ -34,7 +34,7 @@ const DataTable = props => {
 
   const fileName = `${vizTitle || 'data-table'}.csv`
 
-  const isVertical = config.type === 'dashboard' || config.table?.showVertical;
+  const isVertical = !(config.type === 'chart' && !config.table?.showVertical);
 
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
