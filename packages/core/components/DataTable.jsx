@@ -59,8 +59,8 @@ const DataTable = props => {
     const isNumB = !isNaN(Number(valueB)) && valueB !== undefined && valueB !== null && trimmedB !== ''
 
     // Handle empty strings or spaces
-    if (trimmedA === '' && trimmedB !== '') return sortOrder === 'asc' ? -1 : 1
-    if (trimmedA !== '' && trimmedB === '') return sortOrder === 'asc' ? 1 : -1
+    if (trimmedA === '' && trimmedB !== '') return sortBy.asc ? -1 : 1
+    if (trimmedA !== '' && trimmedB === '') return sortBy.asc ? 1 : -1
 
     // Both are numbers: Compare numerically
     if (isNumA && isNumB) {
