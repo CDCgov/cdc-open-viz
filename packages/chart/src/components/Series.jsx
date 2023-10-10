@@ -295,7 +295,7 @@ const SeriesDropdownConfidenceInterval = props => {
                   </>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {/* <div className='input-group'>
+                  <div className='input-group'>
                     <label htmlFor='showInTooltip'>Show In Tooltip</label>
                     <div className={'cove-input__checkbox--small'} onClick={e => updateShowInTooltip(e, index, ciIndex)}>
                       <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
@@ -303,7 +303,45 @@ const SeriesDropdownConfidenceInterval = props => {
                       </div>
                       <input className='cove-input--hidden' type='checkbox' name={'showInTooltip'} checked={showInTooltip ? showInTooltip : false} readOnly />
                     </div>
-                  </div> */}
+                  </div>
+
+                  {/* <label>
+                    High Label
+                    <input
+                      type='text'
+                      key={`series-ci-high-label-${index}`}
+                      value={series.confidenceIntervals[index]?.highLabel ? series.confidenceIntervals[index]?.highLabel : ''}
+                      onChange={e => {
+                        const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
+                        copiedConfidenceArray[ciIndex].highLabel = e.target.value
+                        const copyOfSeries = [...config.series] // copy the entire series array
+                        copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
+                        updateConfig({
+                          ...config,
+                          series: copyOfSeries
+                        })
+                      }}
+                    />
+                  </label> */}
+
+                  {/* <label>
+                    Low label
+                    <input
+                      type='text'
+                      key={`series-ci-high-label-${index}`}
+                      value={series.confidenceIntervals[index]?.lowLabel ? series.confidenceIntervals[index]?.lowLabel : ''}
+                      onChange={e => {
+                        const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
+                        copiedConfidenceArray[ciIndex].lowLabel = e.target.value
+                        const copyOfSeries = [...config.series] // copy the entire series array
+                        copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
+                        updateConfig({
+                          ...config,
+                          series: copyOfSeries
+                        })
+                      }}
+                    />
+                  </label> */}
 
                   <InputSelect
                     initial='Select an option'
@@ -515,7 +553,6 @@ const SeriesItem = props => {
                   <Series.Dropdown.SeriesType series={series} index={i} />
                   <Series.Dropdown.AxisPosition series={series} index={i} />
                   <Series.Dropdown.LineType series={series} index={i} />
-                  {/* <Series.Dropdown.ForecastingStage series={series} index={i} /> */}
                   <Series.Dropdown.ForecastingColor series={series} index={i} />
                   <Series.Dropdown.ConfidenceInterval series={series} index={i} />
                   <Series.Checkbox.DisplayInTooltip series={series} index={i} />

@@ -55,6 +55,17 @@ export const useTooltip = props => {
     const includedSeries = visualizationType !== 'Pie' ? config.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.series.map(item => item.dataKey)
     includedSeries.push(config.xAxis.dataKey)
 
+    if (config.visualizationType === 'Forecasting') {
+      config.series.map(s => {
+        s.confidenceIntervals.map(c => {
+          if (c.showInTooltip) {
+            includedSeries.push(c.high)
+            includedSeries.push(c.low)
+          }
+        })
+      })
+    }
+
     const yScaleValues = getYScaleValues(closestXScaleValue, includedSeries)
 
     const xScaleValues = data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))
@@ -110,7 +121,7 @@ export const useTooltip = props => {
 
       return getIncludedTooltipSeries()
         .filter(Boolean)
-        .flatMap(seriesKey => {
+        .flatMap((seriesKey, index) => {
           return resolvedScaleValues[0][seriesKey] ? [[seriesKey, resolvedScaleValues[0][seriesKey], getAxisPosition(seriesKey)]] : []
         })
     }
