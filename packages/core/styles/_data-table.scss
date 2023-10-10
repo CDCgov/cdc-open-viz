@@ -30,12 +30,13 @@ div.data-table-heading {
   }
 }
 
-table.horizontal {
+.cdc-chart-inner-container table.horizontal {
   tr {
     display: flex;
   }
 
-  th, td {
+  th,
+  td {
     min-width: 200px;
   }
 }
@@ -118,14 +119,14 @@ table.data-table {
 
     // format the white triangle sort icon in data table headers
     .sort-icon {
-    fill: white;
-    width: 30px;
-    float: right;
-    align-self: center;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+      fill: white;
+      width: 30px;
+      float: right;
+      align-self: center;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
     th:last-child,
