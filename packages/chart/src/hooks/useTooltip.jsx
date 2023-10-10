@@ -1,5 +1,6 @@
 import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
+import { defaultStyles } from '@visx/tooltip'
 
 // third party
 import { localPoint } from '@visx/event'
@@ -30,6 +31,8 @@ export const useTooltip = props => {
     }
 
     const tooltipInformation = {
+      tooltipLeft: tooltipData.dataXPosition,
+      tooltipTop: tooltipData.dataYPosition,
       tooltipData: tooltipData
     }
 
