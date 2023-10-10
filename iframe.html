@@ -358,6 +358,11 @@
 </script>
 <script>
   window.global = window;
+  window.process = {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
 </script>
 <style>
 .search-result-item--label {
@@ -374,7 +379,8 @@
 </style>
 <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/contrib/libs/bootstrap/latest/css/bootstrap.min.css?_=39423">
 <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/4.0/assets/css/app.min.css?_=39423">
-  <script type="module" crossorigin src="./assets/iframe-34914215.js"></script>
+  <script type="module" crossorigin src="./storybook.js"></script>
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
