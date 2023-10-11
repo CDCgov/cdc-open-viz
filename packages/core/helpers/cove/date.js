@@ -5,5 +5,6 @@ export function formatDate(format = undefined, date) {
 }
 
 export function parseDate(format = undefined, dateString) {
-  return timeParse(format)(dateString) || new Date()
+  const parsedDate = timeParse(format)(dateString)
+  return parsedDate || null
 }
