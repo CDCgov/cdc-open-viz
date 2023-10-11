@@ -211,7 +211,7 @@ const LinearChart = props => {
   ) : (
     <ErrorBoundary component='LinearChart'>
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
-      <div style={{ width: width, height: height, overflow: 'visible' }}>
+      <div style={{ width: `${width}px`, height: `${height}px`, overflow: 'visible' }} className='tooltip-boundary'>
         <svg width={'100%'} height={'100%'} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} ref={svgRef} style={{ overflow: 'visible' }}>
           <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
           {config.regions
