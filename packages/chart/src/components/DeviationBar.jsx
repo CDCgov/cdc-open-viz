@@ -7,9 +7,10 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import chroma from 'chroma-js'
 
 export default function DeviationBar({ height, xScale, animatedChart }) {
-  const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig, parseDate, formatDate } = useContext(ConfigContext)
+  const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig, parseDate, formatDate, currentViewport } = useContext(ConfigContext)
   const { barStyle, tipRounding, roundingStyle, twoColor } = config
   const barRefs = useRef([])
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const radius = roundingStyle === 'standard' ? '8px' : roundingStyle === 'shallow' ? '5px' : roundingStyle === 'finger' ? '15px' : '0px'
   const fontSize = { small: 16, medium: 18, large: 20 }
   const isRounded = config.barStyle === 'rounded'
@@ -74,22 +75,15 @@ export default function DeviationBar({ height, xScale, animatedChart }) {
   targetLabel.calculate()
 
   useEffect(() => {
-    if (config.barStyle === 'lollipop' && !config.isLollipopChart) {
-      updateConfig({ ...config, isLollipopChart: true })
-    }
-    if (isRounded || config.barStyle === 'flat') {
-      updateConfig({ ...config, isLollipopChart: false })
-    }
-  }, [config.barStyle])
-
-  useEffect(() => {
     const handleResize = () => {
+      setWindowWidth(window.innerWidth)
       barRefs.current.forEach(bar => {
         bar.style.transition = 'none'
         bar.style.transform = 'translate(0) scale(1)'
       })
     }
     window.addEventListener('resize', handleResize)
+
     return () => {
       window.removeEventListener('resize', handleResize)
     }
@@ -97,7 +91,7 @@ export default function DeviationBar({ height, xScale, animatedChart }) {
 
   useEffect(() => {
     barRefs.current.forEach((bar, i) => {
-      if (config.animate && animatedChart) {
+      if (config.animate) {
         const maxValue = maxVal
         // Normalize target to be between 0 and 100
         const normalizedTarget = (target / maxValue) * 100
@@ -117,7 +111,7 @@ export default function DeviationBar({ height, xScale, animatedChart }) {
         bar.style.transform = 'translate(0) scale(1)'
       }
     })
-  }, [config.animate, animatedChart, target])
+  }, [config.animate, animatedChart, target, windowWidth])
 
   if (!config || config?.series?.length !== 1) return <></>
 
