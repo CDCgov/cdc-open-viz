@@ -47,10 +47,17 @@ const DataTable = props => {
     const trimmedA = String(valueA).trim()
     const trimmedB = String(valueB).trim()
 
-    if (isVertical && config.xAxis.type === 'date' && sortBy.column === 'Date') {
-      return sortBy.asc ? Date.parse(trimmedA) - Date.parse(trimmedB) : Date.parse(trimmedB) - Date.parse(trimmedA)
-    }
+    if (config.xAxis.dataKey === sortBy.column && config.xAxis.type === 'date') {
+      let dateA = parseDate(config.xAxis.dateParseFormat, trimmedA)
 
+      let dateB = parseDate(config.xAxis.dateParseFormat, trimmedB)
+
+      if (dateA && dateA.getTime) dateA = dateA.getTime()
+
+      if (dateB && dateB.getTime) dateB = dateB.getTime()
+
+      return sortBy.asc ? dateA - dateB : dateB - dateA
+    }
     // Check if values are numbers
     const isNumA = !isNaN(Number(valueA)) && valueA !== undefined && valueA !== null && trimmedA !== ''
     const isNumB = !isNaN(Number(valueB)) && valueB !== undefined && valueB !== null && trimmedB !== ''
