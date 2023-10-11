@@ -28,16 +28,13 @@ const DataTable = props => {
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
-  const [sortBy, setSortBy] = useState({ column: config.type === 'map' ? 'geo' : 'date', asc: false })
+  const [sortBy, setSortBy] = useState({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
   const fileName = `${vizTitle || 'data-table'}.csv`
 
   const isVertical = !(config.type === 'chart' && !config.table?.showVertical)
-
-  // Catch all sorting method used on load by default but also on user click
-  // Having a custom method means we can add in any business logic we want going forward
 
   const customSort = (a, b) => {
     let valueA = a
@@ -50,10 +47,17 @@ const DataTable = props => {
     const trimmedA = String(valueA).trim()
     const trimmedB = String(valueB).trim()
 
-    if (!isNaN(Date.parse(trimmedA)) && !isNaN(Date.parse(trimmedB))) {
-      return sortBy.asc ? Date.parse(trimmedA) - Date.parse(trimmedB) : Date.parse(trimmedB) - Date.parse(trimmedA)
-    }
+    if (config.xAxis.dataKey === sortBy.column && config.xAxis.type === 'date') {
+      let dateA = parseDate(config.xAxis.dateParseFormat, trimmedA)
 
+      let dateB = parseDate(config.xAxis.dateParseFormat, trimmedB)
+
+      if (dateA && dateA.getTime) dateA = dateA.getTime()
+
+      if (dateB && dateB.getTime) dateB = dateB.getTime()
+
+      return sortBy.asc ? dateA - dateB : dateB - dateA
+    }
     // Check if values are numbers
     const isNumA = !isNaN(Number(valueA)) && valueA !== undefined && valueA !== null && trimmedA !== ''
     const isNumB = !isNaN(Number(valueB)) && valueB !== undefined && valueB !== null && trimmedB !== ''
@@ -186,10 +190,6 @@ const DataTable = props => {
           sortVal = customSort(runtimeData[a][sortBy.column], runtimeData[b][sortBy.column])
         }
         return sortVal
-        // if (!sortBy.asc) return sortVal
-        // if (sortVal === 0) return 0
-        // if (sortVal < 0) return 1
-        // return -1
       })
     : rawRows
 
@@ -275,16 +275,19 @@ const DataTable = props => {
 
     return tmpSeriesColumns
   }
-
   const dataSeriesColumnsSorted = () => {
     return dataSeriesColumns().sort((a, b) => {
-      if (sortBy.column === '__series__') return -1 * customSort(a, b)
+      if (sortBy.column === '__series__') return customSort(a, b)
       let row = runtimeData.find(d => d[config.xAxis?.dataKey] === sortBy.column)
-      if (!row) return 0
-      return -1 * customSort(row[a], row[b])
+      const rowIndex = runtimeData[sortBy.colIndex - 1]
+      if (row) {
+        return customSort(row[a], row[b])
+      }
+      if (row === undefined && rowIndex) {
+        return customSort(rowIndex[a], rowIndex[b])
+      }
     })
   }
-
   const getLabel = name => {
     let custLabel = ''
     if (config.columns && Object.keys(config.columns).length > 0) {
@@ -317,29 +320,30 @@ const DataTable = props => {
     if (isVertical) {
       return (
         <tr>
-          {dataSeriesColumns().map(column => {
+          {dataSeriesColumns().map((column, index) => {
             const text = getSeriesName(column)
 
             return (
               <th
-                key={`col-header-${column}`}
+                key={`col-header-${column}__${index}`}
                 tabIndex='0'
                 title={text}
                 role='columnheader'
                 scope='col'
                 onClick={() => {
-                  setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                  setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false, colIndex: index })
                 }}
                 onKeyDown={e => {
                   if (e.keyCode === 13) {
-                    setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
+                    setColIndex(index)
+                    setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false, colIndex: index })
                   }
                 }}
                 className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
                 {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
               >
                 {text}
-                {sortBy.column === column && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
+                {column === sortBy.column && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
                 <button>
                   <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
                 </button>
@@ -351,30 +355,29 @@ const DataTable = props => {
     } else {
       return (
         <tr>
-          {['__series__', ...Object.keys(runtimeData)].map(row => {
+          {['__series__', ...Object.keys(runtimeData)].map((row, index) => {
             let column = config.xAxis?.dataKey
             let text = row !== '__series__' ? getChartCellValue(row, column) : '__series__'
-
             return (
               <th
-                key={`col-header-${text}`}
+                key={`col-header-${text}__${index}`}
                 tabIndex='0'
                 title={text}
                 role='columnheader'
                 scope='col'
                 onClick={() => {
-                  setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false })
+                  setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
                 }}
                 onKeyDown={e => {
                   if (e.keyCode === 13) {
-                    setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false })
+                    setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
                   }
                 }}
                 className={sortBy.column === text ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
                 {...(sortBy.column === text ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
               >
                 {text === '__series__' ? '' : text}
-                {sortBy.column === text && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
+                {index === sortBy.colIndex && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
                 <button>
                   <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === text ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
                 </button>
@@ -447,9 +450,9 @@ const DataTable = props => {
 
   const genChartRows = rows => {
     if (isVertical) {
-      const allRows = rows.map(row => {
+      const allRows = rows.map((row, index) => {
         return (
-          <tr role='row'>
+          <tr key={`${row}__${index}`} role='row'>
             {dataSeriesColumns().map(column => {
               return getChartCell(row, column)
             })}
@@ -514,7 +517,7 @@ const DataTable = props => {
         <tr>
           {Object.keys(columns)
             .filter(column => columns[column].dataTable === true && columns[column].name)
-            .map(column => {
+            .map((column, index) => {
               let text
               if (column !== 'geo') {
                 text = columns[column].label ? columns[column].label : columns[column].name
@@ -527,7 +530,7 @@ const DataTable = props => {
 
               return (
                 <th
-                  key={`col-header-${column}`}
+                  key={`col-header-${column}__${index}`}
                   id={column}
                   tabIndex='0'
                   title={text}
