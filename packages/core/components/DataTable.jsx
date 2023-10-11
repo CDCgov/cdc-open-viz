@@ -47,22 +47,8 @@ const DataTable = props => {
     const trimmedA = String(valueA).trim()
     const trimmedB = String(valueB).trim()
 
-    const isDateA = parseDate(undefined, valueA) instanceof Date && !isNaN(parseDate(undefined, valueA).getTime())
-    const isDateB = parseDate(undefined, valueB) instanceof Date && !isNaN(parseDate(undefined, valueB).getTime())
-
-    // If both are dates, compare them
-    if (isDateA && isDateB) {
-      return sortBy.asc ? parseDate(undefined, valueA) - parseDate(undefined, valueB) : parseDate(undefined, valueB) - parseDate(undefined, valueA)
-    }
-
-    // If only A is a date
-    if (isDateA) {
-      return sortBy.asc ? -1 : 1
-    }
-
-    // If only B is a date
-    if (isDateB) {
-      return sortBy.asc ? 1 : -1
+    if (isVertical && config.xAxis.type === 'date' && sortBy.column === 'Date') {
+      return sortBy.asc ? Date.parse(trimmedA) - Date.parse(trimmedB) : Date.parse(trimmedB) - Date.parse(trimmedA)
     }
 
     // Check if values are numbers
@@ -350,7 +336,7 @@ const DataTable = props => {
                 {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
               >
                 {text}
-                {index === column && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
+                {column === sortBy.column && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
                 <button>
                   <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
                 </button>
