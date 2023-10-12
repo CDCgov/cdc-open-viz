@@ -358,7 +358,7 @@
 </script>
 <script>
   window.global = window;
-  window.process = {
+  window.process = { // vite does not polyfill process https://github.com/storybookjs/storybook/issues/18920
     "env": {
       "NODE_ENV": "production"
     }
