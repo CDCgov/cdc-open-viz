@@ -35,15 +35,12 @@ const config: StorybookConfig = {
   viteFinal: async (config, {configType}) => {
     console.log("Storybook build mode: ", configType)
 
-    const plugins = [
-      react({jsxRuntime: 'classic'}), //https://github.com/babel/babel/discussions/13013
-      svgr({
-        exportAsDefault: true
-      }),
-    ]
-
     if(configType === 'DEVELOPMENT') { // run Storybook locally
-      return mergeConfig(config, plugins)
+      return mergeConfig(config, {
+        plugins: [
+          svgr({ exportAsDefault: true })
+        ]
+      });
     }
 
     return mergeConfig(config, {
@@ -63,7 +60,12 @@ const config: StorybookConfig = {
           }
         },
       },
-      plugins
+      plugins: [
+        react({jsxRuntime: 'classic'}), //https://github.com/babel/babel/discussions/13013
+        svgr({
+          exportAsDefault: true
+        }),
+      ]
     })
   }
 };

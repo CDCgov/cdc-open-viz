@@ -47,7 +47,7 @@ const DataTable = props => {
     const trimmedA = String(valueA).trim()
     const trimmedB = String(valueB).trim()
 
-    if (config.xAxis.dataKey === sortBy.column && config.xAxis.type === 'date') {
+    if (config.xAxis?.dataKey === sortBy.column && config.xAxis.type === 'date') {
       let dateA = parseDate(config.xAxis.dateParseFormat, trimmedA)
 
       let dateB = parseDate(config.xAxis.dateParseFormat, trimmedB)
