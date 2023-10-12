@@ -1,10 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
-
-import DefaultData from '../../examples/default.json'
-import TestExampleData from '../../examples/test-example.json'
 import APIFiltersMapData from './_mock/api-filter-map.json'
 import APIFiltersChartData from './_mock/api-filter-chart.json'
-
+import ExampleConfig_1 from './_mock/dashboard-gallery.json'
+import ExampleConfig_2 from './_mock/dashboard-2.json'
+import ExampleConfig_3 from './_mock/dashboard_no_filter.json'
 import Dashboard from '../CdcDashboard'
 import { Config } from '../types/Config'
 import { userEvent, within } from '@storybook/testing-library'
@@ -16,15 +15,21 @@ const meta: Meta<typeof Dashboard> = {
 
 type Story = StoryObj<typeof Dashboard>
 
-export const Default: Story = {
+export const Example_1: Story = {
   args: {
-    config: DefaultData as unknown as Config
+    config: ExampleConfig_1 as unknown as Config
   }
 }
 
-export const TestExample: Story = {
+export const Example_2: Story = {
   args: {
-    config: TestExampleData as unknown as Config
+    config: ExampleConfig_2 as unknown as Config
+  }
+}
+
+export const Example_3: Story = {
+  args: {
+    config: ExampleConfig_3 as unknown as Config
   }
 }
 
