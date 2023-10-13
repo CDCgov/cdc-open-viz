@@ -22,6 +22,8 @@ export const useEditorPermissions = () => {
     'Spark Line'
 ]
 
+  const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
+
   const visSupportsSuperTitle = () => {
     const disabledCharts = ['Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
@@ -35,13 +37,13 @@ export const useEditorPermissions = () => {
   }
 
   const visHasLabelOnData = () => {
-    const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot']
+    const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot', 'Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visCanAnimate = () => {
-    const disabledCharts = ['Area Chart', 'Scatter Plot', 'Box Plot', 'Forest Plot']
+    const disabledCharts = ['Area Chart', 'Scatter Plot', 'Box Plot', 'Forest Plot', 'Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -51,6 +53,8 @@ export const useEditorPermissions = () => {
       case 'Box Plot':
         return false
       case 'Forest Plot':
+        return false
+      case 'Spark Line':
         return false
       default:
         return true
@@ -94,9 +98,17 @@ export const useEditorPermissions = () => {
         return false
       case 'Pie':
         return false
+      case 'Spark Line':
+        return false
       default:
         return true
     }
+  }
+
+  const visSupportsTooltipOpacity = () => {
+    const disabledCharts = ['Spark Line']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
   }
 
   const visSupportsTooltipLines = () => {
@@ -124,37 +136,43 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisLabel = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryAxisLine = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryAxisTicks = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryTickRotation = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryNumTicks = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Spark Line']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsResponsiveTicks = () => {
+    const disabledCharts = ['Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsRegions = () => {
-    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar']
+    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar', 'Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -200,33 +218,64 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsChartHeight = () => {
+    const disabledCharts = ['Spark Line']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsLeftValueAxis = () => {
+    const disabledCharts = ['Spark Line']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsRankByValue = () => {
+    const disabledCharts = ['Spark Line']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsDateCategoryHeight = () => {
+    const disabledCharts = ['Spark Line']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
   return {
     enabledChartTypes,
-    visHasLabelOnData,
-    visHasNumbersOnBars,
+    headerColors,
+    visCanAnimate,
     visHasAnchors,
     visHasBarBorders,
     visHasDataCutoff,
-    visCanAnimate,
+    visHasLabelOnData,
     visHasLegend,
-    visSupportsTooltipLines,
-    visSupportsNonSequentialPallete,
-    visSupportsSequentialPallete,
-    visSupportsReverseColorPalette,
+    visHasNumbersOnBars,
+    visSupportsBarSpace,
+    visSupportsBarThickness,
+    visSupportsChartHeight,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
     visSupportsDateCategoryAxisTicks,
-    visSupportsDateCategoryTickRotation,
+    visSupportsDateCategoryHeight,
     visSupportsDateCategoryNumTicks,
-    visSupportsRegions,
+    visSupportsDateCategoryTickRotation,
     visSupportsFilters,
-    visSupportsValueAxisGridLines,
-    visSupportsValueAxisTicks,
-    visSupportsValueAxisLine,
-    visSupportsValueAxisLabels,
-    visSupportsBarSpace,
-    visSupportsBarThickness,
     visSupportsFootnotes,
-    visSupportsSuperTitle
+    visSupportsLeftValueAxis,
+    visSupportsNonSequentialPallete,
+    visSupportsRankByValue,
+    visSupportsRegions,
+    visSupportsResponsiveTicks,
+    visSupportsReverseColorPalette,
+    visSupportsSequentialPallete,
+    visSupportsSuperTitle,
+    visSupportsTooltipLines,
+    visSupportsTooltipOpacity,
+    visSupportsValueAxisGridLines,
+    visSupportsValueAxisLabels,
+    visSupportsValueAxisLine,
+    visSupportsValueAxisTicks
   }
 }
