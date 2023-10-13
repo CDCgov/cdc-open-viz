@@ -5,8 +5,9 @@ import ConfigContext from '../ConfigContext'
 import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import chroma from 'chroma-js'
+import useIntersectionObserver from './useIntersectionObserver'
 
-export default function DeviationBar({ height, xScale, animatedChart }) {
+export default function DeviationBar({ height, xScale }) {
   const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig, parseDate, formatDate, currentViewport } = useContext(ConfigContext)
   const { barStyle, tipRounding, roundingStyle, twoColor } = config
   const barRefs = useRef([])
@@ -74,6 +75,10 @@ export default function DeviationBar({ height, xScale, animatedChart }) {
   }
   targetLabel.calculate()
 
+  const targetRef = useRef(null)
+
+  const entry = useIntersectionObserver(targetRef, {})
+
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth)
@@ -88,30 +93,37 @@ export default function DeviationBar({ height, xScale, animatedChart }) {
       window.removeEventListener('resize', handleResize)
     }
   }, [])
+  const [animatedChart, setAnimatedChart] = useState(false)
+
+  useEffect(() => {
+    if (entry?.isIntersecting) {
+      setTimeout(() => {
+        setAnimatedChart(true)
+      }, 100)
+    }
+  }, [entry?.isIntersecting, config.animate]) // eslint-disable-line
 
   useEffect(() => {
     barRefs.current.forEach((bar, i) => {
       if (config.animate) {
-        const maxValue = maxVal
-        // Normalize target to be between 0 and 100
-        const normalizedTarget = (target / maxValue) * 100
-        // Initial state
+        const normalizedTarget = (target / maxVal) * 100
         bar.style.opacity = '0'
         bar.style.transform = `translate(${normalizedTarget / 1.07}%) scale(0, 1)`
-        // Animate to final state
         setTimeout(() => {
-          bar.style.transition = 'all 0.6s ease'
           bar.style.opacity = '1'
           bar.style.transform = 'translate(0) scale(1)'
-        }, 0)
+          bar.style.transition = 'transform 0.5s ease'
+        }, 100)
       } else {
-        // Keep the bar in the final state without animation
+        bar.style.transition = 'none'
+        bar.style.opacity = '0'
+      }
+      if (!config.animate) {
         bar.style.transition = 'none'
         bar.style.opacity = '1'
-        bar.style.transform = 'translate(0) scale(1)'
       }
     })
-  }, [config.animate, animatedChart, target, windowWidth])
+  }, [config.animate, config, animatedChart])
 
   if (!config || config?.series?.length !== 1) return <></>
 
@@ -165,7 +177,10 @@ export default function DeviationBar({ height, xScale, animatedChart }) {
           return (
             <Group key={`deviation-bar-${config.orientation}-${seriesKey}-${index}`}>
               <foreignObject
-                ref={el => (barRefs.current[index] = el)}
+                ref={el => {
+                  // targetRef.current = el
+                  barRefs.current[index] = el
+                }}
                 x={barX}
                 y={barY}
                 width={barWidth}
@@ -193,6 +208,7 @@ export default function DeviationBar({ height, xScale, animatedChart }) {
 
         {shouldShowTargetLine && <Line from={{ x: targetX, y: 0 }} to={{ x: targetX, y: height }} stroke='#333' strokeWidth={2} />}
       </Group>
+      <foreignObject y={height / 2} ref={targetRef}></foreignObject>
     </ErrorBoundary>
   )
 }
