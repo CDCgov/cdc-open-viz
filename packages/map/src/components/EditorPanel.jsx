@@ -1080,8 +1080,8 @@ const EditorPanel = props => {
     strippedState.general = strippedGeneral
 
     // Add columns property back to data if it's there
-    if (state.data.columns) {
-      strippedState.data.columns = state.data.columns
+    if (state.columns) {
+      strippedState.columns = state.columns
     }
 
     return strippedState
