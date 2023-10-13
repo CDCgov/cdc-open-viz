@@ -93,7 +93,7 @@ const SparkLine = props => {
 
   return (
     <ErrorBoundary component='SparkLine'>
-      <svg role='img' aria-label={handleChartAriaLabels(config)} width={width} height={config.heights.vertical} className={'sparkline'} tabIndex={0}>
+      <svg role='img' aria-label={handleChartAriaLabels(config)} width={width} height={100} className={'sparkline'} tabIndex={0}>
         {config.runtime.lineSeriesKeys?.length > 0
           ? config.runtime.lineSeriesKeys
           : config.runtime.seriesKeys.map((seriesKey, index) => (

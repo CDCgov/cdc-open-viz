@@ -247,7 +247,8 @@ const EditorPanel = () => {
     visSupportsBarThickness,
     visSupportsFootnotes,
     visSupportsSuperTitle,
-    visSupportsDataCutoff
+    visSupportsDataCutoff,
+    visSupportsConfigHeight
   } = useEditorPermissions()
 
   // argument acts as props
@@ -1122,7 +1123,7 @@ const EditorPanel = () => {
                   />
                 )}
 
-                {config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
+                {visSupportsConfigHeight() && config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
               </AccordionItemPanel>
             </AccordionItem>
             {config.visualizationType === 'Forest Plot' && <ForestPlotSettings />}

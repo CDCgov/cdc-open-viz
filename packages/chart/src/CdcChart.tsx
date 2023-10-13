@@ -1202,7 +1202,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                       {parse(config.introText)}
                     </section>
                   )}
-                  <div style={{ height: `${config.heights.vertical}px` || '100px', ...sparkLineStyles }}>
+                  <div style={{ height: `100px`, ...sparkLineStyles }}>
                     <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                   </div>
                   {description && (

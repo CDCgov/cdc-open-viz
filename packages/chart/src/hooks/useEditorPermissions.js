@@ -35,7 +35,7 @@ export const useEditorPermissions = () => {
   }
 
   const visHasLabelOnData = () => {
-    const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot']
+    const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot', 'Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -200,6 +200,12 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsConfigHeight = () => {
+    const disabledCharts = ['']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
   return {
     enabledChartTypes,
     visHasLabelOnData,
@@ -227,6 +233,7 @@ export const useEditorPermissions = () => {
     visSupportsBarSpace,
     visSupportsBarThickness,
     visSupportsFootnotes,
-    visSupportsSuperTitle
+    visSupportsSuperTitle,
+    visSupportsConfigHeight
   }
 }
