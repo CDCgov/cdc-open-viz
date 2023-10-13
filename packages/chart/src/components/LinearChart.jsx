@@ -21,7 +21,7 @@ import Forecasting from './Forecasting'
 import LineChart from './LineChart'
 import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
-import useIntersectionObserver from './useIntersectionObserver'
+import useIntersectionObserver from './../hooks/useIntersectionObserver'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'

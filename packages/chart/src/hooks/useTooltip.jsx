@@ -117,8 +117,8 @@ export const useTooltip = props => {
       if (visualizationType === 'Pie') {
         return [
           [config.xAxis.dataKey, pieChartData],
-          [config.runtime.yAxis.dataKey, formatNumber(arc.data[config.runtime.yAxis.dataKey])],
-          ['Percent', `${Math.round((((arc.endAngle - arc.startAngle) * 180) / Math.PI / 360) * 100) + '%'}`]
+          [config.runtime.yAxis.dataKey, formatNumber(arc?.data[config.runtime.yAxis.dataKey])],
+          ['Percent', `${Math.round((((arc?.endAngle - arc?.startAngle) * 180) / Math.PI / 360) * 100) + '%'}`]
         ]
       }
 

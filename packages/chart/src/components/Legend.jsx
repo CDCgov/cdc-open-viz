@@ -180,7 +180,7 @@ const Legend = () => {
             return (
               <div className={innerClasses.join(' ')}>
                 {createLegendLabels(labels).map((label, i) => {
-                  let className = 'legend-item'
+                  let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
                   let itemName = label.datum
 
                   // Filter excluded data keys from legend
@@ -198,12 +198,12 @@ const Legend = () => {
                   }
 
                   if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                    className += ' inactive'
+                    className.push('inactive')
                   }
 
                   return (
                     <LegendItem
-                      className={className}
+                      className={className.join(' ')}
                       tabIndex={0}
                       key={`legend-quantile-${i}`}
                       onKeyPress={e => {
