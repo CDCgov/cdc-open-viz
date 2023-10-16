@@ -146,6 +146,19 @@
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
+    ,
+    {
+      "STATE": "Great Plains Tribal Leaders Health Board",
+      "Rate": 1000,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Montana American Indian Women’s Health Coalition",
+      "Rate": 1000,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
     {
       "STATE": "AK",
       "Rate": 1200,

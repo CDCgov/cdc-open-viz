@@ -1,4 +1,4 @@
-import supportedCountiesJSON from './supported-counties.json';
+import supportedCountiesJSON from './supported-counties.json'
 
 export const supportedStates = {
   // States
@@ -594,6 +594,7 @@ export const supportedCities = {
   'MILWAUKEE': [-87.906471, 43.038902],
   'MINNEAPOLIS': [-93.265015, 44.977753],
   'MODESTO': [-120.9970, 37.6393],
+  'MONTANA AMERICAN INDIAN WOMEN’S HEALTH COALITION': [-112.01823, 46.584223],
   'MONTGOMERY COUNTY, MARYLAND': [-77.199406, 39.153515],
   'NASHVILLE': [-86.781601, 36.162663],
   'NATIVE AMERICAN REHABILITATION ASSOCIATION OF THE NORTHWEST, INC.': [-122.6920, 45.5184],
@@ -671,4 +672,4 @@ export const supportedCities = {
   'YUKON-KUSKOKWIM HEALTH CORPORATION': [-161.7849, 60.7881]
 };
 
-export const supportedCounties = supportedCountiesJSON;
+export const supportedCounties = supportedCountiesJSON

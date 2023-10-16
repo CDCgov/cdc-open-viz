@@ -1,15 +1,17 @@
 import React, { useContext, useState, useEffect, useRef } from 'react'
 import { animated, useTransition, interpolate } from 'react-spring'
-import { Tooltip as ReactTooltip } from 'react-tooltip'
-
-import Pie from '@visx/shape/lib/shapes/Pie'
 import chroma from 'chroma-js'
+
+// visx
+import { Pie } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
-import useIntersectionObserver from './useIntersectionObserver'
+import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 
+// cove
 import ConfigContext from '../ConfigContext'
-
+import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
+import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 const enterUpdateTransition = ({ startAngle, endAngle }) => ({
@@ -17,9 +19,15 @@ const enterUpdateTransition = ({ startAngle, endAngle }) => ({
   endAngle
 })
 
-export default function PieChart() {
-  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels } = useContext(ConfigContext)
-
+const PieChart = props => {
+  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels, isEditor } = useContext(ConfigContext)
+  const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip()
+  const { handleTooltipMouseOver, handleTooltipMouseOff, TooltipListItem } = useCoveTooltip({
+    xScale: false,
+    yScale: false,
+    showTooltip,
+    hideTooltip
+  })
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
 
@@ -29,7 +37,6 @@ export default function PieChart() {
   })
 
   // Make sure the chart is visible if in the editor
-  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const element = document.querySelector('.isEditor')
     if (element) {
@@ -46,7 +53,7 @@ export default function PieChart() {
     }
   }, [dataRef?.isIntersecting, config.animate]) // eslint-disable-line
 
-  function AnimatedPie({ arcs, path, getKey }) {
+  const AnimatedPie = ({ arcs, path, getKey }) => {
     const transitions = useTransition(arcs, getKey, {
       from: enterUpdateTransition,
       enter: enterUpdateTransition,
@@ -54,19 +61,24 @@ export default function PieChart() {
       leave: enterUpdateTransition
     })
 
+    // DEV-5053
+    // onMouseLeave function doesn't work on animated.path for some reason.
+    // As a workaround, we continue to fire the tooltipData while hovered,
+    // and use this useEffect to hide the tooltip so it doesn't persist when users scroll.
+    useEffect(() => {
+      const timeout = setTimeout(() => {
+        hideTooltip()
+      }, 500)
+      return () => {
+        clearTimeout(timeout)
+      }
+    }, [tooltipData])
+
     return (
       <>
-        {transitions.map(({ item: arc, props, key }) => {
-          let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(arc.data[config.runtime.yAxis.dataKey])}` : formatNumber(arc.data[config.runtime.yAxis.dataKey])
-          let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${arc.data[config.runtime.xAxis.dataKey]}` : arc.data[config.runtime.xAxis.dataKey]
-
-          const tooltip = `<div>
-            ${yAxisTooltip}<br />
-            ${xAxisTooltip}<br />
-            Percent: ${Math.round((((arc.endAngle - arc.startAngle) * 180) / Math.PI / 360) * 100) + '%'}
-            `
+        {transitions.map(({ item: arc, props, key }, animatedPieIndex) => {
           return (
-            <Group key={key} style={{ opacity: config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1 ? 0.5 : 1 }}>
+            <Group className={arc.data[config.xAxis.dataKey]} key={`${key}-${animatedPieIndex}`} style={{ opacity: config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1 ? 0.5 : 1 }}>
               <animated.path
                 d={interpolate([props.startAngle, props.endAngle], (startAngle, endAngle) =>
                   path({
@@ -76,8 +88,8 @@ export default function PieChart() {
                   })
                 )}
                 fill={colorScale(arc.data[config.runtime.xAxis.dataKey])}
-                data-tooltip-html={tooltip}
-                data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                onMouseEnter={e => handleTooltipMouseOver(e, { data: arc.data[config.runtime.xAxis.dataKey], arc })}
+                onMouseLeave={e => handleTooltipMouseOff()}
               />
             </Group>
           )
@@ -138,13 +150,30 @@ export default function PieChart() {
     <ErrorBoundary component='PieChart'>
       <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
         <Group top={centerY} left={centerX}>
-          <Pie data={filteredData || data} pieValue={d => d[config.runtime.yAxis.dataKey]} pieSortValues={() => -1} innerRadius={radius - donutThickness} outerRadius={radius}>
-            {pie => <AnimatedPie {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]} />}
+          {/* prettier-ignore */}
+          <Pie
+            data={filteredData || data}
+            pieValue={d => d[config.runtime.yAxis.dataKey]}
+            pieSortValues={() => -1}
+            innerRadius={radius - donutThickness}
+            outerRadius={radius}
+          >
+            {pie => <AnimatedPie {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]}/>}
           </Pie>
         </Group>
       </svg>
       <div ref={triggerRef} />
-      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
+      {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
+        <>
+          <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important`}</style>
+          <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} left={tooltipLeft} top={tooltipTop}>
+            <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
+          </TooltipWithBounds>
+        </>
+      )}
+      {/* <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' /> */}
     </ErrorBoundary>
   )
 }
+
+export default PieChart

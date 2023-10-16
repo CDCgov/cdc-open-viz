@@ -246,7 +246,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let response = configObj || (await (await fetch(configUrl)).json())
 
     // If data is included through a URL, fetch that and store
-    let data: any[] = response.formattedData || response.data || []
+    let data: any[] = response.data || []
 
     const urlFilters = response.filters ? (response.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
 
@@ -283,11 +283,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         console.error(`COVE: Cannot parse URL: ${response.dataUrl}`) // eslint-disable-line
         data = []
       }
+    }
 
-      if (response.dataDescription) {
-        data = transform.autoStandardize(data)
-        data = transform.developerStandardize(data, response.dataDescription)
-      }
+    if (response.dataDescription) {
+      data = transform.autoStandardize(data)
+      data = transform.developerStandardize(data, response.dataDescription)
     }
 
     if (data) {
@@ -1202,7 +1202,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                       {parse(config.introText)}
                     </section>
                   )}
-                  <div style={{ height: `${config.heights.vertical}px` || '100px', ...sparkLineStyles }}>
+                  <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
                     <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                   </div>
                   {description && (

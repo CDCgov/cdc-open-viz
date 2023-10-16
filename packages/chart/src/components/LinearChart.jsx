@@ -21,7 +21,7 @@ import Forecasting from './Forecasting'
 import LineChart from './LineChart'
 import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
-import useIntersectionObserver from './useIntersectionObserver'
+import useIntersectionObserver from './../hooks/useIntersectionObserver'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
@@ -211,7 +211,7 @@ const LinearChart = props => {
   ) : (
     <ErrorBoundary component='LinearChart'>
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
-      <div style={{ width: width, height: height, overflow: 'visible' }}>
+      <div style={{ width: `${width}px`, height: `${height}px`, overflow: 'visible' }} className='tooltip-boundary'>
         <svg width={'100%'} height={'100%'} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} ref={svgRef} style={{ overflow: 'visible' }}>
           <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
           {config.regions
@@ -716,9 +716,12 @@ const LinearChart = props => {
           )}
         </svg>
         {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
-          <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} left={tooltipLeft} top={tooltipTop}>
-            <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
-          </TooltipWithBounds>
+          <>
+            <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important`}</style>
+            <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} left={tooltipLeft} top={tooltipTop}>
+              <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
+            </TooltipWithBounds>
+          </>
         )}
         {(config.orientation === 'horizontal' || config.visualizationType === 'Scatter Plot' || config.visualizationType === 'Box Plot') && (
           <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />
