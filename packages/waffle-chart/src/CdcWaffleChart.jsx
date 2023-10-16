@@ -291,19 +291,19 @@ const WaffleChart = ({ config, isEditor, link }) => {
             {config.visualizationType === 'Gauge' && (
               <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
                 <div className='cove-gauge-chart__chart'>
-                  <div style={dataFontSize}>
+                  <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
                     {prefix ? prefix : ' '}
                     {config.showPercent ? dataPercentage : waffleNumerator}
                     {suffix ? suffix + ' ' : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
                   </div>
-                  <div className='cove-gauge-chart__data--text introText'>{parse(content)}</div>
+                  <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
                   <svg height={gaugeHeight} width={'100%'}>
                     <Group>
                       <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={gaugeWidth} height={gaugeHeight} fill='#fff' />
                       <Bar x={0} y={0} width={xScale(waffleNumerator)} height={gaugeHeight} fill={gaugeColor} />
                     </Group>
                   </svg>
-                  <div className={'cove-gauge-chart__subtext subtext'}>{parse(subtext)}</div>
+                  <div className={'cove-waffle-chart__subtext subtext'}>{parse(subtext)}</div>
                 </div>
               </div>
             )}
