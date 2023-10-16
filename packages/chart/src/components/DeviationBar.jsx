@@ -5,7 +5,7 @@ import ConfigContext from '../ConfigContext'
 import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import chroma from 'chroma-js'
-import useIntersectionObserver from './useIntersectionObserver'
+import useIntersectionObserver from '../hooks/useIntersectionObserver'
 
 export default function DeviationBar({ height, xScale }) {
   const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig, parseDate, formatDate, currentViewport } = useContext(ConfigContext)
