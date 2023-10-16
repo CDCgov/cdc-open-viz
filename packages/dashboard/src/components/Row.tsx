@@ -1,10 +1,7 @@
 import React, { useContext, useState } from 'react'
 
-import { useGlobalContext } from '@cdc/core/components/GlobalContext'
-import ConfigContext from '../ConfigContext'
+import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 
-import Modal from '@cdc/core/components/ui/Modal'
-import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Icon from '@cdc/core/components/ui/Icon'
 
 import Column from './Column'
@@ -16,11 +13,13 @@ import FourEightColIcon from '../images/icon-col-4-8.svg'
 import EightFourColIcon from '../images/icon-col-8-4.svg'
 
 const RowMenu = ({ rowIdx, row }) => {
-  const { overlay } = useGlobalContext()
-  const { rows, config, updateConfig } = useContext(ConfigContext)
-
+  const { config } = useContext(DashboardContext)
+  if (!config) return null
+  const { rows } = config
+  const dispatch = useContext(DashboardDispatchContext)
+  const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
   const getCurr = () => {
-    let res = []
+    let res = [] as Object[]
 
     for (let i = 0; i < row.length; i++) {
       if (row[i].width) res.push(row[i].width)
@@ -30,7 +29,6 @@ const RowMenu = ({ rowIdx, row }) => {
   }
 
   const [curr, setCurr] = useState(getCurr())
-  const [equalHeight, setEqualHeight] = useState(false)
 
   const setRowLayout = layout => {
     const newRows = [...rows]
@@ -64,8 +62,8 @@ const RowMenu = ({ rowIdx, row }) => {
     let calcRowMove = dir === 'down' ? 202 : -202
     let calcRowMove2 = dir === 'down' ? -202 : 202
 
-    let rowEle = document.querySelector("[data-row-id='" + rowIdx + "']")
-    let rowNewEle = document.querySelector("[data-row-id='" + newIdx + "']")
+    let rowEle = document.querySelector("[data-row-id='" + rowIdx + "']") as HTMLElement
+    let rowNewEle = document.querySelector("[data-row-id='" + newIdx + "']") as HTMLElement
 
     rowEle.style.pointerEvents = 'none'
     rowNewEle.style.pointerEvents = 'none'
@@ -80,8 +78,8 @@ const RowMenu = ({ rowIdx, row }) => {
     }, 0)
 
     setTimeout(() => {
-      rowEle.style = null
-      rowNewEle.style = null
+      rowEle.setAttribute('style', '')
+      rowNewEle.setAttribute('style', '')
     }, 500)
   }
 
@@ -89,12 +87,6 @@ const RowMenu = ({ rowIdx, row }) => {
     rows.splice(rowIdx, 1) // Just delete the row. Don't delete the instantiated widgets for now.
 
     updateConfig({ ...config, rows })
-  }
-
-  const rowItemsHeight = () => {
-    setEqualHeight(!equalHeight)
-
-    row.equalHeight = !equalHeight
   }
 
   const layoutList = [
@@ -115,25 +107,12 @@ const RowMenu = ({ rowIdx, row }) => {
     </li>
   ]
 
-  const rowSettings = (
-    <Modal>
-      <Modal.Header>Row Settings</Modal.Header>
-      <Modal.Content>
-        <InputToggle label='Visualizations in this row should be equal height' fieldName={`toggleEqualHeight${rowIdx}`} value={row.equalHeight ? row.equalHeight : false} updateField={rowItemsHeight}></InputToggle>
-      </Modal.Content>
-    </Modal>
-  )
-
   return (
     <nav className='row-menu'>
       <div className='row-menu__btn'>
         <ul className='row-menu__flyout'>{layoutList}</ul>
       </div>
       <div className='spacer'></div>
-      {/*<button className={'row-menu__btn'} title="Row Settings"*/}
-      {/*        onClick={() => overlay?.actions.openOverlay(rowSettings)}>*/}
-      {/*  <Icon display="edit" color="#fff" size={25}/>*/}
-      {/*</button>*/}
       <button className={rowIdx === 0 ? 'row-menu__btn row-menu__btn-disabled' : 'row-menu__btn'} title='Move Row Up' onClick={() => moveRow('up')}>
         <Icon display='caretUp' color='#fff' size={25} />
       </button>

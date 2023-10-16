@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 
-import ConfigContext from '../ConfigContext'
+import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 import type { APIFilter } from '../types/APIFilter'
 import type { SharedFilter } from '../types/SharedFilter'
 
@@ -11,13 +11,13 @@ import Modal from '@cdc/core/components/ui/Modal'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import Select from '@cdc/core/components/ui/Select'
+import { Config } from '../types/Config'
 
 type HeaderProps = {
   setPreview?: any
-  tabSelected: any
-  setTabSelected: any
   back?: any
   subEditor?: any
+  visualizationKey?: string
 }
 
 export const FilterBehavior = {
@@ -26,8 +26,18 @@ export const FilterBehavior = {
 }
 
 const Header = (props: HeaderProps) => {
-  const { setPreview, tabSelected, setTabSelected, back, subEditor } = props
-  const { config, updateConfig, setParentConfig } = useContext(ConfigContext)
+  const { setPreview, visualizationKey, subEditor } = props
+  const [tabSelected, setTabSelected] = useState(0)
+  const { config, setParentConfig } = useContext(DashboardContext)
+  if (!config) return null
+  const dispatch = useContext(DashboardDispatchContext)
+
+  const back = () => {
+    if (!visualizationKey) return
+    const newConfig: Config = { ...config } as Config
+    newConfig.visualizations[visualizationKey].editing = false
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
+  }
 
   const { overlay } = useGlobalContext()
 
@@ -39,8 +49,7 @@ const Header = (props: HeaderProps) => {
     let newConfig = { ...config }
     if (!newConfig[parentObj]) newConfig[parentObj] = {}
     newConfig[parentObj][key] = value
-
-    updateConfig(newConfig)
+    dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig] })
   }
 
   const setTab = index => {
@@ -59,14 +68,14 @@ const Header = (props: HeaderProps) => {
     const newFilter: SharedFilter = { key: 'Dashboard Filter ' + (dashboardConfig.sharedFilters.length + 1) }
     dashboardConfig.sharedFilters.push(newFilter)
 
-    updateConfig({ ...config, dashboard: dashboardConfig })
+    dispatch({ type: 'UPDATE_CONFIG', payload: [{ ...config, dashboard: dashboardConfig }] })
   }
 
   const removeFilter = index => {
     let dashboardConfig = { ...config.dashboard }
     let visualizations = { ...config.visualizations }
 
-    dashboardConfig.sharedFilters.splice(index, 1)
+    dashboardConfig.sharedFilters?.splice(index, 1)
 
     Object.keys(visualizations).forEach(vizKey => {
       if (visualizations[vizKey].visualizationType === 'filter-dropdowns' && visualizations[vizKey].hide && visualizations[vizKey].hide.length > 0) {
@@ -84,11 +93,12 @@ const Header = (props: HeaderProps) => {
     // Ensures URL filters refresh after filter removal
     if (dashboardConfig.datasets) {
       Object.keys(dashboardConfig.datasets).forEach(datasetKey => {
-        dashboardConfig.datasets[datasetKey].runtimeDataUrl = ''
+        dashboardConfig.datasets![datasetKey].runtimeDataUrl = ''
       })
     }
 
-    updateConfig({ ...config, visualizations, dashboard: dashboardConfig })
+    const newConfig = { ...config, visualizations, dashboard: dashboardConfig }
+    dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig] })
 
     overlay?.actions.toggleOverlay()
   }
@@ -124,6 +134,7 @@ const Header = (props: HeaderProps) => {
 
   useEffect(() => {
     const runSetColumns = async () => {
+      if (!config) return
       if (config.filterBehavior === FilterBehavior.Apply) return
       let columns = {}
       let dataKeys = Object.keys(config.datasets)
@@ -163,8 +174,7 @@ const Header = (props: HeaderProps) => {
       let tempConfig = { ...config.dashboard }
       tempConfig.sharedFilters[index] = filter
 
-      updateConfig({ ...config, dashboard: tempConfig })
-
+      dispatch({ type: 'UPDATE_CONFIG', payload: [{ ...config, dashboard: tempConfig }] })
       overlay?.actions.toggleOverlay()
     }
 
@@ -245,7 +255,7 @@ const Header = (props: HeaderProps) => {
                             </option>
                           )
                         }
-                        return <React.Fragment key={datasetKey}></React.Fragment>
+                        return null
                       })}
                     </select>
                   </label>
@@ -451,7 +461,7 @@ const Header = (props: HeaderProps) => {
         <div className='heading-1'>
           Dashboard Editor
           <br />
-          {<input type='text' placeholder='Enter Dashboard Name Here' defaultValue={config?.dashboard?.title} onChange={e => changeConfigValue('dashboard', 'title', e.target.value)} />}
+          {<input type='text' placeholder='Enter Dashboard Name Here' defaultValue={config.dashboard?.title} onChange={e => changeConfigValue('dashboard', 'title', e.target.value)} />}
         </div>
       )}
       {!subEditor && (
@@ -491,7 +501,7 @@ const Header = (props: HeaderProps) => {
             </li>
           </ul>
           <div className='heading-body'>
-            {tabSelected === 0 && <input type='text' className='description-input' placeholder='Type a dashboard description here.' defaultValue={config?.dashboard?.description} onChange={e => changeConfigValue('dashboard', 'description', e.target.value)} />}
+            {tabSelected === 0 && <input type='text' className='description-input' placeholder='Type a dashboard description here.' defaultValue={config.dashboard?.description} onChange={e => changeConfigValue('dashboard', 'description', e.target.value)} />}
             {tabSelected === 1 && (
               <>
                 {config.dashboard.sharedFilters &&
@@ -517,13 +527,14 @@ const Header = (props: HeaderProps) => {
                   label='Filter Behavior'
                   initial='- Select Option -'
                   onchange={e => {
-                    updateConfig({ ...config, filterBehavior: e.target.value })
+                    const newConfig = { ...config, filterBehavior: e.target.value }
+                    dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig] })
                   }}
                   options={Object.values(FilterBehavior)}
                   tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>
-                        <Icon display='question' base='' size='' color='' style={{ marginLeft: '0.5rem' }} />
+                        <Icon display='question' color='' style={{ marginLeft: '0.5rem' }} />
                       </Tooltip.Target>
                       <Tooltip.Content>
                         <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
@@ -548,17 +559,6 @@ const Header = (props: HeaderProps) => {
                   </label>
                   <br />
                 </div>
-
-                {/* <div className="wrap">
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.downloadPdfButton} onChange={e => changeConfigValue('table', 'downloadPdfButton', e.target.checked)} />
-                    Show PDF Button
-                  </label>
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.downloadImageButton} onChange={e => changeConfigValue('table', 'downloadImageButton', e.target.checked)} />
-                    Show Image Button
-                  </label>
-                </div> */}
 
                 <div className='wrap'>
                   <label>
