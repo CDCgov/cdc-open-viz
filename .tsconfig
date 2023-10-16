@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        "react": ["./node_modules/@types/react"],
+        "jsx": "react"
+    },
+    "include": ["./custom.d.ts"]
+}
