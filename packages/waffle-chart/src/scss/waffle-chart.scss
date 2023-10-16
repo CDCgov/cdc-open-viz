@@ -43,14 +43,19 @@
       flex-direction: column;
       justify-items: center;
       align-items: flex-start;
+
+      & > svg {
+        margin: 0.7em 0;
+      }
     }
 
-    // &__subtext {
-    //   font-size: 0.75em;
-    // }
+    &__subtext {
+      font-style: italic;
+      font-size: 0.9em !important;
+    }
     &__text {
       line-height: 1.25em;
-      width: 100%;
+      font-weight: 400;
     }
   }
 
@@ -118,36 +123,30 @@
 @at-root {
   .cove-waffle-chart.font-small,
   .cove-gauge-chart.font-small #{&} {
-    .cove-waffle-chart__data--primary,
-    .cove-gauge-chart__data--primary {
+    .cove-waffle-chart__data--primary {
       font-size: 35px;
     }
-    .cove-waffle-chart__data--text,
-    .cove-gauge-chart__data--text {
+    .cove-waffle-chart__data--text {
       font-size: 14px;
     }
   }
 
   .cove-waffle-chart.font-medium,
   .cove-gauge-chart.font-medium #{&} {
-    .cove-waffle-chart__data--primary,
-    .cove-gauge-chart__data--primary {
+    .cove-waffle-chart__data--primary {
       font-size: 50px;
     }
-    .cove-waffle-chart__data--text,
-    .cove-gauge-chart__data--text {
+    .cove-waffle-chart__data--text {
       font-size: 18px;
     }
   }
 
   .cove-waffle-chart.font-large,
   .cove-gauge-chart.font-large #{&} {
-    .cove-waffle-chart__data--primary,
-    .cove-gauge-chart__data--primary {
+    .cove-waffle-chart__data--primary {
       font-size: 80px;
     }
-    .cove-waffle-chart__data--text,
-    .cove-gauge-chart__data--text {
+    .cove-waffle-chart__data--text {
       font-size: 20px;
     }
   }
