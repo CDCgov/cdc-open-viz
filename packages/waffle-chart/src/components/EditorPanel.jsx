@@ -418,7 +418,7 @@ const EditorPanel = memo(props => {
               <InputText type='number' value={config.fontSize} fieldName='fontSize' updateField={updateField} />
             </div>
             <div className='cove-accordion__panel-col' style={{ display: 'flex', alignItems: 'center' }}>
-              <label className='accordion__panel-label--muted'> {config.visualizationType === 'Gauge' ? ' default (16px)' : ' default (50px)'}</label>
+              <label className='accordion__panel-label--muted'> default (50px)</label>
             </div>
           </div>
         </div>
