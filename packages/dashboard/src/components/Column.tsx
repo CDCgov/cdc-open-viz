@@ -1,11 +1,11 @@
 import React, { useContext } from 'react'
 import { useDrop } from 'react-dnd'
 
-import ConfigContext from '../ConfigContext'
+import { DashboardContext } from '../DashboardContext'
 import Widget from './Widget'
 
 const Column = ({ data, rowIdx, colIdx }) => {
-  const { visualizations } = useContext(ConfigContext)
+  const { config } = useContext(DashboardContext)
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: 'vis-widget',
@@ -21,7 +21,7 @@ const Column = ({ data, rowIdx, colIdx }) => {
     })
   }))
 
-  const widget = data.widget ? visualizations[data.widget] : null
+  const widget = data.widget ? config?.visualizations[data.widget] : null
   if (widget && !widget.uid) widget.uid = data.widget
 
   let classNames = ['builder-column', 'column-size--' + data.width]

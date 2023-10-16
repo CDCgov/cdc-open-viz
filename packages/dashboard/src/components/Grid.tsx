@@ -1,19 +1,18 @@
 import React, { useContext } from 'react'
 import Row from './Row'
 
-import ConfigContext from '../ConfigContext'
+import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 
 const Grid = () => {
-  const { rows, config, updateConfig } = useContext(ConfigContext)
-
+  const { config } = useContext(DashboardContext)
+  if (!config) return null
+  const rows = config.rows
+  const dispatch = useContext(DashboardDispatchContext)
+  const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
   const addRow = () => {
     updateConfig({
       ...config,
-      rows: [
-        ...rows,
-        [{ width: 12 }, { equalHeight: false }, {}, {}]
-        //[{width: 12}, {}, {}]      ],
-      ],
+      rows: [...rows, [{ width: 12 }, { equalHeight: false }, {}, {}]],
       uuid: Date.now()
     })
   }
