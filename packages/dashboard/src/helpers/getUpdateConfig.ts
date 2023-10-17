@@ -1,11 +1,13 @@
-import { DashboardState } from "../store/dashboard.reducer"
-import { Config } from "../types/Config"
-import { filterData } from "./filterData"
-import { generateValuesForFilter } from "./generateValuesForFilter"
-import { getFormattedData } from "./getFormattedData"
-import { getVizKeys } from "./getVizKeys"
+import { DashboardState } from '../store/dashboard.reducer'
+import { Config } from '../types/Config'
+import { filterData } from './filterData'
+import { generateValuesForFilter } from './generateValuesForFilter'
+import { getFormattedData } from './getFormattedData'
+import { getVizKeys } from './getVizKeys'
 
-export const getUpdateConfig = (state: DashboardState) => (newConfig, dataOverride?: Object): [Config, Object] => {
+export const getUpdateConfig =
+  (state: DashboardState) =>
+  (newConfig, dataOverride?: Object): [Config, Object] => {
     let newFilteredData = {}
     let visualizationKeys = getVizKeys(newConfig)
     const setFilter = (filterIndex: number, key: string, value: any) => {
