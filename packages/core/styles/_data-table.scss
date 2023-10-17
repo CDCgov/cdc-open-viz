@@ -35,7 +35,8 @@ table.horizontal {
     display: flex;
   }
 
-  th, td {
+  th,
+  td {
     min-width: 200px;
   }
 }
@@ -118,14 +119,14 @@ table.data-table {
 
     // format the white triangle sort icon in data table headers
     .sort-icon {
-    fill: white;
-    width: 30px;
-    float: right;
-    align-self: center;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+      fill: white;
+      width: 30px;
+      float: right;
+      align-self: center;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
     th:last-child,
@@ -165,7 +166,12 @@ table.data-table {
       border-right: 0 !important;
     }
   }
-
+  tr {
+    display: flex;
+    & > * {
+      width: 100%;
+    }
+  }
   th {
     flex-grow: 1;
   }
