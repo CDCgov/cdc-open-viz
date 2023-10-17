@@ -10,10 +10,8 @@ import { AreaClosed, LinePath, Bar } from '@visx/shape'
 import { Group } from '@visx/group'
 import { bisector } from 'd3-array'
 
-const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, chartRef, handleTooltipMouseOver, handleTooltipMouseOff, tooltipData, isDebug, isBrush, brushData, children }) => {
-  // enable various console logs in the file
-  const DEBUG = isDebug
-
+const AreaChart = props => {
+  const { xScale, yScale, yMax, xMax, handleTooltipMouseOver, handleTooltipMouseOff, isDebug, isBrush, brushData, children } = props
   // import data from context
   let { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale, rawData } = useContext(ConfigContext)
 
@@ -23,7 +21,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
   if (isBrush && isDebug) console.log('###AREAchart BRUSH data, xScale, yScale, yMax, xMax', data, xScale, yScale, yMax, xMax)
 
   // Draw transparent bars over the chart to get tooltip data
-  // Turn DEBUG on for additional context.
+  // Turn isDebug on for additional context.
   if (!data) return
 
   // Tooltip helper for getting data to the closest date/category hovered.
@@ -98,29 +96,29 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
                 <React.Fragment key={index}>
                   {/* prettier-ignore */}
                   <LinePath
-                  data={seriesData}
-                  x={d => handleX(d)}
-                  y={d => handleY(d, index, s)}
-                  stroke={displayArea ?  colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
-                  strokeWidth={2}
-                  strokeOpacity={1}
-                  shapeRendering='geometricPrecision'
-                  curve={curveType}
-                  strokeDasharray={s.type ? handleLineType(s.type) : 0}
-                />
+                    data={seriesData}
+                    x={d => handleX(d)}
+                    y={d => handleY(d, index, s)}
+                    stroke={displayArea ?  colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
+                    strokeWidth={2}
+                    strokeOpacity={1}
+                    shapeRendering='geometricPrecision'
+                    curve={curveType}
+                    strokeDasharray={s.type ? handleLineType(s.type) : 0}
+                  />
 
                   {/* prettier-ignore */}
                   <AreaClosed
-                  key={'area-chart'}
-                  fill={displayArea ? colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
-                  fillOpacity={transparentArea ? 0.25 : 0.5}
-                  data={seriesData}
-                  x={d => handleX(d)}
-                  y={d => handleY(d, index, s)}
-                  yScale={yScale}
-                  curve={curveType}
-                  strokeDasharray={s.type ? handleLineType(s.type) : 0}
-                />
+                    key={'area-chart'}
+                    fill={displayArea ? colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
+                    fillOpacity={transparentArea ? 0.25 : 0.5}
+                    data={seriesData}
+                    x={d => handleX(d)}
+                    y={d => handleY(d, index, s)}
+                    yScale={yScale}
+                    curve={curveType}
+                    strokeDasharray={s.type ? handleLineType(s.type) : 0}
+                  />
                   {getFirstBrushHandleOnly(children, index)}
                 </React.Fragment>
               )
@@ -128,7 +126,7 @@ const AreaChart = ({ xScale, yScale, yMax, xMax, getXAxisData, getYAxisData, cha
 
             {/* Transparent bar for tooltips - disable if AreaChart is a brush */}
             {/* prettier-ignore */}
-            {!isBrush && <Bar width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />}
+            {!isBrush && <Bar width={Number(xMax)} height={Number(yMax)} fill={isDebug ? 'red' : 'transparent'} fillOpacity={0.05} style={isDebug ? { stroke: 'black', strokeWidth: 2 } : {}} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />}
           </Group>
         </ErrorBoundary>
       </svg>

@@ -11,9 +11,6 @@ import { Group } from '@visx/group'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, handleTooltipMouseOff, isDebug, isBrush }) => {
-  // enable various console logs in the file
-  const DEBUG = isDebug
-
   // import data from context
   let { transformedData: data, config, seriesHighlight, colorScale, rawData } = useContext(ConfigContext)
 
@@ -36,7 +33,14 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
       <svg height={Number(yMax)}>
         <ErrorBoundary component='AreaChartStacked'>
           <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size) + strokeWidth / 2} height={Number(yMax)} style={{ overflow: 'hidden' }}>
-            <AreaStack data={data} keys={config.runtime.seriesKeys} x0={d => handleDateCategory(d.data[config.xAxis.dataKey])} y0={d => Number(yScale(d[0]))} y1={d => Number(yScale(d[1]))} curve={allCurves[approvedCurveTypes[config.stackedAreaChartLineType]]}>
+            <AreaStack
+              data={data}
+              keys={config.runtime.areaSeriesKeys.map(s => s.dataKey) || config.series.map(s => s.dataKey)}
+              x0={d => handleDateCategory(d.data[config.xAxis.dataKey])}
+              y0={d => Number(yScale(d[0]))}
+              y1={d => Number(yScale(d[1]))}
+              curve={allCurves[approvedCurveTypes[config.stackedAreaChartLineType]]}
+            >
               {({ stacks, path }) => {
                 return stacks.map((stack, stackIndex) => {
                   let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(stack.key) === -1
@@ -58,7 +62,7 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
             </AreaStack>
 
             {/* prettier-ignore */}
-            {!isBrush && <Bar width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />}
+            {!isBrush && <Bar width={Number(xMax)} height={Number(yMax)} fill={isDebug ? 'red' : 'transparent'} fillOpacity={0.05} style={isDebug ? { stroke: 'black', strokeWidth: 2 } : {}} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />}
           </Group>
         </ErrorBoundary>
       </svg>
