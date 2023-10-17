@@ -28,7 +28,7 @@
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
     "@types/resize-observer-browser": "^0.1.5",
-    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
     "@visx/group": "^3.0.0",
     "@visx/heatmap": "^3.0.0",
     "@visx/scale": "^3.0.0",
@@ -46,7 +46,7 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.21.5",
-    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-storybook": "^0.6.11",
     "gh-pages": "^5.0.0",
     "html-react-parser": "^3.0.8",
@@ -88,7 +88,7 @@
   "lint-staged": {
     "./packages/*/src/**/*.{js,jsx,ts,tsx}": [
       "npx prettier --write",
-      "eslint --config .eslintrc.js"
+      "eslint --config .eslintrc.json"
     ]
   },
   "scripts": {
@@ -103,7 +103,8 @@
     "@visx/brush": "^3.0.1",
     "@visx/legend": "^3.0.0",
     "@visx/pattern": "^3.0.0",
-    "@visx/responsive": "^2.10.0"
+    "@visx/responsive": "^2.10.0",
+    "eslint-plugin-typescript": "^0.14.0"
   },
   "resolutions": {
     "jackspeak": "2.1.1"

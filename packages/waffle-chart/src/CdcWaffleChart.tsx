@@ -20,24 +20,23 @@ import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
+import { Config } from './types/Config'
+import { useWaffleChart } from './hooks/useWaffleChart'
+
 import './scss/main.scss'
 
-const themeColor = {
-  'theme-blue': '#005eaa',
-  'theme-purple': '#712177',
-  'theme-brown': '#705043',
-  'theme-teal': '#00695c',
-  'theme-pink': '#af4448',
-  'theme-orange': '#bb4d00',
-  'theme-slate': '#29434e',
-  'theme-indigo': '#26418f',
-  'theme-cyan': '#006778',
-  'theme-green': '#4b830d',
-  'theme-amber': '#fbab18'
+type CdcWaffleChartTypes = {
+  configUrl?: string
+  config?: Config
+  isDashboard?: boolean
+  isEditor?: boolean
+  link?: string
+  setConfig?: Function
 }
 
-const WaffleChart = ({ config, isEditor, link }) => {
-  let { title, theme, shape, nodeWidth, nodeSpacer, prefix, suffix, subtext, content, orientation, filters, dataColumn, dataFunction, dataConditionalColumn, dataConditionalOperator, dataConditionalComparate, customDenom, dataDenom, dataDenomColumn, dataDenomFunction, roundToPlace } = config
+const WaffleChart = ({ config, isEditor, link = '' }) => {
+  const { title, theme, shape, nodeWidth, nodeSpacer, prefix, suffix, subtext, content, orientation, filters, dataColumn, dataFunction, dataConditionalColumn, dataConditionalOperator, dataConditionalComparate, customDenom, dataDenom, dataDenomColumn, dataDenomFunction, roundToPlace } = config
+  const { themeColor, gaugeHeight, gaugeWidth, gaugeColor, dataFontSize, handleWaffleChartAriaLabel } = useWaffleChart(config)
 
   const calculateData = useCallback(() => {
     //If either the column or function aren't set, do not calculate
@@ -253,30 +252,12 @@ const WaffleChart = ({ config, isEditor, link }) => {
     return nodeWidth * 10 + nodeSpacer * 9
   }, [nodeWidth, nodeSpacer])
 
-  let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
-
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
-
-  const handleWaffleChartAriaLabel = (state, testing = false) => {
-    if (testing) console.log(`handleWaffleChartAriaLabels Testing On:`, state)
-    try {
-      let ariaLabel = 'Waffle chart'
-      if (state.title) {
-        ariaLabel += ` with the title: ${state.title}`
-      }
-      return ariaLabel
-    } catch (e) {
-      console.error(e.message)
-    }
-  }
-  const gaugeWidth = '100%'
-  const gaugeHeight = 35
 
   const xScale = scaleLinear({
     domain: [0, waffleDenominator],
     range: [0, gaugeWidth]
   })
-  const gaugeColor = themeColor[theme]
 
   return (
     <div className={innerContainerClasses.join(' ')}>
@@ -338,7 +319,7 @@ const WaffleChart = ({ config, isEditor, link }) => {
   )
 }
 
-const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
+const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }: CdcWaffleChartTypes): React.ReactComponentElement => {
   // Default States
   const [config, setConfig] = useState({ ...defaults })
   const [loading, setLoading] = useState(true)

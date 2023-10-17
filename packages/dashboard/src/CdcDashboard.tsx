@@ -48,8 +48,6 @@ type APIFilterDropdowns = {
   [filtername: string]: null | DropdownOptions
 }
 
-/* eslint-disable react-hooks/exhaustive-deps */
-
 type CdcDashboardTypes = {
   configUrl: string
   config?: Config
@@ -1000,7 +998,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           </section>
 
           {/* Data Table */}
-          {config.table && config.data &&
+          {config.table && config.data && (
             <DataTable
               config={config}
               rawData={config.data}
@@ -1015,7 +1013,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               isDebug={isDebug}
               isEditor={isEditor}
             />
-          }
+          )}
           {config.table &&
             config.datasets &&
             Object.keys(config.datasets).map(datasetKey => {
