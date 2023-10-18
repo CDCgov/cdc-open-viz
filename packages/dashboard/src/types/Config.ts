@@ -1,6 +1,6 @@
 import { DataSet } from './DataSet'
 import { SharedFilter } from './SharedFilter'
-import { Visualization } from '@cdc/core/types/Visualization.ts'
+import { Visualization } from '@cdc/core/types/Visualization'
 
 export type Config = DataSet & {
   dashboard: {
