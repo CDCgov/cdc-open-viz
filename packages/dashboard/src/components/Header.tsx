@@ -27,11 +27,10 @@ export const FilterBehavior = {
 
 const Header = (props: HeaderProps) => {
   const { setPreview, visualizationKey, subEditor } = props
-  const [tabSelected, setTabSelected] = useState(0)
-  const { config, setParentConfig } = useContext(DashboardContext)
+  const { config, setParentConfig, tabSelected } = useContext(DashboardContext)
   if (!config) return null
   const dispatch = useContext(DashboardDispatchContext)
-
+  const setTabSelected = (payload: number) => dispatch({ type: 'SET_TAB_SELECTED', payload })
   const back = () => {
     if (!visualizationKey) return
     const newConfig: Config = { ...config } as Config
