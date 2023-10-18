@@ -8,14 +8,19 @@ type ConfigCTX = DashboardState & {
   isDebug: boolean
 }
 
+export const initialState = {
+  data: {},
+  loading: false,
+  filteredData: {},
+  preview: false,
+  tabSelected: 0
+}
+
 const initialContext: ConfigCTX = {
   outerContainerRef: () => {},
   setParentConfig: () => {},
   isDebug: false,
-  data: {},
-  filteredData: {},
-  loading: true,
-  preview: false
+  ...initialState
 }
 
 export const DashboardContext = createContext<ConfigCTX>(initialContext)

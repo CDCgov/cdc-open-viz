@@ -12,7 +12,7 @@ import parse from 'html-react-parser'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
-import { DashboardContext, DashboardDispatchContext } from './DashboardContext'
+import { DashboardContext, DashboardDispatchContext, initialState } from './DashboardContext'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 import Loading from '@cdc/core/components/Loading'
@@ -63,7 +63,7 @@ type CdcDashboardTypes = {
 }
 
 export default function CdcDashboard({ configUrl = '', config: configObj, isEditor = false, isDebug = false, setConfig: setParentConfig }: CdcDashboardTypes) {
-  const [state, dispatch] = useReducer(dashboardReducer, { config: configObj, data: {}, loading: false, filteredData: {}, preview: false })
+  const [state, dispatch] = useReducer(dashboardReducer, { config: configObj, ...initialState })
   const [apiFilterDropdowns, setAPIFilterDropdowns] = useState<APIFilterDropdowns>({})
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
