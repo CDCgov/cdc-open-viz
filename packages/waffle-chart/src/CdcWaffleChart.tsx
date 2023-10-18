@@ -1,27 +1,27 @@
-import React, { useCallback, useEffect, useState, useReducer } from 'react'
-import parse from 'html-react-parser'
-import { Group } from '@visx/group'
+import React, { useCallback, useEffect, useReducer } from 'react'
+
+// visx
 import { Circle, Bar } from '@visx/shape'
+import { Group } from '@visx/group'
 import { scaleLinear } from '@visx/scale'
 
+// external
+import parse from 'html-react-parser'
 import ResizeObserver from 'resize-observer-polyfill'
-import getViewport from '@cdc/core/helpers/getViewport'
-import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import Loading from '@cdc/core/components/Loading'
-
-import ConfigContext from './ConfigContext'
-import EditorPanel from './components/EditorPanel'
-import defaults from './data/initial-state'
-
-import { publish } from '@cdc/core/helpers/events'
-
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-
+// cdc
 import { Config } from './types/Config'
+import { publish } from '@cdc/core/helpers/events'
 import chartReducer from './store/chart.reducer'
+import ConfigContext from './ConfigContext'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import defaults from './data/initial-state'
+import EditorPanel from './components/EditorPanel'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import getViewport from '@cdc/core/helpers/getViewport'
+import Loading from '@cdc/core/components/Loading'
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import './scss/main.scss'
 
