@@ -2,7 +2,7 @@ export type Visualization = {
   visualizationType: string
   dataKey: string
   formattedData: any
-  dataDescription: string
+  dataDescription: Object
   data: any
   originalFormattedData: any
   editing: boolean
