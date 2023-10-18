@@ -11,6 +11,7 @@
     "plugin:jsx-a11y/recommended",
     "prettier",
     "plugin:react-hooks/recommended"
+    // "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
     "import/no-named-as-default": 0,
