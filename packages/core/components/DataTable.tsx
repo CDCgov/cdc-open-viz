@@ -1,6 +1,5 @@
 import React, { useEffect, useState, memo, useMemo } from 'react'
 
-import Papa from 'papaparse'
 import ExternalIcon from '../assets/external-link.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 
@@ -12,6 +11,7 @@ import { parseDate, formatDate } from '@cdc/core/helpers/cove/date'
 import { formatNumber } from '@cdc/core/helpers/cove/number'
 
 import Loading from '@cdc/core/components/Loading'
+import DownloadButton from './DownloadButton'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
@@ -28,11 +28,9 @@ const DataTable = props => {
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
-  const [sortBy, setSortBy] = useState({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
+  const [sortBy, setSortBy] = useState<any>({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
-
-  const fileName = `${vizTitle || 'data-table'}.csv`
 
   const isVertical = !(config.type === 'chart' && !config.table?.showVertical)
 
@@ -94,7 +92,7 @@ const DataTable = props => {
           className='table-link'
           title='Click for more information (Opens in a new window)'
           role='link'
-          tabIndex='0'
+          tabIndex={0}
           onKeyDown={e => {
             if (e.keyCode === 13) {
               navigationHandler(row[columns.navigate.name])
@@ -119,38 +117,6 @@ const DataTable = props => {
     us: 'United States Map',
     world: 'World Map'
   }
-
-  const DownloadButton = memo(() => {
-    if (rawData !== undefined) {
-      let csvData
-      // only use fullGeoName on County maps and no other
-      if (config.general?.geoType === 'us-county') {
-        // Unparse + Add column for full Geo name along with State
-        csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row })))
-      } else {
-        // Just Unparse
-        csvData = Papa.unparse(rawData)
-      }
-
-      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
-
-      const saveBlob = () => {
-        //@ts-ignore
-        if (typeof window.navigator.msSaveBlob === 'function') {
-          //@ts-ignore
-          navigator.msSaveBlob(blob, fileName)
-        }
-      }
-
-      return (
-        <a download={fileName} type='button' onClick={saveBlob} href={URL.createObjectURL(blob)} aria-label='Download this data in a CSV file format.' className={`${headerColor} no-border`} id={`${skipId}`} data-html2canvas-ignore role='button'>
-          Download Data (CSV)
-        </a>
-      )
-    } else {
-      return <></>
-    }
-  }, [rawData])
 
   // Change accessibility label depending on expanded status
   useEffect(() => {
@@ -236,7 +202,7 @@ const DataTable = props => {
               }
 
               return (
-                <td tabIndex='0' role='gridcell' onClick={e => (config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}>
+                <td tabIndex={0} role='gridcell'>
                   {cellValue}
                 </td>
               )
@@ -276,9 +242,11 @@ const DataTable = props => {
     return tmpSeriesColumns
   }
   const dataSeriesColumnsSorted = () => {
+    if (!sortBy && sortBy.colIndex === null) return dataSeriesColumns()
     return dataSeriesColumns().sort((a, b) => {
       if (sortBy.column === '__series__') return customSort(a, b)
       let row = runtimeData.find(d => d[config.xAxis?.dataKey] === sortBy.column)
+
       const rowIndex = runtimeData[sortBy.colIndex - 1]
       if (row) {
         return customSort(row[a], row[b])
@@ -326,7 +294,7 @@ const DataTable = props => {
             return (
               <th
                 key={`col-header-${column}__${index}`}
-                tabIndex='0'
+                tabIndex={0}
                 title={text}
                 role='columnheader'
                 scope='col'
@@ -335,7 +303,6 @@ const DataTable = props => {
                 }}
                 onKeyDown={e => {
                   if (e.keyCode === 13) {
-                    setColIndex(index)
                     setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false, colIndex: index })
                   }
                 }}
@@ -362,7 +329,7 @@ const DataTable = props => {
             return (
               <th
                 key={`col-header-${text}__${index}`}
-                tabIndex='0'
+                tabIndex={0}
                 title={text}
                 role='columnheader'
                 scope='col'
@@ -443,7 +410,7 @@ const DataTable = props => {
 
   const getChartCell = (row, column) => {
     return (
-      <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime?.originalXAxis?.dataKey]}--${row}`}>
+      <td tabIndex={0} role='gridcell' id={`${runtimeData[config.runtime?.originalXAxis?.dataKey]}--${row}`}>
         {getChartCellValue(row, column)}
       </td>
     )
@@ -495,7 +462,7 @@ const DataTable = props => {
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
-    overflowY: 'scroll',
+    OverflowY: 'scroll',
     marginBottom: '33px'
   }
 
@@ -537,7 +504,7 @@ const DataTable = props => {
                 <th
                   key={`col-header-${column}__${index}`}
                   id={column}
-                  tabIndex='0'
+                  tabIndex={0}
                   title={text}
                   role='columnheader'
                   scope='col'
@@ -564,11 +531,21 @@ const DataTable = props => {
       )
     }
 
+    const getDownloadData = () => {
+      // only use fullGeoName on County maps and no other
+      if (config.general?.geoType === 'us-county') {
+        // Add column for full Geo name along with State
+        return rawData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row }))
+      } else {
+        return rawData
+      }
+    }
+
     return (
       <ErrorBoundary component='DataTable'>
         <MediaControls.Section classes={['download-links']}>
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />
-          {(config.table.download || config.general?.showDownloadButton) && <DownloadButton />}
+          {(config.table.download || config.general?.showDownloadButton) && <DownloadButton rawData={getDownloadData()} fileName={`${vizTitle || 'data-table'}.csv`} headerColor={headerColor} skipId={skipId} />}
         </MediaControls.Section>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
@@ -579,7 +556,7 @@ const DataTable = props => {
             onClick={() => {
               setExpanded(!expanded)
             }}
-            tabIndex='0'
+            tabIndex={0}
             onKeyDown={e => {
               if (e.keyCode === 13) {
                 setExpanded(!expanded)
@@ -590,7 +567,7 @@ const DataTable = props => {
             {tableTitle}
           </div>
           <div className='table-container' style={limitHeight}>
-            <table height={expanded ? null : 0} role='table' aria-live='assertive' className={`${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`} hidden={!expanded} aria-rowcount={config?.data?.length ? config.data.length : '-1'}>
+            <table role='table' aria-live='assertive' className={`${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`} hidden={!expanded} aria-rowcount={config?.data?.length ? config.data.length : '-1'}>
               <caption className='cdcdataviz-sr-only'>{caption}</caption>
               <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{config.type === 'map' ? genMapHeader(columns) : genChartHeader(columns, runtimeData)}</thead>
               <tbody>{config.type === 'map' ? genMapRows(rows) : genChartRows(rows)}</tbody>
@@ -638,7 +615,7 @@ const DataTable = props => {
         <tr>
           {columns.map(column => {
             return (
-              <th key={`col-header-${column}`} tabIndex='0' title={column} role='columnheader' scope='col'>
+              <th key={`col-header-${column}`} tabIndex={0} title={column} role='columnheader' scope='col'>
                 {column}
               </th>
             )
@@ -706,7 +683,7 @@ const DataTable = props => {
                 cellValue = resolveCell(index, config.boxplot.plots[colnum - 1])
               }
               return (
-                <td tabIndex='0' key={`tbody__tr__td-${index}`} className='boxplot-td' role='gridcell'>
+                <td tabIndex={0} key={`tbody__tr__td-${index}`} className='boxplot-td' role='gridcell'>
                   {cellValue}
                 </td>
               )
@@ -718,12 +695,6 @@ const DataTable = props => {
     }
     return (
       <ErrorBoundary component='DataTable'>
-        {/* cove media results in error so disabling for now (TT)
-        <MediaControls.Section classes={['download-links']}>
-          <MediaControls.Link config={config} />
-          {config.general.showDownloadButton && <DownloadButton />}
-        </MediaControls.Section>
-        */}
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
             Skip Navigation or Skip to Content
@@ -733,7 +704,7 @@ const DataTable = props => {
             onClick={() => {
               setExpanded(!expanded)
             }}
-            tabIndex='0'
+            tabIndex={0}
             onKeyDown={e => {
               if (e.keyCode === 13) {
                 setExpanded(!expanded)
@@ -744,7 +715,7 @@ const DataTable = props => {
             {tableTitle}
           </div>
           <div className='table-container' style={limitHeight}>
-            <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={'11'}>
+            <table role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={11}>
               <caption className='cdcdataviz-sr-only'>{caption}</caption>
               <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{genBoxplotHeader(config.boxplot.categories)}</thead>
               <tbody>{genBoxplotRows(tableData)}</tbody>
