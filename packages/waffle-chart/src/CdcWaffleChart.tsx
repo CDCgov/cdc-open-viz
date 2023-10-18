@@ -25,7 +25,7 @@ import { useWaffleChart } from './hooks/useWaffleChart'
 
 import './scss/main.scss'
 
-type CdcWaffleChartTypes = {
+type CdcWaffleChartProps = {
   configUrl?: string
   config?: Config
   isDashboard?: boolean
@@ -319,7 +319,7 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
   )
 }
 
-const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }: CdcWaffleChartTypes): React.ReactComponentElement => {
+const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }: CdcWaffleChartProps) => {
   // Default States
   const [config, setConfig] = useState({ ...defaults })
   const [loading, setLoading] = useState(true)
