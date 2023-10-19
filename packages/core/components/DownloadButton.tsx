@@ -1,5 +1,4 @@
 import Papa from 'papaparse'
-import React from 'react'
 
 type DownloadButtonProps = {
   rawData: Object
