@@ -56,33 +56,33 @@ const DataTable = props => {
 
       if (dateB && dateB.getTime) dateB = dateB.getTime()
 
-      return sortBy.asc ? dateA - dateB : dateB - dateA
+      return !sortBy.asc ? dateA - dateB : dateB - dateA
     }
     // Check if values are numbers
     const isNumA = !isNaN(Number(valueA)) && valueA !== undefined && valueA !== null && trimmedA !== ''
     const isNumB = !isNaN(Number(valueB)) && valueB !== undefined && valueB !== null && trimmedB !== ''
 
     // Handle empty strings or spaces
-    if (trimmedA === '' && trimmedB !== '') return sortBy.asc ? -1 : 1
-    if (trimmedA !== '' && trimmedB === '') return sortBy.asc ? 1 : -1
+    if (trimmedA === '' && trimmedB !== '') return !sortBy.asc ? -1 : 1
+    if (trimmedA !== '' && trimmedB === '') return !sortBy.asc ? 1 : -1
 
     // Both are numbers: Compare numerically
     if (isNumA && isNumB) {
-      return sortBy.asc ? Number(valueA) - Number(valueB) : Number(valueB) - Number(valueA)
+      return !sortBy.asc ? Number(valueA) - Number(valueB) : Number(valueB) - Number(valueA)
     }
 
     // Only A is a number
     if (isNumA) {
-      return sortBy.asc ? -1 : 1
+      return !sortBy.asc ? -1 : 1
     }
 
     // Only B is a number
     if (isNumB) {
-      return sortBy.asc ? 1 : -1
+      return !sortBy.asc ? 1 : -1
     }
 
     // Neither are numbers: Compare as strings
-    return sortBy.asc ? trimmedA.localeCompare(trimmedB) : trimmedB.localeCompare(trimmedA)
+    return !sortBy.asc ? trimmedA.localeCompare(trimmedB) : trimmedB.localeCompare(trimmedA)
   }
 
   // Optionally wrap cell with anchor if config defines a navigation url
@@ -335,7 +335,6 @@ const DataTable = props => {
                 }}
                 onKeyDown={e => {
                   if (e.keyCode === 13) {
-                    setColIndex(index)
                     setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false, colIndex: index })
                   }
                 }}
