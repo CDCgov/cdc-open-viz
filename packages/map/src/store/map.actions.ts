@@ -7,6 +7,7 @@ type SET_RUNTIME_FILTERS = Action<'SET_RUNTIME_FILTERS', Object[]>
 type SET_RUNTIME_LEGEND = Action<'SET_RUNTIME_LEGEND', Object[]>
 type SET_ACCESSIBLE_STATUS = Action<'SET_ACCESSIBLE_STATUS', string>
 type SET_MODAL = Action<'SET_MODAL', any>
+type SET_FILTERED_COUNTRY_CODE = Action<'SET_FILTERED_COUNTRY_CODE', string>
 
 // prettier-ignore
 type MapActions =
@@ -17,5 +18,6 @@ type MapActions =
   | SET_RUNTIME_LEGEND
   | SET_ACCESSIBLE_STATUS
   | SET_MODAL
+  | SET_FILTERED_COUNTRY_CODE
 
 export default MapActions
