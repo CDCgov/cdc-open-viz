@@ -44,13 +44,13 @@ const DataTable = props => {
     const isNumberB = !isNaN(b)
 
     if (isDateA && isDateB) {
-      return sortBy.asc ? new Date(a) - new Date(b) : new Date(b) - new Date(a)
+      return !sortBy.asc ? new Date(a) - new Date(b) : new Date(b) - new Date(a)
     }
     if (isNumberA && isNumberB) {
-      return sortBy.asc ? Number(a) - Number(b) : Number(b) - Number(a)
+      return !sortBy.asc ? Number(a) - Number(b) : Number(b) - Number(a)
     }
     if (typeof a === 'string' && typeof b === 'string') {
-      return sortBy.asc ? a.localeCompare(b) : b.localeCompare(a)
+      return !sortBy.asc ? a.localeCompare(b) : b.localeCompare(a)
     }
 
     return 0
