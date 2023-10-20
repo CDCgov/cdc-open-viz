@@ -72,9 +72,6 @@ const hashObj = row => {
   }
 }
 
-// * FILE REVIEW
-// TODO: @tturnerswdev33 - remove/fix mentions of runtimeLegend that were added
-
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
@@ -1129,18 +1126,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         return generateColorsArray(mapColorPalette[3])
       }
 
-      let hash = hashObj(rowObj)
-
-      if (legendMemo.current.has(hash)) {
-        let idx = legendMemo.current.get(hash)
-        if (runtimeLegend[idx]?.disabled) return false
-
-        // DEV-784 changed to use bin prop to get color instead of idx
-        // bc we re-order legend when showSpecialClassesLast is checked
-        let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
-        return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
-      }
-
       // Fail state
       return generateColorsArray()
     } catch (e) {
@@ -1273,8 +1258,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 runtimeData={filteredData || excludedData}
                 expandDataTable={config.table.expanded}
                 columns={config.columns}
-                showDownloadButton={config.general.showDownloadButton}
-                runtimeLegend={dynamicLegendItems}
                 displayDataAsText={displayDataAsText}
                 displayGeoName={displayGeoName}
                 applyLegendToRow={applyLegendToRow}
@@ -1282,18 +1265,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 indexTitle={config.table.indexLabel}
                 vizTitle={title}
                 viewport={currentViewport}
-                parseDate={parseDate}
-                formatDate={formatDate}
-                formatNumber={formatNumber}
                 tabbingId={handleChartTabbing}
-                showDownloadImgButton={config.showDownloadImgButton}
-                showDownloadPdfButton={config.showDownloadPdfButton}
-                innerContainerRef={innerContainerRef}
-                outerContainerRef={outerContainerRef}
-                imageRef={imageId}
                 colorScale={colorScale}
-                isDebug={isDebug}
-                isEditor={isEditor}
               />
             )}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}

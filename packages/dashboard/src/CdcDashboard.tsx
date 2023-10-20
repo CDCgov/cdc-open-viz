@@ -38,13 +38,15 @@ import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
 import { SharedFilter } from './types/SharedFilter'
 import { APIFilter } from './types/APIFilter'
 import { DataSet } from './types/DataSet'
-import { Config, Visualization } from './types/Config'
+import { Config } from './types/Config'
+import { Visualization } from '@cdc/core/types/Visualization'
 import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import { filterData } from './helpers/filterData'
 import { getFormattedData } from './helpers/getFormattedData'
 import { getVizKeys } from './helpers/getVizKeys'
 import Title from '@cdc/core/components/ui/Title'
+import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 
 type DropdownOptions = Record<'value' | 'text', string>[]
 
@@ -842,7 +844,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           </section>
 
           {/* Data Table */}
-          {config.table && config.data && (
+          {config.table && !!config.data?.length && (
             <DataTable
               config={config}
               rawData={config.data}
@@ -896,19 +898,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
                   <DataTable
-                    config={config}
+                    config={config as TableConfig}
                     dataConfig={config.datasets[datasetKey]}
                     rawData={config.datasets[datasetKey].data}
                     runtimeData={filteredTableData || config.datasets[datasetKey].data || []}
                     expandDataTable={config.table.expanded}
-                    showDownloadButton={config.table.download}
                     tableTitle={datasetKey}
                     viewport={currentViewport}
                     tabbingId={datasetKey}
-                    outerContainerRef={outerContainerRef}
-                    imageRef={imageId}
-                    isDebug={isDebug}
-                    isEditor={isEditor}
                   />
                 </div>
               )

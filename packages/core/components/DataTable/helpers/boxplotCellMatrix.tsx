@@ -1,4 +1,6 @@
-const BoxplotRows = ({ rows, config }) => {
+import { ReactNode } from 'react'
+
+const boxplotCellMatrix = ({ rows, config }): ReactNode[][] => {
   const resolveName = key => {
     let {
       boxplot: { labels }
@@ -44,32 +46,19 @@ const BoxplotRows = ({ rows, config }) => {
     return row[0]
   })
   let columns = ['Measures', ...config.boxplot.categories]
-  return (
-    <>
-      {dataKeys.map((rowkey, index) => {
-        if (index === 0) return '' // we did header column separately
-        let rowClass = `row-Box-Plot--${index}`
-        return (
-          <tr role='row' key={`tbody__tr-${index}`} className={rowClass}>
-            {columns.map((column, colnum) => {
-              let cellValue
-              if (column === 'Measures') {
-                let labelValue = index > 0 ? resolveName(rowkey) : ''
-                cellValue = <>{labelValue}</>
-              } else {
-                cellValue = resolveCell(index, config.boxplot.plots[colnum - 1])
-              }
-              return (
-                <td tabIndex={0} key={`tbody__tr__td-${index}`} className='boxplot-td' role='gridcell'>
-                  {cellValue}
-                </td>
-              )
-            })}
-          </tr>
-        )
-      })}
-    </>
-  )
+  dataKeys.shift() // remove index 0 // we did header column separately
+  return dataKeys.map((rowkey, index) => {
+    return columns.map((column, colnum) => {
+      let cellValue
+      if (column === 'Measures') {
+        let labelValue = index > 0 ? resolveName(rowkey) : ''
+        cellValue = <>{labelValue}</>
+      } else {
+        cellValue = resolveCell(index, config.boxplot.plots[colnum - 1])
+      }
+      return cellValue
+    })
+  })
 }
 
-export default BoxplotRows
+export default boxplotCellMatrix

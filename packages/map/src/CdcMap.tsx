@@ -1679,7 +1679,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 innerContainerRef={innerContainerRef}
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
-                isDebug={isDebug}
               />
             )}
 
