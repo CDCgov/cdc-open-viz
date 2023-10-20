@@ -13,6 +13,7 @@ export type MapState = {
   runtimeLegend?: Object[]
   accessibleStatus?: string
   modal: any
+  filteredCountryCode: string
 }
 
 const reducer = (state: MapState, action: MapActions): MapState => {
@@ -37,6 +38,9 @@ const reducer = (state: MapState, action: MapActions): MapState => {
     }
     case 'SET_MODAL': {
       return { ...state, modal: action.payload }
+    }
+    case 'SET_FILTERED_COUNTRY_CODE': {
+      return { ...state, filteredCountryCode: action.payload }
     }
   }
 }

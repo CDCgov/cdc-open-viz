@@ -142,7 +142,8 @@ const CdcMap = ({ className, config: configObj, navigationHandler: customNavigat
     loading: true,
     runtimeFilters: [],
     runtimeLegend: [],
-    modal: null
+    modal: null,
+    filteredCountryCode: null
   }
 
   const [state, dispatch] = useReducer(mapReducer, mapInitialState)
@@ -155,7 +156,8 @@ const CdcMap = ({ className, config: configObj, navigationHandler: customNavigat
     loading,
     runtimeFilters,
     runtimeLegend,
-    modal
+    modal,
+    filteredCountryCode
   } = state
 
   // TODO: move these into context later on.
@@ -175,9 +177,12 @@ const CdcMap = ({ className, config: configObj, navigationHandler: customNavigat
     dispatch({ type: 'SET_ACCESSIBLE_STATUS', payload })
   }
 
+  const setFilteredCountryCode = payload => {
+    dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload })
+  }
+
   const transform = new DataTransform()
   const [runtimeData, setRuntimeData] = useState<Object | Object[]>({ init: true })
-  const [filteredCountryCode, setFilteredCountryCode] = useState()
   const [position, setPosition] = useState(config.mapPosition)
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
