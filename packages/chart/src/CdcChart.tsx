@@ -51,26 +51,6 @@ const generateColorsArray = (color = '#000000', special = false) => {
 
   return [color, hoverColor, colorObj.darken(0.3).hex()]
 }
-const hashObj = row => {
-  try {
-    if (!row) throw new Error('No row supplied to hashObj')
-
-    let str = JSON.stringify(row)
-    let hash = 0
-
-    if (str.length === 0) return hash
-
-    for (let i = 0; i < str.length; i++) {
-      let char = str.charCodeAt(i)
-      hash = (hash << 5) - hash + char
-      hash = hash & hash
-    }
-
-    return hash
-  } catch (e) {
-    console.error('COVE: ', e) // eslint-disable-line
-  }
-}
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()

@@ -3,12 +3,12 @@ import Cell from './Cell'
 
 type RowProps = {
   childRow: ReactNode[]
-  key: string
+  rowKey: string
 }
 
-const Row = ({ childRow, key: rowKey }: RowProps) => {
+const Row = ({ childRow, rowKey }: RowProps) => {
   return (
-    <tr role='row'>
+    <tr>
       {childRow.map((child, i) => (
         <Cell key={rowKey + '__' + i}>{child}</Cell>
       ))}
