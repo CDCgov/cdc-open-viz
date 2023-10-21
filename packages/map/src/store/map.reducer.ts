@@ -2,18 +2,23 @@ import { MapConfig } from '../types/MapConfig'
 import MapActions from './map.actions'
 
 export type MapState = {
+  accessibleStatus?: string
   config?: MapConfig
+  container: any
+  coveLoadedHasRan: boolean
+  currentViewport?: string
   data?: Object
+  dimensions: any
+  filteredCountryCode: string
   filteredData?: Object
   loading?: boolean
+  modal: any
+  position: Object
   preview?: boolean
-  tabSelected?: number
-  currentViewport?: string
+  runtimeData: Object[]
   runtimeFilters?: Object[]
   runtimeLegend?: Object[]
-  accessibleStatus?: string
-  modal: any
-  filteredCountryCode: string
+  tabSelected?: number
 }
 
 const reducer = (state: MapState, action: MapActions): MapState => {
@@ -41,6 +46,21 @@ const reducer = (state: MapState, action: MapActions): MapState => {
     }
     case 'SET_FILTERED_COUNTRY_CODE': {
       return { ...state, filteredCountryCode: action.payload }
+    }
+    case 'SET_RUNTIME_DATA': {
+      return { ...state, runtimeData: action.payload }
+    }
+    case 'SET_POSITION': {
+      return { ...state, position: action.payload }
+    }
+    case 'SET_COVE_LOADED_HAS_RAN': {
+      return { ...state, coveLoadedHasRan: action.payload }
+    }
+    case 'SET_CONTAINER': {
+      return { ...state, container: action.payload }
+    }
+    case 'SET_DIMENSIONS': {
+      return { ...state, dimensions: action.payload }
     }
   }
 }
