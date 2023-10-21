@@ -26,8 +26,7 @@ import { MapConfig } from './types/MapConfig'
 // Assets
 import ExternalIcon from './images/external-link.svg'
 
-// TODO: combine in scss.
-// Sass
+// TODO: combine scss.
 import './scss/main.scss'
 import './scss/btn.scss'
 
@@ -134,16 +133,38 @@ type CdcMapProperties = {
   setSharedFilterValue?: () => any
 }
 
-const CdcMap = ({ className, config: configObj, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }: CdcMapProperties) => {
+const CdcMap = (props: CdcMapProperties) => {
+  // prettier-ignore
+  const {
+    className,
+    config: configObj,
+    configUrl,
+    hostname = 'localhost:8080',
+    isDashboard = false,
+    isDebug = false,
+    isEditor = false,
+    link,
+    logo = '',
+    navigationHandler: customNavigationHandler,
+    setConfig,
+    setSharedFilter,
+    setSharedFilterValue,
+  } = props
+
   const mapInitialState = {
     accessibleStatus: '',
     config: configObj ?? initialState,
+    container: null,
+    coveLoadedHasRan: false,
     currentViewport: null,
+    dimensions: null,
+    filteredCountryCode: null,
     loading: true,
-    runtimeFilters: [],
-    runtimeLegend: [],
     modal: null,
-    filteredCountryCode: null
+    position: configObj?.mapPosition ?? initialState.mapPosition,
+    runtimeData: [],
+    runtimeFilters: [],
+    runtimeLegend: []
   }
 
   const [state, dispatch] = useReducer(mapReducer, mapInitialState)
@@ -157,7 +178,12 @@ const CdcMap = ({ className, config: configObj, navigationHandler: customNavigat
     runtimeFilters,
     runtimeLegend,
     modal,
-    filteredCountryCode
+    filteredCountryCode,
+    runtimeData,
+    position,
+    coveLoadedHasRan,
+    container,
+    dimensions
   } = state
 
   // TODO: move these into context later on.
@@ -181,19 +207,28 @@ const CdcMap = ({ className, config: configObj, navigationHandler: customNavigat
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload })
   }
 
-  const transform = new DataTransform()
-  const [runtimeData, setRuntimeData] = useState<Object | Object[]>({ init: true })
-  const [position, setPosition] = useState(config.mapPosition)
-  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
-  const [container, setContainer] = useState()
-  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
-  const [dimensions, setDimensions] = useState()
+  const setRuntimeData = payload => {
+    dispatch({ type: 'SET_RUNTIME_DATA', payload })
+  }
 
-  const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
+  const setPosition = payload => {
+    dispatch({ type: 'SET_POSITION', payload })
+  }
+
+  const setContainer = payload => {
+    dispatch({ type: 'SET_CONTAINER', payload })
+  }
+
+  const setDimensions = payload => {
+    dispatch({ type: 'SET_DIMENSIONS', payload })
+  }
+
+  const transform = new DataTransform()
+
+  const { handleSorting } = useFilters({ config: config, setConfig: setState })
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
-
-  if (isDebug) console.log('CdcMap state=', state) // eslint-disable-line
+  const imageId = `cove-${Math.random().toString(16).slice(-4)}`
 
   useEffect(() => {
     try {
@@ -220,16 +255,10 @@ const CdcMap = ({ className, config: configObj, navigationHandler: customNavigat
         const tmpData = {
           [filteredCountryCode]: filteredCountryObj
         }
-        setRuntimeData(tmpData)
+        dispatch({ type: 'SET_RUNTIME_DATA', payload: tmpData })
       }
     }, 100)
   }, [filteredCountryCode]) // eslint-disable-line
-
-  useEffect(() => {
-    if (config.mapPosition) {
-      setPosition(config.mapPosition)
-    }
-  }, [config.mapPosition, setPosition])
 
   const generateRuntimeLegendHash = () => {
     return hashObj({
@@ -1438,14 +1467,14 @@ const CdcMap = ({ className, config: configObj, navigationHandler: customNavigat
   useEffect(() => {
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: state })
-      setCoveLoadedHasRan(true)
+      dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
     }
   }, [config, container]) // eslint-disable-line
 
   useEffect(() => {
     if (config.data) {
       let newData = generateRuntimeData(config)
-      setRuntimeData(newData)
+      dispatch({ type: 'SET_RUNTIME_DATA', payload: newData })
     }
   }, [config.general.statePicked]) // eslint-disable-line
 
@@ -1459,15 +1488,20 @@ const CdcMap = ({ className, config: configObj, navigationHandler: customNavigat
   // DEV-769 make "Data Table" both a required field and default value
   useEffect(() => {
     if (config.table?.label === '' || config.table?.label === undefined) {
-      setState({
+      let newState = {
         ...config,
         table: {
           ...config.table,
           title: 'Data Table'
         }
+      }
+
+      dispatch({
+        type: 'SET_CONFIG',
+        payload: newState
       })
     }
-  }, [config.table]) // eslint-disable-line
+  }, [config.table])
 
   // When geo label override changes
   // - redo the tooltips
@@ -1509,7 +1543,7 @@ const CdcMap = ({ className, config: configObj, navigationHandler: customNavigat
     // Data
     if (hashData !== runtimeData.fromHash && config.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(config, filters || runtimeFilters, hashData)
-      setRuntimeData(newRuntimeData)
+      dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
     } else {
       if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
         const legend = generateRuntimeLegend(config, runtimeData, hashLegend)
