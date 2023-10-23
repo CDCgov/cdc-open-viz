@@ -187,7 +187,7 @@ export const useTooltip = props => {
       // Find the closest x value by calculating the minimum distance
       let closestX = null
       let minDistance = Number.MAX_VALUE
-      let offset = x - yAxis.size
+      let offset = x
 
       data.forEach(d => {
         const xPosition = xAxis.type === 'date' ? xScale(parseDate(d[xAxis.dataKey])) : xScale(d[xAxis.dataKey])
