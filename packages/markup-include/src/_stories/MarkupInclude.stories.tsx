@@ -4,7 +4,7 @@ import CdcMarkupInclude from '../CdcMarkupInclude'
 import { Config } from '../types/Config'
 
 const meta: Meta<typeof CdcMarkupInclude> = {
-  title: 'Components/Templates/CdcMarkupInclude',
+  title: 'Components/Templates/Markup Include',
   component: CdcMarkupInclude
 }
 
