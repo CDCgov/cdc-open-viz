@@ -33,7 +33,7 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
                     const palette = sequentialPalettes[stage.color] || colorPalettesChart[stage.color] || false
 
                     const getFill = () => {
-                      if (displayArea) return palette[1] ? palette[1] : 'transparent'
+                      if (displayArea) return palette[2] ? palette[2] : 'transparent'
                       return 'transparent'
                     }
 
@@ -50,7 +50,7 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
                           curve={curveMonotoneX}
                           data={groupData}
                           fill={getFill()}
-                          opacity={transparentArea ? 0.1 : 0.5}
+                          opacity={transparentArea ? 0.1 : .5}
                           x={d => xScale(Date.parse(d[xAxis.dataKey]))}
                           y0={d => yScale(d[ciGroup.low])}
                           y1={d => yScale(d[ciGroup.high])}
