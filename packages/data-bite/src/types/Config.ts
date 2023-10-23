@@ -21,7 +21,7 @@ export type Config = {
     suffix: string
   }
   biteStyle: string
-  filters: any[]
+  filters: Object[]
   subtext: string
   title: string
   theme: string
