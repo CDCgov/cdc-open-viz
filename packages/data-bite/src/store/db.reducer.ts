@@ -1,4 +1,4 @@
-import { Config } from '../../types/Config'
+import { Config } from '../types/Config'
 import DataBiteActions from './db.actions'
 
 export type DataBiteState = {

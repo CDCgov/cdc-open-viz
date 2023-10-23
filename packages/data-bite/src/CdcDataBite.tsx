@@ -23,7 +23,7 @@ import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { Config } from '../types/Config'
+import { Config } from './types/Config'
 import dataBiteReducer from './store/db.reducer'
 
 // styles
