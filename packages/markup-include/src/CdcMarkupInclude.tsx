@@ -72,7 +72,6 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
     const processedConfig = { ...(await coveUpdateWorker(response)) }
 
     updateConfig({ ...defaults, ...processedConfig })
-    // setLoading(false)
     dispatch({ type: 'SET_LOADING', payload: false })
   }, [])
 
