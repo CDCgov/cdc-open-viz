@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import ExampleConfig_1 from './../data/initial-state'
 import CdcMarkupInclude from '../CdcMarkupInclude'
 import { Config } from '../types/Config'
-import { userEvent, within } from '@storybook/testing-library'
 
 const meta: Meta<typeof CdcMarkupInclude> = {
   title: 'Components/Pages/CdcMarkupInclude',
