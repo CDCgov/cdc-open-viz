@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Header } from '@cdc/core/components/ui/Header'
 
 // context & initial state
 import ConfigContext from './ConfigContext'
@@ -117,11 +118,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
   if (loading === false) {
     let body = (
       <>
-        {title && (
-          <header style={{ fontSize }} className={`cove-component__header ${config.theme} `}>
-            {parse(title)}
-          </header>
-        )}
+        <Header classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
         <div className={contentClasses.join(' ')}>
           <div className='cove-component__content-wrap'>
             {filterByTextColumn()
