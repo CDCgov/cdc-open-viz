@@ -14,7 +14,7 @@ import Loading from '@cdc/core/components/Loading'
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
-
+import { Header } from '@cdc/core/components/ui/Header'
 import { publish } from '@cdc/core/helpers/events'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
@@ -281,11 +281,7 @@ const WaffleChart = ({ config, isEditor, link }) => {
   return (
     <div className={innerContainerClasses.join(' ')}>
       <>
-        {title && (
-          <header className={`cove-component__header chart-title ${config.theme}`} aria-hidden='true'>
-            {parse(title)}
-          </header>
-        )}
+        <Header title={title} config={config} classes={['chart-title', `${config.theme}`]} />
         <div className={contentClasses.join(' ')}>
           <div className='cove-component__content-wrap'>
             {config.visualizationType === 'Gauge' && (

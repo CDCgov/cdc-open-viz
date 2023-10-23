@@ -1,8 +1,9 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react'
 import axios from 'axios'
-import parse from 'html-react-parser'
+
 import { Markup } from 'interweave'
 
+import { Header } from '@cdc/core/components/ui/Header'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 
@@ -165,11 +166,7 @@ const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, i
   if (loading === false) {
     let body = (
       <div className={bodyClasses.join(' ')} ref={container}>
-        {title && (
-          <header className={`cove-component__header ${config.theme}`} aria-hidden='true'>
-            {parse(title)} {isDashboard}
-          </header>
-        )}
+        <Header title={title} isDashboard={isDashboard} classes={[`${config.theme}`]} />
         <div className={`cove-component__content ${contentClasses.join(' ')}`}>
           <div className={`${innerContainerClasses.join(' ')}`}>
             <div className='cove-component__content-wrap'>
