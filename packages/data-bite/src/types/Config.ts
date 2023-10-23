@@ -1,6 +1,6 @@
 export type Config = {
   type: string
-  data: any[]
+  data: Object[]
   dataBite: string
   dataFunction: string
   dataColumn: string
@@ -12,7 +12,7 @@ export type Config = {
     display: string
     url: string
     alt: string
-    options: any[]
+    options: Object[]
   }
   dataFormat: {
     roundToPlace: number
