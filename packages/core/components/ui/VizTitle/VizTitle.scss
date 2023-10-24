@@ -1,5 +1,36 @@
-.color-palette li,
-.btn {
+.cove-component__header {
+  position: relative;
+  padding: 0.6em 0.8em;
+  margin: 0;
+  color: #fff;
+  font-size: 1.1em;
+
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+
+  &.mb-0 {
+    margin-bottom: 0 !important;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  strong {
+    font-weight: bold;
+  }
+
+  &:not(:empty) {
+    padding: 0.6em 0.8em;
+    border-bottom-width: 4px;
+    border-bottom-style: solid;
+  }
+
+  &.bite-header {
+    margin-bottom: 0 !important;
+  }
+
+  // THEMES
   &.theme-purple {
     background: #712177;
     border-bottom-color: #b890bb;
@@ -43,5 +74,13 @@
   &.theme-blue {
     background: #005eaa;
     border-bottom-color: #88c3ea;
+  }
+}
+
+// add additional space below title if needed
+.map-title.cove-component__header,
+.type-chart .cove-component__header {
+  &:not(:empty) {
+    margin: 0 0 1rem 0 !important;
   }
 }

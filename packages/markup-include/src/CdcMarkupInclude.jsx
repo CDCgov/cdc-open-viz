@@ -3,7 +3,6 @@ import axios from 'axios'
 
 import { Markup } from 'interweave'
 
-import { Header } from '@cdc/core/components/ui/Header'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 
@@ -17,6 +16,7 @@ import { publish } from '@cdc/core/helpers/events'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
 
 const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
   // Default States
@@ -166,7 +166,7 @@ const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, i
   if (loading === false) {
     let body = (
       <div className={bodyClasses.join(' ')} ref={container}>
-        <Header title={title} isDashboard={isDashboard} classes={[`${config.theme}`]} />
+        <VizTitle title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
         <div className={`cove-component__content ${contentClasses.join(' ')}`}>
           <div className={`${innerContainerClasses.join(' ')}`}>
             <div className='cove-component__content-wrap'>

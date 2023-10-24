@@ -8,7 +8,7 @@ import Context from './context'
 // internal components
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
-import { Header } from '@cdc/core/components/ui/Header'
+import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
 import CircleCallout from './components/CircleCallout'
 
 // external
@@ -453,7 +453,7 @@ const CdcDataBite = props => {
         {isEditor && <EditorPanel />}
         <div className={isEditor ? 'spacing-wrapper' : ''}>
           <div className={innerContainerClasses.join(' ')}>
-            <Header config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
+            <VizTitle config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className={`bite-content-container ${contentClasses.join(' ')}`}>
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}

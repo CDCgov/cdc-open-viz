@@ -40,6 +40,7 @@ import { APIFilter } from './types/APIFilter'
 import { DataSet } from './types/DataSet'
 import { Config, Visualization } from './types/Config'
 import VisualizationsPanel from './components/VisualizationsPanel'
+import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
 
 type DropdownOptions = Record<'value' | 'text', string>[]
 
@@ -851,12 +852,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       <>
         {isEditor && <Header tabSelected={tabSelected} setTabSelected={setTabSelected} setPreview={setPreview} />}
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
-          {/* Title */}
-          {title && (
-            <div role='heading' aria-level={3} className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>
-              {parse(title)}
-            </div>
-          )}
+          <VizTitle title={title} isDashboard={true} classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]} />
           {/* Description */}
           {description && <div className='subtext'>{parse(description)}</div>}
           {/* Filters */}
@@ -1000,7 +996,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           </section>
 
           {/* Data Table */}
-          {config.table && config.data &&
+          {config.table && config.data && (
             <DataTable
               config={config}
               rawData={config.data}
@@ -1015,7 +1011,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               isDebug={isDebug}
               isEditor={isEditor}
             />
-          }
+          )}
           {config.table &&
             config.datasets &&
             Object.keys(config.datasets).map(datasetKey => {
