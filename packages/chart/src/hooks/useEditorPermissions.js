@@ -118,13 +118,13 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsSequentialPallete = () => {
-    const disabledCharts = ['Paired Bar', 'Deviation Bar', 'Forest Plot']
+    const disabledCharts = ['Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsNonSequentialPallete = () => {
-    const disabledCharts = ['Paired Bar', 'Deviation Bar', 'Forest Plot']
+    const disabledCharts = ['Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -178,7 +178,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsFilters = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line']
+    const disabledCharts = ['Forest Plot']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
