@@ -52,8 +52,6 @@ type APIFilterDropdowns = {
   [filtername: string]: null | DropdownOptions
 }
 
-/* eslint-disable react-hooks/exhaustive-deps */
-
 type CdcDashboardTypes = {
   configUrl: string
   config: Config
