@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useReducer } from 'react'
 
 // IE11
 // import 'core-js/stable'
@@ -12,7 +12,7 @@ import parse from 'html-react-parser'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
-import ConfigContext from './ConfigContext'
+import { DashboardContext, DashboardDispatchContext, initialState } from './DashboardContext'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 import Loading from '@cdc/core/components/Loading'
@@ -40,6 +40,10 @@ import { APIFilter } from './types/APIFilter'
 import { DataSet } from './types/DataSet'
 import { Config, Visualization } from './types/Config'
 import VisualizationsPanel from './components/VisualizationsPanel'
+import dashboardReducer from './store/dashboard.reducer'
+import { filterData } from './helpers/filterData'
+import { getFormattedData } from './helpers/getFormattedData'
+import { getVizKeys } from './helpers/getVizKeys'
 
 type DropdownOptions = Record<'value' | 'text', string>[]
 
@@ -50,32 +54,27 @@ type APIFilterDropdowns = {
 
 type CdcDashboardTypes = {
   configUrl: string
-  config?: Config
+  config: Config
   isEditor: boolean
   isDebug: boolean
   setConfig: Function
 }
 
-export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, isDebug = false, setConfig: setParentConfig }: CdcDashboardTypes) {
-  const [config, setConfig] = useState<Config | null>(configObj ?? null)
-  const [data, setData] = useState({})
-  const [filteredData, setFilteredData] = useState({})
+export default function CdcDashboard({ configUrl = '', config: configObj, isEditor = false, isDebug = false, setConfig: setParentConfig }: CdcDashboardTypes) {
+  const [state, dispatch] = useReducer(dashboardReducer, { config: configObj, ...initialState })
   const [apiFilterDropdowns, setAPIFilterDropdowns] = useState<APIFilterDropdowns>({})
-  const [loading, setLoading] = useState(false)
-  const [preview, setPreview] = useState(false)
-  const [tabSelected, setTabSelected] = useState(0)
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const inNoDataState = useMemo(() => {
-    const vals = Object.values(data)
+    const vals = Object.values(state.data)
     if (!vals.length) return true
     return vals.some(val => val === undefined)
-  }, [data])
+  }, [state.data])
 
   const getAutoLoadVisualization = (): Visualization | undefined => {
-    if (!config) return
-    const autoLoadViz = Object.values(config.visualizations).filter(vis => {
+    if (!state.config) return
+    const autoLoadViz = Object.values(state.config.visualizations).filter(vis => {
       return vis.autoLoad && vis.type === 'filter-dropdowns'
     })
     if (autoLoadViz.length === 0) return
@@ -84,20 +83,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   }
 
   const transform = new DataTransform()
-
-  const getFormattedData = (data, dataDescription) => {
-    if (data && dataDescription) {
-      try {
-        let formattedData = transform.autoStandardize(data)
-        formattedData = transform.developerStandardize(data, dataDescription)
-        return formattedData
-      } catch (e) {
-        return data
-      }
-    }
-
-    return data
-  }
 
   const processData = async (dataSet: DataSet, filterBehavior) => {
     let dataset = dataSet.formattedData || dataSet.data
@@ -122,15 +107,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
     return dataset
   }
-
-  const getVizKeys = (_config): string[] => Object.keys(_config?.visualizations || {})
-
   const getApiFilterKey = ({ apiEndpoint, heirarchyLookup }: APIFilter) => {
     return apiEndpoint + (heirarchyLookup || '')
   }
 
   const setAutoLoadDefaultValue = (sharedFilterIndex: number, filterDropdowns: DropdownOptions) => {
-    if (!config) return
+    if (!state.config) return
     const autoLoadViz = getAutoLoadVisualization()
     if (!autoLoadViz) return // no autoLoading happening
     const notIncludedInAutoLoad = autoLoadViz.hide
@@ -138,9 +120,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       // we don't want to auto load it
       return
     } else {
-      const sharedFilter = config.dashboard.sharedFilters[sharedFilterIndex]
+      const sharedFilter = state.config.dashboard.sharedFilters[sharedFilterIndex]
       if (sharedFilter.active) return // a value has already been selected.
-      const filterParents = config.dashboard.sharedFilters.filter(f => sharedFilter.parents?.includes(f.key))
+      const filterParents = state.config.dashboard.sharedFilters.filter(f => sharedFilter.parents?.includes(f.key))
       const notAllParentFiltersSelected = filterParents.some(p => !p.active)
       if (filterParents && notAllParentFiltersSelected) return
       const defaultFilterDropdown = filterDropdowns.find(({ value }) => value === sharedFilter.apiFilter!.defaultValue)
@@ -150,8 +132,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   }
 
   const loadAPIFilters = async () => {
-    if (config?.dashboard?.sharedFilters) {
-      const sharedAPIFilters = config.dashboard.sharedFilters.filter(f => f.apiFilter)
+    if (state.config?.dashboard?.sharedFilters) {
+      const sharedAPIFilters = state.config.dashboard.sharedFilters.filter(f => f.apiFilter)
       const loadingFilterMemo: APIFilterDropdowns = sharedAPIFilters.reduce((acc, curr) => {
         const _key = getApiFilterKey(curr.apiFilter!)
         if (apiFilterDropdowns[_key] != null) return acc // don't overwrite fetched data.
@@ -165,16 +147,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         if (!_parents.length) return null
         return _parents.map(({ queryParameter, active }) => ({ key: queryParameter || '', value: active || '' }))
       }
-      const getFilterValues = (data: any, apiFilter: APIFilter): DropdownOptions => {
+      const getFilterValues = (filterData: Object | Array<Object>, apiFilter: APIFilter): DropdownOptions => {
         const { textSelector, valueSelector, heirarchyLookup } = apiFilter
         if (heirarchyLookup) {
           const heirarchy = heirarchyLookup!.split('.')
           const selector = heirarchy.shift() // pop first element
-          return getFilterValues(selector ? data[selector] : data, { ...apiFilter, heirarchyLookup: heirarchy.join('.') })
+          return getFilterValues(selector ? filterData[selector] : filterData, { ...apiFilter, heirarchyLookup: heirarchy.join('.') })
         }
-        return data.map(v => ({ text: v[textSelector], value: v[valueSelector] }))
+        if (!Array.isArray(filterData)) throw new Error('the filter data has requires a heirarchy path to access the filter values, This should be in the format key.subkey.subsubkey')
+        return filterData.map(v => ({ text: v[textSelector], value: v[valueSelector] }))
       }
-      config.dashboard.sharedFilters.forEach(async (filter, index) => {
+      state.config.dashboard.sharedFilters.forEach(async (filter, index) => {
         if (!filter.apiFilter) return
         const baseEndpoint = filter.apiFilter.apiEndpoint
         const _key = getApiFilterKey(filter.apiFilter)
@@ -196,8 +179,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   }
 
   const reloadURLData = async () => {
+    const { config } = state
     if (config && config.datasets) {
-      let newData = { ...data }
+      let newData = { ...state.data }
       let newDatasets = { ...config.datasets }
       let datasetsNeedsUpdate = false
       let datasetKeys = Object.keys(config.datasets)
@@ -255,7 +239,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       }
 
       if (datasetsNeedsUpdate) {
-        setData(newData)
+        dispatch({ type: 'SET_DATA', payload: newData })
 
         let newFilteredData = {}
         let newConfig = { ...config }
@@ -264,26 +248,25 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
           let applicableFilters = config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
           if (applicableFilters.length > 0) {
-            newFilteredData[key] = filterData(applicableFilters, newData[dataKey])
+            newFilteredData[key] = filterData(applicableFilters, newData[dataKey], state.config?.filterBehavior)
           }
 
           if (newData[dataKey]) {
             newConfig.visualizations[key].formattedData = newData[dataKey]
           }
         })
-        setFilteredData(newFilteredData)
-
+        dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
         newConfig.datasets = newDatasets
-        setConfig(newConfig)
+        dispatch({ type: 'SET_CONFIG', payload: newConfig })
       }
     }
   }
 
   const loadConfig = async () => {
-    setLoading(true)
+    dispatch({ type: 'SET_LOADING', payload: true })
     let response: Config = configObj || (await (await fetch(configUrl)).json())
     let newConfig = { ...defaults, ...response }
-    let datasets = {} as Record<string, DataSet>
+    let datasets = {}
 
     if (response.datasets) {
       await Promise.all(
@@ -316,12 +299,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         newConfig.visualizations[vizKey].formattedData = newConfig.formattedData
       })
 
-      newConfig.data = undefined
+      newConfig.data = []
       newConfig.dataUrl = ''
       newConfig.dataFileName = ''
       newConfig.dataFileSourceType = ''
-      newConfig.dataDescription = ''
-      newConfig.formattedData = undefined
+      newConfig.dataDescription = {}
+      newConfig.formattedData = []
 
       if (newConfig.dashboard && newConfig.dashboard.filters) {
         newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || []
@@ -333,9 +316,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       }
     }
 
-    setData(datasets)
-    updateConfig(newConfig, datasets)
-    setLoading(false)
+    dispatch({ type: 'SET_DATA', payload: datasets })
+    dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig, datasets] })
+    dispatch({ type: 'SET_LOADING', payload: false })
   }
 
   const findFilterTier = (filters: SharedFilter[], sharedFilter: SharedFilter) => {
@@ -348,71 +331,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     }
   }
 
-  const filterData = (filters: SharedFilter[], _data) => {
-    if (_data) {
-      let maxTier = 1
-      filters.forEach(sharedFilter => {
-        sharedFilter.tier = findFilterTier(filters, sharedFilter)
-      })
-
-      filters.forEach(sharedFilter => {
-        if (sharedFilter.tier && sharedFilter.tier > maxTier) {
-          maxTier = sharedFilter.tier
-        }
-      })
-
-      let filteredData = _data
-      // TODO triple loop??
-      for (let i = 0; i < maxTier; i++) {
-        let filteredDataSubTier: any[] = []
-
-        filteredData.forEach(row => {
-          let add = true
-
-          filters.forEach(filter => {
-            // eslint-disable-next-line eqeqeq
-            if (filter.type !== 'urlfilter' && ((!filter.tier && i === 0) || filter.tier === i + 1) && filter.active && row[filter.columnName!] != filter.active) {
-              add = false
-            }
-          })
-
-          if (add) filteredDataSubTier.push(row)
-        })
-
-        filters.forEach(sharedFilter => {
-          if (sharedFilter.tier && sharedFilter.tier === i + 2) {
-            sharedFilter.values = generateValuesForFilter(sharedFilter.columnName, { data: filteredDataSubTier })
-            if (sharedFilter.values.length > 0 && (!sharedFilter.active || sharedFilter.values.indexOf(sharedFilter.active) === -1)) {
-              sharedFilter.active = sharedFilter.values[0]
-            }
-          }
-        })
-
-        filteredData = filteredDataSubTier
-      }
-
-      let filteredDataSubTier: any[] = []
-      filteredData.forEach(row => {
-        let add = true
-
-        filters.forEach(filter => {
-          // eslint-disable-next-line eqeqeq
-          if (filter.type !== 'urlfilter' && filter.tier && filter.tier === maxTier - 1 && filter.active && row[filter.columnName!] != filter.active) {
-            add = false
-          }
-        })
-
-        if (add) filteredDataSubTier.push(row)
-      })
-
-      return filteredDataSubTier
-    }
-  }
-
   const setSharedFilter = (key, datum) => {
+    const { config } = state
     if (!config) return
     let newConfig = { ...config }
-    let newFilteredData = { ...filteredData }
+    let newFilteredData = { ...state.filteredData }
     for (let i = 0; i < newConfig.dashboard.sharedFilters.length; i++) {
       const filter = newConfig.dashboard.sharedFilters[i]
       if (filter.setBy === key) {
@@ -429,99 +352,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       if (applicableFilters.length > 0) {
         const visualization = newConfig.visualizations[visualizationKey]
 
-        const formattedData = visualization.dataDescription ? getFormattedData(data[visualization.dataKey] || visualization.data, visualization.dataDescription) : undefined
+        const formattedData = visualization.dataDescription ? getFormattedData(state.data[visualization.dataKey] || visualization.data, visualization.dataDescription) : undefined
 
-        newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || data[visualization.dataKey])
+        newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || state.data[visualization.dataKey], state.config?.filterBehavior)
       }
     })
 
-    setFilteredData(newFilteredData)
-    setConfig(newConfig)
-  }
-
-  // Gets filter values from API response
-  const generateValuesForAPIFilter = (columnName, _data = data): string[] => {
-    type Row = { [key: string]: any }
-    return Object.values(_data)
-      .filter(row => row && !!(row as Row)[columnName])
-      .map(row => (row as Row)[columnName])
-  }
-
-  // Gets filter values from dataset
-  const generateValuesForFilter = (columnName, _data = data) => {
-    if (config?.filterBehavior === FilterBehavior.Apply) {
-      return generateValuesForAPIFilter(columnName, _data)
-    }
-    const values: string[] = []
-
-    Object.keys(_data).forEach(key => {
-      _data[key].forEach(row => {
-        const value = row[columnName]
-        if (value && false === values.includes(value)) {
-          values.push(value)
-        }
-      })
-    })
-
-    return values
-  }
-
-  const updateConfig = (newConfig, dataOverride?: Record<string, DataSet>) => {
-    let newFilteredData = {}
-    let visualizationKeys = getVizKeys(newConfig)
-    const setFilter = (filterIndex: number, key: string, value: any) => {
-      newConfig.dashboard.sharedFilters[filterIndex][key] = value
-    }
-    if (newConfig.dashboard.sharedFilters) {
-      newConfig.dashboard.sharedFilters.forEach((filter, i) => {
-        const filterIsSetByVizData = !!visualizationKeys.find(key => key === filter.setBy)
-        let _filter = newConfig.dashboard.sharedFilters[i]
-
-        if (filterIsSetByVizData) {
-          const filterValues = generateValuesForFilter(filter.columnName, dataOverride || data)
-
-          if (_filter.order === 'asc') {
-            filterValues.sort()
-          }
-          if (_filter.order === 'desc') {
-            filterValues.sort().reverse()
-          }
-
-          setFilter(i, 'values', filterValues)
-          _filter = newConfig.dashboard.sharedFilters[i]
-          if (filterValues.length > 0) {
-            setFilter(i, 'active', _filter.active || _filter.values[0])
-          }
-        }
-
-        if ((!filter.values || filter.values.length === 0) && filter.showDropdown) {
-          const generatedValues = generateValuesForFilter(filter.columnName, dataOverride || data)
-          setFilter(i, 'values', generatedValues)
-          const _filter = newConfig.dashboard.sharedFilters[i]
-          if (_filter.values.length > 0) {
-            setFilter(i, 'active', filter.active || _filter.values[0])
-          }
-        }
-      })
-
-      visualizationKeys.forEach(visualizationKey => {
-        let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
-
-        if (applicableFilters.length > 0) {
-          const visualization = newConfig.visualizations[visualizationKey]
-
-          const formattedData = getFormattedData(newConfig.datasets[visualization.dataKey] && newConfig.datasets[visualization.dataKey].data ? newConfig.datasets[visualization.dataKey].data : visualization.data, visualization.dataDescription)
-
-          newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || visualization.data || (dataOverride || data)[visualization.dataKey])
-        }
-      })
-    }
-
-    setFilteredData(newFilteredData)
-
-    //Enforce default values that need to be calculated at runtime
-    newConfig.runtime = {}
-    setConfig(newConfig)
+    dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
   // Load data when component first mounts
@@ -532,30 +370,32 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   // Pass up to <CdcEditor /> if it exists when config state changes
   useEffect(() => {
     if (setParentConfig && isEditor) {
-      setParentConfig(config)
+      setParentConfig(state.config)
     }
-  }, [config])
+  }, [state.config])
 
   useEffect(() => {
+    const { config } = state
     if (config && config.filterBehavior !== FilterBehavior.Apply) {
       reloadURLData()
     }
     loadAPIFilters()
-  }, [JSON.stringify(config?.dashboard ? config.dashboard.sharedFilters : undefined)])
+  }, [JSON.stringify(state.config?.dashboard ? state.config.dashboard.sharedFilters : undefined)])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
+    const { config } = state
     if (!config) return
     let updatedConfig = { ...config }
 
     updatedConfig.visualizations[visualizationKey] = newConfig
     updatedConfig.visualizations[visualizationKey].formattedData = config.visualizations[visualizationKey].formattedData
 
-    setConfig(updatedConfig)
+    dispatch({ type: 'SET_CONFIG', payload: config })
   }
 
   const applyFilters = () => {
-    if (!config) return
-    const allFiltersSelected = !config.dashboard.sharedFilters.some(filter => !filter.active)
+    if (!state.config) return
+    const allFiltersSelected = !state.config.dashboard.sharedFilters.some(filter => !filter.active)
     if (allFiltersSelected) {
       reloadURLData()
     } else {
@@ -564,34 +404,34 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   }
 
   const changeFilterActive = (index: number, value: string) => {
+    const { config } = state
     if (!config) return
     let dashboardConfig = { ...config.dashboard }
 
     dashboardConfig.sharedFilters[index].active = value
 
-    setConfig({ ...config, dashboard: dashboardConfig })
+    dispatch({ type: 'SET_CONFIG', payload: { ...config, dashboard: dashboardConfig } })
     if (config.filterBehavior !== FilterBehavior.Apply) {
       let newFilteredData = {}
       getVizKeys(config).forEach(key => {
         let applicableFilters = dashboardConfig.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
         if (applicableFilters.length > 0) {
           const visualization = config.visualizations[key]
+          const _data = state.data[visualization.dataKey] || visualization.data
+          const formattedData = visualization.dataDescription ? getFormattedData(_data, visualization.dataDescription) : _data
 
-          const formattedData = visualization.dataDescription ? getFormattedData(data[config.visualizations[key].dataKey] || visualization.data, visualization.dataDescription) : undefined
-
-          newFilteredData[key] = filterData(applicableFilters, formattedData || data[config.visualizations[key].dataKey])
+          newFilteredData[key] = filterData(applicableFilters, formattedData, config.filterBehavior)
         }
       })
 
-      setFilteredData(newFilteredData)
       const { active, resetLabel } = dashboardConfig.sharedFilters[index]
-      if (active === resetLabel) {
-        setFilteredData(data)
-      }
+      const _filteredData = active === resetLabel ? state.data : newFilteredData
+      dispatch({ type: 'SET_FILTERED_DATA', payload: _filteredData })
     }
   }
 
   const handleOnChange = (index: number, value: string) => {
+    const { config } = state
     if (!config) return
     changeFilterActive(index, value)
     if (config.filterBehavior === FilterBehavior.Apply) {
@@ -619,15 +459,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           if (_isAutoSelectFilter) filter.active = ''
           return filter
         })
-        setConfig({ ...config, dashboard: { ...config.dashboard, sharedFilters: newSharedFilters } })
+        const _newConfig = { ...config, dashboard: { ...config.dashboard, sharedFilters: newSharedFilters } }
+        dispatch({ type: 'SET_CONFIG', payload: _newConfig })
         // setData to empty object because we no longer have a data state.
-        setData({})
-        setFilteredData({})
+        dispatch({ type: 'SET_DATA', payload: {} })
+        dispatch({ type: 'SET_FILTERED_DATA', payload: {} })
       }
     }
   }
 
   const Filters = ({ hide, autoLoad }: { hide?: number[]; autoLoad?: boolean }) => {
+    const { config } = state
     if (!config) return <></>
     const isLegacyFilter = !config.filterBehavior
     const isAutoLoadRow = config.filterBehavior === FilterBehavior.Apply && autoLoad
@@ -704,46 +546,40 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     }
   }, [])
 
+  const setPreview = shouldPreview => dispatch({ type: 'SET_PREVIEW', payload: shouldPreview })
+
   // Prevent render if loading
-  if (loading || !config) return <Loading />
+  if (state.loading || !state.config) return <Loading />
 
   let body: JSX.Element | null = null
   // Editor mode
-  if (isEditor && !preview) {
+  if (isEditor && !state.preview) {
     let subVisualizationEditing = false
 
-    getVizKeys(config).forEach(visualizationKey => {
-      let visualizationConfig = { ...config.visualizations[visualizationKey] }
+    getVizKeys(state.config).forEach(visualizationKey => {
+      let visualizationConfig = { ...state.config?.visualizations[visualizationKey] }
 
       const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
 
-      if (filteredData && filteredData[visualizationKey]) {
-        visualizationConfig.data = filteredData[visualizationKey]
+      if (state.filteredData && state.filteredData[visualizationKey]) {
+        visualizationConfig.data = state.filteredData[visualizationKey]
         if (visualizationConfig.formattedData) {
           visualizationConfig.originalFormattedData = visualizationConfig.formattedData
           visualizationConfig.formattedData = visualizationConfig.data
         }
       } else {
-        visualizationConfig.data = data[dataKey]
+        visualizationConfig.data = state.data[dataKey]
         if (visualizationConfig.formattedData) {
           visualizationConfig.originalFormattedData = visualizationConfig.formattedData
           visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
         }
       }
 
-      const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0
-      const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey)[0].active : undefined
+      const setsSharedFilter = state.config?.dashboard.sharedFilters && state.config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0
+      const setSharedFilterValue = setsSharedFilter ? state.config?.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey)[0].active : undefined
 
       if (visualizationConfig.editing) {
         subVisualizationEditing = true
-
-        const back = () => {
-          const newConfig = { ...config }
-
-          newConfig.visualizations[visualizationKey].editing = false
-
-          setConfig(newConfig)
-        }
 
         const _updateConfig = newConfig => {
           let dataCorrectedConfig = visualizationConfig.originalFormattedData ? { ...newConfig, formattedData: visualizationConfig.originalFormattedData } : newConfig
@@ -754,7 +590,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           case 'chart':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Chart' />
+                <Header visualizationKey={visualizationKey} subEditor='Chart' />
                 <CdcChart
                   key={visualizationKey}
                   config={visualizationConfig}
@@ -763,7 +599,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                   setConfig={_updateConfig}
                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                   setSharedFilterValue={setSharedFilterValue}
-                  dashboardConfig={config}
+                  dashboardConfig={state.config}
                   isDashboard={true}
                   configUrl={undefined}
                   setEditing={undefined}
@@ -776,7 +612,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           case 'map':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Map' />
+                <Header visualizationKey={visualizationKey} subEditor='Map' />
                 <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={_updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true} showLoader={false} />
               </>
             )
@@ -785,7 +621,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             visualizationConfig = { ...visualizationConfig, newViz: true }
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Data Bite' />
+                <Header visualizationKey={visualizationKey} subEditor='Data Bite' />
                 <CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={_updateConfig} isDashboard={true} />
               </>
             )
@@ -793,7 +629,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           case 'waffle-chart':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Waffle Chart' />
+                <Header visualizationKey={visualizationKey} subEditor='Waffle Chart' />
                 <CdcWaffleChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={_updateConfig} isDashboard={true} configUrl={undefined} />
               </>
             )
@@ -801,7 +637,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           case 'markup-include':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Markup Include' />
+                <Header visualizationKey={visualizationKey} subEditor='Markup Include' />
                 <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={_updateConfig} isDashboard={true} configUrl={undefined} />
               </>
             )
@@ -809,7 +645,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           case 'filtered-text':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Filtered Text' />
+                <Header visualizationKey={visualizationKey} subEditor='Filtered Text' />
                 <CdcFilteredText key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={_updateConfig} isDashboard={true} configUrl={undefined} />
               </>
             )
@@ -818,7 +654,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             const hideFilter = visualizationConfig.autoLoad && inNoDataState
             body = !hideFilter ? (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Filter Dropdowns' />
+                <Header visualizationKey={visualizationKey} subEditor='Filter Dropdowns' />
                 <Filters hide={visualizationConfig.hide} autoLoad={visualizationConfig.autoLoad} />
               </>
             ) : (
@@ -835,19 +671,20 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     if (!subVisualizationEditing) {
       body = (
         <DndProvider backend={HTML5Backend}>
-          <Header tabSelected={tabSelected} setTabSelected={setTabSelected} setPreview={setPreview} />
+          <Header setPreview={setPreview} />
           <div className='layout-container'>
-            <VisualizationsPanel loadConfig={loadConfig} config={config} />
+            <VisualizationsPanel loadConfig={loadConfig} config={state.config} />
             <Grid />
           </div>
         </DndProvider>
       )
     }
   } else {
+    const { config } = state
     const { title, description } = config?.dashboard || {}
     body = (
       <>
-        {isEditor && <Header tabSelected={tabSelected} setTabSelected={setTabSelected} setPreview={setPreview} />}
+        {isEditor && <Header setPreview={setPreview} />}
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
           {/* Title */}
           {title && (
@@ -875,14 +712,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
                         const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
 
-                        if (filteredData && filteredData[col.widget]) {
-                          visualizationConfig.data = filteredData[col.widget]
+                        if (state.filteredData && state.filteredData[col.widget]) {
+                          visualizationConfig.data = state.filteredData[col.widget]
                           if (visualizationConfig.formattedData) {
                             visualizationConfig.originalFormattedData = visualizationConfig.formattedData
                             visualizationConfig.formattedData = visualizationConfig.data
                           }
                         } else {
-                          visualizationConfig.data = data[dataKey]
+                          visualizationConfig.data = state.data[dataKey]
                           if (visualizationConfig.formattedData) {
                             visualizationConfig.originalFormattedData = visualizationConfig.formattedData
                             visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
@@ -998,7 +835,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           </section>
 
           {/* Data Table */}
-          {config.table && config.data && (
+          {config.table && !!config.data?.length && (
             <DataTable
               config={config}
               rawData={config.data}
@@ -1045,11 +882,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
                 //Applys any applicable filters
                 if (applicableFilters.length > 0) {
-                  filteredTableData = filterData(applicableFilters, config.datasets[datasetKey].data)
+                  filteredTableData = filterData(applicableFilters, config.datasets[datasetKey].data, state.config?.filterBehavior)
                 }
               }
-
-              let dataFileSourceType = config.datasets[datasetKey]?.dataFileSourceType
 
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
@@ -1076,30 +911,18 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     )
   }
 
-  const contextValues = {
-    config,
-    rawData: data,
-    data: filteredData ?? data,
-    visualizations: config.visualizations,
-    rows: config.rows,
-    loading,
-    updateConfig,
-    setParentConfig,
-    setPreview,
-    outerContainerRef,
-    isDebug
-  }
-
   const dashboardContainerClasses = ['cdc-open-viz-module', 'type-dashboard', `${currentViewport}`]
 
   return (
     <GlobalContextProvider>
-      <ConfigContext.Provider value={contextValues}>
-        <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
-          {body}
-        </div>
-        <OverlayFrame />
-      </ConfigContext.Provider>
+      <DashboardContext.Provider value={{ ...state, setParentConfig, outerContainerRef, isDebug }}>
+        <DashboardDispatchContext.Provider value={dispatch}>
+          <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
+            {body}
+          </div>
+          <OverlayFrame />
+        </DashboardDispatchContext.Provider>
+      </DashboardContext.Provider>
     </GlobalContextProvider>
   )
 }
