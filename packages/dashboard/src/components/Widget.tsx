@@ -2,7 +2,7 @@ import React, { useContext, useRef, useEffect } from 'react'
 import { useDrag } from 'react-dnd'
 
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
-import ConfigContext from '../ConfigContext'
+import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -10,6 +10,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Icon from '@cdc/core/components/ui/Icon'
 import Modal from '@cdc/core/components/ui/Modal'
+import { Visualization } from '../types/Config'
 
 const iconHash = {
   'data-bite': <Icon display='databite' base />,
@@ -45,11 +46,22 @@ const labelHash = {
   'filter-dropdowns': 'Filter Dropdowns'
 }
 
-const Widget = ({ data = {}, addVisualization, type }) => {
-  const { overlay } = useGlobalContext()
-  const { rows, visualizations, config, updateConfig } = useContext(ConfigContext)
+type WidgetData = Visualization & { rowIdx: number; colIdx: number }
+type WidgetProps = {
+  data?: WidgetData
+  addVisualization?: Function
+  type: string
+}
 
-  const dataRef = useRef()
+const Widget = ({ data, addVisualization, type }: WidgetProps) => {
+  const { overlay } = useGlobalContext()
+  const { config } = useContext(DashboardContext)
+  if (!config) return null
+  const rows = config.rows
+  const visualizations = config.visualizations
+  const dispatch = useContext(DashboardDispatchContext)
+  const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
+  const dataRef = useRef<WidgetData>()
   dataRef.current = data
 
   const transform = new DataTransform()
@@ -61,11 +73,11 @@ const Widget = ({ data = {}, addVisualization, type }) => {
 
     const { rowIdx, colIdx } = result
 
-    if (undefined !== data.rowIdx) {
+    if (undefined !== data?.rowIdx) {
       rows[data.rowIdx][data.colIdx].widget = null // Wipe from old position
 
       rows[rowIdx][colIdx].widget = data.uid // Add to new row and col
-    } else {
+    } else if (!!addVisualization) {
       // Item does not exist, instantiate a new one
       const newViz = addVisualization()
       visualizations[newViz.uid] = newViz // Add to widgets collection
@@ -84,13 +96,14 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   })
 
   const deleteWidget = () => {
+    if (!data) return
     rows[data.rowIdx][data.colIdx].widget = null
 
     delete visualizations[data.uid]
 
     if (config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0) {
       config.dashboard.sharedFilters.forEach(sharedFilter => {
-        if (sharedFilter.usedBy.indexOf(data.uid) !== -1) {
+        if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(data.uid) !== -1) {
           sharedFilter.usedBy.splice(sharedFilter.usedBy.indexOf(data.uid), 1)
         }
       })
@@ -100,14 +113,15 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   const editWidget = () => {
+    if (!data) return
     visualizations[data.uid].editing = true
 
     updateConfig({ ...config, visualizations })
   }
 
   const changeDataset = (uid, value) => {
-    delete visualizations[uid].dataDescription
-    delete visualizations[uid].formattedData
+    visualizations[uid].dataDescription = {}
+    visualizations[uid].formattedData = undefined
 
     visualizations[uid].dataKey = value
 
@@ -115,7 +129,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   const updateDescriptionProp = async (visualizationKey, datasetKey, key, value) => {
-    let dataDescription = { ...dataRef.current.dataDescription, [key]: value }
+    let dataDescription = { ...(dataRef.current?.dataDescription as Object), [key]: value }
 
     let newData
     if (!config.datasets[datasetKey].data && config.datasets[datasetKey].dataUrl) {
@@ -135,8 +149,8 @@ const Widget = ({ data = {}, addVisualization, type }) => {
     overlay?.actions.openOverlay(dataDesignerModal(newVisualizations[visualizationKey]))
   }
 
-  const dataDesignerModal = (configureData, dataKeyOverride) => {
-    const dataKey = !dataKeyOverride && dataKeyOverride !== '' ? data.dataKey || dataRef.current.dataKey : dataKeyOverride
+  const dataDesignerModal = (configureData, dataKeyOverride?) => {
+    const dataKey = !dataKeyOverride && dataKeyOverride !== '' ? data?.dataKey || dataRef.current?.dataKey : dataKeyOverride
 
     overlay?.actions.toggleOverlay()
 
@@ -149,7 +163,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
               className='dataset-selector'
               defaultValue={dataKey}
               onChange={e => {
-                changeDataset(data.uid, e.target.value)
+                changeDataset(data?.uid, e.target.value)
                 overlay?.actions.openOverlay(dataDesignerModal(data, e.target.value || ''))
               }}
             >
@@ -161,7 +175,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
             <DataDesigner
               {...{
                 configureData,
-                visualizationKey: data.uid,
+                visualizationKey: data?.uid,
                 dataKey: dataKey,
                 updateDescriptionProp
               }}
@@ -178,7 +192,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   const FilterHideModal = configureData => {
-    const currentVizKey = Object.keys(visualizations).find(vizKey => vizKey === configureData.uid)
+    const currentVizKey = Object.keys(visualizations).find(vizKey => vizKey === configureData.uid) || ''
     const currentViz = config.visualizations && config.visualizations[currentVizKey]
     const onFilterHideChange = (e, index) => {
       const visualizations = { ...config.visualizations }
@@ -243,23 +257,23 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   useEffect(() => {
-    if (data.openModal) {
+    if (data?.openModal) {
       overlay?.actions.openOverlay(type === 'filter-dropdowns' ? FilterHideModal(dataRef.current) : dataDesignerModal(dataRef.current))
 
       visualizations[data.uid].openModal = false
 
       updateConfig({ ...config, visualizations })
     }
-  }, [data.openModal])
+  }, [data?.openModal])
 
   return (
     <>
       <div className='widget' ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
         <Icon display='move' className='drag-icon' />
         <div className='widget__content'>
-          {data.rowIdx !== undefined && (
+          {data?.rowIdx !== undefined && (
             <div className='widget-menu'>
-              {((data.dataKey && data.dataDescription && (data.formattedData || (config.datasets[data.dataKey] && transform.autoStandardize(config.datasets[data.dataKey].data, data.dataDescription)))) || type === 'markup-include') && type !== 'filter-dropdowns' && (
+              {((data.dataKey && data.dataDescription && (data.formattedData || (config.datasets[data.dataKey] && transform.autoStandardize(config.datasets[data.dataKey].data)))) || type === 'markup-include') && type !== 'filter-dropdowns' && (
                 <button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
                   {iconHash['tools']}
                 </button>
@@ -282,7 +296,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
           )}
           {iconHash[type]}
           <span>{labelHash[type]}</span>
-          {data.newViz && type !== 'filter-dropdowns' && (
+          {data?.newViz && type !== 'filter-dropdowns' && (
             <span onClick={editWidget} className='config-needed'>
               Configuration needed
             </span>
