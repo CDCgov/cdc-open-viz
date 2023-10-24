@@ -51,7 +51,7 @@ const BarChartStackedHorizontal = props => {
                     <style>
                       {`
                          #barStack${barStack.index}-${bar.index} rect,
-                         #barStack${barStack.index}-${bar.index} foreignObject{
+                         #barStack${barStack.index}-${bar.index} foreignObject div{
                           animation-delay: ${barStack.index * 0.5}s;
                           transform-origin: ${bar.x}px
                         }
@@ -65,7 +65,6 @@ const BarChartStackedHorizontal = props => {
                         y={bar.y}
                         width={bar.width}
                         height={bar.height}
-                        style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
                         opacity={transparentBar ? 0.5 : 1}
                         display={displayBar ? 'block' : 'none'}
                         data-tooltip-html={tooltip}
@@ -77,7 +76,9 @@ const BarChartStackedHorizontal = props => {
                             setSharedFilter(config.uid, bar)
                           }
                         }}
-                      ></foreignObject>
+                      >
+                        <div style={{ width: bar.width, height: bar.height, background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
+                      </foreignObject>
 
                       {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel && (
                         <Text

@@ -185,10 +185,11 @@ export default function DeviationBar({ height, xScale }) {
                 y={barY}
                 width={barWidth}
                 height={barHeight}
-                style={{ border: `${borderWidth}px solid #333`, backgroundColor: barColor[barPosition], ...borderRadius }}
                 data-tooltip-html={tooltip}
                 data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-              />
+              >
+                <div style={{ width: barWidth, height: barHeight, border: `${borderWidth}px solid #333`, backgroundColor: barColor[barPosition], ...borderRadius }}></div>
+              </foreignObject>
               {config.yAxis.displayNumbersOnBar && (
                 <Text verticalAnchor='middle' x={textX} y={textY} {...textProps[barPosition]}>
                   {formatNumber(d[seriesKey], 'left')}
