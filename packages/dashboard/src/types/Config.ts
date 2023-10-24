@@ -5,7 +5,7 @@ export type Visualization = {
   visualizationType: string
   dataKey: string
   formattedData: any
-  dataDescription: string
+  dataDescription: Object
   data: any
   originalFormattedData: any
   editing: boolean
@@ -32,13 +32,15 @@ export type Config = DataSet & {
     theme: any
     filters: any
   }
+  confidenceKeys: Record<string, any>
   visualizations: {
     [vizKey: string]: Visualization
   }
+  series: {dataKey: string}[]
   datasets: Record<string, DataSet>
   dataFileName: string
   table: any
   rows: any[]
-  data: any
   filterBehavior: string
+  runtime: {editorErrorMessage: string}
 }
