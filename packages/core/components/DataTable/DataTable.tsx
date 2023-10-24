@@ -28,6 +28,7 @@ export type DataTableProps = {
   headerColor?: string
   colorScale?: Function
   expandDataTable: boolean
+  groupBy?: string
   columns?: {
     navigate: {
       name: string

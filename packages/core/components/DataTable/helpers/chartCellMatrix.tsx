@@ -5,14 +5,16 @@ import { DataTableProps } from '../DataTable'
 import { getChartCellValue } from './getChartCellValue'
 import { getDataSeriesColumns } from './getDataSeriesColumns'
 import { ReactNode } from 'react'
+import { CellMatrix, GroupCellMatrix } from '../../Table/types/CellMatrix'
 
 type ChartRowsProps = DataTableProps & {
   rows: string[]
   isVertical: boolean
   sortBy: { colIndex; column }
+  groupBy?: string
 }
 
-const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorScale }: ChartRowsProps): ReactNode[][] => {
+const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorScale, groupBy }: ChartRowsProps): CellMatrix | GroupCellMatrix => {
   const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
 
   const dataSeriesColumnsSorted = () => {
@@ -32,9 +34,30 @@ const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorSc
   }
 
   if (isVertical) {
-    return rows.map(row => {
-      return dataSeriesColumns.map((column, j) => getChartCellValue(row, column, config, runtimeData))
-    })
+    if (groupBy) {
+      const cellMatrix: GroupCellMatrix = {}
+      rows.forEach(row => {
+        let groupKey: string
+        let groupValues = ['']
+        dataSeriesColumns.forEach((column, j) => {
+          if (groupBy === column) {
+            groupKey = getChartCellValue(row, column, config, runtimeData)
+          } else {
+            groupValues.push(getChartCellValue(row, column, config, runtimeData))
+          }
+        })
+        if (!cellMatrix[groupKey]) {
+          cellMatrix[groupKey] = [groupValues]
+        } else {
+          cellMatrix[groupKey].push(groupValues)
+        }
+      })
+      return cellMatrix
+    } else {
+      return rows.map(row => {
+        return dataSeriesColumns.map((column, j) => getChartCellValue(row, column, config, runtimeData))
+      })
+    }
   } else {
     return dataSeriesColumnsSorted().map(column => {
       const seriesName = getSeriesName(column, config)

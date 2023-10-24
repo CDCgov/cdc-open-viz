@@ -1,9 +1,7 @@
 import { ReactNode } from 'react'
 import Row from './components/Row'
 import GroupRow from './components/GroupRow'
-
-type CellMatrix = ReactNode[][]
-type GroupCellMatrix = Record<string, CellMatrix>
+import { CellMatrix, GroupCellMatrix } from './types/CellMatrix'
 
 type TableProps = {
   childrenMatrix: CellMatrix | GroupCellMatrix

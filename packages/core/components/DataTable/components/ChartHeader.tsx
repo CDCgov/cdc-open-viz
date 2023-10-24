@@ -3,9 +3,19 @@ import { getSeriesName } from '../helpers/getSeriesName'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import { DownIcon, UpIcon } from './Icons'
 
-const ChartHeader = ({ data, isVertical, config, runtimeData, setSortBy, sortBy }) => {
+type ChartHeaderProps = { data; isVertical; config; runtimeData; setSortBy; sortBy; groupBy? }
+
+const ChartHeader = ({ data, isVertical, config, runtimeData, setSortBy, sortBy, groupBy }: ChartHeaderProps) => {
   if (!data) return
-  const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
+  let dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
+  if (groupBy) {
+    let sorted = dataSeriesColumns.filter(col => col !== groupBy)
+    if (sorted.length != dataSeriesColumns.length) {
+      // match was found
+      // make the groupBy column the first column
+      dataSeriesColumns = [groupBy, ...sorted]
+    }
+  }
   if (isVertical) {
     return (
       <tr>

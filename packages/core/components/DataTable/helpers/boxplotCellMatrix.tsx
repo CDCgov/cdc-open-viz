@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
+import { CellMatrix } from '../../Table/types/CellMatrix'
 
-const boxplotCellMatrix = ({ rows, config }): ReactNode[][] => {
+const boxplotCellMatrix = ({ rows, config }): CellMatrix => {
   const resolveName = key => {
     let {
       boxplot: { labels }
