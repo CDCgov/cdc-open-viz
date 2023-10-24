@@ -25,7 +25,7 @@ export const parameters = {
 
 export const decorators = [
   Story => (
-    <div className='cove cove-storybook'>
+    <div className='cove-storybook'>
       <Story />
     </div>
   )

@@ -1,5 +1,5 @@
 import React from 'react'
-import type { Visualization } from '../types/Config'
+import type { Visualization } from '@cdc/core/types/Visualization'
 import Widget from './Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 
