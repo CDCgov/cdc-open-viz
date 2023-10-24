@@ -48,7 +48,7 @@
       .wrap {
         display: inline-flex;
         flex-wrap: wrap;
-        width: 33%;  // changed from 20% so that long checkbox name will fit without wrapping
+        width: 33%; // changed from 20% so that long checkbox name will fit without wrapping
         font-size: 0.8em;
 
         .table-height-input {
@@ -179,7 +179,8 @@
     }
   }
 
-  div.dashboard-title {
+  div.dashboard-title,
+  .dashboard-title {
     color: white;
     padding: 0.6em 0.8em;
     border-bottom-width: 3px;

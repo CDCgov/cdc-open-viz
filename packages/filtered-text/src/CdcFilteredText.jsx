@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Header } from '@cdc/core/components/ui/Header'
+import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
 
 // context & initial state
 import ConfigContext from './ConfigContext'
@@ -118,7 +118,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
   if (loading === false) {
     let body = (
       <>
-        <Header classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
+        <VizTitle classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
         <div className={contentClasses.join(' ')}>
           <div className='cove-component__content-wrap'>
             {filterByTextColumn()

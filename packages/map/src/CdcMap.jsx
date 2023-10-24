@@ -39,7 +39,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
-import { Header } from '@cdc/core/components/ui/Header'
+import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
 
 // Child Components
 import ConfigContext from './context'
@@ -1594,7 +1594,15 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
               <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
             )}
-            <Header title={title} superTitle={general.superTitle} config={config} classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]} />
+
+            {/* prettier-ignore */}
+            <VizTitle
+              title={title}
+              superTitle={general.superTitle}
+              config={config}
+              classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
+            />
+
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}

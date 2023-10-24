@@ -20,13 +20,13 @@ import Loading from '@cdc/core/components/Loading'
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
-import { Header } from '@cdc/core/components/ui/Header'
 import { publish } from '@cdc/core/helpers/events'
 import chartReducer from './store/chart.reducer'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import './scss/main.scss'
+import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
 
 type CdcWaffleChartProps = {
   configUrl?: string
@@ -282,7 +282,7 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
   return (
     <div className={innerContainerClasses.join(' ')}>
       <>
-        <Header title={title} config={config} classes={['chart-title', `${config.theme}`]} />
+        <VizTitle title={title} config={config} classes={['chart-title', `${config.theme}`]} />
         <div className={contentClasses.join(' ')}>
           <div className='cove-component__content-wrap'>
             {config.visualizationType === 'Gauge' && (
