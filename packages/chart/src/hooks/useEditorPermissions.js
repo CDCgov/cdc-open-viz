@@ -178,7 +178,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsFilters = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line']
+    const disabledCharts = ['Forest Plot']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
