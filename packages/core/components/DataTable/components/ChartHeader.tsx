@@ -9,11 +9,11 @@ const ChartHeader = ({ data, isVertical, config, runtimeData, setSortBy, sortBy,
   if (!data) return
   let dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
   if (groupBy) {
-    let sorted = dataSeriesColumns.filter(col => col !== groupBy)
-    if (sorted.length != dataSeriesColumns.length) {
+    let groupHeaderRemoved = dataSeriesColumns.filter(col => col !== groupBy)
+    if (groupHeaderRemoved.length != dataSeriesColumns.length) {
       // match was found
-      // make the groupBy column the first column
-      dataSeriesColumns = [groupBy, ...sorted]
+      // assign headers with groupHeaderRemoved
+      dataSeriesColumns = groupHeaderRemoved
     }
   }
   if (isVertical) {

@@ -38,7 +38,7 @@ const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorSc
       const cellMatrix: GroupCellMatrix = {}
       rows.forEach(row => {
         let groupKey: string
-        let groupValues = ['']
+        let groupValues = []
         dataSeriesColumns.forEach((column, j) => {
           if (groupBy === column) {
             groupKey = getChartCellValue(row, column, config, runtimeData)
