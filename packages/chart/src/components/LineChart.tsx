@@ -27,6 +27,44 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
     return `${formatNumber(value, axis)}`
   }
 
+  // TODO: update circle radii in initial state and update everywhere.
+  const LineCircle = props => {
+    const { config, d, displayArea, seriesKey, tooltipData } = props
+    const { lineDatapointStyle } = config
+
+    if (lineDatapointStyle === 'hidden') return null
+
+    if (lineDatapointStyle === 'always show') {
+      return (
+        <circle
+          cx={config.xAxis.type === 'categorical' ? xScale(d[config.xAxis.dataKey]) : xScale(parseDate(d[config.xAxis.dataKey]))}
+          cy={yScale(d[seriesKey])}
+          r={4.5}
+          opacity={d[seriesKey] ? 1 : 0}
+          fillOpacity={1}
+          fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000') : 'transparent'}
+          style={{ filter: 'unset', opacity: 1 }}
+        />
+      )
+    }
+
+    if (lineDatapointStyle === 'hover') {
+      return (
+        <circle
+          cx={config.xAxis.type === 'categorical' ? xScale(d[config.xAxis.dataKey]) : xScale(parseDate(d[config.xAxis.dataKey]))}
+          cy={yScale(d[seriesKey])}
+          r={4.5}
+          opacity={d[seriesKey] ? 1 : 0}
+          fillOpacity={1}
+          fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000') : 'transparent'}
+          style={{ filter: 'unset', opacity: 1 }}
+        />
+      )
+    }
+
+    return null
+  }
+
   const DEBUG = false
 
   return (
