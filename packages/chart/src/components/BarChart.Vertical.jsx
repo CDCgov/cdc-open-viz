@@ -96,6 +96,8 @@ export const BarChartVertical = props => {
                     borderColor,
                     borderStyle: 'solid',
                     borderWidth,
+                    width: barWidth,
+                    height: barHeight,
                     ...borderRadius
                   }
 
@@ -104,8 +106,8 @@ export const BarChartVertical = props => {
                       {/* This feels gross but inline transition was not working well*/}
                       <style>
                         {`
-                        .linear #barGroup${barGroup.index},
-                        .Combo #barGroup${barGroup.index} {
+                        .linear #barGroup${barGroup.index} div,
+                        .Combo #barGroup${barGroup.index} div {
                           transform-origin: 0 ${barY + barHeight}px;
                         }
                       `}
@@ -118,7 +120,6 @@ export const BarChartVertical = props => {
                           y={barY}
                           width={barWidth}
                           height={barHeight}
-                          style={finalStyle}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tooltip-html={tooltip}
@@ -130,7 +131,9 @@ export const BarChartVertical = props => {
                               setSharedFilter(config.uid, bar)
                             }
                           }}
-                        ></foreignObject>
+                        >
+                          <div style={finalStyle}></div>
+                        </foreignObject>
 
                         <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={labelColor} textAnchor='middle'>
                           {yAxisValue}
