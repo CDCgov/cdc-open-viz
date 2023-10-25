@@ -63,7 +63,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const [data, setData] = useState({})
   const [filteredData, setFilteredData] = useState({})
   const [apiFilterDropdowns, setAPIFilterDropdowns] = useState<APIFilterDropdowns>({})
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [preview, setPreview] = useState(false)
   const [tabSelected, setTabSelected] = useState(0)
   const [currentViewport, setCurrentViewport] = useState('lg')
