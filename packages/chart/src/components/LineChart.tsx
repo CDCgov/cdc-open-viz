@@ -51,6 +51,24 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
 
     if (lineDatapointStyle === 'hidden') return null
 
+    const getColor = (displayArea, colorScale, config, seriesIndex, hoveredKey, seriesKey) => {
+      const customColors = config.customColors || []
+      const seriesLabels = config.runtime.seriesLabels || []
+
+      const getIndex = seriesKey => config.runtime.seriesLabelsAll.indexOf(seriesKey)
+
+      if (displayArea) {
+        if (colorScale) {
+          if (getIndex(hoveredKey) === false) return
+          return customColors.length > 0 ? customColors[getIndex(hoveredKey)] : colorScale(seriesLabels[hoveredKey] || seriesKey)
+        } else {
+          return '#000'
+        }
+      } else {
+        return 'transparent'
+      }
+    }
+
     if (lineDatapointStyle === 'always show') {
       return (
         <circle
@@ -73,8 +91,8 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
       return tooltipData.data.map((tooltipItem, index) => {
         let yIndex = tooltipData?.data?.[Number(index) + 1]?.[1]
         let hoveredKey = tooltipData?.data?.[Number(index) + 1]?.[0]
-        console.log('YINDEX', yIndex)
-        if (isNaN(yIndex)) return
+        let seriesIndex = config.runtime.seriesLabelsAll.indexOf(hoveredXValue)
+        if (isNaN(yIndex)) return <></>
         return (
           <circle
             cx={config.xAxis.type === 'categorical' ? xScale(hoveredXValue) : xScale(parseDate(hoveredXValue))}
@@ -82,7 +100,7 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
             r={4.5}
             opacity={1}
             fillOpacity={1}
-            fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[hoveredKey] : seriesKey) : '#000') : 'transparent'}
+            fill={getColor(displayArea, colorScale, config, seriesIndex, hoveredKey, seriesKey)}
             style={{ filter: 'unset', opacity: 1 }}
           />
         )
@@ -93,6 +111,7 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
   }
 
   const DEBUG = false
+
   return (
     <ErrorBoundary component='LineChart'>
       <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
@@ -152,7 +171,9 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                 x={d => xScale(getXAxisData(d))}
                 y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                 stroke={
-                  colorScale
+                  config.customColors
+                    ? config.customColors[index]
+                    : colorScale
                     ? colorPalettes[config.palette][index]
                     : // fallback
                       '#000'
