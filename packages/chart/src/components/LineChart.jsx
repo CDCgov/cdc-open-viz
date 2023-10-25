@@ -84,32 +84,18 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                         {formatNumber(d[seriesKey], 'left')}
                       </Text>
 
-                      <circle
-                        key={`${seriesKey}-${dataIndex}`}
-                        r={circleRadii}
-                        cx={Number(xScale(getXAxisData(d)))}
-                        cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))}
-                        fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                        style={{
-                          fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'
-                        }}
-                        data-tooltip-html={tooltip}
-                        data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                      />
-
                       {/* circles that appear on hover */}
-                      {/* todo: circle radii used here should be global with other circle radii */}
-                      {/* {tooltipData && Object.entries(tooltipData.data).length > 0 && isNumber(tooltipData.data[seriesKey]) && config.lineDatapointStyle === 'hover' && config.series.filter(s => s.type === 'Line') && (
+                      {(config.lineDatapointStyle === 'hover' || config.lineDatapointStyle === 'always show') && config.series.filter(s => s.type === 'Line') && (
                         <circle
-                          cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
-                          cy={yScale(tooltipData.data[seriesKey])}
+                          cx={config.xAxis.type === 'categorical' ? xScale(d[config.xAxis.dataKey]) : xScale(parseDate(d[config.xAxis.dataKey]))}
+                          cy={yScale(d[seriesKey])}
                           r={4.5}
-                          opacity={tooltipData[seriesKey] ? 1 : 0}
+                          opacity={d[seriesKey] ? 1 : 0}
                           fillOpacity={1}
                           fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000') : 'transparent'}
                           style={{ filter: 'unset', opacity: 1 }}
                         />
-                      )} */}
+                      )}
                     </Group>
                   )
                 )
