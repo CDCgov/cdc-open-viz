@@ -8,24 +8,7 @@ import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import useRightAxis from '../hooks/useRightAxis'
-
-// todo: change this config obj to ChartConfig once its created
-type LineCircle = {
-  config: {
-    xAxis: string
-    data: Object[]
-    lineDatapointStyle: string
-    runtime: Object
-  }
-  d?: Object
-  displayArea: boolean
-  seriesKey: string
-  tooltipData: {
-    data: []
-    tooltipDataX: number
-    tooltipDataY: number
-  }
-}
+import LineChartCircle from './LineChart.Circle'
 
 const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, showTooltip, seriesStyle = 'Line', svgRef, handleTooltipClick, tooltipData }) => {
   // Not sure why there's a redraw here.
@@ -42,72 +25,6 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
       return `${label}: ${formatNumber(value, axis)}`
     }
     return `${formatNumber(value, axis)}`
-  }
-
-  // TODO: update circle radii in initial state and update everywhere.
-  const LineCircle = (props: LineCircle) => {
-    const { config, d, displayArea, seriesKey, tooltipData } = props
-    const { lineDatapointStyle } = config
-
-    if (lineDatapointStyle === 'hidden') return null
-
-    const getColor = (displayArea, colorScale, config, seriesIndex, hoveredKey, seriesKey) => {
-      const customColors = config.customColors || []
-      const seriesLabels = config.runtime.seriesLabels || []
-
-      const getIndex = seriesKey => config.runtime.seriesLabelsAll.indexOf(seriesKey)
-
-      if (displayArea) {
-        if (colorScale) {
-          if (getIndex(hoveredKey) === false) return
-          return customColors.length > 0 ? customColors[getIndex(hoveredKey)] : colorScale(seriesLabels[hoveredKey] || seriesKey)
-        } else {
-          return '#000'
-        }
-      } else {
-        return 'transparent'
-      }
-    }
-
-    if (lineDatapointStyle === 'always show') {
-      return (
-        <circle
-          cx={config.xAxis.type === 'categorical' ? xScale(d[config.xAxis.dataKey]) : xScale(parseDate(d[config.xAxis.dataKey]))}
-          cy={yScale(d[seriesKey])}
-          r={4.5}
-          opacity={d[seriesKey] ? 1 : 0}
-          fillOpacity={1}
-          fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000') : 'transparent'}
-          style={{ filter: 'unset', opacity: 1 }}
-        />
-      )
-    }
-
-    if (lineDatapointStyle === 'hover') {
-      if (!tooltipData) return
-      if (!tooltipData.data) return
-      let hoveredXValue = tooltipData?.data?.[0]?.[1]
-      if (!hoveredXValue) return
-      return tooltipData.data.map((tooltipItem, index) => {
-        let yIndex = tooltipData?.data?.[Number(index) + 1]?.[1]
-        let hoveredKey = tooltipData?.data?.[Number(index) + 1]?.[0]
-        let seriesIndex = config.runtime.seriesLabelsAll.indexOf(hoveredXValue)
-        if (isNaN(yIndex)) return <></>
-        return (
-          <circle
-            cx={config.xAxis.type === 'categorical' ? xScale(hoveredXValue) : xScale(parseDate(hoveredXValue))}
-            cy={yIndex ? yScale(yIndex) : null}
-            r={4.5}
-            opacity={1}
-            fillOpacity={1}
-            fill={getColor(displayArea, colorScale, config, seriesIndex, hoveredKey, seriesKey)}
-            style={{ filter: 'unset', opacity: 1 }}
-          />
-        )
-      })
-    }
-
-    return null
   }
 
   const DEBUG = false
@@ -157,13 +74,14 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                         {formatNumber(d[seriesKey], 'left')}
                       </Text>
 
-                      {config.lineDatapointStyle === 'hidden' || (config.lineDatapointStyle === 'always show' && <LineCircle d={d} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} />)}
+                      {config.lineDatapointStyle === 'hidden' ||
+                        (config.lineDatapointStyle === 'always show' && <LineChartCircle d={d} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} />)}
                     </Group>
                   )
                 )
               })}
 
-              <>{config.lineDatapointStyle === 'hover' && <LineCircle config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} />}</>
+              <>{config.lineDatapointStyle === 'hover' && <LineChartCircle config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />}</>
 
               <LinePath
                 curve={allCurves[seriesData[0].lineType]}
