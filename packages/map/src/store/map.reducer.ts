@@ -1,4 +1,5 @@
 import { MapConfig } from '../types/MapConfig'
+import { RuntimeLegend } from '../types/RuntimeLegend'
 import MapActions from './map.actions'
 
 export type MapState = {
@@ -15,9 +16,10 @@ export type MapState = {
   modal: any
   position: Object
   preview?: boolean
-  runtimeData: Object[]
+  runtime
+  runtimeData: Record<string, Object>
   runtimeFilters?: Object[]
-  runtimeLegend?: Object[]
+  runtimeLegend?: RuntimeLegend
   tabSelected?: number
 }
 
@@ -61,6 +63,15 @@ const reducer = (state: MapState, action: MapActions): MapState => {
     }
     case 'SET_DIMENSIONS': {
       return { ...state, dimensions: action.payload }
+    }
+    case 'SET_ERROR_MESSAGE': {
+      return {
+        ...state,
+        runtime: {
+          ...state.runtime,
+          editorErrorMessage: action.payload
+        }
+      }
     }
   }
 }

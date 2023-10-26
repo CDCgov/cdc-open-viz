@@ -1,5 +1,5 @@
 //TODO: Move legends to core
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import parse from 'html-react-parser'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -8,10 +8,9 @@ import HexSetting from './HexShapeSettings'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../context'
 
-const Sidebar = props => {
+const Sidebar = () => {
   // prettier-ignore
   const {
-    changeFilterActive,
     displayDataAsText,
     resetLegendToggles,
     runtimeFilters,
@@ -19,7 +18,6 @@ const Sidebar = props => {
     setAccessibleStatus,
     setRuntimeLegend,
     state,
-    suffix,
     viewport,
   } = useContext(ConfigContext)
 
@@ -38,8 +36,6 @@ const Sidebar = props => {
     const disabledAmt = runtimeLegend.disabledAmt ?? 0
 
     newLegend['disabledAmt'] = newValue ? disabledAmt + 1 : disabledAmt - 1
-
-    newLegend.runtimeDataHash = runtimeLegend.runtimeDataHash
 
     setRuntimeLegend(newLegend)
 
@@ -82,6 +78,7 @@ const Sidebar = props => {
     }
 
     return (
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
       <li
         className={handleListItemClass().join(' ')}
         key={idx}
@@ -101,41 +98,12 @@ const Sidebar = props => {
     e.preventDefault()
     resetLegendToggles()
     setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
-    if (undefined === singleFilter.active) return null
-
-    singleFilter.values.forEach((filterOption, idx) => {
-      values.push(
-        <option key={idx} value={filterOption}>
-          {filterOption}
-        </option>
-      )
-    })
-
-    return (
-      <section className='filter-col' key={idx}>
-        {singleFilter.label?.length > 0 && <label htmlFor={`filter-${idx}`}>{singleFilter.label}</label>}
-        <select
-          id={`filter-${idx}`}
-          className='filter-select'
-          aria-label='select filter'
-          value={singleFilter.active}
-          onChange={val => {
-            changeFilterActive(idx, val.target.value)
-            setAccessibleStatus(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`)
-          }}
-        >
-          {values}
-        </select>
-      </section>
-    )
   }
-
-  const columnLogic = legend.position === 'side' && legend.singleColumn ? 'single-column' : legend.position === 'bottom' && legend.singleRow ? 'single-row' : legend.verticalSorted && !legend.singleRow ? 'vertical-sorted' : ''
 
   return (
     <ErrorBoundary component='Sidebar'>
       <div className='legends'>
-        <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex='0'>
+        <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend'>
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
             {runtimeLegend.disabledAmt > 0 && (
               <button onClick={handleReset} className={legendClasses.resetButton.join(' ') || ''}>
