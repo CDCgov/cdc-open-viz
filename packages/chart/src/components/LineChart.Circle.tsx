@@ -27,7 +27,7 @@ type LineChartCircleProps = {
 const LineChartCircle = (props: LineChartCircleProps) => {
   const { config, d, displayArea, seriesKey, tooltipData, xScale, yScale, colorScale, parseDate, yScaleRight } = props
   const { lineDatapointStyle } = config
-  const filtered = config?.series.filter(s => s.dataKey === seriesKey)[0]
+  const filtered = config?.series.filter(s => s.dataKey === seriesKey)?.[0]
 
   if (lineDatapointStyle === 'hidden') return null
 
@@ -74,10 +74,10 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     let hoveredSeriesValue
     let hoveredSeriesIndex
     let hoveredSeriesData = tooltipData.data.filter(d => d[0] === seriesKey)
-    let hoveredSeriesKey = hoveredSeriesData[0][0]
-    let hoveredSeriesAxis = hoveredSeriesData[0][2]
+    let hoveredSeriesKey = hoveredSeriesData?.[0]?.[0]
+    let hoveredSeriesAxis = hoveredSeriesData?.[0]?.[2]
     hoveredSeriesIndex = tooltipData.data.indexOf(hoveredSeriesKey)
-    hoveredSeriesValue = hoveredSeriesData[0][1]
+    hoveredSeriesValue = hoveredSeriesData?.[0]?.[1]
 
     console.log('hoveredSeriesKey', hoveredSeriesKey)
     console.log('hoveredSeriesAxis', hoveredSeriesAxis)
