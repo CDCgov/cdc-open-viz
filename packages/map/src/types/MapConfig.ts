@@ -47,7 +47,10 @@ export type MapConfig = Visualization & {
     navigate: NavigateColumnProperties
     latitude: LatitudeColumnProperties
     longitude: LongitudeColumnProperties
+    categorical: { name }
   }
+  dataUrl: string
+  runtimeDataUrl: string
   filters: any[]
   general: {
     allowMapZoom: boolean
@@ -80,9 +83,13 @@ export type MapConfig = Visualization & {
     type: 'data' | 'navigation' | 'us-geocode' | 'world-geocode' | 'bubble'
   }
   legend: {
+    additionalCategories
+    categoryValuesOrder
+    description
     descriptions: {}
-    specialClasses: []
+    specialClasses: { key; label; value }[]
     unified: boolean
+    separateZero: boolean
     singleColumn: boolean
     singleRow: boolean
     verticalSorted: boolean
@@ -116,7 +123,7 @@ export type MapConfig = Visualization & {
   }
   mapPosition: { coordinates: Coordinate; zoom: number }
   map: {
-    layers: []
+    layers: { url; namespace; fill; fillOpacity; stroke; strokeWidth; tooltip }[]
   }
   hexMap: HexMapSettings
   filterBehavior: string
