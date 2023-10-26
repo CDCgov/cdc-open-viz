@@ -14,6 +14,14 @@
 .flex-column-reverse {
   flex-direction: column-reverse;
 }
+.visx-brush {
+  & > rect {
+    stroke-width: 1px !important;
+    stroke: rgb(205, 205, 214) !important;
+    stroke-opacity: 1 !important;
+    rx: 15;
+  }
+}
 
 .cdc-open-viz-module.type-chart {
   @import 'DataTable';
