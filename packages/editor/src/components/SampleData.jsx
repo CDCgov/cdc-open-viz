@@ -12,6 +12,8 @@ import validAreaChart from './../samples/valid-area-chart.json?raw'
 import validWorldGeocodeData from './../samples/valid-world-geocode.json?raw'
 import validForecastData from './../samples/valid-forecast-data.csv?raw'
 import validForestPlotData from './../samples/valid-forest-plot-data.csv?raw'
+import vaidWorldData from './../samples/valid-world-data.json?raw'
+import validRegionData from './../samples/valid-region-data.json?raw'
 
 // Add additional data to samples
 const sampleData = {
@@ -64,9 +66,19 @@ const sampleData = {
       data: validGeoPoint
     },
     {
+      text: 'United States: Region',
+      fileName: 'valid-region-data.json',
+      data: validRegionData
+    },
+    {
       text: 'World: Geocode Sample Data',
       fileName: 'valid-world-geocode.json',
       data: validWorldGeocodeData
+    },
+    {
+      text: 'World: Default Data',
+      fileName: 'valid-world-data.json',
+      data: vaidWorldData
     }
   ]
 }

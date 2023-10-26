@@ -67,7 +67,9 @@ const iconHash = {
   'filter-dropdowns': iconDropdowns
 }
 
-const Icon = ({ display = null, base, alt = '', size, color, style, ...attributes }) => {
+export const ICON_TYPES = Object.keys(iconHash)
+
+const Icon = ({ display = '', base, alt = '', size, color, style, ...attributes }) => {
   const IconObj = iconHash[display] || null
 
   const filteredAttrs = { ...attributes }

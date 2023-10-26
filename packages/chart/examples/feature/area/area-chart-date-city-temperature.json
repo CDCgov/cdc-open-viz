@@ -1,6 +1,10 @@
 {
   "type": "chart",
+  "debugSvg": false,
   "title": "Example Area Chart - City Temperature Data",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "showChartBrush": false,
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
@@ -13,6 +17,10 @@
   "barStyle": "",
   "roundingStyle": "standard",
   "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "showDownloadButton": false
+  },
   "padding": {
     "left": 5,
     "right": 5
@@ -24,6 +32,7 @@
     "hideTicks": false,
     "size": "150",
     "gridLines": false,
+    "enablePadding": false,
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -31,16 +40,206 @@
     "tickColor": "#333",
     "rightHideAxis": true,
     "rightAxisSize": 0,
+    "rightLabel": "",
     "rightLabelOffsetSize": 0,
     "rightAxisLabelColor": "#333",
     "rightAxisTickLabelColor": "#333",
     "rightAxisTickColor": "#333",
-    "isLegendValue": false,
     "numTicks": "",
+    "axisPadding": 0,
+    "tickRotation": 0,
+    "anchors": [],
+    "isLegendValue": false,
     "label": "Y Axis - Temperature"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
+    },
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "total": "Total",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
   },
   "topAxis": {
     "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": 0.35,
+  "barHeight": 25,
+  "barSpace": 20,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 750
+  },
+  "xAxis": {
+    "anchors": [],
+    "type": "date",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "50",
+    "tickRotation": 30,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "6",
+    "labelOffset": 65,
+    "axisPadding": 0,
+    "target": 0,
+    "maxTickRotation": 0,
+    "isLegendValue": false,
+    "dataKey": "Date",
+    "label": "X Axis Example Label",
+    "dateParseFormat": "%Y-%m-%d",
+    "dateDisplayFormat": "%m/%d/%Y"
+  },
+  "table": {
+    "label": "Data Type by Date",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": true,
+    "showDataTableLink": true,
+    "indexLabel": "",
+    "download": true,
+    "showVertical": false,
+    "show": true
+  },
+  "orientation": "vertical",
+  "color": "pinkpurple",
+  "columns": {},
+  "legend": {
+    "behavior": "isolate",
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "position": "right",
+    "label": "Type of Data"
+  },
+  "exclusions": {
+    "active": true,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": true,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": true,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false,
+    "useFormat": true
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false
+  },
+  "useLogScale": false,
+  "filterBehavior": "dropdown",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "Austin",
+      "type": "Area Chart",
+      "tooltip": true
+    },
+    {
+      "dataKey": "San Francisco",
+      "type": "Area Chart",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "tooltips": {
+    "opacity": 90
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "width": "auto",
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "lowerCiField": "",
+    "upperCiField": "",
+    "shape": "",
+    "rowHeight": 20,
+    "showZeroLine": false,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 1,
+      "max": 8,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0
+  },
+  "brush": {
+    "pattern_id": "brush_pattern",
+    "accent_color": "#ddd"
+  },
+  "area": {
+    "isStacked": true
   },
   "dataDescription": {
     "horizontal": false,
@@ -48,7 +247,6 @@
   },
   "dataFileName": "valid-area-chart.json",
   "dataFileSourceType": "file",
-  "filterBehavior": "dropdown",
   "formattedData": [
     {
       "Date": "2011-10-01",
@@ -2247,77 +2445,7 @@
       "Austin": "71.9"
     }
   ],
-  "heights": {
-    "horizontal": 750,
-    "vertical": 300
-  },
-  "barHeight": 25,
-  "barSpace": 20,
   "height": 300,
-  "xAxis": {
-    "type": "date",
-    "hideAxis": false,
-    "hideLabel": false,
-    "hideTicks": false,
-    "size": "50",
-    "tickRotation": 30,
-    "min": "",
-    "max": "",
-    "labelColor": "#333",
-    "tickLabelColor": "#333",
-    "tickColor": "#333",
-    "isLegendValue": false,
-    "numTicks": "6",
-    "dataKey": "Date",
-    "label": "X Axis Example Label",
-    "dateParseFormat": "%Y-%m-%d",
-    "dateDisplayFormat": "%m/%d/%Y"
-  },
-  "table": {
-    "label": "Data Type by Date",
-    "expanded": false,
-    "limitHeight": false,
-    "height": "",
-    "caption": "",
-    "showDownloadUrl": true,
-    "show": true,
-    "download": true
-  },
-  "orientation": "vertical",
-  "legend": {
-    "behavior": "isolate",
-    "position": "right",
-    "singleRow": false,
-    "colorCode": "",
-    "reverseLabelOrder": false,
-    "description": "",
-    "dynamicLegend": false,
-    "dynamicLegendDefaultText": "Show All",
-    "dynamicLegendItemLimit": 5,
-    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
-    "dynamicLegendChartMessage": "Select Options from the Legend",
-    "label": "Type of Data"
-  },
-  "exclusions": {
-    "active": true,
-    "keys": []
-  },
-  "palette": "qualitative-bold",
-  "isPaletteReversed": false,
-  "labels": false,
-  "dataFormat": {
-    "abbreviated": true,
-    "commas": true,
-    "prefix": "",
-    "suffix": "",
-    "useFormat": true
-  },
-  "confidenceKeys": {},
-  "visual": {
-    "border": true,
-    "accent": true,
-    "background": true
-  },
   "data": [
     {
       "Date": "2011-10-01",
@@ -4517,12 +4645,8 @@
     }
   ],
   "visualizationType": "Area Chart",
-  "series": [
-    {
-      "dataKey": "Austin",
-      "type": "Area Chart"
-    }
-  ],
   "description": "This example shows a bar chart created in the visualization editor in WCMS",
-  "dataCutoff": "0"
+  "dataCutoff": "0",
+  "validated": 4.23,
+  "dynamicMarginTop": 0
 }
