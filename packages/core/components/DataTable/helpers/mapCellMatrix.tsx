@@ -18,7 +18,7 @@ const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, di
           const rowObj = runtimeData[row]
           const legendColor = applyLegendToRow(rowObj)
 
-          var labelValue
+          let labelValue
           if ((config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') || config.general.type === 'us-geocode') {
             labelValue = displayGeoName(row)
           } else {
@@ -35,16 +35,18 @@ const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, di
         } else {
           // check for special classes
           let specialValFound = ''
-          if (config.legend.specialClasses && config.legend.specialClasses.length && typeof config.legend.specialClasses[0] === 'object') {
-            for (let i = 0; i < config.legend.specialClasses.length; i++) {
-              if (config.legend.specialClasses[i].key === config.columns[column].name) {
-                if (String(runtimeData[row][config.legend.specialClasses[i].key]) === config.legend.specialClasses[i].value) {
-                  specialValFound = config.legend.specialClasses[i].label
+          let columnName = config.columns[column].name
+          const { specialClasses } = config.legend
+          if (specialClasses && specialClasses.length && typeof specialClasses[0] === 'object') {
+            specialClasses.forEach(specialClass => {
+              if (specialClass.key === columnName) {
+                if (String(runtimeData[row][specialClass.key]) === specialClass.value) {
+                  specialValFound = specialClass.label
                 }
               }
-            }
+            })
           }
-          cellValue = specialValFound ? displayDataAsText(specialValFound, column) : displayDataAsText(runtimeData[row][config.columns[column].name], column)
+          cellValue = displayDataAsText(specialValFound || runtimeData[row][columnName], column)
         }
 
         return cellValue

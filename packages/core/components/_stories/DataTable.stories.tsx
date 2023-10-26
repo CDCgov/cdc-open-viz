@@ -4,6 +4,7 @@ import DataTable from '../DataTable'
 import './styles.scss'
 import Example_1 from './_mocks/dashboard_no_filter.json'
 import CityStateExample from './_mocks/example-city-state.json'
+import { displayGeoName } from '@cdc/map/src/helpers/displayGeoName'
 
 const meta: Meta<typeof DataTable> = {
   title: 'Components/Organisms/DataTable',
@@ -41,7 +42,7 @@ export const CityState: Story = {
     tabbingId: '#asdf',
     columns: CityStateExample.columns,
     applyLegendToRow: () => ['#000'],
-    displayGeoName: n => n,
+    displayGeoName,
     displayDataAsText: d => d
   }
 }

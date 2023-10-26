@@ -95,14 +95,18 @@ const DataTable = (props: DataTableProps) => {
   const rawRows = Object.keys(runtimeData)
   const rows = isVertical
     ? rawRows.sort((a, b) => {
-        let sortVal = 0
+        let dataA
+        let dataB
         if (config.type === 'map' && config.columns) {
-          sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name], sortBy, config)
+          const sortByColName = config.columns[sortBy.column].name
+          dataA = runtimeData[a][sortByColName]
+          dataB = runtimeData[b][sortByColName]
         }
         if (config.type === 'chart' || config.type === 'dashboard') {
-          sortVal = customSort(runtimeData[a][sortBy.column], runtimeData[b][sortBy.column], sortBy, config)
+          dataA = runtimeData[a][sortBy.column]
+          dataB = runtimeData[b][sortBy.column]
         }
-        return sortVal
+        return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
       })
     : rawRows
 
