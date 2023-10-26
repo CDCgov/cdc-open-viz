@@ -1984,6 +1984,7 @@ const EditorPanel = () => {
                       }
                       updateField={updateField}
                     />
+                    <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush ' updateField={updateField} />
 
                     {config.exclusions.active && (
                       <>

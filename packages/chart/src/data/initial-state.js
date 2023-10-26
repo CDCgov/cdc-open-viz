@@ -147,6 +147,10 @@ export default {
     lineMode: false,
     verticalSorted: false
   },
+  brush: {
+    height: 25,
+    active: false
+  },
   exclusions: {
     active: false,
     keys: []
