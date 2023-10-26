@@ -7,7 +7,6 @@ export default {
   title: '',
   showTitle: true,
   showDownloadMediaButton: false,
-  showChartBrush: false,
   theme: 'theme-blue',
   animate: false,
   fontSize: 'medium',
@@ -149,6 +148,7 @@ export default {
   },
   brush: {
     height: 25,
+    data: [],
     active: false
   },
   exclusions: {
@@ -223,10 +223,7 @@ export default {
     leftWidthOffset: 0,
     rightWidthOffset: 0
   },
-  brush: {
-    pattern_id: 'brush_pattern',
-    accent_color: '#ddd'
-  },
+
   area: {
     isStacked: false
   }

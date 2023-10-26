@@ -11,10 +11,10 @@ import chroma from 'chroma-js'
 
 export const BarChartVertical = props => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
+  const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
   const { HighLightedBarUtils } = useHighlightedBars(config)
-
+  const data = config.brush.active && config.brush.data ? config.brush.data : transformedData
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&

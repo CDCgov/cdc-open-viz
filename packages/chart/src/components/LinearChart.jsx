@@ -60,6 +60,9 @@ const LinearChart = props => {
     height = height + config.data.length * config.forestPlot.rowHeight
     yMax = yMax + config.data.length * config.forestPlot.rowHeight
   }
+  if (config.brush.active) {
+    height = height + 25
+  }
 
   let dynamicMarginTop = 0 || config.dynamicMarginTop
   const marginTop = 20
