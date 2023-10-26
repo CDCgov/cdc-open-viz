@@ -15,7 +15,7 @@ import Loading from '@cdc/core/components/Loading'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
-  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, isDebug } = props
+  const { config, dataConfig, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, colorScale, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, isDebug } = props
 
   /* eslint-disable no-console */
   if (isDebug) {
@@ -28,107 +28,61 @@ const DataTable = props => {
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
-  const [sortBy, setSortBy] = useState({ column: config.type === 'map' ? 'geo' : 'date', asc: false })
+  const [sortBy, setSortBy] = useState({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
   const fileName = `${vizTitle || 'data-table'}.csv`
 
-  // Catch all sorting method used on load by default but also on user click
-  // Having a custom method means we can add in any business logic we want going forward
+  const isVertical = !(config.type === 'chart' && !config.table?.showVertical)
+
   const customSort = (a, b) => {
-    const isDateA = Date.parse(a)
-    const isDateB = Date.parse(b)
+    let valueA = a
+    let valueB = b
 
-    const isNumberA = !isNaN(a)
-    const isNumberB = !isNaN(b)
+    // Treat booleans and nulls as an empty string
+    valueA = valueA === false || valueA === true || valueA === null ? '' : valueA
+    valueB = valueB === false || valueB == true || valueB === null ? '' : valueB
 
-    if (isDateA && isDateB) {
-      return !sortBy.asc ? new Date(a) - new Date(b) : new Date(b) - new Date(a)
+    const trimmedA = String(valueA).trim()
+    const trimmedB = String(valueB).trim()
+
+    if (config.xAxis?.dataKey === sortBy.column && config.xAxis.type === 'date') {
+      let dateA = parseDate(config.xAxis.dateParseFormat, trimmedA)
+
+      let dateB = parseDate(config.xAxis.dateParseFormat, trimmedB)
+
+      if (dateA && dateA.getTime) dateA = dateA.getTime()
+
+      if (dateB && dateB.getTime) dateB = dateB.getTime()
+
+      return !sortBy.asc ? dateA - dateB : dateB - dateA
     }
-    if (isNumberA && isNumberB) {
-      return !sortBy.asc ? Number(a) - Number(b) : Number(b) - Number(a)
-    }
-    if (typeof a === 'string' && typeof b === 'string') {
-      return !sortBy.asc ? a.localeCompare(b) : b.localeCompare(a)
-    }
+    // Check if values are numbers
+    const isNumA = !isNaN(Number(valueA)) && valueA !== undefined && valueA !== null && trimmedA !== ''
+    const isNumB = !isNaN(Number(valueB)) && valueB !== undefined && valueB !== null && trimmedB !== ''
 
-    return 0
-  }
-  const customSortX = (a, b) => {
-    const digitRegex = /\d+/
+    // Handle empty strings or spaces
+    if (trimmedA === '' && trimmedB !== '') return !sortBy.asc ? -1 : 1
+    if (trimmedA !== '' && trimmedB === '') return !sortBy.asc ? 1 : -1
 
-    const hasNumber = value => digitRegex.test(value)
-
-    // force null and undefined to the bottom
-    a = a === null || a === undefined ? '' : a
-    b = b === null || b === undefined ? '' : b
-
-    // check for dates first
-    if (!isNaN(Date.parse(a)) && !isNaN(Date.parse(b))) {
-      return Date.parse(a) - Date.parse(b)
-    }
-
-    // convert any strings that are actually numbers to proper data type
-    const aNum = Number(a)
-
-    if (!Number.isNaN(aNum)) {
-      a = aNum
+    // Both are numbers: Compare numerically
+    if (isNumA && isNumB) {
+      return !sortBy.asc ? Number(valueA) - Number(valueB) : Number(valueB) - Number(valueA)
     }
 
-    const bNum = Number(b)
-
-    if (!Number.isNaN(bNum)) {
-      b = bNum
+    // Only A is a number
+    if (isNumA) {
+      return !sortBy.asc ? -1 : 1
     }
 
-    // remove iso code prefixes
-    if (typeof a === 'string') {
-      a = a.replace('us-', '')
-      a = displayGeoName(a)
+    // Only B is a number
+    if (isNumB) {
+      return !sortBy.asc ? 1 : -1
     }
 
-    if (typeof b === 'string') {
-      b = b.replace('us-', '')
-      b = displayGeoName(b)
-    }
-
-    // force any string values to lowercase
-    a = typeof a === 'string' ? a.toLowerCase() : a
-    b = typeof b === 'string' ? b.toLowerCase() : b
-
-    // If the string contains a number, remove the text from the value and only sort by the number. Only uses the first number it finds.
-    if (typeof a === 'string' && hasNumber(a) === true) {
-      a = a.match(digitRegex)[0]
-
-      a = Number(a)
-    }
-
-    if (typeof b === 'string' && hasNumber(b) === true) {
-      b = b.match(digitRegex)[0]
-
-      b = Number(b)
-    }
-
-    // When comparing a number to a string, always send string to bottom
-    if (typeof a === 'number' && typeof b === 'string') {
-      return 1
-    }
-
-    if (typeof b === 'number' && typeof a === 'string') {
-      return -1
-    }
-
-    // Return either 1 or -1 to indicate a sort priority
-    if (a > b) {
-      return 1
-    }
-    if (a < b) {
-      return -1
-    }
-    // returning 0, undefined or any falsey value will use subsequent sorts or
-    // the index as a tiebreaker
-    return 0
+    // Neither are numbers: Compare as strings
+    return !sortBy.asc ? trimmedA.localeCompare(trimmedB) : trimmedB.localeCompare(trimmedA)
   }
 
   // Optionally wrap cell with anchor if config defines a navigation url
@@ -170,7 +124,7 @@ const DataTable = props => {
     if (rawData !== undefined) {
       let csvData
       // only use fullGeoName on County maps and no other
-      if (config.general.geoType === 'us-county') {
+      if (config.general?.geoType === 'us-county') {
         // Unparse + Add column for full Geo name along with State
         csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: formatLegendLocation(row[config.columns.geo.name]), ...row })))
       } else {
@@ -225,20 +179,19 @@ const DataTable = props => {
       break
   }
 
-  const rows = Object.keys(runtimeData).sort((a, b) => {
-    let sortVal = 0
-    if (config.type === 'map' && config.columns) {
-      sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
-    }
-    if (config.type === 'chart') {
-      sortVal = customSort(runtimeData[a][sortBy.column], runtimeData[b][sortBy.column])
-    }
-    return sortVal
-    // if (!sortBy.asc) return sortVal
-    // if (sortVal === 0) return 0
-    // if (sortVal < 0) return 1
-    // return -1
-  })
+  const rawRows = Object.keys(runtimeData)
+  const rows = isVertical
+    ? rawRows.sort((a, b) => {
+        let sortVal = 0
+        if (config.type === 'map' && config.columns) {
+          sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
+        }
+        if (config.type === 'chart' || config.type === 'dashboard') {
+          sortVal = customSort(runtimeData[a][sortBy.column], runtimeData[b][sortBy.column])
+        }
+        return sortVal
+      })
+    : rawRows
 
   const genMapRows = rows => {
     const allrows = rows.map(row => {
@@ -297,20 +250,24 @@ const DataTable = props => {
   const dataSeriesColumns = () => {
     let tmpSeriesColumns
     if (config.visualizationType !== 'Pie') {
-      tmpSeriesColumns = [config.xAxis.dataKey] //, ...config.runtime.seriesLabelsAll
-      config.series.forEach(element => {
-        tmpSeriesColumns.push(element.dataKey)
-      })
+      tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey] : [] //, ...config.runtime.seriesLabelsAll
+      if (config.series) {
+        config.series.forEach(element => {
+          tmpSeriesColumns.push(element.dataKey)
+        })
+      } else if (runtimeData && runtimeData.length > 0) {
+        tmpSeriesColumns = Object.keys(runtimeData[0])
+      }
     } else {
-      tmpSeriesColumns = [config.xAxis.dataKey, config.yAxis.dataKey] //Object.keys(runtimeData[0])
+      tmpSeriesColumns = [config.xAxis?.dataKey, config.yAxis?.dataKey] //Object.keys(runtimeData[0])
     }
 
     // then add the additional Columns
-    if (Object.keys(config.columns).length > 0) {
+    if (config.columns && Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
         var value = config.columns[key]
         // add if not the index AND it is enabled to be added to data table
-        if (value.name !== config.xAxis.dataKey && value.dataTable === true) {
+        if (value.name !== config.xAxis?.dataKey && value.dataTable === true) {
           tmpSeriesColumns.push(value.name)
         }
       })
@@ -318,10 +275,22 @@ const DataTable = props => {
 
     return tmpSeriesColumns
   }
-
+  const dataSeriesColumnsSorted = () => {
+    return dataSeriesColumns().sort((a, b) => {
+      if (sortBy.column === '__series__') return customSort(a, b)
+      let row = runtimeData.find(d => d[config.xAxis?.dataKey] === sortBy.column)
+      const rowIndex = runtimeData[sortBy.colIndex - 1]
+      if (row) {
+        return customSort(row[a], row[b])
+      }
+      if (row === undefined && rowIndex) {
+        return customSort(rowIndex[a], rowIndex[b])
+      }
+    })
+  }
   const getLabel = name => {
     let custLabel = ''
-    if (Object.keys(config.columns).length > 0) {
+    if (config.columns && Object.keys(config.columns).length > 0) {
       Object.keys(config.columns).forEach(function (key) {
         var tmpColumn = config.columns[key]
         // add if not the index AND it is enabled to be added to data table
@@ -333,108 +302,180 @@ const DataTable = props => {
     }
   }
 
+  const getSeriesName = column => {
+    // If a user sets the name on a series use that.
+    let userUpdatedSeriesName = config.series ? config.series.filter(series => series.dataKey === column)?.[0]?.name : ''
+    if (userUpdatedSeriesName) return userUpdatedSeriesName
+
+    if (config.runtimeSeriesLabels && config.runtimeSeriesLabels[column]) return config.runtimeSeriesLabels[column]
+
+    let custLabel = getLabel(column) ? getLabel(column) : column
+    let text = column === config.xAxis?.dataKey ? config.table.indexLabel : custLabel
+
+    return text
+  }
+
   const genChartHeader = (columns, data) => {
     if (!data) return
-    return (
-      <tr>
-        {dataSeriesColumns().map(column => {
-          let custLabel = getLabel(column) ? getLabel(column) : column
-          let text = column === config.xAxis.dataKey ? config.table.indexLabel : custLabel
+    if (isVertical) {
+      return (
+        <tr>
+          {dataSeriesColumns().map((column, index) => {
+            const text = getSeriesName(column)
 
-          // If a user sets the name on a series use that.
-          let userUpdatedSeriesName = config.series.filter(series => series.dataKey === column)?.[0]?.name
-          if (userUpdatedSeriesName) text = userUpdatedSeriesName
-
-          return (
-            <th
-              key={`col-header-${column}`}
-              tabIndex='0'
-              title={text}
-              role='columnheader'
-              scope='col'
-              onClick={() => {
-                setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
-              }}
-              onKeyDown={e => {
-                if (e.keyCode === 13) {
-                  setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
-                }
-              }}
-              className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
-              {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
-            >
-              {text}
-              {sortBy.column === column && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
-              <button>
-                <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
-              </button>
-            </th>
-          )
-        })}
-      </tr>
-    )
+            return (
+              <th
+                key={`col-header-${column}__${index}`}
+                tabIndex='0'
+                title={text}
+                role='columnheader'
+                scope='col'
+                onClick={() => {
+                  setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false, colIndex: index })
+                }}
+                onKeyDown={e => {
+                  if (e.keyCode === 13) {
+                    setColIndex(index)
+                    setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false, colIndex: index })
+                  }
+                }}
+                className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
+                {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+              >
+                {text}
+                {column === sortBy.column && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
+                <button>
+                  <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
+                </button>
+              </th>
+            )
+          })}
+        </tr>
+      )
+    } else {
+      return (
+        <tr>
+          {['__series__', ...Object.keys(runtimeData)].map((row, index) => {
+            let column = config.xAxis?.dataKey
+            let text = row !== '__series__' ? getChartCellValue(row, column) : '__series__'
+            return (
+              <th
+                key={`col-header-${text}__${index}`}
+                tabIndex='0'
+                title={text}
+                role='columnheader'
+                scope='col'
+                onClick={() => {
+                  setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
+                }}
+                onKeyDown={e => {
+                  if (e.keyCode === 13) {
+                    setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
+                  }
+                }}
+                className={sortBy.column === text ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
+                {...(sortBy.column === text ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
+              >
+                {text === '__series__' ? '' : text}
+                {index === sortBy.colIndex && <span className={'sort-icon'}>{!sortBy.asc ? upIcon : downIcon}</span>}
+                <button>
+                  <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === text ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
+                </button>
+              </th>
+            )
+          })}
+        </tr>
+      )
+    }
   }
 
   // if its additional column, return formatting params
   const isAdditionalColumn = column => {
     let inthere = false
     let formattingParams = {}
-    Object.keys(config.columns).forEach(keycol => {
-      if (config.columns[keycol].name === column) {
-        inthere = true
-        formattingParams = {
-          addColPrefix: config.columns[keycol].prefix,
-          addColSuffix: config.columns[keycol].suffix,
-          addColRoundTo: config.columns[keycol].roundToPlace ? config.columns[keycol].roundToPlace : '',
-          addColCommas: config.columns[keycol].commas
+    if (config.columns) {
+      Object.keys(config.columns).forEach(keycol => {
+        if (config.columns[keycol].name === column) {
+          inthere = true
+          formattingParams = {
+            addColPrefix: config.columns[keycol].prefix,
+            addColSuffix: config.columns[keycol].suffix,
+            addColRoundTo: config.columns[keycol].roundToPlace ? config.columns[keycol].roundToPlace : '',
+            addColCommas: config.columns[keycol].commas
+          }
         }
-      }
-    })
+      })
+    }
     return formattingParams
   }
 
+  const getChartCellValue = (row, column) => {
+    const rowObj = runtimeData[row]
+    let cellValue // placeholder for formatting below
+    let labelValue = rowObj[column] // just raw X axis string
+    if (column === config.xAxis?.dataKey) {
+      // not the prettiest, but helper functions work nicely here.
+      cellValue = config.xAxis?.type === 'date' ? formatDate(config.xAxis?.dateDisplayFormat, parseDate(config.xAxis?.dateParseFormat, labelValue)) : labelValue
+    } else {
+      let resolvedAxis = 'left'
+      let leftAxisItems = config.series ? config.series.filter(item => item?.axis === 'Left') : []
+      let rightAxisItems = config.series ? config.series.filter(item => item?.axis === 'Right') : []
+
+      leftAxisItems.map(leftSeriesItem => {
+        if (leftSeriesItem.dataKey === column) resolvedAxis = 'left'
+      })
+
+      rightAxisItems.map(rightSeriesItem => {
+        if (rightSeriesItem.dataKey === column) resolvedAxis = 'right'
+      })
+
+      let addColParams = isAdditionalColumn(column)
+      if (addColParams) {
+        cellValue = config.dataFormat ? formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams) : runtimeData[row][column]
+      } else {
+        cellValue = config.dataFormat ? formatNumber(runtimeData[row][column], resolvedAxis, false, config) : runtimeData[row][column]
+      }
+    }
+
+    return cellValue
+  }
+
+  const getChartCell = (row, column) => {
+    return (
+      <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime?.originalXAxis?.dataKey]}--${row}`}>
+        {getChartCellValue(row, column)}
+      </td>
+    )
+  }
+
   const genChartRows = rows => {
-    const allRows = rows.map(row => {
-      return (
-        <tr role='row'>
-          {dataSeriesColumns().map(column => {
-            const rowObj = runtimeData[row]
-            let cellValue // placeholder for formatting below
-            let labelValue = rowObj[column] // just raw X axis string
-            if (column === config.xAxis.dataKey) {
-              // not the prettiest, but helper functions work nicely here.
-              cellValue = <>{config.xAxis.type === 'date' ? formatDate(config.xAxis.dateDisplayFormat, parseDate(config.xAxis.dateParseFormat, labelValue)) : labelValue}</>
-            } else {
-              let resolvedAxis = 'left'
-              let leftAxisItems = config.series.filter(item => item?.axis === 'Left')
-              let rightAxisItems = config.series.filter(item => item?.axis === 'Right')
-
-              leftAxisItems.map(leftSeriesItem => {
-                if (leftSeriesItem.dataKey === column) resolvedAxis = 'left'
-              })
-
-              rightAxisItems.map(rightSeriesItem => {
-                if (rightSeriesItem.dataKey === column) resolvedAxis = 'right'
-              })
-
-              let addColParams = isAdditionalColumn(column)
-              if (addColParams) {
-                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config, addColParams)
-              } else {
-                cellValue = formatNumber(runtimeData[row][column], resolvedAxis, false, config)
-              }
-            }
-
-            return (
-              <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`}>
-                {cellValue}
-              </td>
-            )
-          })}
-        </tr>
-      )
-    })
-    return allRows
+    if (isVertical) {
+      const allRows = rows.map((row, index) => {
+        return (
+          <tr key={`${row}__${index}`} role='row'>
+            {dataSeriesColumns().map(column => {
+              return getChartCell(row, column)
+            })}
+          </tr>
+        )
+      })
+      return allRows
+    } else {
+      const allRows = dataSeriesColumnsSorted().map(column => {
+        return (
+          <tr role='row'>
+            <td>
+              {colorScale && colorScale(getSeriesName(column)) && <LegendCircle fill={colorScale(getSeriesName(column))} />}
+              {getSeriesName(column)}
+            </td>
+            {rows.map(row => {
+              return getChartCell(row, column)
+            })}
+          </tr>
+        )
+      })
+      return allRows
+    }
   }
 
   const upIcon = (
@@ -467,8 +508,8 @@ const DataTable = props => {
       ? [config.yAxis.dataKey]
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])
-        : config.runtime.seriesKeys),
-    [config.runtime.seriesKeys]) // eslint-disable-line
+        : config.runtime?.seriesKeys),
+    [config.runtime?.seriesKeys]) // eslint-disable-line
 
   if (config.visualizationType !== 'Box Plot') {
     const genMapHeader = columns => {
@@ -476,12 +517,12 @@ const DataTable = props => {
         <tr>
           {Object.keys(columns)
             .filter(column => columns[column].dataTable === true && columns[column].name)
-            .map(column => {
+            .map((column, index) => {
               let text
               if (column !== 'geo') {
                 text = columns[column].label ? columns[column].label : columns[column].name
               } else {
-                text = config.type === 'map' ? indexTitle : config.xAxis.dataKey
+                text = config.type === 'map' ? indexTitle : config.xAxis?.dataKey
               }
               if (config.type === 'map' && (text === undefined || text === '')) {
                 text = 'Location'
@@ -489,7 +530,7 @@ const DataTable = props => {
 
               return (
                 <th
-                  key={`col-header-${column}`}
+                  key={`col-header-${column}__${index}`}
                   id={column}
                   tabIndex='0'
                   title={text}
@@ -521,8 +562,8 @@ const DataTable = props => {
     return (
       <ErrorBoundary component='DataTable'>
         <MediaControls.Section classes={['download-links']}>
-          <MediaControls.Link config={config} />
-          {(config.table.download || config.general.showDownloadButton) && <DownloadButton />}
+          <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />
+          {(config.table.download || config.general?.showDownloadButton) && <DownloadButton />}
         </MediaControls.Section>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
@@ -544,7 +585,7 @@ const DataTable = props => {
             {tableTitle}
           </div>
           <div className='table-container' style={limitHeight}>
-            <table height={expanded ? null : 0} role='table' aria-live='assertive' className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!expanded} aria-rowcount={config?.data?.length ? config.data.length : '-1'}>
+            <table height={expanded ? null : 0} role='table' aria-live='assertive' className={`${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`} hidden={!expanded} aria-rowcount={config?.data?.length ? config.data.length : '-1'}>
               <caption className='cdcdataviz-sr-only'>{caption}</caption>
               <thead style={{ position: 'sticky', top: 0, zIndex: 999 }}>{config.type === 'map' ? genMapHeader(columns) : genChartHeader(columns, runtimeData)}</thead>
               <tbody>{config.type === 'map' ? genMapRows(rows) : genChartRows(rows)}</tbody>

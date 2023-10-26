@@ -1,13 +1,29 @@
-//TODO: COVE Refactor This is LEGEND-ary
-import React from 'react'
+//TODO: Move legends to core
+import React, { useContext } from 'react'
 import parse from 'html-react-parser'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
+import HexSetting from './HexShapeSettings'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import ConfigContext from '../context'
 
 const Sidebar = props => {
-  const { legend, runtimeFilters, columns, setAccessibleStatus, changeFilterActive, resetLegendToggles, runtimeLegend, setRuntimeLegend, prefix, suffix, viewport, displayDataAsText, state } = props
+  // prettier-ignore
+  const {
+    changeFilterActive,
+    displayDataAsText,
+    resetLegendToggles,
+    runtimeFilters,
+    runtimeLegend,
+    setAccessibleStatus,
+    setRuntimeLegend,
+    state,
+    suffix,
+    viewport,
+  } = useContext(ConfigContext)
+
+  const { legend } = state
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -80,7 +96,6 @@ const Sidebar = props => {
   })
 
   const { legendClasses } = useDataVizClasses(state, viewport)
-  console.log('legendClasses', legendClasses)
 
   const handleReset = e => {
     e.preventDefault()
@@ -117,40 +132,41 @@ const Sidebar = props => {
 
   const columnLogic = legend.position === 'side' && legend.singleColumn ? 'single-column' : legend.position === 'bottom' && legend.singleRow ? 'single-row' : legend.verticalSorted && !legend.singleRow ? 'vertical-sorted' : ''
 
-  const classNames = [`${legend.position}`, `${columnLogic}`, `cdcdataviz-sr-focusable`, `${viewport}`]
-
   return (
     <ErrorBoundary component='Sidebar'>
-      <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex='0'>
-        <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
-          {runtimeLegend.disabledAmt > 0 && (
-            <button onClick={handleReset} className={legendClasses.resetButton.join(' ') || ''}>
-              Clear
-            </button>
-          )}
-          {legend.title && <span className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</span>}
-          {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>}
-          {legend.dynamicDescription === true &&
-            runtimeFilters.map((filter, idx) => {
-              const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
+      <div className='legends'>
+        <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex='0'>
+          <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
+            {runtimeLegend.disabledAmt > 0 && (
+              <button onClick={handleReset} className={legendClasses.resetButton.join(' ') || ''}>
+                Clear
+              </button>
+            )}
+            {legend.title && <span className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</span>}
+            {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>}
+            {legend.dynamicDescription === true &&
+              runtimeFilters.map((filter, idx) => {
+                const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
 
-              // Do we have a custom description for this?
-              const desc = legend.descriptions[lookupStr] || ''
+                // Do we have a custom description for this?
+                const desc = legend.descriptions[lookupStr] || ''
 
-              if (desc.length > 0) {
-                return (
-                  <p key={`dynamic-description-${lookupStr}`} className={`dynamic-legend-description-${lookupStr}`}>
-                    {desc}
-                  </p>
-                )
-              }
-              return true
-            })}
-          <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
-            {legendList}
-          </ul>
-        </section>
-      </aside>
+                if (desc.length > 0) {
+                  return (
+                    <p key={`dynamic-description-${lookupStr}`} className={`dynamic-legend-description-${lookupStr}`}>
+                      {desc}
+                    </p>
+                  )
+                }
+                return true
+              })}
+            <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
+              {legendList}
+            </ul>
+          </section>
+        </aside>
+        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <HexSetting.Legend state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}
+      </div>
     </ErrorBoundary>
   )
 }

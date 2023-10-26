@@ -53,7 +53,7 @@ const useScales = properties => {
       domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)],
       range: [0, xMax]
     })
-    xScale.type = scaleTypes.TIME
+    xScale.type = scaleTypes.LINEAR
   }
 
   // handle Deviation bar

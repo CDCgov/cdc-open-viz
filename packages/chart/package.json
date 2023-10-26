@@ -1,6 +1,6 @@
 {
   "name": "@cdc/chart",
-  "version": "4.23.6",
+  "version": "4.23.9",
   "description": "React component for visualizing tabular data in various types of charts",
   "moduleName": "CdcChart",
   "main": "dist/cdcchart",
@@ -48,6 +48,7 @@
     "js-base64": "^2.5.2",
     "papaparse": "^5.3.0",
     "react-accessible-accordion": "^3.3.4",
+    "react-icons": "^4.10.1",
     "react-spring": "^8.0.27",
     "react-table": "^7.5.0",
     "react-tooltip": "5.8.2-beta.3",
@@ -58,7 +59,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa",
+  "gitHead": "6c7ac5215dcf3bc1cc7d199089c8c2e75f53a93e",
   "devDependencies": {
     "resize-observer-polyfill": "^1.5.1"
   }

@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import closeIcon from '../images/close.svg?inline'
 import LegendCircle from '@cdc/core/components/LegendCircle'
+import ConfigContext from '../context'
 
-//TODO: Where is this being used? Transfer to new Modal component?
 const Modal = props => {
-  const { applyTooltipsToGeo, content, capitalize, applyLegendToRow, viewport, type } = props
+  const { applyTooltipsToGeo, content, capitalize, applyLegendToRow, viewport, type } = useContext(ConfigContext)
 
   const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx')
 
