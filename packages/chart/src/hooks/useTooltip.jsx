@@ -1,5 +1,6 @@
 import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
+import { defaultStyles } from '@visx/tooltip'
 
 // third party
 import { localPoint } from '@visx/event'
@@ -30,6 +31,8 @@ export const useTooltip = props => {
     }
 
     const tooltipInformation = {
+      tooltipLeft: tooltipData.dataXPosition,
+      tooltipTop: tooltipData.dataYPosition,
       tooltipData: tooltipData
     }
 
@@ -50,10 +53,21 @@ export const useTooltip = props => {
     // Additional data for pie charts
     const { data: pieChartData, arc } = additionalChartData
 
-    const closestXScaleValue = getXValueFromCoordinate(x)
+    const closestXScaleValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
 
     const includedSeries = visualizationType !== 'Pie' ? config.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.series.map(item => item.dataKey)
     includedSeries.push(config.xAxis.dataKey)
+
+    if (config.visualizationType === 'Forecasting') {
+      config.series.map(s => {
+        s.confidenceIntervals.map(c => {
+          if (c.showInTooltip) {
+            includedSeries.push(c.high)
+            includedSeries.push(c.low)
+          }
+        })
+      })
+    }
 
     const yScaleValues = getYScaleValues(closestXScaleValue, includedSeries)
 
@@ -103,14 +117,14 @@ export const useTooltip = props => {
       if (visualizationType === 'Pie') {
         return [
           [config.xAxis.dataKey, pieChartData],
-          [config.runtime.yAxis.dataKey, formatNumber(arc.data[config.runtime.yAxis.dataKey])],
-          ['Percent', `${Math.round((((arc.endAngle - arc.startAngle) * 180) / Math.PI / 360) * 100) + '%'}`]
+          [config.runtime.yAxis.dataKey, formatNumber(arc?.data[config.runtime.yAxis.dataKey])],
+          ['Percent', `${Math.round((((arc?.endAngle - arc?.startAngle) * 180) / Math.PI / 360) * 100) + '%'}`]
         ]
       }
 
       return getIncludedTooltipSeries()
         .filter(Boolean)
-        .flatMap(seriesKey => {
+        .flatMap((seriesKey, index) => {
           return resolvedScaleValues[0][seriesKey] ? [[seriesKey, resolvedScaleValues[0][seriesKey], getAxisPosition(seriesKey)]] : []
         })
     }
@@ -131,7 +145,6 @@ export const useTooltip = props => {
    */
   const handleTooltipMouseOff = () => {
     if (config.visualizationType === 'Area Chart') {
-      console.log('HERE IN OFF')
       setTimeout(() => {
         hideTooltip()
       }, 3000)
@@ -174,7 +187,7 @@ export const useTooltip = props => {
       // Find the closest x value by calculating the minimum distance
       let closestX = null
       let minDistance = Number.MAX_VALUE
-      let offset = x - yAxis.size
+      let offset = x
 
       data.forEach(d => {
         const xPosition = xAxis.type === 'date' ? xScale(parseDate(d[xAxis.dataKey])) : xScale(d[xAxis.dataKey])

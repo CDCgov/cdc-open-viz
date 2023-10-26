@@ -1,0 +1,724 @@
+{
+  "general": {
+    "title": "Example Data Map with Cities",
+    "subtext": "*: Lorem ipsum; NA: Lorem ipsum.",
+    "type": "data",
+    "geoType": "us",
+    "headerColor": "theme-cyan",
+    "showSidebar": true,
+    "showTitle": true,
+    "showDownloadButton": true,
+    "expandDataTable": true,
+    "backgroundColor": "#f5f5f5",
+    "geoBorderColor": "darkGray",
+    "territoriesLabel": "Territories",
+    "language": "en",
+    "hasRegions": false,
+    "displayAsHex": true,
+    "showDownloadMediaButton": false,
+    "displayStateLabels": false,
+    "territoriesAlwaysShow": false,
+    "geoLabelOverride": "",
+    "fullBorder": false,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "statePicked": {
+      "fipsCode": "01",
+      "stateName": "Alabama"
+    }
+  },
+  "type": "map",
+  "color": "yelloworangered",
+  "columns": {
+    "geo": {
+      "dataTable": true,
+      "label": "",
+      "name": "STATE",
+      "tooltip": false
+    },
+    "primary": {
+      "dataTable": true,
+      "label": "Rate",
+      "name": "Intensity Level",
+      "prefix": "",
+      "suffix": "",
+      "tooltip": false
+    },
+    "navigate": {
+      "dataTable": false,
+      "name": "",
+      "tooltip": false
+    },
+    "additionalColumn1": {
+      "label": "Location",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Location",
+      "tooltip": true
+    },
+    "geosInRegion": {
+      "name": "Intensity Level",
+      "dataTable": true
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    },
+    "additionalColumn3": {
+      "label": "New Column",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "name": "Trajectory"
+    }
+  },
+  "legend": {
+    "numberOfItems": 3,
+    "position": "side",
+    "title": "Legend Title",
+    "description": "Legend Text",
+    "specialClasses": [
+      {
+        "key": "Intensity Level",
+        "value": "",
+        "label": "N/A"
+      }
+    ],
+    "unified": false,
+    "singleColumn": true,
+    "dynamicDescription": false,
+    "descriptions": {},
+    "singleRow": false,
+    "showSpecialClassesLast": false,
+    "categoryValuesOrder": [
+      "Low",
+      "Medium",
+      "High"
+    ]
+  },
+  "filters": [],
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": false,
+    "indexLabel": ""
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "geoCodeCircleSize": 2,
+    "showBubbleZeros": false
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": []
+  },
+  "hexMap": {
+    "arrowGroupColumnName": "Trajectory",
+    "arrowGroupColumnKeys": [],
+    "arrowGroupColumnValues": [
+      "Increasing",
+      "Decreasing",
+      "No Change",
+      ""
+    ],
+    "arrowGroups": [
+      {
+        "key": "Location",
+        "shape": "",
+        "column": "",
+        "operator": "=",
+        "value": "Georgia"
+      }
+    ],
+    "shapeGroups": [
+      {
+        "legendTitle": "Intensity Levels",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "Intensity Level",
+            "shape": "Arrow Down",
+            "column": "",
+            "operator": "=",
+            "value": "Low"
+          },
+          {
+            "key": "Intensity Level",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": "High"
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "sharing": {
+    "enabled": false,
+    "dataHost": "wcms-wp.cdc.gov",
+    "configUrl": "/wcms/4.0/cdc-wp/data-presentation/examples/city-data-map-example.json"
+  },
+  "dataTable": {
+    "title": "Data Table"
+  },
+  "usingWidgetLoader": true,
+  "dataUrl": "http://localhost:8080/examples/__data__/hex-data.csv",
+  "data": [
+    {
+      "STATE": "AL",
+      "Rate": "10",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "AK",
+      "Rate": "12",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "AS",
+      "Rate": "14",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "AZ",
+      "Rate": "9",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "AR",
+      "Rate": "17",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "CA",
+      "Rate": "*",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "CO",
+      "Rate": "22",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "CT",
+      "Rate": "10",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "DE",
+      "Rate": "12",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "District of Columbia",
+      "Rate": "14",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "FL",
+      "Rate": "9",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "GA",
+      "Rate": "17",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "GU",
+      "Rate": "20",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "HI",
+      "Rate": "22",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "ID",
+      "Rate": "*",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "IL",
+      "Rate": "12",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "IN",
+      "Rate": "14",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "IA",
+      "Rate": "9",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "KS",
+      "Rate": "NA",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "KY",
+      "Rate": "20",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "LA",
+      "Rate": "22",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Low",
+      "Trajectory": "Increasing"
+    },
+    {
+      "STATE": "ME",
+      "Rate": "10",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "MH",
+      "Rate": "12",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "MD",
+      "Rate": "*",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "MA",
+      "Rate": "9",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "MI",
+      "Rate": "17",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "FM",
+      "Rate": "20",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "MN",
+      "Rate": "22",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "MS",
+      "Rate": "10",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "MO",
+      "Rate": "11",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "MT",
+      "Rate": "14",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "NE",
+      "Rate": "9",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "NV",
+      "Rate": "17",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "NH",
+      "Rate": "20",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "NJ",
+      "Rate": "28",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "NM",
+      "Rate": "10",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "NY",
+      "Rate": "12",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "NC",
+      "Rate": "14",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "ND",
+      "Rate": "9",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "MP",
+      "Rate": "17",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "OH",
+      "Rate": "NA",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "OK",
+      "Rate": "22",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "OR",
+      "Rate": "10",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "Medium",
+      "Trajectory": "Decreasing"
+    },
+    {
+      "STATE": "PW",
+      "Rate": "12",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "PA",
+      "Rate": "14",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "PR",
+      "Rate": "6",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "RI",
+      "Rate": "17",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "SC",
+      "Rate": "20",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "SD",
+      "Rate": "22",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "TN",
+      "Rate": "10",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "TX",
+      "Rate": "12",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "VT",
+      "Rate": "9",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "VI",
+      "Rate": "17",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "VA",
+      "Rate": "20",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "WA",
+      "Rate": "22",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "WV",
+      "Rate": "10",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "WI",
+      "Rate": "12",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "WY",
+      "Rate": "14",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": ""
+    },
+    {
+      "STATE": "Los Angeles",
+      "Rate": "14",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "Atlanta",
+      "Rate": "12",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "Boston",
+      "Rate": "20",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "New York City",
+      "Rate": "22",
+      "Location": "School",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "Dallas",
+      "Rate": "18",
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "Seattle",
+      "Rate": "17",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": "No Change"
+    },
+    {
+      "STATE": "New Orleans",
+      "Rate": "14",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/",
+      "Intensity Level": "High",
+      "Trajectory": ""
+    }
+  ],
+  "validated": 4.23
+}

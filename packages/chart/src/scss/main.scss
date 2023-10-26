@@ -180,6 +180,12 @@
       align-items: flex-start !important;
       user-select: none;
       white-space: nowrap;
+
+      .visx-legend-label {
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
     }
 
     .vertical-sorted:not(.single-row) .legend-item {
@@ -676,24 +682,12 @@
     padding: 1em;
   }
 
-  .cove-component__content:not(.no-borders) {
-    border: 1px solid $lightGray;
-  }
-
-  .cove-component__header ~ .cove-component__content:not(.no-borders) {
-    border-top: none !important;
-  }
-
   .subtext {
     margin-top: 0px;
   }
 
   .isEditor {
     position: relative;
-  }
-
-  .subtext {
-    margin-bottom: 15px;
   }
 }
 
