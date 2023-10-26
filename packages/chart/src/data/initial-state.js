@@ -1,6 +1,9 @@
 export default {
   type: 'chart',
   debugSvg: false,
+  chartMessage: {
+    noData: 'No Data Available'
+  },
   title: '',
   showTitle: true,
   showDownloadMediaButton: false,
@@ -219,5 +222,8 @@ export default {
   brush: {
     pattern_id: 'brush_pattern',
     accent_color: '#ddd'
+  },
+  area: {
+    isStacked: false
   }
 }

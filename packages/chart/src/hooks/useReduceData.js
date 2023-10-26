@@ -13,6 +13,11 @@ function useReduceData(config, data) {
       max = Math.max(...yTotals)
     }
 
+    if (config.visualizationSubType === 'stacked' && config.visualizationType === 'Area Chart') {
+      const yTotals = data.map(sumYValues(config.runtime.seriesKeys))
+      max = Math.max(...yTotals)
+    }
+
     if ((config.visualizationType === 'Bar' || config.visualizationType === 'Deviation Bar') && config.series && config.series.dataKey) {
       max = Math.max(...data.map(d => (isNumber(d[config.series.dataKey]) ? Number(cleanChars(d[config.series.dataKey])) : 0)))
     }
