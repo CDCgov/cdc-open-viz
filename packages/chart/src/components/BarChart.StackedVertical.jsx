@@ -52,7 +52,7 @@ const BarChartStackedVertical = props => {
                   <style>
                     {`
                            #barStack${barStack.index}-${bar.index} rect,
-                           #barStack${barStack.index}-${bar.index} foreignObject{
+                           #barStack${barStack.index}-${bar.index} foreignObject div{
                             animation-delay: ${barStack.index * 0.5}s;
                             transform-origin: ${barThicknessAdjusted / 2}px ${bar.y + bar.height}px
                           }
@@ -68,8 +68,6 @@ const BarChartStackedVertical = props => {
                       y={bar.y}
                       width={barThicknessAdjusted}
                       height={bar.height}
-                      style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
-                      opacity={transparentBar ? 0.5 : 1}
                       display={displayBar ? 'block' : 'none'}
                       data-tooltip-html={barStackTooltip}
                       data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -80,7 +78,9 @@ const BarChartStackedVertical = props => {
                           setSharedFilter(config.uid, bar)
                         }
                       }}
-                    ></foreignObject>
+                    >
+                      <div style={{ opacity: transparentBar ? 0.5 : 1, width: barThicknessAdjusted, height: bar.height, background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
+                    </foreignObject>
                   </Group>
                 </Group>
               )
