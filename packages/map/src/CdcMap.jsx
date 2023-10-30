@@ -117,7 +117,7 @@ const getUniqueValues = (data, columnName) => {
   return Object.keys(result)
 }
 
-const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
+const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
@@ -1300,12 +1300,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     const urlFilters = newState.filters ? (newState.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
 
     if (newState.dataUrl && !urlFilters) {
-      if (newState.dataUrl[0] === '/') {
-        newState.dataUrl = 'http://' + hostname + newState.dataUrl
-      }
-
       // handle urls with spaces in the name.
       if (newState.dataUrl) newState.dataUrl = `${newState.dataUrl}`
+      console.log(newState.dataUrl);
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
 
       if (newData && newState.dataDescription) {
