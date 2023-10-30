@@ -1,11 +1,10 @@
-import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { VizTitle } from './../VizTitle/VizTitle'
+import Title from '../Title'
 
 const meta: Meta = {
-  title: 'Components/Atoms/VizTitle',
-  component: VizTitle
+  title: 'Components/Atoms/Title',
+  component: Title
 }
 
 type Story = StoryObj

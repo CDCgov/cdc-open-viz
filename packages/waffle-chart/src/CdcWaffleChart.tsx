@@ -26,7 +26,7 @@ import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import './scss/main.scss'
-import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
+import Title from '@cdc/core/components/ui/Title'
 
 type CdcWaffleChartProps = {
   configUrl?: string
@@ -282,7 +282,7 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
   return (
     <div className={innerContainerClasses.join(' ')}>
       <>
-        <VizTitle title={title} config={config} classes={['chart-title', `${config.theme}`]} />
+        <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
         <div className={contentClasses.join(' ')}>
           <div className='cove-component__content-wrap'>
             {config.visualizationType === 'Gauge' && (

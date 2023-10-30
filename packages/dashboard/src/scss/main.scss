@@ -179,30 +179,6 @@
     }
   }
 
-  div.dashboard-title,
-  .dashboard-title {
-    color: white;
-    padding: 0.6em 0.8em;
-    border-bottom-width: 3px;
-    border-bottom-style: solid;
-    margin: 0;
-    color: #fff;
-    font-size: 1.1em;
-    position: relative;
-    em {
-      font-style: italic;
-    }
-    strong {
-      font-weight: bold;
-    }
-    &:not(:empty) {
-      margin: 0 0 1rem 0 !important;
-      padding: 0.6em 0.8em;
-      border-bottom-width: 3px;
-      border-bottom-style: solid;
-    }
-  }
-
   .dashboard-download-link {
     font-size: 14px;
   }

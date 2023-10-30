@@ -44,7 +44,7 @@ import dashboardReducer from './store/dashboard.reducer'
 import { filterData } from './helpers/filterData'
 import { getFormattedData } from './helpers/getFormattedData'
 import { getVizKeys } from './helpers/getVizKeys'
-import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
+import Title from '@cdc/core/components/ui/Title'
 
 type DropdownOptions = Record<'value' | 'text', string>[]
 
@@ -687,7 +687,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
       <>
         {isEditor && <Header setPreview={setPreview} />}
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
-          <VizTitle title={title} isDashboard={true} classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]} />
+          <Title title={title} isDashboard={true} classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]} />
           {/* Description */}
           {description && <div className='subtext'>{parse(description)}</div>}
           {/* Filters */}

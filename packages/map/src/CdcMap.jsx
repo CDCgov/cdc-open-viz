@@ -39,7 +39,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
-import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
+import Title from '@cdc/core/components/ui/Title'
 
 // Child Components
 import ConfigContext from './context'
@@ -1596,7 +1596,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             )}
 
             {/* prettier-ignore */}
-            <VizTitle
+            <Title
               title={title}
               superTitle={general.superTitle}
               config={config}

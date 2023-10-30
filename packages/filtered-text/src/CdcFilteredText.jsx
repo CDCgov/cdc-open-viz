@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
 
 // context & initial state
 import ConfigContext from './ConfigContext'
 import defaults from './data/initial-state'
 
 // components
+import Title from '@cdc/core/components/ui/Title'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 import EditorPanel from './components/EditorPanel'
@@ -118,7 +118,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
   if (loading === false) {
     let body = (
       <>
-        <VizTitle classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
+        <Title classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
         <div className={contentClasses.join(' ')}>
           <div className='cove-component__content-wrap'>
             {filterByTextColumn()

@@ -1,6 +1,6 @@
 import React from 'react'
 import parse from 'html-react-parser'
-import './VizTitle.scss'
+import './Title.scss'
 
 type HeaderProps = {
   title?: string
@@ -12,7 +12,7 @@ type HeaderProps = {
   ariaLevel?: number
 }
 
-export const VizTitle = (props: HeaderProps) => {
+const Title = (props: HeaderProps) => {
   const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2 } = props
 
   // standard classes every vis should have
@@ -30,3 +30,5 @@ export const VizTitle = (props: HeaderProps) => {
     )
   )
 }
+
+export default Title

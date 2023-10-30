@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState, useRef, useReducer } from 'react'
+import { useEffect, useCallback, useRef, useReducer } from 'react'
 
 // external
 import { Markup } from 'interweave'
@@ -28,10 +28,10 @@ type CdcMarkupIncludeProps = {
   setConfig: any
 }
 
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
+import Title from '@cdc/core/components/ui/Title'
 
+const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
+  const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
   const initialState = { config: configObj ?? defaults, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
 
   const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
@@ -178,7 +178,7 @@ import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
   if (loading === false) {
     let body = (
       <div className={bodyClasses.join(' ')} ref={container}>
-        <VizTitle title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
+        <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
         <div className={`cove-component__content ${contentClasses.join(' ')}`}>
           <div className={`${innerContainerClasses.join(' ')}`}>
             <div className='cove-component__content-wrap'>

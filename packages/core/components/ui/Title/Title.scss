@@ -75,6 +75,10 @@
     background: #005eaa;
     border-bottom-color: #88c3ea;
   }
+
+  &.mb-0 {
+    margin-bottom: 0 !important;
+  }
 }
 
 // add additional space below title if needed
