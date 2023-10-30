@@ -15,10 +15,10 @@ const ZoomBrush = props => {
     endValue: ''
   })
 
-  const [initialPosition, setInitialPosition] = useState({
+  const initialPosition = {
     start: { x: 0 },
     end: { x: props.xMax }
-  })
+  }
 
   const style = {
     fill: '#EAEAEA',
@@ -29,6 +29,7 @@ const ZoomBrush = props => {
   }
 
   const onBrushChange = event => {
+    console.log('Chaned brush')
     if (!event) return
 
     const { xValues } = event
