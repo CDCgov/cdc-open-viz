@@ -60,7 +60,7 @@ const LinearChart = props => {
     yMax = yMax + config.data.length * config.forestPlot.rowHeight
   }
   if (config.brush.active) {
-    height = height + 25
+    height = height + config.brush.height
   }
 
   let dynamicMarginTop = 0 || config.dynamicMarginTop
@@ -645,7 +645,7 @@ const LinearChart = props => {
             />
           )}
           {/*Zoom Brush */}
-          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && !isHorizontal && <ZoomBrush data={data} xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
+          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && !isHorizontal && config.runtime.xAxis.type === 'date' && <ZoomBrush data={data} xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {visualizationType !== 'Bar' && visualizationType !== 'Paired Bar' && visualizationType !== 'Box Plot' && visualizationType !== 'Area Chart' && visualizationType !== 'Scatter Plot' && visualizationType !== 'Deviation Bar' && visualizationType !== 'Forecasting' && (

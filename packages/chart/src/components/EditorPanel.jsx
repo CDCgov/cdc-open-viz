@@ -1979,7 +1979,7 @@ const EditorPanel = () => {
                       }
                       updateField={updateField}
                     />
-                    <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />
+                    {config.runtime.xAxis.type === 'date' && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
 
                     {config.exclusions.active && (
                       <>
