@@ -36,8 +36,7 @@ import '../scss/LinearChart.scss'
 import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
-  const { isEditor, isDashboard, transformedData, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
-  const data = config.brush.active && config.brush.data.length ? config.brush.data : transformedData
+  const { isEditor, isDashboard, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
 
@@ -83,7 +82,7 @@ const LinearChart = props => {
   // getters & functions
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const xAxisDataMapped = data.map(d => getXAxisData(d))
+  const xAxisDataMapped = config.brush.active && config.brush.data?.length ? config.brush.data.map(d => getXAxisData(d)) : data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
   const { min, max } = useMinMax(properties)
