@@ -49,6 +49,10 @@ export class DataTransform {
 
   //Performs standardizations based on developer provided description of the data
   developerStandardize(data, description) {
+    if(!data){
+      return []
+    }
+    
     //Validate the description object
     if (!description) {
       return undefined
