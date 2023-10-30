@@ -8,6 +8,7 @@ import Context from './context'
 // internal components
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
+import Title from '@cdc/core/components/ui/Title'
 import CircleCallout from './components/CircleCallout'
 
 // external
@@ -53,19 +54,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   const { config, loading, currentViewport, coveLoadedHasRan, container } = state
 
-  const {
-    title,
-    dataColumn,
-    dataFunction,
-    imageData,
-    biteBody,
-    biteFontSize,
-    dataFormat,
-    biteStyle,
-    filters,
-    subtext,
-    general: { isCompactStyle }
-  } = config
+  const { title, dataColumn, dataFunction, imageData, biteBody, biteFontSize, dataFormat, biteStyle, filters, subtext } = config
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
 
@@ -465,7 +454,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         {isEditor && <EditorPanel />}
         <div className={isEditor ? 'spacing-wrapper' : ''}>
           <div className={innerContainerClasses.join(' ')}>
-            {title && <div className={`bite-header cove-component__header component__header ${config.theme}`}>{parse(title)}</div>}
+            <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className={`bite-content-container ${contentClasses.join(' ')}`}>
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
@@ -496,7 +485,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                           {calculateDataBite()}
                         </span>
                       )}
-                      {subtext && !isCompactStyle && <p className='bite-subtext'>{parse(subtext)}</p>}
+                      {subtext && !config.general.isCompactStyle && <p className='bite-subtext'>{parse(subtext)}</p>}
                     </div>
                   </Fragment>
                 </div>

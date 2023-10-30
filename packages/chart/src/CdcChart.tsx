@@ -43,6 +43,7 @@ import './scss/main.scss'
 // load both then config below determines which to use
 import DataTable from '@cdc/core/components/DataTable'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
+import Title from '@cdc/core/components/ui/Title'
 
 const generateColorsArray = (color = '#000000', special = false) => {
   let colorObj = chroma(color)
@@ -1173,13 +1174,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && (
           <div className='cdc-chart-inner-container'>
-            {/* Title */}
-            {title && config.showTitle && (
-              <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
-                {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
-                <div>{parse(title)}</div>
-              </div>
-            )}
+            <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
+
             <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
               Skip Over Chart Container
             </a>
