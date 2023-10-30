@@ -43,26 +43,6 @@
     border: 0;
   }
 
-  div.map-title {
-    margin: 0;
-    color: #fff;
-    font-size: 1.1em;
-    position: relative;
-    em {
-      font-style: italic;
-    }
-    strong {
-      font-weight: bold;
-    }
-  }
-
-  div.map-title:not(:empty) {
-    padding: 0.6em 0.8em;
-    border-bottom-width: 3px;
-    border-bottom-style: solid;
-    margin: 0 0 1rem 0 !important;
-  }
-
   .map-container {
     display: flex;
     position: relative;
