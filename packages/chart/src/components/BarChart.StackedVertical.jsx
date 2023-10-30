@@ -10,7 +10,7 @@ const BarChartStackedVertical = props => {
   const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
   const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius } = useBarChart()
   const { orientation } = config
-  const data = config.brush.active && config.brush.data ? config.brush.data : transformedData
+  const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
   return (
     config.visualizationSubType === 'stacked' &&
