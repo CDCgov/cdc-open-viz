@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState, useRef, useReducer } from 'react'
+import { useEffect, useCallback, useRef, useReducer } from 'react'
 
 // external
 import { Markup } from 'interweave'
@@ -16,6 +16,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import markupIncludeReducer from './store/mi.reducer'
+import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
 
 // styles
 import './scss/main.scss'
@@ -28,9 +29,8 @@ type CdcMarkupIncludeProps = {
   setConfig: any
 }
 
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { VizTitle } from '@cdc/core/components/ui/VizTitle/VizTitle'
+const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
+  const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
 
   const initialState = { config: configObj ?? defaults, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
 
