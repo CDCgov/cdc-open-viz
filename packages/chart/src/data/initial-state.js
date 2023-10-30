@@ -133,6 +133,7 @@ export default {
     // start with a blank list
   },
   legend: {
+    hide: false,
     behavior: 'isolate',
     singleRow: false,
     colorCode: '',

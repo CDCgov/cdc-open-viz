@@ -1188,7 +1188,18 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Visualization */}
             {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
             <div
-              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
+              style={{
+                marginBottom:
+                  config.legend.position !== 'bottom' && config.orientation === 'horizontal'
+                    ? `${config.runtime.xAxis.size}px`
+                    : config.brush.active && config.orientation === 'vertical' && config.legend.position !== 'bottom' && !config.legend.hide
+                    ? `${config.brush.height * 1.3 + config.dynamicMarginTop / 2}px`
+                    : config.brush.active && config.orientation === 'vertical' && config.legend.hide
+                    ? `${config.brush.height + config.dynamicMarginTop / 2}px`
+                    : !config.brush.active && config.orientation === 'vertical'
+                    ? `${config.dynamicMarginTop / 2}px`
+                    : '0px'
+              }}
               className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}

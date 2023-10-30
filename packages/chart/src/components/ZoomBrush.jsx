@@ -29,7 +29,6 @@ const ZoomBrush = props => {
   }
 
   const onBrushChange = event => {
-    console.log('Chaned brush')
     if (!event) return
 
     const { xValues } = event

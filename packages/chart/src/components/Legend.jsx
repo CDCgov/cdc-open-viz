@@ -159,10 +159,11 @@ const Legend = () => {
   }
 
   const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+  const brushHeight = isBottomOrSmallViewport && config.brush.active ? config.brush.height * 2 + config.dynamicMarginTop / 2 : isBottomOrSmallViewport ? 15 : 0
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `0px`
+    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${brushHeight}px`
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
