@@ -1092,7 +1092,7 @@ const EditorPanel = () => {
                 />
 
                 <TextField
-                  type='text'
+                  type='textarea'
                   value={config.description}
                   fieldName='description'
                   label='Subtext/Citation'
