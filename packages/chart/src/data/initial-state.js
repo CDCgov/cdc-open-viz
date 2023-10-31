@@ -7,7 +7,6 @@ export default {
   title: '',
   showTitle: true,
   showDownloadMediaButton: false,
-  showChartBrush: false,
   theme: 'theme-blue',
   animate: false,
   fontSize: 'medium',
@@ -134,6 +133,7 @@ export default {
     // start with a blank list
   },
   legend: {
+    hide: false,
     behavior: 'isolate',
     singleRow: false,
     colorCode: '',
@@ -146,6 +146,11 @@ export default {
     dynamicLegendChartMessage: 'Select Options from the Legend',
     lineMode: false,
     verticalSorted: false
+  },
+  brush: {
+    height: 25,
+    data: [],
+    active: false
   },
   exclusions: {
     active: false,
@@ -219,10 +224,7 @@ export default {
     leftWidthOffset: 0,
     rightWidthOffset: 0
   },
-  brush: {
-    pattern_id: 'brush_pattern',
-    accent_color: '#ddd'
-  },
+
   area: {
     isStacked: false
   }

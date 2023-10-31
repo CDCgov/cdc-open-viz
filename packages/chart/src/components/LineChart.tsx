@@ -13,9 +13,9 @@ import LineChartCircle from './LineChart.Circle'
 const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, showTooltip, seriesStyle = 'Line', svgRef, handleTooltipClick, tooltipData }) => {
   // Not sure why there's a redraw here.
 
-  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType, dashboardConfig, tableData } = useContext(ConfigContext)
+  const { colorPalettes, transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType, dashboardConfig, tableData } = useContext(ConfigContext)
+  const data = config.brush.active && config.brush.data.length ? config.brush.data : transformedData
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
-
   if (!handleTooltipMouseOver) return
   const handleAxisFormating = (axis = 'left', label, value) => {
     // if this is an x axis category/date value return without doing any formatting.

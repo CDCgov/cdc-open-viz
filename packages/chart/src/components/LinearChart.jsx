@@ -33,10 +33,10 @@ import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 
 // styles
 import '../scss/LinearChart.scss'
+import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
   const { isEditor, isDashboard, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
-
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
 
@@ -59,6 +59,9 @@ const LinearChart = props => {
     height = height + config.data.length * config.forestPlot.rowHeight
     yMax = yMax + config.data.length * config.forestPlot.rowHeight
   }
+  if (config.brush.active) {
+    height = height + config.brush.height
+  }
 
   let dynamicMarginTop = 0 || config.dynamicMarginTop
   const marginTop = 20
@@ -79,11 +82,11 @@ const LinearChart = props => {
   // getters & functions
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const xAxisDataMapped = data.map(d => getXAxisData(d))
+  const xAxisDataMapped = config.brush.active && config.brush.data?.length ? config.brush.data.map(d => getXAxisData(d)) : data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
   const { min, max } = useMinMax(properties)
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding } = useScales({ ...properties, min, max })
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush } = useScales({ ...properties, min, max })
 
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
@@ -463,7 +466,7 @@ const LinearChart = props => {
                       )
                     })}
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                    <Text x={axisCenter} y={config.orientation === 'horizontal' ? dynamicMarginTop || config.xAxis.labelOffset : dynamicMarginTop || config.xAxis.size} textAnchor='middle' fontWeight='bold' fill={config.xAxis.labelColor}>
+                    <Text x={axisCenter} y={config.orientation === 'horizontal' ? dynamicMarginTop || config.xAxis.labelOffset : config.isResponsiveTicks && dynamicMarginTop ? dynamicMarginTop : config.xAxis.labelOffset} textAnchor='middle' fontWeight='bold' fill={config.xAxis.labelColor}>
                       {props.label}
                     </Text>
                   </Group>
@@ -641,6 +644,8 @@ const LinearChart = props => {
               config={config}
             />
           )}
+          {/*Zoom Brush */}
+          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && !isHorizontal && config.runtime.xAxis.type === 'date' && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {visualizationType !== 'Bar' && visualizationType !== 'Paired Bar' && visualizationType !== 'Box Plot' && visualizationType !== 'Area Chart' && visualizationType !== 'Scatter Plot' && visualizationType !== 'Deviation Bar' && visualizationType !== 'Forecasting' && (
