@@ -43,6 +43,7 @@ import './scss/main.scss'
 // load both then config below determines which to use
 import DataTable from '@cdc/core/components/DataTable'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
+import Title from '@cdc/core/components/ui/Title'
 
 const generateColorsArray = (color = '#000000', special = false) => {
   let colorObj = chroma(color)
@@ -90,7 +91,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState<any[]>([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
-
+  type Config = typeof config
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
 
@@ -1159,6 +1160,24 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return key
   }
 
+  const computeMarginBottom = (config: Config): string => {
+    if (config.legend.position !== 'bottom' && config.orientation === 'horizontal') {
+      return `${config.runtime.xAxis.size}px`
+    }
+    if (config.brush.active && config.orientation === 'vertical') {
+      if (config.legend.position !== 'bottom' && !config.legend.hide) {
+        return `${config.brush.height * 1.3 + config.dynamicMarginTop / 2}px`
+      }
+      if (config.legend.hide) {
+        return `${config.brush.height + config.dynamicMarginTop / 2}px`
+      }
+    }
+    if (!config.brush.active && config.orientation === 'vertical') {
+      return `${config.dynamicMarginTop / 2}px`
+    }
+    return '0px'
+  }
+
   // Prevent render if loading
   let body = <Loading />
 
@@ -1173,13 +1192,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && (
           <div className='cdc-chart-inner-container'>
-            {/* Title */}
-            {title && config.showTitle && (
-              <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
-                {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
-                <div>{parse(title)}</div>
-              </div>
-            )}
+            <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
+
             <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
               Skip Over Chart Container
             </a>
@@ -1187,10 +1201,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
             {/* Visualization */}
             {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
-            <div
-              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
-              className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
-            >
+            <div style={{ marginBottom: computeMarginBottom(config) }} className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
 

@@ -11,18 +11,11 @@
   .bite-value {
     color: $primary;
   }
-
-  .cove-component__header {
-    background-color: $primary;
-  }
 }
 
 &.theme-purple {
   .bite-value {
     color: $purple-primary;
-  }
-  .cove-component__header {
-    background-color: $purple-primary;
   }
 }
 
@@ -30,17 +23,11 @@
   .bite-value {
     color: $amber-primary;
   }
-  .cove-component__header {
-    background-color: $amber-primary;
-  }
 }
 
 &.theme-orange {
   .bite-value {
     color: $orange-primary;
-  }
-  .cove-component__header {
-    background-color: $orange-primary;
   }
 }
 
@@ -48,17 +35,11 @@
   .bite-value {
     color: $brown-primary;
   }
-  .cove-component__header {
-    background-color: $brown-primary;
-  }
 }
 
 &.theme-teal {
   .bite-value {
     color: $teal-primary;
-  }
-  .cove-component__header {
-    background-color: $teal-primary;
   }
 }
 
@@ -66,17 +47,11 @@
   .bite-value {
     color: $pink-primary;
   }
-  .cove-component__header {
-    background-color: $pink-primary;
-  }
 }
 
 &.theme-slate {
   .bite-value {
     color: $slate-primary;
-  }
-  .cove-component__header {
-    background-color: $slate-primary;
   }
 }
 
@@ -84,37 +59,17 @@
   .bite-value {
     color: $indigo-primary;
   }
-  .cove-component__header {
-    background-color: $indigo-primary;
-  }
 }
 
 &.theme-cyan {
   .bite-value {
     color: $cyan-primary;
   }
-  .cove-component__header {
-    background-color: $cyan-primary;
-  }
 }
 
 &.theme-green {
   .bite-value {
     color: $green-primary;
-  }
-  .cove-component__header {
-    background-color: $green-primary;
-  }
-}
-.cove-component__header {
-  padding: 0 1em;
-  left: 0;
-  top: 0;
-  padding: 0.6rem 0.8rem;
-  color: white;
-  font-size: 1.1em;
-  &:empty {
-    min-height: 5px;
   }
 }
 
@@ -200,18 +155,11 @@
       .bite-value {
         color: $primary;
       }
-
-      .cove-component__header {
-        background-color: $primary;
-      }
     }
 
     &.theme-purple {
       .bite-value {
         color: $purple-primary;
-      }
-      .cove-component__header {
-        background-color: $purple-primary;
       }
     }
 
@@ -219,17 +167,11 @@
       .bite-value {
         color: $amber-primary;
       }
-      .cove-component__header {
-        background-color: $amber-primary;
-      }
     }
 
     &.theme-orange {
       .bite-value {
         color: $orange-primary;
-      }
-      .cove-component__header {
-        background-color: $orange-primary;
       }
     }
 
@@ -237,17 +179,11 @@
       .bite-value {
         color: $brown-primary;
       }
-      .cove-component__header {
-        background-color: $brown-primary;
-      }
     }
 
     &.theme-teal {
       .bite-value {
         color: $teal-primary;
-      }
-      .cove-component__header {
-        background-color: $teal-primary;
       }
     }
 
@@ -255,17 +191,11 @@
       .bite-value {
         color: $pink-primary;
       }
-      .cove-component__header {
-        background-color: $pink-primary;
-      }
     }
 
     &.theme-slate {
       .bite-value {
         color: $slate-primary;
-      }
-      .cove-component__header {
-        background-color: $slate-primary;
       }
     }
 
@@ -273,26 +203,17 @@
       .bite-value {
         color: $indigo-primary;
       }
-      .cove-component__header {
-        background-color: $indigo-primary;
-      }
     }
 
     &.theme-cyan {
       .bite-value {
         color: $cyan-primary;
       }
-      .cove-component__header {
-        background-color: $cyan-primary;
-      }
     }
 
     &.theme-green {
       .bite-value {
         color: $green-primary;
-      }
-      .cove-component__header {
-        background-color: $green-primary;
       }
     }
 
