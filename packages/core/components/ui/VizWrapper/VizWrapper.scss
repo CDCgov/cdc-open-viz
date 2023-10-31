@@ -1,0 +1,17 @@
+.cove .cove-component__content,
+.cove-component__content {
+  padding: 1rem;
+}
+
+.cove-component__content:not(.component--has-background) {
+  background-color: #f2f2f2;
+}
+
+.cove-component__content.component--hideBackgroundColor {
+  background: transparent;
+}
+
+.cove-component {
+  border-radius: 3px;
+  // box-shadow: rgba(0, 0, 0, 0.2) 3px 6px 10px; // no box shadows
+}
