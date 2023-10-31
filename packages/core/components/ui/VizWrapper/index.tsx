@@ -7,13 +7,23 @@ const hasShowTitleProps = (props: VizWrapperProps) => {
 }
 
 const VizWrapper = (props: VizWrapperProps) => {
-  const { children, visualizationType, visualSettings, title, showTitle, ...otherProps } = props
+  const { children, visualizationType, visualSettings, title, showTitle, subType, className, ...otherProps } = props
   let contentClasses = ['cove-component__content']
 
   if (title && showTitle) contentClasses.push('component--has-title')
 
   if (hasShowTitleProps(props)) {
     showTitle && contentClasses.push('component--has-title')
+  }
+
+  console.log(subType)
+
+  if (subType === 'Spark Line') {
+    contentClasses.push('sparkline')
+  }
+
+  if (subType === 'Spark Line' || visualizationType === 'chart') {
+    if (title && showTitle) contentClasses.push('component--has-title')
   }
 
   if (visualSettings) {
@@ -24,8 +34,12 @@ const VizWrapper = (props: VizWrapperProps) => {
     visualSettings.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor')
   }
 
+  console.log('cccc', contentClasses)
+
+  const updatedClasses = [className, contentClasses.join(' ')]
+
   return (
-    <div className={contentClasses.join(' ')} {...otherProps}>
+    <div className={updatedClasses.join(' ')} {...otherProps}>
       {children}
     </div>
   )

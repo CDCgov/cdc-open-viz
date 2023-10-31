@@ -281,7 +281,7 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
   return (
     <>
       <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
-      <VizWrapper config={config}>
+      <VizWrapper title={config.title} visualSettings={config.visual} visualizationType='waffle-chart'>
         {config.visualizationType === 'Gauge' && (
           <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
             <div className='cove-gauge-chart__chart'>

@@ -83,7 +83,7 @@
 
 // add additional space below title if needed
 .map-title.cove-component__header,
-.type-chart .cove-component__header {
+.type-chart:not(.type-sparkline) .cove-component__header {
   &:not(:empty) {
     margin: 0 0 1rem 0 !important;
   }

@@ -1,6 +1,8 @@
 .cove .cove-component__content,
 .cove-component__content {
   padding: 1rem;
+  border-radius: 3px;
+  // box-shadow: rgba(0, 0, 0, 0.2) 3px 6px 10px; // no box shadows
 }
 
 .cove-component__content:not(.component--has-background) {
@@ -14,4 +16,9 @@
 .cove-component {
   border-radius: 3px;
   // box-shadow: rgba(0, 0, 0, 0.2) 3px 6px 10px; // no box shadows
+}
+
+.cove-component__content.sparkline {
+  border-top-right-radius: unset;
+  border-top-left-radius: unset;
 }

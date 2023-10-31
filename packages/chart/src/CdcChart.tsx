@@ -1186,9 +1186,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
             <VizWrapper
               title={config.title}
+              subType={config.visualizationType}
               showTitle={config.showTitle}
               visualSettings={config.visual}
-              visualizationType='chart'
+              visualizationType={config.type}
               style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} `}
             >

@@ -174,7 +174,7 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
     let body = (
       <Component ref={container}>
         <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
-        <VizWrapper config={config}>
+        <VizWrapper title={config.title} visualSettings={config.visual} visualizationType='markup-include'>
           {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
           {markupError && config.srcUrl && <div className='warning'>{errorMessage}</div>}
         </VizWrapper>
