@@ -1,13 +1,12 @@
-import React, { PropsWithChildren, useContext } from 'react'
+import { PropsWithChildren } from 'react'
 import './VizWrapper.scss'
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 type VizWrapperProps = PropsWithChildren<{
   config: any
 }>
 
 const VizWrapper = (props: VizWrapperProps) => {
-  const { config } = props
+  const { config, ...otherProps } = props
 
   let contentClasses = ['cove-component__content']
 
@@ -25,7 +24,7 @@ const VizWrapper = (props: VizWrapperProps) => {
   config?.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor')
 
   return (
-    <div className={contentClasses.join(' ')} {...props}>
+    <div className={contentClasses.join(' ')} {...otherProps}>
       {props.children}
     </div>
   )
