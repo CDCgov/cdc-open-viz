@@ -39,6 +39,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
+import Title from '@cdc/core/components/ui/Title'
 
 // Child Components
 import ConfigContext from './context'
@@ -1590,15 +1591,15 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
               <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
             )}
-            {title && (
-              <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
-                {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-                <div role='heading' className={'map-title ' + general.headerColor} tabIndex='0' aria-level='2'>
-                  {general.superTitle && <sup>{parse(general.superTitle)}</sup>}
-                  <div>{parse(title)}</div>
-                </div>
-              </header>
-            )}
+
+            {/* prettier-ignore */}
+            <Title
+              title={title}
+              superTitle={general.superTitle}
+              config={config}
+              classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
+            />
+
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
