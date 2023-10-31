@@ -13,24 +13,10 @@ export default function useDataVizClasses(config, viewport = null) {
   }
 
   let innerContainerClasses = ['cove-component__inner']
-  let contentClasses = ['cove-component__content']
 
-  if (config?.visualizationType === 'Spark Line' || config?.visualizationType === 'chart') {
-    if (title && showTitle) contentClasses.push('component--has-title')
-  }
-
-  config?.showTitle && contentClasses.push('component--has-title')
-  config?.title && config?.visualizationType !== 'chart' && config?.visualizationType !== 'Spark Line' && contentClasses.push('component--has-title')
   config?.subtext && innerContainerClasses.push('component--has-subtext')
   config?.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
   config?.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
-
-  !config?.visual?.border && contentClasses.push('no-borders')
-  config?.visualizationType === 'Spark Line' && contentClasses.push('sparkline')
-  config?.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
-  config?.visual?.accent && contentClasses.push('component--has-accent')
-  config?.visual?.background && contentClasses.push('component--has-background')
-  config?.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor')
 
   // ! these two will be retired.
   config?.shadow && innerContainerClasses.push('shadow')
@@ -66,5 +52,5 @@ export default function useDataVizClasses(config, viewport = null) {
     description: ['legend-container__description']
   }
 
-  return { innerContainerClasses, contentClasses, barBorderClass, lineDatapointClass, sparkLineStyles, legendClasses }
+  return { innerContainerClasses, barBorderClass, lineDatapointClass, sparkLineStyles, legendClasses }
 }

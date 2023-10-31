@@ -44,6 +44,7 @@ import './scss/main.scss'
 import DataTable from '@cdc/core/components/DataTable'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
+import VizWrapper from '@cdc/core/components/ui/VizWrapper'
 
 const generateColorsArray = (color = '#000000', special = false) => {
   let colorObj = chroma(color)
@@ -107,7 +108,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
 
-  const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
+  const { barBorderClass, lineDatapointClass, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
@@ -1183,9 +1184,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
             {/* Visualization */}
             {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
-            <div
+            <VizWrapper
+              config={config}
               style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
-              className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
+              className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} `}
             >
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
@@ -1209,7 +1211,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 </>
               )}
               {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
-            </div>
+            </VizWrapper>
             {/* Link */}
             {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
 
