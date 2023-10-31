@@ -122,7 +122,7 @@ const BrushHandle = props => {
 
   return (
     <Group left={x + pathWidth / 2} top={-2}>
-      <Text pointerEvents='visiblePainted' dominantBaseline='hanging' x={0} verticalAnchor='start' textAnchor={textAnchor} fontSize={props.fontSize / 1.2} dy={10} y={15}>
+      <Text pointerEvents='visiblePainted' dominantBaseline='hanging' x={0} verticalAnchor='start' textAnchor={textAnchor} fontSize={props.fontSize / 1.4} dy={10} y={15}>
         {isLeft ? textProps.startValue : textProps.endValue}
       </Text>
       <path cursor='ew-resize' d='M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12' fill={!isBrushing ? '#666' : '#297EF1'} strokeWidth='1' transform={transform}></path>
