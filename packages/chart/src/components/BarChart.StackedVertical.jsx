@@ -7,9 +7,10 @@ import { Text } from '@visx/text'
 
 const BarChartStackedVertical = props => {
   const { xScale, yScale, xMax, yMax } = props
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
+  const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
   const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius } = useBarChart()
   const { orientation } = config
+  const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
   return (
     config.visualizationSubType === 'stacked' &&
@@ -27,7 +28,7 @@ const BarChartStackedVertical = props => {
               const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
               const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
 
-              if(!yAxisValue) return <></>
+              if (!yAxisValue) return <></>
 
               const style = applyRadius(barStack.index)
               let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
