@@ -88,14 +88,7 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                 data={data}
                 x={d => xScale(getXAxisData(d))}
                 y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
-                stroke={
-                  config.customColors
-                    ? config.customColors[index]
-                    : colorScale
-                    ? colorPalettes[config.palette][index]
-                    : // fallback
-                      '#000'
-                }
+                stroke={config.customColors ? config.customColors[index] : colorScale ? colorScale(seriesKey) : '#000'}
                 strokeWidth={2}
                 strokeOpacity={1}
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
