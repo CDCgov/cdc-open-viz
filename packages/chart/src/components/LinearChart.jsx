@@ -466,7 +466,7 @@ const LinearChart = props => {
                       )
                     })}
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                    <Text x={axisCenter} y={config.orientation === 'horizontal' ? dynamicMarginTop || config.xAxis.labelOffset : dynamicMarginTop || config.xAxis.size} textAnchor='middle' fontWeight='bold' fill={config.xAxis.labelColor}>
+                    <Text x={axisCenter} y={config.orientation === 'horizontal' ? dynamicMarginTop || config.xAxis.labelOffset : config.isResponsiveTicks && dynamicMarginTop ? dynamicMarginTop : config.xAxis.labelOffset} textAnchor='middle' fontWeight='bold' fill={config.xAxis.labelColor}>
                       {props.label}
                     </Text>
                   </Group>
@@ -645,7 +645,7 @@ const LinearChart = props => {
             />
           )}
           {/*Zoom Brush */}
-          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && !isHorizontal && config.runtime.xAxis.type === 'date' && <ZoomBrush data={data} xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
+          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && !isHorizontal && config.runtime.xAxis.type === 'date' && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {visualizationType !== 'Bar' && visualizationType !== 'Paired Bar' && visualizationType !== 'Box Plot' && visualizationType !== 'Area Chart' && visualizationType !== 'Scatter Plot' && visualizationType !== 'Deviation Bar' && visualizationType !== 'Forecasting' && (

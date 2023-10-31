@@ -48,7 +48,7 @@ const AreaChart = props => {
     data && (
       <svg>
         <ErrorBoundary component='AreaChart'>
-          <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)} top={0}>
+          <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)}>
             {(config.runtime.areaSeriesKeys || config.series).map((s, index) => {
               let seriesData = data.map(d => {
                 return {
