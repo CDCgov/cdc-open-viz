@@ -26,6 +26,7 @@ const VizWrapper = (props: VizWrapperProps) => {
     if (title && showTitle) contentClasses.push('component--has-title')
   }
 
+  console.log('visualSettings', visualSettings)
   if (visualSettings) {
     !visualSettings.border && contentClasses.push('no-borders')
     visualSettings.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
