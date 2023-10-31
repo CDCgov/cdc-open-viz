@@ -1,31 +1,32 @@
-import { PropsWithChildren } from 'react'
 import './VizWrapper.scss'
 
-type VizWrapperProps = PropsWithChildren<{
-  config: any
-}>
+import { type VizWrapperProps } from './types/VizWrapper'
+
+const hasShowTitleProps = (props: VizWrapperProps) => {
+  return 'showTitle' in props
+}
 
 const VizWrapper = (props: VizWrapperProps) => {
-  const { config, ...otherProps } = props
-
+  const { children, visualizationType, visualSettings, title, showTitle, ...otherProps } = props
   let contentClasses = ['cove-component__content']
 
-  if (config?.visualizationType === 'Spark Line' || config?.visualizationType === 'chart') {
-    if (config?.title && config?.showTitle) contentClasses.push('component--has-title')
-  }
-  config?.title && config?.visualizationType !== 'chart' && config?.visualizationType !== 'Spark Line' && contentClasses.push('component--has-title')
+  if (title && showTitle) contentClasses.push('component--has-title')
 
-  config?.showTitle && contentClasses.push('component--has-title')
-  !config?.visual?.border && contentClasses.push('no-borders')
-  config?.visualizationType === 'Spark Line' && contentClasses.push('sparkline')
-  config?.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
-  config?.visual?.accent && contentClasses.push('component--has-accent')
-  config?.visual?.background && contentClasses.push('component--has-background')
-  config?.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor')
+  if (hasShowTitleProps(props)) {
+    showTitle && contentClasses.push('component--has-title')
+  }
+
+  if (visualSettings) {
+    !visualSettings.border && contentClasses.push('no-borders')
+    visualSettings.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
+    visualSettings.accent && contentClasses.push('component--has-accent')
+    visualSettings.background && contentClasses.push('component--has-background')
+    visualSettings.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor')
+  }
 
   return (
     <div className={contentClasses.join(' ')} {...otherProps}>
-      {props.children}
+      {children}
     </div>
   )
 }

@@ -457,7 +457,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         <div {...(isEditor ? { className: 'spacing-wrapper' } : null)}>
           <Component config={config}>
             <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
-            <VizWrapper config={config}>
+            <VizWrapper title={config.title} visualSettings={config.visual} visualizationType='data-bite'>
               <div className={[...biteClasses, 'bite'].join(' ')}>
                 <div className='bite-content-container'>
                   {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
