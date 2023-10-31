@@ -14,8 +14,10 @@ import EditorPanel from './components/EditorPanel'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import markupIncludeReducer from './store/mi.reducer'
+import Component from '@cdc/core/components/ui/Component'
+import VizWrapper from '@cdc/core/components/ui/VizWrapper'
+import Title from '@cdc/core/components/ui/Title'
 
 // styles
 import './scss/main.scss'
@@ -28,8 +30,6 @@ type CdcMarkupIncludeProps = {
   setConfig: any
 }
 
-import Title from '@cdc/core/components/ui/Title'
-
 const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
   const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
   const initialState = { config: configObj ?? defaults, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
@@ -37,13 +37,10 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
   const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
 
   const { config, loading, urlMarkup, markupError, errorMessage, coveLoadedHasRan } = state
+  const { title } = config
 
   // Custom States
   const container = useRef()
-
-  const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
-
-  let { title } = config
 
   // Default Functions
   const updateConfig = newConfig => {
@@ -173,21 +170,15 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
 
   let content = <Loading />
 
-  let bodyClasses = ['markup-include']
-
   if (loading === false) {
     let body = (
-      <div className={bodyClasses.join(' ')} ref={container}>
+      <Component ref={container}>
         <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
-        <div className={`cove-component__content ${contentClasses.join(' ')}`}>
-          <div className={`${innerContainerClasses.join(' ')}`}>
-            <div className='cove-component__content-wrap'>
-              {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
-              {markupError && config.srcUrl && <div className='warning'>{errorMessage}</div>}
-            </div>
-          </div>
-        </div>
-      </div>
+        <VizWrapper config={config}>
+          {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
+          {markupError && config.srcUrl && <div className='warning'>{errorMessage}</div>}
+        </VizWrapper>
+      </Component>
     )
 
     content = (

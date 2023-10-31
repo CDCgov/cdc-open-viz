@@ -23,10 +23,11 @@ import defaults from './data/initial-state'
 import { publish } from '@cdc/core/helpers/events'
 import chartReducer from './store/chart.reducer'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
+import Component from '@cdc/core/components/ui/Component'
+import VizWrapper from '@cdc/core/components/ui/VizWrapper'
 
 type CdcWaffleChartProps = {
   configUrl?: string
@@ -272,66 +273,60 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
     return nodeWidth * 10 + nodeSpacer * 9
   }, [nodeWidth, nodeSpacer])
 
-  const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
-
   const xScale = scaleLinear({
     domain: [0, waffleDenominator],
     range: [0, config.gauge.width]
   })
 
   return (
-    <div className={innerContainerClasses.join(' ')}>
-      <>
-        <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
-        <div className={contentClasses.join(' ')}>
-          <div className='cove-component__content-wrap'>
-            {config.visualizationType === 'Gauge' && (
-              <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-                <div className='cove-gauge-chart__chart'>
-                  <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                    {prefix ? prefix : ' '}
-                    {config.showPercent ? dataPercentage : waffleNumerator}
-                    {suffix ? suffix + ' ' : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
-                  </div>
-                  <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
-                  <svg height={config.gauge.height} width={'100%'}>
-                    <Group>
-                      <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={config.gauge.width} height={config.gauge.height} fill='#fff' />
-                      <Bar x={0} y={0} width={xScale(waffleNumerator)} height={config.gauge.height} fill={gaugeColor} />
-                    </Group>
-                  </svg>
-                  <div className={'cove-waffle-chart__subtext subtext'}>{parse(subtext)}</div>
-                </div>
+    <>
+      <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
+      <VizWrapper config={config}>
+        {config.visualizationType === 'Gauge' && (
+          <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+            <div className='cove-gauge-chart__chart'>
+              <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                {prefix ? prefix : ' '}
+                {config.showPercent ? dataPercentage : waffleNumerator}
+                {suffix ? suffix + ' ' : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
               </div>
-            )}
-            {config.visualizationType !== 'Gauge' && (
-              <div className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-                <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
-                  <svg width={setRatio()} height={setRatio()} role='img' aria-label={handleWaffleChartAriaLabel(config)} tabIndex={0}>
-                    <Group>{buildWaffle()}</Group>
-                  </svg>
-                </div>
-                {(dataPercentage || content) && (
-                  <div className='cove-waffle-chart__data'>
-                    {dataPercentage && (
-                      <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                        {prefix ? prefix : null}
-                        {dataPercentage}
-                        {suffix ? suffix : null}
-                      </div>
-                    )}
-                    <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
-
-                    {subtext && <div className='cove-waffle-chart__subtext subtext'>{parse(subtext)}</div>}
+              <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
+              <svg height={config.gauge.height} width={'100%'}>
+                <Group>
+                  <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={config.gauge.width} height={config.gauge.height} fill='#fff' />
+                  <Bar x={0} y={0} width={xScale(waffleNumerator)} height={config.gauge.height} fill={gaugeColor} />
+                </Group>
+              </svg>
+              <div className={'cove-waffle-chart__subtext subtext'}>{parse(subtext)}</div>
+            </div>
+          </div>
+        )}
+        {config.visualizationType !== 'Gauge' && (
+          <div className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+            <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
+              <svg width={setRatio()} height={setRatio()} role='img' aria-label={handleWaffleChartAriaLabel(config)} tabIndex={0}>
+                <Group>{buildWaffle()}</Group>
+              </svg>
+            </div>
+            {(dataPercentage || content) && (
+              <div className='cove-waffle-chart__data'>
+                {dataPercentage && (
+                  <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                    {prefix ? prefix : null}
+                    {dataPercentage}
+                    {suffix ? suffix : null}
                   </div>
                 )}
+                <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
+
+                {subtext && <div className='cove-waffle-chart__subtext subtext'>{parse(subtext)}</div>}
               </div>
             )}
           </div>
-        </div>
-        {link && link}
-      </>
-    </div>
+        )}
+      </VizWrapper>
+      {link && link}
+    </>
   )
 }
 
@@ -423,12 +418,10 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
       classNames.push('is-editor')
     }
 
-    let bodyClasses = ['cove-component', 'waffle-chart']
-
     let body = (
-      <div className={`${bodyClasses.join(' ')}`} ref={outerContainerRef}>
+      <Component config={config} ref={outerContainerRef}>
         <WaffleChart config={config} isEditor={isEditor} />
-      </div>
+      </Component>
     )
 
     content = (
