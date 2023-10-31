@@ -48,7 +48,6 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     } else {
       color = 'transparent'
     }
-    console.log('color', color)
     return color
   }
 
@@ -79,11 +78,6 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     hoveredSeriesIndex = tooltipData.data.indexOf(hoveredSeriesKey)
     hoveredSeriesValue = hoveredSeriesData?.[0]?.[1]
 
-    console.log('hoveredSeriesKey', hoveredSeriesKey)
-    console.log('hoveredSeriesAxis', hoveredSeriesAxis)
-    console.log('hoveredSeriesValue', hoveredSeriesValue)
-
-    console.log('hoveredSeriesData', hoveredSeriesData)
     return tooltipData.data.map((tooltipItem, index) => {
       let seriesIndex = config.runtime.seriesLabelsAll.indexOf(hoveredXValue)
 
