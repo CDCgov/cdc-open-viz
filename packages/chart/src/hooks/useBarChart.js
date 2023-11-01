@@ -80,7 +80,7 @@ export const useBarChart = () => {
     if (!config.legend.colorCode && config.series.length > 1) {
       return currentBarColor
     }
-    const palettesArr = colorPalettes[config.palette]
+    const palettesArr = config.customColors ?? colorPalettes[config.palette]
     const values = tableData.map(d => {
       return d[config.legend.colorCode]
     })
