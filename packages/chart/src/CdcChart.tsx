@@ -1161,21 +1161,48 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const computeMarginBottom = (config: Config): string => {
-    if (config.legend.position !== 'bottom' && config.orientation === 'horizontal') {
-      return `${config.runtime.xAxis.size}px`
+    const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isHorizontal = config.orientation === 'horizontal'
+    const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
+    const isBrush = config.brush.active
+    const offset = 20
+    const brushHeight = config.brush.height
+    let bottom = 0
+    if (!isLegendBottom && isHorizontal && config.xAxis.label) {
+      bottom = config.runtime.xAxis.size + config.xAxis.labelOffset
     }
-    if (config.brush.active && config.orientation === 'vertical') {
-      if (config.legend.position !== 'bottom' && !config.legend.hide) {
-        return `${config.brush.height * 1.3 + config.dynamicMarginTop / 2}px`
-      }
-      if (config.legend.hide) {
-        return `${config.brush.height + config.dynamicMarginTop / 2}px`
-      }
+    if (!isLegendBottom && isHorizontal && !config.xAxis.label) {
+      bottom = 0
     }
-    if (!config.brush.active && config.orientation === 'vertical') {
-      return `${config.dynamicMarginTop / 2}px`
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && tickRotation && !config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.tickWidthMax + -config.xAxis.size + config.xAxis.labelOffset + offset : config.xAxis.tickWidthMax + offset + -config.xAxis.size + config.xAxis.labelOffset
     }
-    return '0px'
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && tickRotation && !config.isResponsiveTicks) {
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && tickRotation && !config.dynamicMarginTop && !config.isResponsiveTicks) {
+      bottom = isBrush ? config.xAxis.tickWidthMax + brushHeight + offset + -config.xAxis.size : 0
+    }
+
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && !tickRotation && !config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + -config.xAxis.size + config.xAxis.labelOffset + offset : -config.xAxis.size + config.xAxis.labelOffset + offset
+    }
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + config.xAxis.tickWidthMax : config.dynamicMarginTop + -config.xAxis.size + offset
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + config.xAxis.tickWidthMax : config.dynamicMarginTop + -config.xAxis.size - offset
+    }
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + 25 : config.xAxis.labelOffset + -config.xAxis.size + offset
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && !config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = -config.xAxis.size + offset + config.xAxis.labelOffset
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && !tickRotation && !config.dynamicMarginTop && !config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + -config.xAxis.size + config.xAxis.labelOffset : 0
+    }
+
+    return `${bottom}px`
   }
 
   // Prevent render if loading
