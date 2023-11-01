@@ -1138,7 +1138,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       throw Error('Blank string passed as URL. Navigation aborted.')
     }
 
-    const urlObj = new URL(urlString)
+    const urlObj = new URL(urlString, window.location.origin)
 
     // Open constructed link in new tab/window
     window.open(urlObj.toString(), '_blank')
@@ -1228,7 +1228,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const reloadURLData = async () => {
     if (state.dataUrl) {
-      const dataUrl = new URL(state.runtimeDataUrl || state.dataUrl)
+      const dataUrl = new URL(state.runtimeDataUrl || state.dataUrl, window.location.origin)
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
