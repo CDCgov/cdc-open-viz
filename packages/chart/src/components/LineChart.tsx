@@ -13,8 +13,7 @@ import LineChartCircle from './LineChart.Circle'
 const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, showTooltip, seriesStyle = 'Line', svgRef, handleTooltipClick, tooltipData }) => {
   // Not sure why there's a redraw here.
 
-  const { colorPalettes, transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType, dashboardConfig, tableData } = useContext(ConfigContext)
-  const data = config.brush.active && config.brush.data.length ? config.brush.data : transformedData
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType, tableData } = useContext(ConfigContext)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
   if (!handleTooltipMouseOver) return
   const handleAxisFormating = (axis = 'left', label, value) => {
@@ -80,22 +79,14 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                   )
                 )
               })}
-
               <>{config.lineDatapointStyle === 'hover' && <LineChartCircle config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />}</>
-
+              {/* STANDARD LINE */}
               <LinePath
                 curve={allCurves[seriesData[0].lineType]}
                 data={data}
                 x={d => xScale(getXAxisData(d))}
                 y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
-                stroke={
-                  config.customColors
-                    ? config.customColors[index]
-                    : colorScale
-                    ? colorPalettes[config.palette][index]
-                    : // fallback
-                      '#000'
-                }
+                stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
                 strokeWidth={2}
                 strokeOpacity={1}
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
@@ -103,6 +94,7 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                   return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
                 }}
               />
+              {/* ANIMATED LINE */}
               {config.animate && (
                 <LinePath
                   className='animation'
