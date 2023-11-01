@@ -147,7 +147,7 @@ const Legend = () => {
           datum: val,
           index: i,
           text: val,
-          value: colorScale(i)
+          value: colorScale(val)
         }
         return newLabel
       })
