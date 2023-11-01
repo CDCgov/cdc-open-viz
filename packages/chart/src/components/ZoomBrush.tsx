@@ -119,7 +119,9 @@ const ZoomBrush: FC<Props> = props => {
 
     return top
   }
-
+  if (!['Line', 'Bar', 'Area Chart', 'Combo'].includes(config.visualizationType)) {
+    return
+  }
   return (
     <Group display={config.brush.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
       <rect fill='#eee' width={props.xMax} height={config.brush.height} rx={radius} />

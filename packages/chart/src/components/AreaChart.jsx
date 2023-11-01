@@ -71,6 +71,7 @@ const AreaChart = props => {
                 <React.Fragment key={index}>
                   {/* prettier-ignore */}
                   <LinePath
+                      className='murad'
                     data={seriesData}
                     x={d => handleX(d)}
                     y={d => handleY(d, index, s)}
@@ -84,6 +85,7 @@ const AreaChart = props => {
 
                   {/* prettier-ignore */}
                   <AreaClosed
+                  className='murad'
                     key={'area-chart'}
                     fill={displayArea ? colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s.dataKey] : s.dataKey) : '#000' : 'transparent'}
                     fillOpacity={transparentArea ? 0.25 : 0.5}
@@ -97,7 +99,7 @@ const AreaChart = props => {
                 </React.Fragment>
               )
             })}
-            <Bar width={Number(xMax)} height={Number(yMax)} fill={isDebug ? 'red' : 'transparent'} fillOpacity={0.05} style={{ stroke: 'black', strokeWidth: 2 }} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />
+            <Bar width={Number(xMax)} height={Number(yMax)} fill={'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />
           </Group>
         </ErrorBoundary>
       </svg>
