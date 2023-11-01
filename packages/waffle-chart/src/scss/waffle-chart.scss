@@ -8,16 +8,6 @@
   }
 }
 
-.cove .waffle-chart .cove-component__header {
-  font-size: unset;
-}
-
-//@each $theme, $color in $theme-colors {
-//  .cdc-waffle-chart.theme-#{$theme} #{&} {
-//    @include set-theme("color", $color);
-//  }
-//}
-
 .warning-icon {
   position: absolute;
   top: 50%;
@@ -43,14 +33,19 @@
       flex-direction: column;
       justify-items: center;
       align-items: flex-start;
+
+      & > svg {
+        margin: 0.7em 0;
+      }
     }
 
     &__subtext {
-      font-size: 0.75em;
+      font-style: italic;
+      font-size: 0.9em !important;
     }
     &__text {
       line-height: 1.25em;
-      width: 100%;
+      font-weight: 400;
     }
   }
 
@@ -80,10 +75,6 @@
     flex: 1 1 0;
     min-width: 175px;
     margin-bottom: 1rem;
-  }
-
-  .cove-waffle-chart__subtext {
-    font-size: 0.75em;
   }
 
   .cove-waffle-chart__data {
@@ -122,36 +113,30 @@
 @at-root {
   .cove-waffle-chart.font-small,
   .cove-gauge-chart.font-small #{&} {
-    .cove-waffle-chart__data--primary,
-    .cove-gauge-chart__data--primary {
+    .cove-waffle-chart__data--primary {
       font-size: 35px;
     }
-    .cove-waffle-chart__data--text,
-    .cove-gauge-chart__data--text {
+    .cove-waffle-chart__data--text {
       font-size: 14px;
     }
   }
 
   .cove-waffle-chart.font-medium,
   .cove-gauge-chart.font-medium #{&} {
-    .cove-waffle-chart__data--primary,
-    .cove-gauge-chart__data--primary {
+    .cove-waffle-chart__data--primary {
       font-size: 50px;
     }
-    .cove-waffle-chart__data--text,
-    .cove-gauge-chart__data--text {
+    .cove-waffle-chart__data--text {
       font-size: 18px;
     }
   }
 
   .cove-waffle-chart.font-large,
   .cove-gauge-chart.font-large #{&} {
-    .cove-waffle-chart__data--primary,
-    .cove-gauge-chart__data--primary {
+    .cove-waffle-chart__data--primary {
       font-size: 80px;
     }
-    .cove-waffle-chart__data--text,
-    .cove-gauge-chart__data--text {
+    .cove-waffle-chart__data--text {
       font-size: 20px;
     }
   }

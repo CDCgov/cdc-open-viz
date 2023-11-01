@@ -7,6 +7,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import useLegendClasses from './../hooks/useLegendClasses'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 import { Line } from '@visx/shape'
+import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
 
 // * FILE REVIEW *
 // TODO: fix eslint-disable jsxa11y issues
@@ -92,7 +93,7 @@ const Legend = () => {
       // loop through each stage/group/area on the chart and create a label
       config.runtime?.forecastingSeriesKeys?.map((outerGroup, index) => {
         return outerGroup?.stages?.map((stage, index) => {
-          let colorValue = colorPalettes[stage.color]?.[2] ? colorPalettes[stage.color]?.[2] : '#ccc'
+          let colorValue = sequentialPalettes[stage.color]?.[2] ? sequentialPalettes[stage.color]?.[2] : colorPalettes[stage.color]?.[2] ? colorPalettes[stage.color]?.[2] : '#ccc'
 
           const newLabel = {
             datum: stage.key,
@@ -158,10 +159,11 @@ const Legend = () => {
   }
 
   const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
-
+  const brushHeight = isBottomOrSmallViewport && config.brush.active ? config.brush.height * 2 + config.dynamicMarginTop / 2 : isBottomOrSmallViewport ? 15 : 0
+  const top = isBottomOrSmallViewport && config.isResponsiveTicks && config.dynamicMarginTop && !config.brush.active ? config.dynamicMarginTop : 0
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `0px`
+    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${brushHeight + top}px`
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -179,7 +181,7 @@ const Legend = () => {
             return (
               <div className={innerClasses.join(' ')}>
                 {createLegendLabels(labels).map((label, i) => {
-                  let className = 'legend-item'
+                  let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
                   let itemName = label.datum
 
                   // Filter excluded data keys from legend
@@ -197,12 +199,12 @@ const Legend = () => {
                   }
 
                   if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                    className += ' inactive'
+                    className.push('inactive')
                   }
 
                   return (
                     <LegendItem
-                      className={className}
+                      className={className.join(' ')}
                       tabIndex={0}
                       key={`legend-quantile-${i}`}
                       onKeyPress={e => {
