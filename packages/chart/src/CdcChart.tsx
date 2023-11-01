@@ -141,7 +141,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const reloadURLData = async () => {
     if (config.dataUrl) {
-      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl)
+      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
@@ -740,7 +740,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime.seriesKeys) {
-      const configPalette = config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar' ? config.twoColor.palette : config.palette
+      const configPalette = config.customColors ? config.customColors : config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar' ? config.twoColor.palette : config.palette
       const allPalettes = { ...colorPalettes, ...twoColorPalette }
       let palette = config.customColors || allPalettes[configPalette]
       let numberOfKeys = config.runtime.seriesKeys.length
@@ -755,7 +755,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newColorScale = () =>
         scaleOrdinal({
           domain: config.runtime.seriesLabelsAll,
-          range: palette
+          range: palette,
+          unknown: null
         })
 
       setColorScale(newColorScale)

@@ -401,7 +401,6 @@ const ForestPlotSettings = () => {
           options={getColumns(false)}
         />
 
-        <CheckBox value={config.forestPlot.showZeroLine} section='forestPlot' fieldName='showZeroLine' label='Show Line on Zero' updateField={updateField} />
         <Select
           value={config.forestPlot.shape}
           label='Point Estimate Shape'
@@ -422,7 +421,7 @@ const ForestPlotSettings = () => {
         />
         <Select
           value={config.forestPlot.radius.scalingColumn}
-          label='Scale Radius Column'
+          label='Weight Column'
           initial={'Select'}
           onChange={e => {
             if (e.target.value !== '' && e.target.value !== 'Select') {
@@ -491,10 +490,10 @@ const ForestPlotSettings = () => {
         <br />
         <hr />
         <br />
-        <h4>Add Regression Line</h4>
-        <TextField type='number' value={config.forestPlot?.regression?.upper || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='upper' label='Upper Value' />
-        <TextField type='number' value={config.forestPlot?.regression?.lower || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='lower' label='Lower Value' />
-        <TextField type='number' value={config.forestPlot?.regression?.estimateField || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='estimateField' label='Estimate Value' />
+        {/* <h4>Add Regression Line</h4> */}
+        {/* <TextField type='number' value={config.forestPlot?.regression?.upper || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='upper' label='Upper Value' /> */}
+        {/* <TextField type='number' value={config.forestPlot?.regression?.lower || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='lower' label='Lower Value' /> */}
+        <TextField type='number' value={config.forestPlot?.regression?.estimateField || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='estimateField' label='Line of No Effect' />
         <TextField type='text' value={config.forestPlot?.regression?.baseLineColor || 'black'} updateField={updateField} section='forestPlot' subsection='regression' fieldName='baseLineColor' label='Base Color' />
         <CheckBox value={config.forestPlot?.regression?.showBaseLine || false} section='forestPlot' subsection='regression' fieldName='showBaseLine' label='Show base line' updateField={updateField} />
         <CheckBox value={config.forestPlot?.regression?.showDiamond || false} section='forestPlot' subsection='regression' fieldName='showDiamond' label='Show Diamond' updateField={updateField} />

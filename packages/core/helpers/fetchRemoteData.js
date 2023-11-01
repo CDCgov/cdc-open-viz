@@ -2,7 +2,7 @@ import Papa from 'papaparse'
 
 export default async function (url, visualizationType = '') {
   try {
-    url = new URL(url)
+    url = new URL(url, window.location.origin)
 
     const path = url.pathname
     const regex = /(?:\.([^.]+))?$/
