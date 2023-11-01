@@ -63,9 +63,6 @@ const LinearChart = props => {
     height = height + config.brush.height
   }
 
-  let dynamicMarginTop = 0 || config.dynamicMarginTop
-  const marginTop = 20
-
   // hooks  % states
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
@@ -425,8 +422,11 @@ const LinearChart = props => {
                   }
                 })
 
-                dynamicMarginTop = areTicksTouching && config.isResponsiveTicks ? tickWidthMax + defaultTickLength + marginTop : 0
+                const dynamicMarginTop = areTicksTouching && config.isResponsiveTicks ? tickWidthMax + defaultTickLength + 20 : 0
+                const rotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
+
                 config.dynamicMarginTop = dynamicMarginTop
+                config.xAxis.tickWidthMax = tickWidthMax
 
                 return (
                   <Group className='bottom-axis'>
@@ -466,7 +466,21 @@ const LinearChart = props => {
                       )
                     })}
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                    <Text x={axisCenter} y={config.orientation === 'horizontal' ? dynamicMarginTop || config.xAxis.labelOffset : config.isResponsiveTicks && dynamicMarginTop ? dynamicMarginTop : config.xAxis.labelOffset} textAnchor='middle' fontWeight='bold' fill={config.xAxis.labelColor}>
+                    <Text
+                      x={axisCenter}
+                      y={
+                        config.orientation === 'horizontal'
+                          ? dynamicMarginTop || config.xAxis.labelOffset
+                          : config.isResponsiveTicks && dynamicMarginTop && !isHorizontal
+                          ? dynamicMarginTop
+                          : Number(rotation) && !config.isResponsiveTicks && !isHorizontal
+                          ? Number(rotation + tickWidthMax / 1.3)
+                          : Number(config.xAxis.labelOffset)
+                      }
+                      textAnchor='middle'
+                      fontWeight='bold'
+                      fill={config.xAxis.labelColor}
+                    >
                       {props.label}
                     </Text>
                   </Group>
@@ -645,7 +659,7 @@ const LinearChart = props => {
             />
           )}
           {/*Zoom Brush */}
-          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && !isHorizontal && config.runtime.xAxis.type === 'date' && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
+          {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && !isHorizontal && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {visualizationType !== 'Bar' && visualizationType !== 'Paired Bar' && visualizationType !== 'Box Plot' && visualizationType !== 'Area Chart' && visualizationType !== 'Scatter Plot' && visualizationType !== 'Deviation Bar' && visualizationType !== 'Forecasting' && (

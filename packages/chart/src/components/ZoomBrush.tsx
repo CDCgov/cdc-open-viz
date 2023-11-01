@@ -85,10 +85,43 @@ const ZoomBrush: FC<Props> = props => {
     }
   }, [config.brush.active])
 
-  const top = config.xAxis.label ? (config.dynamicMarginTop || config.xAxis.labelOffset) + Number(config.brush.height) : !config.xAxis.label && config.dynamicMarginTop ? config.dynamicMarginTop : Number(config.brush.height) * 2
+  const calculateTop = (): number => {
+    const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
+    let top = 0
+    const offSet = 20
+    if (!config.xAxis.label) {
+      if (!config.isResponsiveTicks && tickRotation) {
+        top = Number(tickRotation + config.xAxis.tickWidthMax) / 1.6
+      }
+      if (!config.isResponsiveTicks && !tickRotation) {
+        top = Number(config.xAxis.labelOffset) - offSet
+      }
+      if (config.isResponsiveTicks && config.dynamicMarginTop) {
+        top = Number(config.xAxis.labelOffset + config.xAxis.tickWidthMax / 1.6)
+      }
+      if (config.isResponsiveTicks && !config.dynamicMarginTop) {
+        top = Number(config.xAxis.labelOffset - offSet)
+      }
+    }
+    if (config.xAxis.label) {
+      if (!config.isResponsiveTicks && tickRotation) {
+        top = Number(config.xAxis.tickWidthMax + tickRotation)
+      }
+
+      if (!config.isResponsiveTicks && !tickRotation) {
+        top = config.xAxis.labelOffset + offSet
+      }
+
+      if (config.isResponsiveTicks && !tickRotation) {
+        top = Number(config.dynamicMarginTop ? config.dynamicMarginTop : config.xAxis.labelOffset) + offSet
+      }
+    }
+
+    return top
+  }
 
   return (
-    <Group display={config.brush.active ? 'block' : 'none'} top={Number(props.yMax) + top} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
+    <Group display={config.brush.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
       <rect fill='#eee' width={props.xMax} height={config.brush.height} rx={radius} />
       <Brush
         renderBrushHandle={props => <BrushHandle textProps={textProps} fontSize={fontSize[config.fontSize]} {...props} isBrushing={brushRef.current?.state.isBrushing} />}
