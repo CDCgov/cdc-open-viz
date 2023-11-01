@@ -755,7 +755,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newColorScale = () =>
         scaleOrdinal({
           domain: config.runtime.seriesLabelsAll,
-          range: palette
+          range: palette,
+          unknown: null
         })
 
       setColorScale(newColorScale)
