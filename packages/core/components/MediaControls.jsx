@@ -107,19 +107,20 @@ const Button = ({ state, text, type, title, elementToCapture }) => {
 }
 
 // Link to CSV/JSON data
-const Link = ({ config }) => {
+const Link = ({ config, dashboardDataConfig }) => {
+  let dataConfig = dashboardDataConfig || config;
   // Handles Maps & Charts
-  if (config.dataFileSourceType === 'url' && config.dataFileName && config.table.showDownloadUrl) {
+  if (dataConfig.dataFileSourceType === 'url' && dataConfig.dataFileName && config.table.showDownloadUrl) {
     return (
-      <a href={config.dataFileName} title={buttonText.link} target='_blank'>
+      <a href={dataConfig.dataFileName} title={buttonText.link} target='_blank'>
         {buttonText.link}
       </a>
     )
   }
 
   // Handles Dashboards
-  return config?.table?.showDownloadUrl && config.dataUrl ? (
-    <a href={config.dataUrl} title='Link to view full data set' target='_blank'>
+  return config?.table?.showDownloadUrl && dataConfig.dataUrl ? (
+    <a href={dataConfig.dataUrl} title='Link to view full data set' target='_blank'>
       {buttonText.link}
     </a>
   ) : null

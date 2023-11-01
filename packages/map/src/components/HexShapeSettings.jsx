@@ -1,11 +1,12 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import parse from 'html-react-parser'
 import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'None']
 
-// todo: DUPLIDATED ACROSS PACKAGES
+// todo: Move duplicated operators to CORE
 export const DATA_OPERATOR_LESS = '<'
 export const DATA_OPERATOR_GREATER = '>'
 export const DATA_OPERATOR_LESSEQUAL = '<='
@@ -40,11 +41,12 @@ const HexSettingDisplayShapesOnHex = props => {
 }
 
 const HexSettingDisplayAsHexMap = props => {
-  const { state, setState, handleEditorChanges } = props
+  const { state, handleEditorChanges } = props
 
   return (
-    'us' === state.general.geoType &&
-    'data' === state.general.type && (
+    state.general.geoType === 'us' &&
+    state.general.type !== ' navigation' &&
+    state.general.type !== 'bubble' && (
       <label className='checkbox mt-4'>
         <input
           type='checkbox'
@@ -95,6 +97,25 @@ const HexSettingShapeColumns = props => {
     })
   }
 
+  const handleRemoveShapeCondition = (shapeGroupIndex, itemIndex) => {
+    setState({
+      ...state,
+      hexMap: {
+        ...state.hexMap,
+        shapeGroups: state.hexMap.shapeGroups.map((group, groupIndex) => {
+          if (groupIndex === shapeGroupIndex) {
+            return {
+              ...group,
+              items: group.items.filter((item, index) => index !== itemIndex)
+            }
+          } else {
+            return group
+          }
+        })
+      }
+    })
+  }
+
   return (
     state.general.displayAsHex &&
     state.hexMap.type === 'shapes' && (
@@ -126,6 +147,32 @@ const HexSettingShapeColumns = props => {
                                         return {
                                           ...group,
                                           legendTitle: e.target.value
+                                        }
+                                      } else {
+                                        return group
+                                      }
+                                    })
+                                  }
+                                }))
+                              }
+                            />
+                          </label>
+
+                          <label>
+                            <span className='edit-label column-heading'>Legend Description</span>
+                            <input
+                              type='text'
+                              value={shapeGroup.legendDescription || ''}
+                              onChange={e =>
+                                setState(prevState => ({
+                                  ...prevState,
+                                  hexMap: {
+                                    ...prevState.hexMap,
+                                    shapeGroups: prevState.hexMap.shapeGroups.map((group, groupIndex) => {
+                                      if (groupIndex === shapeGroupIndex) {
+                                        return {
+                                          ...group,
+                                          legendDescription: e.target.value
                                         }
                                       } else {
                                         return group
@@ -182,6 +229,9 @@ const HexSettingShapeColumns = props => {
                                           </div>
                                         </div>
                                       </div>
+                                      <button className='cove-button cove-button--warn' style={{ background: 'none', border: '1px solid red', color: 'red', marginTop: '15px' }} onClick={e => handleRemoveShapeCondition(shapeGroupIndex, itemIndex)}>
+                                        Remove Shape Conditional
+                                      </button>
                                     </>
                                   </AccordionItemPanel>
                                 </AccordionItem>
@@ -287,7 +337,6 @@ const HexMapShapeLegend = props => {
   const { title } = state.general
 
   const columnLogic = legend.position === 'side' && legend.singleColumn ? 'single-column' : legend.position === 'bottom' && legend.singleRow ? 'single-row' : ''
-  const classNames = [`${legend.position}`, `${columnLogic}`, `cdcdataviz-sr-focusable`, `${viewport}`]
 
   const getItemShape = shape => {
     switch (shape) {
@@ -302,31 +351,22 @@ const HexMapShapeLegend = props => {
     }
   }
 
+  const { legendClasses } = useDataVizClasses(state, viewport)
+
+  // TODO: create core legend for reusability
   return (
     state.hexMap.type === 'shapes' &&
     state.hexMap.shapeGroups.map((shapeGroup, shapeGroupIndex) => {
       return (
-        <aside id='legend' className={classNames.join(' ')} role='region' aria-label='Legend' tabIndex='0'>
-          <section className='legend-section' aria-label='Map Legend'>
-            {runtimeLegend.disabledAmt > 0 && (
-              <button
-                onClick={e => {
-                  e.preventDefault()
-                  resetLegendToggles()
-                  setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
-                }}
-                className='clear btn'
-              >
-                Clear
-              </button>
-            )}
-            {legend.title && <span className='heading-2'>{parse(shapeGroup.legendTitle)}</span>}
-            {legend.dynamicDescription === false && legend.description && <p>{parse(shapeGroup.legendDescription)}</p>}
+        <aside id='legend' className={legendClasses.aside.join(' ')} role='region' aria-label='Legend' tabIndex='0'>
+          <section className={legendClasses.section.join(' ')} aria-label='Map Legend'>
+            {legend.title && <span className={legendClasses.title.join(' ')}>{parse(shapeGroup.legendTitle)}</span>}
+            {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ')}>{parse(shapeGroup.legendDescription)}</p>}
 
-            <ul className={columnLogic} aria-label='Legend items'>
+            <ul className={legendClasses.ul.join(' ')} aria-label='Legend items' style={{ listStyle: 'none' }}>
               {shapeGroup.items.map((item, itemIndex) => {
                 return (
-                  <li>
+                  <li className={legendClasses.li.join(' ')}>
                     {getItemShape(item.shape)} {item.value}
                   </li>
                 )

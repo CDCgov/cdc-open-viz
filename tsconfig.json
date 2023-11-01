@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "esModuleInterop": true
+  },
+  "include": [
+    "globals.d.ts",
+    "packages/**/*.tsx",
+    "packages/**/*.ts",
+    "packages/**/*.jsx"
+  ]
+}

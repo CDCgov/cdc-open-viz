@@ -86,7 +86,6 @@
     "position": "side",
     "title": "Legend Title",
     "description": "Legend Text",
-    "type": "category",
     "specialClasses": [
       {
         "key": "Intensity Level",
@@ -148,7 +147,6 @@
     "layers": []
   },
   "hexMap": {
-    "type": "shapes",
     "arrowGroupColumnName": "Trajectory",
     "arrowGroupColumnKeys": [],
     "arrowGroupColumnValues": [

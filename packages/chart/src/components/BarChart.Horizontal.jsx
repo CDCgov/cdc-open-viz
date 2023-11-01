@@ -120,6 +120,8 @@ export const BarChartHorizontal = props => {
                     borderColor,
                     borderStyle: 'solid',
                     borderWidth,
+                    width: barWidthHorizontal,
+                    height: !config.isLollipopChart ? barWidth : lollipopBarWidth,
                     ...borderRadius
                   }
 
@@ -128,8 +130,8 @@ export const BarChartHorizontal = props => {
                       {/* This feels gross but inline transition was not working well*/}
                       <style>
                         {`
-                        .linear #barGroup${barGroup.index},
-                        .Combo #barGroup${barGroup.index} {
+                        .linear #barGroup${barGroup.index} div,
+                        .Combo #barGroup${barGroup.index} div {
                           transform-origin: 0 ${barY + barHeight}px;
                         }
                       `}
@@ -142,7 +144,6 @@ export const BarChartHorizontal = props => {
                           y={barWidth * bar.index}
                           width={barWidthHorizontal}
                           height={!config.isLollipopChart ? barWidth : lollipopBarWidth}
-                          style={finalStyle}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tooltip-html={tooltip}
@@ -154,7 +155,9 @@ export const BarChartHorizontal = props => {
                               setSharedFilter(config.uid, bar)
                             }
                           }}
-                        ></foreignObject>
+                        >
+                          <div style={finalStyle}></div>
+                        </foreignObject>
                         {!config.isLollipopChart && displayNumbersOnBar && (
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}

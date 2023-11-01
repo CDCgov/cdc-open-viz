@@ -7,9 +7,10 @@ import { Text } from '@visx/text'
 
 const BarChartStackedVertical = props => {
   const { xScale, yScale, xMax, yMax } = props
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
+  const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
   const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius } = useBarChart()
   const { orientation } = config
+  const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
   return (
     config.visualizationSubType === 'stacked' &&
@@ -27,7 +28,7 @@ const BarChartStackedVertical = props => {
               const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
               const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
 
-              if(!yAxisValue) return <></>
+              if (!yAxisValue) return <></>
 
               const style = applyRadius(barStack.index)
               let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
@@ -52,7 +53,7 @@ const BarChartStackedVertical = props => {
                   <style>
                     {`
                            #barStack${barStack.index}-${bar.index} rect,
-                           #barStack${barStack.index}-${bar.index} foreignObject{
+                           #barStack${barStack.index}-${bar.index} foreignObject div{
                             animation-delay: ${barStack.index * 0.5}s;
                             transform-origin: ${barThicknessAdjusted / 2}px ${bar.y + bar.height}px
                           }
@@ -68,8 +69,6 @@ const BarChartStackedVertical = props => {
                       y={bar.y}
                       width={barThicknessAdjusted}
                       height={bar.height}
-                      style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
-                      opacity={transparentBar ? 0.5 : 1}
                       display={displayBar ? 'block' : 'none'}
                       data-tooltip-html={barStackTooltip}
                       data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -80,7 +79,9 @@ const BarChartStackedVertical = props => {
                           setSharedFilter(config.uid, bar)
                         }
                       }}
-                    ></foreignObject>
+                    >
+                      <div style={{ opacity: transparentBar ? 0.5 : 1, width: barThicknessAdjusted, height: bar.height, background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
+                    </foreignObject>
                   </Group>
                 </Group>
               )

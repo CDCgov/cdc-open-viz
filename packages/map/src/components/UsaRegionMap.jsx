@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from 'react'
+import { useState, useEffect, memo, useContext } from 'react'
 
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -7,6 +7,7 @@ import { feature } from 'topojson-client'
 import topoJSON from '../data/us-regions-topo-2.json'
 import { Mercator } from '@visx/geo'
 import chroma from 'chroma-js'
+import ConfigContext from '../context'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.regions)
 
@@ -28,7 +29,19 @@ const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
 }
 
 const UsaRegionMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, titleCase, handleCircleClick, handleMapAriaLabels } = props
+  // prettier-ignore
+  const {
+    applyLegendToRow,
+    applyTooltipsToGeo,
+    data,
+    displayGeoName,
+    geoClickHandler,
+    handleCircleClick,
+    handleMapAriaLabels,
+    state,
+    supportedTerritories,
+    titleCase,
+  } = useContext(ConfigContext)
 
   // "Choose State" options
   const [extent, setExtent] = useState(null)
