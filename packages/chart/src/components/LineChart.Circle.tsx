@@ -41,9 +41,9 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     if (displayArea) {
       if (colorScale) {
         if (getIndex(hoveredKey) === false) return
-        color = customColors.length > 0 ? customColors[getIndex(hoveredKey)] : colorScale(seriesLabels[hoveredKey] || seriesKey)
+        color = colorScale(seriesLabels[hoveredKey] || seriesKey)
       } else if (customColors) {
-        color = customColors.length > 0 ? customColors[getIndex(hoveredKey)] : 'transparent'
+        color = customColors.length > 0 ? colorScale(getIndex(hoveredKey)) : 'transparent'
       }
     } else {
       color = 'transparent'
