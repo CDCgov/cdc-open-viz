@@ -207,7 +207,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         const datasetKey = datasetKeys[i]
         const dataset = config.datasets[datasetKey]
         if (dataset.dataUrl && config.dashboard && config.dashboard.sharedFilters) {
-          const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl)
+          const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl, window.location.origin)
           let currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
           let updatedQSParams = {}
 
