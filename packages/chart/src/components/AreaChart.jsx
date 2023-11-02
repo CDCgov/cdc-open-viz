@@ -123,10 +123,14 @@ const AreaChart = props => {
                 </React.Fragment>
               )
             })}
+<<<<<<< Updated upstream
 
             {/* Transparent bar for tooltips - disable if AreaChart is a brush */}
             {/* prettier-ignore */}
             {!isBrush && <Bar width={Number(xMax)} height={Number(yMax)} fill={isDebug ? 'red' : 'transparent'} fillOpacity={0.05} style={isDebug ? { stroke: 'black', strokeWidth: 2 } : {}} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />}
+=======
+            <Bar width={Number(xMax)} height={Number(yMax)} fill={isDebug ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />
+>>>>>>> Stashed changes
           </Group>
         </ErrorBoundary>
       </svg>
