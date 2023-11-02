@@ -76,11 +76,12 @@ $theme: (
 .markup-include,
 .type-waffle-chart,
 .type-data-bite,
+.cdc-open-viz-module.cdc-map-outer-container,
 .cdc-open-viz-module.type-chart.type-sparkline,
 .cove {
   @each $theme-name, $theme-colors in $theme {
     // Header
-    .theme-#{$theme-name} {
+    .theme-#{$theme-name}:not(.filters-section, a) {
       background-color: string.unquote(nth($theme-colors, 1));
       border-color: string.unquote(nth($theme-colors, 2));
       border-bottom-style: solid;

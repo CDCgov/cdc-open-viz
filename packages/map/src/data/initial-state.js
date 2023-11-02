@@ -95,7 +95,12 @@ export default {
     extraBubbleBorder: false,
     cityStyle: 'circle',
     geoCodeCircleSize: 2,
-    showBubbleZeros: false
+    showBubbleZeros: false,
+    border: false,
+    accent: false,
+    background: false,
+    hideBackgroundColor: true,
+    borderColorTheme: false
   },
   mapPosition: { coordinates: [0, 30], zoom: 1 },
   map: {

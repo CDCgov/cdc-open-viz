@@ -7,10 +7,12 @@ const hasShowTitleProps = (props: VizWrapperProps) => {
 }
 
 const VizWrapper = (props: VizWrapperProps) => {
-  const { children, visualizationType, visualSettings, title, showTitle, subType, className, ...otherProps } = props
+  const { children, visualizationType, visualSettings, title, showTitle = true, subType, className, ...otherProps } = props
   let contentClasses = ['cove-component__content']
 
   if (title && showTitle) contentClasses.push('component--has-title')
+  console.log('ROPS', props)
+  console.log('OC', contentClasses)
 
   if (hasShowTitleProps(props)) {
     showTitle && contentClasses.push('component--has-title')

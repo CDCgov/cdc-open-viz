@@ -11,6 +11,7 @@ import chroma from 'chroma-js'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
+import VizWrapper from '@cdc/core/components/ui/VizWrapper'
 
 // Helpers
 import { publish } from '@cdc/core/helpers/events'
@@ -1303,7 +1304,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (newState.dataUrl && !urlFilters) {
       // handle urls with spaces in the name.
       if (newState.dataUrl) newState.dataUrl = `${newState.dataUrl}`
-      console.log(newState.dataUrl);
+      console.log(newState.dataUrl)
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
 
       if (newData && newState.dataDescription) {
@@ -1486,7 +1487,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   if (!table.label || table.label === '') table.label = 'Data Table'
 
   // Outer container classes
-  let outerContainerClasses = ['cdc-open-viz-module', 'cdc-map-outer-container', currentViewport]
+  let outerContainerClasses = ['cdc-open-viz-module', 'cdc-map-outer-container', currentViewport, `${state?.general?.headerColor}`]
 
   if (className) {
     outerContainerClasses.push(className)
@@ -1600,88 +1601,97 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
             />
 
-            {general.introText && <section className='introText'>{parse(general.introText)}</section>}
-
-            {/* prettier-ignore */}
-            {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
-
-            <div
-              role='button'
-              tabIndex='0'
-              className={mapContainerClasses.join(' ')}
-              onClick={e => closeModal(e)}
-              onKeyDown={e => {
-                if (e.keyCode === 13) {
-                  closeModal(e)
-                }
-              }}
+            <VizWrapper
+              title={state.title}
+              type={state.type}
+              visualSettings={state.visual}
+              visualizationType={'map'}
+              style={{ marginBottom: config?.legend?.position !== 'bottom' && config?.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
+              className={`chart-container p-relative ${config?.legend?.position === 'bottom' ? 'bottom' : ''}${config?.legend?.hide ? ' legend-hidden' : ''} `}
             >
-              <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
-                Skip Over Map Container
-              </a>
+              {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
-              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-              <section className='outline-none geography-container' ref={mapSvg} tabIndex='0' style={{ width: '100%' }}>
-                {currentViewport && (
-                  <>
-                    {modal && <Modal />}
-                    {'single-state' === geoType && <SingleStateMap />}
-                    {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap />}
-                    {'us-region' === geoType && <UsaRegionMap />}
-                    {'world' === geoType && <WorldMap />}
-                    {'us-county' === geoType && <CountyMap />}
-                    {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
-                  </>
-                )}
-              </section>
+              {/* prettier-ignore */}
+              {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
 
-              {general.showSidebar && 'navigation' !== general.type && <Sidebar />}
-            </div>
+              <div
+                role='button'
+                tabIndex='0'
+                className={mapContainerClasses.join(' ')}
+                onClick={e => closeModal(e)}
+                onKeyDown={e => {
+                  if (e.keyCode === 13) {
+                    closeModal(e)
+                  }
+                }}
+              >
+                <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
+                  Skip Over Map Container
+                </a>
 
-            {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
+                {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+                <section className='outline-none geography-container' ref={mapSvg} tabIndex='0' style={{ width: '100%' }}>
+                  {currentViewport && (
+                    <>
+                      {modal && <Modal />}
+                      {'single-state' === geoType && <SingleStateMap />}
+                      {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap />}
+                      {'us-region' === geoType && <UsaRegionMap />}
+                      {'world' === geoType && <WorldMap />}
+                      {'us-county' === geoType && <CountyMap />}
+                      {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+                    </>
+                  )}
+                </section>
 
-            {/* Link */}
-            {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+                {general.showSidebar && 'navigation' !== general.type && <Sidebar />}
+              </div>
 
-            {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+              {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
-            <MediaControls.Section classes={['download-buttons']}>
-              {state.general.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
-              {state.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
-            </MediaControls.Section>
+              {/* Link */}
+              {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
-            {state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading && (
-              <DataTable
-                config={state}
-                rawData={state.data}
-                navigationHandler={navigationHandler}
-                expandDataTable={general.expandDataTable ? general.expandDataTable : table.expanded ? table.expanded : false}
-                headerColor={general.headerColor}
-                columns={state.columns}
-                showDownloadButton={general.showDownloadButton}
-                showFullGeoNameInCSV={table.showFullGeoNameInCSV}
-                runtimeLegend={runtimeLegend}
-                runtimeData={runtimeData}
-                displayDataAsText={displayDataAsText}
-                displayGeoName={displayGeoName}
-                applyLegendToRow={applyLegendToRow}
-                tableTitle={table.label}
-                indexTitle={table.indexLabel}
-                vizTitle={general.title}
-                viewport={currentViewport}
-                formatLegendLocation={formatLegendLocation}
-                setFilteredCountryCode={setFilteredCountryCode}
-                tabbingId={tabId}
-                showDownloadImgButton={state.general.showDownloadImgButton}
-                showDownloadPdfButton={state.general.showDownloadPdfButton}
-                innerContainerRef={innerContainerRef}
-                outerContainerRef={outerContainerRef}
-                imageRef={imageId}
-                isDebug={isDebug}
-              />
-            )}
+              {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
-            {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
+              <MediaControls.Section classes={['download-buttons']}>
+                {state.general.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
+                {state.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
+              </MediaControls.Section>
+
+              {state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading && (
+                <DataTable
+                  config={state}
+                  rawData={state.data}
+                  navigationHandler={navigationHandler}
+                  expandDataTable={general.expandDataTable ? general.expandDataTable : table.expanded ? table.expanded : false}
+                  headerColor={general.headerColor}
+                  columns={state.columns}
+                  showDownloadButton={general.showDownloadButton}
+                  showFullGeoNameInCSV={table.showFullGeoNameInCSV}
+                  runtimeLegend={runtimeLegend}
+                  runtimeData={runtimeData}
+                  displayDataAsText={displayDataAsText}
+                  displayGeoName={displayGeoName}
+                  applyLegendToRow={applyLegendToRow}
+                  tableTitle={table.label}
+                  indexTitle={table.indexLabel}
+                  vizTitle={general.title}
+                  viewport={currentViewport}
+                  formatLegendLocation={formatLegendLocation}
+                  setFilteredCountryCode={setFilteredCountryCode}
+                  tabbingId={tabId}
+                  showDownloadImgButton={state.general.showDownloadImgButton}
+                  showDownloadPdfButton={state.general.showDownloadPdfButton}
+                  innerContainerRef={innerContainerRef}
+                  outerContainerRef={outerContainerRef}
+                  imageRef={imageId}
+                  isDebug={isDebug}
+                />
+              )}
+
+              {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
+            </VizWrapper>
           </section>
         )}
 
