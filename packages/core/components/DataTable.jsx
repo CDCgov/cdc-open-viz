@@ -495,8 +495,7 @@ const DataTable = props => {
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
-    overflowY: 'scroll',
-    marginBottom: '33px'
+    overflowY: 'scroll'
   }
 
   const caption = useMemo(() => {

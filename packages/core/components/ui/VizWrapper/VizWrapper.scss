@@ -5,6 +5,10 @@
   // box-shadow: rgba(0, 0, 0, 0.2) 3px 6px 10px; // no box shadows
 }
 
+.cove.type-chart .cove-component__content {
+  padding-top: 2rem;
+}
+
 .cove-component__content:not(.component--has-background) {
   background-color: #f2f2f2;
 }

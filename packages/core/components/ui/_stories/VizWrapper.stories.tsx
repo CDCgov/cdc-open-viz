@@ -6,6 +6,15 @@ import VizWrapper from '../VizWrapper'
 const meta: Meta = {
   title: 'Components/Molecules/VizWrapper',
   component: VizWrapper,
+  argTypes: {
+    visualSettings: {
+      border: { control: 'boolean' },
+      borderColorTheme: { control: { type: 'boolean' } },
+      accent: true,
+      background: false,
+      hideBackgroundColor: false
+    }
+  },
   decorators: [
     Story => (
       // fake the outer container for now.

@@ -25,7 +25,7 @@
 
   .cove-gauge-chart {
     &__chart {
-      width: 85%;
+      width: 100%;
       margin: 0 auto;
       margin-left: auto;
       height: auto;
@@ -52,7 +52,6 @@
   .cove-waffle-chart {
     display: flex;
     flex-wrap: wrap;
-    padding: 1em 1em 0;
     justify-content: flex-start;
 
     &.cove-waffle-chart--verical {

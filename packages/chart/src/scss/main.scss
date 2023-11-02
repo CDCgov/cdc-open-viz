@@ -374,12 +374,6 @@
   }
 
   @include breakpointClass(md) {
-    .filters-section,
-    .chart-container:not(.sparkline) {
-      margin-left: 1em;
-      margin-right: 1em;
-    }
-
     .chart-container {
       flex-wrap: nowrap;
 

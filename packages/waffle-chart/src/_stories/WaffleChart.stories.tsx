@@ -4,8 +4,11 @@ import type { Meta, StoryObj } from '@storybook/react'
 import WaffleChart from '../CdcWaffleChart'
 
 const meta: Meta<typeof WaffleChart> = {
-  title: 'Components/Templates/WaffleChart',
-  component: WaffleChart
+  title: 'Components/Data_Examples/WaffleChart',
+  component: WaffleChart,
+  argTypes: {
+    config: { type: 'object' }
+  }
 }
 
 type Story = StoryObj<typeof WaffleChart>

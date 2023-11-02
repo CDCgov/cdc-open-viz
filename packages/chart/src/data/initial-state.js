@@ -169,9 +169,9 @@ export default {
   },
   confidenceKeys: {},
   visual: {
-    border: true,
-    accent: true,
-    background: true,
+    border: false,
+    accent: false,
+    background: false,
     verticalHoverLine: false,
     horizontalHoverLine: false
   },

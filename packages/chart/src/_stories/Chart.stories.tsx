@@ -159,7 +159,6 @@ export const Lollipop: Story = {
       labels: false,
       dataFormat: { commas: false, prefix: '', suffix: '', abbreviated: false, bottomSuffix: '', bottomPrefix: '', bottomAbbreviated: false },
       confidenceKeys: {},
-      visual: { border: true, accent: true, background: true, verticalHoverLine: false, horizontalHoverLine: false },
       useLogScale: false,
       filterBehavior: 'Filter Change',
       highlightedBarValues: [],

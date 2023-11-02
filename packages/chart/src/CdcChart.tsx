@@ -1177,14 +1177,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         {!missingRequiredSections() && !config.newViz && (
           <div className='cdc-chart-inner-container'>
             <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
-
-            <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
-              Skip Over Chart Container
-            </a>
-            {/* Filters */}
-            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
-            {/* Visualization */}
-            {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
             <VizWrapper
               title={config.title}
               subType={config.visualizationType}
@@ -1192,76 +1184,85 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               visualSettings={config.visual}
               visualizationType={config.type}
               style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
-              className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} `}
+              className={` p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} `}
             >
-              {/* All charts except sparkline */}
-              {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
+              <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
+                Skip Over Chart Container
+              </a>
+              {/* Filters */}
+              {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
+              {/* Visualization */}
+              {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
+              <div className='chart-container'>
+                {/* All charts except sparkline */}
+                {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
 
-              {/* Sparkline */}
-              {config.visualizationType === 'Spark Line' && (
-                <>
-                  {config?.introText && (
-                    <section className='introText' style={{ padding: '0px 0 35px' }}>
-                      {parse(config.introText)}
-                    </section>
-                  )}
-                  <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
-                    <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
-                  </div>
-                  {description && (
-                    <div className='subtext' style={{ padding: '35px 0 15px' }}>
-                      {parse(description)}
+                {/* Sparkline */}
+                {config.visualizationType === 'Spark Line' && (
+                  <>
+                    {config?.introText && (
+                      <section className='introText' style={{ padding: '0px 0 35px' }}>
+                        {parse(config.introText)}
+                      </section>
+                    )}
+                    <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
+                      <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                     </div>
-                  )}
-                </>
+                    {description && (
+                      <div className='subtext' style={{ padding: '35px 0 15px' }}>
+                        {parse(description)}
+                      </div>
+                    )}
+                  </>
+                )}
+                {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
+              </div>
+              {/* Link */}
+              {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
+
+              {/* Description */}
+              {description && config.visualizationType !== 'Spark Line' && <div className={'column ' + config.isResponsiveTicks ? 'subtext--responsive-ticks' : 'subtext'}>{parse(description)}</div>}
+
+              {/* buttons */}
+              <MediaControls.Section classes={['download-buttons']}>
+                {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+                {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+              </MediaControls.Section>
+
+              {/* Data Table */}
+              {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
+                <DataTable
+                  config={config}
+                  rawData={config.data}
+                  runtimeData={filteredData || excludedData}
+                  expandDataTable={config.table.expanded}
+                  columns={config.columns}
+                  showDownloadButton={config.general.showDownloadButton}
+                  runtimeLegend={dynamicLegendItems}
+                  displayDataAsText={displayDataAsText}
+                  displayGeoName={displayGeoName}
+                  applyLegendToRow={applyLegendToRow}
+                  tableTitle={config.table.label}
+                  indexTitle={config.table.indexLabel}
+                  vizTitle={title}
+                  viewport={currentViewport}
+                  parseDate={parseDate}
+                  formatDate={formatDate}
+                  formatNumber={formatNumber}
+                  tabbingId={handleChartTabbing}
+                  showDownloadImgButton={config.showDownloadImgButton}
+                  showDownloadPdfButton={config.showDownloadPdfButton}
+                  innerContainerRef={innerContainerRef}
+                  outerContainerRef={outerContainerRef}
+                  imageRef={imageId}
+                  colorScale={colorScale}
+                  isDebug={isDebug}
+                  isEditor={isEditor}
+                />
               )}
-              {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
+              {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
+              {/* show pdf or image button */}
             </VizWrapper>
-            {/* Link */}
-            {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
-
-            {/* Description */}
-            {description && config.visualizationType !== 'Spark Line' && <div className={'column ' + config.isResponsiveTicks ? 'subtext--responsive-ticks' : 'subtext'}>{parse(description)}</div>}
-
-            {/* buttons */}
-            <MediaControls.Section classes={['download-buttons']}>
-              {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
-              {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
-            </MediaControls.Section>
-
-            {/* Data Table */}
-            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
-              <DataTable
-                config={config}
-                rawData={config.data}
-                runtimeData={filteredData || excludedData}
-                expandDataTable={config.table.expanded}
-                columns={config.columns}
-                showDownloadButton={config.general.showDownloadButton}
-                runtimeLegend={dynamicLegendItems}
-                displayDataAsText={displayDataAsText}
-                displayGeoName={displayGeoName}
-                applyLegendToRow={applyLegendToRow}
-                tableTitle={config.table.label}
-                indexTitle={config.table.indexLabel}
-                vizTitle={title}
-                viewport={currentViewport}
-                parseDate={parseDate}
-                formatDate={formatDate}
-                formatNumber={formatNumber}
-                tabbingId={handleChartTabbing}
-                showDownloadImgButton={config.showDownloadImgButton}
-                showDownloadPdfButton={config.showDownloadPdfButton}
-                innerContainerRef={innerContainerRef}
-                outerContainerRef={outerContainerRef}
-                imageRef={imageId}
-                colorScale={colorScale}
-                isDebug={isDebug}
-                isEditor={isEditor}
-              />
-            )}
-            {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
-            {/* show pdf or image button */}
           </div>
         )}
       </>
@@ -1322,7 +1323,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     dashboardConfig
   }
 
-  const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
+  const classes = ['cove', 'cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
 
   config.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)
   isEditor && classes.push('spacing-wrapper')
