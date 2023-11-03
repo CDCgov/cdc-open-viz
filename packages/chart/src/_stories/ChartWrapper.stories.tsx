@@ -159,9 +159,12 @@ export const Wrapped_Chart: Story = {
       },
       confidenceKeys: {},
       visual: {
-        border: true,
-        accent: true,
-        background: false
+        border: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false,
+        borderColorTheme: false,
+        validated: '4_23_10'
       },
       data: [
         {
