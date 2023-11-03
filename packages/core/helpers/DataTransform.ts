@@ -17,12 +17,12 @@ export class DataTransform {
     const errorsFound: any[] = []
 
     // Empty data
-    if (0 === data.length) {
+    if (!data || 0 === data.length) {
       errorsFound.push(this.constants.errorMessageEmptyData)
     }
 
     // Does it have the correct data structure?
-    if (!data.filter || data.filter(row => typeof row !== 'object').length > 0) {
+    if (!data?.filter || data.filter(row => typeof row !== 'object').length > 0) {
       errorsFound.push(this.constants.errorMessageFormat)
     }
 
@@ -49,6 +49,10 @@ export class DataTransform {
 
   //Performs standardizations based on developer provided description of the data
   developerStandardize(data, description) {
+    if(!data){
+      return []
+    }
+    
     //Validate the description object
     if (!description) {
       return undefined

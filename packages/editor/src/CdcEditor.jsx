@@ -29,7 +29,7 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
 
   let startingTab = 0
 
-  if (config.data && config.type) {
+  if ((config.data || config.dataUrl) && config.type) {
     startingTab = 2
   }
 

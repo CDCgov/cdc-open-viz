@@ -280,11 +280,6 @@ const EditorPanel = () => {
       ...config,
       series: newSeries
     })
-
-    // disable brush if categorical - or - for now if not Area Chart
-    if (config.xAxis.type === 'categorical' || config.visualizationType !== 'Area Chart') {
-      config.showChartBrush = false
-    }
   }, [config.visualizationType]) // eslint-disable-line
 
   // Scatter Plots default date/category axis is 'continuous'
@@ -1092,7 +1087,7 @@ const EditorPanel = () => {
                 />
 
                 <TextField
-                  type='text'
+                  type='textarea'
                   value={config.description}
                   fieldName='description'
                   label='Subtext/Citation'
@@ -1984,6 +1979,7 @@ const EditorPanel = () => {
                       }
                       updateField={updateField}
                     />
+                    {['Line', 'Bar', 'Area Chart', 'Combo'].includes(config.visualizationType) && config.orientation === 'vertical' && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
 
                     {config.exclusions.active && (
                       <>
@@ -2905,7 +2901,7 @@ const EditorPanel = () => {
 
                 {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 
-                {((config.series?.some(series => series.type === 'Line') && config.visualizationType === 'Combo') || config.visualizationType === 'Line') && (
+                {((config.series?.some(series => series.type === 'Line' || series.type === 'dashed-lg' || series.type === 'dashed-sm' || series.type === 'dashed-md') && config.visualizationType === 'Combo') || config.visualizationType === 'Line') && (
                   <Select value={config.lineDatapointStyle} fieldName='lineDatapointStyle' label='Line Datapoint Style' updateField={updateField} options={['hidden', 'hover', 'always show']} />
                 )}
 

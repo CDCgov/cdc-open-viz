@@ -11,19 +11,22 @@ import ResizeObserver from 'resize-observer-polyfill'
 
 // cdc
 import { Config } from './types/Config'
+import getViewport from '@cdc/core/helpers/getViewport'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import Loading from '@cdc/core/components/Loading'
+
+import ConfigContext from './ConfigContext'
+import EditorPanel from './components/EditorPanel'
+import defaults from './data/initial-state'
 import { publish } from '@cdc/core/helpers/events'
 import chartReducer from './store/chart.reducer'
-import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import defaults from './data/initial-state'
-import EditorPanel from './components/EditorPanel'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import getViewport from '@cdc/core/helpers/getViewport'
-import Loading from '@cdc/core/components/Loading'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import './scss/main.scss'
+import Title from '@cdc/core/components/ui/Title'
 
 type CdcWaffleChartProps = {
   configUrl?: string
@@ -279,11 +282,7 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
   return (
     <div className={innerContainerClasses.join(' ')}>
       <>
-        {title && (
-          <header className={`cove-component__header chart-title ${config.theme}`} aria-hidden='true'>
-            {parse(title)}
-          </header>
-        )}
+        <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
         <div className={contentClasses.join(' ')}>
           <div className='cove-component__content-wrap'>
             {config.visualizationType === 'Gauge' && (

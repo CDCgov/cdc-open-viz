@@ -4,12 +4,11 @@
   "chartMessage": {
     "noData": "No Data Available"
   },
-  "title": "Planet Radius (Combo Example)",
+  "title": "",
   "showTitle": true,
   "showDownloadMediaButton": false,
-  "showChartBrush": false,
   "theme": "theme-blue",
-  "animate": true,
+  "animate": false,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
   "barHasBorder": "false",
@@ -25,8 +24,8 @@
     "showDownloadButton": false
   },
   "padding": {
-    "left": 0,
-    "right": 0
+    "left": 5,
+    "right": 5
   },
   "yAxis": {
     "hideAxis": false,
@@ -41,7 +40,7 @@
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "rightHideAxis": false,
+    "rightHideAxis": true,
     "rightAxisSize": 50,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
@@ -51,8 +50,7 @@
     "numTicks": "",
     "axisPadding": 0,
     "tickRotation": 0,
-    "anchors": [],
-    "label": "Measurement (1000km)"
+    "anchors": []
   },
   "boxplot": {
     "plots": [],
@@ -77,13 +75,15 @@
       "median": "Median",
       "sd": "Standard Deviation",
       "iqr": "Interquartile Range",
-      "count": "Count",
+      "total": "Total",
       "outliers": "Outliers",
-      "values": "Values"
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
     }
   },
   "topAxis": {
-    "hasLine": true
+    "hasLine": false
   },
   "isLegendValue": false,
   "barThickness": 0.35,
@@ -96,14 +96,14 @@
   "xAxis": {
     "sortDates": false,
     "anchors": [],
-    "type": "categorical",
+    "type": "date",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
     "size": 75,
-    "tickRotation": 30,
+    "tickRotation": 0,
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -114,12 +114,14 @@
     "axisPadding": 0,
     "target": 0,
     "maxTickRotation": 0,
-    "label": "Planet",
-    "dataKey": "name"
+    "dataKey": "Date",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y",
+    "tickWidthMax": 91
   },
   "table": {
     "label": "Data Table",
-    "expanded": false,
+    "expanded": true,
     "limitHeight": false,
     "height": "",
     "caption": "",
@@ -127,13 +129,14 @@
     "showDataTableLink": true,
     "indexLabel": "",
     "download": false,
-    "showVertical": false,
+    "showVertical": true,
     "show": true
   },
   "orientation": "vertical",
   "color": "pinkpurple",
   "columns": {},
   "legend": {
+    "hide": false,
     "behavior": "isolate",
     "singleRow": false,
     "colorCode": "",
@@ -145,9 +148,69 @@
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "lineMode": false,
-    "verticalSorted": false,
-    "position": "right",
-    "hide": false
+    "verticalSorted": false
+  },
+  "brush": {
+    "height": 25,
+    "data": [
+      {
+        "Date": "1/15/2016",
+        "Data 1": "900",
+        "Data 2": "135",
+        "Data 3": "300",
+        "Data 4": "95",
+        "Data 5": "120",
+        "Data 6": "310"
+      },
+      {
+        "Date": "2/15/2016",
+        "Data 1": "4000",
+        "Data 2": "90",
+        "Data 3": "240",
+        "Data 4": "60",
+        "Data 5": "160",
+        "Data 6": "2000"
+      },
+      {
+        "Date": "3/15/2016",
+        "Data 1": "500",
+        "Data 2": "300",
+        "Data 3": "290",
+        "Data 4": "100",
+        "Data 5": "200",
+        "Data 6": "250"
+      },
+      {
+        "Date": "4/15/2016",
+        "Data 1": "1200",
+        "Data 2": "160",
+        "Data 3": "230",
+        "Data 4": "180",
+        "Data 5": "160",
+        "Data 6": "220"
+      },
+      {
+        "Date": "5/15/2016",
+        "Data 1": "8000",
+        "Data 2": "350",
+        "Data 3": "300",
+        "Data 4": "150",
+        "Data 5": "130",
+        "Data 6": "100"
+      },
+      {
+        "Date": "6/15/2016",
+        "Data 1": "9000",
+        "Data 2": "220",
+        "Data 3": "320",
+        "Data 4": "100",
+        "Data 5": "220",
+        "Data 6": "300"
+      }
+    ],
+    "active": true,
+    "pattern_id": "brush_pattern",
+    "accent_color": "#ddd"
   },
   "exclusions": {
     "active": false,
@@ -163,12 +226,13 @@
   "dataFormat": {
     "commas": false,
     "prefix": "",
-    "suffix": "km",
+    "suffix": "",
     "abbreviated": false,
     "bottomSuffix": "",
     "bottomPrefix": "",
     "bottomAbbreviated": false,
-    "roundTo": 1
+    "useCommas": false,
+    "roundToPlace": ""
   },
   "confidenceKeys": {},
   "visual": {
@@ -183,14 +247,31 @@
   "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "Radius",
-      "type": "Bar",
-      "axis": "Right",
+      "dataKey": "Data 1",
+      "type": "Area Chart",
+      "axis": "Left",
+      "name": "One",
       "tooltip": true
     },
     {
-      "dataKey": "Diameter",
-      "type": "Line",
+      "dataKey": "Data 2",
+      "type": "Area Chart",
+      "axis": "Left",
+      "name": "two",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Data 3",
+      "type": "Area Chart",
+      "axis": "Left",
+      "name": "three",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Data 4",
+      "type": "Area Chart",
+      "axis": "Left",
+      "name": "four",
       "tooltip": true
     }
   ],
@@ -234,16 +315,79 @@
     "leftWidthOffset": 0,
     "rightWidthOffset": 0
   },
-  "brush": {
-    "pattern_id": "brush_pattern",
-    "accent_color": "#ddd"
-  },
   "area": {
     "isStacked": false
   },
-  "dataUrl": "/examples/feature/__data__/planet-example-data.json",
-  "animateReplay": true,
-  "visualizationType": "Combo",
+  "showChartBrush": false,
+  "customColors": [
+    "red",
+    "orange",
+    "yellow",
+    "teal"
+  ],
+  "visualizationType": "Area Chart",
+  "data": [
+    {
+      "Date": "1/15/2016",
+      "Data 1": "900",
+      "Data 2": "135",
+      "Data 3": "300",
+      "Data 4": "95",
+      "Data 5": "120",
+      "Data 6": "310"
+    },
+    {
+      "Date": "2/15/2016",
+      "Data 1": "4000",
+      "Data 2": "90",
+      "Data 3": "240",
+      "Data 4": "60",
+      "Data 5": "160",
+      "Data 6": "2000"
+    },
+    {
+      "Date": "3/15/2016",
+      "Data 1": "500",
+      "Data 2": "300",
+      "Data 3": "290",
+      "Data 4": "100",
+      "Data 5": "200",
+      "Data 6": "250"
+    },
+    {
+      "Date": "4/15/2016",
+      "Data 1": "1200",
+      "Data 2": "160",
+      "Data 3": "230",
+      "Data 4": "180",
+      "Data 5": "160",
+      "Data 6": "220"
+    },
+    {
+      "Date": "5/15/2016",
+      "Data 1": "8000",
+      "Data 2": "350",
+      "Data 3": "300",
+      "Data 4": "150",
+      "Data 5": "130",
+      "Data 6": "100"
+    },
+    {
+      "Date": "6/15/2016",
+      "Data 1": "9000",
+      "Data 2": "220",
+      "Data 3": "320",
+      "Data 4": "100",
+      "Data 5": "220",
+      "Data 6": "300"
+    }
+  ],
+  "dataFileName": "valid-area-chart.json",
+  "dataFileSourceType": "file",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
   "validated": 4.23,
   "dynamicMarginTop": 0
 }

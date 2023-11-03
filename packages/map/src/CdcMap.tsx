@@ -36,6 +36,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
+import Title from '@cdc/core/components/ui/Title'
 
 // Child Components
 import ConfigContext from './context'
@@ -708,7 +709,7 @@ const CdcMap = (props: CdcMapProperties) => {
       throw Error('Blank string passed as URL. Navigation aborted.')
     }
 
-    const urlObj = new URL(urlString)
+    const urlObj = new URL(urlString, window.location.origin)
 
     // Open constructed link in new tab/window
     window.open(urlObj.toString(), '_blank')
@@ -800,8 +801,8 @@ const CdcMap = (props: CdcMapProperties) => {
   }
 
   const reloadURLData = async () => {
-    if (config.dataUrl) {
-      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl)
+    if (state.dataUrl) {
+      const dataUrl = new URL(state.runtimeDataUrl || state.dataUrl, window.location.origin)
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
@@ -875,12 +876,9 @@ const CdcMap = (props: CdcMapProperties) => {
     const urlFilters = newState.filters ? (newState.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
 
     if (newState.dataUrl && !urlFilters) {
-      if (newState.dataUrl[0] === '/') {
-        newState.dataUrl = 'http://' + hostname + newState.dataUrl
-      }
-
       // handle urls with spaces in the name.
       if (newState.dataUrl) newState.dataUrl = `${newState.dataUrl}`
+      console.log(newState.dataUrl)
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
 
       if (newData && newState.dataDescription) {
@@ -1173,15 +1171,15 @@ const CdcMap = (props: CdcMapProperties) => {
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
               <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />
             )}
-            {title && (
-              <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !config.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
-                {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-                <div role='heading' className={'map-title ' + general.headerColor} tabIndex={0} aria-level={2}>
-                  {general.superTitle && <sup>{parse(general.superTitle)}</sup>}
-                  <div>{parse(title)}</div>
-                </div>
-              </header>
-            )}
+
+            {/* prettier-ignore */}
+            <Title
+              title={title}
+              superTitle={general.superTitle}
+              config={config}
+              classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
+            />
+
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
