@@ -1507,8 +1507,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const mapProps = {
     applyLegendToRow,
     applyTooltipsToGeo,
+    capitalize: state.tooltips?.capitalizeLabels,
     closeModal,
     columnsInData: state?.data?.[0] ? Object.keys(state.data[0]) : [],
+    content: modal,
     currentViewport,
     data: runtimeData,
     displayDataAsText,
@@ -1544,6 +1546,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     supportedCountries,
     supportedTerritories,
     titleCase,
+    type: general.type,
     viewport: currentViewport
   }
 
