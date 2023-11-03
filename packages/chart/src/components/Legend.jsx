@@ -158,11 +158,13 @@ const Legend = () => {
     return reverseLabels(defaultLabels)
   }
 
+  console.log('VIEWPORT', currentViewport)
+
   const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${config.dynamicMarginTop + 15}px`
+    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${config.dynamicMarginTop}px`
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)

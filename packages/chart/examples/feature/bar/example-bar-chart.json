@@ -208,11 +208,6 @@
       "bottomAbbreviated": false
     },
     "confidenceKeys": {},
-    "visual": {
-      "border": true,
-      "accent": true,
-      "background": true
-    },
     "useLogScale": false,
     "filterBehavior": "Filter Change",
     "highlightedBarValues": [],

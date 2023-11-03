@@ -1164,7 +1164,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Prevent render if loading
   let body = <Loading />
-
   if (!loading) {
     const tableLink = (
       <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
@@ -1193,7 +1192,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
               {/* Visualization */}
               {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
-              <div className='chart-container'>
+              <div
+                className={`
+              chart-container
+              p-relative
+              ${config.legend.position === 'bottom' ? 'bottom' : ''}
+              ${config.legend.hide ? ' legend-hidden' : ''}
+              ${lineDatapointClass}
+              ${barBorderClass}
+
+              `}
+              >
                 {/* All charts except sparkline */}
                 {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
 

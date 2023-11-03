@@ -5,6 +5,7 @@ type ComponentProps = ComponentPropsWithRef<'div'> & {
   config: any
 }
 
+// Outer Wrapper containing everything in a visualization
 const Wrapper = forwardRef<HTMLDivElement, ComponentProps>((props: ComponentProps, ref) => {
   const { className, config, ...otherProps } = props
 

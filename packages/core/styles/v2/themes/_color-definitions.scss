@@ -81,7 +81,14 @@ $theme: (
 .cove {
   @each $theme-name, $theme-colors in $theme {
     // Header
-    .theme-#{$theme-name}:not(.filters-section, a) {
+    .cove-component__header.theme-#{$theme-name} {
+      background-color: string.unquote(nth($theme-colors, 1));
+      border-color: string.unquote(nth($theme-colors, 2));
+      border-bottom-style: solid;
+      border-bottom-width: 4px;
+    }
+
+    &.isEditor .editor-panel button.theme-#{$theme-name} {
       background-color: string.unquote(nth($theme-colors, 1));
       border-color: string.unquote(nth($theme-colors, 2));
       border-bottom-style: solid;

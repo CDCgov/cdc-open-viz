@@ -26,3 +26,7 @@
   border-top-right-radius: unset;
   border-top-left-radius: unset;
 }
+
+.cdc-open-viz-module.type-sparkline.lg .chart-container {
+  flex-wrap: wrap;
+}

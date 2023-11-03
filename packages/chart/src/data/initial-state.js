@@ -173,7 +173,8 @@ export default {
     accent: false,
     background: false,
     verticalHoverLine: false,
-    horizontalHoverLine: false
+    horizontalHoverLine: false,
+    hideBackgroundColor: true
   },
   useLogScale: false,
   filterBehavior: 'Filter Change',

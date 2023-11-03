@@ -171,13 +171,7 @@
     "useFormat": true
   },
   "confidenceKeys": {},
-  "visual": {
-    "border": true,
-    "accent": true,
-    "background": true,
-    "verticalHoverLine": false,
-    "horizontalHoverLine": false
-  },
+  "visual": {},
   "useLogScale": false,
   "filterBehavior": "dropdown",
   "highlightedBarValues": [],

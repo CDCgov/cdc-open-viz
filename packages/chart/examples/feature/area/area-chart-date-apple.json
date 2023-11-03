@@ -115,11 +115,7 @@
     "useFormat": true
   },
   "confidenceKeys": {},
-  "visual": {
-    "border": true,
-    "accent": true,
-    "background": true
-  },
+  "visual": {},
   "dataUrl": "./examples/feature/__data__/area-chart-date-apple.json",
   "visualizationType": "Area Chart",
   "series": [

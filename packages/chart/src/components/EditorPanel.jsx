@@ -3066,7 +3066,7 @@ const EditorPanel = () => {
                 {visSupportsBarSpace() && <TextField type='number' value={config.barSpace || '15'} fieldName='barSpace' label='Bar Space' updateField={updateField} min='0' />}
                 {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.topAxis.hasLine} section='topAxis' fieldName='hasLine' label='Add Top Axis Line' updateField={updateField} />}
 
-                {config.visualizationType === 'Spark Line' && (
+                {(config.visualizationType === 'Spark Line' || true) && (
                   <div className='cove-accordion__panel-section checkbox-group'>
                     <CheckBox value={config.visual?.border} section='visual' fieldName='border' label='Show Border' updateField={updateField} />
                     <CheckBox value={config.visual?.borderColorTheme} section='visual' fieldName='borderColorTheme' label='Use Border Color Theme' updateField={updateField} />

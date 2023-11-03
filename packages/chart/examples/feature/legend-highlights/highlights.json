@@ -222,13 +222,6 @@
       "roundTo": 1
     },
     "confidenceKeys": {},
-    "visual": {
-      "border": true,
-      "accent": true,
-      "background": true,
-      "verticalHoverLine": false,
-      "horizontalHoverLine": false
-    },
     "useLogScale": false,
     "filterBehavior": "Filter Change",
     "highlightedBarValues": [],
@@ -486,13 +479,6 @@
     "roundTo": 1
   },
   "confidenceKeys": {},
-  "visual": {
-    "border": true,
-    "accent": true,
-    "background": true,
-    "verticalHoverLine": false,
-    "horizontalHoverLine": false
-  },
   "useLogScale": false,
   "filterBehavior": "Filter Change",
   "highlightedBarValues": [],
