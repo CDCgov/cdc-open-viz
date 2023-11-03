@@ -1,9 +1,8 @@
-import React, { useEffect, useCallback, useState, useRef, useReducer } from 'react'
+import { useEffect, useCallback, useRef, useReducer } from 'react'
 
 // external
 import { Markup } from 'interweave'
 import axios from 'axios'
-import parse from 'html-react-parser'
 
 // cdc
 import { Config } from './types/Config'
@@ -12,6 +11,7 @@ import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
+
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
@@ -28,9 +28,10 @@ type CdcMarkupIncludeProps = {
   setConfig: any
 }
 
+import Title from '@cdc/core/components/ui/Title'
+
 const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
   const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
-
   const initialState = { config: configObj ?? defaults, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
 
   const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
@@ -177,11 +178,7 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
   if (loading === false) {
     let body = (
       <div className={bodyClasses.join(' ')} ref={container}>
-        {title && (
-          <header className={`cove-component__header ${config.theme}`} aria-hidden='true'>
-            {parse(title)} {isDashboard}
-          </header>
-        )}
+        <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
         <div className={`cove-component__content ${contentClasses.join(' ')}`}>
           <div className={`${innerContainerClasses.join(' ')}`}>
             <div className='cove-component__content-wrap'>

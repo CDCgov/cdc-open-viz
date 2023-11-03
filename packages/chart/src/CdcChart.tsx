@@ -43,6 +43,7 @@ import './scss/main.scss'
 // load both then config below determines which to use
 import DataTable from '@cdc/core/components/DataTable'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
+import Title from '@cdc/core/components/ui/Title'
 
 const generateColorsArray = (color = '#000000', special = false) => {
   let colorObj = chroma(color)
@@ -90,7 +91,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState<any[]>([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
-
+  type Config = typeof config
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
 
@@ -140,7 +141,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const reloadURLData = async () => {
     if (config.dataUrl) {
-      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl)
+      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
@@ -739,7 +740,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime.seriesKeys) {
-      const configPalette = config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar' ? config.twoColor.palette : config.palette
+      const configPalette = config.customColors ? config.customColors : config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar' ? config.twoColor.palette : config.palette
       const allPalettes = { ...colorPalettes, ...twoColorPalette }
       let palette = config.customColors || allPalettes[configPalette]
       let numberOfKeys = config.runtime.seriesKeys.length
@@ -754,7 +755,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newColorScale = () =>
         scaleOrdinal({
           domain: config.runtime.seriesLabelsAll,
-          range: palette
+          range: palette,
+          unknown: null
         })
 
       setColorScale(newColorScale)
@@ -1159,6 +1161,51 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return key
   }
 
+  const computeMarginBottom = (config: Config): string => {
+    const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isHorizontal = config.orientation === 'horizontal'
+    const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
+    const isBrush = config.brush.active
+    const offset = 20
+    const brushHeight = config.brush.height
+    let bottom = 0
+    if (!isLegendBottom && isHorizontal && config.xAxis.label) {
+      bottom = config.runtime.xAxis.size + config.xAxis.labelOffset
+    }
+    if (!isLegendBottom && isHorizontal && !config.xAxis.label) {
+      bottom = 0
+    }
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && tickRotation && !config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.tickWidthMax + -config.xAxis.size + config.xAxis.labelOffset + offset : config.xAxis.tickWidthMax + offset + -config.xAxis.size + config.xAxis.labelOffset
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && tickRotation && !config.isResponsiveTicks) {
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && tickRotation && !config.dynamicMarginTop && !config.isResponsiveTicks) {
+      bottom = isBrush ? config.xAxis.tickWidthMax + brushHeight + offset + -config.xAxis.size : 0
+    }
+
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && !tickRotation && !config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + -config.xAxis.size + config.xAxis.labelOffset + offset : -config.xAxis.size + config.xAxis.labelOffset + offset
+    }
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + config.xAxis.tickWidthMax : config.dynamicMarginTop + -config.xAxis.size + offset
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + config.xAxis.tickWidthMax : config.dynamicMarginTop + -config.xAxis.size - offset
+    }
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + 25 : config.xAxis.labelOffset + -config.xAxis.size + offset
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && !config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = -config.xAxis.size + offset + config.xAxis.labelOffset
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && !tickRotation && !config.dynamicMarginTop && !config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + -config.xAxis.size + config.xAxis.labelOffset : 0
+    }
+
+    return `${bottom}px`
+  }
+
   // Prevent render if loading
   let body = <Loading />
 
@@ -1173,13 +1220,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && (
           <div className='cdc-chart-inner-container'>
-            {/* Title */}
-            {title && config.showTitle && (
-              <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
-                {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
-                <div>{parse(title)}</div>
-              </div>
-            )}
+            <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
+
             <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
               Skip Over Chart Container
             </a>
@@ -1187,10 +1229,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
             {/* Visualization */}
             {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
-            <div
-              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
-              className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
-            >
+            <div style={{ marginBottom: computeMarginBottom(config) }} className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
 

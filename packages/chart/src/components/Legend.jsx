@@ -147,7 +147,7 @@ const Legend = () => {
           datum: val,
           index: i,
           text: val,
-          value: palette[i]
+          value: colorScale(val)
         }
         return newLabel
       })
@@ -158,11 +158,42 @@ const Legend = () => {
     return reverseLabels(defaultLabels)
   }
 
-  const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+  const computeMargin = () => {
+    let margin = 0
+    const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isHorizontal = config.orientation === 'horizontal'
+    const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
+    const isBrush = config.brush.active
+    const offset = 25
+    const brushHeight = config.brush.height
+    if (!isHorizontal && isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && !config.isResponsiveTicks && !tickRotation) {
+      margin = isBrush ? -config.xAxis.size + config.xAxis.labelOffset + offset + brushHeight : -config.xAxis.size + config.xAxis.labelOffset + offset
+    }
+    if (!isHorizontal && isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && config.isResponsiveTicks && !tickRotation) {
+      margin = isBrush ? -config.xAxis.size + config.xAxis.labelOffset + offset + brushHeight : -config.xAxis.size + config.xAxis.labelOffset + offset
+    }
+    if (!isHorizontal && isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && !config.isResponsiveTicks && tickRotation) {
+      margin = isBrush ? config.xAxis.tickWidthMax + brushHeight + -config.xAxis.size + config.xAxis.labelOffset + offset : config.xAxis.tickWidthMax + -config.xAxis.size + config.xAxis.labelOffset + offset
+    }
+    if (!isHorizontal && isLegendBottom && !config.xAxis.label && !config.dynamicMarginTop && !config.isResponsiveTicks && tickRotation) {
+      margin = isBrush ? config.xAxis.tickWidthMax + brushHeight + -config.xAxis.size + offset * 1.4 : config.xAxis.tickWidthMax + -config.xAxis.size + offset * 1.3
+    }
+    if (!isHorizontal && isLegendBottom && config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks && !tickRotation) {
+      margin = isBrush ? config.dynamicMarginTop + -config.xAxis.size + offset + brushHeight : config.dynamicMarginTop + -config.xAxis.size + offset
+    }
+    if (!isHorizontal && isLegendBottom && !config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks && !tickRotation) {
+      margin = isBrush ? config.dynamicMarginTop - offset : config.dynamicMarginTop - brushHeight - offset
+    }
+    return `${margin}px`
+  }
 
+  const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+  const brushHeight = isBottomOrSmallViewport && config.brush.active ? config.brush.height * 2 + config.dynamicMarginTop / 2 : isBottomOrSmallViewport ? 15 : 0
+  const top = isBottomOrSmallViewport && config.isResponsiveTicks && config.dynamicMarginTop && !config.brush.active ? config.dynamicMarginTop : 0
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `0px`
+    marginTop: computeMargin()
+    // marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${brushHeight + top}px`
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)

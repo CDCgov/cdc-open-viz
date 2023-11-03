@@ -259,7 +259,7 @@ const DataTable = props => {
         tmpSeriesColumns = Object.keys(runtimeData[0])
       }
     } else {
-      tmpSeriesColumns = [config.xAxis?.dataKey, config.yAxis?.dataKey] //Object.keys(runtimeData[0])
+      tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey, config.yAxis?.dataKey] : [config.yAxis?.dataKey] //Object.keys(runtimeData[0])
     }
 
     // then add the additional Columns
@@ -353,9 +353,10 @@ const DataTable = props => {
         </tr>
       )
     } else {
+      const sliceVal = config.visualizationType === 'Pie' ? 1 : 0
       return (
         <tr>
-          {['__series__', ...Object.keys(runtimeData)].map((row, index) => {
+          {['__series__', ...Object.keys(runtimeData)].slice(sliceVal).map((row, index) => {
             let column = config.xAxis?.dataKey
             let text = row !== '__series__' ? getChartCellValue(row, column) : '__series__'
             return (
@@ -464,10 +465,13 @@ const DataTable = props => {
       const allRows = dataSeriesColumnsSorted().map(column => {
         return (
           <tr role='row'>
-            <td>
-              {colorScale && colorScale(getSeriesName(column)) && <LegendCircle fill={colorScale(getSeriesName(column))} />}
-              {getSeriesName(column)}
-            </td>
+            {config.visualizationType !== 'Pie' && (
+              <td>
+                {colorScale && colorScale(getSeriesName(column)) && <LegendCircle fill={colorScale(getSeriesName(column))} />}
+                {getSeriesName(column)}
+              </td>
+            )}
+
             {rows.map(row => {
               return getChartCell(row, column)
             })}
@@ -491,7 +495,8 @@ const DataTable = props => {
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
-    overflowY: 'scroll'
+    overflowY: 'scroll',
+    marginBottom: '33px'
   }
 
   const caption = useMemo(() => {

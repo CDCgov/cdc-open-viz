@@ -11,6 +11,8 @@ const useScales = properties => {
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
   const isHorizontal = config.orientation === 'horizontal'
+  const getXAxisDataKeys = d => d[config.runtime.originalXAxis.dataKey]
+  const xAxisDataKeysMapped = data.map(d => getXAxisDataKeys(d))
 
   const { visualizationType } = config
 
@@ -21,6 +23,7 @@ const useScales = properties => {
   let g1xScale = null
   let seriesScale = null
   let xScaleNoPadding = null
+  let xScaleBrush = null
 
   const scaleTypes = {
     TIME: 'time',
@@ -41,6 +44,7 @@ const useScales = properties => {
 
   // handle  Vertical bars
   if (!isHorizontal) {
+    xScaleBrush = composeScalePoint(xAxisDataKeysMapped, [0, xMax], 0.5)
     xScale = composeScalePoint(xAxisDataMapped, [0, xMax], 0.5)
     xScale.type = scaleTypes.POINT
     yScale = composeYScale(properties)
@@ -53,6 +57,7 @@ const useScales = properties => {
       domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)],
       range: [0, xMax]
     })
+    xScaleBrush = xScale
     xScale.type = scaleTypes.LINEAR
   }
 
@@ -171,20 +176,20 @@ const useScales = properties => {
 
     if (screenWidth > 480) {
       xScale = scaleLinear({
-        domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
+        domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
         range: [leftWidthOffset, xMax - rightWidthOffset],
         type: 'linear'
       })
     } else {
       xScale = scaleLinear({
-        domain: [Math.min(...data.map(d => parseFloat(d.Lower))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d.Upper))) + xAxisPadding],
+        domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
         range: [leftWidthOffsetMobile, xMax - rightWidthOffsetMobile],
         type: 'linear'
       })
     }
   }
 
-  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding }
+  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush }
 }
 
 export default useScales

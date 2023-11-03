@@ -44,6 +44,7 @@ import dashboardReducer from './store/dashboard.reducer'
 import { filterData } from './helpers/filterData'
 import { getFormattedData } from './helpers/getFormattedData'
 import { getVizKeys } from './helpers/getVizKeys'
+import Title from '@cdc/core/components/ui/Title'
 
 type DropdownOptions = Record<'value' | 'text', string>[]
 
@@ -189,7 +190,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
         const datasetKey = datasetKeys[i]
         const dataset = config.datasets[datasetKey]
         if (dataset.dataUrl && config.dashboard && config.dashboard.sharedFilters) {
-          const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl)
+          const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl, window.location.origin)
           let currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
           let updatedQSParams = {}
 
@@ -686,12 +687,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
       <>
         {isEditor && <Header setPreview={setPreview} />}
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
-          {/* Title */}
-          {title && (
-            <div role='heading' aria-level={3} className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>
-              {parse(title)}
-            </div>
-          )}
+          <Title title={title} isDashboard={true} classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]} />
           {/* Description */}
           {description && <div className='subtext'>{parse(description)}</div>}
           {/* Filters */}
@@ -835,7 +831,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           </section>
 
           {/* Data Table */}
-          {config.table && !!config.data?.length && (
+          {config.table && config.data && (
             <DataTable
               config={config}
               rawData={config.data}
