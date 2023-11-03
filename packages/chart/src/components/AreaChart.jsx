@@ -97,7 +97,7 @@ const AreaChart = props => {
                 </React.Fragment>
               )
             })}
-            <Bar width={Number(xMax)} height={Number(yMax)} fill={isDebug ? 'red' : 'transparent'} fillOpacity={0.05} style={{ stroke: 'black', strokeWidth: 2 }} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />
+            <Bar width={Number(xMax)} height={Number(yMax)} fill={isDebug ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />
           </Group>
         </ErrorBoundary>
       </svg>

@@ -29,7 +29,6 @@ const BarChartStackedVertical = props => {
               const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
 
               if (!yAxisValue) return <></>
-
               const style = applyRadius(barStack.index)
               let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
               const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -47,7 +46,6 @@ const BarChartStackedVertical = props => {
                     ${showLegendValuesTooltip && seriesLabels && hasMultipleSeries ? `${seriesLabels[bar.key] || ''}<br/>` : ''}
                     ${yAxisTooltip}<br />
                       </div>`
-
               return (
                 <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
                   <style>
@@ -80,7 +78,7 @@ const BarChartStackedVertical = props => {
                         }
                       }}
                     >
-                      <div style={{ opacity: transparentBar ? 0.5 : 1, width: barThicknessAdjusted, height: bar.height, background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
+                      <div style={{ opacity: transparentBar ? 0.5 : 1, width: barThicknessAdjusted, height: bar.height, background: colorScale(config.runtime.seriesLabels[bar.key]), border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
                     </foreignObject>
                   </Group>
                 </Group>
