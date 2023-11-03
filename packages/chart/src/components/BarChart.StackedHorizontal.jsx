@@ -78,13 +78,9 @@ const BarChartStackedHorizontal = props => {
                             setSharedFilter(config.uid, bar)
                           }
                         }}
-<<<<<<< Updated upstream
-                      ></foreignObject>
-=======
                       >
                         <div style={{ width: bar.width, height: bar.height, background: colorScale(config.runtime.seriesLabels[bar.key]), border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
                       </foreignObject>
->>>>>>> Stashed changes
 
                       {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel && (
                         <Text
