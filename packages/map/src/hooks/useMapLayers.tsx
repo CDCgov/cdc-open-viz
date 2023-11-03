@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from 'react'
 import { feature } from 'topojson-client'
 import { Group } from '@visx/group'
+import { MapConfig } from '../types/MapConfig'
 
 /**
  * This is the starting structure for adding custom geoJSON shape layers to a projection.
@@ -15,7 +16,7 @@ import { Group } from '@visx/group'
  * 3) Clean (ie. mapshaper -clean) and edit the shape as needed and export the new layer as geoJSON
  * 4) Save the geoJSON somewhere external.
  */
-export default function useMapLayers(config, setConfig, pathGenerator) {
+export default function useMapLayers(config: MapConfig, setConfig, pathGenerator) {
   const [fetchedTopoJSON, setFetchedTopoJSON] = useState([])
   const geoId = useId()
 
@@ -92,7 +93,7 @@ export default function useMapLayers(config, setConfig, pathGenerator) {
       layerValue = layerValue / 100
     }
 
-    let newLayers = [...config.map.layers]
+    let newLayers = [...config.map.layers] as Object[]
 
     newLayers[index][layerKey] = layerValue
 
