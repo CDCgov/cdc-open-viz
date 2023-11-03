@@ -3,11 +3,15 @@ const update_4_23 = async config => {
 
   let newConfig = { ...config }
 
-  if (!config.validated || config.validated <= ver) {
+  if ((!config.validated || config.validated <= ver) && !config.visual.validated) {
     if (newConfig.visualizationType !== 'Spark Line') {
-      newConfig.visual.border = false
-      newConfig.visual.accent = false
-      newConfig.visual.background = false
+      newConfig.visual = {
+        ...newConfig.visual,
+        border: false,
+        accent: false,
+        background: false,
+        validated: '4_23_10'
+      }
     }
   }
 
