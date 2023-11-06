@@ -1,10 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import parse from 'html-react-parser'
-import { Group } from '@visx/group'
+import React, { useCallback, useEffect, useReducer } from 'react'
+
+// visx
 import { Circle, Bar } from '@visx/shape'
+import { Group } from '@visx/group'
 import { scaleLinear } from '@visx/scale'
 
+// external
+import parse from 'html-react-parser'
 import ResizeObserver from 'resize-observer-polyfill'
+
+// cdc
+import { Config } from './types/Config'
 import getViewport from '@cdc/core/helpers/getViewport'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
@@ -14,30 +20,43 @@ import Loading from '@cdc/core/components/Loading'
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
-
 import { publish } from '@cdc/core/helpers/events'
-
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import chartReducer from './store/chart.reducer'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import './scss/main.scss'
+import Title from '@cdc/core/components/ui/Title'
 
-const themeColor = {
-  'theme-blue': '#005eaa',
-  'theme-purple': '#712177',
-  'theme-brown': '#705043',
-  'theme-teal': '#00695c',
-  'theme-pink': '#af4448',
-  'theme-orange': '#bb4d00',
-  'theme-slate': '#29434e',
-  'theme-indigo': '#26418f',
-  'theme-cyan': '#006778',
-  'theme-green': '#4b830d',
-  'theme-amber': '#fbab18'
+type CdcWaffleChartProps = {
+  configUrl?: string
+  config?: Config
+  isDashboard?: boolean
+  isEditor?: boolean
+  link?: string
+  setConfig?: () => void
 }
 
-const WaffleChart = ({ config, isEditor, link }) => {
-  let { title, theme, shape, nodeWidth, nodeSpacer, prefix, suffix, subtext, content, orientation, filters, dataColumn, dataFunction, dataConditionalColumn, dataConditionalOperator, dataConditionalComparate, customDenom, dataDenom, dataDenomColumn, dataDenomFunction, roundToPlace } = config
+const WaffleChart = ({ config, isEditor, link = '' }) => {
+  const { title, theme, shape, nodeWidth, nodeSpacer, prefix, suffix, subtext, content, orientation, filters, dataColumn, dataFunction, dataConditionalColumn, dataConditionalOperator, dataConditionalComparate, customDenom, dataDenom, dataDenomColumn, dataDenomFunction, roundToPlace } = config
+
+  const handleWaffleChartAriaLabel = (state, testing = false): string => {
+    // eslint-disable-next-line no-console
+    if (testing) console.log(`handleWaffleChartAriaLabels Testing On:`, state)
+    try {
+      let ariaLabel = 'Waffle chart'
+      if (state.title) {
+        ariaLabel += ` with the title: ${state.title}`
+      }
+      return ariaLabel
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e.message)
+    }
+  }
+
+  const gaugeColor = config.visual.colors[config.theme]
+  let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
   const calculateData = useCallback(() => {
     //If either the column or function aren't set, do not calculate
@@ -224,7 +243,7 @@ const WaffleChart = ({ config, isEditor, link }) => {
         shape: shape,
         x: calculatePos(shape, 'x', i, nodeWidthNum, nodeSpacerNum),
         y: calculatePos(shape, 'y', i, nodeWidthNum, nodeSpacerNum),
-        color: themeColor[theme],
+        color: config.visual.colors[theme],
         opacity: i + 1 > 100 - Math.round(dataPercentage) ? 1 : 0.35
       }
       waffleData.push(newNode)
@@ -253,39 +272,17 @@ const WaffleChart = ({ config, isEditor, link }) => {
     return nodeWidth * 10 + nodeSpacer * 9
   }, [nodeWidth, nodeSpacer])
 
-  let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
-
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
-
-  const handleWaffleChartAriaLabel = (state, testing = false) => {
-    if (testing) console.log(`handleWaffleChartAriaLabels Testing On:`, state)
-    try {
-      let ariaLabel = 'Waffle chart'
-      if (state.title) {
-        ariaLabel += ` with the title: ${state.title}`
-      }
-      return ariaLabel
-    } catch (e) {
-      console.error(e.message)
-    }
-  }
-  const gaugeWidth = '100%'
-  const gaugeHeight = 35
 
   const xScale = scaleLinear({
     domain: [0, waffleDenominator],
-    range: [0, gaugeWidth]
+    range: [0, config.gauge.width]
   })
-  const gaugeColor = themeColor[theme]
 
   return (
     <div className={innerContainerClasses.join(' ')}>
       <>
-        {title && (
-          <header className={`cove-component__header chart-title ${config.theme}`} aria-hidden='true'>
-            {parse(title)}
-          </header>
-        )}
+        <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
         <div className={contentClasses.join(' ')}>
           <div className='cove-component__content-wrap'>
             {config.visualizationType === 'Gauge' && (
@@ -297,10 +294,10 @@ const WaffleChart = ({ config, isEditor, link }) => {
                     {suffix ? suffix + ' ' : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
                   </div>
                   <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
-                  <svg height={gaugeHeight} width={'100%'}>
+                  <svg height={config.gauge.height} width={'100%'}>
                     <Group>
-                      <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={gaugeWidth} height={gaugeHeight} fill='#fff' />
-                      <Bar x={0} y={0} width={xScale(waffleNumerator)} height={gaugeHeight} fill={gaugeColor} />
+                      <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={config.gauge.width} height={config.gauge.height} fill='#fff' />
+                      <Bar x={0} y={0} width={xScale(waffleNumerator)} height={config.gauge.height} fill={gaugeColor} />
                     </Group>
                   </svg>
                   <div className={'cove-waffle-chart__subtext subtext'}>{parse(subtext)}</div>
@@ -338,14 +335,10 @@ const WaffleChart = ({ config, isEditor, link }) => {
   )
 }
 
-const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
+const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }: CdcWaffleChartProps) => {
   // Default States
-  const [config, setConfig] = useState({ ...defaults })
-  const [loading, setLoading] = useState(true)
-
-  const [currentViewport, setCurrentViewport] = useState('lg')
-  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
-  const [container, setContainer] = useState()
+  const [state, dispatch] = useReducer(chartReducer, { config: configObj ?? defaults, loading: true, preview: false, viewport: 'lg', coveLoadedHasRan: false, container: null })
+  const { loading, config, viewport: currentViewport, coveLoadedHasRan, container } = state
 
   // Default Functions
   const updateConfig = newConfig => {
@@ -354,12 +347,10 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
         newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
     })
-
     newConfig.runtime = {}
     newConfig.runtime.uniqueId = Date.now()
-
     newConfig.runtime.editorErrorMessage = ''
-    setConfig(newConfig)
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
   const loadConfig = useCallback(async () => {
@@ -374,7 +365,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
 
     const processedConfig = { ...(await coveUpdateWorker(response)) }
     updateConfig({ ...defaults, ...processedConfig })
-    setLoading(false)
+    dispatch({ type: 'SET_LOADING', payload: false })
   }, [])
 
   // Custom Functions
@@ -383,8 +374,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let newViewport = getViewport(entry.contentRect.width * 2) // Data bite is usually presented as small, so we scale it up for responsive calculations
-
-      setCurrentViewport(newViewport)
+      dispatch({ type: 'SET_VIEWPORT', payload: newViewport })
     }
   })
 
@@ -392,23 +382,25 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
     if (node !== null) {
       resizeObserver.observe(node)
     }
-    setContainer(node)
+    dispatch({ type: 'SET_CONTAINER', payload: node })
   }, [])
 
   //Load initial config
   useEffect(() => {
+    // eslint-disable-next-line no-console
     loadConfig().catch(err => console.log(err))
   }, [])
 
   useEffect(() => {
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
-      setCoveLoadedHasRan(true)
+      dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
     }
   }, [config, container])
 
   //Reload config if config object provided/updated
   useEffect(() => {
+    // eslint-disable-next-line no-console
     loadConfig().catch(err => console.log(err))
   }, [])
 

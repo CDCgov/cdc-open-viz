@@ -15,7 +15,6 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
 
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType, tableData } = useContext(ConfigContext)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
-
   if (!handleTooltipMouseOver) return
   const handleAxisFormating = (axis = 'left', label, value) => {
     // if this is an x axis category/date value return without doing any formatting.

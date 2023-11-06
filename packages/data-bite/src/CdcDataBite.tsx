@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useReducer } from 'react'
 import { Fragment } from 'react'
 
 // contexts & initial state
@@ -8,6 +8,7 @@ import Context from './context'
 // internal components
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
+import Title from '@cdc/core/components/ui/Title'
 import CircleCallout from './components/CircleCallout'
 
 // external
@@ -23,45 +24,47 @@ import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { Config } from './types/Config'
+import dataBiteReducer from './store/db.reducer'
 
 // styles
 import './scss/main.scss'
 
-const CdcDataBite = props => {
+type CdcDataBiteProps = {
+  config: Config
+  configUrl: string
+  isDashboard: boolean
+  isEditor: boolean
+  setConfig: () => {}
+  link: any
+}
+
+const CdcDataBite = (props: CdcDataBiteProps) => {
   const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig, link } = props
 
-  const [config, setConfig] = useState({ ...defaults })
-  const [loading, setLoading] = useState(true)
+  const initialState = {
+    config: configObj ?? defaults,
+    loading: true,
+    currentViewport: 'lg',
+    coveLoadedHasRan: false,
+    container: null
+  }
 
-  const {
-    title,
-    dataColumn,
-    dataFunction,
-    imageData,
-    biteBody,
-    biteFontSize,
-    dataFormat,
-    biteStyle,
-    filters,
-    subtext,
-    general: { isCompactStyle }
-  } = config
+  const [state, dispatch] = useReducer(dataBiteReducer, initialState)
+
+  const { config, loading, currentViewport, coveLoadedHasRan, container } = state
+
+  const { title, dataColumn, dataFunction, imageData, biteBody, biteFontSize, dataFormat, biteStyle, filters, subtext } = config
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
 
   const transform = new DataTransform()
 
-  const [currentViewport, setCurrentViewport] = useState('lg')
-
-  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
-
-  const [container, setContainer] = useState()
-
   //Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let newViewport = getViewport(entry.contentRect.width * 2) // Data bite is usually presented as small, so we scale it up for responsive calculations
-      setCurrentViewport(newViewport)
+      dispatch({ type: 'SET_CURRENT_VIEWPORT', payload: newViewport })
     }
   })
 
@@ -79,7 +82,7 @@ const CdcDataBite = props => {
 
     //Check things that are needed and set error messages if needed
     newConfig.runtime.editorErrorMessage = ''
-    setConfig(newConfig)
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
   //@ts-ignore
@@ -108,8 +111,7 @@ const CdcDataBite = props => {
     const processedConfig = { ...(await coveUpdateWorker(response)) }
 
     updateConfig({ ...defaults, ...processedConfig })
-
-    setLoading(false)
+    dispatch({ type: 'SET_LOADING', payload: false })
   }
 
   const calculateDataBite = (includePrefixSuffix = true) => {
@@ -337,7 +339,7 @@ const CdcDataBite = props => {
     if (node !== null) {
       resizeObserver.observe(node)
     }
-    setContainer(node)
+    dispatch({ type: 'SET_CONTAINER', payload: node })
   }, [])
 
   // Initial load
@@ -349,7 +351,7 @@ const CdcDataBite = props => {
   useEffect(() => {
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
-      setCoveLoadedHasRan(true)
+      dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
     }
   }, [config, container])
 
@@ -452,7 +454,7 @@ const CdcDataBite = props => {
         {isEditor && <EditorPanel />}
         <div className={isEditor ? 'spacing-wrapper' : ''}>
           <div className={innerContainerClasses.join(' ')}>
-            {title && <div className={`bite-header cove-component__header component__header ${config.theme}`}>{parse(title)}</div>}
+            <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className={`bite-content-container ${contentClasses.join(' ')}`}>
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
@@ -483,7 +485,7 @@ const CdcDataBite = props => {
                           {calculateDataBite()}
                         </span>
                       )}
-                      {subtext && !isCompactStyle && <p className='bite-subtext'>{parse(subtext)}</p>}
+                      {subtext && !config.general.isCompactStyle && <p className='bite-subtext'>{parse(subtext)}</p>}
                     </div>
                   </Fragment>
                 </div>

@@ -280,11 +280,6 @@ const EditorPanel = () => {
       ...config,
       series: newSeries
     })
-
-    // disable brush if categorical - or - for now if not Area Chart
-    if (config.xAxis.type === 'categorical' || config.visualizationType !== 'Area Chart') {
-      config.showChartBrush = false
-    }
   }, [config.visualizationType]) // eslint-disable-line
 
   // Scatter Plots default date/category axis is 'continuous'
@@ -1092,7 +1087,7 @@ const EditorPanel = () => {
                 />
 
                 <TextField
-                  type='text'
+                  type='textarea'
                   value={config.description}
                   fieldName='description'
                   label='Subtext/Citation'
@@ -1984,6 +1979,7 @@ const EditorPanel = () => {
                       }
                       updateField={updateField}
                     />
+                    {config.runtime.xAxis.type === 'date' && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
 
                     {config.exclusions.active && (
                       <>
