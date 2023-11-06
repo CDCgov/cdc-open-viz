@@ -36,7 +36,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     }
   }
 
-  if (config.visualizationType === 'Forecasting') {
+  if (config.series.filter(s => s?.type === 'Forecasting')) {
     const {
       runtime: { forecastingSeriesKeys }
     } = config
