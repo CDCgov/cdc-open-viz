@@ -8,7 +8,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
   const minRequiredCIPadding = 1.15 // regardless of Editor if CI data, there must be 10% padding added
-  
+
   // do validation bafore applying t0 charts
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
   const isMinValid = config.useLogScale ? enteredMinValue >= 0 : (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
@@ -26,7 +26,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
       ciYMax = Math.max.apply(Math, upperCIValues)
       if (ciYMax > max) max = ciYMax * minRequiredCIPadding // bump up the max plus some padding always
 
-      // check the min if lower confidence 
+      // check the min if lower confidence
       let lowerCIValues = data.map(function (d) {
         // if no lower CI then we need lowerCIValues to have nothing in it
         return d[config.confidenceKeys.lower] !== undefined ? d[config.confidenceKeys.lower] : ''
@@ -40,7 +40,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     const {
       runtime: { forecastingSeriesKeys }
     } = config
-    if (forecastingSeriesKeys.length > 0) {
+    if (forecastingSeriesKeys?.length > 0) {
       // push all keys into an array
       let columnNames = []
 
