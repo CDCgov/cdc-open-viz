@@ -21,7 +21,7 @@ const CellAnchor = ({ markup, row, columns, navigationHandler }) => {
     )
   }
 
-  return <></>
+  return <>{markup}</>
 }
 
 export default CellAnchor

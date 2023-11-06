@@ -1671,7 +1671,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 vizTitle={general.title}
                 viewport={currentViewport}
                 formatLegendLocation={formatLegendLocation}
-                //setFilteredCountryCode={setFilteredCountryCode}
                 tabbingId={tabId}
                 showDownloadImgButton={state.general.showDownloadImgButton}
                 showDownloadPdfButton={state.general.showDownloadPdfButton}
