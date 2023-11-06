@@ -1,32 +1,44 @@
-import React, { useEffect, useCallback, useState, useRef } from 'react'
-import axios from 'axios'
-import parse from 'html-react-parser'
+import { useEffect, useCallback, useRef, useReducer } from 'react'
+
+// external
 import { Markup } from 'interweave'
+import axios from 'axios'
+
+// cdc
+import { Config } from './types/Config'
+import { publish } from '@cdc/core/helpers/events'
+import ConfigContext from './ConfigContext'
+import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import defaults from './data/initial-state'
+import EditorPanel from './components/EditorPanel'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import markupIncludeReducer from './store/mi.reducer'
 
-import ConfigContext from './ConfigContext'
-import EditorPanel from './components/EditorPanel'
-import defaults from './data/initial-state'
-
+// styles
 import './scss/main.scss'
 
-import { publish } from '@cdc/core/helpers/events'
+type CdcMarkupIncludeProps = {
+  config: Config
+  configUrl: string
+  isDashboard: boolean
+  isEditor: boolean
+  setConfig: any
+}
 
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import Title from '@cdc/core/components/ui/Title'
 
-const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
-  // Default States
-  const [config, setConfig] = useState({ ...defaults })
-  const [loading, setLoading] = useState(true)
+const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
+  const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
+  const initialState = { config: configObj ?? defaults, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
+
+  const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
+
+  const { config, loading, urlMarkup, markupError, errorMessage, coveLoadedHasRan } = state
 
   // Custom States
-  const [urlMarkup, setUrlMarkup] = useState('')
-  const [markupError, setMarkupError] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
-  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const container = useRef()
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
@@ -45,7 +57,7 @@ const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, i
     newConfig.runtime.uniqueId = Date.now()
 
     newConfig.runtime.editorErrorMessage = ''
-    setConfig(newConfig)
+    dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
   const loadConfig = useCallback(async () => {
@@ -61,7 +73,7 @@ const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, i
     const processedConfig = { ...(await coveUpdateWorker(response)) }
 
     updateConfig({ ...defaults, ...processedConfig })
-    setLoading(false)
+    dispatch({ type: 'SET_LOADING', payload: false })
   }, [])
 
   // Custom Functions
@@ -82,41 +94,42 @@ const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, i
       }
 
       message += errorList[errorCode]
-      setErrorMessage(message)
+      dispatch({ type: 'SET_ERROR_MESSAGE', payload: message })
     } else {
-      setErrorMessage(null)
+      dispatch({ type: 'SET_ERROR_MESSAGE', payload: null })
     }
   }, [markupError])
 
   const loadConfigMarkupData = useCallback(async () => {
-    setMarkupError(null)
+    dispatch({ type: 'SET_MARKUP_ERROR', payload: null })
 
     if (config.srcUrl) {
       if (config.srcUrl === '#example') {
-        setUrlMarkup(
+        let payload =
           '<!doctype html><html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"> <meta http-equiv="X-UA-Compatible" content="ie=edge"> <title>Document</title> </head> <body> <h1>Header</h1> <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p> <br> <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen. </p><br><p>She packed her seven versalia, put her initial into the belt and made herself on the way. When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane. Pityful a rethoric question ran over her cheek.</p></body></html>'
-        )
+
+        dispatch({ type: 'SET_URL_MARKUP', payload })
       } else {
         try {
           await axios.get(config.srcUrl).then(res => {
             if (res.data) {
-              setUrlMarkup(res.data)
+              dispatch({ type: 'SET_URL_MARKUP', payload: res.data })
             }
           })
         } catch (err) {
           if (err.response) {
             // Response with error
-            setMarkupError(err.response.status)
+            dispatch({ type: 'SET_MARKUP_ERROR', payload: err.response.status })
           } else if (err.request) {
             // No response received
-            setMarkupError(200)
+            dispatch({ type: 'SET_MARKUP_ERROR', payload: 200 })
           }
 
-          setUrlMarkup('')
+          dispatch({ type: 'SET_URL_MARKUP', payload: '' })
         }
       }
     } else {
-      setUrlMarkup('')
+      dispatch({ type: 'SET_URL_MARKUP', payload: '' })
     }
   }, [config.srcUrl])
 
@@ -144,7 +157,7 @@ const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, i
   useEffect(() => {
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
-      setCoveLoadedHasRan(true)
+      dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
     }
   }, [config, container])
 
@@ -165,11 +178,7 @@ const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, i
   if (loading === false) {
     let body = (
       <div className={bodyClasses.join(' ')} ref={container}>
-        {title && (
-          <header className={`cove-component__header ${config.theme}`} aria-hidden='true'>
-            {parse(title)} {isDashboard}
-          </header>
-        )}
+        <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
         <div className={`cove-component__content ${contentClasses.join(' ')}`}>
           <div className={`${innerContainerClasses.join(' ')}`}>
             <div className='cove-component__content-wrap'>
