@@ -5,7 +5,7 @@ import { Runtime } from '@cdc/core/types/Runtime'
 export type TableConfig = {
   type?: string
   table: {
-    showVertical: boolean
+    showVertical?: boolean
     indexLabel: string
     limitHeight: boolean
     height: string | number
@@ -47,7 +47,7 @@ export type TableConfig = {
   legend?: {
     specialClasses: { key: string; label: string; value: string }[]
   }
-  series: Series
+  series?: Series
   regions?: { label: string; from: string; to: string }[]
   runtimeSeriesLabels?: Object
   dataFormat?: Object

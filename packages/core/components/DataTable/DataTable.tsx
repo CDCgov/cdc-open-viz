@@ -24,7 +24,7 @@ export type DataTableProps = {
   indexTitle?: string
   vizTitle?: string
   rawData: Object[]
-  runtimeData: Object[]
+  runtimeData: Object[] | Record<string, Object> // UNSAFE
   headerColor?: string
   colorScale?: Function
   expandDataTable: boolean

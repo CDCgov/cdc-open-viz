@@ -19,17 +19,16 @@ const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, di
           const legendColor = applyLegendToRow(rowObj)
 
           let labelValue
+
           if ((config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') || config.general.type === 'us-geocode') {
             labelValue = displayGeoName(row)
           } else {
             labelValue = formatLegendLocation(row)
           }
-
-          labelValue = <CellAnchor markup={labelValue} row={rowObj} columns={columns} navigationHandler={navigationHandler} />
           cellValue = (
             <>
               <LegendCircle fill={legendColor[0]} />
-              {labelValue}
+              <CellAnchor markup={labelValue} row={rowObj} columns={columns} navigationHandler={navigationHandler} />
             </>
           )
         } else {

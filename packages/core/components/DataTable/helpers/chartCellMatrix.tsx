@@ -61,13 +61,16 @@ const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorSc
   } else {
     return dataSeriesColumnsSorted().map(column => {
       const seriesName = getSeriesName(column, config)
-      let nodes: ReactNode[] = [
-        <>
-          {colorScale && colorScale(seriesName) && <LegendCircle fill={colorScale(seriesName)} />}
-          {seriesName}
-        </>
-      ].concat(rows.map((row, i) => getChartCellValue(row, column, config, runtimeData)))
-      return nodes
+      let nodes: ReactNode[] =
+        config.visualizationType !== 'Pie'
+          ? [
+              <>
+                {colorScale && colorScale(seriesName) && <LegendCircle fill={colorScale(seriesName)} />}
+                {seriesName}
+              </>
+            ]
+          : []
+      return nodes.concat(rows.map((row, i) => getChartCellValue(row, column, config, runtimeData)))
     })
   }
 }
