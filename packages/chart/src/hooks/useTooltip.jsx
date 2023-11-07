@@ -9,7 +9,7 @@ import { bisector } from 'd3-array'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 
 export const useTooltip = props => {
-  const { tableData: data, config, formatNumber, capitalize, formatDate, parseDate } = useContext(ConfigContext)
+  const { tableData: data, config, formatNumber, capitalize, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
   const { xScale, yScale, showTooltip, hideTooltip } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
 
