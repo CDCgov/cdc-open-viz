@@ -104,8 +104,6 @@ export const useTooltip = props => {
           addColRoundTo: config.columns[colKeys].roundToPlace ? config.columns[colKeys].roundToPlace : '',
           addColCommas: config.columns[colKeys].commas
         }
-        // console.log(data, 'DAta')
-        // console.log(resolvedScaleValues, 'resolvedScaleValues')
         let closestValue = null
 
         if (config.visualizationType === 'Pie') {
