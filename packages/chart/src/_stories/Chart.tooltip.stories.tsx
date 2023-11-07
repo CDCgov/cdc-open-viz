@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import Chart from '../CdcChart'
 
 const meta: Meta<typeof Chart> = {
-  title: 'Components/Templates/Chart/Tolltip',
+  title: 'Components/Templates/Chart/Tooltip',
   component: Chart
 }
 
