@@ -119,6 +119,7 @@ const CdcMap = (props: CdcMapProperties) => {
     setConfig,
     setSharedFilter,
     setSharedFilterValue,
+    dashboardConfig
   } = props
 
   const mapInitialState = {
@@ -1044,9 +1045,11 @@ const CdcMap = (props: CdcMapProperties) => {
     dispatch({ type: 'SET_RUNTIME_LEGEND', payload: legend })
   }, [runtimeData, config.legend.unified, config.legend.showSpecialClassesLast, config.legend.separateZero, config.general.equalNumberOptIn, config.legend.numberOfItems, config.legend.specialClasses]) // eslint-disable-line
 
+  console.log('dash', dashboardConfig)
   useEffect(() => {
+    console.log('config.dashboard', dashboardConfig)
     reloadURLData()
-  }, [JSON.stringify(config.filters)])
+  }, [JSON.stringify(config.filters), dashboardConfig])
 
   if (config) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
