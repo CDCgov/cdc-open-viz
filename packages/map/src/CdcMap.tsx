@@ -116,7 +116,7 @@ const CdcMap = (props: CdcMapProperties) => {
     link,
     logo = '',
     navigationHandler: customNavigationHandler,
-    setConfig,
+    setConfig: setParentConfig,
     setSharedFilter,
     setSharedFilterValue,
   } = props
@@ -158,7 +158,7 @@ const CdcMap = (props: CdcMapProperties) => {
   } = state
 
   // TODO: move these into context later on.
-  const setState = payload => {
+  const setConfig = payload => {
     dispatch({ type: 'SET_CONFIG', payload })
   }
 
@@ -200,7 +200,7 @@ const CdcMap = (props: CdcMapProperties) => {
 
   const transform = new DataTransform()
 
-  const { handleSorting } = useFilters({ config: config, setConfig: setState })
+  const { handleSorting } = useFilters({ config: config, setConfig: setConfig })
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
   const imageId = `cove-${Math.random().toString(16).slice(-4)}`
@@ -208,15 +208,30 @@ const CdcMap = (props: CdcMapProperties) => {
   useEffect(() => {
     try {
       if (filteredCountryCode) {
+        console.log('filtered_country', filteredCountryCode)
         const coordinates = countryCoordinates[filteredCountryCode]
         const long = coordinates[1]
         const lat = coordinates[0]
         const reversedCoordinates = [long, lat]
 
-        setState({
-          ...state,
-          mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
+        // setConfig({
+        //   ...state.config,
+        //   mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
+        // })
+        dispatch({
+          type: 'SET_CONFIG',
+          payload: {
+            ...state.config,
+            mapPosition: {
+              ...state.config.mapPosition,
+              coordinates: reversedCoordinates,
+              zoom: 3
+            }
+          }
         })
+
+        console.log('here', state.config)
+        dispatch({ type: 'SET_POSITION', payload: { coordinates: reversedCoordinates, zoom: 3 } })
       }
     } catch (e) {
       console.error('COVE: Failed to set world map zoom.') // eslint-disable-line
@@ -725,8 +740,8 @@ const CdcMap = (props: CdcMapProperties) => {
       let lat = value[config.columns.latitude.name]
       let long = value[config.columns.longitude.name]
 
-      setState({
-        ...state,
+      setConfig({
+        ...state.config,
         mapPosition: { coordinates: [long, lat], zoom: 3 }
       })
     }
@@ -857,7 +872,7 @@ const CdcMap = (props: CdcMapProperties) => {
         data = transform.developerStandardize(data, config.dataDescription)
       }
 
-      setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
+      setConfig({ ...state, runtimeDataUrl: dataUrlFinal, data })
     }
   }
 
@@ -920,7 +935,7 @@ const CdcMap = (props: CdcMapProperties) => {
     // add ability to rename state properties over time.
     const processedConfig = { ...(await coveUpdateWorker(newState)) }
 
-    setState(processedConfig)
+    setConfig(processedConfig)
     dispatch({ type: 'SET_LOADING', payload: false })
   }
 
@@ -1111,20 +1126,21 @@ const CdcMap = (props: CdcMapProperties) => {
     runtimeLegend,
     setAccessibleStatus,
     setFilteredCountryCode,
-    setParentConfig: setConfig,
+    setParentConfig: setParentConfig,
     setPosition,
     setRuntimeData,
     setRuntimeFilters,
     setRuntimeLegend,
     setSharedFilterValue,
-    setState,
+    setConfig,
     state: config,
     supportedCities,
     supportedCounties,
     supportedCountries,
     supportedTerritories,
     titleCase,
-    viewport: currentViewport
+    viewport: currentViewport,
+    dispatch
   }
 
   if (!mapProps.data || !config.data) return <></>
@@ -1183,7 +1199,7 @@ const CdcMap = (props: CdcMapProperties) => {
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
-            {config?.filters?.length > 0 && <Filters config={config} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
+            {config?.filters?.length > 0 && <Filters config={config} setConfig={setConfig} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
 
             <div
               role='button'
