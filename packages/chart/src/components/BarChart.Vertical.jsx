@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 import { useBarChart } from '../hooks/useBarChart'
+import useColorScale from '../hooks/useColorScale'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
@@ -11,8 +12,10 @@ import chroma from 'chroma-js'
 
 export const BarChartVertical = props => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
-  const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
+  const { transformedData, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
+  const { colorScale } = useColorScale()
+
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
   return (
