@@ -27,6 +27,8 @@ export default {
     left: 5,
     right: 5
   },
+  suppressedData: [],
+
   yAxis: {
     hideAxis: false,
     displayNumbersOnBar: false,
