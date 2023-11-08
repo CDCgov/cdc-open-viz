@@ -44,6 +44,9 @@ const Legend = () => {
     range: ['none'],
     unknown: 'block'
   })
+  const icons = {
+    star: '*'
+  }
   const createLegendLabels = defaultLabels => {
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
@@ -170,12 +173,13 @@ const Legend = () => {
         })
 
         if (dataExists && label && icon) {
-          const Icon = icons[icon]
+          // const Icon = icons[icon]
           const newLabel = {
             datum: label,
             index: lastIndex + index,
             text: label,
-            icon: <Icon size={15} color='#000' />
+            // icon: <Icon size={15} color='#000' />
+            icon: '*'
           }
           newLabels.push(newLabel)
         }
@@ -281,7 +285,7 @@ const Legend = () => {
                         </svg>
                       ) : (
                         <>
-                          <LegendCircle display={displayScale(label.datum)} fill={label.value} />
+                          <LegendCircle fill={label.value} display={displayScale(label.datum)} />
                           {label.icon}
                         </>
                       )}
