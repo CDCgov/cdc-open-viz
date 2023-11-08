@@ -19,14 +19,15 @@ export const BarChartVertical = props => {
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
   const getIcon = bar => {
-    let icon = ''
-    config.suppressedData?.forEach(d => {
-      if (bar.key === d.column && bar.value === d.value && d.icon) {
-        const BarIcon = icons[d.icon]
-        icon = <BarIcon color='#000' size={fontSize[config.fontSize] / 1.7} />
-      }
-    })
-    return icon
+    return '*'
+    // let icon = ''
+    // config.suppressedData?.forEach(d => {
+    //   if (bar.key === d.column && bar.value === d.value && d.icon) {
+    //     const BarIcon = icons[d.icon]
+    //     icon = <BarIcon color='#000' size={fontSize[config.fontSize] / 1.7} />
+    //   }
+    // })
+    // return icon
   }
 
   return (
@@ -51,11 +52,14 @@ export const BarChartVertical = props => {
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={(xMax / barGroups.length) * barGroup.index}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
+                  const suppresedBarHeight = 25
+
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   // let barHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
+                  let barHeightBase = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                   let barGroupWidth = (xMax / barGroups.length) * (config.barThickness || 0.8)
                   let offset = ((xMax / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
@@ -151,7 +155,7 @@ export const BarChartVertical = props => {
                           <div style={finalStyle}></div>
                         </foreignObject>
 
-                        <g display={displayBar ? 'block' : 'none'} transform={`translate(${iconX}, ${iconY})`}>
+                        <g display={displayBar ? 'block' : 'none'} transform={`translate(${0}, ${0})`}>
                           {getIcon(bar)}
                         </g>
 
