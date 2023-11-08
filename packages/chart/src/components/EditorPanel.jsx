@@ -132,6 +132,81 @@ const Select = memo(({ label, value, options, fieldName, section = null, subsect
   )
 })
 
+const DataSuppression = memo(({ config, updateConfig, data }) => {
+  const getColumnOptions = () => {
+    const keys = new Set()
+    data.forEach(d => {
+      Object.keys(d).forEach(key => {
+        keys.add(key)
+      })
+    })
+    return [...keys]
+  }
+
+  const getIconOptions = () => {
+    return ['star', 'exclamation', 'circle', 'location', 'info', 'arrow', 'ellipsis']
+  }
+
+  let removeColumn = i => {
+    let suppressedData = []
+
+    if (config.suppressedData) {
+      suppressedData = [...config.suppressedData]
+    }
+
+    suppressedData.splice(i, 1)
+
+    updateConfig({ ...config, suppressedData })
+  }
+
+  let addColumn = () => {
+    let suppressedData = config.suppressedData ? [...config.suppressedData] : []
+    suppressedData.push({ label: '', column: '', value: '', icon: '' })
+    updateConfig({ ...config, suppressedData })
+  }
+
+  let update = (fieldName, value, i) => {
+    let suppressedData = []
+
+    if (config.suppressedData) {
+      suppressedData = [...config.suppressedData]
+    }
+
+    suppressedData[i][fieldName] = value
+    updateConfig({ ...config, suppressedData })
+  }
+
+  return (
+    <>
+      {config.suppressedData &&
+        config.suppressedData.map(({ label, column, value, icon }, i) => {
+          return (
+            <div key={`suppressed-${i}`} className='edit-block'>
+              <button
+                type='button'
+                className='remove-column'
+                onClick={event => {
+                  event.preventDefault()
+                  removeColumn(i)
+                }}
+              >
+                Remove
+              </button>
+              <Select value={column} initial='Select' fieldName='column' label='Column' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
+              <TextField value={value} fieldName='value' label='Value' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
+              <Select value={icon} initial='Select' fieldName='icon' label='Icon' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getIconOptions()} />
+              <TextField value={label} fieldName='label' label='Label' placeholder='suppressed' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
+            </div>
+          )
+        })}
+
+      <button type='button' onClick={addColumn} className='btn full-width'>
+        Add Suppression Class
+      </button>
+    </>
+  )
+})
+
 const Regions = memo(({ config, updateConfig }) => {
   let regionUpdate = (fieldName, value, i) => {
     let regions = []
@@ -1189,6 +1264,7 @@ const EditorPanel = () => {
                   )}
 
                   {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
+                  <DataSuppression config={config} updateConfig={updateConfig} data={data} />
                 </AccordionItemPanel>
               </AccordionItem>
             )}
