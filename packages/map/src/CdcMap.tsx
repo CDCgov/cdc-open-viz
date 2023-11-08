@@ -208,7 +208,6 @@ const CdcMap = (props: CdcMapProperties) => {
   useEffect(() => {
     try {
       if (filteredCountryCode) {
-        console.log('filtered_country', filteredCountryCode)
         const coordinates = countryCoordinates[filteredCountryCode]
         const long = coordinates[1]
         const lat = coordinates[0]
@@ -230,7 +229,6 @@ const CdcMap = (props: CdcMapProperties) => {
           }
         })
 
-        console.log('here', state.config)
         dispatch({ type: 'SET_POSITION', payload: { coordinates: reversedCoordinates, zoom: 3 } })
       }
     } catch (e) {
@@ -893,7 +891,6 @@ const CdcMap = (props: CdcMapProperties) => {
     if (newState.dataUrl && !urlFilters) {
       // handle urls with spaces in the name.
       if (newState.dataUrl) newState.dataUrl = `${newState.dataUrl}`
-      console.log(newState.dataUrl)
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
 
       if (newData && newState.dataDescription) {
