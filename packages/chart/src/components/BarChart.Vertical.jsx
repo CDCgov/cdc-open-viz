@@ -12,12 +12,23 @@ import chroma from 'chroma-js'
 
 export const BarChartVertical = props => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
-  const { transformedData, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
+  const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
-  const { colorScale } = useColorScale()
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
+
+  const getIcon = bar => {
+    let icon = ''
+    config.suppressedData?.forEach(d => {
+      if (bar.key === d.column && bar.value === d.value && d.icon) {
+        const BarIcon = icons[d.icon]
+        icon = <BarIcon color='#000' size={fontSize[config.fontSize] / 1.7} />
+      }
+    })
+    return icon
+  }
+
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
@@ -44,7 +55,7 @@ export const BarChartVertical = props => {
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                  let barHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
+                  // let barHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                   let barGroupWidth = (xMax / barGroups.length) * (config.barThickness || 0.8)
                   let offset = ((xMax / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
@@ -87,6 +98,8 @@ export const BarChartVertical = props => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
+                  const barValueLabel = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? '' : yAxisValue
+                  let barHeight = bar.value && config.suppressedData.some(({ column, value }) => bar.key === column && bar.value === value) ? suppresedBarHeight : barHeightBase
 
                   const background = () => {
                     if (isRegularLollipopColor) return barColor
@@ -137,6 +150,21 @@ export const BarChartVertical = props => {
                         >
                           <div style={finalStyle}></div>
                         </foreignObject>
+
+                        <g display={displayBar ? 'block' : 'none'} transform={`translate(${iconX}, ${iconY})`}>
+                          {getIcon(bar)}
+                        </g>
+
+                        <Text // prettier-ignore
+                          display={config.labels && displayBar ? 'block' : 'none'}
+                          opacity={transparentBar ? 0.5 : 1}
+                          x={barWidth * (bar.index + 0.5) + offset}
+                          y={barY - 5}
+                          fill={labelColor}
+                          textAnchor='middle'
+                        >
+                          {barValueLabel}
+                        </Text>
 
                         <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={labelColor} textAnchor='middle'>
                           {yAxisValue}
