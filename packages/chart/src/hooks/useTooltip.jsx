@@ -57,7 +57,6 @@ export const useTooltip = props => {
 
     const includedSeries = visualizationType !== 'Pie' ? config.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.series.map(item => item.dataKey)
     includedSeries.push(config.xAxis.dataKey)
-
     if (config.visualizationType === 'Forecasting') {
       config.series.map(s => {
         s.confidenceIntervals.map(c => {
@@ -68,6 +67,16 @@ export const useTooltip = props => {
         })
       })
     }
+    function getColumnNames(columns) {
+      let names = []
+      for (let key in columns) {
+        if (columns.hasOwnProperty(key)) {
+          names.push(columns[key].name)
+        }
+      }
+      return names
+    }
+    includedSeries.push(...getColumnNames(config.columns))
 
     const yScaleValues = getYScaleValues(closestXScaleValue, includedSeries)
 
@@ -84,49 +93,59 @@ export const useTooltip = props => {
     }
 
     const getTooltipDataArray = () => {
-      if (visualizationType === 'Forest Plot') {
-        const columns = config.columns
-        const columnsWithTooltips = []
+      const columns = config.columns
+      const columnsWithTooltips = []
+      const tooltipItems = []
 
-        for (const [colKeys, colVals] of Object.entries(columns)) {
-          const formattingParams = {
-            addColPrefix: config.columns[colKeys].prefix,
-            addColSuffix: config.columns[colKeys].suffix,
-            addColRoundTo: config.columns[colKeys].roundToPlace ? config.columns[colKeys].roundToPlace : '',
-            addColCommas: config.columns[colKeys].commas
-          }
+      for (const [colKeys, colVals] of Object.entries(columns)) {
+        const formattingParams = {
+          addColPrefix: config.columns[colKeys].prefix,
+          addColSuffix: config.columns[colKeys].suffix,
+          addColRoundTo: config.columns[colKeys].roundToPlace ? config.columns[colKeys].roundToPlace : '',
+          addColCommas: config.columns[colKeys].commas
+        }
+        let closestValue = null
 
-          let closestValue = getClosestYValue(y, colVals.name)
-
-          const formattedValue = formatColNumber(closestValue, 'left', true, config, formattingParams)
-
-          if (colVals.tooltips) {
-            columnsWithTooltips.push([colVals.label, formattedValue])
-          }
+        if (config.visualizationType === 'Pie') {
+          closestValue = arc?.data[colVals.name]
+        } else {
+          closestValue = resolvedScaleValues[0][colVals.name]
         }
 
-        const tooltipItems = []
-        tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
+        const formattedValue = formatColNumber(closestValue, 'left', true, config, formattingParams)
 
-        columnsWithTooltips.forEach(columnData => {
-          tooltipItems.push([columnData[0], columnData[1]])
-        })
-        return tooltipItems
+        if (colVals.tooltips) {
+          columnsWithTooltips.push([colVals.label, formattedValue])
+        }
       }
+      const additionalTooltipItems = []
+
+      columnsWithTooltips.forEach(columnData => {
+        additionalTooltipItems.push([columnData[0], columnData[1]])
+      })
 
       if (visualizationType === 'Pie') {
-        return [
+        tooltipItems.push(
+          // ignore
           [config.xAxis.dataKey, pieChartData],
           [config.runtime.yAxis.dataKey, formatNumber(arc?.data[config.runtime.yAxis.dataKey])],
           ['Percent', `${Math.round((((arc?.endAngle - arc?.startAngle) * 180) / Math.PI / 360) * 100) + '%'}`]
-        ]
+        )
+      }
+      if (visualizationType === 'Forest Plot') {
+        tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
+      }
+      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot') {
+        tooltipItems.push(
+          ...getIncludedTooltipSeries()
+            .filter(Boolean)
+            .flatMap(seriesKey => {
+              return resolvedScaleValues[0][seriesKey] ? [[seriesKey, formatNumber(resolvedScaleValues[0][seriesKey], getAxisPosition(seriesKey))]] : []
+            })
+        )
       }
 
-      return getIncludedTooltipSeries()
-        .filter(Boolean)
-        .flatMap((seriesKey, index) => {
-          return resolvedScaleValues[0][seriesKey] ? [[seriesKey, resolvedScaleValues[0][seriesKey], getAxisPosition(seriesKey)]] : []
-        })
+      return [...tooltipItems, ...additionalTooltipItems]
     }
 
     // Returns an array of arrays.
@@ -403,7 +422,7 @@ export const useTooltip = props => {
     if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? value : value}`}</li>
 
     // TOOLTIP BODY
-    return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, axisPosition)}`}</li>
+    return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${value}`}</li>
   }
 
   return {
