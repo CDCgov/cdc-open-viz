@@ -8,6 +8,7 @@ import useLegendClasses from './../hooks/useLegendClasses'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
 import { Line } from '@visx/shape'
 import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { scaleOrdinal } from '@visx/scale'
 
 // * FILE REVIEW *
 // TODO: fix eslint-disable jsxa11y issues
@@ -38,7 +39,11 @@ const Legend = () => {
   const { visualizationType, visualizationSubType, series, runtime, orientation } = config
   // create fn to reverse labels while legend is Bottom.  Legend-right , legend-left works by default.
   const reverseLabels = labels => (config.legend.reverseLabelOrder && config.legend.position === 'bottom' ? labels.reverse() : labels)
-
+  const displayScale = scaleOrdinal({
+    domain: config.suppressedData?.map(d => d.label),
+    range: ['none'],
+    unknown: 'block'
+  })
   const createLegendLabels = defaultLabels => {
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
@@ -155,6 +160,30 @@ const Legend = () => {
       return reverseLabels(uniqueLabels)
     }
 
+    if (config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.suppressedData && config.suppressedData.length > 0) {
+      const lastIndex = defaultLabels.length - 1
+      let newLabels = []
+
+      config.suppressedData.forEach(({ label, icon, value }, index) => {
+        const dataExists = data.some(d => {
+          return runtime.seriesKeys.some(column => d[column] === value)
+        })
+
+        if (dataExists && label && icon) {
+          const Icon = icons[icon]
+          const newLabel = {
+            datum: label,
+            index: lastIndex + index,
+            text: label,
+            icon: <Icon size={15} color='#000' />
+          }
+          newLabels.push(newLabel)
+        }
+      })
+
+      return [...defaultLabels, ...newLabels]
+    }
+
     return reverseLabels(defaultLabels)
   }
 
@@ -251,7 +280,10 @@ const Legend = () => {
                           <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={label.value} strokeWidth={2} strokeDasharray={handleLineType(config.series[i]?.type ? config.series[i]?.type : '')} />
                         </svg>
                       ) : (
-                        <LegendCircle fill={label.value} />
+                        <>
+                          <LegendCircle display={displayScale(label.datum)} fill={label.value} />
+                          {label.icon}
+                        </>
                       )}
 
                       <LegendLabel align='left' margin='0 0 0 4px'>
