@@ -123,7 +123,7 @@ const CdcMap = (props: CdcMapProperties) => {
 
   const mapInitialState = {
     accessibleStatus: '',
-    config: configObj ?? initialState,
+    config: { ...configObj, ...initialState },
     container: null,
     coveLoadedHasRan: false,
     currentViewport: null,
