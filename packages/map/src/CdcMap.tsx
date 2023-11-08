@@ -1129,7 +1129,7 @@ const CdcMap = (props: CdcMapProperties) => {
 
   if (!mapProps.data || !config.data) return <></>
 
-  const hasDataTable = config.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading
+  const hasDataTable = config?.runtime?.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading
 
   const handleMapTabbing = () => {
     let tabbingID
@@ -1232,7 +1232,7 @@ const CdcMap = (props: CdcMapProperties) => {
               {config.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
             </MediaControls.Section>
 
-            {config.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading && (
+            {config.runtime?.editorErrorMessage?.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading && (
               <DataTable
                 config={config}
                 rawData={config.data}
