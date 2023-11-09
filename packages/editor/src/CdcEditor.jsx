@@ -98,29 +98,29 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
   }, [])
 
   const stripConfig = configToStrip => {
-    let strippedConfig = {...configToStrip}
+    let strippedConfig = { ...configToStrip }
 
-    if(strippedConfig.type === 'dashboard'){
-      if(strippedConfig.datasets){
+    if (strippedConfig.type === 'dashboard') {
+      if (strippedConfig.datasets) {
         Object.keys(strippedConfig.datasets).forEach(datasetKey => {
-          delete strippedConfig.datasets[datasetKey].formattedData;
-          if(strippedConfig.datasets[datasetKey].dataUrl){
-            delete strippedConfig.datasets[datasetKey].data;
+          delete strippedConfig.datasets[datasetKey].formattedData
+          if (strippedConfig.datasets[datasetKey].dataUrl) {
+            delete strippedConfig.datasets[datasetKey].data
           }
         })
       }
-      if(strippedConfig.visualizations){
+      if (strippedConfig.visualizations) {
         Object.keys(strippedConfig.visualizations).forEach(vizKey => {
-          delete strippedConfig.visualizations[vizKey].runtime;
-          delete strippedConfig.visualizations[vizKey].formattedData;
-          delete strippedConfig.visualizations[vizKey].data;
+          delete strippedConfig.visualizations[vizKey].runtime
+          delete strippedConfig.visualizations[vizKey].formattedData
+          delete strippedConfig.visualizations[vizKey].data
         })
       }
     } else {
-      delete strippedConfig.runtime;
-      delete strippedConfig.formattedData;
-      if(strippedConfig.dataUrl){
-        delete strippedConfig.data;
+      delete strippedConfig.runtime
+      delete strippedConfig.formattedData
+      if (strippedConfig.dataUrl) {
+        delete strippedConfig.data
       }
     }
 
