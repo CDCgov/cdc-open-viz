@@ -123,7 +123,7 @@ const CdcMap = (props: CdcMapProperties) => {
 
   const mapInitialState = {
     accessibleStatus: '',
-    config: { ...configObj, ...initialState },
+    config: { ...initialState },
     container: null,
     coveLoadedHasRan: false,
     currentViewport: null,
@@ -941,7 +941,7 @@ const CdcMap = (props: CdcMapProperties) => {
 
     // Load the configuration data passed to this component if it exists
     if (config) {
-      configData = config
+      configData = configObj
     }
 
     // If the config passed is a string, try to load it as an ajax
