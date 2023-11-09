@@ -34,29 +34,36 @@ const WorldMap = props => {
     setState,
     state,
     supportedCountries,
-    titleCase
+    titleCase,
+    dispatch
   } = useContext(ConfigContext)
 
   // TODO Refactor - state should be set together here to avoid rerenders
   // Resets to original data & zooms out
   const handleReset = (state, setState, setRuntimeData, generateRuntimeData) => {
     let reRun = generateRuntimeData(state)
-    setRuntimeData(reRun)
-    setState({
-      ...state,
-      focusedCountry: false,
-      mapPosition: { coordinates: [0, 30], zoom: 1 }
+    // setRuntimeData(reRun)
+
+    dispatch({ type: 'SET_RUNTIME_DATA', payload: reRun })
+    dispatch({
+      type: 'SET_CONFIG',
+      payload: {
+        ...state,
+        focusedCountry: false,
+        mapPosition: { coordinates: [0, 30], zoom: 1 }
+      }
     })
-    setFilteredCountryCode('')
+    dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
   }
   const handleZoomIn = (position, setPosition) => {
     if (position.zoom >= 4) return
-    setPosition(pos => ({ ...pos, zoom: pos.zoom * 1.5 }))
+    dispatch({ type: 'SET_POSITION', payload: { ...position, zoom: position.zoom * 1.5 } })
   }
 
   const handleZoomOut = (position, setPosition) => {
     if (position.zoom <= 1) return
-    setPosition(pos => ({ ...pos, zoom: pos.zoom / 1.5 }))
+    dispatch({ type: 'SET_POSITION', payload: { ...position, zoom: position.zoom / 1.5 } })
   }
 
   const ZoomControls = ({ position, setPosition, state, setState, setRuntimeData, generateRuntimeData }) => {
@@ -93,10 +100,11 @@ const WorldMap = props => {
     if (!state.general.allowMapZoom) return
     let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === country[state.columns.geo.name])
     setFilteredCountryCode(newRuntimeData[0].uid)
+    dispatch({ type: 'SET_POSITION', payload: '' })
   }
 
   const handleMoveEnd = position => {
-    setPosition(position)
+    dispatch({ type: 'SET_POSITION', payload: position })
   }
 
   const constructGeoJsx = geographies => {

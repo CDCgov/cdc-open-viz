@@ -116,7 +116,7 @@ const CdcMap = (props: CdcMapProperties) => {
     link,
     logo = '',
     navigationHandler: customNavigationHandler,
-    setConfig,
+    setConfig: setParentConfig,
     setSharedFilter,
     setSharedFilterValue,
     dashboardConfig
@@ -124,7 +124,7 @@ const CdcMap = (props: CdcMapProperties) => {
 
   const mapInitialState = {
     accessibleStatus: '',
-    config: configObj ?? initialState,
+    config: { ...initialState },
     container: null,
     coveLoadedHasRan: false,
     currentViewport: null,
@@ -159,7 +159,7 @@ const CdcMap = (props: CdcMapProperties) => {
   } = state
 
   // TODO: move these into context later on.
-  const setState = payload => {
+  const setConfig = payload => {
     dispatch({ type: 'SET_CONFIG', payload })
   }
 
@@ -201,7 +201,7 @@ const CdcMap = (props: CdcMapProperties) => {
 
   const transform = new DataTransform()
 
-  const { handleSorting } = useFilters({ config: config, setConfig: setState })
+  const { handleSorting } = useFilters({ config: config, setConfig: setConfig })
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
   const imageId = `cove-${Math.random().toString(16).slice(-4)}`
@@ -214,10 +214,23 @@ const CdcMap = (props: CdcMapProperties) => {
         const lat = coordinates[0]
         const reversedCoordinates = [long, lat]
 
-        setState({
-          ...state,
-          mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
+        // setConfig({
+        //   ...state.config,
+        //   mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
+        // })
+        dispatch({
+          type: 'SET_CONFIG',
+          payload: {
+            ...state.config,
+            mapPosition: {
+              ...state.config.mapPosition,
+              coordinates: reversedCoordinates,
+              zoom: 3
+            }
+          }
         })
+
+        dispatch({ type: 'SET_POSITION', payload: { coordinates: reversedCoordinates, zoom: 3 } })
       }
     } catch (e) {
       console.error('COVE: Failed to set world map zoom.') // eslint-disable-line
@@ -726,8 +739,8 @@ const CdcMap = (props: CdcMapProperties) => {
       let lat = value[config.columns.latitude.name]
       let long = value[config.columns.longitude.name]
 
-      setState({
-        ...state,
+      setConfig({
+        ...state.config,
         mapPosition: { coordinates: [long, lat], zoom: 3 }
       })
     }
@@ -858,7 +871,7 @@ const CdcMap = (props: CdcMapProperties) => {
         data = transform.developerStandardize(data, config.dataDescription)
       }
 
-      setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
+      setConfig({ ...state, runtimeDataUrl: dataUrlFinal, data })
     }
   }
 
@@ -879,7 +892,6 @@ const CdcMap = (props: CdcMapProperties) => {
     if (newState.dataUrl && !urlFilters) {
       // handle urls with spaces in the name.
       if (newState.dataUrl) newState.dataUrl = `${newState.dataUrl}`
-      console.log(newState.dataUrl)
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
 
       if (newData && newState.dataDescription) {
@@ -921,7 +933,7 @@ const CdcMap = (props: CdcMapProperties) => {
     // add ability to rename state properties over time.
     const processedConfig = { ...(await coveUpdateWorker(newState)) }
 
-    setState(processedConfig)
+    setConfig(processedConfig)
     dispatch({ type: 'SET_LOADING', payload: false })
   }
 
@@ -930,7 +942,7 @@ const CdcMap = (props: CdcMapProperties) => {
 
     // Load the configuration data passed to this component if it exists
     if (config) {
-      configData = config
+      configData = configObj
     }
 
     // If the config passed is a string, try to load it as an ajax
@@ -1114,20 +1126,21 @@ const CdcMap = (props: CdcMapProperties) => {
     runtimeLegend,
     setAccessibleStatus,
     setFilteredCountryCode,
-    setParentConfig: setConfig,
+    setParentConfig: setParentConfig,
     setPosition,
     setRuntimeData,
     setRuntimeFilters,
     setRuntimeLegend,
     setSharedFilterValue,
-    setState,
+    setConfig,
     state: config,
     supportedCities,
     supportedCounties,
     supportedCountries,
     supportedTerritories,
     titleCase,
-    viewport: currentViewport
+    viewport: currentViewport,
+    dispatch
   }
 
   if (!mapProps.data || !config.data) return <></>
@@ -1186,7 +1199,7 @@ const CdcMap = (props: CdcMapProperties) => {
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
-            {config?.filters?.length > 0 && <Filters config={config} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
+            {config?.filters?.length > 0 && <Filters config={config} setConfig={setConfig} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
 
             <div
               role='button'

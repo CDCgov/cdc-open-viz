@@ -84,7 +84,7 @@ const EditorPanel = props => {
     runtimeLegend,
     setParentConfig,
     setRuntimeFilters,
-    setState,
+    setConfig: setState,
     state,
   } = useContext(ConfigContext)
 
