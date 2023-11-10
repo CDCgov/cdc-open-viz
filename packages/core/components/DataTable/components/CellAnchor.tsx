@@ -1,6 +1,6 @@
 import ExternalIcon from '@cdc/core/assets/external-link.svg'
 // Optionally wrap cell with anchor if config defines a navigation url
-const CellAnchor = ({ markup, row, columns, navigationHandler }) => {
+const CellAnchor = ({ markup, row, columns, navigationHandler, mapZoomHandler }) => {
   if (columns.navigate && row[columns.navigate.name]) {
     return (
       <span
@@ -17,6 +17,23 @@ const CellAnchor = ({ markup, row, columns, navigationHandler }) => {
       >
         {markup}
         <ExternalIcon className='inline-icon' />
+      </span>
+    )
+  } else if (mapZoomHandler) {
+    return (
+      <span
+        onClick={mapZoomHandler}
+        className='table-link'
+        title='Click to view on map'
+        role='link'
+        tabIndex={0}
+        onKeyDown={e => {
+          if (e.keyCode === 13) {
+            mapZoomHandler()
+          }
+        }}
+      >
+        {markup}
       </span>
     )
   }

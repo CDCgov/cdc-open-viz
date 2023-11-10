@@ -1226,8 +1226,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const reloadURLData = async () => {
-    if (config.dataUrl) {
-      const dataUrl = new URL(config.runtimeDataUrl || config.dataUrl, window.location.origin)
+    if (state.dataUrl) {
+      const dataUrl = new URL(state.runtimeDataUrl || state.dataUrl, window.location.origin)
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
@@ -1599,6 +1599,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             <Title
               title={title}
               superTitle={general.superTitle}
+              config={config}
               classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
             />
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
@@ -1671,12 +1672,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 vizTitle={general.title}
                 viewport={currentViewport}
                 formatLegendLocation={formatLegendLocation}
+                setFilteredCountryCode={setFilteredCountryCode}
                 tabbingId={tabId}
                 showDownloadImgButton={state.general.showDownloadImgButton}
                 showDownloadPdfButton={state.general.showDownloadPdfButton}
                 innerContainerRef={innerContainerRef}
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
+                isDebug={isDebug}
               />
             )}
 

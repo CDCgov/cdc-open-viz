@@ -38,6 +38,7 @@ export type TableConfig = {
     geoType: string
     type: string
     showDownloadButton: boolean
+    allowMapZoom?: boolean
   }
   columns?: {
     geo: {

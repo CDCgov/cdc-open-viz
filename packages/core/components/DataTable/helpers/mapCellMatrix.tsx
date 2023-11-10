@@ -7,7 +7,7 @@ type MapRowsProps = DataTableProps & {
   rows: string[]
 }
 
-const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, displayGeoName, formatLegendLocation, displayDataAsText, navigationHandler }: MapRowsProps): ReactNode[][] => {
+const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, displayGeoName, formatLegendLocation, displayDataAsText, navigationHandler, setFilteredCountryCode }: MapRowsProps): ReactNode[][] => {
   return rows.map(row =>
     Object.keys(columns)
       .filter(column => columns[column].dataTable === true && columns[column].name)
@@ -19,17 +19,17 @@ const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, di
           const legendColor = applyLegendToRow(rowObj)
 
           let labelValue
-
+          const mapZoomHandler = config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
           if ((config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') || config.general.type === 'us-geocode') {
             labelValue = displayGeoName(row)
           } else {
             labelValue = formatLegendLocation(row)
           }
           cellValue = (
-            <>
+            <div className='col-12'>
               <LegendCircle fill={legendColor[0]} />
-              <CellAnchor markup={labelValue} row={rowObj} columns={columns} navigationHandler={navigationHandler} />
-            </>
+              <CellAnchor markup={labelValue} row={rowObj} columns={columns} navigationHandler={navigationHandler} mapZoomHandler={mapZoomHandler} />
+            </div>
           )
         } else {
           // check for special classes

@@ -18,29 +18,26 @@ import boxplotCellMatrix from './helpers/boxplotCellMatrix'
 import { TableConfig } from './types/TableConfig'
 
 export type DataTableProps = {
+  applyLegendToRow?: Function
+  colorScale?: Function
+  columns?: { navigate: { name: string } }
   config: TableConfig
   dataConfig?: Object
-  tableTitle: string
+  displayDataAsText?: Function
+  displayGeoName?: Function
+  expandDataTable: boolean
+  formatLegendLocation?: Function
+  groupBy?: string
+  headerColor?: string
   indexTitle?: string
-  vizTitle?: string
+  navigationHandler?: Function
   rawData: Object[]
   runtimeData: Object[] | Record<string, Object> // UNSAFE
-  headerColor?: string
-  colorScale?: Function
-  expandDataTable: boolean
-  groupBy?: string
-  columns?: {
-    navigate: {
-      name: string
-    }
-  }
-  displayDataAsText?: Function
-  applyLegendToRow?: Function
-  displayGeoName?: Function
-  navigationHandler?: Function
-  viewport: string
-  formatLegendLocation?: Function
+  setFilteredCountryCode?: Function // used for Maps only
   tabbingId: string
+  tableTitle: string
+  viewport: string
+  vizTitle?: string
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
