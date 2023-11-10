@@ -104,14 +104,47 @@ export const BarChartVertical = (props: BarChartProps) => {
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
 
-                  const getBackgroundColor = (barColor): string => {
-                    if (isRegularLollipopColor) return barColor
-                    if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
-                    if (isHighlightedBar) return 'transparent'
-                    return barColor
+                  const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
+                    let _barColor = barColor
+                    let _filteredOutColor = filteredOutColor || '#f2f2f2'
+
+                    /**
+                     * If this is a dashboard using a setBy column on the bars
+                     * color the bar that is using the filter with barColor and
+                     * color the filteredOut (typically gray) bars with the filteredOutColor
+                     */
+                    if (dashboardConfig && dashboardConfig.dashboard.sharedFilters) {
+                      const { sharedFilters } = dashboardConfig.dashboard
+
+                      _barColor = sharedFilters.map(_sharedFilter => {
+                        if (_sharedFilter.setBy === config.uid) {
+                          // If the current filter is the reset filter item.
+                          if (_sharedFilter.resetLabel === _sharedFilter.active) return barColor
+                          // If the current filter is the bars
+                          if (_sharedFilter.active === transformedData[barGroup.index][config.xAxis.dataKey]) return barColor
+                          return _filteredOutColor
+                        } else {
+                          // If the setBy isn't the config.uid return the original barColor
+                          return barColor
+                        }
+                      })[0]
+
+                      if (isRegularLollipopColor) _barColor = barColor
+                      if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
+                      if (isHighlightedBar) _barColor = 'transparent'
+                      return _barColor
+                    }
+
+                    // if this is a two tone lollipop slightly lighten the bar.
+                    if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
+
+                    // if we're highlighting a bar make it invisible since it gets a border
+                    // if (isHighlightedBar) _barColor = 'transparent'
+                    return _barColor
                   }
+
                   const finalStyle = {
-                    background: getBackgroundColor(barColor),
+                    background: getBarBackgroundColor(barColor),
                     borderColor,
                     borderStyle: 'solid',
                     borderWidth,

@@ -272,9 +272,13 @@ export const useTooltip = props => {
       if (!x) throw new Error('COVE: no x value in handleTooltipClick.')
       let closestXScaleValue = getXValueFromCoordinate(x)
       if (!closestXScaleValue) throw new Error('COVE: no closest x scale value in handleTooltipClick')
-      let datum = config.data.filter(item => item[config.xAxis.dataKey] === closestXScaleValue)
+      let datum = config.data?.filter(item => item[config.xAxis.dataKey] === closestXScaleValue)
 
-      if (setSharedFilter) {
+      if (!datum[0]) {
+        throw new Error(`COVE: no data found matching the closest xScale value: ${closestXScaleValue}`)
+      }
+
+      if (setSharedFilter && config?.uid && datum?.[0]) {
         setSharedFilter(config.uid, datum[0])
       }
     } catch (e) {
