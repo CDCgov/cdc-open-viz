@@ -113,6 +113,11 @@ export const BarChartVertical = (props: BarChartProps) => {
                           // If the current filter is the bar.s
                           if (_sharedFilter.active === transformedData[barGroup.index][config.xAxis.dataKey]) return barColor
                           return '#f2f2f2'
+                        } else {
+                          if (isRegularLollipopColor) return barColor
+                          if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
+                          if (isHighlightedBar) return 'transparent'
+                          return barColor
                         }
                       })
                     }
