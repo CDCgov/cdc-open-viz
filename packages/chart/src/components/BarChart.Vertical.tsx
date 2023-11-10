@@ -9,71 +9,70 @@ import { useHighlightedBars } from '../hooks/useHighlightedBars'
 // third party
 import chroma from 'chroma-js'
 
-export const BarChartHorizontal = props => {
-  const { xScale, yScale, yMax, seriesScale } = props
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getTextWidth, getYAxisData, getXAxisData } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, fontSize, isLabelBelowBar, displayNumbersOnBar, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
+import { type BarChartProps } from '../types/ChartProps'
 
+export const BarChartVertical = (props: BarChartProps) => {
+  const { xScale, yScale, xMax, yMax, seriesScale } = props
+
+  // CONTEXT VALUES
+  // prettier-ignore
+  const {
+    colorScale,
+    config,
+    formatDate,
+    formatNumber,
+    getXAxisData,
+    getYAxisData,
+    isNumber,
+    parseDate,
+    seriesHighlight,
+    setSharedFilter,
+    transformedData,
+    dashboardConfig
+  } = useContext(ConfigContext)
+
+  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
   const { HighLightedBarUtils } = useHighlightedBars(config)
-
+  const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
   return (
     config.visualizationSubType !== 'stacked' &&
-    config.visualizationType === 'Bar' &&
-    config.orientation === 'horizontal' && (
+    (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
+    config.orientation === 'vertical' && (
       <Group>
         <BarGroup
           data={data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
           height={yMax}
           x0={d => d[config.runtime.originalXAxis.dataKey]}
-          x0Scale={yScale}
+          x0Scale={xScale}
           x1Scale={seriesScale}
-          yScale={xScale}
+          yScale={yScale}
           color={() => {
             return ''
           }}
         >
           {barGroups => {
             return updateBars(barGroups).map((barGroup, index) => (
-              <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} top={barGroup.y}>
+              <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={(xMax / barGroups.length) * barGroup.index}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
-
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
-
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
-
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                  let barHeight = config.barHeight
+                  let barHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
-                  const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(0)
-                  const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
-                  const barWidth = config.barHeight
-
-                  const yAxisValue = formatNumber(bar.value, 'left')
-                  const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
-
-                  const barPosition = bar.value < 0 ? 'below' : 'above'
-
-                  // check if bar text/value string fits into  each bars.
-                  let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                  let textFits = textWidth < barWidthHorizontal - 5 // minus padding 5
-
-                  // control text position
-                  let textAnchor = textFits ? 'end' : 'start'
-                  let textAnchorLollipop = 'start'
-                  let textPadding = textFits ? -5 : 5
-                  let textPaddingLollipop = 10
-                  // if bars are negative we change positions of text
-                  if (barPosition === 'below') {
-                    textAnchor = textFits ? 'start' : 'end'
-                    textPadding = textFits ? 5 : -5
-                    if (config.isLollipopChart) {
-                      textAnchorLollipop = 'end'
-                      textPaddingLollipop = -10
-                    }
+                  let barGroupWidth = (xMax / barGroups.length) * (config.barThickness || 0.8)
+                  let offset = ((xMax / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
+                  // configure left side offset of lollipop bars
+                  if (config.isLollipopChart) {
+                    offset = xMax / barGroups.length / 2 - lollipopBarWidth / 2
                   }
+
+                  let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
+
+                  let yAxisValue = formatNumber(bar.value, 'left')
+                  let xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
@@ -81,8 +80,9 @@ export const BarChartHorizontal = props => {
 
                   let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+
                   if (!hasMultipleSeries) {
-                    xAxisTooltip = config.isLegendValue ? `<p className="tooltip-heading">${bar.key}: ${xAxisValue}</p>` : config.runtime.xAxis.label ? `<p className="tooltip-heading">${config.runtime.xAxis.label}: ${xAxisValue}</p>` : xAxisValue
+                    yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   }
 
                   const tooltip = `<ul>
@@ -98,18 +98,30 @@ export const BarChartHorizontal = props => {
                   barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
-                  const isHighlightedBar = highlightedBarValues?.includes(yAxisValue)
-                  const highlightedBarColor = getHighlightedBarColorByValue(yAxisValue)
-                  const highlightedBar = getHighlightedBarByValue(yAxisValue)
+                  const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
+                  const highlightedBarColor = getHighlightedBarColorByValue(xAxisValue)
+                  const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  // update label color
-                  if (barColor && labelColor) {
-                    if (chroma.contrast(labelColor, barColor) < 4.9) {
-                      labelColor = textFits ? '#FFFFFF' : '#000000'
-                    }
-                  }
+
                   const background = () => {
+                    if (dashboardConfig && dashboardConfig.dashboard.sharedFilters) {
+                      return dashboardConfig.dashboard.sharedFilters.map(_sharedFilter => {
+                        if (_sharedFilter.setBy === config.uid) {
+                          // If the current filter is the reset filter item.
+                          if (_sharedFilter.resetLabel === _sharedFilter.active) return barColor
+                          // If the current filter is the bar.s
+                          if (_sharedFilter.active === transformedData[barGroup.index][config.xAxis.dataKey]) return barColor
+                          return '#f2f2f2'
+                        } else {
+                          if (isRegularLollipopColor) return barColor
+                          if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
+                          if (isHighlightedBar) return 'transparent'
+                          return barColor
+                        }
+                      })
+                    }
+
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
                     if (isHighlightedBar) return 'transparent'
@@ -120,9 +132,10 @@ export const BarChartHorizontal = props => {
                     borderColor,
                     borderStyle: 'solid',
                     borderWidth,
-                    width: barWidthHorizontal,
-                    height: !config.isLollipopChart ? barWidth : lollipopBarWidth,
-                    ...borderRadius
+                    width: barWidth,
+                    height: barHeight,
+                    ...borderRadius,
+                    cursor: dashboardConfig ? 'pointer' : 'default'
                   }
 
                   return (
@@ -140,10 +153,10 @@ export const BarChartHorizontal = props => {
                         <foreignObject
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                          x={barX}
-                          y={barWidth * bar.index}
-                          width={barWidthHorizontal}
-                          height={!config.isLollipopChart ? barWidth : lollipopBarWidth}
+                          x={barWidth * bar.index + offset}
+                          y={barY}
+                          width={barWidth}
+                          height={barHeight}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tooltip-html={tooltip}
@@ -151,57 +164,34 @@ export const BarChartHorizontal = props => {
                           onClick={e => {
                             e.preventDefault()
                             if (setSharedFilter) {
-                              bar[config.xAxis.dataKey] = yAxisValue
+                              bar[config.xAxis.dataKey] = xAxisValue
                               setSharedFilter(config.uid, bar)
                             }
                           }}
                         >
                           <div style={finalStyle}></div>
                         </foreignObject>
-                        {!config.isLollipopChart && displayNumbersOnBar && (
-                          <Text // prettier-ignore
-                            display={displayBar ? 'block' : 'none'}
-                            x={bar.y}
-                            y={config.barHeight / 2 + config.barHeight * bar.index}
-                            fill={labelColor}
-                            dx={textPadding}
-                            verticalAnchor='middle'
-                            textAnchor={textAnchor}
-                          >
-                            {yAxisValue}
-                          </Text>
-                        )}
-                        {config.isLollipopChart && displayNumbersOnBar && (
-                          <Text // prettier-ignore
-                            display={displayBar ? 'block' : 'none'}
-                            x={bar.y}
-                            y={0}
-                            fill={'#000000'}
-                            dx={textPaddingLollipop}
-                            textAnchor={textAnchorLollipop}
-                            verticalAnchor='middle'
-                            fontWeight={'normal'}
-                          >
-                            {yAxisValue}
-                          </Text>
-                        )}
-                        {isLabelBelowBar && !config.yAxis.hideLabel && (
-                          <Text x={config.yAxis.hideAxis ? 0 : 5} y={barGroup.height} dy={4} verticalAnchor={'start'} textAnchor={'start'}>
-                            {config.runtime.yAxis.type === 'date'
-                              ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
-                              : isHorizontal
-                              ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                              : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
-                          </Text>
-                        )}
+
+                        <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={labelColor} textAnchor='middle'>
+                          {yAxisValue}
+                        </Text>
 
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
-                          <circle cx={bar.y} cy={0 + lollipopBarWidth / 2} r={lollipopShapeSize / 2} fill={barColor} key={`circle--${bar.index}`} data-tooltip-html={tooltip} data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} style={{ filter: 'unset', opacity: 1 }} />
+                          <circle
+                            cx={barWidth * (barGroup.bars.length - bar.index - 1) + offset + lollipopShapeSize / 3.5}
+                            cy={bar.y}
+                            r={lollipopShapeSize / 2}
+                            fill={barColor}
+                            key={`circle--${bar.index}`}
+                            data-tooltip-html={tooltip}
+                            data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                            style={{ filter: 'unset', opacity: 1 }}
+                          />
                         )}
                         {config.isLollipopChart && config.lollipopShape === 'square' && (
                           <rect
-                            x={bar.y > 10 ? bar.y - lollipopShapeSize / 2 : 0}
-                            y={0 - lollipopBarWidth / 2}
+                            x={offset - lollipopBarWidth / 2}
+                            y={barY}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
                             fill={barColor}
@@ -228,21 +218,21 @@ export const BarChartHorizontal = props => {
               let upperPos
               let lowerPos
               let tickWidth = 5
-              yPos = yScale(getXAxisData(d)) - 0.75 * config.barHeight
-              upperPos = xScale(getYAxisData(d, config.confidenceKeys.upper))
-              lowerPos = xScale(getYAxisData(d, config.confidenceKeys.lower))
+              xPos = xScale(getXAxisData(d))
+              upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
+              lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
               return (
                 <path
-                  key={`confidence-interval-h-${yPos}-${d[config.runtime.originalXAxis.dataKey]}`}
+                  key={`confidence-interval-v-${yPos}-${d[config.runtime.originalXAxis.dataKey]}`}
                   stroke='#333'
                   strokeWidth='px'
                   d={`
-                    M${lowerPos} ${yPos - tickWidth}
-                    L${lowerPos} ${yPos + tickWidth}
-                    M${lowerPos} ${yPos}
-                    L${upperPos} ${yPos}
-                    M${upperPos} ${yPos - tickWidth}
-                    L${upperPos} ${yPos + tickWidth} `}
+                    M${xPos - tickWidth} ${upperPos}
+                    L${xPos + tickWidth} ${upperPos}
+                    M${xPos} ${upperPos}
+                    L${xPos} ${lowerPos}
+                    M${xPos - tickWidth} ${lowerPos}
+                    L${xPos + tickWidth} ${lowerPos}`}
                 />
               )
             })
@@ -251,4 +241,4 @@ export const BarChartHorizontal = props => {
     )
   )
 }
-export default BarChartHorizontal
+export default BarChartVertical
