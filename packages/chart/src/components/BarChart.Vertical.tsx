@@ -104,31 +104,14 @@ export const BarChartVertical = (props: BarChartProps) => {
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
 
-                  const background = () => {
-                    if (dashboardConfig && dashboardConfig.dashboard.sharedFilters) {
-                      return dashboardConfig.dashboard.sharedFilters.map(_sharedFilter => {
-                        if (_sharedFilter.setBy === config.uid) {
-                          // If the current filter is the reset filter item.
-                          if (_sharedFilter.resetLabel === _sharedFilter.active) return barColor
-                          // If the current filter is the bar.s
-                          if (_sharedFilter.active === transformedData[barGroup.index][config.xAxis.dataKey]) return barColor
-                          return '#f2f2f2'
-                        } else {
-                          if (isRegularLollipopColor) return barColor
-                          if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
-                          if (isHighlightedBar) return 'transparent'
-                          return barColor
-                        }
-                      })
-                    }
-
+                  const getBackgroundColor = (barColor): string => {
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
                   const finalStyle = {
-                    background: background(),
+                    background: getBackgroundColor(barColor),
                     borderColor,
                     borderStyle: 'solid',
                     borderWidth,
