@@ -167,12 +167,12 @@ const Legend = () => {
       const lastIndex = defaultLabels.length - 1
       let newLabels = []
 
-      config.suppressedData.forEach(({ label, icon, value }, index) => {
+      config.suppressedData?.forEach(({ label, icon, value }, index) => {
         const dataExists = data.some(d => {
           return runtime.seriesKeys.some(column => d[column] === value)
         })
 
-        if (dataExists && label && icon) {
+        if (label && icon) {
           // const Icon = icons[icon]
           const newLabel = {
             datum: label,
