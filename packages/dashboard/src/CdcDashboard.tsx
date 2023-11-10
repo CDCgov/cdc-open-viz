@@ -614,7 +614,18 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
             body = (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Map' />
-                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={_updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true} showLoader={false} />
+                <CdcMap
+                  key={visualizationKey}
+                  config={visualizationConfig}
+                  isEditor={true}
+                  isDebug={isDebug}
+                  setConfig={_updateConfig}
+                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                  setSharedFilterValue={setSharedFilterValue}
+                  isDashboard={true}
+                  showLoader={false}
+                  dashboardConfig={state.config}
+                />
               </>
             )
             break
