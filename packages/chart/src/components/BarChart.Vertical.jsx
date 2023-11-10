@@ -1,11 +1,11 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 import { useBarChart } from '../hooks/useBarChart'
-import useColorScale from '../hooks/useColorScale'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
+import { FaStar } from 'react-icons/fa'
 
 // third party
 import chroma from 'chroma-js'
@@ -18,18 +18,42 @@ export const BarChartVertical = props => {
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
-  const getIcon = bar => {
-    return '*'
-    // let icon = ''
-    // config.suppressedData?.forEach(d => {
-    //   if (bar.key === d.column && bar.value === d.value && d.icon) {
-    //     const BarIcon = icons[d.icon]
-    //     icon = <BarIcon color='#000' size={fontSize[config.fontSize] / 1.7} />
-    //   }
-    // })
-    // return icon
-  }
+  const generateIconSize = barWidth => {
+    if (barWidth < 4) {
+      return 1
+    }
+    if (barWidth < 5) {
+      return 4
+    }
+    if (barWidth < 10) {
+      return 6
+    }
+    if (barWidth < 15) {
+      return 7
+    }
+    if (barWidth < 20) {
+      return 8
+    }
+    if (barWidth < 25) {
+      return 9
+    }
+    if (barWidth < 30) {
+      return 10
+    }
 
+    return 0
+  }
+  const getIcon = (bar, barWidth) => {
+    let icon = null
+    const iconSize = generateIconSize(barWidth)
+    config.suppressedData?.forEach(d => {
+      if (bar.key === d.column && String(bar.value) === String(d.value) && d.icon) {
+        icon = <FaStar color='#000' size={iconSize} />
+        // icon = <BarIcon color='#000' size={fontSize[config.fontSize] / 1.7} />
+      }
+    })
+    return icon
+  }
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
@@ -48,11 +72,11 @@ export const BarChartVertical = props => {
           }}
         >
           {barGroups => {
-            return updateBars(barGroups).map((barGroup, index) => (
+            return barGroups.map((barGroup, index, arr) => (
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={(xMax / barGroups.length) * barGroup.index}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
-                  const suppresedBarHeight = 25
+                  const suppresedBarHeight = 35
 
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
@@ -60,7 +84,10 @@ export const BarChartVertical = props => {
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   // let barHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let barHeightBase = Math.abs(yScale(bar.value) - yScale(scaleVal))
-                  let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
+                  let barYBase = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
+                  const supprssedBarY = bar.value >= 0 && isNumber(bar.value) ? yScale(scaleVal) - suppresedBarHeight : yScale(0)
+                  const barY = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? supprssedBarY : barYBase
+
                   let barGroupWidth = (xMax / barGroups.length) * (config.barThickness || 0.8)
                   let offset = ((xMax / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
                   // configure left side offset of lollipop bars
@@ -103,7 +130,19 @@ export const BarChartVertical = props => {
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
                   const barValueLabel = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? '' : yAxisValue
-                  let barHeight = bar.value && config.suppressedData.some(({ column, value }) => bar.key === column && bar.value === value) ? suppresedBarHeight : barHeightBase
+                  let barHeight = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? suppresedBarHeight : barHeightBase
+
+                  // calc space between each bar
+
+                  const barSpace = Math.round((xMax - barGroups.length * barWidth) / barGroups.length)
+
+                  const iconStyle = {
+                    position: 'absolute',
+                    top: bar.value >= 0 && isNumber(bar.value) ? -suppresedBarHeight / 1.5 : undefined,
+                    bottom: bar.value >= 0 && isNumber(bar.value) ? undefined : `-${suppresedBarHeight}px`,
+                    left: `${barWidth / 2}px`,
+                    transform: `translateX(-50%)`
+                  }
 
                   const background = () => {
                     if (isRegularLollipopColor) return barColor
@@ -134,6 +173,7 @@ export const BarChartVertical = props => {
                       </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         <foreignObject
+                          style={{ overflow: 'visible' }}
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                           x={barWidth * bar.index + offset}
@@ -152,12 +192,11 @@ export const BarChartVertical = props => {
                             }
                           }}
                         >
-                          <div style={finalStyle}></div>
+                          <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+                            <div style={iconStyle}>{getIcon(bar, barWidth)}</div>
+                            <div style={{ ...finalStyle }}></div>
+                          </div>
                         </foreignObject>
-
-                        <g display={displayBar ? 'block' : 'none'} transform={`translate(${0}, ${0})`}>
-                          {getIcon(bar)}
-                        </g>
 
                         <Text // prettier-ignore
                           display={config.labels && displayBar ? 'block' : 'none'}
@@ -168,10 +207,6 @@ export const BarChartVertical = props => {
                           textAnchor='middle'
                         >
                           {barValueLabel}
-                        </Text>
-
-                        <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={labelColor} textAnchor='middle'>
-                          {yAxisValue}
                         </Text>
 
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
