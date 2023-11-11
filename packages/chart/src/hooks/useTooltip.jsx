@@ -5,14 +5,16 @@ import { defaultStyles } from '@visx/tooltip'
 // third party
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+const transform = new DataTransform()
 
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 
 export const useTooltip = props => {
-  const { tableData: data, config, formatNumber, capitalize, formatDate, parseDate } = useContext(ConfigContext)
+  const { tableData, config, formatNumber, capitalize, formatDate, parseDate } = useContext(ConfigContext)
   const { xScale, yScale, showTooltip, hideTooltip } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
-
+  const data = transform.applySuppression(tableData, config.suppressedData)
   /**
    * Provides the tooltip information based on the tooltip data array and svg cursor coordinates
    * @function getTooltipInformation

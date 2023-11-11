@@ -13,36 +13,10 @@ import chroma from 'chroma-js'
 export const BarChartVertical = props => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
   const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
-  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
-
+  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize } = useBarChart()
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
-  const generateIconSize = barWidth => {
-    if (barWidth < 4) {
-      return 1
-    }
-    if (barWidth < 5) {
-      return 4
-    }
-    if (barWidth < 10) {
-      return 6
-    }
-    if (barWidth < 15) {
-      return 7
-    }
-    if (barWidth < 20) {
-      return 8
-    }
-    if (barWidth < 25) {
-      return 9
-    }
-    if (barWidth < 30) {
-      return 10
-    }
-
-    return 0
-  }
   const getIcon = (bar, barWidth) => {
     let icon = null
     const iconSize = generateIconSize(barWidth)
@@ -76,11 +50,12 @@ export const BarChartVertical = props => {
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={(xMax / barGroups.length) * barGroup.index}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
-                  const suppresedBarHeight = 35
+                  const suppresedBarHeight = 20
 
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
+
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   // let barHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let barHeightBase = Math.abs(yScale(bar.value) - yScale(scaleVal))
@@ -138,7 +113,7 @@ export const BarChartVertical = props => {
 
                   const iconStyle = {
                     position: 'absolute',
-                    top: bar.value >= 0 && isNumber(bar.value) ? -suppresedBarHeight / 1.5 : undefined,
+                    top: bar.value >= 0 && isNumber(bar.value) ? -suppresedBarHeight : undefined,
                     bottom: bar.value >= 0 && isNumber(bar.value) ? undefined : `-${suppresedBarHeight}px`,
                     left: `${barWidth / 2}px`,
                     transform: `translateX(-50%)`

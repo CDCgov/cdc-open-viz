@@ -1270,7 +1270,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               <DataTable
                 config={config}
                 rawData={config.data}
-                runtimeData={filteredData || excludedData}
+                runtimeData={transform.applySuppression(filteredData || excludedData, config.suppressedData)}
                 expandDataTable={config.table.expanded}
                 columns={config.columns}
                 showDownloadButton={config.general.showDownloadButton}
@@ -1310,6 +1310,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
+  // const s = transform.applySuppression(filteredData, config.suppressedData)
+  // console.log(s, 'sss')
 
   const contextValues = {
     capitalize,
