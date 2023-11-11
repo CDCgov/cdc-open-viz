@@ -161,8 +161,34 @@ export const useBarChart = () => {
     if (!match?.color) return false
     return match
   }
+  const generateIconSize = barWidth => {
+    if (barWidth < 4) {
+      return 1
+    }
+    if (barWidth < 5) {
+      return 4
+    }
+    if (barWidth < 10) {
+      return 6
+    }
+    if (barWidth < 15) {
+      return 7
+    }
+    if (barWidth < 20) {
+      return 8
+    }
+    if (barWidth < 25) {
+      return 9
+    }
+    if (barWidth < 30) {
+      return 10
+    }
+
+    return 0
+  }
 
   return {
+    generateIconSize,
     isHorizontal,
     barBorderWidth,
     lollipopBarWidth,

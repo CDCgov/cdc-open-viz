@@ -9,6 +9,7 @@ import { useHighlightedBars } from '../hooks/useHighlightedBars'
 import { Line } from '@visx/shape'
 import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
 import { scaleOrdinal } from '@visx/scale'
+import { FaStar } from 'react-icons/fa'
 
 // * FILE REVIEW *
 // TODO: fix eslint-disable jsxa11y issues
@@ -163,7 +164,7 @@ const Legend = () => {
       return reverseLabels(uniqueLabels)
     }
 
-    if (config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.suppressedData && config.suppressedData.length > 0) {
+    if (config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.suppressedData) {
       const lastIndex = defaultLabels.length - 1
       let newLabels = []
 
@@ -179,7 +180,7 @@ const Legend = () => {
             index: lastIndex + index,
             text: label,
             // icon: <Icon size={15} color='#000' />
-            icon: '*'
+            icon: <FaStar color='#000' size={15} />
           }
           newLabels.push(newLabel)
         }
