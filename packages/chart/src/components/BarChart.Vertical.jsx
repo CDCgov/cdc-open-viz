@@ -106,7 +106,7 @@ export const BarChartVertical = props => {
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
                   const barValueLabel = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? '' : yAxisValue
                   let barHeight = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? suppresedBarHeight : barHeightBase
-
+                  const displaylollipopShape = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? 'none' : 'block'
                   // calc space between each bar
 
                   const barSpace = Math.round((xMax - barGroups.length * barWidth) / barGroups.length)
@@ -186,6 +186,7 @@ export const BarChartVertical = props => {
 
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
                           <circle
+                            display={displaylollipopShape}
                             cx={barWidth * (barGroup.bars.length - bar.index - 1) + offset + lollipopShapeSize / 3.5}
                             cy={bar.y}
                             r={lollipopShapeSize / 2}
@@ -198,6 +199,7 @@ export const BarChartVertical = props => {
                         )}
                         {config.isLollipopChart && config.lollipopShape === 'square' && (
                           <rect
+                            display={displaylollipopShape}
                             x={offset - lollipopBarWidth / 2}
                             y={barY}
                             width={lollipopShapeSize}
