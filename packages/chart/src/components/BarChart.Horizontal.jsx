@@ -61,8 +61,8 @@ export const BarChartHorizontal = props => {
                   const barXBase = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const suppresedBarWidth = 55
-                  let barWidthX = bar.value && config.suppressedData.some(({ column, value }) => bar.key === column && bar.value === value) ? suppresedBarWidth : barWidthHorizontal
-                  const barWidth = config.barHeight
+                  let barWidth = bar.value && config.suppressedData.some(({ column, value }) => bar.key === column && bar.value === value) ? suppresedBarWidth : barWidthHorizontal
+
                   const supprssedBarX = bar.value >= 0 && isNumber(bar.value) ? xScale(0) : xScale(scaleVal) - suppresedBarWidth
                   const barX = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? supprssedBarX : barXBase
                   const yAxisValue = formatNumber(bar.value, 'left')
@@ -131,18 +131,32 @@ export const BarChartHorizontal = props => {
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
+
                   const iconStyle = {
                     position: 'absolute',
-                    top: 0,
+                    top: bar.value >= 0 && isNumber(bar.value) ? -8 : -9,
                     left: bar.value >= 0 && isNumber(bar.value) ? `${suppresedBarWidth + 12}px` : `${suppresedBarWidth - 66}px`,
-                    transform: `translate(-0%,0%)`
+                    transform: `translateY(${barHeight}%)`
+                  }
+
+                  {
+                    /* const iconStyle = {
+                    position: 'absolute',
+                    top: bar.value >= 0 && isNumber(bar.value) ? 0 : -9,
+                    left: bar.value >= 0 && isNumber(bar.value) ? `${suppresedBarWidth + 12}px` : `${suppresedBarWidth - 66}px`,
+                    transform: `translateY(${-40}%)`
+                  } */
+                  }
+                  if (config.isLollipopChart) {
+                    iconStyle.top = bar.value >= 0 && isNumber(bar.value) ? 0 : -9
+                    iconStyle.transform = 'translateY(-40%)'
                   }
                   const finalStyle = {
                     background: background(),
                     borderColor,
                     borderStyle: 'solid',
                     borderWidth,
-                    width: barWidthX,
+                    width: barWidth,
                     height: !config.isLollipopChart ? barHeight : lollipopBarWidth,
                     ...borderRadius
                   }
@@ -160,12 +174,13 @@ export const BarChartHorizontal = props => {
                       </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         <foreignObject
-                          style={{ overflow: 'visible' }}
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                           x={barX}
-                          y={barWidth * bar.index}
+                          style={{ overflow: 'visible', ...finalStyle }}
+                          y={barHeight * bar.index}
                           height={!config.isLollipopChart ? barHeight : lollipopBarWidth}
+                          width={barWidth}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tooltip-html={tooltip}
@@ -179,7 +194,7 @@ export const BarChartHorizontal = props => {
                           }}
                         >
                           <div style={{ position: 'relative', height: '100%', width: '100%' }}>
-                            <div style={iconStyle}>{getIcon(bar, barWidth)}</div>
+                            <div style={iconStyle}>{getIcon(bar, 12)}</div>
                             <div style={{ ...finalStyle }}></div>
                           </div>
                         </foreignObject>
