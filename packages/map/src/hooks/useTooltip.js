@@ -1,5 +1,7 @@
 const useTooltip = props => {
-  const { config, displayGeoName, displayDataAsText, supportedStatesFipsCodes } = props
+  const { state, displayGeoName, displayDataAsText, supportedStatesFipsCodes } = props
+
+  const config = state
 
   /**
    * On county maps there's a need to append the state name

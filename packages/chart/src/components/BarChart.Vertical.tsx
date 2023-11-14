@@ -10,10 +10,30 @@ import { FaStar } from 'react-icons/fa'
 // third party
 import chroma from 'chroma-js'
 
-export const BarChartVertical = props => {
+import { type BarChartProps } from '../types/ChartProps'
+
+export const BarChartVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
-  const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getXAxisData, getYAxisData } = useContext(ConfigContext)
+
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize } = useBarChart()
+
+  // CONTEXT VALUES
+  // prettier-ignore
+  const {
+    colorScale,
+    config,
+    formatDate,
+    formatNumber,
+    getXAxisData,
+    getYAxisData,
+    isNumber,
+    parseDate,
+    seriesHighlight,
+    setSharedFilter,
+    transformedData,
+    dashboardConfig
+  } = useContext(ConfigContext)
+
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
@@ -119,20 +139,21 @@ export const BarChartVertical = props => {
                     transform: `translateX(-50%)`
                   }
 
-                  const background = () => {
+                  const getBackgroundColor = (barColor): string => {
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
                   const finalStyle = {
-                    background: background(),
+                    background: getBackgroundColor(barColor),
                     borderColor,
                     borderStyle: 'solid',
                     borderWidth,
                     width: barWidth,
                     height: barHeight,
-                    ...borderRadius
+                    ...borderRadius,
+                    cursor: dashboardConfig ? 'pointer' : 'default'
                   }
 
                   return (

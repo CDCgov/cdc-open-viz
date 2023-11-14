@@ -1135,7 +1135,7 @@ const EditorPanel = props => {
 
   useEffect(() => {
     //If a categorical map is used and the order is either not defined or incorrect, fix it
-    if ('category' === state.legend.type) {
+    if ('category' === state.legend.type && runtimeLegend && runtimeLegend.runtimeDataHash) {
       let valid = true
       if (state.legend.categoryValuesOrder) {
         runtimeLegend.forEach(item => {

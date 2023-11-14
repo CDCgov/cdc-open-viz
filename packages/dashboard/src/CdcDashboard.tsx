@@ -38,13 +38,15 @@ import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
 import { SharedFilter } from './types/SharedFilter'
 import { APIFilter } from './types/APIFilter'
 import { DataSet } from './types/DataSet'
-import { Config, Visualization } from './types/Config'
+import { Config } from './types/Config'
+import { Visualization } from '@cdc/core/types/Visualization'
 import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import { filterData } from './helpers/filterData'
 import { getFormattedData } from './helpers/getFormattedData'
 import { getVizKeys } from './helpers/getVizKeys'
 import Title from '@cdc/core/components/ui/Title'
+import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 
 type DropdownOptions = Record<'value' | 'text', string>[]
 
@@ -614,7 +616,18 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
             body = (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Map' />
-                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={_updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true} showLoader={false} />
+                <CdcMap
+                  key={visualizationKey}
+                  config={visualizationConfig}
+                  isEditor={true}
+                  isDebug={isDebug}
+                  setConfig={_updateConfig}
+                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                  setSharedFilterValue={setSharedFilterValue}
+                  isDashboard={true}
+                  showLoader={false}
+                  dashboardConfig={state.config}
+                />
               </>
             )
             break
@@ -831,22 +844,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           </section>
 
           {/* Data Table */}
-          {config.table && config.data && (
-            <DataTable
-              config={config}
-              rawData={config.data}
-              runtimeData={config.data || []}
-              expandDataTable={config.table.expanded}
-              showDownloadButton={config.table.download}
-              tableTitle={config.dashboard.title || ''}
-              viewport={currentViewport}
-              tabbingId={config.dashboard.title || ''}
-              outerContainerRef={outerContainerRef}
-              imageRef={imageId}
-              isDebug={isDebug}
-              isEditor={isEditor}
-            />
-          )}
+          {config.table && !!config.data?.length && <DataTable config={config} rawData={config.data} runtimeData={config.data || []} expandDataTable={config.table.expanded} tableTitle={config.dashboard.title || ''} viewport={currentViewport} tabbingId={config.dashboard.title || ''} />}
           {config.table &&
             config.datasets &&
             Object.keys(config.datasets).map(datasetKey => {
@@ -885,19 +883,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
                   <DataTable
-                    config={config}
+                    config={config as TableConfig}
                     dataConfig={config.datasets[datasetKey]}
                     rawData={config.datasets[datasetKey].data}
                     runtimeData={filteredTableData || config.datasets[datasetKey].data || []}
                     expandDataTable={config.table.expanded}
-                    showDownloadButton={config.table.download}
                     tableTitle={datasetKey}
                     viewport={currentViewport}
                     tabbingId={datasetKey}
-                    outerContainerRef={outerContainerRef}
-                    imageRef={imageId}
-                    isDebug={isDebug}
-                    isEditor={isEditor}
                   />
                 </div>
               )

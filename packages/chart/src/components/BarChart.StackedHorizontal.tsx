@@ -8,7 +8,9 @@ import { Text } from '@visx/text'
 // third party
 import chroma from 'chroma-js'
 
-const BarChartStackedHorizontal = props => {
+import { type BarChartProps } from '../types/ChartProps'
+
+const BarChartStackedHorizontal = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax } = props
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, animatedChart, getTextWidth } = useContext(ConfigContext)
   const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, isLabelBelowBar, displayNumbersOnBar, fontSize } = useBarChart()

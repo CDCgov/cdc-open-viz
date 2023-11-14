@@ -10,7 +10,9 @@ import { FaStar } from 'react-icons/fa'
 // third party
 import chroma from 'chroma-js'
 
-export const BarChartHorizontal = props => {
+import { type BarChartProps } from '../types/ChartProps'
+
+export const BarChartHorizontal = (props: BarChartProps) => {
   const { xScale, yScale, yMax, seriesScale } = props
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getTextWidth, getYAxisData, getXAxisData } = useContext(ConfigContext)
   const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, fontSize, isLabelBelowBar, displayNumbersOnBar, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize } = useBarChart()
