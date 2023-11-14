@@ -146,11 +146,11 @@ const WorldMap = props => {
           styles.cursor = 'pointer'
         }
 
-        return <Geo key={i + '-geo'} style={styles} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
+        return <Geo key={i + '-geo'} css={styles} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
       }
 
       // Default return state, just geo with no additional information
-      return <Geo key={i + '-geo'} stroke={geoStrokeColor} strokeWidth={strokeWidth} style={styles} path={path} />
+      return <Geo key={i + '-geo'} stroke={geoStrokeColor} strokeWidth={strokeWidth} css={styles} path={path} />
     })
 
     // Cities

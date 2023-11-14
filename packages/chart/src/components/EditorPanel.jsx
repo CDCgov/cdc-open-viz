@@ -2500,7 +2500,7 @@ const EditorPanel = () => {
               </AccordionItem>
             )}{' '}
             {/* Columns */}
-            {config.visualizationType !== 'Box Plot' && config.table.showVertical && (
+            {config.visualizationType !== 'Box Plot' && (
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Columns</AccordionItemButton>
@@ -2563,32 +2563,33 @@ const EditorPanel = () => {
                               </label>
                             </li>
                             <li>
-                              <label className='checkbox'>
-                                <input
-                                  type='checkbox'
-                                  checked={config.columns[val].dataTable}
-                                  onChange={event => {
-                                    editColumn(val, 'dataTable', event.target.checked)
-                                  }}
-                                />
-                                <span className='edit-label'>Show in Data Table</span>
-                              </label>
+                              {config.table.showVertical && (
+                                <label className='checkbox'>
+                                  <input
+                                    type='checkbox'
+                                    checked={config.columns[val].dataTable}
+                                    onChange={event => {
+                                      editColumn(val, 'dataTable', event.target.checked)
+                                    }}
+                                  />
+                                  <span className='edit-label'>Show in Data Table</span>
+                                </label>
+                              )}
                             </li>
                             {/* disable for now */}
-                            {/*
+
                             <li>
                               <label className='checkbox'>
                                 <input
                                   type='checkbox'
-                                  checked={config.columns[val].tooltip}
+                                  checked={config.columns[val].tooltips || false}
                                   onChange={event => {
-                                    editColumn(val, 'tooltip', event.target.checked)
+                                    updateSeriesTooltip(val, event.target.checked)
                                   }}
                                 />
-                                <span className='edit-label'>Display in Tooltips</span>
+                                <span className='edit-label'>Show in tooltip</span>
                               </label>
                             </li>
-                                */}
 
                             {config.visualizationType === 'Forest Plot' && (
                               <>
