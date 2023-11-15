@@ -62,7 +62,7 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
                   const barXBase = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
-                  const suppresedBarWidth = 55
+                  const suppresedBarWidth = 25
                   let barWidth = bar.value && config.suppressedData.some(({ column, value }) => bar.key === column && bar.value === value) ? suppresedBarWidth : barWidthHorizontal
 
                   const supprssedBarX = bar.value >= 0 && isNumber(bar.value) ? xScale(0) : xScale(scaleVal) - suppresedBarWidth
@@ -136,19 +136,11 @@ export const BarChartHorizontal = (props: BarChartProps) => {
 
                   const iconStyle = {
                     position: 'absolute',
-                    top: bar.value >= 0 && isNumber(bar.value) ? -8 : -9,
+                    top: bar.value >= 0 && isNumber(bar.value) ? 0 : -9,
                     left: bar.value >= 0 && isNumber(bar.value) ? `${suppresedBarWidth + 12}px` : `${suppresedBarWidth - 66}px`,
                     transform: `translateY(${barHeight}%)`
                   }
 
-                  {
-                    /* const iconStyle = {
-                    position: 'absolute',
-                    top: bar.value >= 0 && isNumber(bar.value) ? 0 : -9,
-                    left: bar.value >= 0 && isNumber(bar.value) ? `${suppresedBarWidth + 12}px` : `${suppresedBarWidth - 66}px`,
-                    transform: `translateY(${-40}%)`
-                  } */
-                  }
                   if (config.isLollipopChart) {
                     iconStyle.top = bar.value >= 0 && isNumber(bar.value) ? 0 : -9
                     iconStyle.transform = 'translateY(-40%)'

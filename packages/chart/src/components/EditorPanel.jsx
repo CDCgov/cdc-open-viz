@@ -144,7 +144,7 @@ const DataSuppression = memo(({ config, updateConfig, data }) => {
   }
 
   const getIconOptions = () => {
-    return ['star', 'exclamation', 'circle', 'location', 'info', 'arrow', 'ellipsis']
+    return ['star']
   }
 
   let removeColumn = i => {
