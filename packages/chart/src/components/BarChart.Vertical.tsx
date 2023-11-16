@@ -71,13 +71,10 @@ export const BarChartVertical = (props: BarChartProps) => {
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
                   const suppresedBarHeight = 20
-
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
-
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                  // let barHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let barHeightBase = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let barYBase = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                   const supprssedBarY = bar.value >= 0 && isNumber(bar.value) ? yScale(scaleVal) - suppresedBarHeight : yScale(0)
@@ -127,21 +124,6 @@ export const BarChartVertical = (props: BarChartProps) => {
                   const barValueLabel = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? '' : yAxisValue
                   let barHeight = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? suppresedBarHeight : barHeightBase
                   const displaylollipopShape = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? 'none' : 'block'
-                  const getLeft = () => {
-                    if (Number(barWidth) < 10) return 0
-                    if (Number(barWidth) < 15) return 2
-                    if (Number(barWidth) < 20) return 6
-                    if (Number(barWidth) < 25) return 7
-                    if (Number(barWidth) < 30) return 8
-                    if (Number(barWidth) < 35) return 12
-                    if (Number(barWidth) < 40) return 14
-                    if (Number(barWidth) < 45) return 16
-                    if (Number(barWidth) < 50) return 18
-                    if (Number(barWidth) < 55) return 20
-                    if (Number(barWidth) < 60) return 22
-                    if (Number(barWidth) < 65) return 24
-                    else return 20
-                  }
 
                   const getBackgroundColor = (barColor): string => {
                     if (isRegularLollipopColor) return barColor
@@ -193,7 +175,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                         >
                           <div style={{ ...finalStyle }}></div>
                         </foreignObject>
-                        <foreignObject style={{ overflow: 'visible' }} x={bar.index + offset + barWidth / 2.5} y={barY - suppresedBarHeight}>
+                        <foreignObject style={{ overflow: 'visible' }} x={bar.index + offset + barWidth / 2.5} y={bar.value > 0 ? barY - suppresedBarHeight : barY + suppresedBarHeight}>
                           <div>{getIcon(bar, barWidth)}</div>
                         </foreignObject>
 
