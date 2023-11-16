@@ -73,8 +73,9 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                         {formatNumber(d[seriesKey], 'left')}
                       </Text>
 
-                      {config.lineDatapointStyle === 'hidden' ||
-                        (config.lineDatapointStyle === 'always show' && <LineChartCircle d={d} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} />)}
+                      {(config.lineDatapointStyle === 'hidden' || config.lineDatapointStyle === 'always show') && (
+                        <LineChartCircle d={d} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />
+                      )}
                     </Group>
                   )
                 )
