@@ -63,14 +63,15 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                   const barXBase = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const suppresedBarWidth = 25
+                  const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
                   let barWidth = bar.value && config.suppressedData.some(({ column, value }) => bar.key === column && bar.value === value) ? suppresedBarWidth : barWidthHorizontal
 
-                  const supprssedBarX = bar.value >= 0 && isNumber(bar.value) ? xScale(0) : xScale(scaleVal) - suppresedBarWidth
+                  const supprssedBarX = isPositiveBar ? xScale(0) : xScale(scaleVal) - suppresedBarWidth
                   const barX = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? supprssedBarX : barXBase
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
-                  const barPosition = bar.value < 0 ? 'below' : 'above'
+                  const barPosition = !isPositiveBar ? 'below' : 'above'
                   const barValueLabel = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
@@ -133,17 +134,31 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
+                  const getTop = () => {
+                    if (barHeight < 20) return -4
+                    return Math.min(14, Math.floor((barHeight - 20) / 5) * 4)
+                  }
 
-                  const iconStyle = {
+                  const getLeft = () => {
+                    if (barHeight < 25) {
+                      return isPositiveBar ? suppresedBarWidth + 3 : -suppresedBarWidth / 2
+                    }
+                    if (barHeight < 35) {
+                      return isPositiveBar ? suppresedBarWidth + 5 : -suppresedBarWidth / 1.5
+                    }
+                    if (barHeight < 50) {
+                      return isPositiveBar ? suppresedBarWidth + 5 : -suppresedBarWidth
+                    }
+                  }
+
+                  const iconStyle: { [key: string]: any } = {
                     position: 'absolute',
-                    top: bar.value >= 0 && isNumber(bar.value) ? 0 : -9,
-                    left: bar.value >= 0 && isNumber(bar.value) ? `${suppresedBarWidth + 12}px` : `${suppresedBarWidth - 66}px`,
-                    transform: `translateY(${barHeight}%)`
+                    top: getTop(),
+                    left: getLeft()
                   }
 
                   if (config.isLollipopChart) {
-                    iconStyle.top = bar.value >= 0 && isNumber(bar.value) ? 0 : -9
-                    iconStyle.transform = 'translateY(-40%)'
+                    iconStyle.top = -9.7
                   }
                   const finalStyle = {
                     background: background(),
@@ -187,8 +202,8 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                             }
                           }}
                         >
-                          <div style={{ position: 'relative', height: '100%', width: '100%' }}>
-                            <div style={iconStyle}>{getIcon(bar, 12)}</div>
+                          <div style={{ position: 'relative' }}>
+                            <div style={iconStyle}>{getIcon(bar, config.isLollipopChart ? lollipopBarWidth : barHeight)}</div>
                             <div style={{ ...finalStyle }}></div>
                           </div>
                         </foreignObject>

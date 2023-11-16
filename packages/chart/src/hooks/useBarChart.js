@@ -177,13 +177,9 @@ export const useBarChart = () => {
     if (barWidth < 20) {
       return 8
     }
-    if (barWidth < 25) {
-      return 9
+    if (barWidth < 90) {
+      return 8
     }
-    if (barWidth < 30) {
-      return 10
-    }
-
     return 0
   }
 
