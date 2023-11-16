@@ -92,6 +92,9 @@ export default function ChooseTab() {
           } else {
             newConfig.visualizationType = subType
           }
+          if (type === 'chart') {
+            newConfig.visualizationSubType = stacked ? 'stacked' : 'regular'
+          }
 
           setConfig(newConfig)
           setGlobalActive(1)
