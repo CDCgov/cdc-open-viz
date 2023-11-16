@@ -45,9 +45,7 @@ const Legend = () => {
     range: ['none'],
     unknown: 'block'
   })
-  const icons = {
-    star: '*'
-  }
+
   const createLegendLabels = defaultLabels => {
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
@@ -174,7 +172,6 @@ const Legend = () => {
         })
 
         if (label && icon) {
-          // const Icon = icons[icon]
           const newLabel = {
             datum: label,
             index: lastIndex + index,
@@ -284,10 +281,10 @@ const Legend = () => {
                           <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={label.value} strokeWidth={2} strokeDasharray={handleLineType(config.series[i]?.type ? config.series[i]?.type : '')} />
                         </svg>
                       ) : (
-                        <>
-                          <LegendCircle fill={label.value} display={displayScale(label.datum)} />
-                          {label.icon}
-                        </>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <LegendCircle margin='0' fill={label.value} display={displayScale(label.datum)} />
+                          <div style={{ marginTop: '2px', marginRight: '6px' }}>{label.icon}</div>
+                        </div>
                       )}
 
                       <LegendLabel align='left' margin='0 0 0 4px'>
