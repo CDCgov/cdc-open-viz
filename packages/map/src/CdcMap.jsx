@@ -455,8 +455,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         } else {
           uniqueValues.get(value).push(hashObj(row))
         }
-
-        if (count === 10) break // Can only have 10 categorical items for now
       }
 
       let sorted = [...uniqueValues.keys()]
