@@ -143,18 +143,6 @@ export const BarChartVertical = (props: BarChartProps) => {
                     else return 20
                   }
 
-                  const iconStyle: { [key: string]: any } = {
-                    position: 'absolute',
-                    top: bar.value >= 0 && isNumber(bar.value) ? -suppresedBarHeight : undefined,
-                    bottom: bar.value >= 0 && isNumber(bar.value) ? undefined : `-${suppresedBarHeight}px`,
-                    left: getLeft()
-                  }
-
-                  if (config.isLollipopChart) {
-                    iconStyle.left = 0
-                    iconStyle.transform = `translateX(0)`
-                  }
-
                   const getBackgroundColor = (barColor): string => {
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
@@ -185,7 +173,6 @@ export const BarChartVertical = (props: BarChartProps) => {
                       </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         <foreignObject
-                          style={{ overflow: 'visible' }}
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                           x={barWidth * bar.index + offset}
@@ -204,10 +191,10 @@ export const BarChartVertical = (props: BarChartProps) => {
                             }
                           }}
                         >
-                          <div style={{ position: 'relative' }}>
-                            <div style={iconStyle}>{getIcon(bar, barWidth)}</div>
-                            <div style={{ ...finalStyle }}></div>
-                          </div>
+                          <div style={{ ...finalStyle }}></div>
+                        </foreignObject>
+                        <foreignObject style={{ overflow: 'visible' }} x={bar.index + offset + barWidth / 2.5} y={barY - suppresedBarHeight}>
+                          <div>{getIcon(bar, barWidth)}</div>
                         </foreignObject>
 
                         <Text // prettier-ignore
