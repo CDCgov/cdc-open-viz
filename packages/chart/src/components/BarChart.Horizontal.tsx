@@ -135,8 +135,13 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                     return barColor
                   }
                   const getTop = () => {
-                    if (barHeight < 20) return -4
-                    return Math.min(14, Math.floor((barHeight - 20) / 5) * 4)
+                    if (Number(barHeight) < 20) return -4
+                    if (Number(barHeight) < 25) return -1
+                    if (Number(barHeight) < 30) return 2
+                    if (Number(barHeight) < 35) return 4
+                    if (Number(barHeight) < 40) return 5
+                    if (Number(barHeight) < 50) return 9
+                    if (Number(barHeight) < 60) return 10
                   }
 
                   const getLeft = () => {
@@ -150,7 +155,6 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                       return isPositiveBar ? suppresedBarWidth + 5 : -suppresedBarWidth
                     }
                   }
-
                   const iconStyle: { [key: string]: any } = {
                     position: 'absolute',
                     top: getTop(),
