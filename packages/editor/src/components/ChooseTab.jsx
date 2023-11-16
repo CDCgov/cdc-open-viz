@@ -23,6 +23,7 @@ import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
 import InfoIcon from '@cdc/core/assets/icon-info.svg'
 import ForestPlotIcon from '@cdc/core/assets/icon-chart-forest-plot.svg'
 import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
+import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
 
 export default function ChooseTab() {
   const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(ConfigContext)
@@ -186,6 +187,14 @@ export default function ChooseTab() {
               <IconButton label='Paired Bar' type='chart' subType='Paired Bar' orientation='horizontal' icon={<PairedBarIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Use paired bars to show comparisons between two different data categories.</Tooltip.Content>
+          </Tooltip>
+        </li>
+        <li>
+          <Tooltip>
+            <Tooltip.Target>
+              <IconButton label='Deviation Bar' type='chart' subType='Deviation Bar' orientation='horizontal' icon={<DeviationIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Use Deviation Bars to display how individual values differ from a target.</Tooltip.Content>
           </Tooltip>
         </li>
         <li>
