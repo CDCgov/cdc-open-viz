@@ -1135,8 +1135,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     const offset = 20
     const brushHeight = config.brush.height
     let bottom = 0
-    if (!isLegendBottom && isHorizontal && config.xAxis.label) {
-      bottom = config.runtime.xAxis.size + config.xAxis.labelOffset
+    if (!isLegendBottom && isHorizontal && config.xAxis.label && !config.isResponsiveTicks) {
+      bottom = Number(config.runtime.xAxis.size) + Number(config.xAxis.labelOffset)
+    }
+    if (!isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks) {
+      bottom = config.dynamicMarginTop + offset
+    }
+    if (!isLegendBottom && isHorizontal && !config.yAxis.label && config.isResponsiveTicks) {
+      bottom = config.dynamicMarginTop ? config.dynamicMarginTop - offset : Number(config.xAxis.labelOffset) - offset
+    }
+    if (!isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks) {
+      bottom = config.dynamicMarginTop ? config.dynamicMarginTop + offset : Number(config.xAxis.labelOffset)
     }
     if (!isLegendBottom && isHorizontal && !config.xAxis.label) {
       bottom = 0

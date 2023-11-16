@@ -160,9 +160,10 @@ const Legend = () => {
 
   const computeMargin = () => {
     let margin = 0
+    const section = orientation === 'vertical' ? 'xAxis' : 'yAxis'
     const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
-    const isHorizontal = config.orientation === 'horizontal'
-    const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
+    const isHorizontal = orientation === 'horizontal'
+    const tickRotation = Number(config[section].tickRotation) > 0 ? Number(config[section].tickRotation) : 0
     const isBrush = config.brush.active
     const offset = 25
     const brushHeight = config.brush.height
@@ -184,12 +185,29 @@ const Legend = () => {
     if (!isHorizontal && isLegendBottom && !config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks && !tickRotation) {
       margin = isBrush ? config.dynamicMarginTop - offset : config.dynamicMarginTop - brushHeight - offset
     }
+    if (isLegendBottom && isHorizontal && config.yAxis.label && !config.isResponsiveTicks) {
+      margin = Number(config.xAxis.labelOffset) + offset
+    }
+
+    if (isLegendBottom && isHorizontal && !config.yAxis.label && !config.isResponsiveTicks && !tickRotation) {
+      margin = Number(config.xAxis.labelOffset) - offset
+    }
+    if (isLegendBottom && isHorizontal && !config.yAxis.label && !config.isResponsiveTicks && tickRotation) {
+      margin = config.xAxis.tickWidthMax + offset
+    }
+    if (isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks && !tickRotation) {
+      margin = Number(config.dynamicMarginTop) + offset
+    }
+    if (isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks && !tickRotation) {
+      margin = Number(config.dynamicMarginTop) !== 0 ? Number(config.dynamicMarginTop) + offset : Number(config.xAxis.labelOffset) + offset
+    }
+    if (isLegendBottom && isHorizontal && !config.yAxis.label && config.isResponsiveTicks && !tickRotation) {
+      margin = Number(config.dynamicMarginTop) !== 0 ? Number(config.dynamicMarginTop) - offset : Number(config.xAxis.labelOffset) - offset
+    }
     return `${margin}px`
   }
 
   const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
-  const brushHeight = isBottomOrSmallViewport && config.brush.active ? config.brush.height * 2 + config.dynamicMarginTop / 2 : isBottomOrSmallViewport ? 15 : 0
-  const top = isBottomOrSmallViewport && config.isResponsiveTicks && config.dynamicMarginTop && !config.brush.active ? config.dynamicMarginTop : 0
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
     marginTop: computeMargin()
