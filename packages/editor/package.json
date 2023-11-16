@@ -31,7 +31,7 @@
     "@cdc/map": "^4.23.10-alpha",
     "@cdc/markup-include": "^4.23.10-alpha",
     "@cdc/waffle-chart": "^4.23.10-alpha",
-    "axios": "^0.21.1",
+    "axios": "^1.6.0",
     "d3": "^7.0.0",
     "html-react-parser": "^3.0.8",
     "react-dropzone": "^11.2.4",
