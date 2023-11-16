@@ -8,7 +8,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
   const minRequiredCIPadding = 1.15 // regardless of Editor if CI data, there must be 10% padding added
-  
+
   // do validation bafore applying t0 charts
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
   const isMinValid = config.useLogScale ? enteredMinValue >= 0 : (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
@@ -16,24 +16,11 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   min = enteredMinValue && isMinValid ? enteredMinValue : minValue
   max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
-  let ciYMin = 0
-  if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Deviation Bar') {
-    let ciYMax = 0
-    if (config.hasOwnProperty('confidenceKeys')) {
-      let upperCIValues = data.map(function (d) {
-        return d[config.confidenceKeys.upper]
-      })
-      ciYMax = Math.max.apply(Math, upperCIValues)
-      if (ciYMax > max) max = ciYMax * minRequiredCIPadding // bump up the max plus some padding always
+  const { lower, upper } = config?.confidenceKeys || {}
 
-      // check the min if lower confidence 
-      let lowerCIValues = data.map(function (d) {
-        // if no lower CI then we need lowerCIValues to have nothing in it
-        return d[config.confidenceKeys.lower] !== undefined ? d[config.confidenceKeys.lower] : ''
-      })
-      ciYMin = Math.min.apply(Math, lowerCIValues)
-      if (ciYMin < min) min = ciYMin * minRequiredCIPadding // adjust the min + 10% padding for negative numbers to separate from axis
-    }
+  if (lower && upper && config.visualizationType === 'Bar') {
+    max = Math.max(maxValue, Math.max(...data.flatMap(d => [d[upper], d[lower]])) * 1.15)
+    min = Math.min(minValue, Math.min(...data.flatMap(d => [d[upper], d[lower]])) * 1.15)
   }
 
   if (config.visualizationType === 'Forecasting') {
@@ -74,7 +61,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   }
 
   // this should not apply to bar charts if there is negative CI data
-  if (((config.visualizationType === 'Bar' && ciYMin >= 0) || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
+  if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
     min = 0
   }
 
