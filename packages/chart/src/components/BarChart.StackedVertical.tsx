@@ -81,7 +81,7 @@ const BarChartStackedVertical = (props: BarChartProps) => {
                         }
                       }}
                     >
-                      <div style={{ opacity: transparentBar ? 0.5 : 1, width: barThicknessAdjusted, height: bar.height, background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
+                      <div style={{ opacity: transparentBar ? 0.5 : 1, width: barThicknessAdjusted, height: bar.height, background: colorScale(config.runtime.seriesLabels[bar.key]), border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
                     </foreignObject>
                   </Group>
                 </Group>
