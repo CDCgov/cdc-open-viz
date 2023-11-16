@@ -164,7 +164,7 @@ const Legend = () => {
       return reverseLabels(uniqueLabels)
     }
 
-    if (config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.suppressedData) {
+    if ((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && config.visualizationSubType === 'regular' && config.suppressedData) {
       const lastIndex = defaultLabels.length - 1
       let newLabels = []
 
@@ -179,7 +179,6 @@ const Legend = () => {
             datum: label,
             index: lastIndex + index,
             text: label,
-            // icon: <Icon size={15} color='#000' />
             icon: <FaStar color='#000' size={15} />
           }
           newLabels.push(newLabel)

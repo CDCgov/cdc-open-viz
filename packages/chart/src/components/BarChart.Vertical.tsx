@@ -66,7 +66,7 @@ export const BarChartVertical = (props: BarChartProps) => {
           }}
         >
           {barGroups => {
-            return barGroups.map((barGroup, index, arr) => (
+            return barGroups.map((barGroup, index) => (
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={(xMax / barGroups.length) * barGroup.index}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
@@ -127,16 +127,17 @@ export const BarChartVertical = (props: BarChartProps) => {
                   const barValueLabel = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? '' : yAxisValue
                   let barHeight = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? suppresedBarHeight : barHeightBase
                   const displaylollipopShape = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? 'none' : 'block'
-                  // calc space between each bar
 
-                  const barSpace = Math.round((xMax - barGroups.length * barWidth) / barGroups.length)
-
-                  const iconStyle = {
+                  const iconStyle: { [key: string]: any } = {
                     position: 'absolute',
                     top: bar.value >= 0 && isNumber(bar.value) ? -suppresedBarHeight : undefined,
                     bottom: bar.value >= 0 && isNumber(bar.value) ? undefined : `-${suppresedBarHeight}px`,
-                    left: `${barWidth / 2}px`,
-                    transform: `translateX(-50%)`
+                    left: bar.value >= 0 && isNumber(bar.value) ? `${barWidth / 2.2}px` : `${barWidth / 2}px`
+                  }
+
+                  if (config.isLollipopChart) {
+                    iconStyle.left = 0
+                    iconStyle.transform = `translateX(0)`
                   }
 
                   const getBackgroundColor = (barColor): string => {
