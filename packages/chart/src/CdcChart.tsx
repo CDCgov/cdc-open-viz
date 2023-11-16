@@ -280,7 +280,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         response.table.showVertical = false
       }
     }
-    let newConfig = { ...defaults, ...response }
+    const orientation = response?.dataDescription?.horizontal ? 'horizontal' : 'vertical'
+    let newConfig = { ...defaults, ...response, orientation }
     if (newConfig.visualizationType === 'Box Plot') {
       newConfig.legend.hide = true
     }
