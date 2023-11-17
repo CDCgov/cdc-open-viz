@@ -128,6 +128,27 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                       labelColor = textFits ? '#FFFFFF' : '#000000'
                     }
                   }
+                  const getTop = () => {
+                    if (Number(barHeight) < 20) return -4
+                    if (Number(barHeight) < 25) return -1
+                    if (Number(barHeight) < 30) return 2
+                    if (Number(barHeight) < 35) return 4
+                    if (Number(barHeight) < 40) return 5
+                    if (Number(barHeight) < 50) return 9
+                    if (Number(barHeight) < 60) return 10
+                    else {
+                      return 12
+                    }
+                  }
+                  const iconStyle: { [key: string]: any } = {
+                    position: 'absolute',
+                    top: getTop(),
+                    left: suppresedBarWidth * 1.2
+                  }
+
+                  if (config.isLollipopChart) {
+                    iconStyle.top = -9
+                  }
                   const background = () => {
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
@@ -161,7 +182,7 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                           x={barX}
-                          style={finalStyle}
+                          style={{ overflow: 'visible', ...finalStyle }}
                           y={barHeight * bar.index}
                           height={!config.isLollipopChart ? barHeight : lollipopBarWidth}
                           width={barWidth}
@@ -177,11 +198,12 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                             }
                           }}
                         >
-                          <div style={finalStyle}></div>
+                          <div style={{ position: 'relative' }}>
+                            <div style={iconStyle}>{getIcon(bar, barWidth)}</div>
+                            <div style={{ ...finalStyle }}></div>
+                          </div>
                         </foreignObject>
-                        <foreignObject style={{ overflow: 'visible', backgroundColor: 'red' }} x={isPositiveBar ? barX + suppresedBarWidth * 1.1 : barX - suppresedBarWidth/1.2} y={config.isLollipopChart ? lollipopBarWidth * index - 9 : barHeight * index}>
-                          <div>{getIcon(bar, barHeight)}</div>
-                        </foreignObject>
+
                         {!config.isLollipopChart && displayNumbersOnBar && (
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
