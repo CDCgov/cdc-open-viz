@@ -138,7 +138,7 @@ export const useTooltip = props => {
       if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot') {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
-            .filter(Boolean)
+            ?.filter(Boolean)
             .flatMap(seriesKey => {
               return resolvedScaleValues[0][seriesKey] ? [[seriesKey, formatNumber(resolvedScaleValues[0][seriesKey], getAxisPosition(seriesKey))]] : []
             })
@@ -347,7 +347,7 @@ export const useTooltip = props => {
       if (!config.dashboard) {
         switch (visualizationType) {
           case 'Combo':
-            standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys, ...stageColumns, ...ciItems]
+            standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys, ...ciItems]
             break
           case 'Forecasting':
             standardLoopItems = [runtime.xAxis.dataKey, ...stageColumns, ...ciItems]
@@ -365,7 +365,6 @@ export const useTooltip = props => {
             standardLoopItems = [runtime.xAxis.dataKey, ...runtime?.seriesKeys]
           default:
             throw new Error('No visualization type found in handleTooltipMouseOver')
-            break
         }
       }
 

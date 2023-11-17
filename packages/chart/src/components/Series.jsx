@@ -16,7 +16,7 @@ import { colorPalettesChart, sequentialPalettes } from '@cdc/core/data/colorPale
 const SeriesContext = React.createContext()
 
 const SeriesWrapper = props => {
-  const { updateConfig, config } = useContext(ConfigContext)
+  const { updateConfig, config, rawData } = useContext(ConfigContext)
 
   const { getColumns, selectComponent } = props
 
@@ -25,6 +25,20 @@ const SeriesWrapper = props => {
   const updateSeries = (index, value, property) => {
     let series = [...config.series]
     series[index][property] = value
+
+    // dynamically add in the forecasting fields
+    if (series[index].type === 'Forecasting') {
+      console.log('config', config)
+      let forecastingStages = Array.from(new Set(rawData.map(item => item[series[index].dataKey])))
+      let forecastingStageArr = []
+
+      forecastingStages.forEach(stage => {
+        forecastingStageArr.push({ key: stage })
+      })
+      // debugger
+      series[index].stages = forecastingStageArr
+      series[index].stageColumn = series[index].dataKey
+    }
 
     updateConfig({ ...config, series })
   }
