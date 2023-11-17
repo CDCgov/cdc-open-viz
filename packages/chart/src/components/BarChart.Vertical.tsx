@@ -43,7 +43,6 @@ export const BarChartVertical = (props: BarChartProps) => {
     config.suppressedData?.forEach(d => {
       if (bar.key === d.column && String(bar.value) === String(d.value) && d.icon) {
         icon = <FaStar color='#000' size={iconSize} />
-        // icon = <BarIcon color='#000' size={fontSize[config.fontSize] / 1.7} />
       }
     })
     return icon
@@ -131,6 +130,34 @@ export const BarChartVertical = (props: BarChartProps) => {
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
+
+                  const getLeft = () => {
+                    if (Number(barWidth) < 10) return 0
+                    if (Number(barWidth) < 15) return 2
+                    if (Number(barWidth) < 20) return 6
+                    if (Number(barWidth) < 25) return 7
+                    if (Number(barWidth) < 30) return 8
+                    if (Number(barWidth) < 35) return 12
+                    if (Number(barWidth) < 40) return 14
+                    if (Number(barWidth) < 45) return 16
+                    if (Number(barWidth) < 50) return 18
+                    if (Number(barWidth) < 55) return 20
+                    if (Number(barWidth) < 60) return 22
+                    if (Number(barWidth) < 65) return 24
+                    else return 20
+                  }
+                  const iconStyle: { [key: string]: any } = {
+                    position: 'absolute',
+                    top: bar.value >= 0 && isNumber(bar.value) ? -suppresedBarHeight : undefined,
+                    bottom: bar.value >= 0 && isNumber(bar.value) ? undefined : `-${suppresedBarHeight}px`,
+                    left: getLeft()
+                  }
+
+                  if (config.isLollipopChart) {
+                    iconStyle.left = 0
+                    iconStyle.transform = `translateX(0)`
+                  }
+
                   const finalStyle = {
                     background: getBackgroundColor(barColor),
                     borderColor,
@@ -155,6 +182,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                       </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         <foreignObject
+                          style={{ overflow: 'visible' }}
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                           x={barWidth * bar.index + offset}
@@ -173,10 +201,10 @@ export const BarChartVertical = (props: BarChartProps) => {
                             }
                           }}
                         >
-                          <div style={{ ...finalStyle }}></div>
-                        </foreignObject>
-                        <foreignObject style={{ overflow: 'visible' }} x={bar.index + offset + barWidth / 2.5} y={bar.value > 0 ? barY - suppresedBarHeight : barY + suppresedBarHeight}>
-                          <div>{getIcon(bar, barWidth)}</div>
+                          <div style={{ position: 'relative' }}>
+                            <div style={iconStyle}>{getIcon(bar, barWidth)}</div>
+                            <div style={{ ...finalStyle }}></div>
+                          </div>
                         </foreignObject>
 
                         <Text // prettier-ignore
