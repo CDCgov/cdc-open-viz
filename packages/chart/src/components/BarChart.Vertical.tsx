@@ -5,6 +5,7 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
+import { FaStar } from 'react-icons/fa'
 
 // third party
 import chroma from 'chroma-js'
@@ -13,6 +14,8 @@ import { type BarChartProps } from '../types/ChartProps'
 
 export const BarChartVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
+
+  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize } = useBarChart()
 
   // CONTEXT VALUES
   // prettier-ignore
@@ -31,9 +34,19 @@ export const BarChartVertical = (props: BarChartProps) => {
     dashboardConfig
   } = useContext(ConfigContext)
 
-  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue } = useBarChart()
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
+
+  const getIcon = (bar, barWidth) => {
+    let icon = null
+    const iconSize = generateIconSize(barWidth)
+    config.suppressedData?.forEach(d => {
+      if (bar.key === d.column && String(bar.value) === String(d.value) && d.icon) {
+        icon = <FaStar color='#000' size={iconSize} />
+      }
+    })
+    return icon
+  }
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
@@ -52,16 +65,20 @@ export const BarChartVertical = (props: BarChartProps) => {
           }}
         >
           {barGroups => {
-            return updateBars(barGroups).map((barGroup, index) => (
+            return barGroups.map((barGroup, index) => (
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={(xMax / barGroups.length) * barGroup.index}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
+                  const suppresedBarHeight = 20
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                  let barHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
-                  let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
+                  let barHeightBase = Math.abs(yScale(bar.value) - yScale(scaleVal))
+                  let barYBase = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
+                  const supprssedBarY = bar.value >= 0 && isNumber(bar.value) ? yScale(scaleVal) - suppresedBarHeight : yScale(0)
+                  const barY = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? supprssedBarY : barYBase
+
                   let barGroupWidth = (xMax / barGroups.length) * (config.barThickness || 0.8)
                   let offset = ((xMax / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
                   // configure left side offset of lollipop bars
@@ -103,6 +120,9 @@ export const BarChartVertical = (props: BarChartProps) => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
+                  const barValueLabel = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? '' : yAxisValue
+                  let barHeight = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? suppresedBarHeight : barHeightBase
+                  const displaylollipopShape = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? 'none' : 'block'
 
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
                     let _barColor = barColor
@@ -143,6 +163,33 @@ export const BarChartVertical = (props: BarChartProps) => {
                     return _barColor
                   }
 
+                  const getLeft = () => {
+                    if (Number(barWidth) < 10) return 0
+                    if (Number(barWidth) < 15) return 2
+                    if (Number(barWidth) < 20) return 6
+                    if (Number(barWidth) < 25) return 7
+                    if (Number(barWidth) < 30) return 8
+                    if (Number(barWidth) < 35) return 12
+                    if (Number(barWidth) < 40) return 14
+                    if (Number(barWidth) < 45) return 16
+                    if (Number(barWidth) < 50) return 18
+                    if (Number(barWidth) < 55) return 20
+                    if (Number(barWidth) < 60) return 22
+                    if (Number(barWidth) < 65) return 24
+                    else return 20
+                  }
+                  const iconStyle: { [key: string]: any } = {
+                    position: 'absolute',
+                    top: bar.value >= 0 && isNumber(bar.value) ? -suppresedBarHeight : undefined,
+                    bottom: bar.value >= 0 && isNumber(bar.value) ? undefined : `-${suppresedBarHeight}px`,
+                    left: getLeft()
+                  }
+
+                  if (config.isLollipopChart) {
+                    iconStyle.left = 0
+                    iconStyle.transform = `translateX(0)`
+                  }
+
                   const finalStyle = {
                     background: getBarBackgroundColor(barColor),
                     borderColor,
@@ -167,6 +214,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                       </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         <foreignObject
+                          style={{ overflow: 'visible' }}
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                           x={barWidth * bar.index + offset}
@@ -185,15 +233,26 @@ export const BarChartVertical = (props: BarChartProps) => {
                             }
                           }}
                         >
-                          <div style={finalStyle}></div>
+                          <div style={{ position: 'relative' }}>
+                            <div style={iconStyle}>{getIcon(bar, barWidth)}</div>
+                            <div style={{ ...finalStyle }}></div>
+                          </div>
                         </foreignObject>
 
-                        <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={labelColor} textAnchor='middle'>
-                          {yAxisValue}
+                        <Text // prettier-ignore
+                          display={config.labels && displayBar ? 'block' : 'none'}
+                          opacity={transparentBar ? 0.5 : 1}
+                          x={barWidth * (bar.index + 0.5) + offset}
+                          y={barY - 5}
+                          fill={labelColor}
+                          textAnchor='middle'
+                        >
+                          {barValueLabel}
                         </Text>
 
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
                           <circle
+                            display={displaylollipopShape}
                             cx={barWidth * (barGroup.bars.length - bar.index - 1) + offset + lollipopShapeSize / 3.5}
                             cy={bar.y}
                             r={lollipopShapeSize / 2}
@@ -206,6 +265,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                         )}
                         {config.isLollipopChart && config.lollipopShape === 'square' && (
                           <rect
+                            display={displaylollipopShape}
                             x={offset - lollipopBarWidth / 2}
                             y={barY}
                             width={lollipopShapeSize}
