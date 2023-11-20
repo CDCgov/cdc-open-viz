@@ -65,7 +65,7 @@ const LinearChart = props => {
 
   // hooks  % states
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
+
   const { hasTopAxis } = useTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
 
@@ -82,8 +82,9 @@ const LinearChart = props => {
   const xAxisDataMapped = config.brush.active && config.brush.data?.length ? config.brush.data.map(d => getXAxisData(d)) : data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
-  const { min, max } = useMinMax(properties)
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush } = useScales({ ...properties, min, max })
+  const { min, max, leftMax, rightMax } = useMinMax(properties)
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush } = useScales({ ...properties, min, max, leftMax, rightMax })
 
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
