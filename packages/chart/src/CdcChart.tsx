@@ -288,6 +288,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     newConfig.series.map(series => {
       if (!series.tooltip) series.tooltip = true
+      if (!series.axis) series.axis = 'Left'
     })
 
     const processedConfig = { ...(await coveUpdateWorker(newConfig)) }
