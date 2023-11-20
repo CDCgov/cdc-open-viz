@@ -94,6 +94,7 @@ export default function ChooseTab() {
           }
           if (type === 'chart') {
             newConfig.visualizationSubType = stacked ? 'stacked' : 'regular'
+            newConfig.orientation = orientation
           }
 
           setConfig(newConfig)
@@ -195,7 +196,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Deviation Bar' type='chart' subType='Deviation Bar' orientation='horizontal' icon={<DeviationIcon />} />
+              <IconButton label='Deviation Bar' type='chart' subType='Deviation Bar' orientation='horizontal' stacked={false} icon={<DeviationIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Use Deviation Bars to display how individual values differ from a target.</Tooltip.Content>
           </Tooltip>
