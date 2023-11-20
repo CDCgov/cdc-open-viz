@@ -26,6 +26,13 @@ const SeriesWrapper = props => {
     let series = [...config.series]
     series[index][property] = value
 
+    // Reset bars to the left axis if changed.
+    if (property === 'type') {
+      if (value === 'Bar') {
+        series[index].axis = 'Left'
+      }
+    }
+
     updateConfig({ ...config, series })
   }
 
