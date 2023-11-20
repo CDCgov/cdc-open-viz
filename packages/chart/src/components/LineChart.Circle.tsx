@@ -91,6 +91,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
           fillOpacity={1}
           fill={getColor(displayArea, colorScale, config, seriesIndex, hoveredSeriesKey, seriesKey)}
           style={{ filter: 'unset', opacity: 1 }}
+          key={`line-chart-circle--${index}`}
         />
       )
     })
