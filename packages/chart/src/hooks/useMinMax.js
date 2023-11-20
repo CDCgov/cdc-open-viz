@@ -19,8 +19,9 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   const { lower, upper } = config?.confidenceKeys || {}
 
   if (lower && upper && config.visualizationType === 'Bar') {
+    const buffer = min < 0 ? 1.1 : 0
     max = Math.max(maxValue, Math.max(...data.flatMap(d => [d[upper], d[lower]])) * 1.15)
-    min = Math.min(minValue, Math.min(...data.flatMap(d => [d[upper], d[lower]])) * 1.15)
+    min = Math.min(minValue, Math.min(...data.flatMap(d => [d[upper], d[lower]])) * 1.15) * buffer
   }
 
   if (config.visualizationType === 'Forecasting') {
@@ -63,6 +64,9 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   // this should not apply to bar charts if there is negative CI data
   if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
     min = 0
+  }
+  if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min < 0) {
+    min = min * 1.1
   }
 
   if (config.visualizationType === 'Combo' && isAllLine) {
