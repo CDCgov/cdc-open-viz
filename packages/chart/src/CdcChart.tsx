@@ -280,8 +280,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         response.table.showVertical = false
       }
     }
-    const orientation = response?.dataDescription?.horizontal ? 'horizontal' : 'vertical'
-    let newConfig = { ...defaults, ...response, orientation }
+    let newConfig = { ...defaults, ...response }
     if (newConfig.visualizationType === 'Box Plot') {
       newConfig.legend.hide = true
     }
@@ -1135,7 +1134,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     const offset = 20
     const brushHeight = config.brush.height
     let bottom = 0
-    if (!isLegendBottom && isHorizontal && config.xAxis.label && !config.isResponsiveTicks) {
+    if (!isLegendBottom && isHorizontal && !config.yAxis.label) {
+      bottom = Number(config.xAxis.labelOffset)
+    }
+    if (!isLegendBottom && isHorizontal && config.yAxis.label && !config.isResponsiveTicks) {
       bottom = Number(config.runtime.xAxis.size) + Number(config.xAxis.labelOffset)
     }
     if (!isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks) {
@@ -1147,9 +1149,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (!isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks) {
       bottom = config.dynamicMarginTop ? config.dynamicMarginTop + offset : Number(config.xAxis.labelOffset)
     }
-    if (!isLegendBottom && isHorizontal && !config.xAxis.label) {
-      bottom = 0
-    }
+
     if (!isHorizontal && !isLegendBottom && config.xAxis.label && tickRotation && !config.isResponsiveTicks) {
       bottom = isBrush ? brushHeight + config.xAxis.tickWidthMax + -config.xAxis.size + config.xAxis.labelOffset + offset : config.xAxis.tickWidthMax + offset + -config.xAxis.size + config.xAxis.labelOffset
     }
