@@ -125,7 +125,7 @@ export default function DeviationBar({ height, xScale }) {
     })
   }, [config.animate, config, animatedChart])
 
-  if (!config || config?.series?.length !== 1) return <></>
+  // if (!config || config?.series?.length !== 1) return <></>
 
   return (
     <ErrorBoundary component='Deviation Bar'>
