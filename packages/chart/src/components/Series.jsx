@@ -422,7 +422,7 @@ const SeriesDropdownConfidenceInterval = props => {
 const SeriesInputName = props => {
   const { series, index: i } = props
   const { config, updateConfig } = useContext(ConfigContext)
-  const adjustableNameSeriesTypes = ['Bar', 'Line', 'Area Chart']
+  const adjustableNameSeriesTypes = ['Bar', 'Line', 'Area Chart', 'dashed-sm', 'dashed-md', 'dashed-lg']
 
   if (config.visualizationType === 'Combo') return
 
