@@ -4,7 +4,8 @@ import ConfigContext from '../ConfigContext'
 // TODO move props in
 
 const useScales = properties => {
-  let { xAxisDataMapped, xMax, yMax, min, max, config, data } = properties
+  let { xAxisDataMapped, xMax, yMax, min, max, config, data, leftMax, rightMax } = properties
+
   const { rawData, dimensions } = useContext(ConfigContext)
 
   const [screenWidth, screenHeight] = dimensions
@@ -210,11 +211,13 @@ const composeXScale = ({ min, max, xMax, config }) => {
   })
 }
 
-const composeYScale = ({ min, max, yMax, config }) => {
+const composeYScale = ({ min, max, yMax, config, leftMax }) => {
   // Adjust min value if using logarithmic scale
   min = config.useLogScale && min >= 0 && min < 1 ? min + 0.1 : min
   // Select the appropriate scale function
   const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
+
+  if (config.visualizationType === 'Combo') max = leftMax
   // Return the configured scale function
   return scaleFunc({
     domain: [min, max],

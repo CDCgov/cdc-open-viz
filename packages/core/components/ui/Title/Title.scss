@@ -88,3 +88,8 @@
     margin: 0 0 1rem 0 !important;
   }
 }
+
+// fix sparkline bottom margin gap
+.type-sparkline.type-chart .cove-component__header {
+  margin: 0px !important;
+}
