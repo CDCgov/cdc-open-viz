@@ -26,6 +26,7 @@ import ConfigContext from '../ConfigContext'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import WarningImage from '../images/warning.svg'
+import useMinMax from './../hooks/useMinMax'
 
 /* eslint-disable react-hooks/rules-of-hooks */
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
@@ -308,6 +309,9 @@ const EditorPanel = () => {
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
+
+  const properties = { data, config }
+  const { leftMax, rightMax } = useMinMax(properties)
 
   const {
     enabledChartTypes,
@@ -830,23 +834,45 @@ const EditorPanel = () => {
   }
 
   const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
-  const [warningMsg, setWarningMsg] = useState({ maxMsg: '', minMsg: '' })
+  const [warningMsg, setWarningMsg] = useState({ maxMsg: '', minMsg: '', rightMaxMessage: '', minMsgRight: '' })
 
   const validateMaxValue = () => {
     const enteredValue = config[section].max
-    let message = ''
+    const enteredRightMax = config[section].rightMax
 
-    switch (true) {
-      case enteredValue && parseFloat(enteredValue) < parseFloat(maxValue) && existPositiveValue:
-        message = 'Max value must be more than ' + maxValue
-        break
-      case enteredValue && parseFloat(enteredValue) < 0 && !existPositiveValue:
-        message = 'Value must be more than or equal to 0'
-        break
-      default:
-        message = ''
+    let message = ''
+    let rightMaxMessage = ''
+
+    if (config.visualizationType !== 'Combo') {
+      switch (true) {
+        case enteredValue && parseFloat(enteredValue) < parseFloat(maxValue) && existPositiveValue:
+          message = 'Max value must be more than ' + maxValue
+          break
+        case enteredValue && parseFloat(enteredValue) < 0 && !existPositiveValue:
+          message = 'Value must be more than or equal to 0'
+          break
+        default:
+          message = ''
+      }
     }
-    setWarningMsg(prevMsg => ({ ...prevMsg, maxMsg: message }))
+
+    if (config.visualizationType === 'Combo') {
+      switch (true) {
+        case enteredValue && parseFloat(enteredValue) < leftMax:
+          message = 'Max value must be more than ' + leftMax
+          break
+        case enteredRightMax && parseFloat(enteredRightMax) < rightMax:
+          rightMaxMessage = 'Max value must be more than ' + rightMax
+          break
+        case enteredValue && parseFloat(enteredValue) < 0 && !existPositiveValue:
+          message = 'Value must be more than or equal to 0'
+          break
+        default:
+          message = ''
+      }
+    }
+
+    setWarningMsg(prevMsg => ({ ...prevMsg, maxMsg: message, rightMaxMessage: rightMaxMessage }))
   }
 
   const validateMinValue = () => {
@@ -1593,9 +1619,9 @@ const EditorPanel = () => {
                         <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />
                         <CheckBox value={config.yAxis.hideTicks} section='yAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
 
-                        <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='max value' placeholder='Auto' updateField={updateField} />
+                        <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='left axis max value' placeholder='Auto' updateField={updateField} />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
-                        <TextField value={config.yAxis.min} section='yAxis' fieldName='min' type='number' label='min value' placeholder='Auto' updateField={updateField} />
+                        <TextField value={config.yAxis.min} section='yAxis' fieldName='min' type='number' label='left axis min value' placeholder='Auto' updateField={updateField} />
                         <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                       </>
                     )
@@ -1914,6 +1940,11 @@ const EditorPanel = () => {
                   <CheckBox value={config.yAxis.rightHideAxis} section='yAxis' fieldName='rightHideAxis' label='Hide Axis' updateField={updateField} />
                   <CheckBox value={config.yAxis.rightHideLabel} section='yAxis' fieldName='rightHideLabel' label='Hide Label' updateField={updateField} />
                   <CheckBox value={config.yAxis.rightHideTicks} section='yAxis' fieldName='rightHideTicks' label='Hide Ticks' updateField={updateField} />
+
+                  <TextField value={config.yAxis.max} section='yAxis' fieldName='rightMax' type='number' label='right axis max value' placeholder='Auto' updateField={updateField} />
+                  <span style={{ color: 'red', display: 'block' }}>{warningMsg.rightMaxMessage}</span>
+                  <TextField value={config.yAxis.min} section='yAxis' fieldName='rightMin' type='number' label='right axis min value' placeholder='Auto' updateField={updateField} />
+                  <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                 </AccordionItemPanel>
               </AccordionItem>
             )}
