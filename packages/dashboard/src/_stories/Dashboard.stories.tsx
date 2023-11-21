@@ -4,6 +4,7 @@ import APIFiltersChartData from './_mock/api-filter-chart.json'
 import ExampleConfig_1 from './_mock/dashboard-gallery.json'
 import ExampleConfig_2 from './_mock/dashboard-2.json'
 import ExampleConfig_3 from './_mock/dashboard_no_filter.json'
+import Dashboard_Filter from './_mock/dashboard-filter.json'
 import Dashboard from '../CdcDashboard'
 import { Config } from '../types/Config'
 import { userEvent, within } from '@storybook/testing-library'
@@ -30,6 +31,12 @@ export const Example_2: Story = {
 export const Example_3: Story = {
   args: {
     config: ExampleConfig_3 as unknown as Config
+  }
+}
+
+export const Dashboard_Filters: Story = {
+  args: {
+    config: Dashboard_Filter as unknown as Config
   }
 }
 
