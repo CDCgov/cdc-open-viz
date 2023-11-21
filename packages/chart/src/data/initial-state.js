@@ -183,13 +183,18 @@ export default {
       line: '',
       shape: ''
     },
+    lineOfNoEffect: {
+      show: true
+    },
+    type: '',
+    pooledResult: {
+      diamondHeight: 5,
+      column: ''
+    },
     estimateField: '',
     estimateRadius: '',
-    lowerCiField: '',
-    upperCiField: '',
     shape: '',
     rowHeight: 20,
-    showZeroLine: false,
     description: {
       show: true,
       text: 'description',
@@ -211,7 +216,9 @@ export default {
       estimateField: 0
     },
     leftWidthOffset: 0,
-    rightWidthOffset: 0
+    rightWidthOffset: 0,
+    showZeroLine: false,
+    hideDateCategoryCol: false
   },
   brush: {
     pattern_id: 'brush_pattern',

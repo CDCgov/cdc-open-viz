@@ -128,7 +128,19 @@
   },
   "orientation": "horizontal",
   "color": "pinkpurple",
-  "columns": {},
+  "columns": {
+    "additionalColumn1": {
+      "label": "Estimate Field",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "name": "Estimate"
+    }
+  },
   "legend": {
     "behavior": "isolate",
     "singleRow": false,
@@ -184,6 +196,10 @@
       "line": "",
       "shape": ""
     },
+    "outcome": "",
+    "pooledResult": {
+      "diamondHeight": 5
+    },
     "estimateField": "Estimate",
     "estimateRadius": "",
     "lowerCiField": "",
@@ -217,7 +233,8 @@
     "upper": "Upper",
     "rightWidthOffsetMobile": "0",
     "title": "test",
-    "leftWidthOffsetMobile": "51"
+    "leftWidthOffsetMobile": "51",
+    "type": "Linear"
   },
   "brush": {
     "pattern_id": "brush_pattern",
