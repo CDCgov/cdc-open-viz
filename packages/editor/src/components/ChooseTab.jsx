@@ -198,7 +198,7 @@ export default function ChooseTab() {
             <Tooltip.Target>
               <IconButton label='Deviation Bar' type='chart' subType='Deviation Bar' orientation='horizontal' stacked={false} icon={<DeviationIcon />} />
             </Tooltip.Target>
-            <Tooltip.Content>Use Deviation Bars to display how individual values differ from a target.</Tooltip.Content>
+            <Tooltip.Content>Use deviation bars to display how individual values differ from a target.</Tooltip.Content>
           </Tooltip>
         </li>
         <li>
