@@ -29,11 +29,11 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     min = Math.min(minValue, Math.min(...data.flatMap(d => [d[upper], d[lower]])) * 1.15) * buffer
   }
 
-  if (config.visualizationType === 'Forecasting') {
+  if (config.series.filter(s => s?.type === 'Forecasting')) {
     const {
       runtime: { forecastingSeriesKeys }
     } = config
-    if (forecastingSeriesKeys.length > 0) {
+    if (forecastingSeriesKeys?.length > 0) {
       // push all keys into an array
       let columnNames = []
 

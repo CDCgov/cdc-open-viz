@@ -844,8 +844,23 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           </section>
 
           {/* Data Table */}
-          {config.table && !!config.data?.length && <DataTable config={config} rawData={config.data} runtimeData={config.data || []} expandDataTable={config.table.expanded} tableTitle={config.dashboard.title || ''} viewport={currentViewport} tabbingId={config.dashboard.title || ''} />}
-          {config.table &&
+          {config.table.show && config.data && (
+            <DataTable
+              config={config}
+              rawData={config.data}
+              runtimeData={config.data || []}
+              expandDataTable={config.table.expanded}
+              showDownloadButton={config.table.download}
+              tableTitle={config.dashboard.title || ''}
+              viewport={currentViewport}
+              tabbingId={config.dashboard.title || ''}
+              outerContainerRef={outerContainerRef}
+              imageRef={imageId}
+              isDebug={isDebug}
+              isEditor={isEditor}
+            />
+          )}
+          {config.table.show &&
             config.datasets &&
             Object.keys(config.datasets).map(datasetKey => {
               //For each dataset, find any shared filters that apply to all visualizations using the dataset
