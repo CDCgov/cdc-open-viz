@@ -4,8 +4,9 @@ import { useBarChart } from '../hooks/useBarChart'
 import { BarStack } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
+import { type BarChartProps } from '../types/ChartProps'
 
-const BarChartStackedVertical = props => {
+const BarChartStackedVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax } = props
   const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
   const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius } = useBarChart()

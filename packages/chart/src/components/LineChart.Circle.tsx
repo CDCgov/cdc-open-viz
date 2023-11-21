@@ -54,7 +54,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
         r={4.5}
         opacity={d[seriesKey] ? 1 : 0}
         fillOpacity={1}
-        fill={displayArea ? (colorScale ? colorScale(seriesKey) : '#000') : 'transparent'}
+        fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000') : 'transparent'}
         style={{ filter: 'unset', opacity: 1 }}
       />
     )
@@ -86,6 +86,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
           fillOpacity={1}
           fill={getColor(displayArea, colorScale, config, seriesIndex, hoveredSeriesKey, seriesKey)}
           style={{ filter: 'unset', opacity: 1 }}
+          key={`line-chart-circle--${index}`}
         />
       )
     })
