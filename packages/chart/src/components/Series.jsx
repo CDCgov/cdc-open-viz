@@ -145,7 +145,6 @@ const SeriesDropdownForecastingStage = props => {
   const { index, series } = props
 
   // Only combo charts are allowed to have different options
-  if (series.type !== 'Forecasting') return
 
   return (
     <InputSelect

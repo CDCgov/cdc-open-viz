@@ -44,7 +44,8 @@ const BarChartStackedHorizontal = (props: BarChartProps) => {
                     ${xAxisTooltip}
                       </div>`
 
-                if (chroma.contrast(labelColor, bar.color) < 4.9) {
+                console.log('test', colorScale(config.runtime.seriesLabels[bar.key]))
+                if (chroma.contrast(labelColor, colorScale(config.runtime.seriesLabels[bar.key])) < 4.9) {
                   labelColor = '#FFFFFF'
                 }
 
@@ -79,7 +80,7 @@ const BarChartStackedHorizontal = (props: BarChartProps) => {
                           }
                         }}
                       >
-                        <div style={{ width: bar.width, height: bar.height, background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
+                        <div style={{ width: bar.width, height: bar.height, background: colorScale(config.runtime.seriesLabels[bar.key]), border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
                       </foreignObject>
 
                       {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel && (

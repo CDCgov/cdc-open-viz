@@ -30,7 +30,6 @@ const BarChartStackedVertical = (props: BarChartProps) => {
               const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
 
               if (!yAxisValue) return <></>
-
               const style = applyRadius(barStack.index)
               let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
               const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -48,7 +47,6 @@ const BarChartStackedVertical = (props: BarChartProps) => {
                     ${showLegendValuesTooltip && seriesLabels && hasMultipleSeries ? `${seriesLabels[bar.key] || ''}<br/>` : ''}
                     ${yAxisTooltip}<br />
                       </div>`
-
               return (
                 <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
                   <style>
