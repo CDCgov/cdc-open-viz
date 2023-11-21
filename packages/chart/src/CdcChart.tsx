@@ -51,29 +51,6 @@ const generateColorsArray = (color = '#000000', special = false) => {
 
   return [color, hoverColor, colorObj.darken(0.3).hex()]
 }
-const hashObj = row => {
-  try {
-    if (!row) throw new Error('No row supplied to hashObj')
-
-    let str = JSON.stringify(row)
-    let hash = 0
-
-    if (str.length === 0) return hash
-
-    for (let i = 0; i < str.length; i++) {
-      let char = str.charCodeAt(i)
-      hash = (hash << 5) - hash + char
-      hash = hash & hash
-    }
-
-    return hash
-  } catch (e) {
-    console.error('COVE: ', e) // eslint-disable-line
-  }
-}
-
-// * FILE REVIEW
-// TODO: @tturnerswdev33 - remove/fix mentions of runtimeLegend that were added
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
@@ -311,6 +288,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     newConfig.series.map(series => {
       if (!series.tooltip) series.tooltip = true
+      if (!series.axis) series.axis = 'Left'
     })
 
     const processedConfig = { ...(await coveUpdateWorker(newConfig)) }
@@ -1129,18 +1107,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         return generateColorsArray(mapColorPalette[3])
       }
 
-      let hash = hashObj(rowObj)
-
-      if (legendMemo.current.has(hash)) {
-        let idx = legendMemo.current.get(hash)
-        if (runtimeLegend[idx]?.disabled) return false
-
-        // DEV-784 changed to use bin prop to get color instead of idx
-        // bc we re-order legend when showSpecialClassesLast is checked
-        let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color
-        return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
-      }
-
       // Fail state
       return generateColorsArray()
     } catch (e) {
@@ -1162,21 +1128,58 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const computeMarginBottom = (config: Config): string => {
-    if (config.legend.position !== 'bottom' && config.orientation === 'horizontal') {
-      return `${config.runtime.xAxis.size}px`
+    const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isHorizontal = config.orientation === 'horizontal'
+    const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
+    const isBrush = config.brush.active
+    const offset = 20
+    const brushHeight = config.brush.height
+    let bottom = 0
+    if (!isLegendBottom && isHorizontal && !config.yAxis.label) {
+      bottom = Number(config.xAxis.labelOffset)
     }
-    if (config.brush.active && config.orientation === 'vertical') {
-      if (config.legend.position !== 'bottom' && !config.legend.hide) {
-        return `${config.brush.height * 1.3 + config.dynamicMarginTop / 2}px`
-      }
-      if (config.legend.hide) {
-        return `${config.brush.height + config.dynamicMarginTop / 2}px`
-      }
+    if (!isLegendBottom && isHorizontal && config.yAxis.label && !config.isResponsiveTicks) {
+      bottom = Number(config.runtime.xAxis.size) + Number(config.xAxis.labelOffset)
     }
-    if (!config.brush.active && config.orientation === 'vertical') {
-      return `${config.dynamicMarginTop / 2}px`
+    if (!isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks) {
+      bottom = config.dynamicMarginTop + offset
     }
-    return '0px'
+    if (!isLegendBottom && isHorizontal && !config.yAxis.label && config.isResponsiveTicks) {
+      bottom = config.dynamicMarginTop ? config.dynamicMarginTop - offset : Number(config.xAxis.labelOffset) - offset
+    }
+    if (!isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks) {
+      bottom = config.dynamicMarginTop ? config.dynamicMarginTop + offset : Number(config.xAxis.labelOffset)
+    }
+
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && tickRotation && !config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.tickWidthMax + -config.xAxis.size + config.xAxis.labelOffset + offset : config.xAxis.tickWidthMax + offset + -config.xAxis.size + config.xAxis.labelOffset
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && tickRotation && !config.isResponsiveTicks) {
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && tickRotation && !config.dynamicMarginTop && !config.isResponsiveTicks) {
+      bottom = isBrush ? config.xAxis.tickWidthMax + brushHeight + offset + -config.xAxis.size : 0
+    }
+
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && !tickRotation && !config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + -config.xAxis.size + config.xAxis.labelOffset + offset : -config.xAxis.size + config.xAxis.labelOffset + offset
+    }
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + config.xAxis.tickWidthMax : config.dynamicMarginTop + -config.xAxis.size + offset
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + config.xAxis.tickWidthMax : config.dynamicMarginTop + -config.xAxis.size - offset
+    }
+    if (!isHorizontal && !isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + 25 : config.xAxis.labelOffset + -config.xAxis.size + offset
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && !config.dynamicMarginTop && config.isResponsiveTicks) {
+      bottom = -config.xAxis.size + offset + config.xAxis.labelOffset
+    }
+    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && !tickRotation && !config.dynamicMarginTop && !config.isResponsiveTicks) {
+      bottom = isBrush ? brushHeight + -config.xAxis.size + config.xAxis.labelOffset : 0
+    }
+
+    return `${bottom}px`
   }
 
   // Prevent render if loading
@@ -1243,11 +1246,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               <DataTable
                 config={config}
                 rawData={config.data}
-                runtimeData={filteredData || excludedData}
+                runtimeData={transform.applySuppression(filteredData || excludedData, config.suppressedData)}
                 expandDataTable={config.table.expanded}
                 columns={config.columns}
-                showDownloadButton={config.general.showDownloadButton}
-                runtimeLegend={dynamicLegendItems}
                 displayDataAsText={displayDataAsText}
                 displayGeoName={displayGeoName}
                 applyLegendToRow={applyLegendToRow}
@@ -1255,18 +1256,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 indexTitle={config.table.indexLabel}
                 vizTitle={title}
                 viewport={currentViewport}
-                parseDate={parseDate}
-                formatDate={formatDate}
-                formatNumber={formatNumber}
                 tabbingId={handleChartTabbing}
-                showDownloadImgButton={config.showDownloadImgButton}
-                showDownloadPdfButton={config.showDownloadPdfButton}
-                innerContainerRef={innerContainerRef}
-                outerContainerRef={outerContainerRef}
-                imageRef={imageId}
                 colorScale={colorScale}
-                isDebug={isDebug}
-                isEditor={isEditor}
               />
             )}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
@@ -1283,6 +1274,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
+  // const s = transform.applySuppression(filteredData, config.suppressedData)
+  // console.log(s, 'sss')
 
   const contextValues = {
     capitalize,

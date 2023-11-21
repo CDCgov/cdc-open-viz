@@ -15,6 +15,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 // Helpers
 import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import Title from '@cdc/core/components/ui/Title'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
@@ -39,7 +40,6 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
-import Title from '@cdc/core/components/ui/Title'
 
 // Child Components
 import ConfigContext from './context'
@@ -118,7 +118,7 @@ const getUniqueValues = (data, columnName) => {
   return Object.keys(result)
 }
 
-const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
+const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
@@ -1299,9 +1299,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     const urlFilters = newState.filters ? (newState.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
 
     if (newState.dataUrl && !urlFilters) {
+      if (newState.dataUrl[0] === '/') {
+        newState.dataUrl = 'http://' + hostname + newState.dataUrl
+      }
+
       // handle urls with spaces in the name.
       if (newState.dataUrl) newState.dataUrl = `${newState.dataUrl}`
-      console.log(newState.dataUrl);
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
 
       if (newData && newState.dataDescription) {
@@ -1592,7 +1595,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
               <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
             )}
-
             {/* prettier-ignore */}
             <Title
               title={title}
@@ -1600,7 +1602,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               config={config}
               classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
             />
-
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}

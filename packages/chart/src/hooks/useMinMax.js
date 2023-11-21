@@ -2,10 +2,15 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   let min = 0
   let max = 0
 
+  // Implementation for left and right axis
+  let leftMax = 0
+  let rightMax = 0
+
   if (!data) {
     return { min, max }
   }
 
+  const { visualizationType, series } = config
   const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
   const minRequiredCIPadding = 1.15 // regardless of Editor if CI data, there must be 10% padding added
 
@@ -16,24 +21,12 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   min = enteredMinValue && isMinValid ? enteredMinValue : minValue
   max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
-  let ciYMin = 0
-  if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Deviation Bar') {
-    let ciYMax = 0
-    if (config.hasOwnProperty('confidenceKeys')) {
-      let upperCIValues = data.map(function (d) {
-        return d[config.confidenceKeys.upper]
-      })
-      ciYMax = Math.max.apply(Math, upperCIValues)
-      if (ciYMax > max) max = ciYMax * minRequiredCIPadding // bump up the max plus some padding always
+  const { lower, upper } = config?.confidenceKeys || {}
 
-      // check the min if lower confidence
-      let lowerCIValues = data.map(function (d) {
-        // if no lower CI then we need lowerCIValues to have nothing in it
-        return d[config.confidenceKeys.lower] !== undefined ? d[config.confidenceKeys.lower] : ''
-      })
-      ciYMin = Math.min.apply(Math, lowerCIValues)
-      if (ciYMin < min) min = ciYMin * minRequiredCIPadding // adjust the min + 10% padding for negative numbers to separate from axis
-    }
+  if (lower && upper && config.visualizationType === 'Bar') {
+    const buffer = min < 0 ? 1.1 : 0
+    max = Math.max(maxValue, Math.max(...data.flatMap(d => [d[upper], d[lower]])) * 1.15)
+    min = Math.min(minValue, Math.min(...data.flatMap(d => [d[upper], d[lower]])) * 1.15) * buffer
   }
 
   if (config.series.filter(s => s?.type === 'Forecasting')) {
@@ -73,9 +66,43 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     }
   }
 
+  if (visualizationType === 'Combo') {
+    try {
+      if (!data) throw new Error('COVE: missing data while getting min/max for combo chart.')
+      // seperate the left and right axis items & get each sides series keys
+      let leftAxisItems = series.filter(s => s.axis === 'Left')
+      let rightAxisItems = series.filter(s => s.axis === 'Right')
+      let leftAxisSeriesKeys = leftAxisItems.map(i => i.dataKey) || []
+      let rightAxisSeriesKeys = rightAxisItems.map(i => i.dataKey) || []
+
+      // todo: figure out how to determine entered max for each axis
+      const findMaxFromSeriesKeys = (data, axisSeriesKeys, max) => {
+        axisSeriesKeys.forEach(key => {
+          let _data = data.map(d => d[key])
+          let seriesMax = Math.max.apply(null, _data)
+          if (seriesMax > max) {
+            max = seriesMax
+          }
+        })
+        return max
+      }
+      leftMax = findMaxFromSeriesKeys(data, leftAxisSeriesKeys, leftMax)
+      rightMax = findMaxFromSeriesKeys(data, rightAxisSeriesKeys, rightMax)
+
+      if (leftMax < enteredMaxValue) {
+        leftMax = enteredMaxValue
+      }
+    } catch (e) {
+      console.error(e.message)
+    }
+  }
+
   // this should not apply to bar charts if there is negative CI data
-  if (((config.visualizationType === 'Bar' && ciYMin >= 0) || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
+  if ((visualizationType === 'Bar' || (visualizationType === 'Combo' && !isAllLine)) && min > 0) {
     min = 0
+  }
+  if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min < 0) {
+    min = min * 1.1
   }
 
   if (config.visualizationType === 'Combo' && isAllLine) {
@@ -136,6 +163,6 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     }
   }
 
-  return { min, max }
+  return { min, max, leftMax, rightMax }
 }
 export default useMinMax

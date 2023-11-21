@@ -1,5 +1,5 @@
 import { scaleLinear } from '@visx/scale'
-import useReduceData from '../hooks/useReduceData'
+import useReduceData from './useReduceData'
 
 export default function useRightAxis({ config, yMax = 0, data = [], updateConfig }) {
   const hasRightAxis = config.visualizationType === 'Combo' && config.orientation === 'vertical'
@@ -15,7 +15,15 @@ export default function useRightAxis({ config, yMax = 0, data = [], updateConfig
     return rightAxisData
   }
 
-  const max = Math.max.apply(null, allRightAxisData(rightSeriesKeys))
+  let max = Math.max.apply(null, allRightAxisData(rightSeriesKeys))
+
+  if (config.yAxis.rightMax > max) {
+    max = config.yAxis.rightMax
+  }
+
+  if (config.yAxis.rightMin < minValue) {
+    minValue = config.yAxis.rightMin
+  }
 
   // if there is a bar series & the right axis doesn't include a negative number, default to zero
   const hasBarSeries = config.runtime?.barSeriesKeys?.length > 0
