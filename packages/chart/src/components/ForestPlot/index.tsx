@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 
 // visx
 import { Group } from '@visx/group'
@@ -7,16 +7,16 @@ import { GlyphDiamond } from '@visx/glyph'
 import { Text } from '@visx/text'
 import { scaleLinear } from '@visx/scale'
 import { curveLinearClosed } from '@visx/curve'
+import { type ForestPlot } from './ForestPlot'
 
 // cdc
-import ConfigContext from '../ConfigContext'
+import ConfigContext from '../../ConfigContext'
 import { getFontSize } from '@cdc/core/helpers/cove/number'
 
 const ForestPlot = props => {
-  const { transformedData: data, updateConfig, dimensions, rawData } = useContext(ConfigContext)
-  const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver, maxWidth, maxHeight } = props
-  const { forestPlot, runtime, dataFormat } = config
-  const [screenWidth, screenHeight] = dimensions
+  const { transformedData: data, updateConfig, rawData } = useContext(ConfigContext)
+  const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver } = props
+  const { forestPlot } = config as { forestPlot: ForestPlot }
 
   // Requirements for forest plot
   // - force legend to be hidden for this chart type
@@ -37,14 +37,12 @@ const ForestPlot = props => {
     }
   }, [])
 
-  const diamondHeight = 5
-
   // diamond path
   const regressionPoints = [
     { x: xScale(forestPlot.regression.lower), y: height - Number(config.forestPlot.rowHeight) },
-    { x: xScale(forestPlot.regression.estimateField), y: height - diamondHeight - Number(config.forestPlot.rowHeight) },
+    { x: xScale(forestPlot.regression.estimateField), y: height - forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
     { x: xScale(forestPlot.regression.upper), y: height - Number(config.forestPlot.rowHeight) },
-    { x: xScale(forestPlot.regression.estimateField), y: height + diamondHeight - Number(config.forestPlot.rowHeight) },
+    { x: xScale(forestPlot.regression.estimateField), y: height + forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
     { x: xScale(forestPlot.regression.lower), y: height - Number(config.forestPlot.rowHeight) }
   ]
 
@@ -76,8 +74,9 @@ const ForestPlot = props => {
             {forestPlot.title}
           </Text>
         )}
-        {forestPlot.regression.showBaseLine && <Line from={{ x: xScale(forestPlot.regression.estimateField), y: 0 + topMarginOffset }} to={{ x: xScale(forestPlot.regression.estimateField), y: height }} className='forestplot__baseline' stroke={forestPlot.regression.baseLineColor || 'black'} />}
-        {forestPlot.showZeroLine && <Line from={{ x: xScale(0), y: 0 + topMarginOffset }} to={{ x: xScale(0), y: height }} className='forestplot__zero-line' stroke='gray' strokeDasharray={'5 5'} />}
+
+        {/* Line of no effect. */}
+        {forestPlot.lineOfNoEffect.show && <Line from={{ x: xScale(forestPlot.regression.estimateField), y: 0 + topMarginOffset }} to={{ x: xScale(forestPlot.regression.estimateField), y: height }} className='forestplot__baseline' stroke={forestPlot.regression.baseLineColor || 'black'} />}
 
         {data.map((d, i) => {
           // calculate both square and circle size based on radius.min and radius.max
@@ -87,8 +86,8 @@ const ForestPlot = props => {
           })
 
           // glyph settings
-          const diamondSize = forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.estimateField]) * 5 : 4
-          const rectSize = forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.estimateField]) : 4
+          const diamondSize = forestPlot.estimateField !== '' ? scaleRadius(data[i][forestPlot.estimateField]) * 5 : 4
+          const rectSize = forestPlot.estimateField !== '' ? scaleRadius(data[i][forestPlot.estimateField]) : 4
           const shapeColor = forestPlot.colors.shape ? forestPlot.colors.shape : 'black'
           const lineColor = forestPlot.colors.line ? forestPlot.colors.line : 'black'
 
@@ -121,7 +120,7 @@ const ForestPlot = props => {
               {/* main line */}
               <line stroke={lineColor} className={`line-${d[config.yAxis.dataKey]}`} key={i} x1={xScale(d[forestPlot.lower])} x2={xScale(d[forestPlot.upper])} y1={yScale(i)} y2={yScale(i)} />
               {forestPlot.shape === 'circle' && (
-                <Circle className='forest-plot--circle' cx={xScale(Number(d[forestPlot.estimateField]))} cy={yScale(i)} r={forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.estimateField]) : 4} fill={shapeColor} style={{ opacity: 1, filter: 'unset' }} />
+                <Circle className='forest-plot--circle' cx={xScale(Number(d[forestPlot.estimateField]))} cy={yScale(i)} r={forestPlot.estimateField !== '' ? scaleRadius(data[i][forestPlot.estimateField]) : 4} fill={shapeColor} style={{ opacity: 1, filter: 'unset' }} />
               )}
               {forestPlot.shape === 'square' && <rect className='forest-plot--square' x={xScale(Number(d[forestPlot.estimateField]))} y={yScale(i) - rectSize / 2} width={rectSize} height={rectSize} fill={shapeColor} style={{ opacity: 1, filter: 'unset' }} />}
               {forestPlot.shape === 'diamond' && <GlyphDiamond className='forest-plot--diamond' size={diamondSize} top={yScale(i)} left={xScale(Number(d[forestPlot.estimateField]))} fill={shapeColor} />}
