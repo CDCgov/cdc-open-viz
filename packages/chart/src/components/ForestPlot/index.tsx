@@ -7,16 +7,16 @@ import { GlyphDiamond } from '@visx/glyph'
 import { Text } from '@visx/text'
 import { scaleLinear } from '@visx/scale'
 import { curveLinearClosed } from '@visx/curve'
-import { type ForestPlot } from './ForestPlot'
+import { type ForestPlotConfigSettings, type ForestPlotProps, type ChartColumns } from './ForestPlot'
 
 // cdc
 import ConfigContext from '../../ConfigContext'
 import { getFontSize } from '@cdc/core/helpers/cove/number'
 
-const ForestPlot = props => {
+const ForestPlot = (props: ForestPlotProps) => {
   const { transformedData: data, updateConfig, rawData } = useContext(ConfigContext)
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver } = props
-  const { forestPlot } = config as { forestPlot: ForestPlot }
+  const { forestPlot } = config as { forestPlot: ForestPlotConfigSettings }
 
   // Requirements for forest plot
   // - force legend to be hidden for this chart type
@@ -58,13 +58,9 @@ const ForestPlot = props => {
     { x: width, y: height }
   ]
 
-  const columnsOnChart = Object.entries(config.columns)
+  const columnsOnChart = Object.entries(config.columns as ChartColumns)
     .map(entry => entry[1])
     .filter(entry => entry.forestPlot === true)
-
-  const rightOffset = forestPlot.rightWidthOffset !== 0 ? (Number(forestPlot.rightWidthOffset) / 100) * width : width
-  const leftOffset = forestPlot.leftWidthOffset !== 0 ? (Number(forestPlot.leftWidthOffset) / 100) * width : width
-  const chartWidth = width - rightOffset - leftOffset
 
   return (
     <>
@@ -183,6 +179,19 @@ const ForestPlot = props => {
           </Text>
         )
       })}
+
+      {/* left bottom label */}
+      {forestPlot.leftLabel && (
+        <Text className='forest-plot__left-label' x={xScale(-25)} y={height + 50} textAnchor='end'>
+          {forestPlot.leftLabel}
+        </Text>
+      )}
+
+      {forestPlot.rightLabel && (
+        <Text className='forest-plot__right-label' x={xScale(25)} y={height + 50} textAnchor='start'>
+          {forestPlot.rightLabel}
+        </Text>
+      )}
     </>
   )
 }

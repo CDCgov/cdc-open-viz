@@ -149,6 +149,11 @@ const useScales = properties => {
 
   if (visualizationType === 'Forest Plot') {
     const resolvedYRange = () => {
+      // if this is a forest plot account for bottom labels
+      // if (config.visualizationType === 'Forest Plot' && (config.forestPlot.leftLabel || config.forestPlot.rightLabel)) {
+      //   console.log('HEEEEERE')
+      //   yMax = yMax + 50
+      // }
       if (config.forestPlot.regression.showDiamond || config.forestPlot.regression.description) {
         return [0 + config.forestPlot.rowHeight * 2, yMax - config.forestPlot.rowHeight]
       } else {
