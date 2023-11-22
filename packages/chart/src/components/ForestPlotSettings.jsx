@@ -525,13 +525,6 @@ const ForestPlotSettings = () => {
         <br />
         <hr />
         <br />
-        <h4>Pooled Result Settings</h4>
-        <TextField type='number' value={config.forestPlot?.regression?.upper || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='upper' label='Upper Value' />
-        <TextField type='number' value={config.forestPlot?.regression?.lower || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='lower' label='Lower Value' />
-        <CheckBox value={config.forestPlot?.regression?.showDiamond || false} section='forestPlot' subsection='regression' fieldName='showDiamond' label='Show Diamond' updateField={updateField} />
-        <br />
-        <hr />
-        <br />
         <h4>Labels Settings</h4>
         <TextField type='text' value={config.forestPlot?.leftLabel || ''} updateField={updateField} section='forestPlot' fieldName='leftLabel' label='Left Label' />
         <TextField type='text' value={config.forestPlot?.rightLabel || ''} updateField={updateField} section='forestPlot' fieldName='rightLabel' label='Right Label' />

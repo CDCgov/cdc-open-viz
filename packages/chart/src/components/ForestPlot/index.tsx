@@ -7,15 +7,18 @@ import { GlyphDiamond } from '@visx/glyph'
 import { Text } from '@visx/text'
 import { scaleLinear } from '@visx/scale'
 import { curveLinearClosed } from '@visx/curve'
-import { type ForestPlotProps } from './ForestPlot'
-import { type ChartConfig, type ChartColumns } from '../../types/ChartConfig'
+
+// types
+import { type ForestPlotProps } from '@cdc/chart/src/components/ForestPlot/ForestPlotProps'
+import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
+import { type ChartContext } from '@cdc/chart/src/types/ChartContext'
 
 // cdc
 import ConfigContext from '../../ConfigContext'
 import { getFontSize } from '@cdc/core/helpers/cove/number'
 
 const ForestPlot = (props: ForestPlotProps) => {
-  const { rawData: data, updateConfig } = useContext(ConfigContext)
+  const { rawData: data, updateConfig } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver } = props
   const { forestPlot } = config as ChartConfig
 
@@ -38,13 +41,14 @@ const ForestPlot = (props: ForestPlotProps) => {
     }
   }, [])
 
-  // diamond path
+  const pooledData = config.data.find(d => d[config.xAxis.dataKey] === config.forestPlot.pooledResult.column)
+
   const regressionPoints = [
-    { x: xScale(forestPlot.regression.lower), y: height - Number(config.forestPlot.rowHeight) },
-    { x: xScale(forestPlot.regression.estimateField), y: height - forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
-    { x: xScale(forestPlot.regression.upper), y: height - Number(config.forestPlot.rowHeight) },
-    { x: xScale(forestPlot.regression.estimateField), y: height + forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
-    { x: xScale(forestPlot.regression.lower), y: height - Number(config.forestPlot.rowHeight) }
+    { x: xScale(pooledData[config.forestPlot.lower]), y: height - Number(config.forestPlot.rowHeight) },
+    { x: xScale(pooledData[config.forestPlot.estimateField]), y: height - forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
+    { x: xScale(pooledData[config.forestPlot.upper]), y: height - Number(config.forestPlot.rowHeight) },
+    { x: xScale(pooledData[config.forestPlot.estimateField]), y: height + forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
+    { x: xScale(pooledData[config.forestPlot.lower]), y: height - Number(config.forestPlot.rowHeight) }
   ]
 
   const topMarginOffset = config.forestPlot.rowHeight
@@ -59,21 +63,24 @@ const ForestPlot = (props: ForestPlotProps) => {
     { x: width, y: height }
   ]
 
-  const columnsOnChart = Object.entries(config.columns as ChartColumns)
+  const columnsOnChart = Object.entries(config.columns)
     .map(entry => entry[1])
     .filter(entry => entry.forestPlot === true)
 
   return (
     <>
       <Group>
-        {forestPlot.title !== '' && (
-          <Text className={`forest-plot--title`} x={xScale(0)} y={0} textAnchor='middle' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
+        {forestPlot.title && (
+          <Text className={`forest-plot--title`} x={forestPlot.type === 'Linear' ? xScale(0) : xScale(1)} y={0} textAnchor='middle' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
             {forestPlot.title}
           </Text>
         )}
 
-        {/* Line of no effect. */}
-        {forestPlot.lineOfNoEffect.show && <Line from={{ x: xScale(forestPlot.regression.estimateField), y: 0 + topMarginOffset }} to={{ x: xScale(forestPlot.regression.estimateField), y: height }} className='forestplot__baseline' stroke={forestPlot.regression.baseLineColor || 'black'} />}
+        {/* Line of no effect on Continuous Scale. */}
+        {forestPlot.lineOfNoEffect.show && forestPlot.type === 'Linear' && <Line from={{ x: xScale(0), y: 0 + topMarginOffset }} to={{ x: xScale(0), y: height }} className='forestplot__line-of-no-effect' stroke={forestPlot.regression.baseLineColor || 'black'} />}
+
+        {/* Line of no effect on Logarithmic Scale. */}
+        {forestPlot.lineOfNoEffect.show && forestPlot.type === 'Logarithmic' && <Line from={{ x: xScale(1), y: 0 + topMarginOffset }} to={{ x: xScale(1), y: height }} className='forestplot__line-of-no-effect' stroke={forestPlot.regression.baseLineColor || 'black'} />}
 
         {data.map((d, i) => {
           // calculate both square and circle size based on radius.min and radius.max
@@ -90,8 +97,12 @@ const ForestPlot = (props: ForestPlotProps) => {
 
           // ci size
           const ciEndSize = 4
+          console.log('d', d)
 
-          return (
+          // Don't run calculations on the pooled column
+          const isTotalColumn = d[config.xAxis.dataKey] === forestPlot.pooledResult.column
+
+          return !isTotalColumn ? (
             <Group>
               {/* Confidence Interval Paths */}
               <path
@@ -127,6 +138,8 @@ const ForestPlot = (props: ForestPlotProps) => {
                 </Text>
               )}
             </Group>
+          ) : (
+            <LinePath data={regressionPoints} x={d => d.x} y={d => d.y - getFontSize(config.fontSize) / 2} stroke='black' strokeWidth={2} fill={'black'} curve={curveLinearClosed} />
           )
         })}
 
@@ -183,13 +196,13 @@ const ForestPlot = (props: ForestPlotProps) => {
 
       {/* left bottom label */}
       {forestPlot.leftLabel && (
-        <Text className='forest-plot__left-label' x={xScale(0) - 25} y={height + 50} textAnchor='end'>
+        <Text className='forest-plot__left-label' x={forestPlot.type === 'Linear' ? xScale(0) - 25 : xScale(1) - 25} y={height + 50} textAnchor='end'>
           {forestPlot.leftLabel}
         </Text>
       )}
 
       {forestPlot.rightLabel && (
-        <Text className='forest-plot__right-label' x={xScale(0) + 25} y={height + 50} textAnchor='start'>
+        <Text className='forest-plot__right-label' x={forestPlot.type === 'Linear' ? xScale(0) + 25 : xScale(1) + 25} y={height + 50} textAnchor='start'>
           {forestPlot.rightLabel}
         </Text>
       )}
