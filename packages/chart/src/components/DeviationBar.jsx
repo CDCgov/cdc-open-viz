@@ -1,18 +1,17 @@
 import { Line } from '@visx/shape'
 import { Group } from '@visx/group'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import chroma from 'chroma-js'
+import useIntersectionObserver from '../hooks/useIntersectionObserver'
 
 export default function DeviationBar({ height, xScale }) {
-  const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig, parseDate, formatDate } = useContext(ConfigContext)
-
-  if (!config || config?.series?.length !== 1 || config.orientation !== 'horizontal') return
-
+  const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig, parseDate, formatDate, currentViewport } = useContext(ConfigContext)
   const { barStyle, tipRounding, roundingStyle, twoColor } = config
-
+  const barRefs = useRef([])
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const radius = roundingStyle === 'standard' ? '8px' : roundingStyle === 'shallow' ? '5px' : roundingStyle === 'finger' ? '15px' : '0px'
   const fontSize = { small: 16, medium: 18, large: 20 }
   const isRounded = config.barStyle === 'rounded'
@@ -76,14 +75,57 @@ export default function DeviationBar({ height, xScale }) {
   }
   targetLabel.calculate()
 
+  const targetRef = useRef(null)
+
+  const entry = useIntersectionObserver(targetRef, {})
+
   useEffect(() => {
-    if (config.barStyle === 'lollipop' && !config.isLollipopChart) {
-      updateConfig({ ...config, isLollipopChart: true })
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth)
+      barRefs.current.forEach(bar => {
+        bar.style.transition = 'none'
+        bar.style.transform = 'translate(0) scale(1)'
+      })
     }
-    if (isRounded || config.barStyle === 'flat') {
-      updateConfig({ ...config, isLollipopChart: false })
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
     }
-  }, [config.barStyle])
+  }, [])
+  const [animatedChart, setAnimatedChart] = useState(false)
+
+  useEffect(() => {
+    if (entry?.isIntersecting) {
+      setTimeout(() => {
+        setAnimatedChart(true)
+      }, 100)
+    }
+  }, [entry?.isIntersecting, config.animate]) // eslint-disable-line
+
+  useEffect(() => {
+    barRefs.current.forEach((bar, i) => {
+      if (config.animate) {
+        const normalizedTarget = (target / maxVal) * 100
+        bar.style.opacity = '0'
+        bar.style.transform = `translate(${normalizedTarget / 1.07}%) scale(0, 1)`
+        setTimeout(() => {
+          bar.style.opacity = '1'
+          bar.style.transform = 'translate(0) scale(1)'
+          bar.style.transition = 'transform 0.5s ease'
+        }, 100)
+      } else {
+        bar.style.transition = 'none'
+        bar.style.opacity = '0'
+      }
+      if (!config.animate) {
+        bar.style.transition = 'none'
+        bar.style.opacity = '1'
+      }
+    })
+  }, [config.animate, config, animatedChart])
+
+  // if (!config || config?.series?.length !== 1) return <></>
 
   return (
     <ErrorBoundary component='Deviation Bar'>
@@ -122,7 +164,6 @@ export default function DeviationBar({ height, xScale }) {
           const fill = isBarColorDark ? '#FFFFFF' : '#000000'
 
           let textProps = getTextProps(config.isLollipopChart, textFits, lollipopShapeSize, fill)
-
           // tooltips
           const xAxisValue = formatNumber(barValue, 'left')
           const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[index][config.runtime.originalXAxis.dataKey])) : data[index][config.runtime.originalXAxis.dataKey]
@@ -135,7 +176,20 @@ export default function DeviationBar({ height, xScale }) {
 
           return (
             <Group key={`deviation-bar-${config.orientation}-${seriesKey}-${index}`}>
-              <foreignObject x={barX} y={barY} width={barWidth} height={barHeight} style={{ border: `${borderWidth}px solid #333`, backgroundColor: barColor[barPosition], ...borderRadius }} data-tooltip-html={tooltip} data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} />
+              <foreignObject
+                ref={el => {
+                  // targetRef.current = el
+                  barRefs.current[index] = el
+                }}
+                x={barX}
+                y={barY}
+                width={barWidth}
+                height={barHeight}
+                data-tooltip-html={tooltip}
+                data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+              >
+                <div style={{ width: barWidth, height: barHeight, border: `${borderWidth}px solid #333`, backgroundColor: barColor[barPosition], ...borderRadius }}></div>
+              </foreignObject>
               {config.yAxis.displayNumbersOnBar && (
                 <Text verticalAnchor='middle' x={textX} y={textY} {...textProps[barPosition]}>
                   {formatNumber(d[seriesKey], 'left')}
@@ -155,6 +209,7 @@ export default function DeviationBar({ height, xScale }) {
 
         {shouldShowTargetLine && <Line from={{ x: targetX, y: 0 }} to={{ x: targetX, y: height }} stroke='#333' strokeWidth={2} />}
       </Group>
+      <foreignObject y={height / 2} ref={targetRef}></foreignObject>
     </ErrorBoundary>
   )
 }

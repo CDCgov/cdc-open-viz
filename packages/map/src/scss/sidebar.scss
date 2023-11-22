@@ -15,7 +15,7 @@ aside {
   border-top: $lightGray 1px solid;
   @include breakpointClass(md) {
     &.bottom {
-      border: #c2c2c2 1px solid;
+      border: $lightGray 1px solid;
     }
     &.side {
       z-index: 1;
@@ -27,71 +27,132 @@ aside {
       z-index: 4;
       right: 1em;
       border: $lightGray 1px solid;
-      width: 50%;
       top: 2em;
       right: 1em;
+
+      ul.vertical-sorted {
+        column-count: 2;
+        column-fill: balance;
+      }
+
+      ul:not(.vertical-sorted) {
+        column-count: initial;
+        column-fill: initial;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+    }
+
+    &.bottom {
+      ul.legend-container__ul.vertical-sorted {
+        display: block;
+        column-count: 2;
+        column-fill: balance;
+      }
+
+      ul.legend-container__ul {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        li {
+          width: 50%;
+        }
+      }
+
+      ul.single-row {
+        display: block;
+        column-count: initial;
+        column-fill: auto;
+      }
     }
   }
 
-  .legend-section {
+  .legend-container {
     padding: 1em;
     position: relative;
-    .heading-2 {
+    .legend-container__title {
       font-size: 1.3em;
       padding-bottom: 0;
       display: inline-block;
     }
-    .heading-2 + p, .heading-2 + ul, p + ul, p + p {
+    .legend-container__title + p,
+    .legend-container__title + ul,
+    p + ul,
+    p + p {
       padding-top: 1em;
     }
-    .clear {
-      font-size: .75em;
+    .legend-container__reset-button {
+      font-size: 0.75em;
       color: rgba(0, 0, 0, 0.6);
       position: absolute;
       right: 1em;
       background: rgba(0, 0, 0, 0.1);
       text-transform: uppercase;
-      transition: .2s all;
-      padding: .2em .5em;
-      border: rgba(0,0,0,.2) 1px solid;
+      transition: 0.2s all;
+      padding: 0.2em 0.5em;
+      border: rgba(0, 0, 0, 0.2) 1px solid;
       &:hover {
         text-decoration: none;
-        background: rgba(0,0,0,.15);
-        transition: .2s all;
+        background: rgba(0, 0, 0, 0.15);
+        transition: 0.2s all;
       }
     }
     p {
       line-height: 1.4em;
     }
-    ul {
+    .legend-container__ul {
       list-style: none;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      button { font-size: unset; background: transparent; }
-      li {
+      padding-top: 1em;
+      button {
+        font-size: unset;
+        background: transparent;
+      }
+
+      &.vertical-sorted {
+        flex-direction: column;
+      }
+
+      &:not(.vertical-sorted, .legend-container__ul--single-column) {
+        width: 100%;
+        @include breakpoint(sm) {
+          .legend-container__li {
+            width: 50%;
+          }
+        }
+      }
+      .legend-container__li {
         flex-shrink: 0;
         display: inline-block;
         padding-right: 1em;
         padding-bottom: 1em;
         vertical-align: middle;
-        transition: .1s opacity;
+        transition: 0.1s opacity;
         display: flex;
-        // align-items: center;
-        &.single-legend {
-          cursor: pointer;
-        }
-        .color {
-          flex-shrink: 0;
-        }
-        &.disabled {
-          opacity: .4;
+        cursor: pointer;
+        flex-grow: 1;
+
+        &.legend-container__li--disabled {
+          opacity: 0.4;
         }
       }
     }
   }
 
-  &.side.single-column {
+  .bottom .legend-container__ul--single-column:not(.vertical-sorted) {
+    display: inline-block;
+
+    @include breakpoint(md) {
+      display: flex;
+    }
+
+    .legend-container__li {
+      width: 100%;
+    }
+  }
+
+  &.side .legend-container .legend-container__ul--single-column {
     @include breakpointClass(md) {
       width: 25%;
       min-width: 200px;
@@ -99,7 +160,7 @@ aside {
         flex-direction: column;
         li {
           width: 100%;
-          &:nth-last-of-type(-n+2) {
+          &:nth-last-of-type(-n + 2) {
             padding-bottom: 1em;
           }
           &:last-child {
@@ -108,40 +169,40 @@ aside {
         }
       }
     }
-  }
-  
-  &.bottom.single-row {
+    li {
       width: 100%;
-      .legend-section ul {
-        flex-direction: row;
-        align-items: baseline;
-        justify-content:flex-start;
-        flex-wrap: wrap;
-        li {
-          justify-items: center;
-          line-break:loose;
-          align-items: center;
-          width: auto;
-          padding-right: 1em;
-          padding-bottom: 1em;
-          display: inline-block;
-          & > span {
-            margin: 0 !important;
-          }
+    }
+  }
+
+  &.bottom.single-row {
+    width: 100%;
+    .legend-container ul {
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      li {
+        justify-items: center;
+        line-break: loose;
+        align-items: center;
+        width: auto;
+        padding-right: 1em;
+        padding-bottom: 1em;
+        display: inline-block;
+        & > span {
+          margin: 0 !important;
         }
       }
-  };
+    }
+  }
 
   @include breakpointClass(sm) {
-    .legend-section ul {
+    .legend-container ul {
       align-items: flex-start;
       justify-content: space-between;
       li {
-        width: 48%;
-        padding-right: .5em;
-        &:nth-last-of-type(-n+2) {
-          padding-bottom: 0
-        }
+        flex-grow: 1;
+        padding-right: 0.5em;
       }
     }
   }
@@ -150,15 +211,15 @@ aside {
     padding: 0 1em 1em;
     .heading-3 {
       font-weight: bold;
-      margin-bottom: .5em;
+      margin-bottom: 0.5em;
     }
     form {
-      margin-top: .5em;
+      margin-top: 0.5em;
       line-height: 2em;
       display: flex;
       align-items: flex-end;
       section + section {
-        margin-left: .75em;
+        margin-left: 0.75em;
       }
       select {
         display: block;

@@ -1,0 +1,199 @@
+{
+  "dashboard": {
+    "sharedFilters": [
+      {
+        "key": "Category",
+        "usedBy": [
+          "map1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "http://test.gov/api/poc/topics",
+          "valueSelector": "TopicID",
+          "textSelector": "Topic"
+        },
+        "queryParameter": "topicid",
+        "resetLabel": "- Select -",
+        "showDropdown": true
+      },
+      {
+        "key": "Indicator",
+        "usedBy": [
+          "chart1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "http://test.gov/api/poc/indicators",
+          "valueSelector": "IndicatorID",
+          "textSelector": "Indicator"
+        },
+        "queryParameter": "indicatorid",
+        "resetLabel": "- Select -",
+        "showDropdown": true,
+        "parents": ["Category"]
+      },
+      {
+        "key": "Year",
+        "usedBy": [
+          "map1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "http://test.gov/api/POC/Filters",
+          "valueSelector": "Year",
+          "textSelector": "Year",
+          "heirarchyLookup": "Years"
+        },
+        "queryParameter": "year",
+        "resetLabel": "- Select -",
+        "showDropdown": true,
+        "parents": ["Category", "Indicator"]
+      },
+      {
+        "key": "View By",
+        "usedBy": [
+          "map1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "http://test.gov/api/POC/Filters",
+          "valueSelector": "StratificationCategoryId",
+          "textSelector": "StratificationCategory",
+          "heirarchyLookup": "StratificationCategories"
+        },
+        "resetLabel": "- Select -",
+        "queryParameter": "stratificationcategoryid",
+        "showDropdown": true,
+        "parents": ["Category", "Indicator"]
+      },
+      {
+        "key": "Stratification",
+        "usedBy": [
+          "map1"
+        ],
+        "type": "urlfilter",
+        "apiFilter": {
+          "apiEndpoint": "http://test.gov/api/POC/stratifications",
+          "valueSelector": "StratificationId",
+          "textSelector": "Stratification"
+        },
+        "resetLabel": "- Select -",
+        "queryParameter": "stratificationid",
+        "showDropdown": true,
+        "parents": ["Category", "Indicator", "View By"]
+      }
+    ]
+  },
+  "rows": [
+    [
+      {
+        "width": 12,
+        "widget": "map1"
+      }
+    ]
+  ],
+  "visualizations": {
+    "map1": {
+      "uid": "map1",
+      "type": "map",
+      "defaultData": false,
+      "dataKey": "data3",
+      "general": {
+        "title": "Map Example",
+        "subtext": "",
+        "territoriesLabel": "Territories",
+        "type": "data",
+        "geoType": "us",
+        "headerColor": "theme-blue",
+        "showSidebar": true,
+        "showTitle": true,
+        "geoBorderColor": "darkGray",
+        "showDownloadButton": true,
+        "expandDataTable": true,
+        "showDownloadMediaButton": false,
+        "displayAsHex": false,
+        "displayStateLabels": true,
+        "territoriesAlwaysShow": false,
+        "language": "en",
+        "geoLabelOverride": "",
+        "hasRegions": false,
+        "fullBorder": false,
+        "palette": {
+          "isReversed": false
+        },
+        "allowMapZoom": true,
+        "hideGeoColumnInTooltip": false,
+        "hidePrimaryColumnInTooltip": false
+      },
+      "color": "greenBlue",
+      "columns": {
+        "geo": {
+          "name": "LocationAbbr",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": true
+        },
+        "primary": {
+          "name": "DataValue",
+          "label": "Value",
+          "prefix": "",
+          "suffix": "%",
+          "dataTable": true,
+          "tooltip": true
+        },
+        "additionalColumn1": {
+          "label": "Low Confidence Limit",
+          "dataTable": true,
+          "tooltips": false,
+          "prefix": "",
+          "suffix": "%",
+          "name": "LowConfidenceLimit",
+          "tooltip": true
+      },
+      "additionalColumn2": {
+          "label": "High Confidence Limit",
+          "dataTable": true,
+          "tooltips": false,
+          "prefix": "",
+          "suffix": "%",
+          "name": "HighConfidenceLimit",
+          "tooltip": true
+      },
+        "navigate": {
+          "name": "link",
+          "tooltip": false,
+          "dataTable": false
+        },
+        "latitude": {
+          "name": ""
+        },
+        "longitude": {
+          "name": ""
+        }
+      },
+      "legend": {
+        "descriptions": {},
+        "specialClasses": [
+            "NA"
+        ],
+        "unified": false,
+        "singleColumn": false,
+        "dynamicDescription": false,
+        "type": "equalnumber",
+        "numberOfItems": 4,
+        "position": "side",
+        "title": "Crude Prevalence",
+        "separateZero": true
+      }
+    }
+  },
+  "type": "dashboard",
+  "datasets": {
+    "data3": {
+      "dataUrl": "http://test.gov/api/POC/TableData?DataValueTypeId=CRDMEDN"
+    }
+  },
+  "filterBehavior": "Apply Button",
+  "runtime": {},
+  "uuid": 1684783370106
+}

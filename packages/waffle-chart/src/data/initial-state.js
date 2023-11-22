@@ -29,11 +29,28 @@ export default {
   nodeSpacer: '2',
   theme: 'theme-blue',
   type: 'waffle-chart',
+  gauge: {
+    height: 35,
+    width: '100%'
+  },
   visual: {
     border: true,
     accent: false,
     background: false,
     hideBackgroundColor: false,
-    borderColorTheme: false
+    borderColorTheme: false,
+    colors: {
+      'theme-blue': '#005eaa',
+      'theme-purple': '#712177',
+      'theme-brown': '#705043',
+      'theme-teal': '#00695c',
+      'theme-pink': '#af4448',
+      'theme-orange': '#bb4d00',
+      'theme-slate': '#29434e',
+      'theme-indigo': '#26418f',
+      'theme-cyan': '#006778',
+      'theme-green': '#4b830d',
+      'theme-amber': '#fbab18'
+    }
   }
 }

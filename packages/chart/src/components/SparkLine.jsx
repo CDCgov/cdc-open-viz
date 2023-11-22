@@ -6,6 +6,7 @@ import { LinePath } from '@visx/shape'
 import { Text } from '@visx/text'
 import { scaleLinear, scalePoint } from '@visx/scale'
 import { AxisBottom } from '@visx/axis'
+
 import { MarkerArrow } from '@visx/marker'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -14,7 +15,8 @@ import useReduceData from '../hooks/useReduceData'
 
 import ConfigContext from '../ConfigContext'
 
-export default function SparkLine({ width: parentWidth, height: parentHeight }) {
+const SparkLine = props => {
+  const { width: parentWidth, height: parentHeight } = props
   const { transformedData: data, config, parseDate, formatDate, seriesHighlight, formatNumber, colorScale, handleChartAriaLabels } = useContext(ConfigContext)
   let width = parentWidth
   const { minValue, maxValue } = useReduceData(config, data, ConfigContext)
@@ -91,16 +93,14 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
 
   return (
     <ErrorBoundary component='SparkLine'>
-      <svg role='img' aria-label={handleChartAriaLabels(config)} width={width} height={height} className={'sparkline'} tabIndex={0}>
+      <svg role='img' aria-label={handleChartAriaLabels(config)} width={parentWidth} height={100} className={'sparkline'} tabIndex={0}>
         {config.runtime.lineSeriesKeys?.length > 0
           ? config.runtime.lineSeriesKeys
           : config.runtime.seriesKeys.map((seriesKey, index) => (
               <>
                 <Group
+                  style={{ width }}
                   className='sparkline-group'
-                  height={parentHeight}
-                  style={{ height: parentHeight }}
-                  top={margin.top}
                   key={`series-${seriesKey}`}
                   opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
                   display={config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
@@ -115,25 +115,11 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
 									${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''}
 									</div>`
 
-                    let circleRadii = 4.5
                     return (
                       <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                         <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={yScale(getYAxisData(d, seriesKey))} fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'} textAnchor='middle'>
                           {formatNumber(d[seriesKey])}
                         </Text>
-                        {/* hide data point circles */}
-                        {/* dataIndex + 1 !== data.length && (config.lineDatapointStyle === 'always show' || config.lineDatapointStyle === 'hover') && (
-                          <circle
-                            key={`${seriesKey}-${dataIndex}`}
-                            r={circleRadii}
-                            cx={xScale(getXAxisData(d))}
-                            cy={yScale(getYAxisData(d, seriesKey))}
-                            fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                            style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
-                            data-tooltip-html={tooltip}
-                            data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                          />
-                        )*/}
                       </Group>
                     )
                   })}
@@ -180,3 +166,5 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
     </ErrorBoundary>
   )
 }
+
+export default SparkLine

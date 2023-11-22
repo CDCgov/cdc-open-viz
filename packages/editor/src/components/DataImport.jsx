@@ -82,7 +82,7 @@ export default function DataImport() {
     let dataURL = ''
     // Is URL valid?
     try {
-      dataURL = new URL(externalURL)
+      dataURL = new URL(externalURL, window.location.origin)
     } catch {
       throw errorMessages.urlInvalid
     }
@@ -168,7 +168,7 @@ export default function DataImport() {
       }
 
       if (fileSourceType === 'url') {
-        let urlData = new URL(path)
+        let urlData = new URL(path, window.location.origin)
         fileExtension = Object.keys(supportedDataTypes).find(extension => urlData.pathname.endsWith(extension))
       }
 
@@ -512,7 +512,7 @@ export default function DataImport() {
   } else {
     previewData = config.data
     configureData = config
-    readyToConfigure = !!config.formattedData
+    readyToConfigure = !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data, config.dataDescription))
   }
 
   // Box plots skip the data description steps.

@@ -2,16 +2,14 @@ import Papa from 'papaparse'
 
 export default async function (url, visualizationType = '') {
   try {
-    url = new URL(url)
+    url = new URL(url, window.location.origin)
 
     const path = url.pathname
     const regex = /(?:\.([^.]+))?$/
     const ext = regex.exec(path)[1]
 
-    let data = []
-
     if ('csv' === ext) {
-      data = await fetch(url.href)
+      return await fetch(url.href)
         .then(response => response.text())
         .then(responseText => {
           // for every comma NOT inside quotes, replace with a pipe delimiter
@@ -31,13 +29,9 @@ export default async function (url, visualizationType = '') {
           })
           return parsedCsv.data
         })
+    } else {
+      return await fetch(url.href).then(response => response.json())
     }
-
-    if ('json' === ext) {
-      data = await fetch(url.href).then(response => response.json())
-    }
-
-    return data
   } catch {
     // If we can't parse it, still attempt to fetch it
     try {

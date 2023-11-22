@@ -4,18 +4,19 @@ import ConfigContext from '../ConfigContext'
 // Core
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import Check from '@cdc/core/assets/icon-check.svg'
+import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 import Icon from '@cdc/core/components/ui/Icon'
 
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { Draggable } from '@hello-pangea/dnd'
-import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChart, sequentialPalettes } from '@cdc/core/data/colorPalettes'
 
 const SeriesContext = React.createContext()
 
 const SeriesWrapper = props => {
-  const { updateConfig, config } = useContext(ConfigContext)
+  const { updateConfig, config, rawData } = useContext(ConfigContext)
 
   const { getColumns, selectComponent } = props
 
@@ -24,6 +25,27 @@ const SeriesWrapper = props => {
   const updateSeries = (index, value, property) => {
     let series = [...config.series]
     series[index][property] = value
+
+    // Reset bars to the left axis if changed.
+    if (property === 'type') {
+      if (value === 'Bar') {
+        series[index].axis = 'Left'
+      }
+    }
+
+    // dynamically add in the forecasting fields
+    if (series[index].type === 'Forecasting') {
+      console.log('config', config)
+      let forecastingStages = Array.from(new Set(rawData.map(item => item[series[index].dataKey])))
+      let forecastingStageArr = []
+
+      forecastingStages.forEach(stage => {
+        forecastingStageArr.push({ key: stage })
+      })
+      // debugger
+      series[index].stages = forecastingStageArr
+      series[index].stageColumn = series[index].dataKey
+    }
 
     updateConfig({ ...config, series })
   }
@@ -36,22 +58,22 @@ const SeriesDropdownLineType = props => {
   const { series, index } = props
 
   // Run a quick test to determine if we should even show this.
-  const supportsLineType = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart'].some(item => item.includes(series.type))
+  const supportsLineType = () => {
+    let supported = false
+    if (config.visualizationSubType === 'stacked') return supported
+    const supportedCharts = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg', 'Area Chart']
+    if (supportedCharts.some(item => item.includes(series.type))) {
+      supported = true
+    }
+    return supported
+  }
 
-  if (!supportsLineType) return
+  if (!supportsLineType()) return
 
   const changeLineType = (i, value) => {
     let series = [...config.series]
     series[i].lineType = value
     updateConfig({ ...config, series })
-  }
-
-  const approvedCurveTypes = {
-    Linear: 'curveLinear',
-    Cardinal: 'curveCardinal',
-    Natural: 'curveNatural',
-    'Monotone X': 'curveMonotoneX',
-    Step: 'curveStep'
   }
 
   let options = []
@@ -123,7 +145,6 @@ const SeriesDropdownForecastingStage = props => {
   const { index, series } = props
 
   // Only combo charts are allowed to have different options
-  if (series.type !== 'Forecasting') return
 
   return (
     <InputSelect
@@ -218,6 +239,10 @@ const SeriesDropdownForecastColor = props => {
   // Hide AxisPositionDropdown in certain cases.
   if (!series) return
 
+  const allowedForecastingColors = () => {
+    return Object.keys(sequentialPalettes)
+  }
+
   return series?.stages?.map((stage, stageIndex) => (
     <InputSelect
       key={`${stage}--${stageIndex}`}
@@ -235,7 +260,7 @@ const SeriesDropdownForecastColor = props => {
           series: copyOfSeries
         })
       }}
-      options={Object.keys(colorPalettesChart)}
+      options={Object.keys(sequentialPalettes)}
     />
   ))
 }
@@ -290,7 +315,7 @@ const SeriesDropdownConfidenceInterval = props => {
                   </>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {/* <div className='input-group'>
+                  <div className='input-group'>
                     <label htmlFor='showInTooltip'>Show In Tooltip</label>
                     <div className={'cove-input__checkbox--small'} onClick={e => updateShowInTooltip(e, index, ciIndex)}>
                       <div className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`} style={{ backgroundColor: '' }}>
@@ -298,7 +323,45 @@ const SeriesDropdownConfidenceInterval = props => {
                       </div>
                       <input className='cove-input--hidden' type='checkbox' name={'showInTooltip'} checked={showInTooltip ? showInTooltip : false} readOnly />
                     </div>
-                  </div> */}
+                  </div>
+
+                  {/* <label>
+                    High Label
+                    <input
+                      type='text'
+                      key={`series-ci-high-label-${index}`}
+                      value={series.confidenceIntervals[index]?.highLabel ? series.confidenceIntervals[index]?.highLabel : ''}
+                      onChange={e => {
+                        const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
+                        copiedConfidenceArray[ciIndex].highLabel = e.target.value
+                        const copyOfSeries = [...config.series] // copy the entire series array
+                        copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
+                        updateConfig({
+                          ...config,
+                          series: copyOfSeries
+                        })
+                      }}
+                    />
+                  </label> */}
+
+                  {/* <label>
+                    Low label
+                    <input
+                      type='text'
+                      key={`series-ci-high-label-${index}`}
+                      value={series.confidenceIntervals[index]?.lowLabel ? series.confidenceIntervals[index]?.lowLabel : ''}
+                      onChange={e => {
+                        const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
+                        copiedConfidenceArray[ciIndex].lowLabel = e.target.value
+                        const copyOfSeries = [...config.series] // copy the entire series array
+                        copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
+                        updateConfig({
+                          ...config,
+                          series: copyOfSeries
+                        })
+                      }}
+                    />
+                  </label> */}
 
                   <InputSelect
                     initial='Select an option'
@@ -365,7 +428,7 @@ const SeriesDropdownConfidenceInterval = props => {
 const SeriesInputName = props => {
   const { series, index: i } = props
   const { config, updateConfig } = useContext(ConfigContext)
-  const adjustableNameSeriesTypes = ['Bar', 'Line', 'Area Chart']
+  const adjustableNameSeriesTypes = ['Bar', 'Line', 'Area Chart', 'dashed-sm', 'dashed-md', 'dashed-lg']
 
   if (config.visualizationType === 'Combo') return
 
@@ -375,11 +438,15 @@ const SeriesInputName = props => {
     let series = [...config.series]
     let seriesLabelsCopy = { ...config.runtime.seriesLabels }
     series[i].name = value
-    seriesLabelsCopy[series[i].dataKey] = series[i].name
+    seriesLabelsCopy[series[i].dataKey] = series[i].name ? series[i].name : series[i].dataKey
 
     let newConfig = {
       ...config,
-      series
+      series,
+      runtime: {
+        ...config.runtime,
+        seriesLabels: seriesLabelsCopy
+      }
     }
 
     updateConfig(newConfig)
@@ -506,7 +573,6 @@ const SeriesItem = props => {
                   <Series.Dropdown.SeriesType series={series} index={i} />
                   <Series.Dropdown.AxisPosition series={series} index={i} />
                   <Series.Dropdown.LineType series={series} index={i} />
-                  {/* <Series.Dropdown.ForecastingStage series={series} index={i} /> */}
                   <Series.Dropdown.ForecastingColor series={series} index={i} />
                   <Series.Dropdown.ConfidenceInterval series={series} index={i} />
                   <Series.Checkbox.DisplayInTooltip series={series} index={i} />

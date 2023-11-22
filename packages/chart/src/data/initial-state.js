@@ -1,10 +1,12 @@
 export default {
   type: 'chart',
   debugSvg: false,
+  chartMessage: {
+    noData: 'No Data Available'
+  },
   title: '',
   showTitle: true,
   showDownloadMediaButton: false,
-  showChartBrush: false,
   theme: 'theme-blue',
   animate: false,
   fontSize: 'medium',
@@ -25,6 +27,8 @@ export default {
     left: 5,
     right: 5
   },
+  suppressedData: [],
+
   yAxis: {
     hideAxis: false,
     displayNumbersOnBar: false,
@@ -92,6 +96,7 @@ export default {
     horizontal: 750
   },
   xAxis: {
+    sortDates: false,
     anchors: [],
     type: 'categorical',
     showTargetLabel: true,
@@ -130,6 +135,7 @@ export default {
     // start with a blank list
   },
   legend: {
+    hide: false,
     behavior: 'isolate',
     singleRow: false,
     colorCode: '',
@@ -139,7 +145,14 @@ export default {
     dynamicLegendDefaultText: 'Show All',
     dynamicLegendItemLimit: 5,
     dynamicLegendItemLimitMessage: 'Dynamic Legend Item Limit Hit.',
-    dynamicLegendChartMessage: 'Select Options from the Legend'
+    dynamicLegendChartMessage: 'Select Options from the Legend',
+    lineMode: false,
+    verticalSorted: false
+  },
+  brush: {
+    height: 25,
+    data: [],
+    active: false
   },
   exclusions: {
     active: false,
@@ -221,8 +234,8 @@ export default {
     leftLabel: 'left label',
     rightLabel: 'right label'
   },
-  brush: {
-    pattern_id: 'brush_pattern',
-    accent_color: '#ddd'
+
+  area: {
+    isStacked: false
   }
 }

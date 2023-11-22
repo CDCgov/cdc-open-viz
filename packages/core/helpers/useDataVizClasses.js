@@ -1,4 +1,5 @@
-export default function useDataVizClasses(config) {
+export default function useDataVizClasses(config, viewport = null) {
+  const { legend } = config
   let lineDatapointClass = ''
   let barBorderClass = ''
 
@@ -15,7 +16,14 @@ export default function useDataVizClasses(config) {
   let innerContainerClasses = ['cove-component__inner']
   let contentClasses = ['cove-component__content']
 
-  config.title && innerContainerClasses.push('component--has-title')
+  const { visualizationType, title, showTitle } = config
+
+  if (visualizationType === 'Spark Line' || visualizationType === 'chart') {
+    if (title && showTitle) contentClasses.push('component--has-title')
+  }
+
+  config.showTitle && contentClasses.push('component--has-title')
+  config.title && config.visualizationType !== 'chart' && config.visualizationType !== 'Spark Line' && contentClasses.push('component--has-title')
   config.subtext && innerContainerClasses.push('component--has-subtext')
   config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
   config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
@@ -32,9 +40,34 @@ export default function useDataVizClasses(config) {
   config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
   let sparkLineStyles = {
-    width: '100%',
-    height: '100px'
+    width: '100%'
   }
 
-  return { innerContainerClasses, contentClasses, barBorderClass, lineDatapointClass, sparkLineStyles }
+  // Starting work on combining legend classes.
+  // Using short circuiting to check between charts & maps for now.
+  const getListPosition = () => {
+    if (legend?.position === 'side' && legend?.singleColumn) return 'legend-container__ul--single-column'
+    if (legend?.position === 'bottom' && legend?.singleRow) return 'single-row'
+    if (legend?.verticalSorted && !legend?.singleRow) return 'vertical-sorted'
+    return ''
+  }
+
+  const getUlClasses = () => {
+    const ulClasses = ['legend-container__ul']
+    ulClasses.push(getListPosition())
+    return ulClasses
+  }
+  const legendOuterClasses = [`${legend?.position}`, `${getListPosition()}`, `cdcdataviz-sr-focusable`, `${viewport}`]
+
+  const legendClasses = {
+    aside: legendOuterClasses,
+    section: ['legend-container'],
+    ul: getUlClasses(),
+    li: ['single-legend-item', 'legend-container__li'],
+    title: ['legend-container__title'],
+    resetButton: ['legend-container__reset-button', 'btn', 'clear'],
+    description: ['legend-container__description']
+  }
+
+  return { innerContainerClasses, contentClasses, barBorderClass, lineDatapointClass, sparkLineStyles, legendClasses }
 }
