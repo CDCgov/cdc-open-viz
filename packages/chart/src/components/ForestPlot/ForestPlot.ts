@@ -1,6 +1,30 @@
 import { type Color } from '@cdc/core/types/Color'
 
-export type ForestPlot = {
+export type ChartColumns = {
+  [key: string]: {
+    label: string
+    dataTable: boolean
+    tooltips: boolean
+    prefix: string
+    suffix: string
+    forestPlot: boolean
+    startingPoint: string
+    forestPlotAlignRight: boolean
+    name?: string
+  }
+}
+
+export type ForestPlotProps = {
+  xScale: Function
+  yScale: Function
+  config: any // todo
+  height: number
+  width: number
+  handleTooltipMouseOff: Function
+  handleTooltipMouseOver: Function
+}
+
+export type ForestPlotConfigSettings = {
   colors: {
     line: Color // color of line of effect
     shape: Color // color for effect estimate shape
@@ -50,8 +74,10 @@ export type ForestPlot = {
   shape: string
   startAt: number
   title: string // centered title above the chart
-  width: string
 
   /** @deprecated - moved to lineOfNoEffect*/
   showZeroLine: boolean
+  // labels under chart
+  leftLabel: string
+  rightLabel: string
 }

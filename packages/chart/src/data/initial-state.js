@@ -178,7 +178,6 @@ export default {
   },
   forestPlot: {
     startAt: 0,
-    width: 'auto',
     colors: {
       line: '',
       shape: ''
@@ -218,7 +217,9 @@ export default {
     leftWidthOffset: 0,
     rightWidthOffset: 0,
     showZeroLine: false,
-    hideDateCategoryCol: false
+    hideDateCategoryCol: false,
+    leftLabel: 'left label',
+    rightLabel: 'right label'
   },
   brush: {
     pattern_id: 'brush_pattern',

@@ -115,8 +115,6 @@ const TextField = memo(({ label, tooltip, section = null, subsection = null, fie
 const ForestPlotSettings = () => {
   const { config, rawData: unfilteredData, updateConfig, isDebug } = useContext(ConfigContext)
 
-  console.log('config', config.forestPlot)
-
   const enforceRestrictions = updatedConfig => {
     if (updatedConfig.orientation === 'horizontal') {
       updatedConfig.labels = false
@@ -286,25 +284,6 @@ const ForestPlotSettings = () => {
 
         <TextField type='text' value={config.forestPlot?.title || ''} updateField={updateField} section='forestPlot' fieldName='title' label='Plot Title' />
 
-        {/* width in center */}
-        {/* <label>
-          <span className='edit-label column-heading'>Forest Plot Width (%)</span>
-          <input
-            type='number'
-            min={0}
-            max={100}
-            value={config.forestPlot.width || ''}
-            onChange={e => {
-              updateConfig({
-                ...config,
-                forestPlot: {
-                  ...config.forestPlot,
-                  width: e.target.value
-                }
-              })
-            }}
-          />
-        </label> */}
         <br />
         <hr />
         <br />
@@ -400,7 +379,10 @@ const ForestPlotSettings = () => {
                 ...config,
                 forestPlot: {
                   ...config.forestPlot,
-                  upper: e.target.value
+                  pooledResult: {
+                    ...config.forestPlot.pooledResult,
+                    column: e.target.value
+                  }
                 }
               })
             }
@@ -547,6 +529,12 @@ const ForestPlotSettings = () => {
         <TextField type='number' value={config.forestPlot?.regression?.upper || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='upper' label='Upper Value' />
         <TextField type='number' value={config.forestPlot?.regression?.lower || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='lower' label='Lower Value' />
         <CheckBox value={config.forestPlot?.regression?.showDiamond || false} section='forestPlot' subsection='regression' fieldName='showDiamond' label='Show Diamond' updateField={updateField} />
+        <br />
+        <hr />
+        <br />
+        <h4>Labels Settings</h4>
+        <TextField type='text' value={config.forestPlot?.leftLabel || ''} updateField={updateField} section='forestPlot' fieldName='leftLabel' label='Left Label' />
+        <TextField type='text' value={config.forestPlot?.rightLabel || ''} updateField={updateField} section='forestPlot' fieldName='rightLabel' label='Right Label' />
       </AccordionItemPanel>
     </AccordionItem>
   )
