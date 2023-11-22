@@ -7,16 +7,17 @@ import { GlyphDiamond } from '@visx/glyph'
 import { Text } from '@visx/text'
 import { scaleLinear } from '@visx/scale'
 import { curveLinearClosed } from '@visx/curve'
-import { type ForestPlotConfigSettings, type ForestPlotProps, type ChartColumns } from './ForestPlot'
+import { type ForestPlotProps } from './ForestPlot'
+import { type ChartConfig, type ChartColumns } from '../../types/ChartConfig'
 
 // cdc
 import ConfigContext from '../../ConfigContext'
 import { getFontSize } from '@cdc/core/helpers/cove/number'
 
 const ForestPlot = (props: ForestPlotProps) => {
-  const { transformedData: data, updateConfig, rawData } = useContext(ConfigContext)
+  const { rawData: data, updateConfig } = useContext(ConfigContext)
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver } = props
-  const { forestPlot } = config as { forestPlot: ForestPlotConfigSettings }
+  const { forestPlot } = config as ChartConfig
 
   // Requirements for forest plot
   // - force legend to be hidden for this chart type
@@ -182,13 +183,13 @@ const ForestPlot = (props: ForestPlotProps) => {
 
       {/* left bottom label */}
       {forestPlot.leftLabel && (
-        <Text className='forest-plot__left-label' x={xScale(-25)} y={height + 50} textAnchor='end'>
+        <Text className='forest-plot__left-label' x={xScale(0) - 25} y={height + 50} textAnchor='end'>
           {forestPlot.leftLabel}
         </Text>
       )}
 
       {forestPlot.rightLabel && (
-        <Text className='forest-plot__right-label' x={xScale(25)} y={height + 50} textAnchor='start'>
+        <Text className='forest-plot__right-label' x={xScale(0) + 25} y={height + 50} textAnchor='start'>
           {forestPlot.rightLabel}
         </Text>
       )}
