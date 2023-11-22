@@ -154,13 +154,13 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryTickRotation = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line']
+    const disabledCharts = ['Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryNumTicks = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line']
+    const disabledCharts = ['Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }

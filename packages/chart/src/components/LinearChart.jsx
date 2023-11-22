@@ -110,6 +110,8 @@ const LinearChart = props => {
       // when logarithmic scale applied change value FIRST  of  tick
       tick = 0
     }
+
+    if (config.visualizationType === 'Forest Plot') return formatNumber(tick, 'bottom', false, false, false, true)
     if (runtime.xAxis.type === 'date') return formatDate(tick)
     if (orientation === 'horizontal') return formatNumber(tick, 'left', shouldAbbreviate)
     if (config.xAxis.type === 'continuous') return formatNumber(tick, 'bottom', shouldAbbreviate)
@@ -148,7 +150,12 @@ const LinearChart = props => {
           tickCount = 4 // same default as standalone components
         }
       }
+
+      if (config.visualizationType === 'Forest Plot') {
+        tickCount = config.xAxis.numTicks
+      }
     }
+
     return tickCount
   }
 

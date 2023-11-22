@@ -35,7 +35,6 @@ const SeriesWrapper = props => {
 
     // dynamically add in the forecasting fields
     if (series[index].type === 'Forecasting') {
-      console.log('config', config)
       let forecastingStages = Array.from(new Set(rawData.map(item => item[series[index].dataKey])))
       let forecastingStageArr = []
 
