@@ -17,12 +17,17 @@ export default {
     hasRegions: false,
     fullBorder: false,
     type: 'data',
+    convertFipsCodes: true,
     palette: {
       isReversed: false
     },
     allowMapZoom: true,
     hideGeoColumnInTooltip: false,
-    hidePrimaryColumnInTooltip: false
+    hidePrimaryColumnInTooltip: false,
+    statePicked: {
+      fipsCode: '01',
+      stateName: 'Alabama'
+    }
   },
   type: 'map',
   color: 'pinkpurple',
@@ -53,6 +58,7 @@ export default {
     unified: false,
     singleColumn: false,
     singleRow: false,
+    verticalSorted: false,
     showSpecialClassesLast: false,
     dynamicDescription: false,
     type: 'equalnumber',
@@ -94,6 +100,16 @@ export default {
   mapPosition: { coordinates: [0, 30], zoom: 1 },
   map: {
     layers: []
+  },
+  hexMap: {
+    type: '',
+    shapeGroups: [
+      {
+        legendTitle: '',
+        legendDescription: '',
+        items: [{ key: '', shape: 'Arrow up', column: '', operator: '=', value: '' }]
+      }
+    ]
   },
   filterBehavior: 'Filter Change'
 }

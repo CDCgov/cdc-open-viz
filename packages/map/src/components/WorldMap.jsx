@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useContext } from 'react'
 
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -10,13 +10,32 @@ import ZoomableGroup from './ZoomableGroup'
 import Geo from './Geo'
 import CityList from './CityList'
 import BubbleList from './BubbleList'
+import ConfigContext from '../context'
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
 let projection = geoMercator()
 
 const WorldMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedCountries, setState, setRuntimeData, generateRuntimeData, setFilteredCountryCode, position, setPosition, hasZoom, handleMapAriaLabels, titleCase } = props
+  // prettier-ignore
+  const {
+    applyLegendToRow,
+    applyTooltipsToGeo,
+    data,
+    displayGeoName,
+    generateRuntimeData,
+    geoClickHandler,
+    handleMapAriaLabels,
+    hasZoom,
+    position,
+    setFilteredCountryCode,
+    setPosition,
+    setRuntimeData,
+    setState,
+    state,
+    supportedCountries,
+    titleCase
+  } = useContext(ConfigContext)
 
   // TODO Refactor - state should be set together here to avoid rerenders
   // Resets to original data & zooms out

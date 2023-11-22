@@ -6,6 +6,10 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 
 import useLegendClasses from './../hooks/useLegendClasses'
 import { useHighlightedBars } from '../hooks/useHighlightedBars'
+import { Line } from '@visx/shape'
+import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { scaleOrdinal } from '@visx/scale'
+import { FaStar } from 'react-icons/fa'
 
 // * FILE REVIEW *
 // TODO: fix eslint-disable jsxa11y issues
@@ -28,13 +32,19 @@ const Legend = () => {
     highlightReset,
     transformedData: data,
     colorPalettes,
-    currentViewport
+    currentViewport,
+    handleLineType
   } = useContext(ConfigContext)
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
   const { visualizationType, visualizationSubType, series, runtime, orientation } = config
   // create fn to reverse labels while legend is Bottom.  Legend-right , legend-left works by default.
   const reverseLabels = labels => (config.legend.reverseLabelOrder && config.legend.position === 'bottom' ? labels.reverse() : labels)
+  const displayScale = scaleOrdinal({
+    domain: config.suppressedData?.map(d => d.label),
+    range: ['none'],
+    unknown: 'block'
+  })
 
   const createLegendLabels = defaultLabels => {
     const colorCode = config.legend?.colorCode
@@ -90,7 +100,7 @@ const Legend = () => {
       // loop through each stage/group/area on the chart and create a label
       config.runtime?.forecastingSeriesKeys?.map((outerGroup, index) => {
         return outerGroup?.stages?.map((stage, index) => {
-          let colorValue = colorPalettes[stage.color]?.[2] ? colorPalettes[stage.color]?.[2] : '#ccc'
+          let colorValue = sequentialPalettes[stage.color]?.[2] ? sequentialPalettes[stage.color]?.[2] : colorPalettes[stage.color]?.[2] ? colorPalettes[stage.color]?.[2] : '#ccc'
 
           const newLabel = {
             datum: stage.key,
@@ -144,7 +154,7 @@ const Legend = () => {
           datum: val,
           index: i,
           text: val,
-          value: palette[i]
+          value: colorScale(val)
         }
         return newLabel
       })
@@ -152,20 +162,91 @@ const Legend = () => {
       return reverseLabels(uniqueLabels)
     }
 
+    if ((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && config.visualizationSubType === 'regular' && config.suppressedData) {
+      const lastIndex = defaultLabels.length - 1
+      let newLabels = []
+
+      config.suppressedData?.forEach(({ label, icon, value }, index) => {
+        const dataExists = data.some(d => {
+          return runtime.seriesKeys.some(column => d[column] === value)
+        })
+
+        if (label && icon) {
+          const newLabel = {
+            datum: label,
+            index: lastIndex + index,
+            text: label,
+            icon: <FaStar color='#000' size={15} />
+          }
+          newLabels.push(newLabel)
+        }
+      })
+
+      return [...defaultLabels, ...newLabels]
+    }
+
     return reverseLabels(defaultLabels)
   }
 
-  const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+  const computeMargin = () => {
+    let margin = 0
+    const section = orientation === 'vertical' ? 'xAxis' : 'yAxis'
+    const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isHorizontal = orientation === 'horizontal'
+    const tickRotation = Number(config[section].tickRotation) > 0 ? Number(config[section].tickRotation) : 0
+    const isBrush = config.brush.active
+    const offset = 25
+    const brushHeight = config.brush.height
+    if (!isHorizontal && isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && !config.isResponsiveTicks && !tickRotation) {
+      margin = isBrush ? -config.xAxis.size + config.xAxis.labelOffset + offset + brushHeight : -config.xAxis.size + config.xAxis.labelOffset + offset
+    }
+    if (!isHorizontal && isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && config.isResponsiveTicks && !tickRotation) {
+      margin = isBrush ? -config.xAxis.size + config.xAxis.labelOffset + offset + brushHeight : -config.xAxis.size + config.xAxis.labelOffset + offset
+    }
+    if (!isHorizontal && isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && !config.isResponsiveTicks && tickRotation) {
+      margin = isBrush ? config.xAxis.tickWidthMax + brushHeight + -config.xAxis.size + config.xAxis.labelOffset + offset : config.xAxis.tickWidthMax + -config.xAxis.size + config.xAxis.labelOffset + offset
+    }
+    if (!isHorizontal && isLegendBottom && !config.xAxis.label && !config.dynamicMarginTop && !config.isResponsiveTicks && tickRotation) {
+      margin = isBrush ? config.xAxis.tickWidthMax + brushHeight + -config.xAxis.size + offset * 1.4 : config.xAxis.tickWidthMax + -config.xAxis.size + offset * 1.3
+    }
+    if (!isHorizontal && isLegendBottom && config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks && !tickRotation) {
+      margin = isBrush ? config.dynamicMarginTop + -config.xAxis.size + offset + brushHeight : config.dynamicMarginTop + -config.xAxis.size + offset
+    }
+    if (!isHorizontal && isLegendBottom && !config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks && !tickRotation) {
+      margin = isBrush ? config.dynamicMarginTop - offset : config.dynamicMarginTop - brushHeight - offset
+    }
+    if (isLegendBottom && isHorizontal && config.yAxis.label && !config.isResponsiveTicks) {
+      margin = Number(config.xAxis.labelOffset) + offset
+    }
 
+    if (isLegendBottom && isHorizontal && !config.yAxis.label && !config.isResponsiveTicks && !tickRotation) {
+      margin = Number(config.xAxis.labelOffset) - offset
+    }
+    if (isLegendBottom && isHorizontal && !config.yAxis.label && !config.isResponsiveTicks && tickRotation) {
+      margin = config.xAxis.tickWidthMax + offset
+    }
+    if (isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks && !tickRotation) {
+      margin = Number(config.dynamicMarginTop) + offset
+    }
+    if (isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks && !tickRotation) {
+      margin = Number(config.dynamicMarginTop) !== 0 ? Number(config.dynamicMarginTop) + offset : Number(config.xAxis.labelOffset) + offset
+    }
+    if (isLegendBottom && isHorizontal && !config.yAxis.label && config.isResponsiveTicks && !tickRotation) {
+      margin = Number(config.dynamicMarginTop) !== 0 ? Number(config.dynamicMarginTop) - offset : Number(config.xAxis.labelOffset) - offset
+    }
+    return `${margin}px`
+  }
+
+  const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `0px`
+    marginTop: computeMargin()
+    // marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${brushHeight + top}px`
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
-
   if (!legend) return null
 
   return (
@@ -178,7 +259,7 @@ const Legend = () => {
             return (
               <div className={innerClasses.join(' ')}>
                 {createLegendLabels(labels).map((label, i) => {
-                  let className = 'legend-item'
+                  let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
                   let itemName = label.datum
 
                   // Filter excluded data keys from legend
@@ -196,12 +277,12 @@ const Legend = () => {
                   }
 
                   if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                    className += ' inactive'
+                    className.push('inactive')
                   }
 
                   return (
                     <LegendItem
-                      className={className}
+                      className={className.join(' ')}
                       tabIndex={0}
                       key={`legend-quantile-${i}`}
                       onKeyPress={e => {
@@ -213,7 +294,17 @@ const Legend = () => {
                         highlight(label)
                       }}
                     >
-                      <LegendCircle fill={label.value} />
+                      {config.visualizationType === 'Line' && config.legend.lineMode ? (
+                        <svg width={40} height={20}>
+                          <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={label.value} strokeWidth={2} strokeDasharray={handleLineType(config.series[i]?.type ? config.series[i]?.type : '')} />
+                        </svg>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <LegendCircle margin='0' fill={label.value} display={displayScale(label.datum)} />
+                          <div style={{ marginTop: '2px', marginRight: '6px' }}>{label.icon}</div>
+                        </div>
+                      )}
+
                       <LegendLabel align='left' margin='0 0 0 4px'>
                         {label.text}
                       </LegendLabel>

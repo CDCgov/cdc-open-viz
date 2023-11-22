@@ -21,7 +21,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
       },
       sourcemap: false,
       lib: {
-        entry: `src/${componentName}.jsx`,
+        entry: `src/${componentName}`,
         formats: ['es'],
         fileName: format => `${componentName.toLowerCase()}.js`
       },

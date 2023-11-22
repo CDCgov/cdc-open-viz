@@ -80,7 +80,7 @@ export const useBarChart = () => {
     if (!config.legend.colorCode && config.series.length > 1) {
       return currentBarColor
     }
-    const palettesArr = colorPalettes[config.palette]
+    const palettesArr = config.customColors ?? colorPalettes[config.palette]
     const values = tableData.map(d => {
       return d[config.legend.colorCode]
     })
@@ -161,8 +161,30 @@ export const useBarChart = () => {
     if (!match?.color) return false
     return match
   }
+  const generateIconSize = barWidth => {
+    if (barWidth < 4) {
+      return 1
+    }
+    if (barWidth < 5) {
+      return 4
+    }
+    if (barWidth < 10) {
+      return 6
+    }
+    if (barWidth < 15) {
+      return 7
+    }
+    if (barWidth < 20) {
+      return 8
+    }
+    if (barWidth < 90) {
+      return 8
+    }
+    return 0
+  }
 
   return {
+    generateIconSize,
     isHorizontal,
     barBorderWidth,
     lollipopBarWidth,
