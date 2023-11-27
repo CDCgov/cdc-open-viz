@@ -4,9 +4,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import ConfigContext from '../context'
 
 const Modal = props => {
-  const { applyTooltipsToGeo, capitalize, applyLegendToRow, viewport, type } = useContext(ConfigContext)
-
-  const { content } = props
+  const { applyTooltipsToGeo, capitalize, applyLegendToRow, viewport, type, content } = useContext(ConfigContext)
 
   const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx')
 
