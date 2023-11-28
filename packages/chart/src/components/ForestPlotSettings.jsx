@@ -372,7 +372,7 @@ const ForestPlotSettings = () => {
           value={config.forestPlot.pooledResult.column}
           label='Pooled Result Column'
           initial={'Select'}
-          required={true}
+          required={false}
           onChange={e => {
             if (e.target.value !== '' && e.target.value !== 'Select') {
               updateConfig({
@@ -388,7 +388,7 @@ const ForestPlotSettings = () => {
             }
             e.target.value = ''
           }}
-          options={config.data.map(d => d[config.xAxis.dataKey])}
+          options={['None', ...config.data.map(d => d[config.xAxis.dataKey])]}
         />
 
         <CheckBox value={config.forestPlot?.hideDateCategoryCol || false} section='forestPlot' fieldName='hideDateCategoryCol' label='Hide Date Category Column' updateField={updateField} />

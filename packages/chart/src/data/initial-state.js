@@ -231,8 +231,8 @@ export default {
     rightWidthOffset: 0,
     showZeroLine: false,
     hideDateCategoryCol: false,
-    leftLabel: 'left label',
-    rightLabel: 'right label'
+    leftLabel: '',
+    rightLabel: ''
   },
 
   area: {
