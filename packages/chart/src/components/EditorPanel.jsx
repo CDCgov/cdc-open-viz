@@ -2147,8 +2147,7 @@ const EditorPanel = () => {
 
                     {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                     {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
-
-                    {config.xAxis.type === 'continuous' && (
+                    {(config.xAxis.type === 'continuous' || config.forestPlot.type === 'Logarithmic') && (
                       <>
                         <CheckBox value={config.dataFormat.bottomCommas} section='dataFormat' fieldName='bottomCommas' label='Add commas' updateField={updateField} />
                         <TextField value={config.dataFormat.bottomRoundTo} type='number' section='dataFormat' fieldName='bottomRoundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />

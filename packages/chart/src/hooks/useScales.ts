@@ -1,4 +1,4 @@
-import { scaleBand, scaleLinear, scaleLog, scalePoint, scaleTime } from '@visx/scale'
+import { LogScaleConfig, scaleBand, scaleLinear, scaleLog, scalePoint, scaleTime } from '@visx/scale'
 import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 // TODO move props in
@@ -176,17 +176,52 @@ const useScales = properties => {
     const leftWidthOffsetMobile = (Number(config.forestPlot.leftWidthOffsetMobile) / 100) * xMax
 
     if (screenWidth > 480) {
-      xScale = scaleLinear({
-        domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
-        range: [leftWidthOffset, xMax - rightWidthOffset],
-        type: 'linear'
-      })
+      if (config.forestPlot.type === 'Linear') {
+        xScale = scaleLinear({
+          domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
+          range: [leftWidthOffset, xMax - rightWidthOffset],
+          type: 'linear'
+        })
+      }
+      if (config.forestPlot.type === 'Logarithmic') {
+        let max = Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper])))
+        let fp_min = Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower])))
+
+        console.log('MIN', fp_min)
+
+        max = max < 1 ? 1 - Math.abs(fp_min) + 1 : max
+        xScale = scaleLog<LogScaleConfig>({
+          domain: [fp_min, max],
+          range: [leftWidthOffset, xMax - rightWidthOffset],
+          base: max > 1 ? 10 : 2,
+          round: true,
+          clamp: true
+        })
+
+        console.log('x', xScale.domain())
+      }
     } else {
-      xScale = scaleLinear({
-        domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
-        range: [leftWidthOffsetMobile, xMax - rightWidthOffsetMobile],
-        type: 'linear'
-      })
+      if (config.forestPlot.type === 'Linear') {
+        xScale = scaleLinear({
+          domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
+          range: [leftWidthOffsetMobile, xMax - rightWidthOffsetMobile],
+          type: scaleTypes.LINEAR
+        })
+      }
+
+      if (config.forestPlot.type === 'Logarithmic') {
+        let max = Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper])))
+        let fp_min = Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower])))
+
+        xScale = scaleLog<LogScaleConfig>({
+          domain: [fp_min, max],
+          range: [leftWidthOffset, xMax - rightWidthOffset],
+          nice: true,
+          base: max > 1 ? 10 : 2,
+          round: false,
+          type: scaleTypes.LOG
+        })
+      }
     }
   }
 

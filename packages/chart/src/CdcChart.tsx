@@ -542,6 +542,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)) {
       newConfig.runtime.xAxis = newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis
+
+      if (newConfig.visualizationType === 'Forest Plot') {
+        newConfig.runtime.xAxis.type = newConfig.forestPlot.type
+        newConfig.runtime.xAxis.tickRotation = newConfig.xAxis.tickRotation
+      }
       newConfig.runtime.horizontal = true
       newConfig.orientation = 'horizontal'
     } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType)) {

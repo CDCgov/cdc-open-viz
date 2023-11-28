@@ -2,6 +2,8 @@ import React, { useContext, memo, useState, useEffect } from 'react'
 import ConfigContext from '../ConfigContext'
 import { useDebounce } from 'use-debounce'
 import WarningImage from '../images/warning.svg'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Icon from '@cdc/core/components/ui/Icon'
 
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
@@ -180,7 +182,7 @@ const ForestPlotSettings = () => {
     }
 
     if (section === 'forestPlot' && subsection) {
-      updateConfig({
+      let newConfig = {
         ...config,
         [section]: {
           ...config[section],
@@ -189,7 +191,10 @@ const ForestPlotSettings = () => {
             [fieldName]: newValue
           }
         }
-      })
+      }
+
+      console.log('newCOnfig', newConfig)
+      updateConfig(newConfig)
       return
     }
 
@@ -244,27 +249,155 @@ const ForestPlotSettings = () => {
         </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        <TextField type='text' value={config.forestPlot?.title || ''} updateField={updateField} section='forestPlot' fieldName='title' label='Plot Title' />
-
-        {/* width in center */}
-        {/* <label>
-          <span className='edit-label column-heading'>Forest Plot Width (%)</span>
-          <input
-            type='number'
-            min={0}
-            max={100}
-            value={config.forestPlot.width || ''}
-            onChange={e => {
+        <Select
+          value={config.forestPlot.type}
+          label='Forest Plot Type'
+          initial={'Select'}
+          required={true}
+          onChange={e => {
+            if (e.target.value !== '' && e.target.value !== 'Select') {
               updateConfig({
                 ...config,
                 forestPlot: {
                   ...config.forestPlot,
-                  width: e.target.value
+                  type: e.target.value
                 }
               })
-            }}
-          />
-        </label> */}
+            }
+            e.target.value = ''
+          }}
+          options={['Linear', 'Logarithmic']}
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  Linear - Typically used for continuous outcomes. Line of no effect is positioned on 0 (zero) <br />
+                  <br /> Logarithmic - Typically used for binary outcomes such as risk ratios and odds ratios. Line of no effect is positioned on 1.
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+        />
+
+        <TextField type='text' value={config.forestPlot?.title || ''} updateField={updateField} section='forestPlot' fieldName='title' label='Plot Title' />
+
+        <br />
+        <hr />
+        <br />
+        <h4>Column Settings</h4>
+
+        <Select
+          value={config.forestPlot.estimateField}
+          label='Point Estimate Column'
+          initial={'Select'}
+          required={true}
+          onChange={e => {
+            if (e.target.value !== '' && e.target.value !== 'Select') {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  estimateField: e.target.value
+                }
+              })
+            }
+            e.target.value = ''
+          }}
+          options={getColumns(false)}
+        />
+
+        <Select
+          value={config.forestPlot.shape}
+          label='Point Estimate Shape'
+          initial={'Select'}
+          onChange={e => {
+            if (e.target.value !== '' && e.target.value !== 'Select') {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  shape: e.target.value
+                }
+              })
+            }
+            e.target.value = ''
+          }}
+          options={['text', 'circle', 'square', 'diamond']}
+        />
+
+        <Select
+          value={config.forestPlot.lower}
+          label='Lower CI Column'
+          required={true}
+          initial={'Select'}
+          onChange={e => {
+            if (e.target.value !== '' && e.target.value !== 'Select') {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  lower: e.target.value
+                }
+              })
+            }
+            e.target.value = ''
+          }}
+          options={getColumns(false)}
+        />
+
+        <Select
+          value={config.forestPlot.upper}
+          label='Upper CI Column'
+          initial={'Select'}
+          required={true}
+          onChange={e => {
+            if (e.target.value !== '' && e.target.value !== 'Select') {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  upper: e.target.value
+                }
+              })
+            }
+            e.target.value = ''
+          }}
+          options={getColumns(false)}
+        />
+
+        <Select
+          value={config.forestPlot.pooledResult.column}
+          label='Pooled Result Column'
+          initial={'Select'}
+          required={false}
+          onChange={e => {
+            if (e.target.value !== '' && e.target.value !== 'Select') {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  pooledResult: {
+                    ...config.forestPlot.pooledResult,
+                    column: e.target.value
+                  }
+                }
+              })
+            }
+            e.target.value = ''
+          }}
+          options={['None', ...config.data.map(d => d[config.xAxis.dataKey])]}
+        />
+
+        <CheckBox value={config.forestPlot?.hideDateCategoryCol || false} section='forestPlot' fieldName='hideDateCategoryCol' label='Hide Date Category Column' updateField={updateField} />
+        <CheckBox value={config.forestPlot?.lineOfNoEffect?.show || false} section='forestPlot' subsection='lineOfNoEffect' fieldName='show' label='Show Line of No Effect' updateField={updateField} />
+
+        <br />
+        <hr />
+        <br />
+        <h4>Width Settings</h4>
 
         <label>
           <span className='edit-label column-heading'>Chart Offset Left (%)</span>
@@ -342,104 +475,6 @@ const ForestPlotSettings = () => {
           />
         </label>
 
-        <Select
-          value={config.forestPlot.estimateField}
-          label='Point Estimate Column'
-          initial={'Select'}
-          required={true}
-          onChange={e => {
-            if (e.target.value !== '' && e.target.value !== 'Select') {
-              updateConfig({
-                ...config,
-                forestPlot: {
-                  ...config.forestPlot,
-                  estimateField: e.target.value
-                }
-              })
-            }
-            e.target.value = ''
-          }}
-          options={getColumns(false)}
-        />
-
-        <Select
-          value={config.forestPlot.lower}
-          label='Lower CI Column'
-          required={true}
-          initial={'Select'}
-          onChange={e => {
-            if (e.target.value !== '' && e.target.value !== 'Select') {
-              updateConfig({
-                ...config,
-                forestPlot: {
-                  ...config.forestPlot,
-                  lower: e.target.value
-                }
-              })
-            }
-            e.target.value = ''
-          }}
-          options={getColumns(false)}
-        />
-        <Select
-          value={config.forestPlot.upper}
-          label='Upper CI Column'
-          initial={'Select'}
-          required={true}
-          onChange={e => {
-            if (e.target.value !== '' && e.target.value !== 'Select') {
-              updateConfig({
-                ...config,
-                forestPlot: {
-                  ...config.forestPlot,
-                  upper: e.target.value
-                }
-              })
-            }
-            e.target.value = ''
-          }}
-          options={getColumns(false)}
-        />
-
-        <Select
-          value={config.forestPlot.shape}
-          label='Point Estimate Shape'
-          initial={'Select'}
-          onChange={e => {
-            if (e.target.value !== '' && e.target.value !== 'Select') {
-              updateConfig({
-                ...config,
-                forestPlot: {
-                  ...config.forestPlot,
-                  shape: e.target.value
-                }
-              })
-            }
-            e.target.value = ''
-          }}
-          options={['text', 'circle', 'square', 'diamond']}
-        />
-        <Select
-          value={config.forestPlot.radius.scalingColumn}
-          label='Weight Column'
-          initial={'Select'}
-          onChange={e => {
-            if (e.target.value !== '' && e.target.value !== 'Select') {
-              updateConfig({
-                ...config,
-                forestPlot: {
-                  ...config.forestPlot,
-                  radius: {
-                    ...config.forestPlot.radius,
-                    scalingColumn: e.target.value
-                  }
-                }
-              })
-            }
-            e.target.value = ''
-          }}
-          options={getColumns(false)}
-        />
         <label>
           <span className='edit-label column-heading'>Radius Minimum Size</span>
           <input
@@ -490,15 +525,9 @@ const ForestPlotSettings = () => {
         <br />
         <hr />
         <br />
-        {/* <h4>Add Regression Line</h4> */}
-        {/* <TextField type='number' value={config.forestPlot?.regression?.upper || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='upper' label='Upper Value' /> */}
-        {/* <TextField type='number' value={config.forestPlot?.regression?.lower || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='lower' label='Lower Value' /> */}
-        <TextField type='number' value={config.forestPlot?.regression?.estimateField || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='estimateField' label='Line of No Effect' />
-        <TextField type='text' value={config.forestPlot?.regression?.baseLineColor || 'black'} updateField={updateField} section='forestPlot' subsection='regression' fieldName='baseLineColor' label='Base Color' />
-        <CheckBox value={config.forestPlot?.regression?.showBaseLine || false} section='forestPlot' subsection='regression' fieldName='showBaseLine' label='Show base line' updateField={updateField} />
-        <CheckBox value={config.forestPlot?.regression?.showDiamond || false} section='forestPlot' subsection='regression' fieldName='showDiamond' label='Show Diamond' updateField={updateField} />
-        <CheckBox value={config.forestPlot?.hideDateCategoryCol || false} section='forestPlot' fieldName='hideDateCategoryCol' label='Hide Date Category Column' updateField={updateField} />
-        <TextField type='text' value={config.forestPlot?.regression?.description || ''} updateField={updateField} section='forestPlot' subsection='regression' fieldName='description' label='Description' />
+        <h4>Labels Settings</h4>
+        <TextField type='text' value={config.forestPlot?.leftLabel || ''} updateField={updateField} section='forestPlot' fieldName='leftLabel' label='Left Label' />
+        <TextField type='text' value={config.forestPlot?.rightLabel || ''} updateField={updateField} section='forestPlot' fieldName='rightLabel' label='Right Label' />
       </AccordionItemPanel>
     </AccordionItem>
   )
