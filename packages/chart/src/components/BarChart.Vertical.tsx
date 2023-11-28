@@ -164,19 +164,10 @@ export const BarChartVertical = (props: BarChartProps) => {
                   }
 
                   const getLeft = () => {
-                    if (Number(barWidth) < 10) return 0
-                    if (Number(barWidth) < 15) return 2
-                    if (Number(barWidth) < 20) return 6
-                    if (Number(barWidth) < 25) return 7
-                    if (Number(barWidth) < 30) return 8
-                    if (Number(barWidth) < 35) return 12
-                    if (Number(barWidth) < 40) return 14
-                    if (Number(barWidth) < 45) return 16
-                    if (Number(barWidth) < 50) return 18
-                    if (Number(barWidth) < 55) return 20
-                    if (Number(barWidth) < 60) return 22
-                    if (Number(barWidth) < 65) return 24
-                    else return 20
+                    if (barWidth < 50 && barWidth > 15) return barWidth / 2.5
+                    if (barWidth < 15 && barWidth > 5) return barWidth / 6
+                    if (barWidth < 5) return 0
+                    return barWidth / 2
                   }
                   const iconStyle: { [key: string]: any } = {
                     position: 'absolute',
