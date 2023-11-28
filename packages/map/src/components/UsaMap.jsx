@@ -237,7 +237,7 @@ const UsaMap = props => {
 
     const label = supportedTerritories[territory][1]
 
-    if (!territoryData) return <Shape key={label} label={label} style={styles} text={styles.color} />
+    if (!territoryData) return <Shape key={label} label={label} css={styles} text={styles.color} />
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
@@ -271,8 +271,7 @@ const UsaMap = props => {
           fill: legendColors[2]
         }
       }
-
-      return <Shape key={label} label={label} style={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} territory={territory} />
+      return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} territory={territory} territoryData={territoryData} />
     }
   })
 
