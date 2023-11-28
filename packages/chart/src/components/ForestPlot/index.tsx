@@ -43,13 +43,15 @@ const ForestPlot = (props: ForestPlotProps) => {
 
   const pooledData = config.data.find(d => d[config.xAxis.dataKey] === config.forestPlot.pooledResult.column)
 
-  const regressionPoints = [
-    { x: xScale(pooledData[config.forestPlot.lower]), y: height - Number(config.forestPlot.rowHeight) },
-    { x: xScale(pooledData[config.forestPlot.estimateField]), y: height - forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
-    { x: xScale(pooledData[config.forestPlot.upper]), y: height - Number(config.forestPlot.rowHeight) },
-    { x: xScale(pooledData[config.forestPlot.estimateField]), y: height + forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
-    { x: xScale(pooledData[config.forestPlot.lower]), y: height - Number(config.forestPlot.rowHeight) }
-  ]
+  const regressionPoints = pooledData
+    ? [
+        { x: xScale(pooledData[config.forestPlot.lower]), y: height - Number(config.forestPlot.rowHeight) },
+        { x: xScale(pooledData[config.forestPlot.estimateField]), y: height - forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
+        { x: xScale(pooledData[config.forestPlot.upper]), y: height - Number(config.forestPlot.rowHeight) },
+        { x: xScale(pooledData[config.forestPlot.estimateField]), y: height + forestPlot.pooledResult.diamondHeight - Number(config.forestPlot.rowHeight) },
+        { x: xScale(pooledData[config.forestPlot.lower]), y: height - Number(config.forestPlot.rowHeight) }
+      ]
+    : []
 
   const topMarginOffset = config.forestPlot.rowHeight
 
