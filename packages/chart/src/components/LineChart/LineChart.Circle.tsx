@@ -1,13 +1,10 @@
 import React from 'react'
+import chroma from 'chroma-js'
+import { type ChartConfig } from '../../types/ChartConfig'
 
 // todo: change this config obj to ChartConfig once its created
 type LineChartCircleProps = {
-  config: {
-    xAxis: string
-    data: Object[]
-    lineDatapointStyle: string
-    runtime: Object
-  }
+  config: ChartConfig
   d?: Object
   displayArea: boolean
   seriesKey: string
@@ -29,32 +26,47 @@ const LineChartCircle = (props: LineChartCircleProps) => {
   const { lineDatapointStyle } = config
   const filtered = config?.series.filter(s => s.dataKey === seriesKey)?.[0]
 
+  // If we're not showing the circle, simply return
   if (lineDatapointStyle === 'hidden') return null
 
-  const getColor = (displayArea, colorScale, config, seriesIndex, hoveredKey, seriesKey) => {
-    const customColors = config.customColors || []
+  const getIndex = seriesKey => config.runtime.seriesLabelsAll.indexOf(seriesKey)
+
+  const getColor = (
+    displayArea: boolean,
+    colorScale: Function,
+    config: ChartConfig,
+    hoveredKey: string,
+    seriesKey: string
+  ) => {
     const seriesLabels = config.runtime.seriesLabels || []
     let color
-
-    const getIndex = seriesKey => config.runtime.seriesLabelsAll.indexOf(seriesKey)
 
     if (displayArea) {
       color = colorScale(seriesLabels[hoveredKey] || seriesKey)
     } else {
       color = 'transparent'
     }
+
+    if (config.lineDatapointColor === 'Lighter than Line' && color !== 'transparent' && color) {
+      color = chroma(color).brighten(1)
+    }
     return color
   }
 
   if (lineDatapointStyle === 'always show') {
+    console.log('series index: ', getIndex(config.runtime.seriesLabels[seriesKey]))
     return (
       <circle
-        cx={config.xAxis.type === 'categorical' ? xScale(d[config.xAxis.dataKey]) : xScale(parseDate(d[config.xAxis.dataKey]))}
+        cx={
+          config.xAxis.type === 'categorical'
+            ? xScale(d[config.xAxis.dataKey])
+            : xScale(parseDate(d[config.xAxis.dataKey]))
+        }
         cy={filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered.dataKey])}
         r={4.5}
         opacity={d[seriesKey] ? 1 : 0}
         fillOpacity={1}
-        fill={displayArea ? (colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000') : 'transparent'}
+        fill={getColor(displayArea, colorScale, config, seriesKey, seriesKey)}
         style={{ filter: 'unset', opacity: 1 }}
       />
     )
@@ -84,7 +96,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
           r={4.5}
           opacity={1}
           fillOpacity={1}
-          fill={getColor(displayArea, colorScale, config, seriesIndex, hoveredSeriesKey, seriesKey)}
+          fill={getColor(displayArea, colorScale, config, hoveredSeriesKey, seriesKey)}
           style={{ filter: 'unset', opacity: 1 }}
           key={`line-chart-circle--${index}`}
         />
