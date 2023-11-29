@@ -6,27 +6,47 @@ import { LinePath, Bar } from '@visx/shape'
 import { Text } from '@visx/text'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import ConfigContext from '../ConfigContext'
-import useRightAxis from '../hooks/useRightAxis'
+import ConfigContext from '../../ConfigContext'
+import useRightAxis from '../../hooks/useRightAxis'
 import LineChartCircle from './LineChart.Circle'
 
-const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, showTooltip, seriesStyle = 'Line', svgRef, handleTooltipClick, tooltipData }) => {
-  // Not sure why there's a redraw here.
+// types
+import { type ChartContext } from '../../types/ChartContext'
+import { type LineChartProps } from './LineChartProps'
 
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig, handleLineType, tableData } = useContext(ConfigContext)
+const LineChart = (props: LineChartProps) => {
+  // prettier-ignore
+  const {
+    getXAxisData,
+    getYAxisData,
+    handleTooltipClick,
+    handleTooltipMouseOff,
+    handleTooltipMouseOver,
+    tooltipData,
+    xMax,
+    xScale,
+    yMax,
+    yScale,
+  } = props
+
+  // prettier-ignore
+  const {
+    colorScale,
+    config,
+    formatNumber,
+    handleLineType,
+    isNumber,
+    parseDate,
+    seriesHighlight,
+    tableData,
+    transformedData: data,
+    updateConfig,
+  } = useContext<ChartContext>(ConfigContext)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
   if (!handleTooltipMouseOver) return
-  const handleAxisFormating = (axis = 'left', label, value) => {
-    // if this is an x axis category/date value return without doing any formatting.
-    // if (label === config.runtime.xAxis.label) return value
-    axis = String(axis).toLocaleLowerCase()
-    if (label) {
-      return `${label}: ${formatNumber(value, axis)}`
-    }
-    return `${formatNumber(value, axis)}`
-  }
 
   const DEBUG = false
+  const { lineDatapointStyle, showLineSeriesLabels, legend } = config
 
   return (
     <ErrorBoundary component='LineChart'>
@@ -38,21 +58,19 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
           const seriesData = config.series.filter(item => item.dataKey === seriesKey)
           const seriesAxis = seriesData[0].axis ? seriesData[0].axis : 'left'
 
-          let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
+          let displayArea = legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
 
           return (
             <Group
               key={`series-${seriesKey}`}
-              opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
-              display={config.legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !config.legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
+              opacity={legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
+              display={legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
             >
               {data.map((d, dataIndex) => {
                 // Find the series object from the config.series array that has a dataKey matching the seriesKey variable.
                 const series = config.series.find(({ dataKey }) => dataKey === seriesKey)
                 const { axis } = series
 
-                const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.xAxis.dataKey])) : d[config.runtime.xAxis.dataKey]
-                const yAxisValue = getYAxisData(d, seriesKey)
                 const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
                 const labeltype = axis === 'Right' ? 'rightLabel' : 'label'
                 let label = config.runtime.yAxis[labeltype]
@@ -73,14 +91,14 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                         {formatNumber(d[seriesKey], 'left')}
                       </Text>
 
-                      {(config.lineDatapointStyle === 'hidden' || config.lineDatapointStyle === 'always show') && (
+                      {(lineDatapointStyle === 'hidden' || lineDatapointStyle === 'always show') && (
                         <LineChartCircle d={d} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />
                       )}
                     </Group>
                   )
                 )
               })}
-              <>{config.lineDatapointStyle === 'hover' && <LineChartCircle config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />}</>
+              <>{lineDatapointStyle === 'hover' && <LineChartCircle config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />}</>
               {/* STANDARD LINE */}
               <LinePath
                 curve={allCurves[seriesData[0].lineType]}
@@ -114,7 +132,7 @@ const LineChart = ({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, han
                 />
               )}
               {/* Render series labels at end if each line if selected in the editor */}
-              {config.showLineSeriesLabels &&
+              {showLineSeriesLabels &&
                 (config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map(seriesKey => {
                   let lastDatum
                   for (let i = data.length - 1; i >= 0; i--) {
