@@ -11,6 +11,7 @@ export default {
   animate: false,
   fontSize: 'medium',
   lineDatapointStyle: 'hover',
+  lineDatapointColor: 'Same as Line',
   barHasBorder: 'false',
   isLollipopChart: false,
   lollipopShape: 'circle',
