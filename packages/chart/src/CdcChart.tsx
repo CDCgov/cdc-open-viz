@@ -291,6 +291,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       if (!series.axis) series.axis = 'Left'
     })
 
+    if (!newConfig.data && data) {
+      newConfig.data = data
+    }
+
     const processedConfig = { ...(await coveUpdateWorker(newConfig)) }
 
     updateConfig(processedConfig, data)
