@@ -152,7 +152,7 @@ const LinearChart = props => {
       }
 
       if (config.visualizationType === 'Forest Plot') {
-        tickCount = config.xAxis.numTicks
+        tickCount = config.xAxis.numTicks !== '' ? config.xAxis.numTicks : 4
       }
     }
 

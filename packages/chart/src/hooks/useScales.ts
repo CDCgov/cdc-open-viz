@@ -1,12 +1,23 @@
 import { LogScaleConfig, scaleBand, scaleLinear, scaleLog, scalePoint, scaleTime } from '@visx/scale'
 import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
-// TODO move props in
+import { ChartConfig } from '../types/ChartConfig'
+import { ChartContext } from '../types/ChartContext'
 
-const useScales = properties => {
-  let { xAxisDataMapped, xMax, yMax, min, max, config, data, leftMax, rightMax } = properties
+type useScaleProps = {
+  config: ChartConfig // standard chart config
+  data: Object[] // standard data array
+  max: number // maximum value from useMinMax hook
+  min: number // minimum value from useMinMax hook
+  xAxisDataMapped: Object[] // array of x axis date/category items
+  xMax: number // chart svg width
+  yMax: number // chart svg height
+}
 
-  const { rawData, dimensions } = useContext(ConfigContext)
+const useScales = (properties: useScaleProps) => {
+  let { xAxisDataMapped, xMax, yMax, min, max, config, data } = properties
+
+  const { rawData, dimensions } = useContext<ChartContext>(ConfigContext)
 
   const [screenWidth, screenHeight] = dimensions
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
@@ -179,26 +190,20 @@ const useScales = properties => {
       if (config.forestPlot.type === 'Linear') {
         xScale = scaleLinear({
           domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
-          range: [leftWidthOffset, xMax - rightWidthOffset],
-          type: 'linear'
+          range: [leftWidthOffset, xMax - rightWidthOffset]
         })
+        xScale.type = scaleTypes.LINEAR
       }
       if (config.forestPlot.type === 'Logarithmic') {
         let max = Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper])))
         let fp_min = Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower])))
 
-        console.log('MIN', fp_min)
-
-        max = max < 1 ? 1 - Math.abs(fp_min) + 1 : max
         xScale = scaleLog<LogScaleConfig>({
           domain: [fp_min, max],
           range: [leftWidthOffset, xMax - rightWidthOffset],
-          base: max > 1 ? 10 : 2,
-          round: true,
-          clamp: true
+          nice: true
         })
-
-        console.log('x', xScale.domain())
+        xScale.type = scaleTypes.LOG
       }
     } else {
       if (config.forestPlot.type === 'Linear') {
@@ -224,6 +229,8 @@ const useScales = properties => {
       }
     }
   }
+
+  console.log('here', xScale.type)
 
   return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush }
 }

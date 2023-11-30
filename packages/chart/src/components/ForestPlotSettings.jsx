@@ -292,7 +292,7 @@ const ForestPlotSettings = () => {
         <Select
           value={config.forestPlot.estimateField}
           label='Point Estimate Column'
-          initial={'Select'}
+          initial={config.forestPlot.estimateField || 'Select'}
           required={true}
           onChange={e => {
             if (e.target.value !== '' && e.target.value !== 'Select') {
@@ -312,7 +312,7 @@ const ForestPlotSettings = () => {
         <Select
           value={config.forestPlot.shape}
           label='Point Estimate Shape'
-          initial={'Select'}
+          initial={config.forestPlot.shape || 'Select'}
           onChange={e => {
             if (e.target.value !== '' && e.target.value !== 'Select') {
               updateConfig({
@@ -325,14 +325,36 @@ const ForestPlotSettings = () => {
             }
             e.target.value = ''
           }}
-          options={['text', 'circle', 'square', 'diamond']}
+          options={['text', 'circle', 'square']}
+        />
+
+        <Select
+          value={config.forestPlot.radius.scalingColumn}
+          label='Scale Radius Column'
+          initial={'Select'}
+          onChange={e => {
+            if (e.target.value !== '' && e.target.value !== 'Select') {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  radius: {
+                    ...config.forestPlot.radius,
+                    scalingColumn: e.target.value
+                  }
+                }
+              })
+            }
+            e.target.value = ''
+          }}
+          options={getColumns(false)}
         />
 
         <Select
           value={config.forestPlot.lower}
           label='Lower CI Column'
           required={true}
-          initial={'Select'}
+          initial={config.forestPlot.lower || 'Select'}
           onChange={e => {
             if (e.target.value !== '' && e.target.value !== 'Select') {
               updateConfig({
@@ -351,7 +373,7 @@ const ForestPlotSettings = () => {
         <Select
           value={config.forestPlot.upper}
           label='Upper CI Column'
-          initial={'Select'}
+          initial={config.forestPlot.upper || 'Select'}
           required={true}
           onChange={e => {
             if (e.target.value !== '' && e.target.value !== 'Select') {
@@ -370,8 +392,8 @@ const ForestPlotSettings = () => {
 
         <Select
           value={config.forestPlot.pooledResult.column}
-          label='Pooled Result Column'
-          initial={'Select'}
+          label='Pooled Result Row'
+          initial={config.forestPlot.pooledResult.column || 'Select'}
           required={false}
           onChange={e => {
             if (e.target.value !== '' && e.target.value !== 'Select') {
