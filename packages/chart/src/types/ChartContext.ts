@@ -4,6 +4,7 @@ import { type ChartConfig } from './ChartConfig'
 type LineChartContext = {
   colorScale: Function
   config: ChartConfig
+  dimensions: [screenWidth: number, screenHeight: number]
   formatDate: Function
   formatNumber: Function
   handleLineType: Function
@@ -22,6 +23,8 @@ export type ChartContext =
   | {
       colorScale?: Function
       config?: ChartConfig
+      dimensions: [screenWidth: number, screenHeight: number]
+
       formatDate?: Function
       formatNumber?: Function
       handleLineType?: Function

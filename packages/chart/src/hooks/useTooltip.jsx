@@ -86,7 +86,7 @@ export const useTooltip = props => {
 
     const resolvedScaleValues = orientation === 'vertical' ? yScaleValues : xScaleValues
 
-    const forestPlotXValue = visualizationType === 'Forest Plot' ? data?.filter(d => d[xAxis.dataKey] === getClosestYValue(y))[0][config.forestPlot.estimateField] : null
+    // const forestPlotXValue = visualizationType === 'Forest Plot' ? data?.filter(d => d[xAxis.dataKey] === getClosestYValue(y))?.[0]?.[config.forestPlot.estimateField] : null
 
     const getAxisPosition = seriesKey => {
       const seriesObj = config.series.filter(s => s.dataKey === seriesKey)[0]
