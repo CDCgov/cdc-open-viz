@@ -6,7 +6,7 @@ export const customSort = (a, b, sortBy, config) => {
 
   // Treat booleans and nulls as an empty string
   valueA = valueA === false || valueA === true || valueA === null ? '' : valueA
-  valueB = valueB === false || valueB == true || valueB === null ? '' : valueB
+  valueB = valueB === false || valueB === true || valueB === null ? '' : valueB
 
   const trimmedA = String(valueA).trim()
   const trimmedB = String(valueB).trim()
