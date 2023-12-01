@@ -3315,7 +3315,7 @@ const EditorPanel = () => {
                     section='table'
                     type='textarea'
                     fieldName='caption'
-                    label='Data Table Caption'
+                    label='Screen Reader Description'
                     placeholder=' Data table'
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
