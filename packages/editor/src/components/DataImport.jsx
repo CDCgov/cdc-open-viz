@@ -351,6 +351,7 @@ export default function DataImport() {
     asyncWrapper()
   }, [config.datasets]) // eslint-disable-line
 
+  // todo: code repetition in Widget.jsx?
   const updateDescriptionProp = (visualizationKey, datasetKey, key, value) => {
     if (config.type === 'dashboard') {
       let dataDescription = { ...config.datasets[datasetKey].dataDescription, [key]: value }
