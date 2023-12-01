@@ -229,9 +229,6 @@ const useScales = (properties: useScaleProps) => {
       }
     }
   }
-
-  console.log('here', xScale.type)
-
   return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush }
 }
 

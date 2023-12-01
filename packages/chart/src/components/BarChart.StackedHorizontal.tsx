@@ -44,7 +44,6 @@ const BarChartStackedHorizontal = (props: BarChartProps) => {
                     ${xAxisTooltip}
                       </div>`
 
-                console.log('test', colorScale(config.runtime.seriesLabels[bar.key]))
                 if (chroma.contrast(labelColor, colorScale(config.runtime.seriesLabels[bar.key])) < 4.9) {
                   labelColor = '#FFFFFF'
                 }

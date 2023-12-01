@@ -21,8 +21,6 @@ const ForestPlot = (props: ForestPlotProps) => {
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver } = props
   const { forestPlot } = config as ChartConfig
 
-  console.log('scale', xScale.type)
-
   // Requirements for forest plot
   // - force legend to be hidden for this chart type
   // - reset the date category axis to zero

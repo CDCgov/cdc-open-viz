@@ -193,7 +193,6 @@ const ForestPlotSettings = () => {
         }
       }
 
-      console.log('newCOnfig', newConfig)
       updateConfig(newConfig)
       return
     }
