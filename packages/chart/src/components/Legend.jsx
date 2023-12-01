@@ -188,60 +188,11 @@ const Legend = () => {
     return reverseLabels(defaultLabels)
   }
 
-  const computeMargin = () => {
-    let margin = 0
-    const section = orientation === 'vertical' ? 'xAxis' : 'yAxis'
-    const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
-    const isHorizontal = orientation === 'horizontal'
-    const tickRotation = Number(config[section].tickRotation) > 0 ? Number(config[section].tickRotation) : 0
-    const isBrush = config.brush.active
-    const offset = 25
-    const brushHeight = config.brush.height
-    if (!isHorizontal && isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && !config.isResponsiveTicks && !tickRotation) {
-      margin = isBrush ? -config.xAxis.size + config.xAxis.labelOffset + offset + brushHeight : -config.xAxis.size + config.xAxis.labelOffset + offset
-    }
-    if (!isHorizontal && isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && config.isResponsiveTicks && !tickRotation) {
-      margin = isBrush ? -config.xAxis.size + config.xAxis.labelOffset + offset + brushHeight : -config.xAxis.size + config.xAxis.labelOffset + offset
-    }
-    if (!isHorizontal && isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && !config.isResponsiveTicks && tickRotation) {
-      margin = isBrush ? config.xAxis.tickWidthMax + brushHeight + -config.xAxis.size + config.xAxis.labelOffset + offset : config.xAxis.tickWidthMax + -config.xAxis.size + config.xAxis.labelOffset + offset
-    }
-    if (!isHorizontal && isLegendBottom && !config.xAxis.label && !config.dynamicMarginTop && !config.isResponsiveTicks && tickRotation) {
-      margin = isBrush ? config.xAxis.tickWidthMax + brushHeight + -config.xAxis.size + offset * 1.4 : config.xAxis.tickWidthMax + -config.xAxis.size + offset * 1.3
-    }
-    if (!isHorizontal && isLegendBottom && config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks && !tickRotation) {
-      margin = isBrush ? config.dynamicMarginTop + -config.xAxis.size + offset + brushHeight : config.dynamicMarginTop + -config.xAxis.size + offset
-    }
-    if (!isHorizontal && isLegendBottom && !config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks && !tickRotation) {
-      margin = isBrush ? config.dynamicMarginTop - offset : config.dynamicMarginTop - brushHeight - offset
-    }
-    if (isLegendBottom && isHorizontal && config.yAxis.label && !config.isResponsiveTicks) {
-      margin = Number(config.xAxis.labelOffset) + offset
-    }
-
-    if (isLegendBottom && isHorizontal && !config.yAxis.label && !config.isResponsiveTicks && !tickRotation) {
-      margin = Number(config.xAxis.labelOffset) - offset
-    }
-    if (isLegendBottom && isHorizontal && !config.yAxis.label && !config.isResponsiveTicks && tickRotation) {
-      margin = config.xAxis.tickWidthMax + offset
-    }
-    if (isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks && !tickRotation) {
-      margin = Number(config.dynamicMarginTop) + offset
-    }
-    if (isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks && !tickRotation) {
-      margin = Number(config.dynamicMarginTop) !== 0 ? Number(config.dynamicMarginTop) + offset : Number(config.xAxis.labelOffset) + offset
-    }
-    if (isLegendBottom && isHorizontal && !config.yAxis.label && config.isResponsiveTicks && !tickRotation) {
-      margin = Number(config.dynamicMarginTop) !== 0 ? Number(config.dynamicMarginTop) - offset : Number(config.xAxis.labelOffset) - offset
-    }
-    return `${margin}px`
-  }
-
   const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: computeMargin()
-    // marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${brushHeight + top}px`
+    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${isBottomOrSmallViewport ? config.dynamicMarginTop + 15 : 0}px`
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
