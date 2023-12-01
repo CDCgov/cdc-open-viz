@@ -2609,7 +2609,7 @@ const EditorPanel = props => {
                     updateField={updateField}
                     section='table'
                     fieldName='caption'
-                    label='Data Table Caption'
+                    label='Screen Reader Description'
                     placeholder='Data Table'
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
