@@ -1305,7 +1305,7 @@ const EditorPanel = () => {
                     </>
                   )}
                   {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
-                  {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />}
+                  {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
                 </AccordionItemPanel>
               </AccordionItem>
             )}
@@ -2103,7 +2103,7 @@ const EditorPanel = () => {
                       }
                       updateField={updateField}
                     />
-                    {visHasBrushChart && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
+                    {/* {visHasBrushChart && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />} */}
 
                     {config.exclusions.active && (
                       <>
