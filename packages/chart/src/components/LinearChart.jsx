@@ -222,48 +222,6 @@ const LinearChart = props => {
       <div style={{ width: `${width}px`, height: `${height}px`, overflow: 'visible' }} className='tooltip-boundary'>
         <svg width={'100%'} height={'100%'} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} ref={svgRef} style={{ overflow: 'visible' }}>
           <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
-          {config.regions
-            ? config.regions.map(region => {
-                if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
-
-                let from
-                let to
-                let width
-
-                if (config.xAxis.type === 'date') {
-                  from = xScale(parseDate(region.from).getTime())
-                  to = xScale(parseDate(region.to).getTime())
-                  width = to - from
-                }
-
-                if (config.xAxis.type === 'categorical') {
-                  from = xScale(region.from)
-                  to = xScale(region.to)
-                  width = to - from
-                }
-
-                if (!from) return null
-                if (!to) return null
-
-                return (
-                  <Group className='regions' left={Number(runtime.yAxis.size)} key={region.label}>
-                    <path
-                      stroke='#333'
-                      d={`M${from} -5
-                          L${from} 5
-                          M${from} 0
-                          L${to} 0
-                          M${to} -5
-                          L${to} 5`}
-                    />
-                    <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-                    <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-                      {region.label}
-                    </Text>
-                  </Group>
-                )
-              })
-            : ''}
           {/* Y axis */}
           {!['Spark Line', 'Forest Plot'].includes(visualizationType) && (
             <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
@@ -726,6 +684,48 @@ const LinearChart = props => {
               />
               )
             })}
+          {config.regions
+            ? config.regions.map(region => {
+                if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+
+                let from
+                let to
+                let width
+
+                if (config.xAxis.type === 'date') {
+                  from = xScale(parseDate(region.from).getTime())
+                  to = xScale(parseDate(region.to).getTime())
+                  width = to - from
+                }
+
+                if (config.xAxis.type === 'categorical') {
+                  from = xScale(region.from)
+                  to = xScale(region.to)
+                  width = to - from
+                }
+
+                if (!from) return null
+                if (!to) return null
+
+                return (
+                  <Group className='regions' left={Number(runtime.yAxis.size)} key={region.label} onMouseMove={handleTooltipMouseOver} onMouseLeave={handleTooltipMouseOff} handleTooltipClick={handleTooltipClick} tooltipData={JSON.stringify(tooltipData)} showTooltip={showTooltip}>
+                    <path
+                      stroke='#333'
+                      d={`M${from} -5
+                          L${from} 5
+                          M${from} 0
+                          L${to} 0
+                          M${to} -5
+                          L${to} 5`}
+                    />
+                    <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+                    <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+                      {region.label}
+                    </Text>
+                  </Group>
+                )
+              })
+            : ''}
           {chartHasTooltipGuides && showTooltip && tooltipData && config.visual.verticalHoverLine && (
             <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
               <Line from={{ x: tooltipData.dataXPosition - 10, y: 0 }} to={{ x: tooltipData.dataXPosition - 10, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
