@@ -3225,6 +3225,7 @@ const EditorPanel = () => {
                     />
                   </label>
                 )}
+                <CheckBox value={config.tooltips.singleSeries} fieldName='singleSeries' section='tooltips' label='SHOW HOVER FOR SINGLE DATA SERIES' updateField={updateField} />
 
                 <label>
                   <span className='edit-label column-heading'>No Data Message</span>

@@ -187,7 +187,8 @@ export default {
   highlightedBarValues: [],
   series: [],
   tooltips: {
-    opacity: 90
+    opacity: 90,
+    singleSeries: true
   },
   forestPlot: {
     startAt: 0,
