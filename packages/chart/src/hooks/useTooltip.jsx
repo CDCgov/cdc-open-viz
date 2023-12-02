@@ -53,7 +53,7 @@ export const useTooltip = props => {
     const { x, y } = eventSvgCoords
 
     // Additional data for pie charts
-    const { data: pieChartData, arc } = additionalChartData
+    const { data: pieChartData, arc } = additionalChartData ?? {}
 
     const closestXScaleValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
 
