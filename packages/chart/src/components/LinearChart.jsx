@@ -34,6 +34,7 @@ import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 // styles
 import '../scss/LinearChart.scss'
 import ZoomBrush from './ZoomBrush'
+import { localPoint } from '@visx/event'
 
 const LinearChart = props => {
   const { isEditor, isDashboard, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
@@ -213,14 +214,45 @@ const LinearChart = props => {
     if (config.visualizationType === 'Forest Plot') return config.data.length
     return countNumOfTicks('yAxis')
   }
+  const [point, setPoint] = useState({
+    x: 0,
+    y: 0
+  })
+  const onMouseMove = event => {
+    const svgRect = event.currentTarget.getBoundingClientRect()
+    const x = event.clientX - svgRect.left
+    const y = event.clientY - svgRect.top
+    // e.stopPropagation()
+    // const eventSvgCoords = localPoint(e)
+    // const { x, y } = eventSvgCoords
+    console.log(xMax, 'msx')
+    console.log(yMax, 'msx')
 
+    const myX = x > xMax ? 0 : x
+    setPoint({
+      x,
+      y: y
+    })
+  }
+
+  console.log(width)
   return isNaN(width) ? (
     <React.Fragment></React.Fragment>
   ) : (
     <ErrorBoundary component='LinearChart'>
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
       <div style={{ width: `${width}px`, height: `${height}px`, overflow: 'visible' }} className='tooltip-boundary'>
-        <svg width={'100%'} height={'100%'} className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`} role='img' aria-label={handleChartAriaLabels(config)} ref={svgRef} style={{ overflow: 'visible' }}>
+        <svg
+          // onMouseLeave={() => setPoint(null)}
+          onMouseMove={onMouseMove}
+          width={'100%'}
+          height={'100%'}
+          className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`}
+          role='img'
+          aria-label={handleChartAriaLabels(config)}
+          ref={svgRef}
+          style={{ overflow: 'visible' }}
+        >
           <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
           {config.regions
             ? config.regions.map(region => {
@@ -741,6 +773,12 @@ const LinearChart = props => {
               {config.chartMessage.noData}
             </Text>
           )}
+          {/* <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
+            <Line from={{ x: point.x - 10, y: 0 }} to={{ x: point.x - 10, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
+          </Group>
+          <Group key='tooltipLine-horizontal' className='horizontal-tooltip-line' left={config.yAxis.size ? config.yAxis.size : 0}>
+            <Line from={{ x: 0, y: point.y }} to={{ x: xMax, y: point.y }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='horizontal-tooltip-line' />
+          </Group> */}
         </svg>
         {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
           <>
@@ -750,9 +788,11 @@ const LinearChart = props => {
             </TooltipWithBounds>
           </>
         )}
-        {(config.orientation === 'horizontal' || config.visualizationType === 'Scatter Plot' || config.visualizationType === 'Box Plot') && (
+
+        {(config.visualizationType === 'Scatter Plot' || config.visualizationType === 'Box Plot' || config.tooltips.singleSeries) && (
           <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />
         )}
+
         <div className='animation-trigger' ref={triggerRef} />
       </div>
     </ErrorBoundary>
