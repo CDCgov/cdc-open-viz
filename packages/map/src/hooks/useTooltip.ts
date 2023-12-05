@@ -1,6 +1,8 @@
 const useTooltip = props => {
   const { state, displayGeoName, displayDataAsText, supportedStatesFipsCodes } = props
 
+  const config = state
+
   /**
    * On county maps there's a need to append the state name
    * @param {String} toolTipText - previous tooltip text to build upon
@@ -8,9 +10,9 @@ const useTooltip = props => {
    * @returns {String} toolTipText - new toolTipText
    */
   const handleTooltipStateNameColumn = (toolTipText, row) => {
-    const { geoType, type, hideGeoColumnInTooltip } = state.general
+    const { geoType, type, hideGeoColumnInTooltip } = config.general
     if (geoType === 'us-county' && type !== 'us-geocode') {
-      let stateFipsCode = row[state.columns.geo.name].substring(0, 2)
+      let stateFipsCode = row[config.columns.geo.name].substring(0, 2)
       const stateName = supportedStatesFipsCodes[stateFipsCode]
       toolTipText += hideGeoColumnInTooltip ? `<strong>${stateName}</strong><br/>` : `<strong>Location:  ${stateName}</strong><br/>`
     }
@@ -22,11 +24,11 @@ const useTooltip = props => {
    * @param {String} geoName - feature name
    * @returns {String} text to be appended to toolTipText
    */
-  const handleTooltipGeoColumn = geoName => {
-    const { hideGeoColumnInTooltip } = state.general
+  const handleTooltipGeoColumn = (geoName: string) => {
+    const { hideGeoColumnInTooltip } = config.general as { hideGeoColumnInTooltip: boolean }
 
-    const handleTooltipPrefix = toolTipText => {
-      const { geoType, geoLabelOverride } = state.general
+    const handleTooltipPrefix = (toolTipText: string) => {
+      const { geoType, geoLabelOverride } = config.general
       switch (geoType) {
         case 'us':
           toolTipText = 'State: '
@@ -47,7 +49,7 @@ const useTooltip = props => {
       return toolTipText
     }
 
-    const prefix = handleTooltipPrefix()
+    const prefix = handleTooltipPrefix('')
 
     if (hideGeoColumnInTooltip) return `<strong>${displayGeoName(geoName)}</strong>`
     return `<p class="tooltip-heading">${prefix}${displayGeoName(geoName)}</p>`
@@ -69,9 +71,11 @@ const useTooltip = props => {
   }
 
   const handleTooltipPrimaryColumn = (tooltipValue, column) => {
-    const { hidePrimaryColumnInTooltip } = state.general
+    const { hidePrimaryColumnInTooltip } = config.general as { hidePrimaryColumnInTooltip: boolean }
     let tooltipPrefix = column.label?.length > 0 ? column.label : ''
-    if (hidePrimaryColumnInTooltip || !tooltipPrefix) return `<li class="tooltip-body">${tooltipValue}</li>`
+    console.log('column.name', column.name)
+    console.log('config.columns.primary.name', config.columns.primary.name)
+    if ((column.name === config.columns.primary.name && hidePrimaryColumnInTooltip) || !tooltipPrefix) return `<li class="tooltip-body">${tooltipValue}</li>`
     return `<li class="tooltip-body">${tooltipPrefix}: ${tooltipValue}</li>`
   }
 
@@ -87,14 +91,14 @@ const useTooltip = props => {
       general: { type: currentMapType },
       columns,
       legend: { specialClasses }
-    } = state
+    } = config
 
     if (tooltipEnabledMaps.includes(currentMapType) && undefined !== row) {
       toolTipText += `<ul className="capitalize">`
 
       // if tooltips are allowed, loop through each column
       Object.keys(columns).forEach(columnKey => {
-        const column = state.columns[columnKey]
+        const column = config.columns[columnKey]
 
         if (column.tooltip) {
           let tooltipValue = handleTooltipSpecialClassText(specialClasses, column, row, '', columnKey)
