@@ -684,7 +684,8 @@ const LinearChart = props => {
               />
               )
             })}
-          {config.regions
+          {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
+          {config.regions && config.visualizationType !== 'Bar' && config.orientation === 'vertical'
             ? config.regions.map(region => {
                 if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
