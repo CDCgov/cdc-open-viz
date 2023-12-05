@@ -97,15 +97,16 @@ export const BarChartVertical = (props: BarChartProps) => {
 
                   let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
 
-                  if (!hasMultipleSeries) {
-                    yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                  }
+                  // if (!hasMultipleSeries) {
+                  //   yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                  // }
 
                   const tooltip = `<ul>
                   ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
-                  <li class="tooltip-heading">${yAxisTooltip}</li>
-                  <li class="tooltip-body">${xAxisTooltip}</li>
+                  <li class="tooltip-heading"">${xAxisTooltip}</li>
+                  <li class="tooltip-body ">${tooltipBody}</li>
                     </li></ul>`
 
                   // configure colors
