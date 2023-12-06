@@ -222,11 +222,6 @@ const LinearChart = props => {
     const svgRect = event.currentTarget.getBoundingClientRect()
     const x = event.clientX - svgRect.left
     const y = event.clientY - svgRect.top
-    // e.stopPropagation()
-    // const eventSvgCoords = localPoint(e)
-    // const { x, y } = eventSvgCoords
-    console.log(xMax, 'msx')
-    console.log(yMax, 'msx')
 
     const myX = x > xMax ? 0 : x
     setPoint({
@@ -235,7 +230,6 @@ const LinearChart = props => {
     })
   }
 
-  console.log(width)
   return isNaN(width) ? (
     <React.Fragment></React.Fragment>
   ) : (

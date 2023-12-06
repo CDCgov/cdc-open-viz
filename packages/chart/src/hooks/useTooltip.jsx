@@ -4,7 +4,7 @@ import { defaultStyles } from '@visx/tooltip'
 
 // third party
 import { localPoint } from '@visx/event'
-import { bisector } from 'd3-array'
+import { bisector, bisectLeft } from 'd3-array'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 const transform = new DataTransform()
 
@@ -79,6 +79,7 @@ export const useTooltip = props => {
       return names
     }
     includedSeries.push(...getColumnNames(config.columns))
+    includedSeries.push(...getColumnNames(config.columns))
 
     const yScaleValues = getYScaleValues(closestXScaleValue, includedSeries)
 
@@ -93,7 +94,42 @@ export const useTooltip = props => {
       const position = seriesObj?.axis ? String(seriesObj.axis).toLowerCase() : 'left'
       return position
     }
+    const getHoveredLine = () => {
+      // Get the mouse position relative to the event's current target (the chart).
+      const { x: mouseX, y: mouseY } = localPoint(e) || { x: 0, y: 0 }
 
+      let hoveredSeriesKeys = {}
+      const threshold = 10
+      if (visualizationType === 'Line') {
+        // Assuming yScaleValues is an array of objects representing the data points for each series.
+        const hoveredDataPoint = yScaleValues.find(point => {
+          const rangeX = xScale(point[xAxis.dataKey])
+          return Math.abs(mouseX - rangeX) < threshold // threshold can be a small value like 5 or 10
+        })
+
+        if (hoveredDataPoint) {
+          const seriesKeys = config.runtime.seriesKeys // Assuming this is an array of your series keys.
+
+          seriesKeys.forEach(seriesKey => {
+            const rangeY = yScale(hoveredDataPoint[seriesKey])
+            const yDistance = Math.abs(mouseY - rangeY)
+
+            // Define a threshold for how close the mouse needs to be to consider it hovering over a line.
+            // This is an arbitrary value and may need to be adjusted based on your chart's scale.
+
+            // If the mouse is within the threshold, we can say the user is hovering over this series.
+            if (yDistance < threshold) {
+              hoveredSeriesKeys[seriesKey] = hoveredDataPoint[seriesKey]
+            }
+          })
+        }
+      }
+      console.log(hoveredSeriesKeys, 'hoveredSeriesKeys')
+
+      return hoveredSeriesKeys
+    }
+
+    const hoveredBar = getHoveredLine()
     const getTooltipDataArray = () => {
       const columns = config.columns
       const columnsWithTooltips = []
@@ -137,7 +173,7 @@ export const useTooltip = props => {
       if (visualizationType === 'Forest Plot') {
         tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
       }
-      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot') {
+      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && !config.tooltips.singleSeries) {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
             ?.filter(Boolean)
@@ -145,6 +181,10 @@ export const useTooltip = props => {
               return resolvedScaleValues[0][seriesKey] ? [[seriesKey, formatNumber(resolvedScaleValues[0][seriesKey], getAxisPosition(seriesKey))]] : []
             })
         )
+      }
+      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && config.tooltips.singleSeries && hoveredBar) {
+        tooltipItems.push([config.xAxis.dataKey, orientation === 'horizontal' ? getClosestYValue(y) : closestXScaleValue])
+        tooltipItems.push([hoveredBar?.key, formatNumber(hoveredBar?.value, 'left')])
       }
 
       return [...tooltipItems, ...additionalTooltipItems]
