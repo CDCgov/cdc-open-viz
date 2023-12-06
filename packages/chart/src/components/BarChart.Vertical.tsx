@@ -312,7 +312,7 @@ export const BarChartVertical = (props: BarChartProps) => {
             })
           : ''}
 
-        {config.regions
+        {config.regions && config.visualizationType !== 'Combo'
           ? config.regions.map(region => {
               if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
