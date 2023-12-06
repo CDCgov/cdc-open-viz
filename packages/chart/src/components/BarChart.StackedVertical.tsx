@@ -33,28 +33,16 @@ const BarChartStackedVertical = (props: BarChartProps) => {
               const style = applyRadius(barStack.index)
               let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
               const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-              if (!hasMultipleSeries) {
-                yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-              }
+
               const additionalColTooltip = getAdditionalColumn(hoveredBar)
 
-              const {
-                legend: { showLegendValuesTooltip },
-                runtime: { seriesLabels }
-              } = config
               const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
               const tooltip = `<ul>
-                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                   <li class="tooltip-heading"">${xAxisTooltip}</li>
                   <li class="tooltip-body ">${tooltipBody}</li>
                   <li class="tooltip-body ">${additionalColTooltip}</li>
                     </li></ul>`
 
-              const barStackTooltip = `<div>
-                    <p class="tooltip-heading"><strong>${xAxisTooltip}</strong></p>
-                    ${showLegendValuesTooltip && seriesLabels && hasMultipleSeries ? `${seriesLabels[bar.key] || ''}<br/>` : ''}
-                    ${xAxisTooltip}<br />
-                      </div>`
               return (
                 <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
                   <style>

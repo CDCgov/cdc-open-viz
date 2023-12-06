@@ -189,10 +189,10 @@ export const useBarChart = () => {
     const columns = config.columns
     const columnsWithTooltips = []
     let additionalTooltipItems = ''
-    const closestVal = tableData.find(d => {
-      return d[config.xAxis.dataKey] === xAxisDataValue
-    })
-
+    const closestVal =
+      tableData.find(d => {
+        return d[config.xAxis.dataKey] === xAxisDataValue
+      }) || {}
     for (const [colKeys, colVals] of Object.entries(columns)) {
       const formattingParams = {
         addColPrefix: config.columns[colKeys].prefix,

@@ -33,28 +33,16 @@ const BarChartStackedHorizontal = (props: BarChartProps) => {
                 const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
                 const style = applyRadius(barStack.index)
                 let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                 let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                if (!hasMultipleSeries) {
-                  xAxisTooltip = config.isLegendValue ? `${bar.key}: ${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisTooltip
-                }
 
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${xAxisValue}`
                 const tooltip = `<ul>
-                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                   <li class="tooltip-heading"">${yAxisTooltip}</li>
                   <li class="tooltip-body ">${tooltipBody}</li>
                   <li class="tooltip-body ">${additionalColTooltip}</li>
                     </li></ul>`
 
-                const tooltipg = `<div>
-                    ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
-                    ${yAxisTooltip}<br />
-                    ${xAxisTooltip}
-                      </div>`
-
-                console.log('test', colorScale(config.runtime.seriesLabels[bar.key]))
                 if (chroma.contrast(labelColor, colorScale(config.runtime.seriesLabels[bar.key])) < 4.9) {
                   labelColor = '#FFFFFF'
                 }

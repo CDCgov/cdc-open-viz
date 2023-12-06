@@ -94,51 +94,7 @@ export const useTooltip = props => {
       const position = seriesObj?.axis ? String(seriesObj.axis).toLowerCase() : 'left'
       return position
     }
-    const getHoveredLine = () => {
-      // Calculate mouseX from the MouseEvent and the chart's position on the page.
-      const { clientX } = e
-      const { top, left } = e.currentTarget.getBoundingClientRect()
-      const mouseX = clientX - left
 
-      // You can also calculate mouseY similarly if needed:
-      const { clientY } = e
-      const mouseY = clientY - top
-
-      let hoveredSeriesKeys = {}
-
-      if (visualizationType === 'Line') {
-        const distances = yScaleValues.map(point => ({
-          point,
-          distance: Math.abs(mouseX - xScale(point[xAxis.dataKey]))
-        }))
-        const hoveredDataPoint = distances.reduce((min, d) => (d.distance < min.distance ? d : min), distances[0]).point
-        if (hoveredDataPoint) {
-          const seriesKeys = config.runtime.seriesKeys // Array of your series keys.
-
-          seriesKeys.forEach(seriesKey => {
-            // Find the y position of the current series' data point.
-            const rangeY = yScale(hoveredDataPoint[seriesKey])
-            const yDistance = Math.abs(mouseY - rangeY)
-            //console.log(rangeY, 'rangeY')
-
-            // Define a threshold for how close the mouse needs to be to consider it hovering over a line.
-            const threshold = 100 // This is an arbitrary value and may need to be adjusted.
-
-            // If the mouse is within the threshold, we can say the user is hovering over this series.
-            if (yDistance < threshold) {
-              hoveredSeriesKeys = {
-                key: seriesKey,
-                value: hoveredDataPoint[seriesKey]
-              }
-            }
-          })
-        }
-      }
-      console.log(hoveredSeriesKeys, 'hoveredSeriesKey')
-      return hoveredSeriesKeys
-    }
-
-    const hoveredBar = getHoveredLine()
     const getTooltipDataArray = () => {
       const columns = config.columns
       const columnsWithTooltips = []
@@ -183,7 +139,7 @@ export const useTooltip = props => {
         tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
       }
 
-      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && !config.tooltips.singleSeries) {
+      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot') {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
             ?.filter(Boolean)
@@ -191,10 +147,6 @@ export const useTooltip = props => {
               return resolvedScaleValues[0][seriesKey] ? [[seriesKey, formatNumber(resolvedScaleValues[0][seriesKey], getAxisPosition(seriesKey))]] : []
             })
         )
-      }
-      if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && config.tooltips.singleSeries && hoveredBar) {
-        tooltipItems.push([config.xAxis.dataKey, orientation === 'horizontal' ? getClosestYValue(y) : closestXScaleValue])
-        tooltipItems.push([hoveredBar?.key, formatNumber(hoveredBar?.value, 'left')])
       }
 
       return [...tooltipItems, ...additionalTooltipItems]

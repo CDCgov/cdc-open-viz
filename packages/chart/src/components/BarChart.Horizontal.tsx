@@ -117,23 +117,12 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                   const borderRadius = applyRadius(newIndex)
 
                   let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${xAxisValue}` : xAxisValue
-                  let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-                  if (!hasMultipleSeries) {
-                    xAxisTooltip = config.isLegendValue ? `<p className="tooltip-heading">${bar.key}: ${xAxisValue}</p>` : config.runtime.xAxis.label ? `<p className="tooltip-heading">${config.runtime.xAxis.label}: ${xAxisValue}</p>` : xAxisValue
-                  }
                   const additionalColTooltip = getAdditionalColumn(hoveredBar)
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
                   const tooltip = `<ul>
-                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                   <li class="tooltip-heading"">${yAxisTooltip}</li>
                   <li class="tooltip-body ">${tooltipBody}</li>
                   <li class="tooltip-body ">${additionalColTooltip}</li>
-                    </li></ul>`
-
-                  const tooltip3 = `<ul>
-                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
-                  <li class="tooltip-heading">${yAxisTooltip}</li>
-                  <li class="tooltip-body">${xAxisTooltip}</li>
                     </li></ul>`
 
                   // configure colors

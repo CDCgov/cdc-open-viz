@@ -96,16 +96,10 @@ export const BarChartVertical = (props: BarChartProps) => {
                   const borderRadius = applyRadius(newIndex)
                   // tooltips
                   const additionalColTooltip = getAdditionalColumn(hoveredBar)
-                  let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
-                  //console.log(xAxisValue, 'yAxisValueyAxisValueyAxisValue')
-                  // if (!hasMultipleSeries) {
-                  //   yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                  // }
 
                   const tooltip = `<ul>
-                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                   <li class="tooltip-heading"">${xAxisTooltip}</li>
                   <li class="tooltip-body ">${tooltipBody}</li>
                    <li class="tooltip-body ">${additionalColTooltip}</li>
