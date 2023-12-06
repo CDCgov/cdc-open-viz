@@ -57,7 +57,7 @@ export const useTooltip = props => {
 
     const closestXScaleValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
 
-    const includedSeries = visualizationType !== 'Pie' ? config.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.series.map(item => item.dataKey)
+    let includedSeries = visualizationType !== 'Pie' ? config.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.series.map(item => item.dataKey)
     includedSeries.push(config.xAxis.dataKey)
     if (config.visualizationType === 'Forecasting') {
       config.series.map(s => {
@@ -107,16 +107,11 @@ export const useTooltip = props => {
       let hoveredSeriesKeys = {}
 
       if (visualizationType === 'Line') {
-        const pointSpacing = xScale.step()
-        const threshold = pointSpacing / 2
-        // Find the closest data point to where the user is hovering on the x-axis.
-        // This assumes that xScale and yScaleValues are available in your scope.
-        const hoveredDataPoint = yScaleValues.find(point => {
-          const rangeX = xScale(point[xAxis.dataKey])
-
-          return Math.abs(mouseX - rangeX)
-        })
-        console.log(hoveredDataPoint, 'hoveredDataPoint')
+        const distances = yScaleValues.map(point => ({
+          point,
+          distance: Math.abs(mouseX - xScale(point[xAxis.dataKey]))
+        }))
+        const hoveredDataPoint = distances.reduce((min, d) => (d.distance < min.distance ? d : min), distances[0]).point
         if (hoveredDataPoint) {
           const seriesKeys = config.runtime.seriesKeys // Array of your series keys.
 
@@ -124,20 +119,22 @@ export const useTooltip = props => {
             // Find the y position of the current series' data point.
             const rangeY = yScale(hoveredDataPoint[seriesKey])
             const yDistance = Math.abs(mouseY - rangeY)
-            console.log(rangeY, 'rangeY')
+            //console.log(rangeY, 'rangeY')
 
             // Define a threshold for how close the mouse needs to be to consider it hovering over a line.
             const threshold = 100 // This is an arbitrary value and may need to be adjusted.
 
             // If the mouse is within the threshold, we can say the user is hovering over this series.
             if (yDistance < threshold) {
-              hoveredSeriesKeys[seriesKey] = hoveredDataPoint[seriesKey]
+              hoveredSeriesKeys = {
+                key: seriesKey,
+                value: hoveredDataPoint[seriesKey]
+              }
             }
           })
         }
       }
-      // console.log(hoveredSeriesKeys, 'hoveredSeriesKeys')
-
+      console.log(hoveredSeriesKeys, 'hoveredSeriesKey')
       return hoveredSeriesKeys
     }
 
@@ -185,6 +182,7 @@ export const useTooltip = props => {
       if (visualizationType === 'Forest Plot') {
         tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
       }
+
       if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot' && !config.tooltips.singleSeries) {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
