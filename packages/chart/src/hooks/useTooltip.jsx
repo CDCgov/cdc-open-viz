@@ -95,27 +95,39 @@ export const useTooltip = props => {
       return position
     }
     const getHoveredLine = () => {
-      // Get the mouse position relative to the event's current target (the chart).
-      const { x: mouseX, y: mouseY } = localPoint(e) || { x: 0, y: 0 }
+      // Calculate mouseX from the MouseEvent and the chart's position on the page.
+      const { clientX } = e
+      const { top, left } = e.currentTarget.getBoundingClientRect()
+      const mouseX = clientX - left
+
+      // You can also calculate mouseY similarly if needed:
+      const { clientY } = e
+      const mouseY = clientY - top
 
       let hoveredSeriesKeys = {}
-      const threshold = 10
+
       if (visualizationType === 'Line') {
-        // Assuming yScaleValues is an array of objects representing the data points for each series.
+        const pointSpacing = xScale.step()
+        const threshold = pointSpacing / 2
+        // Find the closest data point to where the user is hovering on the x-axis.
+        // This assumes that xScale and yScaleValues are available in your scope.
         const hoveredDataPoint = yScaleValues.find(point => {
           const rangeX = xScale(point[xAxis.dataKey])
-          return Math.abs(mouseX - rangeX) < threshold // threshold can be a small value like 5 or 10
-        })
 
+          return Math.abs(mouseX - rangeX)
+        })
+        console.log(hoveredDataPoint, 'hoveredDataPoint')
         if (hoveredDataPoint) {
-          const seriesKeys = config.runtime.seriesKeys // Assuming this is an array of your series keys.
+          const seriesKeys = config.runtime.seriesKeys // Array of your series keys.
 
           seriesKeys.forEach(seriesKey => {
+            // Find the y position of the current series' data point.
             const rangeY = yScale(hoveredDataPoint[seriesKey])
             const yDistance = Math.abs(mouseY - rangeY)
+            console.log(rangeY, 'rangeY')
 
             // Define a threshold for how close the mouse needs to be to consider it hovering over a line.
-            // This is an arbitrary value and may need to be adjusted based on your chart's scale.
+            const threshold = 100 // This is an arbitrary value and may need to be adjusted.
 
             // If the mouse is within the threshold, we can say the user is hovering over this series.
             if (yDistance < threshold) {
@@ -124,7 +136,7 @@ export const useTooltip = props => {
           })
         }
       }
-      console.log(hoveredSeriesKeys, 'hoveredSeriesKeys')
+      // console.log(hoveredSeriesKeys, 'hoveredSeriesKeys')
 
       return hoveredSeriesKeys
     }
