@@ -1,4 +1,21 @@
-const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAllLine }) => {
+import { ChartConfig } from '../types/ChartConfig'
+
+type UseMinMaxProps = {
+  /** config - standard chart config */
+  config: ChartConfig
+  /** minValue - starting minimum value */
+  minValue: number
+  /** maxValue - starting maximum value before transformations */
+  maxValue: number
+  /** existsPositiveValue - determines if axis should show values above/below 0 */
+  existPositiveValue: boolean
+  /** data - standard data array */
+  data: Object[]
+  /** isAllLine: if all series are line type including dashed lines */
+  isAllLine: boolean
+}
+
+const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAllLine }: UseMinMaxProps) => {
   let min = 0
   let max = 0
 
@@ -70,24 +87,32 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     try {
       if (!data) throw new Error('COVE: missing data while getting min/max for combo chart.')
       // seperate the left and right axis items & get each sides series keys
-      let leftAxisItems = series.filter(s => s.axis === 'Left')
-      let rightAxisItems = series.filter(s => s.axis === 'Right')
-      let leftAxisSeriesKeys = leftAxisItems.map(i => i.dataKey) || []
-      let rightAxisSeriesKeys = rightAxisItems.map(i => i.dataKey) || []
+      let leftAxisSeriesItems = series.filter(s => s.axis === 'Left')
+      let rightAxisSeriesItems = series.filter(s => s.axis === 'Right')
 
-      // todo: figure out how to determine entered max for each axis
-      const findMaxFromSeriesKeys = (data, axisSeriesKeys, max) => {
+      const findMaxFromSeriesKeys = (data, seriesData, max, axis = 'left') => {
+        let stackedBarMax = 0
+        let axisSeriesKeys = seriesData.map(i => i.dataKey) || []
+
         axisSeriesKeys.forEach(key => {
+          let _seriesData = seriesData.find(s => s.dataKey === key)
           let _data = data.map(d => d[key])
           let seriesMax = Math.max.apply(null, _data)
+          if (config.visualizationSubType === 'stacked' && axis === 'left' && _seriesData.type === 'Bar') {
+            stackedBarMax += seriesMax
+          }
           if (seriesMax > max) {
             max = seriesMax
+          }
+
+          if (max < stackedBarMax) {
+            max = stackedBarMax
           }
         })
         return max
       }
-      leftMax = findMaxFromSeriesKeys(data, leftAxisSeriesKeys, leftMax)
-      rightMax = findMaxFromSeriesKeys(data, rightAxisSeriesKeys, rightMax)
+      leftMax = findMaxFromSeriesKeys(data, leftAxisSeriesItems, leftMax, 'left')
+      rightMax = findMaxFromSeriesKeys(data, rightAxisSeriesItems, rightMax, 'right')
 
       if (leftMax < enteredMaxValue) {
         leftMax = enteredMaxValue
