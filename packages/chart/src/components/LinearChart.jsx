@@ -773,12 +773,16 @@ const LinearChart = props => {
               {config.chartMessage.noData}
             </Text>
           )}
-          {/* <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
-            <Line from={{ x: point.x - 10, y: 0 }} to={{ x: point.x - 10, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
-          </Group>
-          <Group key='tooltipLine-horizontal' className='horizontal-tooltip-line' left={config.yAxis.size ? config.yAxis.size : 0}>
-            <Line from={{ x: 0, y: point.y }} to={{ x: xMax, y: point.y }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='horizontal-tooltip-line' />
-          </Group> */}
+          {config.visualizationType === 'Bar' && config.tooltips.singleSeries && config.visual.horizontalHoverLine && (
+            <Group key='tooltipLine-horizontal' className='horizontal-tooltip-line' left={config.yAxis.size ? config.yAxis.size : 0}>
+              <Line from={{ x: 0, y: point.y }} to={{ x: xMax, y: point.y }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='horizontal-tooltip-line' />
+            </Group>
+          )}
+          {config.visualizationType === 'Bar' && config.tooltips.singleSeries && config.visual.verticalHoverLine && (
+            <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
+              <Line from={{ x: point.x, y: 0 }} to={{ x: point.x, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
+            </Group>
+          )}
         </svg>
         {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
           <>
@@ -789,7 +793,7 @@ const LinearChart = props => {
           </>
         )}
 
-        {(config.visualizationType === 'Scatter Plot' || config.visualizationType === 'Box Plot' || config.tooltips.singleSeries) && (
+        {(config.visualizationType === 'Scatter Plot' || config.visualizationType === 'Box Plot' || (config.visualizationType === 'Bar' && config.tooltips.singleSeries)) && (
           <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />
         )}
 

@@ -9,7 +9,7 @@ import { type BarChartProps } from '../types/ChartProps'
 const BarChartStackedVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax } = props
   const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius } = useBarChart()
+  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, hoveredBar, setHoveredBar, getAdditionalColumn } = useBarChart()
   const { orientation } = config
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
@@ -36,16 +36,24 @@ const BarChartStackedVertical = (props: BarChartProps) => {
               if (!hasMultipleSeries) {
                 yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
               }
+              const additionalColTooltip = getAdditionalColumn(hoveredBar)
 
               const {
                 legend: { showLegendValuesTooltip },
                 runtime: { seriesLabels }
               } = config
+              const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
+              const tooltip = `<ul>
+                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                  <li class="tooltip-heading"">${xAxisTooltip}</li>
+                  <li class="tooltip-body ">${tooltipBody}</li>
+                  <li class="tooltip-body ">${additionalColTooltip}</li>
+                    </li></ul>`
 
               const barStackTooltip = `<div>
                     <p class="tooltip-heading"><strong>${xAxisTooltip}</strong></p>
                     ${showLegendValuesTooltip && seriesLabels && hasMultipleSeries ? `${seriesLabels[bar.key] || ''}<br/>` : ''}
-                    ${yAxisTooltip}<br />
+                    ${xAxisTooltip}<br />
                       </div>`
               return (
                 <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
@@ -63,13 +71,14 @@ const BarChartStackedVertical = (props: BarChartProps) => {
                       {yAxisValue}
                     </Text>
                     <foreignObject
+                      onMouseMove={() => setHoveredBar(xAxisValue)}
                       key={`bar-stack-${barStack.index}-${bar.index}`}
                       x={barThickness * bar.index + offset}
                       y={bar.y}
                       width={barThicknessAdjusted}
                       height={bar.height}
                       display={displayBar ? 'block' : 'none'}
-                      data-tooltip-html={barStackTooltip}
+                      data-tooltip-html={tooltip}
                       data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       onClick={e => {
                         e.preventDefault()

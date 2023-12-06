@@ -13,7 +13,7 @@ import { type BarChartProps } from '../types/ChartProps'
 const BarChartStackedHorizontal = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax } = props
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, animatedChart, getTextWidth } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, isLabelBelowBar, displayNumbersOnBar, fontSize } = useBarChart()
+  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, isLabelBelowBar, displayNumbersOnBar, fontSize, getAdditionalColumn, hoveredBar, setHoveredBar } = useBarChart()
   const { orientation, visualizationSubType } = config
 
   return (
@@ -38,7 +38,17 @@ const BarChartStackedHorizontal = (props: BarChartProps) => {
                 if (!hasMultipleSeries) {
                   xAxisTooltip = config.isLegendValue ? `${bar.key}: ${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisTooltip
                 }
-                const tooltip = `<div>
+
+                const additionalColTooltip = getAdditionalColumn(hoveredBar)
+                const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${xAxisValue}`
+                const tooltip = `<ul>
+                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                  <li class="tooltip-heading"">${yAxisTooltip}</li>
+                  <li class="tooltip-body ">${tooltipBody}</li>
+                  <li class="tooltip-body ">${additionalColTooltip}</li>
+                    </li></ul>`
+
+                const tooltipg = `<div>
                     ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}
@@ -62,6 +72,7 @@ const BarChartStackedHorizontal = (props: BarChartProps) => {
                     </style>
                     <Group key={index} id={`barStack${barStack.index}-${bar.index}`} className='stack horizontal'>
                       <foreignObject
+                        onMouseMove={() => setHoveredBar(yAxisValue)}
                         key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                         className={`animated-chart group ${animatedChart ? 'animated' : ''}`}
                         x={bar.x}

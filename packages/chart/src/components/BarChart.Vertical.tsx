@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { useBarChart } from '../hooks/useBarChart'
 import { Group } from '@visx/group'
@@ -15,7 +15,7 @@ import { type BarChartProps } from '../types/ChartProps'
 export const BarChartVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
 
-  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize } = useBarChart()
+  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize, getAdditionalColumn, hoveredBar, setHoveredBar } = useBarChart()
 
   // CONTEXT VALUES
   // prettier-ignore
@@ -94,11 +94,12 @@ export const BarChartVertical = (props: BarChartProps) => {
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
                   const borderRadius = applyRadius(newIndex)
-
+                  // tooltips
+                  const additionalColTooltip = getAdditionalColumn(hoveredBar)
                   let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
-
+                  //console.log(xAxisValue, 'yAxisValueyAxisValueyAxisValue')
                   // if (!hasMultipleSeries) {
                   //   yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   // }
@@ -107,6 +108,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                   ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                   <li class="tooltip-heading"">${xAxisTooltip}</li>
                   <li class="tooltip-body ">${tooltipBody}</li>
+                   <li class="tooltip-body ">${additionalColTooltip}</li>
                     </li></ul>`
 
                   // configure colors
@@ -215,6 +217,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                       </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         <foreignObject
+                          onMouseMove={() => setHoveredBar(xAxisValue)}
                           style={{ overflow: 'visible' }}
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
