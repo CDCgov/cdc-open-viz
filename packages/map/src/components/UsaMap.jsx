@@ -13,6 +13,7 @@ import { supportedCities, supportedStates } from '../data/supported-geos'
 import { geoAlbersUsa } from 'd3-composite-projections'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 
 import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
 
@@ -368,8 +369,6 @@ const UsaMap = props => {
               {state.hexMap.shapeGroups.map((group, groupIndex) => {
                 return group.items.map((item, itemIndex) => {
                   if (item.operator === '=') {
-                    console.log('group', item.value)
-                    console.log('geoData', geoData)
                     if (geoData[item.key] === item.value) {
                       return (
                         <Group top={centroid[1] - 5} left={centroid[0] - iconSize} color={textColor} textAnchor='start'>
@@ -386,10 +385,23 @@ const UsaMap = props => {
           )
         }
 
+        console.log('geoName', geoData)
+
         return (
           <g data-name={geoName} key={key}>
             <g className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
+              {state.map.patterns.map(
+                (patternData, patternIndex) =>
+                  patternData.geoKey === geoData.state && (
+                    <>
+                      {patternData.pattern === 'waves' && <PatternWaves id={`${patternData.geoKey}`} height={10} width={10} fill='black' complement />}
+                      {patternData.pattern === 'circles' && <PatternCircles id={`${patternData.geoKey}`} height={10} width={10} fill='black' complement />}
+                      {patternData.pattern === 'lines' && <PatternLines id={`${patternData.geoKey}`} height={6} width={6} stroke='black' strokeWidth={1} orientation={['diagonalRightToLeft']} />}
+                      <path className={`pattern-geoKey--${patternData.geoKey}`} tabIndex={-1} strokeWidth={1.3} d={path} fill={`url(#${patternData.geoKey})`} />
+                    </>
+                  )
+              )}
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
               {isHex && state.hexMap.type === 'shapes' && getArrowDirection(geoData, geo, legendColors[0])}
             </g>
