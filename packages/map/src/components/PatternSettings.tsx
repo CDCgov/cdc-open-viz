@@ -2,6 +2,7 @@ import { useContext } from 'react'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import ConfigContext from '../context'
 import { type MapContext } from './../types/MapContext'
+import Button from '@cdc/core/components/elements/Button'
 
 type PatternSettingProps = {}
 
@@ -18,7 +19,7 @@ const PatternSettings = (props: PatternSettingProps) => {
   /** Updates the map config with a new pattern item */
   const handleAddGeoPattern = () => {
     let patterns = [...state.map.patterns]
-    patterns.push({ geoKey: '', pattern: defaultPattern })
+    patterns.push({ dataKey: '', pattern: defaultPattern })
     setState({
       ...state,
       map: {
@@ -29,16 +30,21 @@ const PatternSettings = (props: PatternSettingProps) => {
   }
 
   /** Updates the map pattern at a given index */
-  const handleUpdateGeoPattern = (value: string, index: number, keyToUpdate: 'geoKey' | 'pattern') => {
+  const handleUpdateGeoPattern = (value: string, index: number, keyToUpdate: 'dataKey' | 'pattern' | 'dataValue' | 'size') => {
     const updatedPatterns = [...state.map.patterns]
+    updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value }
 
-    if (keyToUpdate === 'geoKey') {
-      updatedPatterns[index] = { ...updatedPatterns[index], geoKey: value }
-    }
+    setState({
+      ...state,
+      map: {
+        ...state.map,
+        patterns: updatedPatterns
+      }
+    })
+  }
 
-    if (keyToUpdate === 'pattern') {
-      updatedPatterns[index] = { ...updatedPatterns[index], pattern: value }
-    }
+  const handleRemovePattern = index => {
+    const updatedPatterns = state.map.patterns.filter((pattern, i) => i !== index)
 
     setState({
       ...state,
@@ -57,33 +63,70 @@ const PatternSettings = (props: PatternSettingProps) => {
       <AccordionItemPanel>
         {patterns &&
           patterns.map((pattern, patternIndex) => {
+            const dataValueOptions = [...new Set(data?.map(d => d?.[pattern?.dataKey]))]
+            const dataKeyOptions = Object.keys(data[0])
+            dataValueOptions.unshift('Select')
+            dataKeyOptions.unshift('Select')
+
+            dataValueOptions.sort()
+            dataKeyOptions.sort()
+            console.log('dataValue', dataValueOptions)
             return (
-              <Accordion>
+              <Accordion allowZeroExpanded>
                 <AccordionItem>
                   <AccordionItemHeading>
-                    <AccordionItemButton>{pattern.geoKey || 'Select State'}</AccordionItemButton>
+                    <AccordionItemButton>{pattern.dataKey || 'Select State'}</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
                     <>
-                      <label htmlFor={`pattern-geoKey--${patternIndex}`}>Choose Geography:</label>
-                      <select id={`pattern-geoKey--${patternIndex}`} value={patterns[patternIndex].geoKey} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'geoKey')}>
+                      <label htmlFor={`pattern-dataKey--${patternIndex}`}>Data Key:</label>
+                      <select id={`pattern-dataKey--${patternIndex}`} value={pattern.dataKey !== '' ? pattern.dataKey : 'Select'} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'dataKey')}>
                         {/* TODO: sort these? */}
-                        {data &&
-                          data.map((d, index) => (
-                            <option value={d[state.columns.geo.name]} key={index}>
-                              {d[state.columns.geo.name]}
+                        {dataKeyOptions.map((d, index) => {
+                          return (
+                            <option value={d} key={index}>
+                              {d}
                             </option>
-                          ))}
+                          )
+                        })}
                       </select>
 
-                      <label htmlFor={`pattern-type--${patternIndex}`}>Choose Pattern:</label>
-                      <select id={`pattern-type--${patternIndex}`} value={patterns[patternIndex].pattern} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'pattern')}>
+                      {
+                        <>
+                          <label htmlFor={`pattern-dataValue--${patternIndex}`}>Data Value:</label>
+                          <select id={`pattern-dataValue--${patternIndex}`} value={pattern.dataValue === '' ? 'Select' : pattern.dataValue} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'dataValue')}>
+                            {/* TODO: sort these? */}
+                            {dataValueOptions?.map((d, index) => {
+                              return (
+                                <option value={d} key={index}>
+                                  {d}
+                                </option>
+                              )
+                            })}
+                          </select>
+                        </>
+                      }
+
+                      <label htmlFor={`pattern-type--${patternIndex}`}>Pattern Type:</label>
+                      <select id={`pattern-type--${patternIndex}`} value={pattern?.pattern} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'pattern')}>
                         {patternTypes.map((patternName, index) => (
                           <option value={patternName} key={index}>
                             {patternName}
                           </option>
                         ))}
                       </select>
+
+                      <label htmlFor={`pattern-size--${patternIndex}`}>Pattern Size:</label>
+                      <select id={`pattern-size--${patternIndex}`} value={pattern?.size} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'size')}>
+                        {['small', 'medium', 'large'].map((size, index) => (
+                          <option value={size} key={index}>
+                            {size}
+                          </option>
+                        ))}
+                      </select>
+                      <Button onClick={e => handleRemovePattern(patternIndex)} className='btn btn--remove warn'>
+                        Remove Pattern
+                      </Button>
                     </>
                   </AccordionItemPanel>
                 </AccordionItem>

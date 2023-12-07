@@ -18,7 +18,8 @@ export type MapVisualSettings = {
 }
 
 type PatternSelection = {
-  geoKey: string
+  dataKey: string
+  dataValue: string
   pattern: 'lines' | 'circles' | 'waves'
 }
 
