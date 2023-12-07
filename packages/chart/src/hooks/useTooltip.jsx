@@ -142,7 +142,8 @@ export const useTooltip = props => {
           ...getIncludedTooltipSeries()
             ?.filter(Boolean)
             .flatMap(seriesKey => {
-              return resolvedScaleValues[0][seriesKey] ? [[seriesKey, formatNumber(resolvedScaleValues[0][seriesKey], getAxisPosition(seriesKey))]] : []
+              const formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0][seriesKey] : formatNumber(resolvedScaleValues[0][seriesKey], getAxisPosition(seriesKey))
+              return resolvedScaleValues[0][seriesKey] ? [[seriesKey, formattedValue]] : []
             })
         )
       }
