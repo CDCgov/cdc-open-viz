@@ -69,7 +69,7 @@ const BarChartStackedHorizontal = (props: BarChartProps) => {
                         style={{ transition: 'all 0.2s linear' }}
                         width={bar.width}
                         height={bar.height}
-                        opacity={transparentBar ? 0.5 : 1}
+                        opacity={transparentBar ? 0.2 : 1}
                         display={displayBar ? 'block' : 'none'}
                         data-tooltip-html={tooltip}
                         data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}

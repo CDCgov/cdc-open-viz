@@ -72,9 +72,7 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
 
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
-
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
-
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   let barHeight = config.barHeight
@@ -205,7 +203,7 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                           y={barHeight * bar.index}
                           height={!config.isLollipopChart ? barHeight : lollipopBarWidth}
                           width={barWidth}
-                          opacity={transparentBar ? 0.5 : 1}
+                          opacity={transparentBar ? 0.2 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tooltip-html={tooltip}
                           data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}

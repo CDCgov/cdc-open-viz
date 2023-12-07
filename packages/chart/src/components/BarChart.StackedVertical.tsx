@@ -73,7 +73,7 @@ const BarChartStackedVertical = (props: BarChartProps) => {
                       }}
                     >
                       <div
-                        style={{ transition: 'all 0.2s linear', opacity: transparentBar ? 0.5 : 1, width: barThicknessAdjusted, height: bar.height, background: colorScale(config.runtime.seriesLabels[bar.key]), border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
+                        style={{ transition: 'all 0.2s linear', opacity: transparentBar ? 0.2 : 1, width: barThicknessAdjusted, height: bar.height, background: colorScale(config.runtime.seriesLabels[bar.key]), border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
                       ></div>
                     </foreignObject>
                   </Group>
