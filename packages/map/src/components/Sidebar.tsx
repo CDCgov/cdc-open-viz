@@ -42,55 +42,80 @@ const Sidebar = () => {
     setAccessibleStatus(`Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`)
   }
 
-  const legendList = runtimeLegend.map((entry, idx) => {
-    const entryMax = displayDataAsText(entry.max, 'primary')
+  const legendList = () => {
+    let legendItems
 
-    const entryMin = displayDataAsText(entry.min, 'primary')
+    legendItems = runtimeLegend.map((entry, idx) => {
+      const entryMax = displayDataAsText(entry.max, 'primary')
 
-    let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
+      const entryMin = displayDataAsText(entry.min, 'primary')
 
-    // If interval, add some formatting
-    if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
-      formattedText = `${entryMin} - < ${entryMax}`
+      let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
+
+      // If interval, add some formatting
+      if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
+        formattedText = `${entryMin} - < ${entryMax}`
+      }
+
+      const { disabled } = entry
+
+      if (legend.type === 'category') {
+        formattedText = displayDataAsText(entry.value, 'primary')
+      }
+
+      if (entry.max === 0 && entry.min === 0) {
+        formattedText = '0'
+      }
+
+      let legendLabel = formattedText
+
+      if (entry.hasOwnProperty('special')) {
+        legendLabel = entry.label || entry.value
+      }
+
+      const handleListItemClass = () => {
+        let classes = ['legend-container__li']
+        if (disabled) classes.push('legend-container__li--disabled')
+        if (entry.hasOwnProperty('special')) classes.push('legend-container__li--special-class')
+        return classes
+      }
+
+      return (
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
+        <li
+          className={handleListItemClass().join(' ')}
+          key={idx}
+          title={`Legend item ${legendLabel} - Click to disable`}
+          onClick={() => {
+            toggleLegendActive(idx, legendLabel)
+          }}
+        >
+          <LegendCircle fill={entry.color} /> <span className='label'>{legendLabel}</span>
+        </li>
+      )
+    })
+
+    if (state.map.patterns) {
+      // loop over map patterns
+
+      state.map.patterns.map((patternData, patternDataIndex) => {
+        legendItems.push(
+          <li
+            className={`legend-container__li`}
+            key={patternDataIndex}
+            title={`Legend item  - Click to disable`}
+            onClick={() => {
+              // toggleLegendActive(idx, legendLabel)
+            }}
+          >
+            <LegendCircle fill={'orange'} /> <span className='label'>{patternData.dataValue}</span>
+          </li>
+        )
+      })
     }
 
-    const { disabled } = entry
-
-    if (legend.type === 'category') {
-      formattedText = displayDataAsText(entry.value, 'primary')
-    }
-
-    if (entry.max === 0 && entry.min === 0) {
-      formattedText = '0'
-    }
-
-    let legendLabel = formattedText
-
-    if (entry.hasOwnProperty('special')) {
-      legendLabel = entry.label || entry.value
-    }
-
-    const handleListItemClass = () => {
-      let classes = ['legend-container__li']
-      if (disabled) classes.push('legend-container__li--disabled')
-      if (entry.hasOwnProperty('special')) classes.push('legend-container__li--special-class')
-      return classes
-    }
-
-    return (
-      // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
-      <li
-        className={handleListItemClass().join(' ')}
-        key={idx}
-        title={`Legend item ${legendLabel} - Click to disable`}
-        onClick={() => {
-          toggleLegendActive(idx, legendLabel)
-        }}
-      >
-        <LegendCircle fill={entry.color} /> <span className='label'>{legendLabel}</span>
-      </li>
-    )
-  })
+    return legendItems
+  }
 
   const { legendClasses } = useDataVizClasses(state, viewport)
 
@@ -129,7 +154,7 @@ const Sidebar = () => {
                 return true
               })}
             <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
-              {legendList}
+              {legendList()}
             </ul>
           </section>
         </aside>

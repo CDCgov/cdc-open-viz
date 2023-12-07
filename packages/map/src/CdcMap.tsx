@@ -1448,6 +1448,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // Data
     if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+
       setRuntimeData(newRuntimeData)
     } else {
       if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
