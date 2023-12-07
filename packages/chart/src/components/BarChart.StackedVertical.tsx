@@ -9,7 +9,7 @@ import { type BarChartProps } from '../types/ChartProps'
 const BarChartStackedVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax } = props
   const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, hoveredBar, setHoveredBar, getAdditionalColumn } = useBarChart()
+  const { isHorizontal, barBorderWidth, applyRadius, hoveredBar, getAdditionalColumn, onMouseLeaveBar, onMouseOverBar } = useBarChart()
   const { orientation } = config
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
@@ -28,14 +28,9 @@ const BarChartStackedVertical = (props: BarChartProps) => {
               // tooltips
               const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
               const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
-
-              if (!yAxisValue) return <></>
               const style = applyRadius(barStack.index)
-              let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
               const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-
               const additionalColTooltip = getAdditionalColumn(hoveredBar)
-
               const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
               const tooltip = `<ul>
                   <li class="tooltip-heading"">${xAxisTooltip}</li>
@@ -59,7 +54,8 @@ const BarChartStackedVertical = (props: BarChartProps) => {
                       {yAxisValue}
                     </Text>
                     <foreignObject
-                      onMouseMove={() => setHoveredBar(xAxisValue)}
+                      onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
+                      onMouseLeave={onMouseLeaveBar}
                       key={`bar-stack-${barStack.index}-${bar.index}`}
                       x={barThickness * bar.index + offset}
                       y={bar.y}
@@ -76,7 +72,9 @@ const BarChartStackedVertical = (props: BarChartProps) => {
                         }
                       }}
                     >
-                      <div style={{ opacity: transparentBar ? 0.5 : 1, width: barThicknessAdjusted, height: bar.height, background: colorScale(config.runtime.seriesLabels[bar.key]), border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
+                      <div
+                        style={{ transition: 'all 0.2s linear', opacity: transparentBar ? 0.5 : 1, width: barThicknessAdjusted, height: bar.height, background: colorScale(config.runtime.seriesLabels[bar.key]), border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
+                      ></div>
                     </foreignObject>
                   </Group>
                 </Group>

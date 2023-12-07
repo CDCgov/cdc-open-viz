@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 export const useBarChart = () => {
-  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, formatNumber } = useContext(ConfigContext)
+  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight } = useContext(ConfigContext)
   const { orientation } = config
   const [hoveredBar, setHoveredBar] = useState(null)
 
@@ -212,6 +212,14 @@ export const useBarChart = () => {
     return additionalTooltipItems
   }
 
+  const onMouseOverBar = (categoryValue, barKey) => {
+    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight' && barKey) setSeriesHighlight([barKey])
+    setHoveredBar(categoryValue)
+  }
+  const onMouseLeaveBar = () => {
+    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') setSeriesHighlight([])
+  }
+
   return {
     generateIconSize,
     isHorizontal,
@@ -235,6 +243,8 @@ export const useBarChart = () => {
     getHighlightedBarByValue,
     getAdditionalColumn,
     hoveredBar,
-    setHoveredBar
+    setHoveredBar,
+    onMouseOverBar,
+    onMouseLeaveBar
   }
 }

@@ -18,7 +18,6 @@ export const BarChartHorizontal = (props: BarChartProps) => {
   const {
     isHorizontal,
     barBorderWidth,
-    hasMultipleSeries,
     applyRadius,
     updateBars,
     assignColorsToValues,
@@ -33,7 +32,8 @@ export const BarChartHorizontal = (props: BarChartProps) => {
     generateIconSize,
     getAdditionalColumn,
     hoveredBar,
-    setHoveredBar
+    onMouseLeaveBar,
+    onMouseOverBar
   } = useBarChart()
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -178,6 +178,7 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                     borderStyle: 'solid',
                     borderWidth,
                     width: barWidth,
+                    transition: 'all 0.2s linear',
                     height: !config.isLollipopChart ? barHeight : lollipopBarWidth,
                     ...borderRadius
                   }
@@ -195,7 +196,8 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                       </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         <foreignObject
-                          onMouseMove={() => setHoveredBar(xAxisValue)}
+                          onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
+                          onMouseLeave={onMouseLeaveBar}
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                           x={barX}

@@ -15,24 +15,11 @@ import { type BarChartProps } from '../types/ChartProps'
 export const BarChartVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
 
-  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize, getAdditionalColumn, hoveredBar, setHoveredBar } = useBarChart()
+  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize, getAdditionalColumn, hoveredBar, onMouseOverBar, onMouseLeaveBar } = useBarChart()
 
   // CONTEXT VALUES
   // prettier-ignore
-  const {
-    colorScale,
-    config,
-    formatDate,
-    formatNumber,
-    getXAxisData,
-    getYAxisData,
-    isNumber,
-    parseDate,
-    seriesHighlight,
-    setSharedFilter,
-    transformedData,
-    dashboardConfig
-  } = useContext(ConfigContext)
+  const { colorScale, config, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, dashboardConfig, setSeriesHighlight } = useContext(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
@@ -100,7 +87,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
 
                   const tooltip = `<ul>
-                  <li class="tooltip-heading"">${xAxisTooltip}</li>
+                  <li class="tooltip-heading">${xAxisTooltip}</li>
                   <li class="tooltip-body ">${tooltipBody}</li>
                    <li class="tooltip-body ">${additionalColTooltip}</li>
                     </li></ul>`
@@ -211,8 +198,9 @@ export const BarChartVertical = (props: BarChartProps) => {
                       </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         <foreignObject
-                          onMouseMove={() => setHoveredBar(xAxisValue)}
-                          style={{ overflow: 'visible' }}
+                          onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
+                          onMouseLeave={onMouseLeaveBar}
+                          style={{ overflow: 'visible', transition: 'all 0.2s linear' }}
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                           x={barWidth * bar.index + offset}

@@ -12,8 +12,8 @@ import { type BarChartProps } from '../types/ChartProps'
 
 const BarChartStackedHorizontal = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax } = props
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, animatedChart, getTextWidth } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, isLabelBelowBar, displayNumbersOnBar, fontSize, getAdditionalColumn, hoveredBar, setHoveredBar } = useBarChart()
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, animatedChart, getTextWidth, setSeriesHighlight } = useContext(ConfigContext)
+  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, isLabelBelowBar, displayNumbersOnBar, fontSize, getAdditionalColumn, hoveredBar, onMouseLeaveBar, onMouseOverBar } = useBarChart()
   const { orientation, visualizationSubType } = config
 
   return (
@@ -60,11 +60,13 @@ const BarChartStackedHorizontal = (props: BarChartProps) => {
                     </style>
                     <Group key={index} id={`barStack${barStack.index}-${bar.index}`} className='stack horizontal'>
                       <foreignObject
-                        onMouseMove={() => setHoveredBar(yAxisValue)}
+                        onMouseOver={() => onMouseOverBar(yAxisValue, bar.key)}
+                        onMouseLeave={onMouseLeaveBar}
                         key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                         className={`animated-chart group ${animatedChart ? 'animated' : ''}`}
                         x={bar.x}
                         y={bar.y}
+                        style={{ transition: 'all 0.2s linear' }}
                         width={bar.width}
                         height={bar.height}
                         opacity={transparentBar ? 0.5 : 1}

@@ -30,6 +30,7 @@ import useRightAxis from '../hooks/useRightAxis'
 import useScales from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
+import { useEditorPermissions } from '../hooks/useEditorPermissions'
 
 // styles
 import '../scss/LinearChart.scss'
@@ -66,9 +67,10 @@ const LinearChart = props => {
 
   // hooks  % states
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
-
+  const { visSupportsReactTooltip } = useEditorPermissions()
   const { hasTopAxis } = useTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
+  const [point, setPoint] = useState({ x: 0, y: 0 })
 
   // refs
   const triggerRef = useRef()
@@ -214,19 +216,15 @@ const LinearChart = props => {
     if (config.visualizationType === 'Forest Plot') return config.data.length
     return countNumOfTicks('yAxis')
   }
-  const [point, setPoint] = useState({
-    x: 0,
-    y: 0
-  })
+
   const onMouseMove = event => {
     const svgRect = event.currentTarget.getBoundingClientRect()
     const x = event.clientX - svgRect.left
     const y = event.clientY - svgRect.top
 
-    const myX = x > xMax ? 0 : x
     setPoint({
       x,
-      y: y
+      y
     })
   }
 
@@ -778,7 +776,7 @@ const LinearChart = props => {
             </Group>
           )}
         </svg>
-        {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
+        {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && !config.tooltips.singleSeries && (
           <>
             <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important`}</style>
             <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} left={tooltipLeft} top={tooltipTop}>
@@ -787,10 +785,7 @@ const LinearChart = props => {
           </>
         )}
 
-        {(config.visualizationType === 'Scatter Plot' || config.visualizationType === 'Box Plot' || (config.visualizationType === 'Bar' && config.tooltips.singleSeries)) && (
-          <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />
-        )}
-
+        {visSupportsReactTooltip() && <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
         <div className='animation-trigger' ref={triggerRef} />
       </div>
     </ErrorBoundary>
