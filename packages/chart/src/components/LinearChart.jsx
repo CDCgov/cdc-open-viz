@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState, useMemo } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -6,7 +6,7 @@ import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
 import { Text } from '@visx/text'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import { useTooltip, TooltipWithBounds, useTooltipInPortal } from '@visx/tooltip'
+import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 
 // CDC Components
 import AreaChart from './AreaChart'
@@ -35,7 +35,6 @@ import { useEditorPermissions } from '../hooks/useEditorPermissions'
 // styles
 import '../scss/LinearChart.scss'
 import ZoomBrush from './ZoomBrush'
-import { localPoint } from '@visx/event'
 
 const LinearChart = props => {
   const { isEditor, isDashboard, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)

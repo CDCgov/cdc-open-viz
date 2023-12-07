@@ -4,7 +4,7 @@ import { defaultStyles } from '@visx/tooltip'
 
 // third party
 import { localPoint } from '@visx/event'
-import { bisector, bisectLeft } from 'd3-array'
+import { bisector } from 'd3-array'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 const transform = new DataTransform()
 
@@ -57,7 +57,7 @@ export const useTooltip = props => {
 
     const closestXScaleValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
 
-    let includedSeries = visualizationType !== 'Pie' ? config.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.series.map(item => item.dataKey)
+    const includedSeries = visualizationType !== 'Pie' ? config.series.filter(series => series.tooltip === true).map(item => item.dataKey) : config.series.map(item => item.dataKey)
     includedSeries.push(config.xAxis.dataKey)
     if (config.visualizationType === 'Forecasting') {
       config.series.map(s => {
