@@ -73,8 +73,6 @@ const useTooltip = props => {
   const handleTooltipPrimaryColumn = (tooltipValue, column) => {
     const { hidePrimaryColumnInTooltip } = config.general as { hidePrimaryColumnInTooltip: boolean }
     let tooltipPrefix = column.label?.length > 0 ? column.label : ''
-    console.log('column.name', column.name)
-    console.log('config.columns.primary.name', config.columns.primary.name)
     if ((column.name === config.columns.primary.name && hidePrimaryColumnInTooltip) || !tooltipPrefix) return `<li class="tooltip-body">${tooltipValue}</li>`
     return `<li class="tooltip-body">${tooltipPrefix}: ${tooltipValue}</li>`
   }

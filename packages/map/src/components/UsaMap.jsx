@@ -368,8 +368,6 @@ const UsaMap = props => {
               {state.hexMap.shapeGroups.map((group, groupIndex) => {
                 return group.items.map((item, itemIndex) => {
                   if (item.operator === '=') {
-                    console.log('group', item.value)
-                    console.log('geoData', geoData)
                     if (geoData[item.key] === item.value) {
                       return (
                         <Group top={centroid[1] - 5} left={centroid[0] - iconSize} color={textColor} textAnchor='start'>
