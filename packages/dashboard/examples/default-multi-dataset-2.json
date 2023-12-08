@@ -83,7 +83,7 @@
         },
         "path": "test",
         "fileName": "test",
-        "filterBy": "File Name"
+        "filterBy": "Query String"
       },
       {
         "key": "County",
