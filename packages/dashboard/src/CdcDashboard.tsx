@@ -188,6 +188,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
       let newDatasets = { ...config.datasets }
       let datasetsNeedsUpdate = false
       let datasetKeys = Object.keys(config.datasets)
+      let newFileName = ''
+
       for (let i = 0; i < datasetKeys.length; i++) {
         const datasetKey = datasetKeys[i]
         const dataset = config.datasets[datasetKey]
@@ -199,6 +201,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           let isUpdateNeeded = false
 
           config.dashboard.sharedFilters.forEach(filter => {
+            if (filter.fileName && newFileName === '' && filter.datasetKey === datasetKey) newFileName = filter.fileName
             if (filter.type === 'urlfilter' && !!filter.queryParameter) {
               if (updatedQSParams[filter.queryParameter]) {
                 updatedQSParams[filter.queryParameter] = updatedQSParams[filter.queryParameter] + filter.active
@@ -223,6 +226,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           })
           const _params = Object.keys(updatedQSParams).map(key => ({ key, value: updatedQSParams[key] }))
           let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${gatherQueryParams(_params)}`
+
+          if (newFileName !== '') {
+            let fileExtension = dataUrl.pathname.split('.').pop()
+            let pathWithoutFilename = dataUrl.pathname.substring(0, dataUrl.pathname.lastIndexOf('/'))
+            dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${newFileName}.${fileExtension}${gatherQueryParams(_params)}`
+          }
+
+          console.log('dataUrlFinal', dataUrlFinal)
 
           let newDataset = await fetchRemoteData(`${dataUrlFinal}`)
 
