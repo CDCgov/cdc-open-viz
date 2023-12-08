@@ -953,7 +953,7 @@ const EditorPanel = () => {
   ]
 
   if (config.data && config.series) {
-    Object.keys(config.data[0]).map(colName => {
+    Object.keys(config.data?.[0] || []).map(colName => {
       // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
       const found = config?.series.some(series => series.dataKey === colName)
       if (colName !== config.xAxis.dataKey && !found) {

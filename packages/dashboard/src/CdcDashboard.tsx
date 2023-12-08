@@ -844,7 +844,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           </section>
 
           {/* Data Table */}
-          {config.table.show && config.data && (
+          {config?.table?.show && config?.data && (
             <DataTable
               config={config}
               rawData={config.data}
@@ -860,7 +860,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
               isEditor={isEditor}
             />
           )}
-          {config.table.show &&
+          {config.table?.show &&
             config.datasets &&
             Object.keys(config.datasets).map(datasetKey => {
               //For each dataset, find any shared filters that apply to all visualizations using the dataset

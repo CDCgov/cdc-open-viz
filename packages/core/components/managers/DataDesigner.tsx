@@ -17,12 +17,12 @@ type DataDesignerProps = {
 
 const DataDesigner = (props: DataDesignerProps) => {
   const { configureData, updateDescriptionProp, visualizationKey, dataKey, config, setConfig } = props
-  const hasDataOrientation = config.visualizationType !== 'Forest Plot'
-  const hasMultipleSeries = config.visualizationType !== 'Forest Plot'
-  const hasRowSelection = config.visualizationType !== 'Forest Plot'
+  const hasDataOrientation = config?.visualizationType !== 'Forest Plot'
+  const hasMultipleSeries = config?.visualizationType !== 'Forest Plot'
+  const hasRowSelection = config?.visualizationType !== 'Forest Plot'
 
   useEffect(() => {
-    if (config.visualizationType === 'Forest Plot') {
+    if (config?.visualizationType === 'Forest Plot') {
       // needed to properly set data up?
       setConfig({
         ...config,
