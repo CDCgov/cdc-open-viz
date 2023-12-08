@@ -117,7 +117,6 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
         let longitude = Number(stateData.Longitude)
         let latitude = Number(stateData.Latitude)
         let coordinates = [longitude, latitude]
-        //console.log('projection', projection([longitude, latitude]))
         let stateName = stateData.Name
         if (!coordinates) return true
 

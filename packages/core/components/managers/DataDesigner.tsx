@@ -21,9 +21,6 @@ const DataDesigner = (props: DataDesignerProps) => {
   const hasMultipleSeries = config.visualizationType !== 'Forest Plot'
   const hasRowSelection = config.visualizationType !== 'Forest Plot'
 
-  console.log('visualizationKey', visualizationKey)
-  console.log('dataKey', dataKey)
-
   useEffect(() => {
     if (config.visualizationType === 'Forest Plot') {
       // needed to properly set data up?
