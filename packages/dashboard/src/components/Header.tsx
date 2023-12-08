@@ -260,8 +260,17 @@ const Header = (props: HeaderProps) => {
                       </select>
                     </label>
                     <label>
-                      <span className='edit-label column-heading'>File Name: </span>
-                      <input value={filter.fileName || ''} onChange={e => updateFilterProp('fileName', index, e.target.value)} />
+                      <span className='edit-label column-heading'>Filter By: </span>
+                      <select defaultValue={filter.filterBy || ''} onChange={e => updateFilterProp('filterBy', index, e.target.value)}>
+                        return (<option value=''>- Select Option -</option>
+                        <option key={'query-string'} value={'Query String'}>
+                          Query String
+                        </option>
+                        <option key={'file-name'} value={'File Name'}>
+                          File Name
+                        </option>
+                        )
+                      </select>
                     </label>
                   </>
                 )}
