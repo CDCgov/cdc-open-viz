@@ -7,6 +7,10 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import HexSetting from './HexShapeSettings'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../context'
+import { Legend } from '@visx/legend'
+import { scaleOrdinal } from '@visx/scale'
+import { Text } from '@visx/text'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 
 const Sidebar = () => {
   // prettier-ignore
@@ -97,19 +101,31 @@ const Sidebar = () => {
 
     if (state.map.patterns) {
       // loop over map patterns
-
       state.map.patterns.map((patternData, patternDataIndex) => {
+        const { pattern, dataKey, size } = patternData
+        let defaultPatternColor = 'black'
+        const sizes = {
+          small: '8',
+          medium: '10',
+          large: '12'
+        }
+
+        const legendSize = 16
+
         legendItems.push(
-          <li
-            className={`legend-container__li`}
-            key={patternDataIndex}
-            title={`Legend item  - Click to disable`}
-            onClick={() => {
-              // toggleLegendActive(idx, legendLabel)
-            }}
-          >
-            <LegendCircle fill={'orange'} /> <span className='label'>{patternData.dataValue}</span>
-          </li>
+          <>
+            <li className={`legend-container__li legend-container__li--geo-pattern`} style={{ alignItems: 'center' }}>
+              <span className='legend-item' style={{ border: 'unset' }}>
+                <svg width={legendSize} height={legendSize}>
+                  <circle id={dataKey} fill={`url(#${dataKey})`} r={legendSize / 2} cx={legendSize / 2} cy={legendSize / 2} stroke='#0000004d' strokeWidth={1} />
+                  {pattern === 'waves' && <PatternWaves id={`${dataKey}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
+                  {pattern === 'circles' && <PatternCircles id={`${dataKey}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
+                  {pattern === 'lines' && <PatternLines id={`${dataKey}`} height={sizes[size] ?? 6} width={sizes[size] ?? 6} stroke={defaultPatternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
+                </svg>
+              </span>
+              <p>{patternData.dataValue}</p>
+            </li>
+          </>
         )
       })
     }
