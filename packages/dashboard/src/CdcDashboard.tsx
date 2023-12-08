@@ -201,6 +201,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           let isUpdateNeeded = false
 
           config.dashboard.sharedFilters.forEach(filter => {
+            if (filter.filterBy === 'Query String' && filter.datasetKey === datasetKey) newFileName = filter.fileName
             if (filter.filterBy === 'File Name' && filter.datasetKey === datasetKey) newFileName = filter.active
             if (filter.type === 'urlfilter' && !!filter.queryParameter) {
               if (updatedQSParams[filter.queryParameter]) {
