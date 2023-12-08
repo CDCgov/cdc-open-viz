@@ -197,8 +197,6 @@ const useScales = properties => {
           round: true,
           clamp: true
         })
-
-        console.log('x', xScale.domain())
       }
     } else {
       if (config.forestPlot.type === 'Linear') {
