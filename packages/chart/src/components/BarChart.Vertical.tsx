@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { useBarChart } from '../hooks/useBarChart'
 import { Group } from '@visx/group'
@@ -15,24 +15,11 @@ import { type BarChartProps } from '../types/ChartProps'
 export const BarChartVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
 
-  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize } = useBarChart()
+  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize, getAdditionalColumn, hoveredBar, onMouseOverBar, onMouseLeaveBar } = useBarChart()
 
   // CONTEXT VALUES
   // prettier-ignore
-  const {
-    colorScale,
-    config,
-    formatDate,
-    formatNumber,
-    getXAxisData,
-    getYAxisData,
-    isNumber,
-    parseDate,
-    seriesHighlight,
-    setSharedFilter,
-    transformedData,
-    dashboardConfig
-  } = useContext(ConfigContext)
+  const { colorScale, config, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, dashboardConfig, setSeriesHighlight } = useContext(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
@@ -94,18 +81,15 @@ export const BarChartVertical = (props: BarChartProps) => {
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
                   const borderRadius = applyRadius(newIndex)
-
-                  let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                  // tooltips
+                  const additionalColTooltip = getAdditionalColumn(hoveredBar)
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-
-                  if (!hasMultipleSeries) {
-                    yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                  }
+                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
 
                   const tooltip = `<ul>
-                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
-                  <li class="tooltip-heading">${yAxisTooltip}</li>
-                  <li class="tooltip-body">${xAxisTooltip}</li>
+                  <li class="tooltip-heading">${xAxisTooltip}</li>
+                  <li class="tooltip-body ">${tooltipBody}</li>
+                   <li class="tooltip-body ">${additionalColTooltip}</li>
                     </li></ul>`
 
                   // configure colors
@@ -214,14 +198,16 @@ export const BarChartVertical = (props: BarChartProps) => {
                       </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         <foreignObject
-                          style={{ overflow: 'visible' }}
+                          onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
+                          onMouseLeave={onMouseLeaveBar}
+                          style={{ overflow: 'visible', transition: 'all 0.2s linear' }}
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                           x={barWidth * bar.index + offset}
                           y={barY}
                           width={barWidth}
                           height={barHeight}
-                          opacity={transparentBar ? 0.5 : 1}
+                          opacity={transparentBar ? 0.2 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tooltip-html={tooltip}
                           data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
