@@ -3,7 +3,7 @@ import ConfigContext from '../ConfigContext'
 
 export const useEditorPermissions = () => {
   const { config } = useContext(ConfigContext)
-  const { visualizationType, series, orientation } = config
+  const { visualizationType, series, orientation, visualizationSubType } = config
 
   // Overall support for the chart types
   // prettier-ignore
@@ -82,6 +82,15 @@ export const useEditorPermissions = () => {
       default:
         return false
     }
+  }
+
+  const visHasDataSuppression = () => {
+    if ((visualizationType === 'Bar' || 'Combo') && visualizationSubType === 'regular') {
+      return true
+    }
+  }
+  const visHasBrushChart = () => {
+    return ['Line', 'Bar', 'Area Chart', 'Combo'].includes(visualizationType) && orientation === 'vertical'
   }
 
   const visHasBarBorders = () => {
@@ -256,7 +265,9 @@ export const useEditorPermissions = () => {
     visHasBarBorders,
     visHasDataCutoff,
     visHasLabelOnData,
+    visHasDataSuppression,
     visHasLegend,
+    visHasBrushChart,
     visHasNumbersOnBars,
     visSupportsBarSpace,
     visSupportsBarThickness,

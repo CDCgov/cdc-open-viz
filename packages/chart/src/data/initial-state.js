@@ -11,6 +11,7 @@ export default {
   animate: false,
   fontSize: 'medium',
   lineDatapointStyle: 'hover',
+  lineDatapointColor: 'Same as Line',
   barHasBorder: 'false',
   isLollipopChart: false,
   lollipopShape: 'circle',
@@ -189,7 +190,7 @@ export default {
   series: [],
   tooltips: {
     opacity: 90,
-    singleSeries: true
+    singleSeries: false
   },
   forestPlot: {
     startAt: 0,

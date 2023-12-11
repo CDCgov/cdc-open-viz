@@ -3,7 +3,6 @@ import { useContext, useEffect } from 'react'
 // visx
 import { Group } from '@visx/group'
 import { Line, Bar, Circle, LinePath } from '@visx/shape'
-import { GlyphDiamond } from '@visx/glyph'
 import { Text } from '@visx/text'
 import { scaleLinear } from '@visx/scale'
 import { curveLinearClosed } from '@visx/curve'
@@ -87,19 +86,17 @@ const ForestPlot = (props: ForestPlotProps) => {
         {data.map((d, i) => {
           // calculate both square and circle size based on radius.min and radius.max
           const scaleRadius = scaleLinear({
-            domain: xScale.domain(),
+            domain: data.map(d => d[forestPlot.radius.scalingColumn]),
             range: [forestPlot.radius.min, forestPlot.radius.max]
           })
 
           // glyph settings
-          const diamondSize = forestPlot.estimateField !== '' ? scaleRadius(data[i][forestPlot.estimateField]) * 5 : 4
-          const rectSize = forestPlot.estimateField !== '' ? scaleRadius(data[i][forestPlot.estimateField]) : 4
+          const rectSize = forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.radius.scalingColumn]) : 4
           const shapeColor = forestPlot.colors.shape ? forestPlot.colors.shape : 'black'
           const lineColor = forestPlot.colors.line ? forestPlot.colors.line : 'black'
 
           // ci size
           const ciEndSize = 4
-          console.log('d', d)
 
           // Don't run calculations on the pooled column
           const isTotalColumn = d[config.xAxis.dataKey] === forestPlot.pooledResult.column
@@ -130,10 +127,9 @@ const ForestPlot = (props: ForestPlotProps) => {
               {/* main line */}
               <line stroke={lineColor} className={`line-${d[config.yAxis.dataKey]}`} key={i} x1={xScale(d[forestPlot.lower])} x2={xScale(d[forestPlot.upper])} y1={yScale(i)} y2={yScale(i)} />
               {forestPlot.shape === 'circle' && (
-                <Circle className='forest-plot--circle' cx={xScale(Number(d[forestPlot.estimateField]))} cy={yScale(i)} r={forestPlot.estimateField !== '' ? scaleRadius(data[i][forestPlot.estimateField]) : 4} fill={shapeColor} style={{ opacity: 1, filter: 'unset' }} />
+                <Circle className='forest-plot--circle' cx={xScale(Number(d[forestPlot.estimateField]))} cy={yScale(i)} r={forestPlot.radius.scalingColumn !== '' ? scaleRadius(data[i][forestPlot.radius.scalingColumn]) : 4} fill={shapeColor} style={{ opacity: 1, filter: 'unset' }} />
               )}
               {forestPlot.shape === 'square' && <rect className='forest-plot--square' x={xScale(Number(d[forestPlot.estimateField]))} y={yScale(i) - rectSize / 2} width={rectSize} height={rectSize} fill={shapeColor} style={{ opacity: 1, filter: 'unset' }} />}
-              {forestPlot.shape === 'diamond' && <GlyphDiamond className='forest-plot--diamond' size={diamondSize} top={yScale(i)} left={xScale(Number(d[forestPlot.estimateField]))} fill={shapeColor} />}
               {forestPlot.shape === 'text' && (
                 <Text className='forest-plot--text' x={xScale(Number(d[forestPlot.estimateField]))} y={yScale(i)} textAnchor='middle' verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={shapeColor}>
                   {d[forestPlot.estimateField]}

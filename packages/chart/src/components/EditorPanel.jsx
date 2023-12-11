@@ -327,6 +327,7 @@ const EditorPanel = () => {
     visHasDataCutoff,
     visCanAnimate,
     visHasLegend,
+    visHasBrushChart,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
     visSupportsDateCategoryAxisTicks,
@@ -348,7 +349,8 @@ const EditorPanel = () => {
     visSupportsTooltipOpacity,
     visSupportsRankByValue,
     visSupportsResponsiveTicks,
-    visSupportsDateCategoryHeight
+    visSupportsDateCategoryHeight,
+    visHasDataSuppression
   } = useEditorPermissions()
 
   // argument acts as props
@@ -1301,7 +1303,6 @@ const EditorPanel = () => {
                       </Series.Wrapper>
                     )}
                   </>
-
                   {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
                     <>
                       <span className='divider-heading'>Confidence Keys</span>
@@ -1309,9 +1310,8 @@ const EditorPanel = () => {
                       <Select value={config.confidenceKeys.lower || ''} section='confidenceKeys' fieldName='lower' label='Lower' updateField={updateField} initial='Select' options={getColumns()} />
                     </>
                   )}
-
                   {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
-                  <DataSuppression config={config} updateConfig={updateConfig} data={data} />
+                  {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
                 </AccordionItemPanel>
               </AccordionItem>
             )}
@@ -2109,7 +2109,7 @@ const EditorPanel = () => {
                       }
                       updateField={updateField}
                     />
-                    {['Line', 'Bar', 'Area Chart', 'Combo'].includes(config.visualizationType) && config.orientation === 'vertical' && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
+                    {/* {visHasBrushChart && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />} */}
 
                     {config.exclusions.active && (
                       <>
@@ -3028,7 +3028,10 @@ const EditorPanel = () => {
                 {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 
                 {((config.series?.some(series => series.type === 'Line' || series.type === 'dashed-lg' || series.type === 'dashed-sm' || series.type === 'dashed-md') && config.visualizationType === 'Combo') || config.visualizationType === 'Line') && (
-                  <Select value={config.lineDatapointStyle} fieldName='lineDatapointStyle' label='Line Datapoint Style' updateField={updateField} options={['hidden', 'hover', 'always show']} />
+                  <>
+                    <Select value={config.lineDatapointStyle} fieldName='lineDatapointStyle' label='Line Datapoint Style' updateField={updateField} options={['hidden', 'hover', 'always show']} />
+                    <Select value={config.lineDatapointColor} fieldName='lineDatapointColor' label='Line Datapoint Color' updateField={updateField} options={['Same as Line', 'Lighter than Line']} />
+                  </>
                 )}
 
                 {/* eslint-disable */}

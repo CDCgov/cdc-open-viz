@@ -291,6 +291,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       if (!series.axis) series.axis = 'Left'
     })
 
+    if (!newConfig.data && data) {
+      newConfig.data = data
+    }
+
     const processedConfig = { ...(await coveUpdateWorker(newConfig)) }
 
     updateConfig(processedConfig, data)
@@ -1279,8 +1283,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
-  // const s = transform.applySuppression(filteredData, config.suppressedData)
-  // console.log(s, 'sss')
 
   const contextValues = {
     capitalize,
