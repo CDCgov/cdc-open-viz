@@ -15,11 +15,16 @@ import { type BarChartProps } from '../types/ChartProps'
 export const BarChartVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
 
+  const [barWidth, setBarWidth] = useState(0)
+  const [totalBarsInGroup, setTotalBarsInGroup] = useState(0)
+
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize, getAdditionalColumn, hoveredBar, onMouseOverBar, onMouseLeaveBar } = useBarChart()
 
   // CONTEXT VALUES
   // prettier-ignore
   const { colorScale, config, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, dashboardConfig, setSeriesHighlight } = useContext(ConfigContext)
+
+  const { runtime } = config
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
@@ -74,6 +79,8 @@ export const BarChartVertical = (props: BarChartProps) => {
                   }
 
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
+                  setBarWidth(barWidth)
+                  setTotalBarsInGroup(barGroup.bars.length)
 
                   let yAxisValue = formatNumber(bar.value, 'left')
                   let xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
@@ -148,19 +155,10 @@ export const BarChartVertical = (props: BarChartProps) => {
                   }
 
                   const getLeft = () => {
-                    if (Number(barWidth) < 10) return 0
-                    if (Number(barWidth) < 15) return 2
-                    if (Number(barWidth) < 20) return 6
-                    if (Number(barWidth) < 25) return 7
-                    if (Number(barWidth) < 30) return 8
-                    if (Number(barWidth) < 35) return 12
-                    if (Number(barWidth) < 40) return 14
-                    if (Number(barWidth) < 45) return 16
-                    if (Number(barWidth) < 50) return 18
-                    if (Number(barWidth) < 55) return 20
-                    if (Number(barWidth) < 60) return 22
-                    if (Number(barWidth) < 65) return 24
-                    else return 20
+                    if (barWidth < 50 && barWidth > 15) return barWidth / 2.5
+                    if (barWidth < 15 && barWidth > 5) return barWidth / 6
+                    if (barWidth < 5) return 0
+                    return barWidth / 2
                   }
                   const iconStyle: { [key: string]: any } = {
                     position: 'absolute',
@@ -296,6 +294,50 @@ export const BarChartVertical = (props: BarChartProps) => {
                     M${xPos - tickWidth} ${lowerPos}
                     L${xPos + tickWidth} ${lowerPos}`}
                 />
+              )
+            })
+          : ''}
+
+        {config.regions && config.visualizationType !== 'Combo'
+          ? config.regions.map(region => {
+              if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+
+              let from
+              let to
+              let width
+
+              if (config.xAxis.type === 'date') {
+                from = xScale(parseDate(region.from).getTime()) - (barWidth * totalBarsInGroup) / 2
+                to = xScale(parseDate(region.to).getTime()) + (barWidth * totalBarsInGroup) / 2
+
+                width = to - from
+              }
+
+              if (config.xAxis.type === 'categorical') {
+                from = xScale(region.from)
+                to = xScale(region.to)
+                width = to - from
+              }
+
+              if (!from) return null
+              if (!to) return null
+
+              return (
+                <Group className='regions' left={0} key={region.label}>
+                  <path
+                    stroke='#333'
+                    d={`M${from} -5
+                          L${from} 5
+                          M${from} 0
+                          L${to} 0
+                          M${to} -5
+                          L${to} 5`}
+                  />
+                  <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+                  <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+                    {region.label}
+                  </Text>
+                </Group>
               )
             })
           : ''}

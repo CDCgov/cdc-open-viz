@@ -53,7 +53,7 @@ export const useTooltip = props => {
     const { x, y } = eventSvgCoords
 
     // Additional data for pie charts
-    const { data: pieChartData, arc } = additionalChartData
+    const { data: pieChartData, arc } = additionalChartData ?? {}
 
     const closestXScaleValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
 
@@ -87,7 +87,7 @@ export const useTooltip = props => {
 
     const resolvedScaleValues = orientation === 'vertical' ? yScaleValues : xScaleValues
 
-    const forestPlotXValue = visualizationType === 'Forest Plot' ? data?.filter(d => d[xAxis.dataKey] === getClosestYValue(y))[0][config.forestPlot.estimateField] : null
+    // const forestPlotXValue = visualizationType === 'Forest Plot' ? data?.filter(d => d[xAxis.dataKey] === getClosestYValue(y))?.[0]?.[config.forestPlot.estimateField] : null
 
     const getAxisPosition = seriesKey => {
       const seriesObj = config.series.filter(s => s.dataKey === seriesKey)[0]
@@ -144,7 +144,8 @@ export const useTooltip = props => {
           ...getIncludedTooltipSeries()
             ?.filter(Boolean)
             .flatMap(seriesKey => {
-              return resolvedScaleValues[0][seriesKey] ? [[seriesKey, formatNumber(resolvedScaleValues[0][seriesKey], getAxisPosition(seriesKey))]] : []
+              const formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0][seriesKey] : formatNumber(resolvedScaleValues[0][seriesKey], getAxisPosition(seriesKey))
+              return resolvedScaleValues[0][seriesKey] ? [[seriesKey, formattedValue]] : []
             })
         )
       }

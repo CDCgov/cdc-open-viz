@@ -24,10 +24,10 @@ const useTooltip = props => {
    * @param {String} geoName - feature name
    * @returns {String} text to be appended to toolTipText
    */
-  const handleTooltipGeoColumn = geoName => {
-    const { hideGeoColumnInTooltip } = config.general
+  const handleTooltipGeoColumn = (geoName: string) => {
+    const { hideGeoColumnInTooltip } = config.general as { hideGeoColumnInTooltip: boolean }
 
-    const handleTooltipPrefix = toolTipText => {
+    const handleTooltipPrefix = (toolTipText: string) => {
       const { geoType, geoLabelOverride } = config.general
       switch (geoType) {
         case 'us':
@@ -49,7 +49,7 @@ const useTooltip = props => {
       return toolTipText
     }
 
-    const prefix = handleTooltipPrefix()
+    const prefix = handleTooltipPrefix('')
 
     if (hideGeoColumnInTooltip) return `<strong>${displayGeoName(geoName)}</strong>`
     return `<p class="tooltip-heading">${prefix}${displayGeoName(geoName)}</p>`
@@ -71,9 +71,11 @@ const useTooltip = props => {
   }
 
   const handleTooltipPrimaryColumn = (tooltipValue, column) => {
-    const { hidePrimaryColumnInTooltip } = config.general
+    const { hidePrimaryColumnInTooltip } = config.general as { hidePrimaryColumnInTooltip: boolean }
     let tooltipPrefix = column.label?.length > 0 ? column.label : ''
-    if (hidePrimaryColumnInTooltip || !tooltipPrefix) return `<li class="tooltip-body">${tooltipValue}</li>`
+    console.log('column.name', column.name)
+    console.log('config.columns.primary.name', config.columns.primary.name)
+    if ((column.name === config.columns.primary.name && hidePrimaryColumnInTooltip) || !tooltipPrefix) return `<li class="tooltip-body">${tooltipValue}</li>`
     return `<li class="tooltip-body">${tooltipPrefix}: ${tooltipValue}</li>`
   }
 

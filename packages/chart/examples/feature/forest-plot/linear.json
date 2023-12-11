@@ -204,60 +204,6 @@
   "tooltips": {
     "opacity": 90
   },
-  "forestPlot": {
-    "startAt": 0,
-    "colors": {
-      "line": "",
-      "shape": ""
-    },
-    "lineOfNoEffect": {
-      "show": true
-    },
-    "type": "Linear",
-    "pooledResult": {
-      "diamondHeight": 5,
-      "column": "Total"
-    },
-    "estimateField": "Estimate",
-    "estimateRadius": "",
-    "shape": "circle",
-    "rowHeight": 20,
-    "description": {
-      "show": true,
-      "text": "description",
-      "location": 0
-    },
-    "result": {
-      "show": true,
-      "text": "result",
-      "location": 100
-    },
-    "radius": {
-      "min": 1,
-      "max": 8,
-      "scalingColumn": ""
-    },
-    "regression": {
-      "lower": 0,
-      "upper": 0,
-      "estimateField": 0
-    },
-    "leftWidthOffset": "17",
-    "rightWidthOffset": "30",
-    "showZeroLine": false,
-    "hideDateCategoryCol": false,
-    "leftLabel": "left label",
-    "rightLabel": "right label",
-    "width": "auto",
-    "outcome": "",
-    "lowerCiField": "",
-    "upperCiField": "",
-    "lower": "Lower",
-    "upper": "Upper",
-    "rightWidthOffsetMobile": "0",
-    "title": "test",
-    "leftWidthOffsetMobile": "51"
-  },
   "area": {
     "isStacked": false
   },

@@ -1616,7 +1616,7 @@ const EditorPanel = props => {
                     <option value='data'>Data</option>
                     {state.general.geoType === 'us-county' && <option value='us-geocode'>Geocode</option>}
                     {state.general.geoType === 'world' && <option value='world-geocode'>Geocode</option>}
-                    <option value='navigation'>Navigation</option>
+                    {state.general.geoType !== 'us-county' && <option value='navigation'>Navigation</option>}
                     {(state.general.geoType === 'world' || state.general.geoType === 'us') && <option value='bubble'>Bubble</option>}
                   </select>
                 </label>
