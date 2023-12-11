@@ -148,7 +148,8 @@ export default {
     dynamicLegendItemLimitMessage: 'Dynamic Legend Item Limit Hit.',
     dynamicLegendChartMessage: 'Select Options from the Legend',
     lineMode: false,
-    verticalSorted: false
+    verticalSorted: false,
+    highlightOnHover: false
   },
   brush: {
     height: 25,
@@ -188,7 +189,8 @@ export default {
   highlightedBarValues: [],
   series: [],
   tooltips: {
-    opacity: 90
+    opacity: 90,
+    singleSeries: false
   },
   forestPlot: {
     startAt: 0,

@@ -79,6 +79,7 @@ export const useTooltip = props => {
       return names
     }
     includedSeries.push(...getColumnNames(config.columns))
+    includedSeries.push(...getColumnNames(config.columns))
 
     const yScaleValues = getYScaleValues(closestXScaleValue, includedSeries)
 
@@ -137,6 +138,7 @@ export const useTooltip = props => {
       if (visualizationType === 'Forest Plot') {
         tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
       }
+
       if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot') {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
