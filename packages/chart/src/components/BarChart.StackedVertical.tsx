@@ -9,7 +9,7 @@ import { type BarChartProps } from '../types/ChartProps'
 const BarChartStackedVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax } = props
   const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius } = useBarChart()
+  const { isHorizontal, barBorderWidth, applyRadius, hoveredBar, getAdditionalColumn, onMouseLeaveBar, onMouseOverBar } = useBarChart()
   const { orientation } = config
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
@@ -28,25 +28,16 @@ const BarChartStackedVertical = (props: BarChartProps) => {
               // tooltips
               const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
               const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
-
-              if (!yAxisValue) return <></>
               const style = applyRadius(barStack.index)
-              let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
               const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-              if (!hasMultipleSeries) {
-                yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-              }
+              const additionalColTooltip = getAdditionalColumn(hoveredBar)
+              const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
+              const tooltip = `<ul>
+                  <li class="tooltip-heading"">${xAxisTooltip}</li>
+                  <li class="tooltip-body ">${tooltipBody}</li>
+                  <li class="tooltip-body ">${additionalColTooltip}</li>
+                    </li></ul>`
 
-              const {
-                legend: { showLegendValuesTooltip },
-                runtime: { seriesLabels }
-              } = config
-
-              const barStackTooltip = `<div>
-                    <p class="tooltip-heading"><strong>${xAxisTooltip}</strong></p>
-                    ${showLegendValuesTooltip && seriesLabels && hasMultipleSeries ? `${seriesLabels[bar.key] || ''}<br/>` : ''}
-                    ${yAxisTooltip}<br />
-                      </div>`
               return (
                 <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
                   <style>
@@ -63,13 +54,15 @@ const BarChartStackedVertical = (props: BarChartProps) => {
                       {yAxisValue}
                     </Text>
                     <foreignObject
+                      onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
+                      onMouseLeave={onMouseLeaveBar}
                       key={`bar-stack-${barStack.index}-${bar.index}`}
                       x={barThickness * bar.index + offset}
                       y={bar.y}
                       width={barThicknessAdjusted}
                       height={bar.height}
                       display={displayBar ? 'block' : 'none'}
-                      data-tooltip-html={barStackTooltip}
+                      data-tooltip-html={tooltip}
                       data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       onClick={e => {
                         e.preventDefault()
@@ -79,7 +72,9 @@ const BarChartStackedVertical = (props: BarChartProps) => {
                         }
                       }}
                     >
-                      <div style={{ opacity: transparentBar ? 0.5 : 1, width: barThicknessAdjusted, height: bar.height, background: colorScale(config.runtime.seriesLabels[bar.key]), border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}></div>
+                      <div
+                        style={{ transition: 'all 0.2s linear', opacity: transparentBar ? 0.2 : 1, width: barThicknessAdjusted, height: bar.height, background: colorScale(config.runtime.seriesLabels[bar.key]), border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
+                      ></div>
                     </foreignObject>
                   </Group>
                 </Group>

@@ -15,7 +15,26 @@ import { type BarChartProps } from '../types/ChartProps'
 export const BarChartHorizontal = (props: BarChartProps) => {
   const { xScale, yScale, yMax, seriesScale } = props
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getTextWidth, getYAxisData, getXAxisData } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, fontSize, isLabelBelowBar, displayNumbersOnBar, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize } = useBarChart()
+  const {
+    isHorizontal,
+    barBorderWidth,
+    applyRadius,
+    updateBars,
+    assignColorsToValues,
+    section,
+    fontSize,
+    isLabelBelowBar,
+    displayNumbersOnBar,
+    lollipopBarWidth,
+    lollipopShapeSize,
+    getHighlightedBarColorByValue,
+    getHighlightedBarByValue,
+    generateIconSize,
+    getAdditionalColumn,
+    hoveredBar,
+    onMouseLeaveBar,
+    onMouseOverBar
+  } = useBarChart()
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const getIcon = (bar, barWidth) => {
@@ -53,9 +72,7 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
 
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
-
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
-
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   let barHeight = config.barHeight
@@ -97,16 +114,13 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                   const newIndex = bar.value < 0 ? -1 : index
                   const borderRadius = applyRadius(newIndex)
 
-                  let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                  let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-                  if (!hasMultipleSeries) {
-                    xAxisTooltip = config.isLegendValue ? `<p className="tooltip-heading">${bar.key}: ${xAxisValue}</p>` : config.runtime.xAxis.label ? `<p className="tooltip-heading">${config.runtime.xAxis.label}: ${xAxisValue}</p>` : xAxisValue
-                  }
-
+                  let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${xAxisValue}` : xAxisValue
+                  const additionalColTooltip = getAdditionalColumn(hoveredBar)
+                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
                   const tooltip = `<ul>
-                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
-                  <li class="tooltip-heading">${yAxisTooltip}</li>
-                  <li class="tooltip-body">${xAxisTooltip}</li>
+                  <li class="tooltip-heading"">${yAxisTooltip}</li>
+                  <li class="tooltip-body ">${tooltipBody}</li>
+                  <li class="tooltip-body ">${additionalColTooltip}</li>
                     </li></ul>`
 
                   // configure colors
@@ -162,6 +176,7 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                     borderStyle: 'solid',
                     borderWidth,
                     width: barWidth,
+                    transition: 'all 0.2s linear',
                     height: !config.isLollipopChart ? barHeight : lollipopBarWidth,
                     ...borderRadius
                   }
@@ -179,6 +194,8 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                       </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                         <foreignObject
+                          onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
+                          onMouseLeave={onMouseLeaveBar}
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                           x={barX}
@@ -186,7 +203,7 @@ export const BarChartHorizontal = (props: BarChartProps) => {
                           y={barHeight * bar.index}
                           height={!config.isLollipopChart ? barHeight : lollipopBarWidth}
                           width={barWidth}
-                          opacity={transparentBar ? 0.5 : 1}
+                          opacity={transparentBar ? 0.2 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tooltip-html={tooltip}
                           data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}

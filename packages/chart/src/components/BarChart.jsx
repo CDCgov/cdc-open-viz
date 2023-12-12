@@ -21,7 +21,7 @@ const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, handleTooltipMouseO
         <BarChartType.Horizontal xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} seriesScale={seriesScale} />
 
         {/* tooltips */}
-        <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={false ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
+        <Bar key={'bars'} display={config.tooltips.singleSeries ? 'none' : 'block'} width={Number(xMax)} height={Number(yMax)} fill={'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, data)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
       </Group>
     </ErrorBoundary>
   )
