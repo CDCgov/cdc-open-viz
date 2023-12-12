@@ -242,22 +242,43 @@ const Header = (props: HeaderProps) => {
                   />
                 </label>
                 {config.filterBehavior !== FilterBehavior.Apply && (
-                  <label>
-                    <span className='edit-label column-heading'>URL to Filter: </span>
-                    <select defaultValue={filter.datasetKey || ''} onChange={e => updateFilterProp('datasetKey', index, e.target.value)}>
-                      <option value=''>- Select Option -</option>
-                      {Object.keys(config.datasets).map(datasetKey => {
-                        if (config.datasets[datasetKey].dataUrl) {
-                          return (
-                            <option key={datasetKey} value={datasetKey}>
-                              {config.datasets[datasetKey].dataUrl.substring(0, 50)}
-                            </option>
-                          )
-                        }
-                        return null
-                      })}
-                    </select>
-                  </label>
+                  <>
+                    <label>
+                      <span className='edit-label column-heading'>URL to Filter: </span>
+                      <select defaultValue={filter.datasetKey || ''} onChange={e => updateFilterProp('datasetKey', index, e.target.value)}>
+                        <option value=''>- Select Option -</option>
+                        {Object.keys(config.datasets).map(datasetKey => {
+                          if (config.datasets[datasetKey].dataUrl) {
+                            return (
+                              <option key={datasetKey} value={datasetKey}>
+                                {config.datasets[datasetKey].dataUrl.substring(0, 50)}
+                              </option>
+                            )
+                          }
+                          return null
+                        })}
+                      </select>
+                    </label>
+                    <label>
+                      <span className='edit-label column-heading'>Filter By: </span>
+                      <select defaultValue={filter.filterBy || ''} onChange={e => updateFilterProp('filterBy', index, e.target.value)}>
+                        return (<option value=''>- Select Option -</option>
+                        <option key={'query-string'} value={'Query String'}>
+                          Query String
+                        </option>
+                        <option key={'file-name'} value={'File Name'}>
+                          File Name
+                        </option>
+                        )
+                      </select>
+                    </label>
+                    {filter.filterBy === 'Query String' && (
+                      <label>
+                        <span className='edit-label column-heading'>File Name: </span>
+                        <input type='text' defaultValue={filter.fileName || ''} onChange={e => updateFilterProp('fileName', index, e.target.value)} />
+                      </label>
+                    )}
+                  </>
                 )}
                 <label>
                   <span className='edit-label column-heading'>Query string parameter</span> <input type='text' defaultValue={filter.queryParameter} onChange={e => updateFilterProp('queryParameter', index, e.target.value)} />

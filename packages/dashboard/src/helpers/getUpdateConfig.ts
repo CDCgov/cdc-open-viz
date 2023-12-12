@@ -51,7 +51,7 @@ export const getUpdateConfig =
         if (applicableFilters.length > 0) {
           const visualization = newConfig.visualizations[visualizationKey]
           const _newConfigDataSet = newConfig.datasets[visualization.dataKey]
-          const formattedData = getFormattedData(_newConfigDataSet.data || visualization.data, visualization.dataDescription)
+          const formattedData = getFormattedData(_newConfigDataSet?.data || visualization.data, visualization.dataDescription)
           const _data = formattedData || (dataOverride || state.data)[visualization.dataKey]
           newFilteredData[visualizationKey] = filterData(applicableFilters, _data, state.config?.filterBehavior)
         }
