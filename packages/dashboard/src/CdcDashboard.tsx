@@ -165,12 +165,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
         const baseEndpoint = filter.apiFilter.apiEndpoint
         const _key = getApiFilterKey(filter.apiFilter)
         const params = getParentParams(filter)
-        console.log('params', params)
-        console.log('api', apiFilterDropdowns[_key])
-        console.log('f', filter.filterBy)
-        if (apiFilterDropdowns[_key] && !params && filter.filterBy === 'Query String') console.log('not returning')
         const notAllParentsSelected = params?.some(({ value }) => value === '')
-        if (notAllParentsSelected) console.log('not all defined')
         if (notAllParentsSelected) return // don't send request for dependent children filter options
         if (apiFilterDropdowns[_key] && !params && filter.filterBy === 'Query String') return // don't reload filter unless it's a child
         const endpoint = baseEndpoint + (params ? gatherQueryParams(params) : '')
@@ -206,13 +201,16 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           let isUpdateNeeded = false
 
           config.dashboard.sharedFilters.forEach(filter => {
-            if (filter.filterBy === 'File Name' && filter.datasetKey === datasetKey) newFileName = filter.fileName
-            if (newFileName.includes('${query}')) {
-              newFileName = newFileName.replace('${query}', filter.active)
+            if (filter.filterBy === 'File Name') {
+              // if no file name is entered use the default active filter. ie. /activeFilter.json
+              if (!filter.fileName && filter.datasetKey === datasetKey) newFileName = filter.active
+              // if a file name is found, ie, state_${query}, use that, ie. state_activeFilter.json
+              if (filter.datasetKey === datasetKey && filter.fileName) newFileName = filter.fileName
+              if (newFileName && newFileName.includes('${query}')) {
+                newFileName = newFileName.replace('${query}', filter.active)
+              }
             }
-            if (filter.filterBy === 'File Name' && filter.fileName === '') newFileName = filter.active
 
-            if (filter.filterBy === 'Query String' && filter.datasetKey === datasetKey) newFileName = filter.active
             if (filter.type === 'urlfilter' && !!filter.queryParameter) {
               if (updatedQSParams[filter.queryParameter]) {
                 updatedQSParams[filter.queryParameter] = updatedQSParams[filter.queryParameter] + filter.active
@@ -241,13 +239,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           const _params = Object.keys(updatedQSParams).map(key => ({ key, value: updatedQSParams[key] }))
           let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${gatherQueryParams(_params)}`
 
-          if (newFileName) {
+          if (newFileName !== '') {
             let fileExtension = dataUrl.pathname.split('.').pop()
             let pathWithoutFilename = dataUrl.pathname.substring(0, dataUrl.pathname.lastIndexOf('/'))
             dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${newFileName}.${fileExtension}${gatherQueryParams(_params)}`
           }
-
-          console.log('dataUrlFinal', dataUrlFinal)
 
           let newDataset = await fetchRemoteData(`${dataUrlFinal}`)
 
