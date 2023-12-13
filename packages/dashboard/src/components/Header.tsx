@@ -272,7 +272,7 @@ const Header = (props: HeaderProps) => {
                         )
                       </select>
                     </label>
-                    {filter.filterBy === 'Query String' && (
+                    {filter.filterBy === 'File Name' && (
                       <label>
                         <span className='edit-label column-heading'>File Name: </span>
                         <input type='text' defaultValue={filter.fileName || ''} onChange={e => updateFilterProp('fileName', index, e.target.value)} />
@@ -294,7 +294,7 @@ const Header = (props: HeaderProps) => {
                   />
                 </label>
                 <label>
-                  <span className='edit-label column-heading'>Text Selector: </span>
+                  <span className='edit-label column-heading'>Option Text Selector: </span>
                   <input
                     type='text'
                     value={filter.apiFilter?.textSelector}
@@ -304,7 +304,7 @@ const Header = (props: HeaderProps) => {
                   />
                 </label>
                 <label>
-                  <span className='edit-label column-heading'>Value Selector: </span>
+                  <span className='edit-label column-heading'>Option Value Selector: </span>
                   <input
                     type='text'
                     value={filter.apiFilter?.valueSelector}
