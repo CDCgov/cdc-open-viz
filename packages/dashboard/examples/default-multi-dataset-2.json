@@ -82,8 +82,8 @@
           "autoLoad": true
         },
         "path": "test",
-        "fileName": "test",
-        "filterBy": "File Name"
+        "fileName": "nsspsubsets${query}",
+        "filterBy": "Query String"
       },
       {
         "key": "County",

@@ -280,9 +280,11 @@ const Header = (props: HeaderProps) => {
                     )}
                   </>
                 )}
-                <label>
-                  <span className='edit-label column-heading'>Query string parameter</span> <input type='text' defaultValue={filter.queryParameter} onChange={e => updateFilterProp('queryParameter', index, e.target.value)} />
-                </label>
+                {filter.filterBy === 'Query String' && (
+                  <label>
+                    <span className='edit-label column-heading'>Query string parameter</span> <input type='text' defaultValue={filter.queryParameter} onChange={e => updateFilterProp('queryParameter', index, e.target.value)} />
+                  </label>
+                )}
                 <label>
                   <span className='edit-label column-heading'>Filter API Endpoint: </span>
                   <input
