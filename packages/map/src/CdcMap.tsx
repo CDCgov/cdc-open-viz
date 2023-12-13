@@ -1008,6 +1008,20 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // guard clause else error in editor
     if (!string) return
     if (string !== undefined) {
+      const toTitleCase = word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()
+
+      if (string.toUpperCase().includes('U.S.') || string.toUpperCase().includes('US')) {
+        return string
+          .split(' ')
+          .map(word => {
+            if (word.toUpperCase() === 'U.S.' || word.toUpperCase() === 'US') {
+              return word.toUpperCase()
+            } else {
+              return toTitleCase(word)
+            }
+          })
+          .join(' ')
+      }
       // if hyphen found, then split, uppercase each word, and put back together
       if (string.includes('–') || string.includes('-')) {
         let dashSplit = string.includes('–') ? string.split('–') : string.split('-') // determine hyphen or en dash to split on
