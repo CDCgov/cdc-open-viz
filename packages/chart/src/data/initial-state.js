@@ -208,7 +208,7 @@ export default {
     },
     estimateField: '',
     estimateRadius: '',
-    shape: '',
+    shape: 'circle',
     rowHeight: 20,
     description: {
       show: true,
@@ -233,7 +233,6 @@ export default {
     leftWidthOffset: 0,
     rightWidthOffset: 0,
     showZeroLine: false,
-    hideDateCategoryCol: false,
     leftLabel: '',
     rightLabel: ''
   },

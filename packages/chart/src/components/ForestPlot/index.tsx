@@ -157,7 +157,7 @@ const ForestPlot = (props: ForestPlotProps) => {
 
       {/* column data */}
       {columnsOnChart.map(column => {
-        return rawData.map((d, i) => {
+        return data.map((d, i) => {
           return (
             <Text className={`${d[column.name]}`} x={column.forestPlotAlignRight ? width : column.forestPlotStartingPoint} y={yScale(i)} textAnchor={column.forestPlotAlignRight ? 'end' : 'start'} verticalAnchor='middle' fontSize={getFontSize(config.fontSize)} fill={'black'}>
               {d[column.name]}

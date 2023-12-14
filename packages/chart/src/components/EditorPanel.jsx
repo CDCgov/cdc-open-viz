@@ -2662,18 +2662,6 @@ const EditorPanel = () => {
                                   <label className='checkbox'>
                                     <input
                                       type='checkbox'
-                                      checked={config.columns[val].tooltips || false}
-                                      onChange={event => {
-                                        updateSeriesTooltip(val, event.target.checked)
-                                      }}
-                                    />
-                                    <span className='edit-label'>Show in tooltip</span>
-                                  </label>
-                                </li>
-                                <li>
-                                  <label className='checkbox'>
-                                    <input
-                                      type='checkbox'
                                       checked={config.columns[val].forestPlotAlignRight || false}
                                       onChange={event => {
                                         editColumn(val, 'forestPlotAlignRight', event.target.checked)

@@ -1328,7 +1328,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     isDebug,
     setSharedFilter,
     setSharedFilterValue,
-    dashboardConfig
+    dashboardConfig,
+    debugSvg: isDebug
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]

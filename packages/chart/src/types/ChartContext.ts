@@ -29,6 +29,8 @@ export type ChartContext =
       formatNumber?: Function
       handleLineType?: Function
       isNumber?: boolean
+      // url param added to allow various console logs and chart helpers
+      isDebug?: boolean
       parseDate?: Function
       rawData?: Object[]
       seriesHighlight?: String[]
