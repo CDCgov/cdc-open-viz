@@ -92,13 +92,17 @@ const LineChart = (props: LineChartProps) => {
                       </Text>
 
                       {(lineDatapointStyle === 'hidden' || lineDatapointStyle === 'always show') && (
-                        <LineChartCircle d={d} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />
+                        <LineChartCircle data={data} d={d} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />
                       )}
                     </Group>
                   )
                 )
               })}
-              <>{lineDatapointStyle === 'hover' && <LineChartCircle config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />}</>
+              <>
+                {lineDatapointStyle === 'hover' && (
+                  <LineChartCircle data={data} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />
+                )}
+              </>
               {/* STANDARD LINE */}
               <LinePath
                 curve={allCurves[seriesData[0].lineType]}

@@ -5,6 +5,7 @@ import { type ChartConfig } from '../../types/ChartConfig'
 // todo: change this config obj to ChartConfig once its created
 type LineChartCircleProps = {
   config: ChartConfig
+  data: object[]
   d?: Object
   displayArea: boolean
   seriesKey: string
@@ -22,10 +23,9 @@ type LineChartCircleProps = {
 }
 
 const LineChartCircle = (props: LineChartCircleProps) => {
-  const { config, d, displayArea, seriesKey, tooltipData, xScale, yScale, colorScale, parseDate, yScaleRight } = props
+  const { config, d, displayArea, seriesKey, tooltipData, xScale, yScale, colorScale, parseDate, yScaleRight, data } = props
   const { lineDatapointStyle } = config
   const filtered = config?.series.filter(s => s.dataKey === seriesKey)?.[0]
-
   // If we're not showing the circle, simply return
   if (lineDatapointStyle === 'hidden') return null
 
@@ -66,14 +66,18 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     if (!tooltipData.data) return
     let hoveredXValue = tooltipData?.data?.[0]?.[1]
     if (!hoveredXValue) return
+
     let hoveredSeriesValue
     let hoveredSeriesIndex
     let hoveredSeriesData = tooltipData.data.filter(d => d[0] === seriesKey)
     let hoveredSeriesKey = hoveredSeriesData?.[0]?.[0]
     let hoveredSeriesAxis = hoveredSeriesData?.[0]?.[2]
     hoveredSeriesIndex = tooltipData.data.indexOf(hoveredSeriesKey)
-    hoveredSeriesValue = hoveredSeriesData?.[0]?.[1]
+    hoveredSeriesValue = data?.find(d => {
+      return d[config?.xAxis.dataKey] === hoveredXValue
+    })[seriesKey]
 
+    //    hoveredSeriesValue = extractNumber(hoveredSeriesValue)
     return tooltipData.data.map((tooltipItem, index) => {
       let seriesIndex = config.runtime.seriesLabelsAll.indexOf(hoveredXValue)
 
