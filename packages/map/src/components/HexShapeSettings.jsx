@@ -25,7 +25,6 @@ const HexSettingDisplayShapesOnHex = props => {
         type='checkbox'
         checked={state.hexMap.type === 'shapes'}
         onChange={event => {
-          console.log('event', event.target.checked)
           setState({
             ...state,
             hexMap: {

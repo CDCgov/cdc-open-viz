@@ -11,17 +11,11 @@ import { Group } from '@visx/group'
 import { bisector } from 'd3-array'
 
 const AreaChart = props => {
-  const { xScale, yScale, yMax, xMax, handleTooltipMouseOver, handleTooltipMouseOff, isDebug, isBrush, brushData, children } = props
+  const { xScale, yScale, yMax, xMax, handleTooltipMouseOver, handleTooltipMouseOff, isDebug, children } = props
   // import data from context
-  let { transformedData: data, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale, rawData } = useContext(ConfigContext)
+  let { transformedData, config, handleLineType, parseDate, formatDate, formatNumber, seriesHighlight, colorScale, rawData } = useContext(ConfigContext)
+  const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
-  // use brush data if it is passed in AND if this is NOT a brush chart
-  data = !isBrush && undefined !== brushData && brushData.length ? brushData : data
-
-  if (isBrush && isDebug) console.log('###AREAchart BRUSH data, xScale, yScale, yMax, xMax', data, xScale, yScale, yMax, xMax)
-
-  // Draw transparent bars over the chart to get tooltip data
-  // Turn isDebug on for additional context.
   if (!data) return
 
   // Tooltip helper for getting data to the closest date/category hovered.
@@ -42,38 +36,19 @@ const AreaChart = props => {
     }
   }
 
-  const getXAxisDates = brushDataSet => {
-    if (undefined === brushDataSet || !brushDataSet) return
-    let XAxisBrushDates = []
-    brushDataSet.forEach(function convertDateTimeNumber(key, value, brushDataSet) {
-      let tmp = getXValueFromCoordinate(xScale(value))
-      let date = formatDate(tmp)
-      XAxisBrushDates.push(date)
-    })
-    return XAxisBrushDates
-  }
-
   const handleX = d => {
     return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])
   }
 
   const handleY = (d, index, s = undefined) => {
-    return isBrush ? yScale(d[s.dataKey]) / 4 : yScale(d[s.dataKey])
-  }
-
-  // prevents duplicate brush handles being rendered
-  const getFirstBrushHandleOnly = (children, index) => {
-    if (index === 0) {
-      return children
-    }
-    // else dont return the other brush handles
+    return yScale(d[s.dataKey])
   }
 
   return (
     data && (
       <svg>
         <ErrorBoundary component='AreaChart'>
-          <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)} top={isBrush ? yMax * 1.3 : 0}>
+          <Group className='area-chart' key='area-wrapper' left={Number(config.yAxis.size)}>
             {(config.runtime.areaSeriesKeys || config.series).map((s, index) => {
               let seriesData = data.map(d => {
                 return {
@@ -119,11 +94,10 @@ const AreaChart = props => {
                     curve={curveType}
                     strokeDasharray={s.type ? handleLineType(s.type) : 0}
                   />
-                  {getFirstBrushHandleOnly(children, index)}
                 </React.Fragment>
               )
             })}
-            <Bar width={Number(xMax)} height={Number(yMax)} fill={isDebug ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />
+            <Bar width={Number(xMax)} height={Number(yMax)} fill={'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />
           </Group>
         </ErrorBoundary>
       </svg>

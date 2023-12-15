@@ -1,0 +1,121 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Dashboard with No Filters"
+  },
+  "rows": [
+    [
+      {
+        "width": 12,
+        "widget": "map1629143821077"
+      },
+      {},
+      {}
+    ],
+    [
+      {
+        "width": 6,
+        "widget": "data-bite1629144030877"
+      },
+      {
+        "width": 6,
+        "widget": "data-bite1629144267659"
+      },
+      {
+        "width": null
+      }
+    ]
+  ],
+  "table": {
+    "label": "Data Table",
+    "show": true
+  },
+  "type": "dashboard",
+  "uuid": 1629144022257,
+  "datasets": {
+    "dashboard_example_map.csv": {
+      "data": [
+        {
+          "Location": "Alabama",
+          "TimeZone": 1,
+          "Rate": 1375
+        },
+        {
+          "Location": "Alaska",
+          "TimeZone": 1,
+          "Rate": 1377
+        },
+        {
+          "Location": "American Samoa",
+          "TimeZone": 1,
+          "Rate": 1388
+        },
+        {
+          "Location": "Arizona",
+          "TimeZone": 1,
+          "Rate": 1401
+        },
+        {
+          "Location": "Arkansas",
+          "TimeZone": 1,
+          "Rate": 1398
+        },
+        {
+          "Location": "California",
+          "TimeZone": 2,
+          "Rate": 1381
+        },
+        {
+          "Location": "Colorado",
+          "TimeZone": 2,
+          "Rate": 1369
+        },
+        {
+          "Location": "Connecticut",
+          "TimeZone": 2,
+          "Rate": 1403
+        },
+        {
+          "Location": "Delaware\t",
+          "TimeZone": 2,
+          "Rate": "1384"
+        },
+        {
+          "Location": "District of Columbia",
+          "TimeZone": 2,
+          "Rate": 1400
+        },
+        {
+          "Location": "Florida",
+          "TimeZone": 2,
+          "Rate": 1387
+        },
+        {
+          "Location": "Georgia",
+          "TimeZone": 3,
+          "Rate": 1365
+        },
+        {
+          "Location": "Guam",
+          "TimeZone": 3,
+          "Rate": 1356
+        },
+        {
+          "Location": "Hawaii",
+          "TimeZone": 3,
+          "Rate": 1362
+        },
+        {
+          "Location": "Idaho",
+          "TimeZone": 3,
+          "Rate": 1374
+        }
+      ],
+      "dataFileSize": 971,
+      "dataFileName": "dashboard_example_map.csv",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  }
+}
