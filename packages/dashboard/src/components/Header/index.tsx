@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react'
 
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
-import type { APIFilter } from '../../types/APIFilter'
-import type { SharedFilter } from '../../types/SharedFilter'
+
+// types
+import { type APIFilter } from '../../types/APIFilter'
+import { type SharedFilter } from '../../types/SharedFilter'
+import { type Config } from '../../types/Config'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -11,7 +14,6 @@ import Modal from '@cdc/core/components/ui/Modal'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import Select from '@cdc/core/components/ui/Select'
-import { Config } from '../../types/Config'
 import Button from '@cdc/core/components/elements/Button'
 
 import './index.scss'
@@ -266,21 +268,48 @@ const Header = (props: HeaderProps) => {
                       </select>
                     </label>
                     {filter.filterBy === 'File Name' && (
-                      <label>
-                        <span className='edit-label column-heading'>
-                          File Name:
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>{`Add \${query}\ to replace the filename with the active dropdown value.`}</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </span>
+                      <>
+                        <label>
+                          <span className='edit-label column-heading'>
+                            File Name:
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>{`Add \${query}\ to replace the filename with the active dropdown value.`}</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
 
-                        <input type='text' defaultValue={filter.fileName || ''} onChange={e => updateFilterProp('fileName', index, e.target.value)} />
-                      </label>
+                          <input type='text' defaultValue={filter.fileName || ''} onChange={e => updateFilterProp('fileName', index, e.target.value)} />
+                        </label>
+
+                        <label>
+                          <span className='edit-label column-heading'>
+                            White Space Replacments
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>{`Set how whitespace characters will be handled in the file request`}</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
+                          <select defaultValue={filter.whitespaceReplacement || 'Keep Spaces'} onChange={e => updateFilterProp('whitespaceReplacement', index, e.target.value)}>
+                            <option key={'remove-spaces'} value={'Remove Spaces'}>
+                              Remove Spaces
+                            </option>
+                            <option key={'replace-with-underscore'} value={'Replace With Underscore'}>
+                              Replace With Underscore
+                            </option>
+                            <option key={'keep-spaces'} value={'Keep Spaces'}>
+                              Keep Spaces
+                            </option>
+                          </select>
+                        </label>
+                      </>
                     )}
                   </>
                 )}
