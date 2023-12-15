@@ -10,10 +10,10 @@ import { Bar, AreaStack } from '@visx/shape'
 import { Group } from '@visx/group'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
-const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, handleTooltipMouseOff, isDebug, isBrush }) => {
+const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, handleTooltipMouseOff, isDebug }) => {
   // import data from context
-  let { transformedData: data, config, seriesHighlight, colorScale, rawData } = useContext(ConfigContext)
-
+  let { transformedData, config, seriesHighlight, colorScale, rawData } = useContext(ConfigContext)
+  const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
   if (!data) return
@@ -60,9 +60,8 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
                 })
               }}
             </AreaStack>
-
             {/* prettier-ignore */}
-            {!isBrush && <Bar width={Number(xMax)} height={Number(yMax)} fill={isDebug ? 'red' : 'transparent'} fillOpacity={0.05} style={isDebug ? { stroke: 'black', strokeWidth: 2 } : {}} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />}
+            <Bar width={Number(xMax)} height={Number(yMax)} fill={'transparent'}   onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />
           </Group>
         </ErrorBoundary>
       </svg>
