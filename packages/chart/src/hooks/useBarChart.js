@@ -145,10 +145,10 @@ export const useBarChart = () => {
   }
 
   const getHighlightedBarColorByValue = value => {
-    const match = config?.highlightedBarValues.filter(item => {
+    const match = config?.highlightedBarValues.find(item => {
       if (!item.value) return
       return config.xAxis.type === 'date' ? formatDate(parseDate(item.value)) === value : item.value === value
-    })[0]
+    })
 
     if (!match?.color) return `rgba(255, 102, 1)`
     return match.color

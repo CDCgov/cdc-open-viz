@@ -176,7 +176,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                     background: getBarBackgroundColor(barColor),
                     borderColor,
                     borderStyle: 'solid',
-                    borderWidth,
+                    borderWidth: `${borderWidth}px`,
                     width: barWidth,
                     height: barHeight,
                     ...borderRadius,
