@@ -150,7 +150,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                     if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
 
                     // if we're highlighting a bar make it invisible since it gets a border
-                    // if (isHighlightedBar) _barColor = 'transparent'
+                    if (isHighlightedBar) _barColor = 'transparent'
                     return _barColor
                   }
 
