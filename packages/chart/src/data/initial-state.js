@@ -7,11 +7,11 @@ export default {
   title: '',
   showTitle: true,
   showDownloadMediaButton: false,
-  showChartBrush: false,
   theme: 'theme-blue',
   animate: false,
   fontSize: 'medium',
   lineDatapointStyle: 'hover',
+  lineDatapointColor: 'Same as Line',
   barHasBorder: 'false',
   isLollipopChart: false,
   lollipopShape: 'circle',
@@ -28,6 +28,8 @@ export default {
     left: 5,
     right: 5
   },
+  suppressedData: [],
+
   yAxis: {
     hideAxis: false,
     displayNumbersOnBar: false,
@@ -134,6 +136,7 @@ export default {
     // start with a blank list
   },
   legend: {
+    hide: false,
     behavior: 'isolate',
     singleRow: false,
     colorCode: '',
@@ -145,7 +148,13 @@ export default {
     dynamicLegendItemLimitMessage: 'Dynamic Legend Item Limit Hit.',
     dynamicLegendChartMessage: 'Select Options from the Legend',
     lineMode: false,
-    verticalSorted: false
+    verticalSorted: false,
+    highlightOnHover: false
+  },
+  brush: {
+    height: 25,
+    data: [],
+    active: false
   },
   exclusions: {
     active: false,
@@ -180,22 +189,27 @@ export default {
   highlightedBarValues: [],
   series: [],
   tooltips: {
-    opacity: 90
+    opacity: 90,
+    singleSeries: false
   },
   forestPlot: {
     startAt: 0,
-    width: 'auto',
     colors: {
       line: '',
       shape: ''
     },
+    lineOfNoEffect: {
+      show: true
+    },
+    type: '',
+    pooledResult: {
+      diamondHeight: 5,
+      column: ''
+    },
     estimateField: '',
     estimateRadius: '',
-    lowerCiField: '',
-    upperCiField: '',
     shape: '',
     rowHeight: 20,
-    showZeroLine: false,
     description: {
       show: true,
       text: 'description',
@@ -217,12 +231,13 @@ export default {
       estimateField: 0
     },
     leftWidthOffset: 0,
-    rightWidthOffset: 0
+    rightWidthOffset: 0,
+    showZeroLine: false,
+    hideDateCategoryCol: false,
+    leftLabel: '',
+    rightLabel: ''
   },
-  brush: {
-    pattern_id: 'brush_pattern',
-    accent_color: '#ddd'
-  },
+
   area: {
     isStacked: false
   }
