@@ -14,7 +14,7 @@ import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 // chart components
-import ForestPlotSettings from './ForestPlotSettings'
+import ForestPlotSettings from './ForestPlot/ForestPlotSettings'
 import Series from './Series'
 
 // cdc additional

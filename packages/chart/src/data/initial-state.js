@@ -221,8 +221,8 @@ export default {
       location: 100
     },
     radius: {
-      min: 1,
-      max: 8,
+      min: 2,
+      max: 10,
       scalingColumn: ''
     },
     regression: {

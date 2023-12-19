@@ -2,8 +2,10 @@ import { type Color } from '@cdc/core/types/Color'
 
 export type ForestPlotConfigSettings = {
   colors: {
-    line: Color // color of line of effect
-    shape: Color // color for effect estimate shape
+    // color of line of no effect
+    line: Color
+    // color for effect estimate shape
+    shape: Color
   }
   // description - appears below the study column.
   description: {
@@ -11,8 +13,9 @@ export type ForestPlotConfigSettings = {
     text: string
     location: number
   }
-  // effect estimates
-  estimateField: string // column chose for the effect estimate
+  // column chose for the effect estimate
+  estimateField: string
+  // column chose for the esimate radius
   estimateRadius: string
   hideDateCategoryCol: boolean
   leftWidthOffset: number
@@ -33,14 +36,7 @@ export type ForestPlotConfigSettings = {
   radius: {
     min: number
     max: number
-    /** @deprecated - moved to estimateField due to duplication */
     scalingColumn: string
-  }
-  /** @deprecated - moved to pooledResult */
-  regression: {
-    lower: number
-    upper: number
-    estimateField: number
   }
   result: {
     show: boolean
@@ -51,9 +47,6 @@ export type ForestPlotConfigSettings = {
   shape: string
   startAt: number
   title: string // centered title above the chart
-
-  /** @deprecated - moved to lineOfNoEffect*/
-  showZeroLine: boolean
   // labels under chart
   leftLabel: string
   rightLabel: string
