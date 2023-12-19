@@ -92,7 +92,21 @@ const LineChart = (props: LineChartProps) => {
                       </Text>
 
                       {(lineDatapointStyle === 'hidden' || lineDatapointStyle === 'always show') && (
-                        <LineChartCircle data={data} d={d} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />
+                        <LineChartCircle
+                          data={data}
+                          d={d}
+                          config={config}
+                          seriesKey={seriesKey}
+                          displayArea={displayArea}
+                          tooltipData={tooltipData}
+                          xScale={xScale}
+                          yScale={yScale}
+                          colorScale={colorScale}
+                          parseDate={parseDate}
+                          yScaleRight={yScaleRight}
+                          seriesAxis={seriesAxis}
+                          key={`line-circle--${dataIndex}`}
+                        />
                       )}
                     </Group>
                   )

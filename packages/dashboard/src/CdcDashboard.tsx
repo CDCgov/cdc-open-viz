@@ -211,7 +211,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           let isUpdateNeeded = false
 
           config.dashboard.sharedFilters.forEach(filter => {
-            console.log('filter', filter)
             if (filter.filterBy === 'File Name') {
               // if no file name is entered use the default active filter. ie. /activeFilter.json
               if (!filter.fileName && filter.datasetKey === datasetKey) newFileName = filter.active
