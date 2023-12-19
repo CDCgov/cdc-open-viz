@@ -3,7 +3,7 @@ import ConfigContext from '../ConfigContext'
 
 export const useEditorPermissions = () => {
   const { config } = useContext(ConfigContext)
-  const { visualizationType, series, orientation } = config
+  const { visualizationType, series, orientation, visualizationSubType } = config
 
   // Overall support for the chart types
   // prettier-ignore
@@ -84,6 +84,15 @@ export const useEditorPermissions = () => {
     }
   }
 
+  const visHasDataSuppression = () => {
+    if ((visualizationType === 'Bar' || 'Combo') && visualizationSubType === 'regular') {
+      return true
+    }
+  }
+  const visHasBrushChart = () => {
+    return ['Line', 'Bar', 'Area Chart', 'Combo'].includes(visualizationType) && orientation === 'vertical'
+  }
+
   const visHasBarBorders = () => {
     const disabledCharts = ['Box Plot', 'Scatter Plot', 'Pie']
     if (disabledCharts.includes(visualizationType)) return false
@@ -154,13 +163,13 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryTickRotation = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line']
+    const disabledCharts = ['Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryNumTicks = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line']
+    const disabledCharts = ['Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -242,6 +251,12 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsReactTooltip = () => {
+    if (['Deviation Bar', 'Box Plot', 'Scatter Plot', 'Paired Bar'].includes(visualizationType) || (visualizationType === 'Bar' && config.tooltips.singleSeries)) {
+      return true
+    }
+  }
+
   return {
     enabledChartTypes,
     headerColors,
@@ -250,7 +265,9 @@ export const useEditorPermissions = () => {
     visHasBarBorders,
     visHasDataCutoff,
     visHasLabelOnData,
+    visHasDataSuppression,
     visHasLegend,
+    visHasBrushChart,
     visHasNumbersOnBars,
     visSupportsBarSpace,
     visSupportsBarThickness,
@@ -276,6 +293,7 @@ export const useEditorPermissions = () => {
     visSupportsValueAxisGridLines,
     visSupportsValueAxisLabels,
     visSupportsValueAxisLine,
-    visSupportsValueAxisTicks
+    visSupportsValueAxisTicks,
+    visSupportsReactTooltip
   }
 }

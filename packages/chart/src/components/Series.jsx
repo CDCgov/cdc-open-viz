@@ -16,7 +16,7 @@ import { colorPalettesChart, sequentialPalettes } from '@cdc/core/data/colorPale
 const SeriesContext = React.createContext()
 
 const SeriesWrapper = props => {
-  const { updateConfig, config } = useContext(ConfigContext)
+  const { updateConfig, config, rawData } = useContext(ConfigContext)
 
   const { getColumns, selectComponent } = props
 
@@ -25,6 +25,26 @@ const SeriesWrapper = props => {
   const updateSeries = (index, value, property) => {
     let series = [...config.series]
     series[index][property] = value
+
+    // Reset bars to the left axis if changed.
+    if (property === 'type') {
+      if (value === 'Bar') {
+        series[index].axis = 'Left'
+      }
+    }
+
+    // dynamically add in the forecasting fields
+    if (series[index].type === 'Forecasting') {
+      let forecastingStages = Array.from(new Set(rawData.map(item => item[series[index].dataKey])))
+      let forecastingStageArr = []
+
+      forecastingStages.forEach(stage => {
+        forecastingStageArr.push({ key: stage })
+      })
+      // debugger
+      series[index].stages = forecastingStageArr
+      series[index].stageColumn = series[index].dataKey
+    }
 
     updateConfig({ ...config, series })
   }
@@ -124,7 +144,6 @@ const SeriesDropdownForecastingStage = props => {
   const { index, series } = props
 
   // Only combo charts are allowed to have different options
-  if (series.type !== 'Forecasting') return
 
   return (
     <InputSelect
@@ -408,7 +427,7 @@ const SeriesDropdownConfidenceInterval = props => {
 const SeriesInputName = props => {
   const { series, index: i } = props
   const { config, updateConfig } = useContext(ConfigContext)
-  const adjustableNameSeriesTypes = ['Bar', 'Line', 'Area Chart']
+  const adjustableNameSeriesTypes = ['Bar', 'Line', 'Area Chart', 'dashed-sm', 'dashed-md', 'dashed-lg']
 
   if (config.visualizationType === 'Combo') return
 

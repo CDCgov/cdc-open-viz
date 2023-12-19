@@ -1616,7 +1616,7 @@ const EditorPanel = props => {
                     <option value='data'>Data</option>
                     {state.general.geoType === 'us-county' && <option value='us-geocode'>Geocode</option>}
                     {state.general.geoType === 'world' && <option value='world-geocode'>Geocode</option>}
-                    <option value='navigation'>Navigation</option>
+                    {state.general.geoType !== 'us-county' && <option value='navigation'>Navigation</option>}
                     {(state.general.geoType === 'world' || state.general.geoType === 'us') && <option value='bubble'>Bubble</option>}
                   </select>
                 </label>
@@ -2609,7 +2609,7 @@ const EditorPanel = props => {
                     updateField={updateField}
                     section='table'
                     fieldName='caption'
-                    label='Data Table Caption'
+                    label='Screen Reader Description'
                     placeholder='Data Table'
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
