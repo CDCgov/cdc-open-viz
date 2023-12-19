@@ -40,6 +40,35 @@ const ForestPlot = (props: ForestPlotProps) => {
     }
   }, [])
 
+  useEffect(() => {
+    try {
+      const defaultColumns = ['estimateField', 'lower', 'upper', 'estimateRadius']
+      const newConfig = config
+
+      // Setting a default number of colums.additionalColumn1, columns.additionalColumn2, etc.
+      // to loop through to clean up which columns are being displayed by default for forest plots
+      // Set tooltip and data table properties according to the default forestPlot column names above.
+      const colsToCheck = 10
+      for (let i = 0; i < colsToCheck; i++) {
+        defaultColumns.forEach(col => {
+          console.log(`MATCH ON index ${i}:  ${config.forestPlot[col] === newConfig.columns[`additionalColumn${i}`]?.name}`)
+          if (config.forestPlot[col] && config.forestPlot[col] !== newConfig.columns[config.forestPlot[`additionalColumn${i}`]]?.name) {
+            delete newConfig.columns[`additionalColumn${i}`] // Remove old value if found to prevent duplicates
+            newConfig.columns[config.forestPlot[col]] = {}
+            newConfig.columns[config.forestPlot[col]].dataKey = newConfig.forestPlot[col]
+            newConfig.columns[config.forestPlot[col]].name = newConfig.forestPlot[col]
+            newConfig.columns[config.forestPlot[col]].dataTable = true
+            newConfig.columns[config.forestPlot[col]].tooltips = true
+          }
+        })
+      }
+
+      updateConfig(newConfig)
+    } catch (e) {
+      console.log(e.message)
+    }
+  }, [])
+
   const pooledData = config.data.find(d => d[config.xAxis.dataKey] === config.forestPlot.pooledResult.column)
 
   const regressionPoints = pooledData
@@ -64,7 +93,11 @@ const ForestPlot = (props: ForestPlotProps) => {
     { x: width, y: height }
   ]
 
-  const columnsOnChart = Object.entries(config.columns)
+  type Columns = {
+    forestPlot?: boolean
+  }
+
+  const columnsOnChart: Columns[] = Object.entries(config.columns)
     .map(entry => entry[1])
     .filter(entry => entry.forestPlot === true)
 
