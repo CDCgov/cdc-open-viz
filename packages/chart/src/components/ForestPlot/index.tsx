@@ -20,6 +20,7 @@ const ForestPlot = (props: ForestPlotProps) => {
   const { rawData: data, updateConfig } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver } = props
   const { forestPlot } = config as ChartConfig
+  const labelPosition = config.xAxis.tickWidthMax + 10
 
   // Requirements for forest plot
   // - force legend to be hidden for this chart type
@@ -51,7 +52,6 @@ const ForestPlot = (props: ForestPlotProps) => {
       const colsToCheck = 10
       for (let i = 0; i < colsToCheck; i++) {
         defaultColumns.forEach(col => {
-          console.log(`MATCH ON index ${i}:  ${config.forestPlot[col] === newConfig.columns[`additionalColumn${i}`]?.name}`)
           if (config.forestPlot[col] && config.forestPlot[col] !== newConfig.columns[config.forestPlot[`additionalColumn${i}`]]?.name) {
             delete newConfig.columns[`additionalColumn${i}`] // Remove old value if found to prevent duplicates
             newConfig.columns[config.forestPlot[col]] = {}
@@ -59,8 +59,13 @@ const ForestPlot = (props: ForestPlotProps) => {
             newConfig.columns[config.forestPlot[col]].name = newConfig.forestPlot[col]
             newConfig.columns[config.forestPlot[col]].dataTable = true
             newConfig.columns[config.forestPlot[col]].tooltips = true
+            newConfig.columns[config.forestPlot[col]].label = newConfig.forestPlot[col]
           }
         })
+      }
+
+      if (newConfig.table.showVertical) {
+        newConfig.table.indexLabel = config.xAxis.dataKey
       }
 
       updateConfig(newConfig)
@@ -227,13 +232,13 @@ const ForestPlot = (props: ForestPlotProps) => {
 
       {/* left bottom label */}
       {forestPlot.leftLabel && (
-        <Text className='forest-plot__left-label' x={forestPlot.type === 'Linear' ? xScale(0) - 25 : xScale(1) - 25} y={height + 50} textAnchor='end'>
+        <Text className='forest-plot__left-label' x={forestPlot.type === 'Linear' ? xScale(0) - 25 : xScale(1) - 25} y={height + labelPosition} textAnchor='end' verticalAnchor='start'>
           {forestPlot.leftLabel}
         </Text>
       )}
 
       {forestPlot.rightLabel && (
-        <Text className='forest-plot__right-label' x={forestPlot.type === 'Linear' ? xScale(0) + 25 : xScale(1) + 25} y={height + 50} textAnchor='start'>
+        <Text className='forest-plot__right-label' x={forestPlot.type === 'Linear' ? xScale(0) + 25 : xScale(1) + 25} y={height + labelPosition} textAnchor='start' verticalAnchor='start'>
           {forestPlot.rightLabel}
         </Text>
       )}

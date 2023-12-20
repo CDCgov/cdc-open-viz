@@ -543,23 +543,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
     }
 
-    if (newConfig.visualizationType === 'Forest Plot') {
-      // newConfig.runtime.xAxis.type = newConfig.forestPlot.type
-      // newConfig.runtime.xAxis.tickRotation = newConfig.xAxis.tickRotation
-      // try {
-      //   const defaultColumns = ['upper', 'lower', 'estimateField']
-      //   defaultColumns.map(col => {
-      //     newConfig.columns[config.forestPlot[col]] = {}
-      //     newConfig.columns[config.forestPlot[col]].dataKey = newConfig.forestPlot[col]
-      //     newConfig.columns[config.forestPlot[col]].name = newConfig.forestPlot[col]
-      //     newConfig.columns[config.forestPlot[col]].dataTable = true
-      //     newConfig.columns[config.forestPlot[col]].tooltips = true
-      //   })
-      // } catch (e) {
-      //   console.log(e.message)
-      // }
-    }
-
     if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)) {
       newConfig.runtime.xAxis = newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis
@@ -1155,7 +1138,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return key
   }
 
-  const computeMarginBottom = (config: Config): string => {
+  const computeMarginBottom = (config: Config, asNumber = false): string => {
     const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
     const isHorizontal = config.orientation === 'horizontal'
     const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
@@ -1207,6 +1190,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       bottom = isBrush ? brushHeight + -config.xAxis.size + config.xAxis.labelOffset : 0
     }
 
+    if (asNumber) return bottom
     return `${bottom}px`
   }
 
@@ -1233,7 +1217,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
             {/* Visualization */}
             {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
-            <div style={{ marginBottom: computeMarginBottom(config) }} className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
+            <div
+              style={{ marginBottom: computeMarginBottom(config) }}
+              className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')} ${isDebug ? 'debug' : ''}`}
+            >
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
 
@@ -1305,6 +1292,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const contextValues = {
     capitalize,
+    computeMarginBottom,
     getXAxisData,
     getYAxisData,
     config,

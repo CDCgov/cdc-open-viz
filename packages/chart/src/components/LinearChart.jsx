@@ -37,7 +37,27 @@ import '../scss/LinearChart.scss'
 import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
-  const { isEditor, isDashboard, transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, capitalize, setSharedFilter, setSharedFilterValue, getTextWidth, isDebug } = useContext(ConfigContext)
+  const {
+    isEditor,
+    isDashboard,
+    computeMarginBottom,
+    transformedData: data,
+    dimensions,
+    config,
+    parseDate,
+    formatDate,
+    currentViewport,
+    formatNumber,
+    handleChartAriaLabels,
+    updateConfig,
+    handleLineType,
+    rawData,
+    capitalize,
+    setSharedFilter,
+    setSharedFilterValue,
+    getTextWidth,
+    isDebug
+  } = useContext(ConfigContext)
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
 
@@ -458,7 +478,9 @@ const LinearChart = props => {
                     <Text
                       x={axisCenter}
                       y={
-                        config.orientation === 'horizontal'
+                        config.visualizationType === 'Forest Plot'
+                          ? config.xAxis.tickWidthMax + 40
+                          : config.orientation === 'horizontal'
                           ? dynamicMarginTop || config.xAxis.labelOffset
                           : config.isResponsiveTicks && dynamicMarginTop && !isHorizontal
                           ? dynamicMarginTop
@@ -467,6 +489,7 @@ const LinearChart = props => {
                           : Number(config.xAxis.labelOffset)
                       }
                       textAnchor='middle'
+                      verticalAnchor='start'
                       fontWeight='bold'
                       fill={config.xAxis.labelColor}
                     >

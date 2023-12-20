@@ -87,8 +87,6 @@ export const useTooltip = props => {
 
     const resolvedScaleValues = orientation === 'vertical' ? yScaleValues : xScaleValues
 
-    // const forestPlotXValue = visualizationType === 'Forest Plot' ? data?.filter(d => d[xAxis.dataKey] === getClosestYValue(y))?.[0]?.[config.forestPlot.estimateField] : null
-
     const getAxisPosition = seriesKey => {
       const seriesObj = config.series.filter(s => s.dataKey === seriesKey)[0]
       const position = seriesObj?.axis ? String(seriesObj.axis).toLowerCase() : 'left'
@@ -135,6 +133,7 @@ export const useTooltip = props => {
           ['Percent', `${Math.round((((arc?.endAngle - arc?.startAngle) * 180) / Math.PI / 360) * 100) + '%'}`]
         )
       }
+
       if (visualizationType === 'Forest Plot') {
         tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
       }
