@@ -17,6 +17,7 @@ import chroma from 'chroma-js'
 // Primary Components
 import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
+import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
 
 import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
@@ -1235,6 +1236,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                     </div>
                   )}
                 </>
+              )}
+              {config.visualizationType === 'Sankey' && (
+                <div style={{ height: `500px`, width: `100%` }}>
+                  <ParentSize>{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>
+                </div>
               )}
               {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
             </div>

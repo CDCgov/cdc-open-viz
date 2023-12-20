@@ -240,5 +240,52 @@ export default {
 
   area: {
     isStacked: false
+  },
+  sankey: {
+    title: {
+      name: 'Outcomes of Emergency Medical Systems (EMS) Responses to Suicide-Related Calls, 2022',
+      defaultColor: 'black'
+    },
+    iterations: 1,
+    rxValue: 0.9,
+    overallSize: {
+      width: 900,
+      height: 700
+    },
+    margin: {
+      margin_y: 25,
+      margin_x: 5
+    },
+    nodeSize: {
+      nodeWidth: 26,
+      nodeHeight: 40
+    },
+    nodePadding: 55,
+    nodeFontSize: '16px',
+    nodeFontColor: 'black',
+    nodeColor: {
+      default: '#ff8500',
+      inactive: '#808080'
+    },
+    linkColor: {
+      default: '#ffc900',
+      inactive: '#D3D3D3'
+    },
+    opacity: {
+      nodeOpacityDefault: 1.0,
+      nodeOpacityInactive: 0.1,
+      LinkOpacityDefault: 1.0,
+      LinkOpacityInactive: 0.1
+    },
+    storyNodeFontColor: '#006778',
+    storyNodeText: [
+      { StoryNode: 'Suicide EMS Responses', segmentTextBefore: 'In 2022, there were', segmentTextAfter: 'Suicide EMS Responses' },
+      { StoryNode: 'Treated', segmentTextBefore: 'of which,', segmentTextAfter: 'were treated' },
+      { StoryNode: 'Transported to hospital', segmentTextBefore: 'and', segmentTextAfter: 'were transported\n to the hospital' }
+    ],
+    nodeValueStyle: {
+      textBefore: '(',
+      textAfter: ')'
+    }
   }
 }

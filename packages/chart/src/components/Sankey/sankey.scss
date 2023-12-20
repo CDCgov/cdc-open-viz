@@ -1,0 +1,43 @@
+.sankey-chart {
+  --font-size-normal: 16px;
+  --font-size-large: 24px;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+
+  overflow: visible;
+
+  svg.sankey-chart__diagram {
+    font-family: 'Roboto', sans-serif;
+    height: auto;
+    width: 100%;
+  }
+
+  .node-id {
+    font-size: var(--font-size-normal);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .node-value {
+    font-size: var(--font-size-normal);
+    font-weight: var(--font-weight-normal);
+  }
+
+  .node-text {
+    font-size: var(--font-size-large);
+    font-weight: var(--font-weight-normal);
+  }
+
+  .node-value--storynode {
+    fill: #006778;
+    font-size: 40px;
+    font-weight: var(--font-weight-bold);
+  }
+
+  /* Hover card */
+  .sankey-chart__tooltip {
+    color: black;
+    &--tooltip-header {
+      font-weight: var(--font-weight-bold);
+    }
+  }
+}
