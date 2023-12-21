@@ -251,6 +251,12 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsReactTooltip = () => {
+    if (['Deviation Bar', 'Box Plot', 'Scatter Plot', 'Paired Bar'].includes(visualizationType) || (visualizationType === 'Bar' && config.tooltips.singleSeries)) {
+      return true
+    }
+  }
+
   return {
     enabledChartTypes,
     headerColors,
@@ -287,6 +293,7 @@ export const useEditorPermissions = () => {
     visSupportsValueAxisGridLines,
     visSupportsValueAxisLabels,
     visSupportsValueAxisLine,
-    visSupportsValueAxisTicks
+    visSupportsValueAxisTicks,
+    visSupportsReactTooltip
   }
 }
