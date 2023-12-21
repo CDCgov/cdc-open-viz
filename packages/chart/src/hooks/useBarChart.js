@@ -184,7 +184,7 @@ export const useBarChart = () => {
     return 0
   }
 
-  const getAdditionalColumn = xAxisDataValue => {
+  const getAdditionalColumn = (series, xAxisDataValue) => {
     if (!xAxisDataValue) return ''
     const columns = config.columns
     const columnsWithTooltips = []
@@ -194,6 +194,7 @@ export const useBarChart = () => {
         return d[config.xAxis.dataKey] === xAxisDataValue
       }) || {}
     for (const [colKeys, colVals] of Object.entries(columns)) {
+      if(series && config.columns[colKeys].series && config.columns[colKeys].series !== series) return
       const formattingParams = {
         addColPrefix: config.columns[colKeys].prefix,
         addColSuffix: config.columns[colKeys].suffix,
