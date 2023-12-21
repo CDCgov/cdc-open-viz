@@ -35,11 +35,8 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
 import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
-import { SharedFilter } from './types/SharedFilter'
-import { APIFilter } from './types/APIFilter'
-import { DataSet } from './types/DataSet'
-import { Config } from './types/Config'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { capitalizeSplitAndJoin } from '@cdc/core/helpers/cove/string'
+
 import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import { filterData } from './helpers/filterData'
@@ -47,6 +44,13 @@ import { getFormattedData } from './helpers/getFormattedData'
 import { getVizKeys } from './helpers/getVizKeys'
 import Title from '@cdc/core/components/ui/Title'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
+
+// types
+import { type SharedFilter } from './types/SharedFilter'
+import { type APIFilter } from './types/APIFilter'
+import { type DataSet } from './types/DataSet'
+import { type Config } from './types/Config'
+import { type Visualization } from '@cdc/core/types/Visualization'
 
 type DropdownOptions = Record<'value' | 'text', string>[]
 
@@ -68,6 +72,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
   const [apiFilterDropdowns, setAPIFilterDropdowns] = useState<APIFilterDropdowns>({})
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+
+  const replacements = {
+    'Remove Spaces': '',
+    'Keep Spaces': ' ',
+    'Replace With Underscore': '_'
+  }
 
   const inNoDataState = useMemo(() => {
     const vals = Object.values(state.data)
@@ -167,7 +177,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
         const params = getParentParams(filter)
         const notAllParentsSelected = params?.some(({ value }) => value === '')
         if (notAllParentsSelected) return // don't send request for dependent children filter options
-        if (apiFilterDropdowns[_key] && !params) return // don't reload filter unless it's a child
+        if (apiFilterDropdowns[_key] && !params && filter.filterBy === 'Query String') return // don't reload filter unless it's a child
         const endpoint = baseEndpoint + (params ? gatherQueryParams(params) : '')
         fetch(endpoint)
           .then(resp => resp.json())
@@ -188,6 +198,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
       let newDatasets = { ...config.datasets }
       let datasetsNeedsUpdate = false
       let datasetKeys = Object.keys(config.datasets)
+      let newFileName = ''
+
       for (let i = 0; i < datasetKeys.length; i++) {
         const datasetKey = datasetKeys[i]
         const dataset = config.datasets[datasetKey]
@@ -199,12 +211,25 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           let isUpdateNeeded = false
 
           config.dashboard.sharedFilters.forEach(filter => {
+            if (filter.filterBy === 'File Name') {
+              // if no file name is entered use the default active filter. ie. /activeFilter.json
+              if (!filter.fileName && filter.datasetKey === datasetKey) newFileName = filter.active
+              // if a file name is found, ie, state_${query}, use that, ie. state_activeFilter.json
+              if (filter.datasetKey === datasetKey && filter.fileName) newFileName = capitalizeSplitAndJoin.call(String(filter.fileName), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces'])
+              if (newFileName && newFileName.includes('${query}')) {
+                newFileName = newFileName.replace('${query}', capitalizeSplitAndJoin.call(String(filter.active), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces']))
+              }
+            }
+
             if (filter.type === 'urlfilter' && !!filter.queryParameter) {
               if (updatedQSParams[filter.queryParameter]) {
                 updatedQSParams[filter.queryParameter] = updatedQSParams[filter.queryParameter] + filter.active
               } else {
                 updatedQSParams[filter.queryParameter] = filter.active
               }
+            }
+            if (filter.filterBy === 'File Name') {
+              isUpdateNeeded = true
             }
           })
 
@@ -223,6 +248,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           })
           const _params = Object.keys(updatedQSParams).map(key => ({ key, value: updatedQSParams[key] }))
           let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${gatherQueryParams(_params)}`
+
+          if (newFileName !== '') {
+            let fileExtension = dataUrl.pathname.split('.').pop()
+            let pathWithoutFilename = dataUrl.pathname.substring(0, dataUrl.pathname.lastIndexOf('/'))
+            dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${newFileName}.${fileExtension}${gatherQueryParams(_params)}`
+          }
 
           let newDataset = await fetchRemoteData(`${dataUrlFinal}`)
 
@@ -844,7 +875,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           </section>
 
           {/* Data Table */}
-          {config.table.show && config.data && (
+          {config?.table?.show && config?.data && (
             <DataTable
               config={config}
               rawData={config.data}
@@ -860,7 +891,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
               isEditor={isEditor}
             />
           )}
-          {config.table.show &&
+          {config.table?.show &&
             config.datasets &&
             Object.keys(config.datasets).map(datasetKey => {
               //For each dataset, find any shared filters that apply to all visualizations using the dataset

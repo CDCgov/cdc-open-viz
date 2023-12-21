@@ -494,7 +494,7 @@ export const supportedTerritories = {
   'US-AS': ['AMERICAN SAMOA', 'AS'],
   'US-GU': ['GUAM', 'GU'],
   'US-PR': ['PUERTO RICO', 'PR'],
-  'US-VI': ['VIRGIN ISLANDS', 'VI'],
+  'US-VI': ['U.S. VIRGIN ISLANDS', 'VI', 'US VIRGIN ISLANDS', 'VIRGIN ISLANDS'],
   'US-MP': ['NORTHERN MARIANAS', 'MP', 'CNMI'],
   'US-FM': ['MICRONESIA', 'FM', 'Federated States of Micronesia'], // Note: Key is not an official ISO code
   'US-PW': ['PALAU', 'PW'], // Note: Key is not an official ISO code

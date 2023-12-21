@@ -1,9 +1,14 @@
 import { parseDate } from '@cdc/core/helpers/cove/date'
+import { standardizeStateName } from './standardizeState'
 
 export const customSort = (a, b, sortBy, config) => {
   let valueA = a
   let valueB = b
 
+  if (config.type === 'map') {
+    valueA = standardizeStateName(a)
+    valueB = standardizeStateName(b)
+  }
   // Treat booleans and nulls as an empty string
   valueA = valueA === false || valueA === true || valueA === null ? '' : valueA
   valueB = valueB === false || valueB === true || valueB === null ? '' : valueB
