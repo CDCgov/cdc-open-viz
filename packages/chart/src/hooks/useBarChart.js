@@ -193,7 +193,7 @@ export const useBarChart = () => {
       tableData.find(d => {
         return d[config.xAxis.dataKey] === xAxisDataValue
       }) || {}
-    for (const [colKeys, colVals] of Object.entries(columns)) {
+    Object.keys(columns).forEach(colKeys => {
       if(series && config.columns[colKeys].series && config.columns[colKeys].series !== series) return
       const formattingParams = {
         addColPrefix: config.columns[colKeys].prefix,
@@ -202,11 +202,11 @@ export const useBarChart = () => {
         addColCommas: config.columns[colKeys].commas
       }
 
-      const formattedValue = formatColNumber(closestVal[colVals?.name], 'left', true, config, formattingParams)
-      if (colVals.tooltips) {
-        columnsWithTooltips.push([colVals.label, formattedValue])
+      const formattedValue = formatColNumber(closestVal[config.columns[colKeys].name], 'left', true, config, formattingParams)
+      if (config.columns[colKeys].tooltips) {
+        columnsWithTooltips.push([config.columns[colKeys].label, formattedValue])
       }
-    }
+    })
     columnsWithTooltips.forEach(columnData => {
       additionalTooltipItems += `${columnData[0]} : ${columnData[1]} <br/>`
     })
