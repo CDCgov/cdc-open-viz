@@ -1463,7 +1463,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // Legend - Update when runtimeData does
     const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
     setRuntimeLegend(legend)
-  }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses]) // eslint-disable-line
+  }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses, state.legend.additionalCategories]) // eslint-disable-line
 
   useEffect(() => {
     reloadURLData()
