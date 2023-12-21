@@ -13,7 +13,7 @@ import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 export const useTooltip = props => {
   const { tableData, config, formatNumber, capitalize, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
   const { xScale, yScale, showTooltip, hideTooltip } = props
-  const { xAxis, visualizationType, orientation, yAxis, runtime } = config
+  const { xAxis, visualizationType, orientation, yAxis, runtime, barWidth } = config
   const data = transform.applySuppression(tableData, config.suppressedData)
   /**
    * Provides the tooltip information based on the tooltip data array and svg cursor coordinates
@@ -207,6 +207,8 @@ export const useTooltip = props => {
   const getXValueFromCoordinate = x => {
     if (visualizationType === 'Pie') return
     if (orientation === 'horizontal') return
+
+    // Check the type of x equal to point or if the type of xAxis is equal to continuous or date
     if (xScale.type === 'point' || xAxis.type === 'continuous' || xAxis.type === 'date') {
       // Find the closest x value by calculating the minimum distance
       let closestX = null
@@ -215,11 +217,12 @@ export const useTooltip = props => {
 
       data.forEach(d => {
         const xPosition = xAxis.type === 'date' ? xScale(parseDate(d[xAxis.dataKey])) : xScale(d[xAxis.dataKey])
-        const distance = Math.abs(Number(xPosition - offset))
+        let bwOffset = config.barHeight
+        const distance = Math.abs(Number(xPosition - offset + bwOffset))
 
-        if (distance < minDistance) {
+        if (distance <= minDistance) {
           minDistance = distance
-          closestX = xAxis.type === 'date' ? parseDate(d[xAxis.dataKey]) : d[xAxis.dataKey]
+          closestX = xAxis.type === 'date' ? d[xAxis.dataKey] : d[xAxis.dataKey]
         }
       })
       return closestX
@@ -276,8 +279,13 @@ export const useTooltip = props => {
       const { x } = eventSvgCoords
       if (!x) throw new Error('COVE: no x value in handleTooltipClick.')
       let closestXScaleValue = getXValueFromCoordinate(x)
-      if (!closestXScaleValue) throw new Error('COVE: no closest x scale value in handleTooltipClick')
       let datum = config.data?.filter(item => item[config.xAxis.dataKey] === closestXScaleValue)
+      if (!closestXScaleValue) throw new Error('COVE: no closest x scale value in handleTooltipClick')
+      if (xAxis.type === 'date' && closestXScaleValue) {
+        closestXScaleValue = new Date(closestXScaleValue)
+        closestXScaleValue = formatDate(closestXScaleValue)
+        datum = config.data?.filter(item => formatDate(new Date(item[config.xAxis.dataKey])) === closestXScaleValue)
+      }
 
       if (!datum[0]) {
         throw new Error(`COVE: no data found matching the closest xScale value: ${closestXScaleValue}`)
