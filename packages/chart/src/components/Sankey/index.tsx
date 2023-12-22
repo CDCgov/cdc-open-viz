@@ -1,9 +1,12 @@
-import { SankeyGraph, sankey, sankeyLinkHorizontal } from 'd3-sankey'
+import { SankeyGraph, sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey'
 import './sankey.scss'
-import { useContext, useState } from 'react'
+import { useContext, useState, useRef, useEffect } from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 import ConfigContext from '@cdc/chart/src/ConfigContext'
+import { Group } from '@visx/group'
+import { Text } from '@visx/text'
+import { ChartContext } from '../../types/ChartContext'
 
 type Link = { source: string; target: string; value: number }
 
@@ -24,14 +27,11 @@ type SankeyProps = {
 const Sankey = ({ width, height }: SankeyProps) => {
   // Merges initial-state with the passed config in examples/feature/sankey/initial.json
   const DEBUG = true
-  const { config } = useContext(ConfigContext)
+  const { config } = useContext<ChartContext>(ConfigContext)
   const { sankey: sankeyConfig } = config
   const data = sankeyConfig?.data
-
-  if (DEBUG) {
-    console.log('sankeyData', sankeyConfig)
-    console.log('data', data)
-  }
+  const [largestGroupWidth, setLargestGroupWidth] = useState(0)
+  const groupRefs = useRef([])
 
   const [tooltipID, setTooltipID] = useState<string>('')
 
@@ -42,6 +42,19 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const clearNodeClick = () => {
     setTooltipID('')
   }
+
+  // Uses Visx Groups innerRef to get all Group elements that are mapped.
+  // Sets the largest group width in state and subtracts that group the svg width to calculate overall width.
+  useEffect(() => {
+    let largest = 0
+    groupRefs?.current?.map(g => {
+      const groupWidth = g?.getBoundingClientRect().width
+      if (groupWidth > largest) {
+        largest = groupWidth
+      }
+    })
+    setLargestGroupWidth(largest)
+  }, [groupRefs])
 
   //Retrieve all the unique values for the Nodes
   const uniqueNodes = Array.from(new Set(data.links.flatMap(link => [link.source, link.target])))
@@ -56,14 +69,17 @@ const Sankey = ({ width, height }: SankeyProps) => {
     }))
   }
 
+  let textPositionHorizontal = 30
+
   // Set the sankey diagram properties
   const sankeyGenerator = sankey<SankeyNode, { source: number; target: number }>()
     .nodeWidth(sankeyConfig.nodeSize.nodeWidth)
     .nodePadding(sankeyConfig.nodePadding)
     .iterations(sankeyConfig.iterations)
+    .nodeAlign(sankeyLeft)
     .extent([
       [sankeyConfig.margin.margin_x, sankeyConfig.margin.margin_y],
-      [width - sankeyConfig.margin.margin_x, height - sankeyConfig.margin.margin_y]
+      [width - textPositionHorizontal - largestGroupWidth, height]
     ])
 
   const { nodes, links } = sankeyGenerator(sankeyData)
@@ -79,6 +95,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
     let classStyle = 'node-value--storynode'
     let storyNodes = true
 
+    // TODO: need a dynamic way to apply classes here instead of checking static values.
     if (id.toString() !== 'Suicide EMS Responses' && id.toString() !== 'Treated' && id.toString() !== 'Transported to hospital') {
       storyNodes = false
       textPositionVertical = 10
@@ -98,17 +115,15 @@ const Sankey = ({ width, height }: SankeyProps) => {
     let { textPositionHorizontal, textPositionVertical, classStyle, storyNodes } = nodeStyle(node.id)
 
     let opacityValue = sankeyConfig.opacity.nodeOpacityDefault
-    let defaultNodeColor = sankeyConfig.nodeColor.default
-    let inactiveNodeColor = sankeyConfig.nodeColor.inactive
-    let nodeColor = defaultNodeColor
+    let nodeColor = sankeyConfig.nodeColor.default
 
     if (tooltipID !== node.id && tooltipID !== '') {
-      nodeColor = inactiveNodeColor
+      nodeColor = sankeyConfig.nodeColor.inactive
       opacityValue = sankeyConfig.opacity.nodeOpacityInactive
     }
 
     return (
-      <g key={i}>
+      <Group className='' key={i} innerRef={el => (groupRefs.current[i] = el)}>
         <rect
           height={node.y1! - node.y0! + 2} // increasing node size to account for smaller nodes
           width={sankeyGenerator.nodeWidth()}
@@ -124,11 +139,13 @@ const Sankey = ({ width, height }: SankeyProps) => {
         />
         {storyNodes ? (
           <>
-            <text
+            <Text
               /* Text Position Horizontal
               x0 is the left edge of the node
               # - positions text # units to the right of the left edge of the node */
               x={node.x0! + textPositionHorizontal}
+              textAnchor={filteredNodes.length - 1 === i ? 'end' : 'start'}
+              verticalAnchor='end'
               /*Text Position Vertical
               y1 and y0 are the top and bottom edges of the node
               y1+y0 = total height
@@ -141,31 +158,31 @@ const Sankey = ({ width, height }: SankeyProps) => {
               dominant baseline allows for different vertical alignments
               text-before-edge aligns the text's bottom edge with the bottom edge of the container
               */
-              dominantBaseline='text-before-edge'
               fill={sankeyConfig.nodeFontColor}
               fontSize={sankeyConfig.nodeFontSize} // font size
               fontWeight='bold' // font weight
-              textAnchor='start' // position of text
               style={{ pointerEvents: 'none' }}
+              className='node-text'
             >
-              <tspan className='node-text'>{(sankeyConfig.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}</tspan>
-            </text>
-            <text x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0!) / 2} dominantBaseline='text-before-edge' fill={sankeyConfig.nodeFontColor} fontSize={sankeyConfig.nodeFontSize} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
-              <tspan className={classStyle}>{typeof node.value === 'number' ? node.value.toLocaleString() : node.value}</tspan>
-            </text>
-            <text
+              {(sankeyConfig.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
+            </Text>
+            <Text verticalAnchor='end' className={classStyle} x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0! + 25) / 2} fill={sankeyConfig.nodeFontColor} fontSize={sankeyConfig.nodeFontSize} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
+              {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
+            </Text>
+            <Text
               x={node.x0! + textPositionHorizontal}
               // plus 50 will move the vertical position down
               y={(node.y1! + node.y0!) / 2 + 50}
-              dominantBaseline='text-before-edge'
               fill={sankeyConfig.nodeFontColor}
               fontSize={sankeyConfig.nodeFontSize}
               fontWeight='bold'
-              textAnchor='start'
+              textAnchor={filteredNodes.length === i ? 'end' : 'start'}
               style={{ pointerEvents: 'none' }}
+              className='node-text'
+              verticalAnchor='end'
             >
-              <tspan className='node-text'>{(sankeyConfig.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}</tspan>
-            </text>
+              {(sankeyConfig.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}
+            </Text>
           </>
         ) : (
           <>
@@ -191,7 +208,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
             </text>
           </>
         )}
-      </g>
+      </Group>
     )
   })
 
@@ -224,9 +241,9 @@ const Sankey = ({ width, height }: SankeyProps) => {
 
   return (
     <div className='sankey-chart'>
-      <svg className='sankey-chart__diagram' width={width} height={height}>
-        <g>{allLinks}</g>
-        <g>{allNodes}</g>
+      <svg className='sankey-chart__diagram' width={width} height={height} style={{ overflow: 'visible' }}>
+        <Group className='links'>{allLinks}</Group>
+        <Group className='nodes'>{allNodes}</Group>
       </svg>
       <ReactTooltip id={`tooltip`} afterHide={() => clearNodeClick()} events={['click']} html='true' place='top' style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
     </div>

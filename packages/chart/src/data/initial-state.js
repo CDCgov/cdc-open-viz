@@ -243,7 +243,6 @@ export default {
   },
   sankey: {
     title: {
-      name: 'Outcomes of Emergency Medical Systems (EMS) Responses to Suicide-Related Calls, 2022',
       defaultColor: 'black'
     },
     iterations: 1,
@@ -254,7 +253,7 @@ export default {
     },
     margin: {
       margin_y: 25,
-      margin_x: 5
+      margin_x: 0
     },
     nodeSize: {
       nodeWidth: 26,
@@ -278,11 +277,7 @@ export default {
       LinkOpacityInactive: 0.1
     },
     storyNodeFontColor: '#006778',
-    storyNodeText: [
-      { StoryNode: 'Suicide EMS Responses', segmentTextBefore: 'In 2022, there were', segmentTextAfter: 'Suicide EMS Responses' },
-      { StoryNode: 'Treated', segmentTextBefore: 'of which,', segmentTextAfter: 'were treated' },
-      { StoryNode: 'Transported to hospital', segmentTextBefore: 'and', segmentTextAfter: 'were transported\n to the hospital' }
-    ],
+    storyNodeText: [],
     nodeValueStyle: {
       textBefore: '(',
       textAfter: ')'
