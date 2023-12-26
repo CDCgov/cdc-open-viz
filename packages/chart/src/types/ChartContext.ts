@@ -34,5 +34,7 @@ export type ChartContext =
       seriesHighlight?: String[]
       tableData?: Object[]
       transformedData?: Object[]
+      setSharedFilter?: Function
+      sharedFilterValue?: string
       updateConfig?: Function
     }
