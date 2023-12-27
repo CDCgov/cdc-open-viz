@@ -1695,6 +1695,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
                 isDebug={isDebug}
+                wrapColumns={table.wrapColumns}
               />
             )}
 
