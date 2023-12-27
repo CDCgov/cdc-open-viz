@@ -1,5 +1,6 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import ConfigContext from '../ConfigContext'
+import { type ChartContext } from '../types/ChartContext'
 import { useBarChart } from '../hooks/useBarChart'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -11,6 +12,7 @@ import { FaStar } from 'react-icons/fa'
 import chroma from 'chroma-js'
 
 import { type BarChartProps } from '../types/ChartProps'
+import { add } from 'lodash'
 
 export const BarChartVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
@@ -20,9 +22,23 @@ export const BarChartVertical = (props: BarChartProps) => {
 
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize, getAdditionalColumn, hoveredBar, onMouseOverBar, onMouseLeaveBar } = useBarChart()
 
-  // CONTEXT VALUES
   // prettier-ignore
-  const { colorScale, config, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, dashboardConfig, setSeriesHighlight } = useContext(ConfigContext)
+  const {
+    colorScale,
+    config,
+    dashboardConfig,
+    formatDate,
+    formatNumber,
+    getXAxisData,
+    getYAxisData,
+    isNumber,
+    parseDate,
+    seriesHighlight,
+    setSeriesHighlight,
+    setSharedFilter,
+    transformedData,
+    updateConfig
+  } = useContext<ChartContext>(ConfigContext)
 
   const { runtime } = config
 
@@ -89,14 +105,15 @@ export const BarChartVertical = (props: BarChartProps) => {
                   const newIndex = bar.value < 0 ? -1 : index
                   const borderRadius = applyRadius(newIndex)
                   // tooltips
-                  const additionalColTooltip = getAdditionalColumn(hoveredBar)
+
+                  const additionalColTooltip = getAdditionalColumn(bar.key, data[barGroup.index][config.runtime.originalXAxis.dataKey])
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
 
                   const tooltip = `<ul>
                   <li class="tooltip-heading">${xAxisTooltip}</li>
                   <li class="tooltip-body ">${tooltipBody}</li>
-                   <li class="tooltip-body ">${additionalColTooltip}</li>
+                  ${additionalColTooltip ? ('<li class="tooltip-body ">' + additionalColTooltip + '</li>') : ''}
                     </li></ul>`
 
                   // configure colors
@@ -150,7 +167,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                     if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
 
                     // if we're highlighting a bar make it invisible since it gets a border
-                    // if (isHighlightedBar) _barColor = 'transparent'
+                    if (isHighlightedBar) _barColor = 'transparent'
                     return _barColor
                   }
 
@@ -176,7 +193,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                     background: getBarBackgroundColor(barColor),
                     borderColor,
                     borderStyle: 'solid',
-                    borderWidth,
+                    borderWidth: `${borderWidth}px`,
                     width: barWidth,
                     height: barHeight,
                     ...borderRadius,
