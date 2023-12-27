@@ -7,6 +7,10 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import HexSetting from './HexShapeSettings'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../context'
+import { Legend } from '@visx/legend'
+import { scaleOrdinal } from '@visx/scale'
+import { Text } from '@visx/text'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 
 const Sidebar = () => {
   // prettier-ignore
@@ -42,55 +46,92 @@ const Sidebar = () => {
     setAccessibleStatus(`Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`)
   }
 
-  const legendList = runtimeLegend.map((entry, idx) => {
-    const entryMax = displayDataAsText(entry.max, 'primary')
+  const legendList = () => {
+    let legendItems
 
-    const entryMin = displayDataAsText(entry.min, 'primary')
+    legendItems = runtimeLegend.map((entry, idx) => {
+      const entryMax = displayDataAsText(entry.max, 'primary')
 
-    let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
+      const entryMin = displayDataAsText(entry.min, 'primary')
 
-    // If interval, add some formatting
-    if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
-      formattedText = `${entryMin} - < ${entryMax}`
+      let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`
+
+      // If interval, add some formatting
+      if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
+        formattedText = `${entryMin} - < ${entryMax}`
+      }
+
+      const { disabled } = entry
+
+      if (legend.type === 'category') {
+        formattedText = displayDataAsText(entry.value, 'primary')
+      }
+
+      if (entry.max === 0 && entry.min === 0) {
+        formattedText = '0'
+      }
+
+      let legendLabel = formattedText
+
+      if (entry.hasOwnProperty('special')) {
+        legendLabel = entry.label || entry.value
+      }
+
+      const handleListItemClass = () => {
+        let classes = ['legend-container__li']
+        if (disabled) classes.push('legend-container__li--disabled')
+        if (entry.hasOwnProperty('special')) classes.push('legend-container__li--special-class')
+        return classes
+      }
+
+      return (
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
+        <li
+          className={handleListItemClass().join(' ')}
+          key={idx}
+          title={`Legend item ${legendLabel} - Click to disable`}
+          onClick={() => {
+            toggleLegendActive(idx, legendLabel)
+          }}
+        >
+          <LegendCircle fill={entry.color} /> <span className='label'>{legendLabel}</span>
+        </li>
+      )
+    })
+
+    if (state.map.patterns) {
+      // loop over map patterns
+      state.map.patterns.map((patternData, patternDataIndex) => {
+        const { pattern, dataKey, size } = patternData
+        let defaultPatternColor = 'black'
+        const sizes = {
+          small: '8',
+          medium: '10',
+          large: '12'
+        }
+
+        const legendSize = 16
+
+        legendItems.push(
+          <>
+            <li className={`legend-container__li legend-container__li--geo-pattern`} style={{ alignItems: 'center' }}>
+              <span className='legend-item' style={{ border: 'unset' }}>
+                <svg width={legendSize} height={legendSize}>
+                  <circle id={dataKey} fill={`url(#${dataKey})`} r={legendSize / 2} cx={legendSize / 2} cy={legendSize / 2} stroke='#0000004d' strokeWidth={1} />
+                  {pattern === 'waves' && <PatternWaves id={`${dataKey}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
+                  {pattern === 'circles' && <PatternCircles id={`${dataKey}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
+                  {pattern === 'lines' && <PatternLines id={`${dataKey}`} height={sizes[size] ?? 6} width={sizes[size] ?? 6} stroke={defaultPatternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
+                </svg>
+              </span>
+              <p>{patternData.dataValue}</p>
+            </li>
+          </>
+        )
+      })
     }
 
-    const { disabled } = entry
-
-    if (legend.type === 'category') {
-      formattedText = displayDataAsText(entry.value, 'primary')
-    }
-
-    if (entry.max === 0 && entry.min === 0) {
-      formattedText = '0'
-    }
-
-    let legendLabel = formattedText
-
-    if (entry.hasOwnProperty('special')) {
-      legendLabel = entry.label || entry.value
-    }
-
-    const handleListItemClass = () => {
-      let classes = ['legend-container__li']
-      if (disabled) classes.push('legend-container__li--disabled')
-      if (entry.hasOwnProperty('special')) classes.push('legend-container__li--special-class')
-      return classes
-    }
-
-    return (
-      // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
-      <li
-        className={handleListItemClass().join(' ')}
-        key={idx}
-        title={`Legend item ${legendLabel} - Click to disable`}
-        onClick={() => {
-          toggleLegendActive(idx, legendLabel)
-        }}
-      >
-        <LegendCircle fill={entry.color} /> <span className='label'>{legendLabel}</span>
-      </li>
-    )
-  })
+    return legendItems
+  }
 
   const { legendClasses } = useDataVizClasses(state, viewport)
 
@@ -129,7 +170,7 @@ const Sidebar = () => {
                 return true
               })}
             <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
-              {legendList}
+              {legendList()}
             </ul>
           </section>
         </aside>
