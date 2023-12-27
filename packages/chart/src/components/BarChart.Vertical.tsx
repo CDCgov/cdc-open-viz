@@ -12,6 +12,7 @@ import { FaStar } from 'react-icons/fa'
 import chroma from 'chroma-js'
 
 import { type BarChartProps } from '../types/ChartProps'
+import { add } from 'lodash'
 
 export const BarChartVertical = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax, seriesScale } = props
@@ -104,14 +105,15 @@ export const BarChartVertical = (props: BarChartProps) => {
                   const newIndex = bar.value < 0 ? -1 : index
                   const borderRadius = applyRadius(newIndex)
                   // tooltips
-                  const additionalColTooltip = getAdditionalColumn(hoveredBar)
+
+                  const additionalColTooltip = getAdditionalColumn(bar.key, data[barGroup.index][config.runtime.originalXAxis.dataKey])
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
 
                   const tooltip = `<ul>
                   <li class="tooltip-heading">${xAxisTooltip}</li>
                   <li class="tooltip-body ">${tooltipBody}</li>
-                   <li class="tooltip-body ">${additionalColTooltip}</li>
+                  ${additionalColTooltip ? ('<li class="tooltip-body ">' + additionalColTooltip + '</li>') : ''}
                     </li></ul>`
 
                   // configure colors

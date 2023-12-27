@@ -132,38 +132,29 @@ export class DataTransform {
         if (description.valueKeys !== undefined) {
           let standardizedMapped = {}
           let standardized: string[] = []
-          let valueKeys = description.valueKeys
-          if (description.ignoredKeys && description.ignoredKeys.length > 0) {
-            valueKeys = valueKeys.concat(description.ignoredKeys)
-          }
 
           data.forEach(row => {
-            valueKeys.forEach(valueKey => {
-              let extraKeys: string[] = []
-              let uniqueKey = row[description.xKey] + '|' + valueKey
-              Object.keys(row).forEach(key => {
-                if (key !== description.xKey && key !== description.seriesKey && valueKeys.indexOf(key) === -1) {
-                  uniqueKey += '|' + key + '=' + row[key]
-                  extraKeys.push(key)
-                }
-              })
-
-              if (!standardizedMapped[uniqueKey]) {
-                standardizedMapped[uniqueKey] = { [description.xKey]: row[description.xKey], '**Numeric Value Property**': valueKey }
-                extraKeys.forEach(key => {
-                  standardizedMapped[uniqueKey][key] = row[key]
-                })
+            let uniqueKey = row[description.xKey];
+            Object.keys(row).forEach(key => {
+              if(key !== description.xKey && key !== description.seriesKey && description.valueKeys.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)){
+                uniqueKey += "|" + row[key];
               }
+            })
 
-              standardizedMapped[uniqueKey][row[description.seriesKey]] = row[valueKey]
+            if(!standardizedMapped[uniqueKey]){
+              standardizedMapped[uniqueKey] = {[description.xKey]: row[description.xKey]}
+            }
+            Object.keys(row).forEach(key => {
+              if(key !== description.xKey && key !== description.seriesKey && description.valueKeys.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)){
+                standardizedMapped[uniqueKey][key] = row[key];
+              }
+            })
+            description.valueKeys.forEach(valueKey => {
+              standardizedMapped[uniqueKey][row[description.seriesKey] + '-' + valueKey] = row[valueKey];
             })
           })
 
-          Object.keys(standardizedMapped).forEach(key => {
-            if (!description.ignoredKeys || description.ignoredKeys.indexOf(standardizedMapped[key]['**Numeric Value Property**']) === -1) {
-              standardized.push(standardizedMapped[key])
-            }
-          })
+          standardized = Object.keys(standardizedMapped).map(key => standardizedMapped[key]);
 
           return standardized
         } else {

@@ -1,0 +1,98 @@
+[
+      {
+            "date": "1/1/23",
+            "pathogen": "COVID",
+            "value": 23,
+            "upper_ci": 47,
+            "lower_ci": 20,
+            "filter1": "value1"
+      },
+      {
+            "date": "1/1/23",
+            "pathogen": "RSV",
+            "value": 33,
+            "upper_ci": 57,
+            "lower_ci": 10,
+            "filter1": "value1"
+      },
+      {
+            "date": "1/1/23",
+            "pathogen": "Flu",
+            "value": 53,
+            "upper_ci": 67,
+            "lower_ci": 40,
+            "filter1": "value1"
+      },
+      {
+            "date": "1/2/23",
+            "pathogen": "COVID",
+            "value": 60,
+            "upper_ci": 87,
+            "lower_ci": 20,
+            "filter1": "value1"
+      },
+      {
+            "date": "1/2/23",
+            "pathogen": "RSV",
+            "value": 33,
+            "upper_ci": 57,
+            "lower_ci": 10,
+            "filter1": "value1"
+      },
+      {
+            "date": "1/2/23",
+            "pathogen": "Flu",
+            "value": 53,
+            "upper_ci": 67,
+            "lower_ci": 40,
+            "filter1": "value1"
+      },
+      {
+            "date": "1/1/23",
+            "pathogen": "COVID",
+            "value": 23,
+            "upper_ci": 47,
+            "lower_ci": 20,
+            "filter1": "value2"
+      },
+      {
+            "date": "1/1/23",
+            "pathogen": "RSV",
+            "value": 33,
+            "upper_ci": 57,
+            "lower_ci": 10,
+            "filter1": "value2"
+      },
+      {
+            "date": "1/1/23",
+            "pathogen": "Flu",
+            "value": 53,
+            "upper_ci": 67,
+            "lower_ci": 40,
+            "filter1": "value2"
+      },
+      {
+            "date": "1/2/23",
+            "pathogen": "COVID",
+            "value": 23,
+            "upper_ci": 47,
+            "lower_ci": 20,
+            "filter1": "value2"
+      },
+      {
+            "date": "1/2/23",
+            "pathogen": "RSV",
+            "value": 33,
+            "upper_ci": 57,
+            "lower_ci": 10,
+            "filter1": "value2"
+      },
+      {
+            "date": "1/2/23",
+            "pathogen": "Flu",
+            "value": 53,
+            "upper_ci": 67,
+            "lower_ci": 40,
+            "filter1": "value2"
+      }
+]
