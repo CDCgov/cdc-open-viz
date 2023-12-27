@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
 
+import PatternSettings from './PatternSettings'
+
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -2997,6 +2999,7 @@ const EditorPanel = props => {
                 </button>
               </AccordionItemPanel>
             </AccordionItem>
+            <PatternSettings />
           </Accordion>
           <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
         </section>
