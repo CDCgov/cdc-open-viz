@@ -35,7 +35,7 @@ type AllChartsConfig = {
   runtime: {}
   series: Series[]
   useLogScale: boolean
-  visualizationType: 'Area Chart' | 'Bar' | 'Deviation Bar' | 'Forest Plot' | 'Paired Bar' | 'Scatter Plot' | 'Spark Line'
+  visualizationType: 'Area Chart' | 'Bar' | 'Deviation Bar' | 'Forest Plot' | 'Paired Bar' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting'
   xAxis: {
     // column chosen on xAxis
     dataKey: string
