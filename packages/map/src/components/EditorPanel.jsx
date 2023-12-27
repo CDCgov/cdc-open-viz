@@ -2571,6 +2571,22 @@ const EditorPanel = props => {
                   <label className='checkbox'>
                     <input
                       type='checkbox'
+                      checked={state.table.wrapColumns}
+                      onChange={event => {
+                        setState({
+                          ...state,
+                          table: {
+                            ...state.table,
+                            wrapColumns: event.target.checked
+                          }
+                        })
+                      }}
+                    />
+                    <span className='edit-label column-heading'>WRAP DATA TABLE COLUMNS</span>
+                  </label>
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
                       checked={state.table.forceDisplay !== undefined ? state.table.forceDisplay : !isDashboard}
                       onChange={event => {
                         handleEditorChanges('showDataTable', event.target.checked)
