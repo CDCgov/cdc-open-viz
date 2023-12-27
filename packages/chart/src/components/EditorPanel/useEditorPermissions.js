@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import ConfigContext from '../ConfigContext'
+import ConfigContext from '../../ConfigContext'
 
 export const useEditorPermissions = () => {
   const { config } = useContext(ConfigContext)
@@ -23,6 +23,12 @@ export const useEditorPermissions = () => {
 ]
 
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
+
+  const visSupportsDateCategoryAxis = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
 
   const visSupportsSuperTitle = () => {
     const disabledCharts = ['Spark Line']
@@ -186,6 +192,18 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsValueAxisMax = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
+  const visSupportsValueAxisMin = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
   const visSupportsFilters = () => {
     const disabledCharts = ['Forest Plot']
     if (disabledCharts.includes(visualizationType)) return false
@@ -201,16 +219,22 @@ export const useEditorPermissions = () => {
 
   // implement later
   const visSupportsValueAxisTicks = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   // implement later
   const visSupportsValueAxisLine = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   // implement later
   const visSupportsValueAxisLabels = () => {
+    const disabledCharts = ['Forest Plot']
+    if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
@@ -272,6 +296,7 @@ export const useEditorPermissions = () => {
     visSupportsBarSpace,
     visSupportsBarThickness,
     visSupportsChartHeight,
+    visSupportsDateCategoryAxis,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
     visSupportsDateCategoryAxisTicks,
@@ -294,6 +319,8 @@ export const useEditorPermissions = () => {
     visSupportsValueAxisLabels,
     visSupportsValueAxisLine,
     visSupportsValueAxisTicks,
-    visSupportsReactTooltip
+    visSupportsReactTooltip,
+    visSupportsValueAxisMax,
+    visSupportsValueAxisMin
   }
 }

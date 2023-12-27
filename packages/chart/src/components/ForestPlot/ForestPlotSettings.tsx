@@ -5,113 +5,9 @@ import WarningImage from '../../images/warning.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { type ChartContext } from '../../types/ChartContext'
+import { Select, CheckBox, TextField } from '../EditorPanel/Inputs'
 
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
-
-const Select = memo(({ label, value, options, fieldName, section = null, subsection = null, required = false, tooltip, updateField, initial: initialValue, ...attributes }) => {
-  let optionsJsx = options.map((optionName, index) => (
-    <option value={optionName} key={index}>
-      {optionName}
-    </option>
-  ))
-
-  if (initialValue) {
-    optionsJsx.unshift(
-      <option value='' key='initial'>
-        {initialValue}
-      </option>
-    )
-  }
-
-  return (
-    <label>
-      <span className='edit-label'>
-        {label}
-        {tooltip}
-      </span>
-      <select
-        className={required && !value ? 'warning' : ''}
-        name={fieldName}
-        value={value}
-        onChange={event => {
-          updateField(section, subsection, fieldName, event.target.value)
-        }}
-        {...attributes}
-      >
-        {optionsJsx}
-      </select>
-    </label>
-  )
-})
-
-const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-  <label className='checkbox column-heading'>
-    <input
-      type='checkbox'
-      name={fieldName}
-      checked={value}
-      onChange={e => {
-        updateField(section, subsection, fieldName, !value)
-      }}
-      {...attributes}
-    />
-    <span className='edit-label'>
-      {label}
-      {tooltip}
-    </span>
-  </label>
-))
-
-/* eslint-disable react-hooks/rules-of-hooks */
-const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
-  const [value, setValue] = useState(stateValue)
-
-  const [debouncedValue] = useDebounce(value, 500)
-
-  useEffect(() => {
-    if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
-      updateField(section, subsection, fieldName, debouncedValue, i)
-    }
-  }, [debouncedValue]) // eslint-disable-line
-
-  let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
-
-  const onChange = e => {
-    if ('number' !== type || min === null) {
-      setValue(e.target.value)
-    } else {
-      if (!e.target.value || min <= parseFloat(e.target.value)) {
-        setValue(e.target.value)
-      } else {
-        setValue(min.toString())
-      }
-    }
-  }
-
-  let formElement = <input type='text' name={name} onChange={onChange} {...attributes} value={value} />
-
-  if ('textarea' === type) {
-    formElement = <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
-  }
-
-  if ('number' === type) {
-    formElement = <input type='number' name={name} onChange={onChange} {...attributes} value={value} />
-  }
-
-  if ('date' === type) {
-    formElement = <input type='date' name={name} onChange={onChange} {...attributes} value={value} />
-  }
-
-  return (
-    <label>
-      <span className='edit-label column-heading'>
-        {label}
-        {tooltip}
-      </span>
-      {formElement}
-    </label>
-  )
-})
 
 type ForestPlotSettingsProps = {
   // Fn for editing columns, used here for updating the datatable property.
@@ -119,7 +15,7 @@ type ForestPlotSettingsProps = {
 }
 
 const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
-  const { config, rawData: unfilteredData, updateConfig, isDebug } = useContext(ConfigContext)
+  const { config, rawData: unfilteredData, updateConfig } = useContext<ChartContext>(ConfigContext)
 
   const enforceRestrictions = updatedConfig => {
     if (updatedConfig.orientation === 'horizontal') {
@@ -254,6 +150,26 @@ const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
         </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
+        <Select
+          value={config.xAxis.dataKey || setCategoryAxis() || ''}
+          section='xAxis'
+          fieldName='dataKey'
+          label='Study Column'
+          initial='Select'
+          required={true}
+          updateField={updateField}
+          options={getColumns(false)}
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>Select the column or row containing the categories or dates for this axis. </p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+        />
         <Select
           value={config.forestPlot.type}
           label='Forest Plot Type'

@@ -30,10 +30,9 @@ import useRightAxis from '../hooks/useRightAxis'
 import useScales from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
-import { useEditorPermissions } from '../hooks/useEditorPermissions'
+import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 
 // styles
-import '../scss/LinearChart.scss'
 import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
@@ -70,7 +69,7 @@ const LinearChart = props => {
   }
   //  configure height , yMax, xMax
   const { horizontal: heightHorizontal } = config.heights
-  const isHorizontal = orientation === 'horizontal'
+  const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
   const shouldAbbreviate = true
   let height = config.aspectRatio ? width * config.aspectRatio : config.visualizationType === 'Forest Plot' ? config.heights['vertical'] : config.heights[orientation]
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
@@ -102,7 +101,7 @@ const LinearChart = props => {
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = config.brush.active && config.brush.data?.length ? config.brush.data.map(d => getXAxisData(d)) : data.map(d => getXAxisData(d))
-  const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
+  const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
   const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
   const { min, max, leftMax, rightMax } = useMinMax(properties)
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
@@ -133,10 +132,10 @@ const LinearChart = props => {
       tick = 0
     }
 
-    if (config.visualizationType === 'Forest Plot') return formatNumber(tick, 'bottom', false, false, false, true)
-    if (runtime.xAxis.type === 'date') return formatDate(tick)
-    if (orientation === 'horizontal') return formatNumber(tick, 'left', shouldAbbreviate)
-    if (config.xAxis.type === 'continuous') return formatNumber(tick, 'bottom', shouldAbbreviate)
+    if (runtime.xAxis.type === 'date' && config.visualizationType !== 'Forest Plot') return formatDate(tick)
+    if (orientation === 'horizontal' && config.visualizationType !== 'Forest Plot') return formatNumber(tick, 'left', shouldAbbreviate)
+    if (config.xAxis.type === 'continuous' && config.visualizationType !== 'Forest Plot') return formatNumber(tick, 'bottom', shouldAbbreviate)
+    if (config.visualizationType === 'Forest Plot') return formatNumber(tick, 'left', config.dataFormat.abbreviated, config.runtime.xAxis.prefix, config.runtime.xAxis.suffix, Number(config.dataFormat.roundTo))
     return tick
   }
 
@@ -174,7 +173,7 @@ const LinearChart = props => {
       }
 
       if (config.visualizationType === 'Forest Plot') {
-        tickCount = config.xAxis.numTicks !== '' ? config.xAxis.numTicks : 4
+        tickCount = config.yAxis.numTicks !== '' ? config.yAxis.numTicks : 4
       }
     }
 
