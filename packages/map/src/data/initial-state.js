@@ -68,6 +68,7 @@ export default {
   },
   filters: [],
   table: {
+    wrapColumns: false,
     label: 'Data Table',
     expanded: false,
     limitHeight: false,

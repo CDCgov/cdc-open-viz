@@ -4,13 +4,16 @@ import Cell from './Cell'
 type RowProps = {
   childRow: ReactNode[]
   rowKey: string
+  columnWrap: boolean
 }
 
-const Row = ({ childRow, rowKey }: RowProps) => {
+const Row = ({ childRow, rowKey, wrapColumns }: RowProps) => {
   return (
     <tr>
       {childRow.map((child, i) => (
-        <Cell key={rowKey + '__' + i}>{child}</Cell>
+        <Cell key={rowKey + '__' + i} wrapColumns={wrapColumns}>
+          {child}
+        </Cell>
       ))}
     </tr>
   )
