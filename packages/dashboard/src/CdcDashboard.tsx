@@ -35,11 +35,8 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
 import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
-import { SharedFilter } from './types/SharedFilter'
-import { APIFilter } from './types/APIFilter'
-import { DataSet } from './types/DataSet'
-import { Config } from './types/Config'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { capitalizeSplitAndJoin } from '@cdc/core/helpers/cove/string'
+
 import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import { filterData } from './helpers/filterData'
@@ -47,6 +44,13 @@ import { getFormattedData } from './helpers/getFormattedData'
 import { getVizKeys } from './helpers/getVizKeys'
 import Title from '@cdc/core/components/ui/Title'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
+
+// types
+import { type SharedFilter } from './types/SharedFilter'
+import { type APIFilter } from './types/APIFilter'
+import { type DataSet } from './types/DataSet'
+import { type Config } from './types/Config'
+import { type Visualization } from '@cdc/core/types/Visualization'
 
 type DropdownOptions = Record<'value' | 'text', string>[]
 
@@ -68,6 +72,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
   const [apiFilterDropdowns, setAPIFilterDropdowns] = useState<APIFilterDropdowns>({})
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+
+  const replacements = {
+    'Remove Spaces': '',
+    'Keep Spaces': ' ',
+    'Replace With Underscore': '_'
+  }
 
   const inNoDataState = useMemo(() => {
     const vals = Object.values(state.data)
@@ -205,9 +215,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
               // if no file name is entered use the default active filter. ie. /activeFilter.json
               if (!filter.fileName && filter.datasetKey === datasetKey) newFileName = filter.active
               // if a file name is found, ie, state_${query}, use that, ie. state_activeFilter.json
-              if (filter.datasetKey === datasetKey && filter.fileName) newFileName = filter.fileName
+              if (filter.datasetKey === datasetKey && filter.fileName) newFileName = capitalizeSplitAndJoin.call(String(filter.fileName), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces'])
               if (newFileName && newFileName.includes('${query}')) {
-                newFileName = newFileName.replace('${query}', filter.active)
+                newFileName = newFileName.replace('${query}', capitalizeSplitAndJoin.call(String(filter.active), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces']))
               }
             }
 

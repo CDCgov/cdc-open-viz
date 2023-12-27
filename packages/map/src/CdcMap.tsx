@@ -1008,6 +1008,20 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // guard clause else error in editor
     if (!string) return
     if (string !== undefined) {
+      const toTitleCase = word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()
+
+      if (string.toUpperCase().includes('U.S.') || string.toUpperCase().includes('US')) {
+        return string
+          .split(' ')
+          .map(word => {
+            if (word.toUpperCase() === 'U.S.' || word.toUpperCase() === 'US') {
+              return word.toUpperCase()
+            } else {
+              return toTitleCase(word)
+            }
+          })
+          .join(' ')
+      }
       // if hyphen found, then split, uppercase each word, and put back together
       if (string.includes('–') || string.includes('-')) {
         let dashSplit = string.includes('–') ? string.split('–') : string.split('-') // determine hyphen or en dash to split on
@@ -1448,6 +1462,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // Data
     if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+
       setRuntimeData(newRuntimeData)
     } else {
       if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
@@ -1463,7 +1478,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // Legend - Update when runtimeData does
     const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
     setRuntimeLegend(legend)
-  }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses]) // eslint-disable-line
+  }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses, state.legend.additionalCategories]) // eslint-disable-line
 
   useEffect(() => {
     reloadURLData()
@@ -1680,6 +1695,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
                 isDebug={isDebug}
+                wrapColumns={table.wrapColumns}
               />
             )}
 

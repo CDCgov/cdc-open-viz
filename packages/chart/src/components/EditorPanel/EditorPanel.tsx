@@ -2494,12 +2494,24 @@ const EditorPanel = () => {
                           <label>
                             <span className='edit-label column-heading'>Column</span>
                             <select
-                              value={config.columns[val] ? config.columns[val].name : columnsOptions[0]}
+                              value={config.columns[val] ? config.columns[val].name : getColumns()[0]}
                               onChange={event => {
                                 editColumn(val, 'name', event.target.value)
                               }}
                             >
-                              {columnsOptions}
+                              {getColumns().map(option => <option>{option}</option>)}
+                            </select>
+                          </label>
+                          <label>
+                            <span className='edit-label column-heading'>Associate to Series</span>
+                            <select
+                              value={config.columns[val] ? config.columns[val].series : ''}
+                              onChange={event => {
+                                editColumn(val, 'series', event.target.value)
+                              }}
+                            >
+                              <option value="">Select series</option>
+                              {config.series.map(series => <option>{series.dataKey}</option>)}
                             </select>
                           </label>
                           <TextField value={config.columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' updateField={updateField} />
