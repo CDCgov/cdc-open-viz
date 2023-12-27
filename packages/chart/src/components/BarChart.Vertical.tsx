@@ -1,5 +1,6 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import ConfigContext from '../ConfigContext'
+import { type ChartContext } from '../types/ChartContext'
 import { useBarChart } from '../hooks/useBarChart'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -20,9 +21,23 @@ export const BarChartVertical = (props: BarChartProps) => {
 
   const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize, getAdditionalColumn, hoveredBar, onMouseOverBar, onMouseLeaveBar } = useBarChart()
 
-  // CONTEXT VALUES
   // prettier-ignore
-  const { colorScale, config, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, dashboardConfig, setSeriesHighlight } = useContext(ConfigContext)
+  const {
+    colorScale,
+    config,
+    dashboardConfig,
+    formatDate,
+    formatNumber,
+    getXAxisData,
+    getYAxisData,
+    isNumber,
+    parseDate,
+    seriesHighlight,
+    setSeriesHighlight,
+    setSharedFilter,
+    transformedData,
+    updateConfig
+  } = useContext<ChartContext>(ConfigContext)
 
   const { runtime } = config
 
