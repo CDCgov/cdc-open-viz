@@ -4,6 +4,7 @@ import { type ChartConfig } from '../../types/ChartConfig'
 
 // todo: change this config obj to ChartConfig once its created
 type LineChartCircleProps = {
+  circleData: any
   config: ChartConfig
   data: object[]
   d?: Object
@@ -23,7 +24,7 @@ type LineChartCircleProps = {
 }
 
 const LineChartCircle = (props: LineChartCircleProps) => {
-  const { config, d, displayArea, seriesKey, tooltipData, xScale, yScale, colorScale, parseDate, yScaleRight, data } = props
+  const { config, d, displayArea, seriesKey, tooltipData, xScale, yScale, colorScale, parseDate, yScaleRight, data, circleData } = props
   const { lineDatapointStyle } = config
   const filtered = config?.series.filter(s => s.dataKey === seriesKey)?.[0]
   // If we're not showing the circle, simply return
@@ -46,8 +47,11 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     }
     return color
   }
-
   if (lineDatapointStyle === 'always show') {
+    const isMatch = circleData?.some(cd => cd[config.xAxis.dataKey] === d[config.xAxis.dataKey] && cd[seriesKey] === d[seriesKey])
+    if (isMatch) {
+      return <></>
+    }
     return (
       <circle
         cx={config.xAxis.type === 'categorical' ? xScale(d[config.xAxis.dataKey]) : xScale(parseDate(d[config.xAxis.dataKey]))}
@@ -84,6 +88,11 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       let seriesIndex = config.runtime.seriesLabelsAll.indexOf(hoveredXValue)
 
       if (isNaN(hoveredSeriesValue)) return <></>
+      const isMatch = circleData?.some(cd => cd[config.xAxis.dataKey] === hoveredXValue)
+
+      if (isMatch) {
+        return <></>
+      }
       return (
         <circle
           cx={config.xAxis.type === 'categorical' ? xScale(hoveredXValue) : xScale(parseDate(hoveredXValue))}
