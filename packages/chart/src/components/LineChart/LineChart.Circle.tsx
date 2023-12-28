@@ -4,7 +4,7 @@ import { type ChartConfig } from '../../types/ChartConfig'
 
 // todo: change this config obj to ChartConfig once its created
 type LineChartCircleProps = {
-  circleData: any
+  circleData: object[]
   config: ChartConfig
   data: object[]
   d?: Object

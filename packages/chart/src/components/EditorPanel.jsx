@@ -207,7 +207,7 @@ const DataSuppression = memo(({ config, updateConfig, data }) => {
     </>
   )
 })
-const DataPreliminary = memo(({ config, updateConfig, data }) => {
+const PreliminaryData = memo(({ config, updateConfig, data }) => {
   const getColumnOptions = () => {
     const keys = new Set()
     data.forEach(d => {
@@ -1401,7 +1401,7 @@ const EditorPanel = () => {
                   )}
                   {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
                   {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
-                  <DataPreliminary config={config} updateConfig={updateConfig} data={data} />
+                  <PreliminaryData config={config} updateConfig={updateConfig} data={data} />
                 </AccordionItemPanel>
               </AccordionItem>
             )}
