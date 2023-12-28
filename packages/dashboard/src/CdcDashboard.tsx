@@ -27,7 +27,7 @@ import CdcMarkupInclude from '@cdc/markup-include'
 import CdcFilteredText from '@cdc/filtered-text'
 
 import Grid from './components/Grid'
-import Header, { FilterBehavior } from './components/Header'
+import Header, { FilterBehavior } from './components/Header/Header'
 import defaults from './data/initial-state'
 import DataTable from '@cdc/core/components/DataTable'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -178,7 +178,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
         const notAllParentsSelected = params?.some(({ value }) => value === '')
         if (notAllParentsSelected) return // don't send request for dependent children filter options
         if (apiFilterDropdowns[_key] && !params && filter.filterBy === 'Query String') return // don't reload filter unless it's a child
-        const endpoint = baseEndpoint + (params ? gatherQueryParams(params) : '')
+        let endpoint = baseEndpoint + (params ? gatherQueryParams(params) : '')
+        console.log('filter.filterBy', filter.filterBy)
+        if (filter.filterBy === 'Parent Filter') {
+          let parentFilter = sharedAPIFilters.find(f => f.key === filter.parents)
+          // reset api endpoint
+          // Build API endpiont based on parent filter value
+          // ie. https://data.cdc.gov/resource/tajw-whir.json?$select=distinct%20county&geography=Nevada
+          endpoint = ''
+          endpoint = `${baseEndpoint}&${filter.queryParameter}=${parentFilter.active}`
+        }
+
         fetch(endpoint)
           .then(resp => resp.json())
           .then(data => {
