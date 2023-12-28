@@ -2,7 +2,7 @@ import { APIFilter } from './APIFilter'
 export type SharedFilter = {
   type?: 'urlfilter' | 'datafilter' | ''
   fileName: string
-  filterBy?: 'Query String' | 'File Name'
+  filterBy?: 'Query String' | 'File Name' | 'Parent Filter'
   queryParameter?: string
   active?: string
   usedBy?: string[]
