@@ -9,6 +9,7 @@ type LineChartContext = {
   formatNumber: Function
   handleLineType: Function
   isNumber: unknown
+  isDebug?: boolean
   parseDate: Function
   rawData: Object[]
   seriesHighlight: String[]
@@ -24,11 +25,12 @@ export type ChartContext =
       colorScale?: Function
       config?: ChartConfig
       dimensions: [screenWidth: number, screenHeight: number]
-
       formatDate?: Function
       formatNumber?: Function
       handleLineType?: Function
       isNumber?: boolean
+      // url param added to allow various console logs and chart helpers
+      isDebug?: boolean
       parseDate?: Function
       rawData?: Object[]
       seriesHighlight?: String[]

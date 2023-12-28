@@ -128,41 +128,6 @@
   },
   "orientation": "horizontal",
   "color": "pinkpurple",
-  "columns": {
-    "additionalColumn1": {
-      "label": "Estimate Field",
-      "dataTable": true,
-      "tooltips": true,
-      "prefix": "",
-      "suffix": "",
-      "forestPlot": false,
-      "startingPoint": "0",
-      "forestPlotAlignRight": false,
-      "name": "effect"
-    },
-    "additionalColumn2": {
-      "label": "Low",
-      "dataTable": true,
-      "tooltips": true,
-      "prefix": "",
-      "suffix": "",
-      "forestPlot": false,
-      "startingPoint": "0",
-      "forestPlotAlignRight": false,
-      "name": "low"
-    },
-    "additionalColumn3": {
-      "label": "High",
-      "dataTable": true,
-      "tooltips": true,
-      "prefix": "",
-      "suffix": "",
-      "forestPlot": false,
-      "startingPoint": "0",
-      "forestPlotAlignRight": false,
-      "name": "high"
-    }
-  },
   "legend": {
     "behavior": "isolate",
     "singleRow": false,

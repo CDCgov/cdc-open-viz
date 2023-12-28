@@ -547,11 +547,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.xAxis = newConfig.yAxis
       newConfig.runtime.yAxis = newConfig.xAxis
 
-      if (newConfig.visualizationType === 'Forest Plot') {
-        newConfig.runtime.xAxis.type = newConfig.forestPlot.type
-        newConfig.runtime.xAxis.tickRotation = newConfig.xAxis.tickRotation
-      }
-      newConfig.runtime.horizontal = true
+      newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'
     } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType)) {
       newConfig.runtime.xAxis = newConfig.xAxis
@@ -914,11 +910,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     }
 
+    const resolveBottomTickRounding = () => {
+      if (config.forestPlot.type === 'Logarithmic' && !bottomRoundTo) return 2
+      if (Number(bottomRoundTo)) return Number(bottomRoundTo)
+      return 0
+    }
+
     if (axis === 'bottom') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.bottomCommas ? true : false,
-        minimumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0,
-        maximumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0
+        minimumFractionDigits: resolveBottomTickRounding(),
+        maximumFractionDigits: resolveBottomTickRounding()
       }
     }
 
@@ -1136,7 +1138,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return key
   }
 
-  const computeMarginBottom = (config: Config): string => {
+  const computeMarginBottom = (config: Config, asNumber = false): string => {
     const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
     const isHorizontal = config.orientation === 'horizontal'
     const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
@@ -1188,6 +1190,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       bottom = isBrush ? brushHeight + -config.xAxis.size + config.xAxis.labelOffset : 0
     }
 
+    if (asNumber) return bottom
     return `${bottom}px`
   }
 
@@ -1214,7 +1217,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
             {/* Visualization */}
             {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
-            <div style={{ marginBottom: computeMarginBottom(config) }} className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
+            <div
+              style={{ marginBottom: computeMarginBottom(config) }}
+              className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')} ${isDebug ? 'debug' : ''}`}
+            >
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
 
@@ -1286,6 +1292,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const contextValues = {
     capitalize,
+    computeMarginBottom,
     getXAxisData,
     getYAxisData,
     config,
@@ -1328,7 +1335,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     isDebug,
     setSharedFilter,
     setSharedFilterValue,
-    dashboardConfig
+    dashboardConfig,
+    debugSvg: isDebug
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
