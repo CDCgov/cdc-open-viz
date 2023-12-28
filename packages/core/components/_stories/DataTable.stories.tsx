@@ -5,6 +5,8 @@ import './styles.scss'
 import Example_1 from './_mocks/dashboard_no_filter.json'
 import CityStateExample from './_mocks/example-city-state.json'
 import { displayGeoName } from '@cdc/map/src/helpers/displayGeoName'
+import rowTypeData from './_mocks/row_type.json'
+import { TableConfig } from '../DataTable/types/TableConfig'
 
 const meta: Meta<typeof DataTable> = {
   title: 'Components/Organisms/DataTable',
@@ -58,5 +60,44 @@ export const Grouped: Story = {
     groupBy: 'TimeZone',
     viewport: 'lg',
     tabbingId: datasetKey
+  }
+}
+
+export const RowType: Story = {
+  args: {
+    config: {
+      dashboard: {
+        theme: 'theme-blue',
+        title: 'ARDI'
+      },
+      title: 'ARDI',
+      dataUrl: '/examples/feature/__data__/ardi.json',
+      animate: false,
+      animateReplay: true,
+      palette: 'qualitative-soft',
+      aspectRatio: 1,
+      dataFormat: {
+        roundTo: 1,
+        commas: false,
+        prefix: '',
+        suffix: ''
+      },
+      legend: {
+        hide: false
+      },
+      table: {
+        label: 'Data Table',
+        expanded: true,
+        show: true,
+        showAllColumns: true
+      }
+    } as unknown as TableConfig,
+    dataConfig: { data: rowTypeData },
+    rawData: rowTypeData,
+    runtimeData: rowTypeData,
+    expandDataTable: true,
+    tableTitle: 'ARDI DataTable',
+    viewport: 'lg',
+    tabbingId: '#asdf'
   }
 }

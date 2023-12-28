@@ -1,4 +1,5 @@
 export type Table = {
+  cellMinWidth?: number
   label?: string
   show?: boolean
   showVertical?: boolean

@@ -104,6 +104,8 @@ export default function DataImport() {
             responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
           } else if (fileExtension === '.json' && responseBlob.type === 'text/plain') {
             responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
+          } else {
+            responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
           }
         })
     } catch (err) {
@@ -170,8 +172,7 @@ export default function DataImport() {
       }
 
       if (fileSourceType === 'url') {
-        let urlData = new URL(path, window.location.origin)
-        fileExtension = Object.keys(supportedDataTypes).find(extension => urlData.pathname.endsWith(extension))
+        return '.json'
       }
 
       return fileExtension

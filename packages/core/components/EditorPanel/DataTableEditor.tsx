@@ -15,13 +15,6 @@ interface DataTableProps {
 }
 
 const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard, isLoadedFromUrl }) => {
-  const onCheckChange =
-    (fieldName, section = null, subsection = null) =>
-    e => {
-      let val = e.target.checked
-      updateField(section, subsection, fieldName, val)
-    }
-
   return (
     <>
       <TextField
@@ -125,6 +118,10 @@ const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard,
       {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' section='table' updateField={updateField} />}
       <CheckBox value={config.table.download} fieldName='download' label='Show Download CSV Link' section='table' updateField={updateField} />
       <CheckBox value={config.table.showDownloadImgButton} fieldName='showDownloadImgButton' label='Display Image Button' section='table' updateField={updateField} />
+      <label>
+        <span className='edit-label column-heading'>Table Cell Min Width</span>
+        <input type='number' value={config.table.cellMinWidth ? config.table.cellMinWidth : 0} onChange={e => updateField('table', null, 'cellMinWidth', e.target.value)} />
+      </label>
     </>
   )
 }

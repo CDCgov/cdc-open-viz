@@ -1,4 +1,5 @@
 export const getDataSeriesColumns = (config, isVertical, runtimeData): string[] => {
+  if (config.table.showAllColumns) return runtimeData[0] ? Object.keys(runtimeData[0]) : []
   let tmpSeriesColumns
   if (config.visualizationType !== 'Pie') {
     tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey] : [] //, ...config.runtime.seriesLabelsAll

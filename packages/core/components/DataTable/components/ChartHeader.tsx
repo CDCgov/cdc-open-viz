@@ -3,11 +3,11 @@ import { getSeriesName } from '../helpers/getSeriesName'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import { DownIcon, UpIcon } from './Icons'
 
-type ChartHeaderProps = { data; isVertical; config; runtimeData; setSortBy; sortBy; groupBy? }
+type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; groupBy?; hasRowType? }
 
-const ChartHeader = ({ data, isVertical, config, runtimeData, setSortBy, sortBy, groupBy }: ChartHeaderProps) => {
+const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, hasRowType }: ChartHeaderProps) => {
   if (!data) return
-  let dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
+  let dataSeriesColumns = getDataSeriesColumns(config, isVertical, data)
   if (groupBy) {
     let groupHeaderRemoved = dataSeriesColumns.filter(col => col !== groupBy)
     if (groupHeaderRemoved.length != dataSeriesColumns.length) {
@@ -17,6 +17,14 @@ const ChartHeader = ({ data, isVertical, config, runtimeData, setSortBy, sortBy,
     }
   }
   if (isVertical) {
+    if (hasRowType) {
+      // find the row type column and place it at the beginning of the array
+      const rowTypeRegex = /row[_-]?type/i
+      const rowTypeIndex = dataSeriesColumns.findIndex(column => rowTypeRegex.test(column))
+      if (rowTypeIndex > -1) {
+        dataSeriesColumns.splice(rowTypeIndex, 1)
+      }
+    }
     return (
       <tr>
         {dataSeriesColumns.map((column, index) => {
@@ -54,9 +62,9 @@ const ChartHeader = ({ data, isVertical, config, runtimeData, setSortBy, sortBy,
     const sliceVal = config.visualizationType === 'Pie' ? 1 : 0
     return (
       <tr>
-        {['__series__', ...Object.keys(runtimeData)].slice(sliceVal).map((row, index) => {
+        {['__series__', ...Object.keys(data)].slice(sliceVal).map((row, index) => {
           let column = config.xAxis?.dataKey
-          let text = row !== '__series__' ? getChartCellValue(row, column, config, runtimeData) : '__series__'
+          let text = row !== '__series__' ? getChartCellValue(row, column, config, data) : '__series__'
           return (
             <th style={{minWidth: (config.table.cellMinWidth || 0) + 'px'}}
               key={`col-header-${text}__${index}`}
