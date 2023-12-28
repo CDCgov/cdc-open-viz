@@ -143,7 +143,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       let data: any[] = []
 
       try {
-        const ext = getFileExtension(dataUrl.pathname)
+        const ext = getFileExtension(dataUrl.href)
         if ('csv' === ext) {
           data = await fetch(dataUrlFinal)
             .then(response => response.text())
