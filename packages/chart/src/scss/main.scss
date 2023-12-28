@@ -1,7 +1,5 @@
 @import '@cdc/core/styles/base';
 @import '@cdc/core/styles/heading-colors';
-@import 'mixins';
-@import 'variables';
 @import '@cdc/core/styles/v2/themes/color-definitions';
 
 .form-container {
@@ -17,7 +15,6 @@
 
 .cdc-open-viz-module.type-chart {
   @import 'DataTable';
-  @import 'editor-panel';
 
   border-radius: 3px;
 
