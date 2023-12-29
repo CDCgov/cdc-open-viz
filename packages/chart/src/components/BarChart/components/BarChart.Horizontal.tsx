@@ -1,16 +1,16 @@
 import React, { useContext } from 'react'
-import ConfigContext from '../ConfigContext'
-import { useBarChart } from '../hooks/useBarChart'
+import ConfigContext from '../../../ConfigContext'
+import { useBarChart } from '../../../hooks/useBarChart'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
-import { useHighlightedBars } from '../hooks/useHighlightedBars'
+import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { FaStar } from 'react-icons/fa'
 
 // third party
 import chroma from 'chroma-js'
 
-import { type BarChartProps } from '../types/ChartProps'
+import { type BarChartProps } from '../../../types/ChartProps'
 
 export const BarChartHorizontal = (props: BarChartProps) => {
   const { xScale, yScale, yMax, seriesScale } = props

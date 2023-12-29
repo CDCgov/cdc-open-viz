@@ -1,7 +1,7 @@
 import React, { useContext, memo } from 'react'
 
 // cdc
-import ConfigContext from '../ConfigContext'
+import ConfigContext from '../../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 // visx & d3
