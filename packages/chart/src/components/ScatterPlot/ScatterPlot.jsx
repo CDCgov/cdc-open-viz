@@ -1,8 +1,8 @@
 import React, { useContext } from 'react'
-import ConfigContext from '../ConfigContext'
+import ConfigContext from '../../ConfigContext'
 import { Group } from '@visx/group'
 
-const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
+const ScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
   const { colorScale, transformedData: data, config, formatNumber, seriesHighlight, colorPalettes } = useContext(ConfigContext)
 
   // TODO: copied from line chart should probably be a constant somewhere.
@@ -48,4 +48,4 @@ const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
     </Group>
   )
 }
-export default CoveScatterPlot
+export default ScatterPlot

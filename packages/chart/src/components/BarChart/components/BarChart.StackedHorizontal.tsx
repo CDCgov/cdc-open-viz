@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
-import ConfigContext from '../ConfigContext'
-import { useBarChart } from '../hooks/useBarChart'
+import ConfigContext from '../../../ConfigContext'
+import { useBarChart } from '../../../hooks/useBarChart'
 import { BarStackHorizontal } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -8,7 +8,7 @@ import { Text } from '@visx/text'
 // third party
 import chroma from 'chroma-js'
 
-import { type BarChartProps } from '../types/ChartProps'
+import { type BarChartProps } from '../../../types/ChartProps'
 
 const BarChartStackedHorizontal = (props: BarChartProps) => {
   const { xScale, yScale, xMax, yMax } = props

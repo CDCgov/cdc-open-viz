@@ -9,11 +9,10 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 
 // CDC Components
-import AreaChart from './AreaChart'
-import AreaChartStacked from './AreaChart.Stacked'
+import { AreaChart, AreaChartStacked } from './AreaChart'
 import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
-import CoveBoxPlot from './BoxPlot'
+import BoxPlot from './BoxPlot'
 import ScatterPlot from './ScatterPlot'
 import DeviationBar from './DeviationBar'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -582,7 +581,7 @@ const LinearChart = props => {
               showTooltip={showTooltip}
             />
           )}
-          {visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
+          {visualizationType === 'Box Plot' && <BoxPlot xScale={xScale} yScale={yScale} />}
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'regular') || visualizationType === 'Combo') && (
             <AreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
           )}

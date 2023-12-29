@@ -13,8 +13,8 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { Select, TextField, CheckBox } from './Inputs'
 
 // chart components
-import ForestPlotSettings from '../ForestPlot/ForestPlotSettings'
-import Series from '../Series'
+import Panels from './components/Panels'
+import Series from './components/Panel.Series.jsx'
 
 // cdc additional
 import { useColorPalette } from '../../hooks/useColorPalette'
@@ -1153,7 +1153,7 @@ const EditorPanel = () => {
                 {visSupportsChartHeight() && config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
               </AccordionItemPanel>
             </AccordionItem>
-            {config.visualizationType === 'Forest Plot' && <ForestPlotSettings />}
+            {config.visualizationType === 'Forest Plot' && <Panels.ForestPlot editColumn={editColumn} setCategoryAxis={setCategoryAxis} />}
             {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && (
               <AccordionItem>
                 <AccordionItemHeading>
@@ -1176,7 +1176,7 @@ const EditorPanel = () => {
                       options={getColumns()}
                     />
                     {config.series && config.series.length !== 0 && (
-                      <Series.Wrapper getColumns={getColumns}>
+                      <Panels.Series.Wrapper getColumns={getColumns}>
                         <fieldset>
                           <legend className='edit-label float-left'>Displaying</legend>
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -1195,14 +1195,14 @@ const EditorPanel = () => {
                             {provided => {
                               return (
                                 <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
-                                  <Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
+                                  <Panels.Series.List series={config.series} getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} />
                                   {provided.placeholder}
                                 </ul>
                               )
                             }}
                           </Droppable>
                         </DragDropContext>
-                      </Series.Wrapper>
+                      </Panels.Series.Wrapper>
                     )}
                   </>
                   {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
@@ -2499,7 +2499,9 @@ const EditorPanel = () => {
                                 editColumn(val, 'name', event.target.value)
                               }}
                             >
-                              {getColumns().map(option => <option>{option}</option>)}
+                              {getColumns().map(option => (
+                                <option>{option}</option>
+                              ))}
                             </select>
                           </label>
                           <label>
@@ -2510,8 +2512,10 @@ const EditorPanel = () => {
                                 editColumn(val, 'series', event.target.value)
                               }}
                             >
-                              <option value="">Select series</option>
-                              {config.series.map(series => <option>{series.dataKey}</option>)}
+                              <option value=''>Select series</option>
+                              {config.series.map(series => (
+                                <option>{series.dataKey}</option>
+                              ))}
                             </select>
                           </label>
                           <TextField value={config.columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' updateField={updateField} />
