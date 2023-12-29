@@ -1,6 +1,6 @@
 import React from 'react'
 import chroma from 'chroma-js'
-import { type ChartConfig } from '../../types/ChartConfig'
+import { type ChartConfig } from '../../../types/ChartConfig'
 
 // todo: change this config obj to ChartConfig once its created
 type LineChartCircleProps = {

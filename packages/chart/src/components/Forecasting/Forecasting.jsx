@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 
 // cdc
-import ConfigContext from '../ConfigContext'
+import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart, sequentialPalettes } from '@cdc/core/data/colorPalettes'
 

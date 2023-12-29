@@ -8,7 +8,7 @@ import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
-import LineChartCircle from './LineChart.Circle'
+import LineChartCircle from './components/LineChart.Circle'
 
 // types
 import { type ChartContext } from '../../types/ChartContext'

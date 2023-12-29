@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import { BoxPlot } from '@visx/stats'
 import { Group } from '@visx/group'
-import ConfigContext from '../ConfigContext'
+import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
