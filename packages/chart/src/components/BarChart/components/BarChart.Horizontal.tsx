@@ -9,12 +9,12 @@ import { FaStar } from 'react-icons/fa'
 
 // third party
 import chroma from 'chroma-js'
+import BarChartContext, { BarChartContextValues } from './context'
+import { ChartContext } from '../../../types/ChartContext'
 
-import { type BarChartProps } from '../../../types/ChartProps'
-
-export const BarChartHorizontal = (props: BarChartProps) => {
-  const { xScale, yScale, yMax, seriesScale } = props
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getTextWidth, getYAxisData, getXAxisData } = useContext(ConfigContext)
+export const BarChartHorizontal = () => {
+  const { xScale, yScale, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getTextWidth, getYAxisData, getXAxisData } = useContext<ChartContext>(ConfigContext)
   const {
     isHorizontal,
     barBorderWidth,

@@ -1,5 +1,3 @@
-import React from 'react'
-
 import BarChartStackedVertical from './BarChart.StackedVertical'
 import BarChartStackedHorizontal from './BarChart.StackedHorizontal'
 import BarChartVertical from './BarChart.Vertical'
