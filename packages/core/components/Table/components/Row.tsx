@@ -3,14 +3,15 @@ import Cell from './Cell'
 
 type RowProps = {
   childRow: ReactNode[]
-  rowKey: string
+  rowKey: string,
+  cellMinWidth: Number
 }
 
-const Row = ({ childRow, rowKey }: RowProps) => {
+const Row = ({ childRow, rowKey, cellMinWidth }: RowProps) => {
   return (
     <tr>
       {childRow.map((child, i) => (
-        <Cell key={rowKey + '__' + i}>{child}</Cell>
+        <Cell key={rowKey + '__' + i} cellMinWidth={cellMinWidth}>{child}</Cell>
       ))}
     </tr>
   )

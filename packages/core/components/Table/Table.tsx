@@ -13,7 +13,8 @@ type TableProps = {
     className: string
     'aria-live'?: 'off' | 'assertive' | 'polite'
     hidden?: boolean
-    'aria-rowcount'?: number
+    'aria-rowcount'?: number,
+    cellMinWidth?: number
   }
 }
 
@@ -33,13 +34,13 @@ const Table = ({ childrenMatrix, tableName, caption, stickyHeader, headContent, 
               const rows = childrenMatrix[groupName].map((row, i) => {
                 colSpan = row.length
                 const key = `${tableName}-${groupName}-row-${i}`
-                return <Row key={key} rowKey={key} childRow={row} />
+                return <Row key={key} rowKey={key} childRow={row} cellMinWidth={tableOptions.cellMinWidth} />
               })
               return [<GroupRow label={groupName} colSpan={colSpan} key={`${tableName}-${groupName}`} />, ...rows]
             })
           : childrenMatrix.map((childRow, i) => {
               const key = `${tableName}-row-${i}`
-              return <Row key={key} rowKey={key} childRow={childRow} />
+              return <Row key={key} rowKey={key} childRow={childRow} cellMinWidth={tableOptions.cellMinWidth} />
             })}
       </tbody>
     </table>
