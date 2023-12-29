@@ -7,7 +7,7 @@ import { Bar } from '@visx/shape'
 // cdc
 import BarChartType from './BarChartType'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import ConfigContext from '../ConfigContext'
+import ConfigContext from '../../../ConfigContext'
 
 const BarChart = ({ xScale, yScale, seriesScale, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff, handleTooltipClick }) => {
   const { transformedData: data, config } = useContext(ConfigContext)

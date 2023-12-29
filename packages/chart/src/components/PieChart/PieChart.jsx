@@ -9,9 +9,9 @@ import { Text } from '@visx/text'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 
 // cove
-import ConfigContext from '../ConfigContext'
-import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
-import useIntersectionObserver from '../hooks/useIntersectionObserver'
+import ConfigContext from '../../ConfigContext'
+import { useTooltip as useCoveTooltip } from '../../hooks/useTooltip'
+import useIntersectionObserver from '../../hooks/useIntersectionObserver'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 const enterUpdateTransition = ({ startAngle, endAngle }) => ({
