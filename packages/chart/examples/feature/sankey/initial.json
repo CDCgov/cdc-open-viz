@@ -44,6 +44,7 @@
   },
   "visualizationType": "Sankey",
   "sankey": {
+    "name": "Outcomes of Emergency Medical Systems (EMS) Responses to Suicide-Related Calls, 2022",
     "data": {
       "links": [
         {
@@ -137,6 +138,23 @@
           "value": 0
         }
       ]
-    }
+    },
+    "storyNodeText": [
+      {
+        "StoryNode": "Suicide EMS Responses",
+        "segmentTextBefore": "In 2022, there were",
+        "segmentTextAfter": "Suicide EMS Responses"
+      },
+      {
+        "StoryNode": "Treated",
+        "segmentTextBefore": "of which,",
+        "segmentTextAfter": "were treated"
+      },
+      {
+        "StoryNode": "Transported to hospital",
+        "segmentTextBefore": "and",
+        "segmentTextAfter": "were transported\n to the hospital"
+      }
+    ]
   }
 }
