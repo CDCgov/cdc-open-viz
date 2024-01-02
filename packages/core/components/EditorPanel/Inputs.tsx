@@ -5,22 +5,27 @@ export type Input = {
   label: string
   tooltip?: any
   section?: any
+  placeholder?: string
   subsection?: any
-  updateField: Function
+  updateField?: Function
   fieldName?: string
 }
 
 export type TextFieldProps = {
-  value: string
-  type: 'text' | 'number' | 'textarea' | 'date'
+  className?: string
+  value: string | number
+  type?: 'text' | 'number' | 'textarea' | 'date'
   min?: number
+  max?: number
   i?: number
+  id?: string
 } & Input
 
 export type CheckboxProps = {
-  value?: string
+  value?: boolean
   min?: number
   i?: number
+  className?: string
 } & Input
 
 export type SelectProps = {
@@ -34,7 +39,7 @@ export type SelectProps = {
 } & Input
 
 const TextField = memo((props: TextFieldProps) => {
-  const { label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes } = props
+  const { label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'text', i = null, min = null, ...attributes } = props
   const [value, setValue] = useState(stateValue)
   const [debouncedValue] = useDebounce(value, 500)
 

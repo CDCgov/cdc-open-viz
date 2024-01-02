@@ -4,6 +4,6 @@ export type Runtime = {
     name: string
     axis: string
   }
-  seriesKeys: []
+  seriesKeys: any[]
   editorErrorMessage: string
 }
