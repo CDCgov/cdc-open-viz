@@ -1,5 +1,10 @@
 import { type ChartConfig } from './ChartConfig'
 
+type TransformedData = {
+  dataKey?: string
+  [key: string]: any
+}
+
 // Line Chart Specific Context
 type LineChartContext = {
   colorScale: Function
@@ -14,7 +19,7 @@ type LineChartContext = {
   rawData: Object[]
   seriesHighlight: String[]
   tableData: Object[]
-  transformedData: Object[]
+  transformedData: TransformedData[]
   updateConfig: Function
   visualizationType: 'Line'
 }
@@ -35,7 +40,7 @@ export type ChartContext =
       rawData?: Object[]
       seriesHighlight?: String[]
       tableData?: Object[]
-      transformedData?: Object[]
+      transformedData?: TransformedData[]
       setSharedFilter?: Function
       sharedFilterValue?: string
       updateConfig?: Function

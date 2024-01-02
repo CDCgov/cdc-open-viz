@@ -192,6 +192,7 @@ const DataTable = (props: DataTableProps) => {
           <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           <div className='table-container' style={limitHeight}>
             <Table
+              wrapColumns={wrapColumns}
               childrenMatrix={boxplotCellMatrix({ rows: tableData, config })}
               tableName={config.visualizationType}
               caption={caption}
