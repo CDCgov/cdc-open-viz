@@ -29,6 +29,7 @@ export default {
     right: 5
   },
   suppressedData: [],
+  preliminaryData: [],
 
   yAxis: {
     hideAxis: false,

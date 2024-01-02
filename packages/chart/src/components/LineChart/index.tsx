@@ -9,6 +9,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
 import LineChartCircle from './LineChart.Circle'
+import { splitData, filterCircles } from './helpers'
 
 // types
 import { type ChartContext } from '../../types/ChartContext'
@@ -41,6 +42,7 @@ const LineChart = (props: LineChartProps) => {
     tableData,
     transformedData: data,
     updateConfig,
+    rawData
   } = useContext<ChartContext>(ConfigContext)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
   if (!handleTooltipMouseOver) return
@@ -59,6 +61,8 @@ const LineChart = (props: LineChartProps) => {
           const seriesAxis = seriesData[0].axis ? seriesData[0].axis : 'left'
 
           let displayArea = legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
+          const segments = splitData(seriesKey, rawData, config)
+          const circleData = filterCircles(config.preliminaryData, rawData, seriesKey)
 
           return (
             <Group
@@ -93,6 +97,7 @@ const LineChart = (props: LineChartProps) => {
 
                       {(lineDatapointStyle === 'hidden' || lineDatapointStyle === 'always show') && (
                         <LineChartCircle
+                          circleData={circleData}
                           data={data}
                           d={d}
                           config={config}
@@ -114,23 +119,42 @@ const LineChart = (props: LineChartProps) => {
               })}
               <>
                 {lineDatapointStyle === 'hover' && (
-                  <LineChartCircle data={data} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />
+                  <LineChartCircle circleData={circleData} data={data} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />
                 )}
               </>
               {/* STANDARD LINE */}
-              <LinePath
-                curve={allCurves[seriesData[0].lineType]}
-                data={data}
-                x={d => xScale(getXAxisData(d))}
-                y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
-                stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
-                strokeWidth={2}
-                strokeOpacity={1}
-                strokeDasharray={lineType ? handleLineType(lineType) : 0}
-                defined={(item, i) => {
-                  return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
-                }}
-              />
+              {segments.map((segment, index) => {
+                return (
+                  <LinePath
+                    key={index}
+                    curve={allCurves[seriesData[0].lineType]}
+                    data={segment.data}
+                    x={d => xScale(getXAxisData(d))}
+                    y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
+                    stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
+                    strokeWidth={2}
+                    strokeOpacity={1}
+                    strokeDasharray={segment.dashed && segment.lineType ? handleLineType(segment.lineType) : lineType ? handleLineType(lineType) : 0}
+                    defined={(item, i) => {
+                      return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                    }}
+                  />
+                )
+              })}
+              {/* circles for preliminaryData data */}
+              {circleData.map((d, i) => {
+                return (
+                  <circle
+                    key={i}
+                    cx={xScale(getXAxisData(d))}
+                    cy={yScale(getYAxisData(d, seriesKey))}
+                    r={4.5} // Radius of the circle
+                    stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
+                    fill='transparent' // Fill color of the circle
+                  />
+                )
+              })}
+
               {/* ANIMATED LINE */}
               {config.animate && (
                 <LinePath

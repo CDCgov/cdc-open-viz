@@ -108,6 +108,95 @@ const DataSuppression = memo(({ config, updateConfig, data }: any) => {
     </>
   )
 })
+const PreliminaryData = memo(({ config, updateConfig, data }) => {
+  const getColumnOptions = () => {
+    const keys = new Set()
+    data.forEach(d => {
+      Object.keys(d).forEach(key => {
+        keys.add(key)
+      })
+    })
+    return [...keys]
+  }
+  const getTypeOptions = () => {
+    if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
+      return ['suppression', 'effect']
+    } else {
+      return ['suppression']
+    }
+  }
+
+  const getStyleOptions = () => {
+    if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
+      return ['Dashed Small', 'Dashed Medium', 'Dashed Large', 'Open Circles']
+    }
+    if (config.visualizationType === 'Bar') {
+      return ['star']
+    }
+  }
+
+  let removeColumn = i => {
+    let preliminaryData = []
+
+    if (config.preliminaryData) {
+      preliminaryData = [...config.preliminaryData]
+    }
+
+    preliminaryData.splice(i, 1)
+
+    updateConfig({ ...config, preliminaryData })
+  }
+
+  let addColumn = () => {
+    let preliminaryData = config.preliminaryData ? [...config.preliminaryData] : []
+    preliminaryData.push({ type: '', label: '', column: '', value: '', style: '' })
+    updateConfig({ ...config, preliminaryData })
+  }
+
+  let update = (fieldName, value, i) => {
+    let preliminaryData = []
+
+    if (config.preliminaryData) {
+      preliminaryData = [...config.preliminaryData]
+    }
+
+    preliminaryData[i][fieldName] = value
+    updateConfig({ ...config, preliminaryData })
+  }
+
+  return (
+    <>
+      {config.preliminaryData &&
+        config.preliminaryData.map(({ seriesKey, type, label, column, value, style }, i) => {
+          return (
+            <div key={`preliminaryData-${i}`} className='edit-block'>
+              <button
+                type='button'
+                className='remove-column'
+                onClick={event => {
+                  event.preventDefault()
+                  removeColumn(i)
+                }}
+              >
+                Remove
+              </button>
+              <Select value={type} initial='Select' fieldName='type' label='Type' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
+              <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='Data Series' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
+              <Select value={column} initial='Select' fieldName='column' label='Column' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
+              <TextField value={value} fieldName='value' label='Value' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
+              <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions()} />
+
+              <TextField value={label} fieldName='label' label='Label' placeholder='suppressed' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
+            </div>
+          )
+        })}
+
+      <button type='button' onClick={addColumn} className='btn full-width'>
+        {config.visualizationType === 'Line' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Line/Bar'}
+      </button>
+    </>
+  )
+})
 
 const Regions = memo(({ config, updateConfig }: { config: ChartConfig; updateConfig: Function }) => {
   let regionUpdate = (fieldName, value, i) => {
@@ -1216,6 +1305,7 @@ const EditorPanel = () => {
                   )}
                   {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
                   {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
+                  <PreliminaryData config={config} updateConfig={updateConfig} data={data} />
                 </AccordionItemPanel>
               </AccordionItem>
             )}
