@@ -1,19 +1,17 @@
 import React, { useContext, memo, useState, useEffect } from 'react'
-import ConfigContext from '../../ConfigContext'
+import ConfigContext from '../../../ConfigContext'
 import { useDebounce } from 'use-debounce'
-import WarningImage from '../../images/warning.svg'
+import WarningImage from '../../../images/warning.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
-import { type ChartContext } from '../../types/ChartContext'
+import { type ChartContext } from '../../../types/ChartContext'
 import { Select, CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
-type ForestPlotSettingsProps = {
-  // Fn for editing columns, used here for updating the datatable property.
-  editColumn: Function
-}
+type ForestPlotSettingsProps = {}
 
+// TODO: Rename to panel?
 const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
   const { config, rawData: unfilteredData, updateConfig } = useContext<ChartContext>(ConfigContext)
 
@@ -151,7 +149,7 @@ const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
       </AccordionItemHeading>
       <AccordionItemPanel>
         <Select
-          value={config.xAxis.dataKey || setCategoryAxis() || ''}
+          value={config.xAxis.dataKey || ''}
           section='xAxis'
           fieldName='dataKey'
           label='Study Column'

@@ -16,12 +16,12 @@ import chroma from 'chroma-js'
 
 // Primary Components
 import ConfigContext from './ConfigContext'
-import PieChart from './components/PieChart'
+import PieChart from './components/PieChart/PieChart'
 import LinearChart from './components/LinearChart'
 
 import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 
-import SparkLine from './components/SparkLine'
+import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'

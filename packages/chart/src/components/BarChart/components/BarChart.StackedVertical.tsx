@@ -1,13 +1,13 @@
 import React, { useContext } from 'react'
-import ConfigContext from '../ConfigContext'
-import { useBarChart } from '../hooks/useBarChart'
+import ConfigContext from '../../../ConfigContext'
+import { useBarChart } from '../../../hooks/useBarChart'
 import { BarStack } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
-import { type BarChartProps } from '../types/ChartProps'
+import BarChartContext from './context'
 
-const BarChartStackedVertical = (props: BarChartProps) => {
-  const { xScale, yScale, xMax, yMax } = props
+const BarChartStackedVertical = () => {
+  const { xScale, yScale, xMax, yMax } = useContext(BarChartContext)
   const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
   const { isHorizontal, barBorderWidth, applyRadius, hoveredBar, getAdditionalColumn, onMouseLeaveBar, onMouseOverBar } = useBarChart()
   const { orientation } = config
