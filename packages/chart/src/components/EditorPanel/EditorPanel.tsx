@@ -3245,6 +3245,22 @@ const EditorPanel = () => {
                   {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' updateField={updateField} />}
                   <CheckBox value={config.table.download} section='table' fieldName='download' label='Show Download CSV Link' updateField={updateField} />
                   <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} />
+                  <label>
+                    <span className='edit-label column-heading'>Table Cell Min Width</span>
+                    <input
+                      type='number'
+                      value={config.table.cellMinWidth ? config.table.cellMinWidth : 0}
+                      onChange={e =>
+                        updateConfig({
+                          ...config,
+                          table: {
+                            ...config.table,
+                            cellMinWidth: e.target.value
+                          }
+                        })
+                      }
+                    />
+                  </label>
                   {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
                 </AccordionItemPanel>
               </AccordionItem>

@@ -10,7 +10,8 @@ export type TableConfig = {
     limitHeight: boolean
     height: string | number
     caption: string
-    download: boolean
+    download: boolean,
+    cellMinWidth?: number
   }
   xAxis?: Axis
   yAxis?: Axis
