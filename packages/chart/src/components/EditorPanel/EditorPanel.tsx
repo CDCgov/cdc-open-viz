@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
@@ -10,7 +10,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
-import { Select, TextField, CheckBox } from './Inputs'
+import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 
 // chart components
 import Panels from './components/Panels'
@@ -31,8 +31,10 @@ import { type ChartConfig } from '../../types/ChartConfig'
 import { type ChartContext } from '../../types/ChartContext'
 
 import './editor-panel.scss'
+import { Anchor } from '@cdc/core/types/Axis'
+import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 
-const DataSuppression = memo(({ config, updateConfig, data }) => {
+const DataSuppression = memo(({ config, updateConfig, data }: any) => {
   const getColumnOptions = () => {
     const keys = new Set()
     data.forEach(d => {
@@ -102,6 +104,95 @@ const DataSuppression = memo(({ config, updateConfig, data }) => {
 
       <button type='button' onClick={addColumn} className='btn full-width'>
         Add Suppression Class
+      </button>
+    </>
+  )
+})
+const PreliminaryData = memo(({ config, updateConfig, data }) => {
+  const getColumnOptions = () => {
+    const keys = new Set()
+    data.forEach(d => {
+      Object.keys(d).forEach(key => {
+        keys.add(key)
+      })
+    })
+    return [...keys]
+  }
+  const getTypeOptions = () => {
+    if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
+      return ['suppression', 'effect']
+    } else {
+      return ['suppression']
+    }
+  }
+
+  const getStyleOptions = () => {
+    if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
+      return ['Dashed Small', 'Dashed Medium', 'Dashed Large', 'Open Circles']
+    }
+    if (config.visualizationType === 'Bar') {
+      return ['star']
+    }
+  }
+
+  let removeColumn = i => {
+    let preliminaryData = []
+
+    if (config.preliminaryData) {
+      preliminaryData = [...config.preliminaryData]
+    }
+
+    preliminaryData.splice(i, 1)
+
+    updateConfig({ ...config, preliminaryData })
+  }
+
+  let addColumn = () => {
+    let preliminaryData = config.preliminaryData ? [...config.preliminaryData] : []
+    preliminaryData.push({ type: '', label: '', column: '', value: '', style: '' })
+    updateConfig({ ...config, preliminaryData })
+  }
+
+  let update = (fieldName, value, i) => {
+    let preliminaryData = []
+
+    if (config.preliminaryData) {
+      preliminaryData = [...config.preliminaryData]
+    }
+
+    preliminaryData[i][fieldName] = value
+    updateConfig({ ...config, preliminaryData })
+  }
+
+  return (
+    <>
+      {config.preliminaryData &&
+        config.preliminaryData.map(({ seriesKey, type, label, column, value, style }, i) => {
+          return (
+            <div key={`preliminaryData-${i}`} className='edit-block'>
+              <button
+                type='button'
+                className='remove-column'
+                onClick={event => {
+                  event.preventDefault()
+                  removeColumn(i)
+                }}
+              >
+                Remove
+              </button>
+              <Select value={type} initial='Select' fieldName='type' label='Type' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
+              <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='Data Series' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
+              <Select value={column} initial='Select' fieldName='column' label='Column' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
+              <TextField value={value} fieldName='value' label='Value' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
+              <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions()} />
+
+              <TextField value={label} fieldName='label' label='Label' placeholder='suppressed' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
+            </div>
+          )
+        })}
+
+      <button type='button' onClick={addColumn} className='btn full-width'>
+        {config.visualizationType === 'Line' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Line/Bar'}
       </button>
     </>
   )
@@ -786,7 +877,7 @@ const EditorPanel = () => {
   }
 
   const validateMinValue = () => {
-    const enteredValue = config[section].min
+    const enteredValue = parseFloat(config[section].min)
     let minVal = Number(minValue)
     let message = ''
 
@@ -794,19 +885,19 @@ const EditorPanel = () => {
       case config.useLogScale && ['Line', 'Combo', 'Bar'].includes(config.visualizationType) && enteredValue < 0:
         message = 'Negative numbers are not supported in logarithmic scale'
         break
-      case (config.visualizationType === 'Line' || config.visualizationType === 'Spark Line') && enteredValue && parseFloat(enteredValue) > minVal:
+      case (config.visualizationType === 'Line' || config.visualizationType === 'Spark Line') && enteredValue > minVal:
         message = 'Value should not exceed ' + minValue
         break
-      case config.visualizationType === 'Combo' && isAllLine && enteredValue && parseFloat(enteredValue) > minVal:
+      case config.visualizationType === 'Combo' && isAllLine && enteredValue > minVal:
         message = 'Value should not exceed ' + minValue
         break
-      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
+      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && minVal > 0 && enteredValue > 0:
         message = config.useLogScale ? 'Value must be equal to 0' : 'Value must be less than or equal to 0'
         break
-      case config.visualizationType === 'Deviation Bar' && parseFloat(enteredValue) >= Math.min(minVal, config.xAxis.target):
+      case config.visualizationType === 'Deviation Bar' && enteredValue >= Math.min(minVal, config.xAxis.target):
         message = 'Value must be less than ' + Math.min(minVal, config.xAxis.target)
         break
-      case config.visualizationType !== 'Deviation Bar' && enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
+      case config.visualizationType !== 'Deviation Bar' && enteredValue && minVal < 0 && enteredValue > minVal:
         message = 'Value should not exceed ' + minValue
         break
       default:
@@ -1018,7 +1109,7 @@ const EditorPanel = () => {
       {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'}${isDashboard ? ' dashboard' : ''}`}>
-        <div aria-level='2' role='heading' className='heading-2'>
+        <div aria-level={2} role='heading' className='heading-2'>
           Configure Chart
         </div>
         <section className='form-container'>
@@ -1214,6 +1305,7 @@ const EditorPanel = () => {
                   )}
                   {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
                   {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
+                  <PreliminaryData config={config} updateConfig={updateConfig} data={data} />
                 </AccordionItemPanel>
               </AccordionItem>
             )}
@@ -1391,7 +1483,7 @@ const EditorPanel = () => {
                         <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                       )}
                       <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
-                      {config.visualizationType === 'Paired Bar' && <TextField value={config.yAxis.tickRotation || 0} type='number' min='0' section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                      {config.visualizationType === 'Paired Bar' && <TextField value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       <TextField
                         value={config.yAxis.size}
                         type='number'
@@ -1412,12 +1504,12 @@ const EditorPanel = () => {
                         }
                       />
                       {config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
-                      {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation} type='number' min='0' section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                      {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       {config.isResponsiveTicks && config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && (
                         <TextField
                           value={config.xAxis.maxTickRotation}
                           type='number'
-                          min='0'
+                          min={0}
                           section='xAxis'
                           fieldName='maxTickRotation'
                           label='Max Tick Rotation'
@@ -1647,7 +1739,7 @@ const EditorPanel = () => {
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.yAxis.anchors]
-                          anchors.push({})
+                          anchors.push({} as Anchor)
                           updateConfig({
                             ...config,
                             yAxis: {
@@ -1773,7 +1865,7 @@ const EditorPanel = () => {
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.xAxis.anchors]
-                          anchors.push({})
+                          anchors.push({} as Anchor)
                           updateConfig({
                             ...config,
                             xAxis: {
@@ -1937,8 +2029,7 @@ const EditorPanel = () => {
                                   <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
-                                  {config.visualizationType !== 'Pie' && <p>Enter a data suffix (such as "%"), if applicable.</p>}
+                                  <p>Enter a data suffix (such as "%"), if applicable.</p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
@@ -1956,8 +2047,7 @@ const EditorPanel = () => {
                                   <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
-                                  {config.visualizationType !== 'Pie' && <p>Enter a data suffix (such as "%"), if applicable.</p>}
+                                  <p>Enter a data suffix (such as "%"), if applicable.</p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
@@ -2053,8 +2143,8 @@ const EditorPanel = () => {
                         </>
                       )}
 
-                      {visSupportsDateCategoryNumTicks() && <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min='1' section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />}
-                      {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.size} type='number' min='0' section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
+                      {visSupportsDateCategoryNumTicks() && <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />}
+                      {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.size} type='number' min={0} section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                       {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
@@ -2066,13 +2156,13 @@ const EditorPanel = () => {
                       )}
                       {visSupportsResponsiveTicks() && config.orientation === 'vertical' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
                       {(config.orientation === 'horizontal' || !config.isResponsiveTicks) && visSupportsDateCategoryTickRotation() && (
-                        <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />
+                        <TextField value={config.xAxis.tickRotation} type='number' min={0} section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />
                       )}
                       {config.orientation === 'vertical' && config.isResponsiveTicks && config.visualizationType !== 'Paired Bar' && (
                         <TextField
                           value={config.xAxis.maxTickRotation}
                           type='number'
-                          min='0'
+                          min={0}
                           section='xAxis'
                           fieldName='maxTickRotation'
                           label='Max Tick Rotation'
@@ -2305,7 +2395,7 @@ const EditorPanel = () => {
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.xAxis.anchors]
-                          anchors.push({})
+                          anchors.push({} as Anchor)
                           updateConfig({
                             ...config,
                             xAxis: {
@@ -2431,7 +2521,7 @@ const EditorPanel = () => {
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.yAxis.anchors]
-                          anchors.push({})
+                          anchors.push({} as Anchor)
                           updateConfig({
                             ...config,
                             yAxis: {
@@ -2652,20 +2742,18 @@ const EditorPanel = () => {
                             >
                               Remove
                             </button>
-                            <label>
-                              <span className='edit-label column-heading'>Category</span>
-                              <TextField
-                                value={val}
-                                section='legend'
-                                subsection={null}
-                                fieldName='additionalCategories'
-                                updateField={(section, subsection, fieldName, value) => {
-                                  const updatedAdditionaCategories = [...config.legend.additionalCategories]
-                                  updatedAdditionaCategories[i] = value
-                                  updateField(section, subsection, fieldName, updatedAdditionaCategories)
-                                }}
-                              />
-                            </label>
+                            <TextField
+                              value={val}
+                              label='Category'
+                              section='legend'
+                              subsection={null}
+                              fieldName='additionalCategories'
+                              updateField={(section, subsection, fieldName, value) => {
+                                const updatedAdditionaCategories = [...config.legend.additionalCategories]
+                                updatedAdditionaCategories[i] = value
+                                updateField(section, subsection, fieldName, updatedAdditionaCategories)
+                              }}
+                            />
                           </fieldset>
                         ))}
                       <button
@@ -2800,7 +2888,7 @@ const EditorPanel = () => {
                                 }}
                               >
                                 <option value=''>- Select Option -</option>
-                                {getFilters(true).map((dataKey, index) => (
+                                {getFilters().map((dataKey, index) => (
                                   <option value={dataKey} key={index}>
                                     {dataKey}
                                   </option>
@@ -2866,7 +2954,7 @@ const EditorPanel = () => {
                                             <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
                                               {(provided, snapshot) => (
                                                 <li>
-                                                  <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                  <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                                     {value}
                                                   </div>
                                                 </li>
@@ -3096,9 +3184,9 @@ const EditorPanel = () => {
                     />
                   </>
                 )}
-                {visSupportsBarThickness() && config.orientation === 'horizontal' && !config.isLollipopChart && config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label=' Bar Thickness' updateField={updateField} min='15' />}
+                {visSupportsBarThickness() && config.orientation === 'horizontal' && !config.isLollipopChart && config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label=' Bar Thickness' updateField={updateField} min={15} />}
                 {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') && <TextField value={config.barThickness} type='number' fieldName='barThickness' label='Bar Thickness' updateField={updateField} />}
-                {visSupportsBarSpace() && <TextField type='number' value={config.barSpace || '15'} fieldName='barSpace' label='Bar Space' updateField={updateField} min='0' />}
+                {visSupportsBarSpace() && <TextField type='number' value={config.barSpace || '15'} fieldName='barSpace' label='Bar Space' updateField={updateField} min={0} />}
                 {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.topAxis.hasLine} section='topAxis' fieldName='hasLine' label='Add Top Axis Line' updateField={updateField} />}
 
                 {config.visualizationType === 'Spark Line' && (
@@ -3251,6 +3339,22 @@ const EditorPanel = () => {
                   {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' updateField={updateField} />}
                   <CheckBox value={config.table.download} section='table' fieldName='download' label='Show Download CSV Link' updateField={updateField} />
                   <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} />
+                  <label>
+                    <span className='edit-label column-heading'>Table Cell Min Width</span>
+                    <input
+                      type='number'
+                      value={config.table.cellMinWidth ? config.table.cellMinWidth : 0}
+                      onChange={e =>
+                        updateConfig({
+                          ...config,
+                          table: {
+                            ...config.table,
+                            cellMinWidth: e.target.value
+                          }
+                        })
+                      }
+                    />
+                  </label>
                   {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
                 </AccordionItemPanel>
               </AccordionItem>

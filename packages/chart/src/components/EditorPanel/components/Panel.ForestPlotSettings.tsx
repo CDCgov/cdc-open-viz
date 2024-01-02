@@ -5,7 +5,8 @@ import WarningImage from '../../../images/warning.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { type ChartContext } from '../../../types/ChartContext'
-import { Select, CheckBox, TextField } from '../Inputs'
+import { Select, CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
 type ForestPlotSettingsProps = {}
