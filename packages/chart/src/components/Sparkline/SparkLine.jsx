@@ -11,9 +11,9 @@ import { MarkerArrow } from '@visx/marker'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
-import useReduceData from '../hooks/useReduceData'
+import useReduceData from '../../hooks/useReduceData'
 
-import ConfigContext from '../ConfigContext'
+import ConfigContext from '../../ConfigContext'
 
 const SparkLine = props => {
   const { width: parentWidth, height: parentHeight } = props

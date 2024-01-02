@@ -1,26 +1,38 @@
-import React, { useContext, useState, useEffect } from 'react'
-import ConfigContext from '../ConfigContext'
-import { type ChartContext } from '../types/ChartContext'
-import { useBarChart } from '../hooks/useBarChart'
+import React, { useContext, useState } from 'react'
+import ConfigContext from '../../../ConfigContext'
+import { type ChartContext } from '../../../types/ChartContext'
+import { useBarChart } from '../../../hooks/useBarChart'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
-import { useHighlightedBars } from '../hooks/useHighlightedBars'
+import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { FaStar } from 'react-icons/fa'
 
 // third party
 import chroma from 'chroma-js'
+import BarChartContext, { type BarChartContextValues } from './context'
 
-import { type BarChartProps } from '../types/ChartProps'
-import { add } from 'lodash'
-
-export const BarChartVertical = (props: BarChartProps) => {
-  const { xScale, yScale, xMax, yMax, seriesScale } = props
+export const BarChartVertical = () => {
+  const { xScale, yScale, xMax, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
 
   const [barWidth, setBarWidth] = useState(0)
   const [totalBarsInGroup, setTotalBarsInGroup] = useState(0)
 
-  const { barBorderWidth, hasMultipleSeries, applyRadius, updateBars, assignColorsToValues, section, lollipopBarWidth, lollipopShapeSize, getHighlightedBarColorByValue, getHighlightedBarByValue, generateIconSize, getAdditionalColumn, hoveredBar, onMouseOverBar, onMouseLeaveBar } = useBarChart()
+  // prettier-ignore
+  const {
+    applyRadius,
+    assignColorsToValues,
+    barBorderWidth,
+    generateIconSize,
+    getAdditionalColumn,
+    getHighlightedBarByValue,
+    getHighlightedBarColorByValue,
+    lollipopBarWidth,
+    lollipopShapeSize,
+    onMouseLeaveBar,
+    onMouseOverBar,
+    section
+  } = useBarChart()
 
   // prettier-ignore
   const {
@@ -34,13 +46,9 @@ export const BarChartVertical = (props: BarChartProps) => {
     isNumber,
     parseDate,
     seriesHighlight,
-    setSeriesHighlight,
     setSharedFilter,
     transformedData,
-    updateConfig
   } = useContext<ChartContext>(ConfigContext)
-
-  const { runtime } = config
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
@@ -113,7 +121,7 @@ export const BarChartVertical = (props: BarChartProps) => {
                   const tooltip = `<ul>
                   <li class="tooltip-heading">${xAxisTooltip}</li>
                   <li class="tooltip-body ">${tooltipBody}</li>
-                  ${additionalColTooltip ? ('<li class="tooltip-body ">' + additionalColTooltip + '</li>') : ''}
+                  ${additionalColTooltip ? '<li class="tooltip-body ">' + additionalColTooltip + '</li>' : ''}
                     </li></ul>`
 
                   // configure colors

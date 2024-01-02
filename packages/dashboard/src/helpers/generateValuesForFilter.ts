@@ -1,4 +1,4 @@
-import { FilterBehavior } from '../components/Header'
+import { FilterBehavior } from '../components/Header/Header'
 
 // Gets filter values from API response
 export const generateValuesForAPIFilter = (columnName, _data): string[] => {

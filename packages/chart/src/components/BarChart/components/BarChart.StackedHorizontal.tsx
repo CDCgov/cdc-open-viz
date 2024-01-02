@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
-import ConfigContext from '../ConfigContext'
-import { useBarChart } from '../hooks/useBarChart'
+import ConfigContext from '../../../ConfigContext'
+import { useBarChart } from '../../../hooks/useBarChart'
 import { BarStackHorizontal } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -8,12 +8,42 @@ import { Text } from '@visx/text'
 // third party
 import chroma from 'chroma-js'
 
-import { type BarChartProps } from '../types/ChartProps'
+// types
+import BarChartContext, { type BarChartContextValues } from './context'
+import { type ChartContext } from '../../../types/ChartContext'
 
-const BarChartStackedHorizontal = (props: BarChartProps) => {
-  const { xScale, yScale, xMax, yMax } = props
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, animatedChart, getTextWidth, setSeriesHighlight } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, hasMultipleSeries, applyRadius, updateBars, isLabelBelowBar, displayNumbersOnBar, fontSize, getAdditionalColumn, hoveredBar, onMouseLeaveBar, onMouseOverBar } = useBarChart()
+const BarChartStackedHorizontal = () => {
+  const { yMax, yScale, xScale } = useContext<BarChartContextValues>(BarChartContext)
+
+  // prettier-ignore
+  const {
+    animatedChart,
+    colorScale,
+    config,
+    formatDate,
+    formatNumber,
+    getTextWidth,
+    parseDate,
+    seriesHighlight,
+    setSharedFilter,
+    transformedData: data
+  } = useContext<ChartContext>(ConfigContext)
+
+  // prettier-ignore
+  const {
+    applyRadius,
+    barBorderWidth,
+    displayNumbersOnBar,
+    fontSize,
+    getAdditionalColumn,
+    hoveredBar,
+    isHorizontal,
+    isLabelBelowBar,
+    onMouseLeaveBar,
+    onMouseOverBar,
+    updateBars
+  } = useBarChart()
+
   const { orientation, visualizationSubType } = config
 
   return (

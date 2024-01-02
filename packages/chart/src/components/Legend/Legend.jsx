@@ -1,22 +1,15 @@
 import React, { useContext, useEffect } from 'react'
-import ConfigContext from '../ConfigContext'
+import ConfigContext from '../../ConfigContext'
 import parse from 'html-react-parser'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 
-import useLegendClasses from './../hooks/useLegendClasses'
-import { useHighlightedBars } from '../hooks/useHighlightedBars'
+import useLegendClasses from '../../hooks/useLegendClasses'
+import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { Line } from '@visx/shape'
 import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
 import { scaleOrdinal } from '@visx/scale'
 import { FaStar } from 'react-icons/fa'
-
-// * FILE REVIEW *
-// TODO: fix eslint-disable jsxa11y issues
-
-// * ADDITIONAL NOTES *
-// > recently removed dynamic legend items as they weren't used
-// > recently removed boxplots, they don't provide any legend settings
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const Legend = () => {
