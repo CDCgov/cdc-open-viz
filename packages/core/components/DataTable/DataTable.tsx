@@ -159,7 +159,7 @@ const DataTable = (props: DataTableProps) => {
               caption={caption}
               stickyHeader
               headContent={config.type === 'map' ? <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} /> : <ChartHeader data={runtimeData} {...props} isVertical={isVertical} sortBy={sortBy} setSortBy={setSortBy} />}
-              tableOptions={{ className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`, 'aria-live': 'assertive', 'aria-rowcount': config?.data?.length ? config.data.length : -1, hidden: !expanded }}
+              tableOptions={{ className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`, 'aria-live': 'assertive', 'aria-rowcount': config?.data?.length ? config.data.length : -1, hidden: !expanded, cellMinWidth: config.table.cellMinWidth }}
             />
 
             {/* REGION Data Table */}
