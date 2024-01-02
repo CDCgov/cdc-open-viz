@@ -572,6 +572,37 @@ const EditorPanel = () => {
     updateConfig({ ...config }, newData)
   }
 
+  const removeSeries = seriesKey => {
+    let series = [...config.series]
+    let seriesIndex = -1
+
+    for (let i = 0; i < series.length; i++) {
+      if (series[i].dataKey === seriesKey) {
+        seriesIndex = i
+        break
+      }
+    }
+
+    if (seriesIndex !== -1) {
+      series.splice(seriesIndex, 1)
+
+      let newConfig = { ...config, series }
+
+      if (series.length === 0) {
+        delete newConfig.series
+      }
+
+      updateConfig(newConfig)
+    }
+
+    if (config.visualizationType === 'Paired Bar') {
+      updateConfig({
+        ...config,
+        series: []
+      })
+    }
+  }
+
   const addNewExclusion = exclusionKey => {
     let newExclusion = [...config.exclusions.keys]
     newExclusion.push(exclusionKey)
@@ -914,6 +945,141 @@ const EditorPanel = () => {
 
   const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting']
 
+  const columnsOptions = [
+    <option value='' key={'Select Option'}>
+      - Select Option -
+    </option>
+  ]
+
+  if (config.data && config.series) {
+    Object.keys(config.data?.[0] || []).map(colName => {
+      // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
+      const found = config?.series.some(series => series.dataKey === colName)
+      if (colName !== config.xAxis.dataKey && !found) {
+        // if not the index then add it
+        return columnsOptions.push(
+          <option value={colName} key={colName}>
+            {colName}
+          </option>
+        )
+      }
+    })
+
+    let columnsByKey = {}
+    config.data.forEach(datum => {
+      Object.keys(datum).forEach(key => {
+        columnsByKey[key] = columnsByKey[key] || []
+        const value = typeof datum[key] === 'number' ? datum[key].toString() : datum[key]
+
+        if (columnsByKey[key].indexOf(value) === -1) {
+          columnsByKey[key].push(value)
+        }
+      })
+    })
+  }
+
+  // for pie charts
+  if (!config.data && data) {
+    if (!data[0]) return
+    Object.keys(data[0]).map(colName => {
+      // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
+      const found = data.some(el => el.dataKey === colName)
+      if (colName !== config.xAxis.dataKey && !found) {
+        // if not the index then add it
+        return columnsOptions.push(
+          <option value={colName} key={colName}>
+            {colName}
+          </option>
+        )
+      }
+    })
+
+    let columnsByKey = {}
+    data.forEach(datum => {
+      Object.keys(datum).forEach(key => {
+        columnsByKey[key] = columnsByKey[key] || []
+        const value = typeof datum[key] === 'number' ? datum[key].toString() : datum[key]
+
+        if (columnsByKey[key].indexOf(value) === -1) {
+          columnsByKey[key].push(value)
+        }
+      })
+    })
+  }
+
+  // prevents adding duplicates
+  const additionalColumns = Object.keys(config.columns).filter(value => {
+    const defaultCols = [config.xAxis.dataKey] // ['geo', 'navigate', 'primary', 'latitude', 'longitude']
+
+    if (true === defaultCols.includes(value)) {
+      return false
+    }
+    return true
+  })
+
+  // just adds a new column but not set to any data yet
+  const addAdditionalColumn = number => {
+    const columnKey = `additionalColumn${number}`
+
+    updateConfig({
+      ...config,
+      columns: {
+        ...config.columns,
+        [columnKey]: {
+          label: 'New Column',
+          dataTable: false,
+          tooltips: false,
+          prefix: '',
+          suffix: '',
+          forestPlot: false,
+          startingPoint: '0',
+          forestPlotAlignRight: false
+        }
+      }
+    })
+  }
+
+  const removeAdditionalColumn = columnName => {
+    const newColumns = config.columns
+
+    delete newColumns[columnName]
+
+    updateConfig({
+      ...config,
+      columns: newColumns
+    })
+  }
+
+  const editColumn = async (addCol, columnName, setval) => {
+    // not using special classes like in map editorpanel so removed those cases
+    switch (columnName) {
+      case 'name':
+        updateConfig({
+          ...config,
+          columns: {
+            ...config.columns,
+            [addCol]: {
+              ...config.columns[addCol],
+              [columnName]: setval
+            }
+          }
+        })
+        break
+      default:
+        updateConfig({
+          ...config,
+          columns: {
+            ...config.columns,
+            [addCol]: {
+              ...config.columns[addCol],
+              [columnName]: setval
+            }
+          }
+        })
+        break
+    }
+  }
+
   // prettier-ignore
   const {
     highlightedBarValues,
@@ -925,6 +1091,17 @@ const EditorPanel = () => {
     handleHighlightedBarLegendLabel,
     handleUpdateHighlightedBorderWidth
    } = useHighlightedBars(config, updateConfig)
+
+  const updateSeriesTooltip = (column, event) => {
+    let updatedColumns = config.columns
+
+    updatedColumns[column].tooltips = event
+
+    updateConfig({
+      ...config,
+      columns: updatedColumns
+    })
+  }
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -3078,7 +3255,7 @@ const EditorPanel = () => {
                   <AccordionItemButton>Data Table</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <DataTableEditor config={config} updateField={updateField} isDashboard={isDashboard} isLoadedFromUrl={isLoadedFromUrl} />
+                  <DataTableEditor config={config} updateField={updateField} isDashboard={isDashboard} isLoadedFromUrl={isLoadedFromUrl} />{' '}
                 </AccordionItemPanel>
               </AccordionItem>
             )}
