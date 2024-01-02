@@ -1,4 +1,4 @@
-type DataArray = Record<string,any>[]
+type DataArray = Record<string, any>[]
 
 export class DataTransform {
   constants: any
@@ -17,12 +17,12 @@ export class DataTransform {
     const errorsFound: any[] = []
 
     // Empty data
-    if (0 === data.length) {
+    if (!data || 0 === data.length) {
       errorsFound.push(this.constants.errorMessageEmptyData)
     }
 
     // Does it have the correct data structure?
-    if (!data.filter || data.filter(row => typeof row !== 'object').length > 0) {
+    if (!data?.filter || data.filter(row => typeof row !== 'object').length > 0) {
       errorsFound.push(this.constants.errorMessageFormat)
     }
 
@@ -49,10 +49,10 @@ export class DataTransform {
 
   //Performs standardizations based on developer provided description of the data
   developerStandardize(data, description) {
-    if(!data){
+    if (!data) {
       return []
     }
-    
+
     //Validate the description object
     if (!description) {
       return undefined
@@ -102,7 +102,7 @@ export class DataTransform {
 
         return standardized
       } else {
-        let standardized: {key: string, value: any}[] = []
+        let standardized: { key: string; value: any }[] = []
 
         data.forEach(row => {
           let nonNumericKeys: string[] = []
@@ -132,38 +132,29 @@ export class DataTransform {
         if (description.valueKeys !== undefined) {
           let standardizedMapped = {}
           let standardized: string[] = []
-          let valueKeys = description.valueKeys
-          if (description.ignoredKeys && description.ignoredKeys.length > 0) {
-            valueKeys = valueKeys.concat(description.ignoredKeys)
-          }
 
           data.forEach(row => {
-            valueKeys.forEach(valueKey => {
-              let extraKeys: string[] = []
-              let uniqueKey = row[description.xKey] + '|' + valueKey
-              Object.keys(row).forEach(key => {
-                if (key !== description.xKey && key !== description.seriesKey && valueKeys.indexOf(key) === -1) {
-                  uniqueKey += '|' + key + '=' + row[key]
-                  extraKeys.push(key)
-                }
-              })
-
-              if (!standardizedMapped[uniqueKey]) {
-                standardizedMapped[uniqueKey] = { [description.xKey]: row[description.xKey], '**Numeric Value Property**': valueKey }
-                extraKeys.forEach(key => {
-                  standardizedMapped[uniqueKey][key] = row[key]
-                })
+            let uniqueKey = row[description.xKey];
+            Object.keys(row).forEach(key => {
+              if(key !== description.xKey && key !== description.seriesKey && description.valueKeys.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)){
+                uniqueKey += "|" + row[key];
               }
+            })
 
-              standardizedMapped[uniqueKey][row[description.seriesKey]] = row[valueKey]
+            if(!standardizedMapped[uniqueKey]){
+              standardizedMapped[uniqueKey] = {[description.xKey]: row[description.xKey]}
+            }
+            Object.keys(row).forEach(key => {
+              if(key !== description.xKey && key !== description.seriesKey && description.valueKeys.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)){
+                standardizedMapped[uniqueKey][key] = row[key];
+              }
+            })
+            description.valueKeys.forEach(valueKey => {
+              standardizedMapped[uniqueKey][row[description.seriesKey] + '-' + valueKey] = row[valueKey];
             })
           })
 
-          Object.keys(standardizedMapped).forEach(key => {
-            if (!description.ignoredKeys || description.ignoredKeys.indexOf(standardizedMapped[key]['**Numeric Value Property**']) === -1) {
-              standardized.push(standardizedMapped[key])
-            }
-          })
+          standardized = Object.keys(standardizedMapped).map(key => standardizedMapped[key]);
 
           return standardized
         } else {
@@ -222,7 +213,7 @@ export class DataTransform {
     */
   cleanData(data: DataArray, excludeKey, testing = false): DataArray {
     let cleanedupData: DataArray = []
-    if(!Array.isArray(data)) debugger;
+    if (!Array.isArray(data)) debugger
     if (testing) console.log('## Data to clean=', data)
     if (excludeKey === undefined) {
       console.log('COVE: cleanData excludeKey undefined')
@@ -232,7 +223,7 @@ export class DataTransform {
       if (testing) console.log('clean', i, ' d', d)
       let cleaned = {}
       Object.keys(d).forEach(function (key) {
-        const value = d[key];
+        const value = d[key]
         if (key === excludeKey) {
           // pass thru
           cleaned[key] = value
@@ -263,21 +254,44 @@ export class DataTransform {
     return cleanedupData
   }
 
-  // clean out %, $, commas from numbers when needing to do sorting!
-  cleanDataPoint(data, testing = false) {
-      if (testing) console.log('clean', data)
-      let cleaned = ''
+  applySuppression = (data, suppressedData) => {
+    if (!suppressedData || suppressedData.length === 0) return data
 
-      // remove comma and dollar signs
-      let tmp = ''
-      if (typeof data === 'string') {
-        tmp = data!== null && data !== '' ? data.replace(/[,\$\%]/g, '') : ''
-      } else {
-        tmp = data !== null && data !== '' ? data : ''
+    // Create a new array to store the result without modifying the original data
+    const result = data.map(item => {
+      // Create a new object to store the updated item without modifying the original item
+      const newItem = { ...item }
+
+      // For each suppressedData item
+      for (let i = 0; i < suppressedData.length; i++) {
+        // If the object contains the column and its value matches the suppressed one
+        if (newItem[suppressedData[i].column] && newItem[suppressedData[i].column] === suppressedData[i].value) {
+          // Replace the value with the label in the new object
+          newItem[suppressedData[i].column] = suppressedData[i].label
+        }
       }
 
-      if (testing) console.log('## cleanedData =', tmp)
-      return tmp
+      return newItem
+    })
+
+    return result
+  }
+
+  // clean out %, $, commas from numbers when needing to do sorting!
+  cleanDataPoint(data, testing = false) {
+    if (testing) console.log('clean', data)
+    let cleaned = ''
+
+    // remove comma and dollar signs
+    let tmp = ''
+    if (typeof data === 'string') {
+      tmp = data !== null && data !== '' ? data.replace(/[,\$\%]/g, '') : ''
+    } else {
+      tmp = data !== null && data !== '' ? data : ''
+    }
+
+    if (testing) console.log('## cleanedData =', tmp)
+    return tmp
   }
 }
 

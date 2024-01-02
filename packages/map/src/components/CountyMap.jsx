@@ -11,6 +11,10 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useMapLayers from '../hooks/useMapLayers'
 import ConfigContext from '../context'
 
+const getCountyTopoURL = (year) => {
+  return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`;
+}
+
 const sortById = (a, b) => {
   if (a.id < b.id) return -1
   if (b.id < a.id) return 1
@@ -19,7 +23,13 @@ const sortById = (a, b) => {
 
 const getTopoData = year => {
   return new Promise((resolve, reject) => {
-    const resolveWithTopo = response => {
+    const resolveWithTopo = async (response) => {
+      if(response.status !== 200){
+        response = await import('../data/cb_2019_us_county_20m.json');
+      } else {
+        response = await response.json();
+      }
+
       let topoData = {}
 
       topoData.year = year || 'default'
@@ -50,36 +60,36 @@ const getTopoData = year => {
     const numericYear = parseInt(year)
 
     if (isNaN(numericYear)) {
-      import('../data/cb_2019_us_county_20m.json').then(resolveWithTopo)
+      fetch(getCountyTopoURL(2019)).then(resolveWithTopo)
     } else if (numericYear > 2022) {
-      import('../data/cb_2022_us_county_20m.json').then(resolveWithTopo)
+      fetch(getCountyTopoURL(2022)).then(resolveWithTopo)
     } else if (numericYear < 2013) {
-      import('../data/cb_2013_us_county_20m.json').then(resolveWithTopo)
+      fetch(getCountyTopoURL(2013)).then(resolveWithTopo)
     } else {
       switch (numericYear) {
         case 2022:
-          import('../data/cb_2022_us_county_20m.json').then(resolveWithTopo)
+          fetch(getCountyTopoURL(2022)).then(resolveWithTopo)
           break
         case 2021:
-          import('../data/cb_2021_us_county_20m.json').then(resolveWithTopo)
+          fetch(getCountyTopoURL(2021)).then(resolveWithTopo)
           break
         case 2020:
-          import('../data/cb_2020_us_county_20m.json').then(resolveWithTopo)
+          fetch(getCountyTopoURL(2020)).then(resolveWithTopo)
           break
         case 2018:
         case 2017:
         case 2016:
         case 2015:
-          import('../data/cb_2015_us_county_20m.json').then(resolveWithTopo)
+          fetch(getCountyTopoURL(2015)).then(resolveWithTopo)
           break
         case 2014:
-          import('../data/cb_2014_us_county_20m.json').then(resolveWithTopo)
+          fetch(getCountyTopoURL(2014)).then(resolveWithTopo)
           break
         case 2013:
-          import('../data/cb_2013_us_county_20m.json').then(resolveWithTopo)
+          fetch(getCountyTopoURL(2013)).then(resolveWithTopo)
           break
         default:
-          import('../data/cb_2019_us_county_20m.json').then(resolveWithTopo)
+          fetch(getCountyTopoURL(2019)).then(resolveWithTopo)
           break
       }
     }

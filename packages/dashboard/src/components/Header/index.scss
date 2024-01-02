@@ -1,0 +1,51 @@
+.cdc-open-viz-module .shared-filter-modal,
+.cove .shared-filter-modal,
+.shared-filter-modal {
+  &__title {
+    margin: unset;
+  }
+  &__fieldset {
+    padding: unset;
+    span.edit-label {
+      display: block;
+      font-size: 0.75rem;
+      margin-bottom: 2px;
+      width: 100%;
+    }
+    label,
+    input:not([type='checkbox']),
+    select {
+      width: 100% !important;
+    }
+
+    label {
+      display: flex !important;
+      flex-wrap: wrap !important;
+    }
+    h2 {
+      margin: unset;
+    }
+    select {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+
+  &__right-buttons {
+    float: right;
+    overflow: auto;
+
+    &::after {
+      content: '';
+      clear: both;
+      display: table;
+    }
+  }
+
+  .btn--submit,
+  .btn--warn,
+  .btn--cancel {
+    border-radius: 3px;
+  }
+}
