@@ -4,7 +4,7 @@ import Cell from './Cell'
 type RowProps = {
   childRow: ReactNode[]
   rowKey: string
-  columnWrap: boolean
+  wrapColumns: boolean
 }
 
 const Row = ({ childRow, rowKey, wrapColumns }: RowProps) => {
