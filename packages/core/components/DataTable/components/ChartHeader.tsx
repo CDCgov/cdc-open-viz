@@ -23,7 +23,7 @@ const ChartHeader = ({ data, isVertical, config, runtimeData, setSortBy, sortBy,
           const text = getSeriesName(column, config)
 
           return (
-            <th
+            <th style={{minWidth: (config.table.cellMinWidth || 0) + 'px'}}
               key={`col-header-${column}__${index}`}
               tabIndex={0}
               title={text}
@@ -58,7 +58,7 @@ const ChartHeader = ({ data, isVertical, config, runtimeData, setSortBy, sortBy,
           let column = config.xAxis?.dataKey
           let text = row !== '__series__' ? getChartCellValue(row, column, config, runtimeData) : '__series__'
           return (
-            <th
+            <th style={{minWidth: (config.table.cellMinWidth || 0) + 'px'}}
               key={`col-header-${text}__${index}`}
               tabIndex={0}
               title={text}
