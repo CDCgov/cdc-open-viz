@@ -16,11 +16,12 @@ type TableProps = {
     'aria-rowcount'?: number,
     cellMinWidth?: number
   }
+  wrapColumns: boolean
 }
 
 type Position = 'sticky'
 
-const Table = ({ childrenMatrix, tableName, caption, stickyHeader, headContent, tableOptions }: TableProps) => {
+const Table = ({ childrenMatrix, tableName, caption, stickyHeader, headContent, tableOptions, wrapColumns }: TableProps) => {
   const headStyle = stickyHeader ? { position: 'sticky' as Position, top: 0, zIndex: 999 } : {}
   const isGroupedMatrix = !Array.isArray(childrenMatrix)
   return (
@@ -34,13 +35,13 @@ const Table = ({ childrenMatrix, tableName, caption, stickyHeader, headContent, 
               const rows = childrenMatrix[groupName].map((row, i) => {
                 colSpan = row.length
                 const key = `${tableName}-${groupName}-row-${i}`
-                return <Row key={key} rowKey={key} childRow={row} cellMinWidth={tableOptions.cellMinWidth} />
+                return <Row key={key} rowKey={key} childRow={row} wrapColumns={wrapColumns} cellMinWidth={tableOptions.cellMinWidth} />
               })
               return [<GroupRow label={groupName} colSpan={colSpan} key={`${tableName}-${groupName}`} />, ...rows]
             })
           : childrenMatrix.map((childRow, i) => {
               const key = `${tableName}-row-${i}`
-              return <Row key={key} rowKey={key} childRow={childRow} cellMinWidth={tableOptions.cellMinWidth} />
+              return <Row key={key} rowKey={key} childRow={childRow} wrapColumns={wrapColumns} cellMinWidth={tableOptions.cellMinWidth} />
             })}
       </tbody>
     </table>

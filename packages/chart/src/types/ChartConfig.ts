@@ -1,6 +1,7 @@
 import { type ForestPlotConfigSettings } from './ForestPlot'
 
 export type ChartColumns = {
+  /** key - is the column name */
   [key: string]: {
     label: string
     dataTable: boolean
@@ -21,23 +22,37 @@ type Series = {
 
 type AllChartsConfig = {
   columns: ChartColumns
+  data: Object[]
   forestPlot: ForestPlotConfigSettings
   isLollipopChart: boolean
   legend: {
-    behavior: 'highlight' | unknown
+    // general legend onClick behavior
+    behavior: 'highlight' | 'isolate' | unknown
+    // show or hide the legend
+    hide: boolean
   }
   orientation: 'vertical' | 'horizontal'
   runtime: {}
   series: Series[]
   useLogScale: boolean
-  visualizationType: 'Area Chart' | 'Bar' | 'Deviation Bar' | 'Forest Plot' | 'Paired Bar' | 'Scatter Plot' | 'Spark Line'
+  visualizationType: 'Area Chart' | 'Bar' | 'Deviation Bar' | 'Forest Plot' | 'Paired Bar' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting'
+  xAxis: {
+    // column chosen on xAxis
+    dataKey: string
+  }
+  yAxis: {}
   xScale: Function
   yScale: Function
 }
 
+export type ForestPlotConfig = {
+  visualizationType: 'Forest Plot'
+  forestPlot: ForestPlotConfigSettings
+} & AllChartsConfig
+
 export type LineChartConfig = {
   visualizationType: 'Line'
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
-} & AllCharts
+} & AllChartsConfig
 
-export type ChartConfig = LineChartConfig | AllChartsConfig
+export type ChartConfig = LineChartConfig | ForestPlotConfig | AllChartsConfig

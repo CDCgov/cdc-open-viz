@@ -1,7 +1,6 @@
-import { createContext } from 'react'
-import { MapConfig } from './MapConfig'
+import { type MapConfig } from './MapConfig'
 
-type MapContext = {
+export type MapContext = {
   applyLegendToRow
   applyTooltipsToGeo
   closeModal
@@ -43,7 +42,3 @@ type MapContext = {
   titleCase
   viewport
 }
-
-const ConfigContext = createContext({} as MapContext)
-
-export default ConfigContext
