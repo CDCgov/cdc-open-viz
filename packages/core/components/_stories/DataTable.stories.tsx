@@ -68,9 +68,9 @@ export const RowType: Story = {
     config: {
       dashboard: {
         theme: 'theme-blue',
-        title: 'ARDI'
+        title: 'RowType'
       },
-      title: 'ARDI',
+      title: 'RowType',
       dataUrl: '/examples/feature/__data__/ardi.json',
       animate: false,
       animateReplay: true,
@@ -96,7 +96,7 @@ export const RowType: Story = {
     rawData: rowTypeData,
     runtimeData: rowTypeData,
     expandDataTable: true,
-    tableTitle: 'ARDI DataTable',
+    tableTitle: 'DataTable',
     viewport: 'lg',
     tabbingId: '#asdf'
   }
