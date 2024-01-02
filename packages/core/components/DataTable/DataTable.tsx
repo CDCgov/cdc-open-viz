@@ -21,6 +21,8 @@ export type DataTableProps = {
   applyLegendToRow?: Function
   colorScale?: Function
   columns?: { navigate: { name: string } }
+  // determines if columns should be wrapped in the table
+  wrapColumns: boolean
   config: TableConfig
   dataConfig?: Object
   displayDataAsText?: Function
@@ -42,7 +44,7 @@ export type DataTableProps = {
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
-  const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId } = props
+  const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId, wrapColumns } = props
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
@@ -151,7 +153,8 @@ const DataTable = (props: DataTableProps) => {
           <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           <div className='table-container' style={limitHeight}>
             <Table
-              childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, ...props }) : chartCellMatrix({ rows, ...props, isVertical, sortBy })}
+              wrapColumns={wrapColumns}
+              childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, wrapColumns, ...props }) : chartCellMatrix({ rows, ...props, isVertical, sortBy })}
               tableName={config.type}
               caption={caption}
               stickyHeader
@@ -162,6 +165,7 @@ const DataTable = (props: DataTableProps) => {
             {/* REGION Data Table */}
             {config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' && (
               <Table
+                wrapColumns={wrapColumns}
                 childrenMatrix={regionCellMatrix({ config })}
                 tableName={config.visualizationType}
                 caption='Table of the highlighted regions in the visualization'
@@ -188,6 +192,7 @@ const DataTable = (props: DataTableProps) => {
           <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           <div className='table-container' style={limitHeight}>
             <Table
+              wrapColumns={wrapColumns}
               childrenMatrix={boxplotCellMatrix({ rows: tableData, config })}
               tableName={config.visualizationType}
               caption={caption}

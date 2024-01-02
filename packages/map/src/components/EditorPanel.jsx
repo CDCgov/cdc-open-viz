@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
 
+import PatternSettings from './PatternSettings'
+
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -2569,6 +2571,22 @@ const EditorPanel = props => {
                   <label className='checkbox'>
                     <input
                       type='checkbox'
+                      checked={state.table.wrapColumns}
+                      onChange={event => {
+                        setState({
+                          ...state,
+                          table: {
+                            ...state.table,
+                            wrapColumns: event.target.checked
+                          }
+                        })
+                      }}
+                    />
+                    <span className='edit-label column-heading'>WRAP DATA TABLE COLUMNS</span>
+                  </label>
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
                       checked={state.table.forceDisplay !== undefined ? state.table.forceDisplay : !isDashboard}
                       onChange={event => {
                         handleEditorChanges('showDataTable', event.target.checked)
@@ -2997,6 +3015,7 @@ const EditorPanel = props => {
                 </button>
               </AccordionItemPanel>
             </AccordionItem>
+            <PatternSettings />
           </Accordion>
           <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
         </section>

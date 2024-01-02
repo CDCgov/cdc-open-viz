@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
-
-import { useDebounce } from 'use-debounce'
 
 // @cdc/core
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
@@ -12,128 +10,31 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
+import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 
 // chart components
-import ForestPlotSettings from './ForestPlotSettings'
-import Series from './Series'
+import ForestPlotSettings from '../ForestPlot/ForestPlotSettings'
+import Series from '../Series'
 
 // cdc additional
-import { useColorPalette } from '../hooks/useColorPalette'
-import { useEditorPermissions } from '../hooks/useEditorPermissions'
+import { useColorPalette } from '../../hooks/useColorPalette'
+import { useEditorPermissions } from './useEditorPermissions'
 import { useFilters } from '@cdc/core/components/Filters'
-import { useHighlightedBars } from '../hooks/useHighlightedBars'
-import ConfigContext from '../ConfigContext'
-import useReduceData from '../hooks/useReduceData'
-import useRightAxis from '../hooks/useRightAxis'
-import WarningImage from '../images/warning.svg'
-import useMinMax from './../hooks/useMinMax'
+import { useHighlightedBars } from '../../hooks/useHighlightedBars'
+import ConfigContext from '../../ConfigContext'
+import useReduceData from '../../hooks/useReduceData'
+import useRightAxis from '../../hooks/useRightAxis'
+import WarningImage from '../../images/warning.svg'
+import useMinMax from '../../hooks/useMinMax'
 
-/* eslint-disable react-hooks/rules-of-hooks */
-const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
-  const [value, setValue] = useState(stateValue)
+import { type ChartConfig } from '../../types/ChartConfig'
+import { type ChartContext } from '../../types/ChartContext'
 
-  const [debouncedValue] = useDebounce(value, 500)
+import './editor-panel.scss'
+import { Anchor } from '@cdc/core/types/Axis'
+import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 
-  useEffect(() => {
-    if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
-      updateField(section, subsection, fieldName, debouncedValue, i)
-    }
-  }, [debouncedValue]) // eslint-disable-line
-
-  let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
-
-  const onChange = e => {
-    if ('number' !== type || min === null) {
-      setValue(e.target.value)
-    } else {
-      if (!e.target.value || min <= parseFloat(e.target.value)) {
-        setValue(e.target.value)
-      } else {
-        setValue(min.toString())
-      }
-    }
-  }
-
-  let formElement = <input type='text' name={name} onChange={onChange} {...attributes} value={value} />
-
-  if ('textarea' === type) {
-    formElement = <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
-  }
-
-  if ('number' === type) {
-    formElement = <input type='number' name={name} onChange={onChange} {...attributes} value={value} />
-  }
-
-  if ('date' === type) {
-    formElement = <input type='date' name={name} onChange={onChange} {...attributes} value={value} />
-  }
-
-  return (
-    <label>
-      <span className='edit-label column-heading'>
-        {label}
-        {tooltip}
-      </span>
-      {formElement}
-    </label>
-  )
-})
-
-const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-  <label className='checkbox column-heading'>
-    <input
-      type='checkbox'
-      name={fieldName}
-      checked={value}
-      onChange={e => {
-        updateField(section, subsection, fieldName, !value)
-      }}
-      {...attributes}
-    />
-    <span className='edit-label'>
-      {label}
-      {tooltip}
-    </span>
-  </label>
-))
-
-const Select = memo(({ label, value, options, fieldName, section = null, subsection = null, required = false, tooltip, updateField, initial: initialValue, ...attributes }) => {
-  let optionsJsx = options.map((optionName, index) => (
-    <option value={optionName} key={index}>
-      {optionName}
-    </option>
-  ))
-
-  if (initialValue) {
-    optionsJsx.unshift(
-      <option value='' key='initial'>
-        {initialValue}
-      </option>
-    )
-  }
-
-  return (
-    <label>
-      <span className='edit-label'>
-        {label}
-        {tooltip}
-      </span>
-      <select
-        className={required && !value ? 'warning' : ''}
-        name={fieldName}
-        value={value}
-        onChange={event => {
-          updateField(section, subsection, fieldName, event.target.value)
-        }}
-        {...attributes}
-      >
-        {optionsJsx}
-      </select>
-    </label>
-  )
-})
-
-const DataSuppression = memo(({ config, updateConfig, data }) => {
+const DataSuppression = memo(({ config, updateConfig, data }: any) => {
   const getColumnOptions = () => {
     const keys = new Set()
     data.forEach(d => {
@@ -297,7 +198,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
   )
 })
 
-const Regions = memo(({ config, updateConfig }) => {
+const Regions = memo(({ config, updateConfig }: { config: ChartConfig; updateConfig: Function }) => {
   let regionUpdate = (fieldName, value, i) => {
     let regions = []
 
@@ -393,7 +294,7 @@ const Regions = memo(({ config, updateConfig }) => {
 })
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, lineOptions, rawData } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, lineOptions, rawData } = useContext<ChartContext>(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
@@ -417,6 +318,9 @@ const EditorPanel = () => {
     visCanAnimate,
     visHasLegend,
     visHasBrushChart,
+    visSupportsDateCategoryAxis,
+    visSupportsValueAxisMin,
+    visSupportsValueAxisMax,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
     visSupportsDateCategoryAxisTicks,
@@ -973,7 +877,7 @@ const EditorPanel = () => {
   }
 
   const validateMinValue = () => {
-    const enteredValue = config[section].min
+    const enteredValue = parseFloat(config[section].min)
     let minVal = Number(minValue)
     let message = ''
 
@@ -981,19 +885,19 @@ const EditorPanel = () => {
       case config.useLogScale && ['Line', 'Combo', 'Bar'].includes(config.visualizationType) && enteredValue < 0:
         message = 'Negative numbers are not supported in logarithmic scale'
         break
-      case (config.visualizationType === 'Line' || config.visualizationType === 'Spark Line') && enteredValue && parseFloat(enteredValue) > minVal:
+      case (config.visualizationType === 'Line' || config.visualizationType === 'Spark Line') && enteredValue > minVal:
         message = 'Value should not exceed ' + minValue
         break
-      case config.visualizationType === 'Combo' && isAllLine && enteredValue && parseFloat(enteredValue) > minVal:
+      case config.visualizationType === 'Combo' && isAllLine && enteredValue > minVal:
         message = 'Value should not exceed ' + minValue
         break
-      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
+      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && minVal > 0 && enteredValue > 0:
         message = config.useLogScale ? 'Value must be equal to 0' : 'Value must be less than or equal to 0'
         break
-      case config.visualizationType === 'Deviation Bar' && parseFloat(enteredValue) >= Math.min(minVal, config.xAxis.target):
+      case config.visualizationType === 'Deviation Bar' && enteredValue >= Math.min(minVal, config.xAxis.target):
         message = 'Value must be less than ' + Math.min(minVal, config.xAxis.target)
         break
-      case config.visualizationType !== 'Deviation Bar' && enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
+      case config.visualizationType !== 'Deviation Bar' && enteredValue && minVal < 0 && enteredValue > minVal:
         message = 'Value should not exceed ' + minValue
         break
       default:
@@ -1205,7 +1109,7 @@ const EditorPanel = () => {
       {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'}${isDashboard ? ' dashboard' : ''}`}>
-        <div aria-level='2' role='heading' className='heading-2'>
+        <div aria-level={2} role='heading' className='heading-2'>
           Configure Chart
         </div>
         <section className='form-container'>
@@ -1579,7 +1483,7 @@ const EditorPanel = () => {
                         <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                       )}
                       <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
-                      {config.visualizationType === 'Paired Bar' && <TextField value={config.yAxis.tickRotation || 0} type='number' min='0' section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                      {config.visualizationType === 'Paired Bar' && <TextField value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       <TextField
                         value={config.yAxis.size}
                         type='number'
@@ -1600,12 +1504,12 @@ const EditorPanel = () => {
                         }
                       />
                       {config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
-                      {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation} type='number' min='0' section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                      {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       {config.isResponsiveTicks && config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && (
                         <TextField
                           value={config.xAxis.maxTickRotation}
                           type='number'
-                          min='0'
+                          min={0}
                           section='xAxis'
                           fieldName='maxTickRotation'
                           label='Max Tick Rotation'
@@ -1629,7 +1533,7 @@ const EditorPanel = () => {
                       {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
                       {visSupportsValueAxisGridLines() && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
                       <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
-                      {config.visualizationSubType === 'regular' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
+                      {config.visualizationSubType === 'regular' && config.visualizationType !== 'Forest Plot' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
                     </>
                   )}
                   <span className='divider-heading'>Number Formatting</span>
@@ -1696,9 +1600,9 @@ const EditorPanel = () => {
                       {visSupportsValueAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
                       {visSupportsValueAxisLabels() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
                       {visSupportsValueAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
-                      <TextField value={config.xAxis.max} section='xAxis' fieldName='max' label='max value' type='number' placeholder='Auto' updateField={updateField} />
+                      {visSupportsValueAxisMax() && <TextField value={config.xAxis.max} section='xAxis' fieldName='max' label='max value' type='number' placeholder='Auto' updateField={updateField} />}
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
-                      <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='min value' placeholder='Auto' updateField={updateField} />
+                      {visSupportsValueAxisMin() && <TextField value={config.xAxis.min} section='xAxis' fieldName='min' type='number' label='min value' placeholder='Auto' updateField={updateField} />}
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                       {config.visualizationType === 'Deviation Bar' && (
                         <>
@@ -1835,7 +1739,7 @@ const EditorPanel = () => {
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.yAxis.anchors]
-                          anchors.push({})
+                          anchors.push({} as Anchor)
                           updateConfig({
                             ...config,
                             yAxis: {
@@ -1961,7 +1865,7 @@ const EditorPanel = () => {
                         onClick={e => {
                           e.preventDefault()
                           const anchors = [...config.xAxis.anchors]
-                          anchors.push({})
+                          anchors.push({} as Anchor)
                           updateConfig({
                             ...config,
                             xAxis: {
@@ -2044,25 +1948,52 @@ const EditorPanel = () => {
                 </AccordionItemPanel>
               </AccordionItem>
             )}
-            <AccordionItem>
-              <AccordionItemHeading>
-                <AccordionItemButton>
-                  {config.visualizationType === 'Pie' ? 'Segments' : 'Date/Category Axis'}
-                  {!config.xAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
-                </AccordionItemButton>
-              </AccordionItemHeading>
-              <AccordionItemPanel>
-                {config.visualizationType !== 'Pie' && (
-                  <>
-                    {config.visualizationType !== 'Forest Plot' && (
-                      <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
-                    )}
-                    <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />{' '}
+            {visSupportsDateCategoryAxis() && (
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    {config.visualizationType === 'Pie' ? 'Segments' : 'Date/Category Axis'}
+                    {!config.xAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  {config.visualizationType !== 'Pie' && (
+                    <>
+                      {config.visualizationType !== 'Forest Plot' && (
+                        <>
+                          <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
+                          <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />{' '}
+                        </>
+                      )}
+                      <Select
+                        value={config.xAxis.dataKey || setCategoryAxis() || ''}
+                        section='xAxis'
+                        fieldName='dataKey'
+                        label='Data Key'
+                        initial='Select'
+                        required={true}
+                        updateField={updateField}
+                        options={getColumns(false)}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Select the column or row containing the categories or dates for this axis. </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                    </>
+                  )}
+
+                  {config.visualizationType === 'Pie' && (
                     <Select
-                      value={config.xAxis.dataKey || setCategoryAxis() || ''}
+                      value={config.xAxis.dataKey || ''}
                       section='xAxis'
                       fieldName='dataKey'
-                      label='Data Key'
+                      label='Segment Labels'
                       initial='Select'
                       required={true}
                       updateField={updateField}
@@ -2073,48 +2004,169 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>Select the column or row containing the categories or dates for this axis. </p>
+                            <p>Select the source row or column that contains the segment labels. Depending on the data structure, it may be listed as "Key."</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
                     />
-                  </>
-                )}
+                  )}
 
-                {config.visualizationType === 'Pie' && (
-                  <Select
-                    value={config.xAxis.dataKey || ''}
-                    section='xAxis'
-                    fieldName='dataKey'
-                    label='Segment Labels'
-                    initial='Select'
-                    required={true}
-                    updateField={updateField}
-                    options={getColumns(false)}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Select the source row or column that contains the segment labels. Depending on the data structure, it may be listed as "Key."</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                )}
+                  {config.visualizationType !== 'Pie' && (
+                    <>
+                      <TextField value={config.xAxis.label} section='xAxis' fieldName='label' label='Label' updateField={updateField} />
 
-                {config.visualizationType !== 'Pie' && (
-                  <>
-                    <TextField value={config.xAxis.label} section='xAxis' fieldName='label' label='Label' updateField={updateField} />
+                      {config.xAxis.type === 'continuous' && (
+                        <>
+                          <TextField
+                            value={config.dataFormat.bottomPrefix}
+                            section='dataFormat'
+                            fieldName='bottomPrefix'
+                            label='Prefix'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Enter a data suffix (such as "%"), if applicable.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
 
-                    {config.xAxis.type === 'continuous' && (
-                      <>
+                          <TextField
+                            value={config.dataFormat.bottomSuffix}
+                            section='dataFormat'
+                            fieldName='bottomSuffix'
+                            label='Suffix'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Enter a data suffix (such as "%"), if applicable.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+
+                          <CheckBox
+                            value={config.dataFormat.bottomAbbreviated}
+                            section='dataFormat'
+                            fieldName='bottomAbbreviated'
+                            label='Abbreviate Axis Values'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                        </>
+                      )}
+
+                      {config.xAxis.type === 'date' && (
+                        <>
+                          <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
+                            Format how charts should parse and display your dates using{' '}
+                            <a href='https://github.com/d3/d3-time-format#locale_format' target='_blank' rel='noreferrer'>
+                              these guidelines
+                            </a>
+                            .
+                          </p>
+                          <TextField value={config.xAxis.dateParseFormat} section='xAxis' fieldName='dateParseFormat' placeholder='Ex. %Y-%m-%d' label='Date Parse Format' updateField={updateField} />
+                          <TextField value={config.xAxis.dateDisplayFormat} section='xAxis' fieldName='dateDisplayFormat' placeholder='Ex. %Y-%m-%d' label='Date Display Format' updateField={updateField} />
+                        </>
+                      )}
+
+                      <CheckBox
+                        value={config.exclusions.active}
+                        section='exclusions'
+                        fieldName='active'
+                        label={config.xAxis.type === 'date' ? 'Limit by start and/or end dates' : 'Exclude one or more values'}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>When this option is checked, you can select source-file values for exclusion from the date/category axis. </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        updateField={updateField}
+                      />
+                      {/* {visHasBrushChart && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />} */}
+
+                      {config.exclusions.active && (
+                        <>
+                          {config.xAxis.type === 'categorical' && (
+                            <>
+                              {config.exclusions.keys.length > 0 && (
+                                <>
+                                  <fieldset>
+                                    <legend className='edit-label'>Excluded Keys</legend>
+                                  </fieldset>
+                                  <ExclusionsList />
+                                </>
+                              )}
+
+                              <Select
+                                fieldName='visualizationType'
+                                label='Add Exclusion'
+                                initial='Select'
+                                onChange={e => {
+                                  if (e.target.value !== '' && e.target.value !== 'Select') {
+                                    addNewExclusion(e.target.value)
+                                  }
+                                  e.target.value = ''
+                                }}
+                                options={getDataValues(config.xAxis.dataKey, true)}
+                              />
+                            </>
+                          )}
+
+                          {config.xAxis.type === 'date' && (
+                            <>
+                              <TextField type='date' section='exclusions' fieldName='dateStart' label='Start Date' updateField={updateField} value={config.exclusions.dateStart || ''} />
+                              <TextField type='date' section='exclusions' fieldName='dateEnd' label='End Date' updateField={updateField} value={config.exclusions.dateEnd || ''} />
+                            </>
+                          )}
+                        </>
+                      )}
+
+                      {visSupportsDateCategoryNumTicks() && <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />}
+                      {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.size} type='number' min={0} section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
+
+                      {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
+                      {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
+                      {(config.xAxis.type === 'continuous' || config.forestPlot.type === 'Logarithmic') && (
+                        <>
+                          <CheckBox value={config.dataFormat.bottomCommas} section='dataFormat' fieldName='bottomCommas' label='Add commas' updateField={updateField} />
+                          <TextField value={config.dataFormat.bottomRoundTo} type='number' section='dataFormat' fieldName='bottomRoundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
+                        </>
+                      )}
+                      {visSupportsResponsiveTicks() && config.orientation === 'vertical' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
+                      {(config.orientation === 'horizontal' || !config.isResponsiveTicks) && visSupportsDateCategoryTickRotation() && (
+                        <TextField value={config.xAxis.tickRotation} type='number' min={0} section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />
+                      )}
+                      {config.orientation === 'vertical' && config.isResponsiveTicks && config.visualizationType !== 'Paired Bar' && (
                         <TextField
-                          value={config.dataFormat.bottomPrefix}
-                          section='dataFormat'
-                          fieldName='bottomPrefix'
-                          label='Prefix'
+                          value={config.xAxis.maxTickRotation}
+                          type='number'
+                          min={0}
+                          section='xAxis'
+                          fieldName='maxTickRotation'
+                          label='Max Tick Rotation'
+                          className='number-narrow'
                           updateField={updateField}
                           tooltip={
                             <Tooltip style={{ textTransform: 'none' }}>
@@ -2122,146 +2174,75 @@ const EditorPanel = () => {
                                 <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                               </Tooltip.Target>
                               <Tooltip.Content>
-                                {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
-                                {config.visualizationType !== 'Pie' && <p>Enter a data suffix (such as "%"), if applicable.</p>}
+                                <p>Degrees ticks will be rotated if values overlap, especially in smaller viewports.</p>
                               </Tooltip.Content>
                             </Tooltip>
                           }
                         />
+                      )}
 
-                        <TextField
-                          value={config.dataFormat.bottomSuffix}
-                          section='dataFormat'
-                          fieldName='bottomSuffix'
-                          label='Suffix'
-                          updateField={updateField}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
-                                {config.visualizationType !== 'Pie' && <p>Enter a data suffix (such as "%"), if applicable.</p>}
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
+                      {config.orientation === 'horizontal' ? (
+                        <>
+                          {visSupportsDateCategoryAxisLine() && <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
+                          {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
+                        </>
+                      ) : (
+                        <>
+                          {visSupportsDateCategoryAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
+                          {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
+                          {visSupportsDateCategoryAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
+                        </>
+                      )}
 
-                        <CheckBox
-                          value={config.dataFormat.bottomAbbreviated}
-                          section='dataFormat'
-                          fieldName='bottomAbbreviated'
-                          label='Abbreviate Axis Values'
-                          updateField={updateField}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
-                      </>
-                    )}
+                      {config.series?.length === 1 && config.visualizationType === 'Bar' && (
+                        <>
+                          {/* HIGHLIGHTED BARS */}
+                          <label htmlFor='barHighlight'>Bar Highlighting</label>
+                          {config.series.length === 1 &&
+                            highlightedBarValues.map((highlightedBarValue, i) => (
+                              <fieldset>
+                                <div className='edit-block' key={`highlighted-bar-${i}`}>
+                                  <button className='remove-column' onClick={e => handleRemoveHighlightedBar(e, i)}>
+                                    Remove
+                                  </button>
+                                  <p>Highlighted Bar {i + 1}</p>
+                                  <label>
+                                    <span className='edit-label column-heading'>Value</span>
+                                    <select value={config.highlightedBarValues[i].value} onChange={e => handleUpdateHighlightedBar(e, i)}>
+                                      <option value=''>- Select Value -</option>
+                                      {highlightedSeriesValues && [...new Set(highlightedSeriesValues)].sort().map(option => <option key={`special-class-value-option-${i}-${option}`}>{option}</option>)}
+                                    </select>
+                                  </label>
+                                  <label>
+                                    <span className='edit-label column-heading'>Color</span>
+                                    <input type='text' value={config.highlightedBarValues[i].color ? config.highlightedBarValues[i].color : ''} onChange={e => handleUpdateHighlightedBarColor(e, i)} />
+                                  </label>
+                                  <label>
+                                    <span className='edit-label column-heading'>Border Width</span>
+                                    <input max='5' min='0' type='number' value={config.highlightedBarValues[i].borderWidth ? config.highlightedBarValues[i].borderWidth : ''} onChange={e => handleUpdateHighlightedBorderWidth(e, i)} />
+                                  </label>
+                                  <label>
+                                    <span className='edit-label column-heading'>Legend Label</span>
+                                    <input type='text' value={config.highlightedBarValues[i].legendLabel ? config.highlightedBarValues[i].legendLabel : ''} onChange={e => handleHighlightedBarLegendLabel(e, i)} />
+                                  </label>
+                                </div>
+                              </fieldset>
+                            ))}
+                          <button className='btn full-width' onClick={e => handleAddNewHighlightedBar(e)}>
+                            Add Highlighted Bar
+                          </button>
+                        </>
+                      )}
+                    </>
+                  )}
 
-                    {config.xAxis.type === 'date' && (
-                      <>
-                        <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
-                          Format how charts should parse and display your dates using{' '}
-                          <a href='https://github.com/d3/d3-time-format#locale_format' target='_blank' rel='noreferrer'>
-                            these guidelines
-                          </a>
-                          .
-                        </p>
-                        <TextField value={config.xAxis.dateParseFormat} section='xAxis' fieldName='dateParseFormat' placeholder='Ex. %Y-%m-%d' label='Date Parse Format' updateField={updateField} />
-                        <TextField value={config.xAxis.dateDisplayFormat} section='xAxis' fieldName='dateDisplayFormat' placeholder='Ex. %Y-%m-%d' label='Date Display Format' updateField={updateField} />
-                      </>
-                    )}
-
-                    <CheckBox
-                      value={config.exclusions.active}
-                      section='exclusions'
-                      fieldName='active'
-                      label={config.xAxis.type === 'date' ? 'Limit by start and/or end dates' : 'Exclude one or more values'}
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>When this option is checked, you can select source-file values for exclusion from the date/category axis. </p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                      updateField={updateField}
-                    />
-                    {/* {visHasBrushChart && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />} */}
-
-                    {config.exclusions.active && (
-                      <>
-                        {config.xAxis.type === 'categorical' && (
-                          <>
-                            {config.exclusions.keys.length > 0 && (
-                              <>
-                                <fieldset>
-                                  <legend className='edit-label'>Excluded Keys</legend>
-                                </fieldset>
-                                <ExclusionsList />
-                              </>
-                            )}
-
-                            <Select
-                              fieldName='visualizationType'
-                              label='Add Exclusion'
-                              initial='Select'
-                              onChange={e => {
-                                if (e.target.value !== '' && e.target.value !== 'Select') {
-                                  addNewExclusion(e.target.value)
-                                }
-                                e.target.value = ''
-                              }}
-                              options={getDataValues(config.xAxis.dataKey, true)}
-                            />
-                          </>
-                        )}
-
-                        {config.xAxis.type === 'date' && (
-                          <>
-                            <TextField type='date' section='exclusions' fieldName='dateStart' label='Start Date' updateField={updateField} value={config.exclusions.dateStart || ''} />
-                            <TextField type='date' section='exclusions' fieldName='dateEnd' label='End Date' updateField={updateField} value={config.exclusions.dateEnd || ''} />
-                          </>
-                        )}
-                      </>
-                    )}
-
-                    {visSupportsDateCategoryNumTicks() && <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min='1' section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />}
-                    {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.size} type='number' min='0' section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
-
-                    {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
-                    {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
-                    {(config.xAxis.type === 'continuous' || config.forestPlot.type === 'Logarithmic') && (
-                      <>
-                        <CheckBox value={config.dataFormat.bottomCommas} section='dataFormat' fieldName='bottomCommas' label='Add commas' updateField={updateField} />
-                        <TextField value={config.dataFormat.bottomRoundTo} type='number' section='dataFormat' fieldName='bottomRoundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
-                      </>
-                    )}
-                    {visSupportsResponsiveTicks() && config.orientation === 'vertical' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
-                    {(config.orientation === 'horizontal' || !config.isResponsiveTicks) && visSupportsDateCategoryTickRotation() && (
-                      <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />
-                    )}
-                    {config.orientation === 'vertical' && config.isResponsiveTicks && config.visualizationType !== 'Paired Bar' && (
-                      <TextField
-                        value={config.xAxis.maxTickRotation}
-                        type='number'
-                        min='0'
-                        section='xAxis'
-                        fieldName='maxTickRotation'
-                        label='Max Tick Rotation'
-                        className='number-narrow'
+                  {config.visualizationType === 'Pie' && (
+                    <>
+                      <CheckBox
+                        value={config.exclusions.active}
+                        section='exclusions'
+                        fieldName='active'
+                        label={'Exclude one or more values'}
                         updateField={updateField}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -2269,369 +2250,294 @@ const EditorPanel = () => {
                               <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
-                              <p>Degrees ticks will be rotated if values overlap, especially in smaller viewports.</p>
+                              <p>When this option is checked, you can select values for exclusion from the pie segments.</p>
                             </Tooltip.Content>
                           </Tooltip>
                         }
                       />
-                    )}
-
-                    {config.orientation === 'horizontal' ? (
-                      <>
-                        {visSupportsDateCategoryAxisLine() && <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
-                        {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
-                      </>
-                    ) : (
-                      <>
-                        {visSupportsDateCategoryAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
-                        {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
-                        {visSupportsDateCategoryAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
-                      </>
-                    )}
-
-                    {config.series?.length === 1 && config.visualizationType === 'Bar' && (
-                      <>
-                        {/* HIGHLIGHTED BARS */}
-                        <label htmlFor='barHighlight'>Bar Highlighting</label>
-                        {config.series.length === 1 &&
-                          highlightedBarValues.map((highlightedBarValue, i) => (
-                            <fieldset>
-                              <div className='edit-block' key={`highlighted-bar-${i}`}>
-                                <button className='remove-column' onClick={e => handleRemoveHighlightedBar(e, i)}>
-                                  Remove
-                                </button>
-                                <p>Highlighted Bar {i + 1}</p>
-                                <label>
-                                  <span className='edit-label column-heading'>Value</span>
-                                  <select value={config.highlightedBarValues[i].value} onChange={e => handleUpdateHighlightedBar(e, i)}>
-                                    <option value=''>- Select Value -</option>
-                                    {highlightedSeriesValues && [...new Set(highlightedSeriesValues)].sort().map(option => <option key={`special-class-value-option-${i}-${option}`}>{option}</option>)}
-                                  </select>
-                                </label>
-                                <label>
-                                  <span className='edit-label column-heading'>Color</span>
-                                  <input type='text' value={config.highlightedBarValues[i].color ? config.highlightedBarValues[i].color : ''} onChange={e => handleUpdateHighlightedBarColor(e, i)} />
-                                </label>
-                                <label>
-                                  <span className='edit-label column-heading'>Border Width</span>
-                                  <input max='5' min='0' type='number' value={config.highlightedBarValues[i].borderWidth ? config.highlightedBarValues[i].borderWidth : ''} onChange={e => handleUpdateHighlightedBorderWidth(e, i)} />
-                                </label>
-                                <label>
-                                  <span className='edit-label column-heading'>Legend Label</span>
-                                  <input type='text' value={config.highlightedBarValues[i].legendLabel ? config.highlightedBarValues[i].legendLabel : ''} onChange={e => handleHighlightedBarLegendLabel(e, i)} />
-                                </label>
-                              </div>
-                            </fieldset>
-                          ))}
-                        <button className='btn full-width' onClick={e => handleAddNewHighlightedBar(e)}>
-                          Add Highlighted Bar
-                        </button>
-                      </>
-                    )}
-                  </>
-                )}
-
-                {config.visualizationType === 'Pie' && (
-                  <>
-                    <CheckBox
-                      value={config.exclusions.active}
-                      section='exclusions'
-                      fieldName='active'
-                      label={'Exclude one or more values'}
-                      updateField={updateField}
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>When this option is checked, you can select values for exclusion from the pie segments.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                    />
-                    {config.exclusions.active && (
-                      <>
-                        {config.exclusions.keys.length > 0 && (
-                          <>
-                            <fieldset>
-                              <legend className='edit-label'>Excluded Keys</legend>
-                            </fieldset>
-                            <ExclusionsList />
-                          </>
-                        )}
-
-                        <Select
-                          fieldName='visualizationType'
-                          label='Add Exclusion'
-                          initial='Select'
-                          onChange={e => {
-                            if (e.target.value !== '' && e.target.value !== 'Select') {
-                              addNewExclusion(e.target.value)
-                            }
-                            e.target.value = ''
-                          }}
-                          options={getDataValues(config.xAxis.dataKey, true)}
-                        />
-                      </>
-                    )}
-                  </>
-                )}
-
-                {/* anchors */}
-                {visHasAnchors() && config.orientation !== 'horizontal' && (
-                  <div className='edit-block'>
-                    <span className='edit-label column-heading'>Anchors</span>
-                    <Accordion allowZeroExpanded>
-                      {config.xAxis?.anchors?.map((anchor, index) => (
-                        <AccordionItem className='series-item series-item--chart' key={`xaxis-anchors-2-${index}`}>
-                          <AccordionItemHeading className='series-item__title'>
+                      {config.exclusions.active && (
+                        <>
+                          {config.exclusions.keys.length > 0 && (
                             <>
-                              <AccordionItemButton className={'accordion__button accordion__button'}>
-                                Anchor {index + 1}
-                                <button
-                                  className='series-list__remove'
-                                  onClick={e => {
+                              <fieldset>
+                                <legend className='edit-label'>Excluded Keys</legend>
+                              </fieldset>
+                              <ExclusionsList />
+                            </>
+                          )}
+
+                          <Select
+                            fieldName='visualizationType'
+                            label='Add Exclusion'
+                            initial='Select'
+                            onChange={e => {
+                              if (e.target.value !== '' && e.target.value !== 'Select') {
+                                addNewExclusion(e.target.value)
+                              }
+                              e.target.value = ''
+                            }}
+                            options={getDataValues(config.xAxis.dataKey, true)}
+                          />
+                        </>
+                      )}
+                    </>
+                  )}
+
+                  {/* anchors */}
+                  {visHasAnchors() && config.orientation !== 'horizontal' && (
+                    <div className='edit-block'>
+                      <span className='edit-label column-heading'>Anchors</span>
+                      <Accordion allowZeroExpanded>
+                        {config.xAxis?.anchors?.map((anchor, index) => (
+                          <AccordionItem className='series-item series-item--chart' key={`xaxis-anchors-2-${index}`}>
+                            <AccordionItemHeading className='series-item__title'>
+                              <>
+                                <AccordionItemButton className={'accordion__button accordion__button'}>
+                                  Anchor {index + 1}
+                                  <button
+                                    className='series-list__remove'
+                                    onClick={e => {
+                                      e.preventDefault()
+                                      const copiedAnchorGroups = [...config.xAxis.anchors]
+                                      copiedAnchorGroups.splice(index, 1)
+                                      updateConfig({
+                                        ...config,
+                                        xAxis: {
+                                          ...config.xAxis,
+                                          anchors: copiedAnchorGroups
+                                        }
+                                      })
+                                    }}
+                                  >
+                                    Remove
+                                  </button>
+                                </AccordionItemButton>
+                              </>
+                            </AccordionItemHeading>
+                            <AccordionItemPanel>
+                              <label>
+                                <span>Anchor Value</span>
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>Enter the value as its shown in the data column</p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                                <input
+                                  type='text'
+                                  value={config.xAxis.anchors[index].value ? config.xAxis.anchors[index].value : ''}
+                                  onChange={e => {
                                     e.preventDefault()
-                                    const copiedAnchorGroups = [...config.xAxis.anchors]
-                                    copiedAnchorGroups.splice(index, 1)
+                                    const copiedAnchors = [...config.xAxis.anchors]
+                                    copiedAnchors[index].value = e.target.value
                                     updateConfig({
                                       ...config,
                                       xAxis: {
                                         ...config.xAxis,
-                                        anchors: copiedAnchorGroups
+                                        anchors: copiedAnchors
+                                      }
+                                    })
+                                  }}
+                                />
+                              </label>
+
+                              <label>
+                                <span>Anchor Color</span>
+                                <input
+                                  type='text'
+                                  value={config.xAxis.anchors[index].color ? config.xAxis.anchors[index].color : ''}
+                                  onChange={e => {
+                                    e.preventDefault()
+                                    const copiedAnchors = [...config.xAxis.anchors]
+                                    copiedAnchors[index].color = e.target.value
+                                    updateConfig({
+                                      ...config,
+                                      xAxis: {
+                                        ...config.xAxis,
+                                        anchors: copiedAnchors
+                                      }
+                                    })
+                                  }}
+                                />
+                              </label>
+
+                              <label>
+                                Anchor Line Style
+                                <select
+                                  value={config.xAxis.anchors[index].lineStyle || ''}
+                                  onChange={e => {
+                                    const copiedAnchors = [...config.xAxis.anchors]
+                                    copiedAnchors[index].lineStyle = e.target.value
+                                    updateConfig({
+                                      ...config,
+                                      xAxis: {
+                                        ...config.xAxis,
+                                        anchors: copiedAnchors
                                       }
                                     })
                                   }}
                                 >
-                                  Remove
-                                </button>
-                              </AccordionItemButton>
-                            </>
-                          </AccordionItemHeading>
-                          <AccordionItemPanel>
-                            <label>
-                              <span>Anchor Value</span>
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>Enter the value as its shown in the data column</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                              <input
-                                type='text'
-                                value={config.xAxis.anchors[index].value ? config.xAxis.anchors[index].value : ''}
-                                onChange={e => {
-                                  e.preventDefault()
-                                  const copiedAnchors = [...config.xAxis.anchors]
-                                  copiedAnchors[index].value = e.target.value
-                                  updateConfig({
-                                    ...config,
-                                    xAxis: {
-                                      ...config.xAxis,
-                                      anchors: copiedAnchors
-                                    }
-                                  })
-                                }}
-                              />
-                            </label>
+                                  <option>Select</option>
+                                  {lineOptions.map(line => (
+                                    <option key={line.key}>{line.value}</option>
+                                  ))}
+                                </select>
+                              </label>
+                            </AccordionItemPanel>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
 
-                            <label>
-                              <span>Anchor Color</span>
-                              <input
-                                type='text'
-                                value={config.xAxis.anchors[index].color ? config.xAxis.anchors[index].color : ''}
-                                onChange={e => {
-                                  e.preventDefault()
-                                  const copiedAnchors = [...config.xAxis.anchors]
-                                  copiedAnchors[index].color = e.target.value
-                                  updateConfig({
-                                    ...config,
-                                    xAxis: {
-                                      ...config.xAxis,
-                                      anchors: copiedAnchors
-                                    }
-                                  })
-                                }}
-                              />
-                            </label>
+                      <button
+                        className='btn full-width'
+                        onClick={e => {
+                          e.preventDefault()
+                          const anchors = [...config.xAxis.anchors]
+                          anchors.push({} as Anchor)
+                          updateConfig({
+                            ...config,
+                            xAxis: {
+                              ...config.xAxis,
+                              anchors
+                            }
+                          })
+                        }}
+                      >
+                        Add Anchor
+                      </button>
+                    </div>
+                  )}
 
-                            <label>
-                              Anchor Line Style
-                              <select
-                                value={config.xAxis.anchors[index].lineStyle || ''}
-                                onChange={e => {
-                                  const copiedAnchors = [...config.xAxis.anchors]
-                                  copiedAnchors[index].lineStyle = e.target.value
-                                  updateConfig({
-                                    ...config,
-                                    xAxis: {
-                                      ...config.xAxis,
-                                      anchors: copiedAnchors
-                                    }
-                                  })
-                                }}
-                              >
-                                <option>Select</option>
-                                {lineOptions.map(line => (
-                                  <option key={line.key}>{line.value}</option>
-                                ))}
-                              </select>
-                            </label>
-                          </AccordionItemPanel>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-
-                    <button
-                      className='btn full-width'
-                      onClick={e => {
-                        e.preventDefault()
-                        const anchors = [...config.xAxis.anchors]
-                        anchors.push({})
-                        updateConfig({
-                          ...config,
-                          xAxis: {
-                            ...config.xAxis,
-                            anchors
-                          }
-                        })
-                      }}
-                    >
-                      Add Anchor
-                    </button>
-                  </div>
-                )}
-
-                {visHasAnchors() && config.orientation === 'horizontal' && (
-                  <div className='edit-block'>
-                    <span className='edit-label column-heading'>Anchors</span>
-                    <Accordion allowZeroExpanded>
-                      {config.yAxis?.anchors?.map((anchor, index) => (
-                        <AccordionItem className='series-item series-item--chart' key={`accordion-yaxis-anchors-${index}`}>
-                          <AccordionItemHeading className='series-item__title'>
-                            <>
-                              <AccordionItemButton className={'accordion__button accordion__button'}>
-                                Anchor {index + 1}
-                                <button
-                                  className='series-list__remove'
-                                  onClick={e => {
+                  {visHasAnchors() && config.orientation === 'horizontal' && (
+                    <div className='edit-block'>
+                      <span className='edit-label column-heading'>Anchors</span>
+                      <Accordion allowZeroExpanded>
+                        {config.yAxis?.anchors?.map((anchor, index) => (
+                          <AccordionItem className='series-item series-item--chart' key={`accordion-yaxis-anchors-${index}`}>
+                            <AccordionItemHeading className='series-item__title'>
+                              <>
+                                <AccordionItemButton className={'accordion__button accordion__button'}>
+                                  Anchor {index + 1}
+                                  <button
+                                    className='series-list__remove'
+                                    onClick={e => {
+                                      e.preventDefault()
+                                      const copiedAnchorGroups = [...config.yAxis.anchors]
+                                      copiedAnchorGroups.splice(index, 1)
+                                      updateConfig({
+                                        ...config,
+                                        yAxis: {
+                                          ...config.yAxis,
+                                          anchors: copiedAnchorGroups
+                                        }
+                                      })
+                                    }}
+                                  >
+                                    Remove
+                                  </button>
+                                </AccordionItemButton>
+                              </>
+                            </AccordionItemHeading>
+                            <AccordionItemPanel>
+                              <label>
+                                <span>Anchor Value</span>
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>Enter the value as its shown in the data column</p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                                <input
+                                  type='text'
+                                  value={config.yAxis.anchors[index].value ? config.yAxis.anchors[index].value : ''}
+                                  onChange={e => {
                                     e.preventDefault()
-                                    const copiedAnchorGroups = [...config.yAxis.anchors]
-                                    copiedAnchorGroups.splice(index, 1)
+                                    const copiedAnchors = [...config.yAxis.anchors]
+                                    copiedAnchors[index].value = e.target.value
                                     updateConfig({
                                       ...config,
                                       yAxis: {
                                         ...config.yAxis,
-                                        anchors: copiedAnchorGroups
+                                        anchors: copiedAnchors
+                                      }
+                                    })
+                                  }}
+                                />
+                              </label>
+
+                              <label>
+                                <span>Anchor Color</span>
+                                <input
+                                  type='text'
+                                  value={config.yAxis.anchors[index].color ? config.yAxis.anchors[index].color : ''}
+                                  onChange={e => {
+                                    e.preventDefault()
+                                    const copiedAnchors = [...config.yAxis.anchors]
+                                    copiedAnchors[index].color = e.target.value
+                                    updateConfig({
+                                      ...config,
+                                      yAxis: {
+                                        ...config.yAxis,
+                                        anchors: copiedAnchors
+                                      }
+                                    })
+                                  }}
+                                />
+                              </label>
+
+                              <label>
+                                Anchor Line Style
+                                <select
+                                  value={config.yAxis.anchors[index].lineStyle || ''}
+                                  onChange={e => {
+                                    const copiedAnchors = [...config.yAxis.anchors]
+                                    copiedAnchors[index].lineStyle = e.target.value
+                                    updateConfig({
+                                      ...config,
+                                      yAxis: {
+                                        ...config.yAxis,
+                                        anchors: copiedAnchors
                                       }
                                     })
                                   }}
                                 >
-                                  Remove
-                                </button>
-                              </AccordionItemButton>
-                            </>
-                          </AccordionItemHeading>
-                          <AccordionItemPanel>
-                            <label>
-                              <span>Anchor Value</span>
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>Enter the value as its shown in the data column</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                              <input
-                                type='text'
-                                value={config.yAxis.anchors[index].value ? config.yAxis.anchors[index].value : ''}
-                                onChange={e => {
-                                  e.preventDefault()
-                                  const copiedAnchors = [...config.yAxis.anchors]
-                                  copiedAnchors[index].value = e.target.value
-                                  updateConfig({
-                                    ...config,
-                                    yAxis: {
-                                      ...config.yAxis,
-                                      anchors: copiedAnchors
-                                    }
-                                  })
-                                }}
-                              />
-                            </label>
+                                  <option>Select</option>
+                                  {lineOptions.map(line => (
+                                    <option key={line.key}>{line.value}</option>
+                                  ))}
+                                </select>
+                              </label>
+                            </AccordionItemPanel>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
 
-                            <label>
-                              <span>Anchor Color</span>
-                              <input
-                                type='text'
-                                value={config.yAxis.anchors[index].color ? config.yAxis.anchors[index].color : ''}
-                                onChange={e => {
-                                  e.preventDefault()
-                                  const copiedAnchors = [...config.yAxis.anchors]
-                                  copiedAnchors[index].color = e.target.value
-                                  updateConfig({
-                                    ...config,
-                                    yAxis: {
-                                      ...config.yAxis,
-                                      anchors: copiedAnchors
-                                    }
-                                  })
-                                }}
-                              />
-                            </label>
-
-                            <label>
-                              Anchor Line Style
-                              <select
-                                value={config.yAxis.anchors[index].lineStyle || ''}
-                                onChange={e => {
-                                  const copiedAnchors = [...config.yAxis.anchors]
-                                  copiedAnchors[index].lineStyle = e.target.value
-                                  updateConfig({
-                                    ...config,
-                                    yAxis: {
-                                      ...config.yAxis,
-                                      anchors: copiedAnchors
-                                    }
-                                  })
-                                }}
-                              >
-                                <option>Select</option>
-                                {lineOptions.map(line => (
-                                  <option key={line.key}>{line.value}</option>
-                                ))}
-                              </select>
-                            </label>
-                          </AccordionItemPanel>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-
-                    <button
-                      className='btn full-width'
-                      onClick={e => {
-                        e.preventDefault()
-                        const anchors = [...config.yAxis.anchors]
-                        anchors.push({})
-                        updateConfig({
-                          ...config,
-                          yAxis: {
-                            ...config.yAxis,
-                            anchors
-                          }
-                        })
-                      }}
-                    >
-                      Add Anchor
-                    </button>
-                  </div>
-                )}
-              </AccordionItemPanel>
-            </AccordionItem>
+                      <button
+                        className='btn full-width'
+                        onClick={e => {
+                          e.preventDefault()
+                          const anchors = [...config.yAxis.anchors]
+                          anchors.push({} as Anchor)
+                          updateConfig({
+                            ...config,
+                            yAxis: {
+                              ...config.yAxis,
+                              anchors
+                            }
+                          })
+                        }}
+                      >
+                        Add Anchor
+                      </button>
+                    </div>
+                  )}
+                </AccordionItemPanel>
+              </AccordionItem>
+            )}
             {visSupportsRegions() && (
               <AccordionItem>
                 <AccordionItemHeading>
@@ -2678,12 +2584,24 @@ const EditorPanel = () => {
                           <label>
                             <span className='edit-label column-heading'>Column</span>
                             <select
-                              value={config.columns[val] ? config.columns[val].name : columnsOptions[0]}
+                              value={config.columns[val] ? config.columns[val].name : getColumns()[0]}
                               onChange={event => {
                                 editColumn(val, 'name', event.target.value)
                               }}
                             >
-                              {columnsOptions}
+                              {getColumns().map(option => <option>{option}</option>)}
+                            </select>
+                          </label>
+                          <label>
+                            <span className='edit-label column-heading'>Associate to Series</span>
+                            <select
+                              value={config.columns[val] ? config.columns[val].series : ''}
+                              onChange={event => {
+                                editColumn(val, 'series', event.target.value)
+                              }}
+                            >
+                              <option value="">Select series</option>
+                              {config.series.map(series => <option>{series.dataKey}</option>)}
                             </select>
                           </label>
                           <TextField value={config.columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' updateField={updateField} />
@@ -2746,18 +2664,6 @@ const EditorPanel = () => {
                                       }}
                                     />
                                     <span className='edit-label'>Show in Forest Plot</span>
-                                  </label>
-                                </li>
-                                <li>
-                                  <label className='checkbox'>
-                                    <input
-                                      type='checkbox'
-                                      checked={config.columns[val].tooltips || false}
-                                      onChange={event => {
-                                        updateSeriesTooltip(val, event.target.checked)
-                                      }}
-                                    />
-                                    <span className='edit-label'>Show in tooltip</span>
                                   </label>
                                 </li>
                                 <li>
@@ -2832,20 +2738,18 @@ const EditorPanel = () => {
                             >
                               Remove
                             </button>
-                            <label>
-                              <span className='edit-label column-heading'>Category</span>
-                              <TextField
-                                value={val}
-                                section='legend'
-                                subsection={null}
-                                fieldName='additionalCategories'
-                                updateField={(section, subsection, fieldName, value) => {
-                                  const updatedAdditionaCategories = [...config.legend.additionalCategories]
-                                  updatedAdditionaCategories[i] = value
-                                  updateField(section, subsection, fieldName, updatedAdditionaCategories)
-                                }}
-                              />
-                            </label>
+                            <TextField
+                              value={val}
+                              label='Category'
+                              section='legend'
+                              subsection={null}
+                              fieldName='additionalCategories'
+                              updateField={(section, subsection, fieldName, value) => {
+                                const updatedAdditionaCategories = [...config.legend.additionalCategories]
+                                updatedAdditionaCategories[i] = value
+                                updateField(section, subsection, fieldName, updatedAdditionaCategories)
+                              }}
+                            />
                           </fieldset>
                         ))}
                       <button
@@ -2980,7 +2884,7 @@ const EditorPanel = () => {
                                 }}
                               >
                                 <option value=''>- Select Option -</option>
-                                {getFilters(true).map((dataKey, index) => (
+                                {getFilters().map((dataKey, index) => (
                                   <option value={dataKey} key={index}>
                                     {dataKey}
                                   </option>
@@ -3046,7 +2950,7 @@ const EditorPanel = () => {
                                             <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
                                               {(provided, snapshot) => (
                                                 <li>
-                                                  <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                  <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                                     {value}
                                                   </div>
                                                 </li>
@@ -3276,9 +3180,9 @@ const EditorPanel = () => {
                     />
                   </>
                 )}
-                {visSupportsBarThickness() && config.orientation === 'horizontal' && !config.isLollipopChart && config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label=' Bar Thickness' updateField={updateField} min='15' />}
+                {visSupportsBarThickness() && config.orientation === 'horizontal' && !config.isLollipopChart && config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label=' Bar Thickness' updateField={updateField} min={15} />}
                 {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') && <TextField value={config.barThickness} type='number' fieldName='barThickness' label='Bar Thickness' updateField={updateField} />}
-                {visSupportsBarSpace() && <TextField type='number' value={config.barSpace || '15'} fieldName='barSpace' label='Bar Space' updateField={updateField} min='0' />}
+                {visSupportsBarSpace() && <TextField type='number' value={config.barSpace || '15'} fieldName='barSpace' label='Bar Space' updateField={updateField} min={0} />}
                 {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.topAxis.hasLine} section='topAxis' fieldName='hasLine' label='Add Top Axis Line' updateField={updateField} />}
 
                 {config.visualizationType === 'Spark Line' && (

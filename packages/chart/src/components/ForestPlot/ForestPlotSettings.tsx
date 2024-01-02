@@ -1,119 +1,21 @@
 import React, { useContext, memo, useState, useEffect } from 'react'
-import ConfigContext from '../ConfigContext'
+import ConfigContext from '../../ConfigContext'
 import { useDebounce } from 'use-debounce'
-import WarningImage from '../images/warning.svg'
+import WarningImage from '../../images/warning.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import { type ChartContext } from '../../types/ChartContext'
+import { Select, CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
-const Select = memo(({ label, value, options, fieldName, section = null, subsection = null, required = false, tooltip, updateField, initial: initialValue, ...attributes }) => {
-  let optionsJsx = options.map((optionName, index) => (
-    <option value={optionName} key={index}>
-      {optionName}
-    </option>
-  ))
+type ForestPlotSettingsProps = {
+  // Fn for editing columns, used here for updating the datatable property.
+  editColumn: Function
+}
 
-  if (initialValue) {
-    optionsJsx.unshift(
-      <option value='' key='initial'>
-        {initialValue}
-      </option>
-    )
-  }
-
-  return (
-    <label>
-      <span className='edit-label'>
-        {label}
-        {tooltip}
-      </span>
-      <select
-        className={required && !value ? 'warning' : ''}
-        name={fieldName}
-        value={value}
-        onChange={event => {
-          updateField(section, subsection, fieldName, event.target.value)
-        }}
-        {...attributes}
-      >
-        {optionsJsx}
-      </select>
-    </label>
-  )
-})
-
-const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-  <label className='checkbox column-heading'>
-    <input
-      type='checkbox'
-      name={fieldName}
-      checked={value}
-      onChange={e => {
-        updateField(section, subsection, fieldName, !value)
-      }}
-      {...attributes}
-    />
-    <span className='edit-label'>
-      {label}
-      {tooltip}
-    </span>
-  </label>
-))
-
-/* eslint-disable react-hooks/rules-of-hooks */
-const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
-  const [value, setValue] = useState(stateValue)
-
-  const [debouncedValue] = useDebounce(value, 500)
-
-  useEffect(() => {
-    if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
-      updateField(section, subsection, fieldName, debouncedValue, i)
-    }
-  }, [debouncedValue]) // eslint-disable-line
-
-  let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
-
-  const onChange = e => {
-    if ('number' !== type || min === null) {
-      setValue(e.target.value)
-    } else {
-      if (!e.target.value || min <= parseFloat(e.target.value)) {
-        setValue(e.target.value)
-      } else {
-        setValue(min.toString())
-      }
-    }
-  }
-
-  let formElement = <input type='text' name={name} onChange={onChange} {...attributes} value={value} />
-
-  if ('textarea' === type) {
-    formElement = <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
-  }
-
-  if ('number' === type) {
-    formElement = <input type='number' name={name} onChange={onChange} {...attributes} value={value} />
-  }
-
-  if ('date' === type) {
-    formElement = <input type='date' name={name} onChange={onChange} {...attributes} value={value} />
-  }
-
-  return (
-    <label>
-      <span className='edit-label column-heading'>
-        {label}
-        {tooltip}
-      </span>
-      {formElement}
-    </label>
-  )
-})
-
-const ForestPlotSettings = () => {
-  const { config, rawData: unfilteredData, updateConfig, isDebug } = useContext(ConfigContext)
+const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
+  const { config, rawData: unfilteredData, updateConfig } = useContext<ChartContext>(ConfigContext)
 
   const enforceRestrictions = updatedConfig => {
     if (updatedConfig.orientation === 'horizontal') {
@@ -249,6 +151,26 @@ const ForestPlotSettings = () => {
       </AccordionItemHeading>
       <AccordionItemPanel>
         <Select
+          value={config.xAxis.dataKey || setCategoryAxis() || ''}
+          section='xAxis'
+          fieldName='dataKey'
+          label='Study Column'
+          initial='Select'
+          required={true}
+          updateField={updateField}
+          options={getColumns(false)}
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>Select the column or row containing the categories or dates for this axis. </p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+        />
+        <Select
           value={config.forestPlot.type}
           label='Forest Plot Type'
           initial={'Select'}
@@ -311,7 +233,6 @@ const ForestPlotSettings = () => {
         <Select
           value={config.forestPlot.shape}
           label='Point Estimate Shape'
-          initial={config.forestPlot.shape || 'Select'}
           onChange={e => {
             if (e.target.value !== '' && e.target.value !== 'Select') {
               updateConfig({
@@ -325,28 +246,6 @@ const ForestPlotSettings = () => {
             e.target.value = ''
           }}
           options={['text', 'circle', 'square']}
-        />
-
-        <Select
-          value={config.forestPlot.radius.scalingColumn}
-          label='Scale Radius Column'
-          initial={'Select'}
-          onChange={e => {
-            if (e.target.value !== '' && e.target.value !== 'Select') {
-              updateConfig({
-                ...config,
-                forestPlot: {
-                  ...config.forestPlot,
-                  radius: {
-                    ...config.forestPlot.radius,
-                    scalingColumn: e.target.value
-                  }
-                }
-              })
-            }
-            e.target.value = ''
-          }}
-          options={getColumns(false)}
         />
 
         <Select
@@ -412,7 +311,6 @@ const ForestPlotSettings = () => {
           options={['None', ...config.data.map(d => d[config.xAxis.dataKey])]}
         />
 
-        <CheckBox value={config.forestPlot?.hideDateCategoryCol || false} section='forestPlot' fieldName='hideDateCategoryCol' label='Hide Date Category Column' updateField={updateField} />
         <CheckBox value={config.forestPlot?.lineOfNoEffect?.show || false} section='forestPlot' subsection='lineOfNoEffect' fieldName='show' label='Show Line of No Effect' updateField={updateField} />
 
         <br />
@@ -496,12 +394,45 @@ const ForestPlotSettings = () => {
           />
         </label>
 
+        <TextField type='number' min={20} max={45} value={config.forestPlot.rowHeight ? config.forestPlot.rowHeight : 10} updateField={updateField} section='forestPlot' fieldName='rowHeight' label='Row Height' placeholder='10' />
+        <br />
+        <hr />
+        <br />
+        <h4>Labels Settings</h4>
+        <TextField type='text' value={config.forestPlot?.leftLabel || ''} updateField={updateField} section='forestPlot' fieldName='leftLabel' label='Left Label' />
+        <TextField type='text' value={config.forestPlot?.rightLabel || ''} updateField={updateField} section='forestPlot' fieldName='rightLabel' label='Right Label' />
+
+        <br />
+        <hr />
+        <br />
+        <Select
+          value={config.forestPlot.radius.scalingColumn}
+          label='Weight Column'
+          initial={'Select'}
+          onChange={e => {
+            if (e.target.value !== '' && e.target.value !== 'Select') {
+              updateConfig({
+                ...config,
+                forestPlot: {
+                  ...config.forestPlot,
+                  radius: {
+                    ...config.forestPlot.radius,
+                    scalingColumn: e.target.value
+                  }
+                }
+              })
+            }
+            e.target.value = ''
+          }}
+          options={getColumns(false)}
+        />
+
         <label>
           <span className='edit-label column-heading'>Radius Minimum Size</span>
           <input
-            min={1}
-            max={5}
-            value={config.forestPlot.radius.min}
+            min={3}
+            max={6}
+            value={config.forestPlot.radius.min || 3}
             onChange={e => {
               updateConfig({
                 ...config,
@@ -522,7 +453,7 @@ const ForestPlotSettings = () => {
         <label>
           <span className='edit-label column-heading'>Radius Maximum Size</span>
           <input
-            min={5}
+            min={7}
             max={10}
             value={config.forestPlot.radius.max}
             onChange={e => {
@@ -542,13 +473,6 @@ const ForestPlotSettings = () => {
             placeholder=' 1'
           />
         </label>
-        <TextField type='number' min={20} max={45} value={config.forestPlot.rowHeight ? config.forestPlot.rowHeight : 10} updateField={updateField} section='forestPlot' fieldName='rowHeight' label='Row Height' placeholder='10' />
-        <br />
-        <hr />
-        <br />
-        <h4>Labels Settings</h4>
-        <TextField type='text' value={config.forestPlot?.leftLabel || ''} updateField={updateField} section='forestPlot' fieldName='leftLabel' label='Left Label' />
-        <TextField type='text' value={config.forestPlot?.rightLabel || ''} updateField={updateField} section='forestPlot' fieldName='rightLabel' label='Right Label' />
       </AccordionItemPanel>
     </AccordionItem>
   )
