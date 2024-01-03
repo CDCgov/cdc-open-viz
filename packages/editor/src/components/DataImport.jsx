@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { csvParse } from 'd3'
-import { get } from 'axios'
+import axios from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
@@ -92,18 +92,20 @@ export default function DataImport() {
 
     try {
       // eslint-disable-next-line no-unused-vars
-      const response = await get(dataURL, {
-        responseType: 'blob'
-      }).then(response => {
-        responseBlob = response.data
+      const response = await axios
+        .get(dataURL, {
+          responseType: 'blob'
+        })
+        .then(response => {
+          responseBlob = response.data
 
-        // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
-        if (fileExtension === '.csv' && responseBlob.type === 'text/plain') {
-          responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
-        } else if (fileExtension === '.json' && responseBlob.type === 'text/plain') {
-          responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
-        }
-      })
+          // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
+          if (fileExtension === '.csv' && responseBlob.type === 'text/plain') {
+            responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
+          } else if (fileExtension === '.json' && responseBlob.type === 'text/plain') {
+            responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
+          }
+        })
     } catch (err) {
       console.error(err)
 
@@ -349,6 +351,7 @@ export default function DataImport() {
     asyncWrapper()
   }, [config.datasets]) // eslint-disable-line
 
+  // todo: code repetition in Widget.jsx?
   const updateDescriptionProp = (visualizationKey, datasetKey, key, value) => {
     if (config.type === 'dashboard') {
       let dataDescription = { ...config.datasets[datasetKey].dataDescription, [key]: value }

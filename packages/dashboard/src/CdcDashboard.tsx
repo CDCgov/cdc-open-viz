@@ -27,7 +27,7 @@ import CdcMarkupInclude from '@cdc/markup-include'
 import CdcFilteredText from '@cdc/filtered-text'
 
 import Grid from './components/Grid'
-import Header, { FilterBehavior } from './components/Header'
+import Header, { FilterBehavior } from './components/Header/Header'
 import defaults from './data/initial-state'
 import DataTable from '@cdc/core/components/DataTable'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -35,15 +35,22 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
 import { gatherQueryParams } from '@cdc/core/helpers/gatherQueryParams'
-import { SharedFilter } from './types/SharedFilter'
-import { APIFilter } from './types/APIFilter'
-import { DataSet } from './types/DataSet'
-import { Config, Visualization } from './types/Config'
+import { capitalizeSplitAndJoin } from '@cdc/core/helpers/cove/string'
+
 import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import { filterData } from './helpers/filterData'
 import { getFormattedData } from './helpers/getFormattedData'
 import { getVizKeys } from './helpers/getVizKeys'
+import Title from '@cdc/core/components/ui/Title'
+import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
+
+// types
+import { type SharedFilter } from './types/SharedFilter'
+import { type APIFilter } from './types/APIFilter'
+import { type DataSet } from './types/DataSet'
+import { type Config } from './types/Config'
+import { type Visualization } from '@cdc/core/types/Visualization'
 
 type DropdownOptions = Record<'value' | 'text', string>[]
 
@@ -65,6 +72,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
   const [apiFilterDropdowns, setAPIFilterDropdowns] = useState<APIFilterDropdowns>({})
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+
+  const replacements = {
+    'Remove Spaces': '',
+    'Keep Spaces': ' ',
+    'Replace With Underscore': '_'
+  }
 
   const inNoDataState = useMemo(() => {
     const vals = Object.values(state.data)
@@ -164,8 +177,18 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
         const params = getParentParams(filter)
         const notAllParentsSelected = params?.some(({ value }) => value === '')
         if (notAllParentsSelected) return // don't send request for dependent children filter options
-        if (apiFilterDropdowns[_key] && !params) return // don't reload filter unless it's a child
-        const endpoint = baseEndpoint + (params ? gatherQueryParams(params) : '')
+        if (apiFilterDropdowns[_key] && !params && filter.filterBy === 'Query String') return // don't reload filter unless it's a child
+        let endpoint = baseEndpoint + (params ? gatherQueryParams(params) : '')
+        console.log('filter.filterBy', filter.filterBy)
+        if (filter.filterBy === 'Parent Filter') {
+          let parentFilter = sharedAPIFilters.find(f => f.key === filter.parents)
+          // reset api endpoint
+          // Build API endpiont based on parent filter value
+          // ie. https://data.cdc.gov/resource/tajw-whir.json?$select=distinct%20county&geography=Nevada
+          endpoint = ''
+          endpoint = `${baseEndpoint}&${filter.queryParameter}=${parentFilter.active}`
+        }
+
         fetch(endpoint)
           .then(resp => resp.json())
           .then(data => {
@@ -185,23 +208,38 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
       let newDatasets = { ...config.datasets }
       let datasetsNeedsUpdate = false
       let datasetKeys = Object.keys(config.datasets)
+      let newFileName = ''
+
       for (let i = 0; i < datasetKeys.length; i++) {
         const datasetKey = datasetKeys[i]
         const dataset = config.datasets[datasetKey]
         if (dataset.dataUrl && config.dashboard && config.dashboard.sharedFilters) {
-          const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl)
+          const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl, window.location.origin)
           let currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
           let updatedQSParams = {}
 
           let isUpdateNeeded = false
 
           config.dashboard.sharedFilters.forEach(filter => {
+            if (filter.filterBy === 'File Name') {
+              // if no file name is entered use the default active filter. ie. /activeFilter.json
+              if (!filter.fileName && filter.datasetKey === datasetKey) newFileName = filter.active
+              // if a file name is found, ie, state_${query}, use that, ie. state_activeFilter.json
+              if (filter.datasetKey === datasetKey && filter.fileName) newFileName = capitalizeSplitAndJoin.call(String(filter.fileName), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces'])
+              if (newFileName && newFileName.includes('${query}')) {
+                newFileName = newFileName.replace('${query}', capitalizeSplitAndJoin.call(String(filter.active), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces']))
+              }
+            }
+
             if (filter.type === 'urlfilter' && !!filter.queryParameter) {
               if (updatedQSParams[filter.queryParameter]) {
                 updatedQSParams[filter.queryParameter] = updatedQSParams[filter.queryParameter] + filter.active
               } else {
                 updatedQSParams[filter.queryParameter] = filter.active
               }
+            }
+            if (filter.filterBy === 'File Name') {
+              isUpdateNeeded = true
             }
           })
 
@@ -220,6 +258,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           })
           const _params = Object.keys(updatedQSParams).map(key => ({ key, value: updatedQSParams[key] }))
           let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${gatherQueryParams(_params)}`
+
+          if (newFileName !== '') {
+            let fileExtension = dataUrl.pathname.split('.').pop()
+            let pathWithoutFilename = dataUrl.pathname.substring(0, dataUrl.pathname.lastIndexOf('/'))
+            dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${newFileName}.${fileExtension}${gatherQueryParams(_params)}`
+          }
 
           let newDataset = await fetchRemoteData(`${dataUrlFinal}`)
 
@@ -613,7 +657,18 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
             body = (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Map' />
-                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} isDebug={isDebug} setConfig={_updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true} showLoader={false} />
+                <CdcMap
+                  key={visualizationKey}
+                  config={visualizationConfig}
+                  isEditor={true}
+                  isDebug={isDebug}
+                  setConfig={_updateConfig}
+                  setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                  setSharedFilterValue={setSharedFilterValue}
+                  isDashboard={true}
+                  showLoader={false}
+                  dashboardConfig={state.config}
+                />
               </>
             )
             break
@@ -686,12 +741,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
       <>
         {isEditor && <Header setPreview={setPreview} />}
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
-          {/* Title */}
-          {title && (
-            <div role='heading' aria-level={3} className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>
-              {parse(title)}
-            </div>
-          )}
+          <Title title={title} isDashboard={true} classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]} />
           {/* Description */}
           {description && <div className='subtext'>{parse(description)}</div>}
           {/* Filters */}
@@ -835,7 +885,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           </section>
 
           {/* Data Table */}
-          {config.table && !!config.data?.length && (
+          {config?.table?.show && config?.data && (
             <DataTable
               config={config}
               rawData={config.data}
@@ -851,7 +901,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
               isEditor={isEditor}
             />
           )}
-          {config.table &&
+          {config.table?.show &&
             config.datasets &&
             Object.keys(config.datasets).map(datasetKey => {
               //For each dataset, find any shared filters that apply to all visualizations using the dataset
@@ -889,19 +939,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
                   <DataTable
-                    config={config}
+                    config={config as TableConfig}
                     dataConfig={config.datasets[datasetKey]}
                     rawData={config.datasets[datasetKey].data}
                     runtimeData={filteredTableData || config.datasets[datasetKey].data || []}
                     expandDataTable={config.table.expanded}
-                    showDownloadButton={config.table.download}
                     tableTitle={datasetKey}
                     viewport={currentViewport}
                     tabbingId={datasetKey}
-                    outerContainerRef={outerContainerRef}
-                    imageRef={imageId}
-                    isDebug={isDebug}
-                    isEditor={isEditor}
                   />
                 </div>
               )

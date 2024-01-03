@@ -13,6 +13,7 @@ import { supportedCities, supportedStates } from '../data/supported-geos'
 import { geoAlbersUsa } from 'd3-composite-projections'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 
 import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
 
@@ -271,7 +272,6 @@ const UsaMap = props => {
           fill: legendColors[2]
         }
       }
-
       return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} territory={territory} territoryData={territoryData} />
     }
   })
@@ -369,8 +369,6 @@ const UsaMap = props => {
               {state.hexMap.shapeGroups.map((group, groupIndex) => {
                 return group.items.map((item, itemIndex) => {
                   if (item.operator === '=') {
-                    console.log('group', item.value)
-                    console.log('geoData', geoData)
                     if (geoData[item.key] === item.value) {
                       return (
                         <Group top={centroid[1] - 5} left={centroid[0] - iconSize} color={textColor} textAnchor='start'>
@@ -387,10 +385,36 @@ const UsaMap = props => {
           )
         }
 
+        const sizes = {
+          small: '8',
+          medium: '10',
+          large: '12'
+        }
+
         return (
           <g data-name={geoName} key={key}>
-            <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
+            <g className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
+              {state.map.patterns.map((patternData, patternIndex) => {
+                const { pattern, dataKey, size } = patternData
+                let defaultPatternColor = 'black'
+                const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
+
+                if (chroma.contrast(defaultPatternColor, legendColors[0]) < 3.5) {
+                  defaultPatternColor = 'white'
+                }
+
+                return (
+                  hasMatchingValues && (
+                    <>
+                      {pattern === 'waves' && <PatternWaves id={`${dataKey}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
+                      {pattern === 'circles' && <PatternCircles id={`${dataKey}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
+                      {pattern === 'lines' && <PatternLines id={`${dataKey}`} height={sizes[size] ?? 6} width={sizes[size] ?? 6} stroke={defaultPatternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
+                      <path className={`pattern-geoKey--${dataKey}`} tabIndex={-1} stroke='transparent' d={path} fill={`url(#${dataKey})`} />
+                    </>
+                  )
+                )
+              })}
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
               {isHex && state.hexMap.type === 'shapes' && getArrowDirection(geoData, geo, legendColors[0])}
             </g>
@@ -401,7 +425,7 @@ const UsaMap = props => {
       // Default return state, just geo with no additional information
       return (
         <g data-name={geoName} key={key}>
-          <g className='geo-group' css={styles}>
+          <g className='geo-group' style={styles}>
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
             {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}
           </g>

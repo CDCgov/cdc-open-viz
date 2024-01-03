@@ -1,9 +1,10 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../ConfigContext'
-
+import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 export const useBarChart = () => {
-  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate } = useContext(ConfigContext)
+  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight } = useContext(ConfigContext)
   const { orientation } = config
+  const [hoveredBar, setHoveredBar] = useState(null)
 
   const isHorizontal = orientation === 'horizontal'
   const barBorderWidth = 1
@@ -80,7 +81,7 @@ export const useBarChart = () => {
     if (!config.legend.colorCode && config.series.length > 1) {
       return currentBarColor
     }
-    const palettesArr = colorPalettes[config.palette]
+    const palettesArr = config.customColors ?? colorPalettes[config.palette]
     const values = tableData.map(d => {
       return d[config.legend.colorCode]
     })
@@ -144,10 +145,10 @@ export const useBarChart = () => {
   }
 
   const getHighlightedBarColorByValue = value => {
-    const match = config?.highlightedBarValues.filter(item => {
+    const match = config?.highlightedBarValues.find(item => {
       if (!item.value) return
       return config.xAxis.type === 'date' ? formatDate(parseDate(item.value)) === value : item.value === value
-    })[0]
+    })
 
     if (!match?.color) return `rgba(255, 102, 1)`
     return match.color
@@ -161,8 +162,67 @@ export const useBarChart = () => {
     if (!match?.color) return false
     return match
   }
+  const generateIconSize = barWidth => {
+    if (barWidth < 4) {
+      return 1
+    }
+    if (barWidth < 5) {
+      return 4
+    }
+    if (barWidth < 10) {
+      return 6
+    }
+    if (barWidth < 15) {
+      return 7
+    }
+    if (barWidth < 20) {
+      return 8
+    }
+    if (barWidth < 90) {
+      return 8
+    }
+    return 0
+  }
+
+  const getAdditionalColumn = (series, xAxisDataValue) => {
+    if (!xAxisDataValue) return ''
+    const columns = config.columns
+    const columnsWithTooltips = []
+    let additionalTooltipItems = ''
+    const closestVal =
+      tableData.find(d => {
+        return d[config.xAxis.dataKey] === xAxisDataValue
+      }) || {}
+    Object.keys(columns).forEach(colKeys => {
+      if(series && config.columns[colKeys].series && config.columns[colKeys].series !== series) return
+      const formattingParams = {
+        addColPrefix: config.columns[colKeys].prefix,
+        addColSuffix: config.columns[colKeys].suffix,
+        addColRoundTo: config.columns[colKeys].roundToPlace ? config.columns[colKeys].roundToPlace : '',
+        addColCommas: config.columns[colKeys].commas
+      }
+
+      const formattedValue = formatColNumber(closestVal[config.columns[colKeys].name], 'left', true, config, formattingParams)
+      if (config.columns[colKeys].tooltips) {
+        columnsWithTooltips.push([config.columns[colKeys].label, formattedValue])
+      }
+    })
+    columnsWithTooltips.forEach(columnData => {
+      additionalTooltipItems += `${columnData[0]} : ${columnData[1]} <br/>`
+    })
+    return additionalTooltipItems
+  }
+
+  const onMouseOverBar = (categoryValue, barKey) => {
+    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight' && barKey) setSeriesHighlight([barKey])
+    setHoveredBar(categoryValue)
+  }
+  const onMouseLeaveBar = () => {
+    if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') setSeriesHighlight([])
+  }
 
   return {
+    generateIconSize,
     isHorizontal,
     barBorderWidth,
     lollipopBarWidth,
@@ -181,6 +241,11 @@ export const useBarChart = () => {
     updateBars,
     assignColorsToValues,
     getHighlightedBarColorByValue,
-    getHighlightedBarByValue
+    getHighlightedBarByValue,
+    getAdditionalColumn,
+    hoveredBar,
+    setHoveredBar,
+    onMouseOverBar,
+    onMouseLeaveBar
   }
 }

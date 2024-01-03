@@ -1,7 +1,5 @@
 @import '@cdc/core/styles/base';
 @import '@cdc/core/styles/heading-colors';
-@import 'mixins';
-@import 'variables';
 @import '@cdc/core/styles/v2/themes/color-definitions';
 
 .form-container {
@@ -17,7 +15,6 @@
 
 .cdc-open-viz-module.type-chart {
   @import 'DataTable';
-  @import 'editor-panel';
 
   border-radius: 3px;
 
@@ -71,34 +68,6 @@
 
     path {
       fill: #d8000c;
-    }
-  }
-
-  .chart-title {
-    position: relative;
-    padding: 0.6em 0.8em;
-    margin: 0;
-    color: #fff;
-    font-size: 1.1em;
-    border-bottom-width: 3px;
-    border-bottom-style: solid;
-
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-
-    em {
-      font-style: italic;
-    }
-
-    strong {
-      font-weight: bold;
-    }
-
-    &:not(:empty) {
-      margin: 0 0 1rem 0 !important;
-      padding: 0.6em 0.8em;
-      border-bottom-width: 3px;
-      border-bottom-style: solid;
     }
   }
 
@@ -672,10 +641,6 @@
 
   .cove-component__content.component--hideBackgroundColor {
     background: transparent;
-  }
-
-  .chart-title:not(:empty) {
-    margin-bottom: 0 !important;
   }
 
   .cove-component__content .chart-container {

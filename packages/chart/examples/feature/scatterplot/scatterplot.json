@@ -1,10 +1,17 @@
 {
   "type": "chart",
-  "title": "Scatter Plot",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
   "barHasBorder": "false",
   "isLollipopChart": false,
   "lollipopShape": "circle",
@@ -13,42 +20,87 @@
   "barStyle": "",
   "roundingStyle": "standard",
   "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "showDownloadButton": false
+  },
   "padding": {
     "left": 5,
     "right": 5
   },
+  "suppressedData": [],
   "yAxis": {
-    "dataKey": "y",
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
     "size": 50,
-    "gridLines": true,
+    "gridLines": false,
+    "enablePadding": false,
     "min": "",
     "max": "",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
     "rightHideAxis": true,
-    "rightAxisSize": 50,
+    "rightAxisSize": 0,
+    "rightLabel": "",
     "rightLabelOffsetSize": 0,
     "rightAxisLabelColor": "#333",
     "rightAxisTickLabelColor": "#333",
     "rightAxisTickColor": "#333",
-    "isLegendValue": false,
     "numTicks": "",
-    "label": "Y Axis"
+    "axisPadding": 0,
+    "tickRotation": 0,
+    "anchors": []
   },
-  "boxplot": [],
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
+    },
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "total": "Total",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
+  },
   "topAxis": {
     "hasLine": false
   },
+  "isLegendValue": false,
   "barThickness": 0.35,
   "barHeight": 25,
-  "height": 300,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 750
+  },
   "xAxis": {
-    "type": "",
+    "sortDates": false,
+    "anchors": [],
+    "type": "continuous",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
@@ -59,10 +111,13 @@
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "isLegendValue": false,
     "numTicks": "",
+    "labelOffset": 65,
+    "axisPadding": 0,
+    "target": 0,
+    "maxTickRotation": 0,
     "dataKey": "x",
-    "label": "X Axis"
+    "tickWidthMax": 21
   },
   "table": {
     "label": "Data Table",
@@ -70,12 +125,19 @@
     "limitHeight": false,
     "height": "",
     "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "indexLabel": "",
+    "download": false,
+    "showVertical": true,
     "show": true
   },
   "orientation": "vertical",
+  "color": "pinkpurple",
+  "columns": {},
   "legend": {
+    "hide": false,
     "behavior": "isolate",
-    "position": "right",
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
@@ -84,53 +146,230 @@
     "dynamicLegendDefaultText": "Show All",
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
-    "dynamicLegendChartMessage": "Select Options from the Legend"
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false
+  },
+  "brush": {
+    "height": 25,
+    "data": [],
+    "active": false
   },
   "exclusions": {
     "active": false,
     "keys": []
   },
-  "palette": "qualitative1",
+  "palette": "qualitative-bold",
   "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
   "labels": false,
   "dataFormat": {
     "commas": false,
     "prefix": "",
     "suffix": "",
-    "useFormat": false
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
   },
   "confidenceKeys": {},
   "visual": {
     "border": true,
     "accent": true,
-    "background": true
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false
   },
-  "dataUrl": "/examples/feature/scatterplot/scatterplot-continuous.csv",
-  "visualizationType": "Scatter Plot",
-  "description": "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.",
-  "dataDescription": {
-    "horizontal": false,
-    "series": false,
-    "singleRow": false,
-    "xKey": "Group_Category",
-    "valueKey": "Value"
-  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
   "series": [
     {
       "dataKey": "y1",
-      "type": "Bar"
+      "type": "Scatter Plot",
+      "axis": "Left",
+      "tooltip": true
     },
     {
       "dataKey": "y2",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "y3",
-      "type": "Bar"
-    },
-    {
-      "dataKey": "y4",
-      "type": "Bar"
+      "type": "Scatter Plot",
+      "axis": "Left",
+      "tooltip": true
     }
-  ]
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "circle",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "datasets": {},
+  "visualizationType": "Scatter Plot",
+  "data": [
+    {
+      "x": "1",
+      "y1": "8",
+      "y2": "37",
+      "y3": "72",
+      "y4": "82"
+    },
+    {
+      "x": "2",
+      "y1": "2",
+      "y2": "30",
+      "y3": "75",
+      "y4": "83"
+    },
+    {
+      "x": "3",
+      "y1": "15",
+      "y2": "42",
+      "y3": "51",
+      "y4": "95"
+    },
+    {
+      "x": "4",
+      "y1": "10",
+      "y2": "38",
+      "y3": "61",
+      "y4": "96"
+    },
+    {
+      "x": "5",
+      "y1": "1",
+      "y2": "38",
+      "y3": "66",
+      "y4": "86"
+    },
+    {
+      "x": "60",
+      "y1": "6",
+      "y2": "37",
+      "y3": "70",
+      "y4": "85"
+    },
+    {
+      "x": "10",
+      "y1": "19",
+      "y2": "47",
+      "y3": "59",
+      "y4": "91"
+    },
+    {
+      "x": "24",
+      "y1": "18",
+      "y2": "32",
+      "y3": "68",
+      "y4": "89"
+    },
+    {
+      "x": "3",
+      "y1": "7",
+      "y2": "38",
+      "y3": "74",
+      "y4": "89"
+    },
+    {
+      "x": "26",
+      "y1": "10",
+      "y2": "39",
+      "y3": "56",
+      "y4": "91"
+    },
+    {
+      "x": "42",
+      "y1": "16",
+      "y2": "38",
+      "y3": "55",
+      "y4": "76"
+    },
+    {
+      "x": "32",
+      "y1": "20",
+      "y2": "46",
+      "y3": "52",
+      "y4": "94"
+    },
+    {
+      "x": "11",
+      "y1": "9",
+      "y2": "41",
+      "y3": "57",
+      "y4": "86"
+    },
+    {
+      "x": "22",
+      "y1": "10",
+      "y2": "47",
+      "y3": "56",
+      "y4": "80"
+    },
+    {
+      "x": "73",
+      "y1": "1",
+      "y2": "36",
+      "y3": "71",
+      "y4": "94"
+    },
+    {
+      "x": "23",
+      "y1": "13",
+      "y2": "30",
+      "y3": "66",
+      "y4": "78"
+    }
+  ],
+  "dataFileName": "valid-scatterplot.csv",
+  "dataFileSourceType": "file",
+  "validated": 4.23,
+  "dynamicMarginTop": 0
 }
