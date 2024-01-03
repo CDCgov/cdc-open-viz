@@ -22,3 +22,4 @@ Author(s) and Year,Confidence,Timing,N,Estimate,Lower,Upper,Result
 "Knox, 2020",L,T1,2080,22.9,-89.5,135.2,"22.9 [-89.5, 135.2]"
 "Manning, 2017",L,T2-T3,2463,-133.4,-349.9,83.1,"-133.4 [-349.9, 83.1]"
 "Jackson, 2018",L,B,1880,14,-168.5,196.5,"14 [-168.5, 196.5]"
+"Total", "","","", -10, -20, 0, "Result"

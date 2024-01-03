@@ -1,6 +1,10 @@
+import { Series } from '@cdc/core/types/Series'
+import { Runtime } from '@cdc/core/types/Runtime'
 import { DataSet } from './DataSet'
 import { SharedFilter } from './SharedFilter'
 import { Visualization } from '@cdc/core/types/Visualization'
+import { Table } from '@cdc/core/types/Table'
+import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 
 export type Config = DataSet & {
   dashboard: {
@@ -15,11 +19,11 @@ export type Config = DataSet & {
   visualizations: {
     [vizKey: string]: Visualization
   }
-  series: { dataKey: string }[]
+  series: Series
   datasets: Record<string, DataSet>
   dataFileName: string
-  table: any
+  table: Table
   rows: any[]
-  filterBehavior: string
-  runtime: { editorErrorMessage: string }
+  filterBehavior: FilterBehavior
+  runtime: Runtime
 }

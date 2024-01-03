@@ -11,6 +11,17 @@
   .loading > div.la-ball-beat {
     margin-top: 20%;
   }
+
+  .visually-hidden {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
   @include breakpointClass(md) {
     .map-container.modal-background::before {
       border-bottom: $lightGray 1px solid;
@@ -41,26 +52,6 @@
 
   .no-border {
     border: 0;
-  }
-
-  div.map-title {
-    margin: 0;
-    color: #fff;
-    font-size: 1.1em;
-    position: relative;
-    em {
-      font-style: italic;
-    }
-    strong {
-      font-weight: bold;
-    }
-  }
-
-  div.map-title:not(:empty) {
-    padding: 0.6em 0.8em;
-    border-bottom-width: 3px;
-    border-bottom-style: solid;
-    margin: 0 0 1rem 0 !important;
   }
 
   .map-container {

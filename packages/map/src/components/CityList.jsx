@@ -104,7 +104,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
     }
 
     return (
-      <g key={i} transform={transform} css={styles} className='geo-point'>
+      <g key={i} transform={transform} style={styles} className='geo-point'>
         {state.visual.cityStyle === 'circle' && circle}
         {state.visual.cityStyle === 'pin' && pin}
       </g>

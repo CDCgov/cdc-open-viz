@@ -51,6 +51,7 @@ table.data-table {
   overflow: auto;
   appearance: none;
   table-layout: fixed;
+  display: grid;
   * {
     box-sizing: border-box;
   }
@@ -64,6 +65,7 @@ table.data-table {
       background: none;
       font-size: initial;
       color: #fff;
+      border: 0;
     }
 
     tr {
@@ -136,6 +138,7 @@ table.data-table {
   }
 
   tbody {
+    display: table-cell;
     tr {
       width: 100%;
       &:hover {

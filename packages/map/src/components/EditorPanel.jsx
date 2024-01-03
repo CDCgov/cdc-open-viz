@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
 
+import PatternSettings from './PatternSettings'
+
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -1135,7 +1137,7 @@ const EditorPanel = props => {
 
   useEffect(() => {
     //If a categorical map is used and the order is either not defined or incorrect, fix it
-    if ('category' === state.legend.type) {
+    if ('category' === state.legend.type && runtimeLegend && runtimeLegend.runtimeDataHash) {
       let valid = true
       if (state.legend.categoryValuesOrder) {
         runtimeLegend.forEach(item => {
@@ -1616,7 +1618,7 @@ const EditorPanel = props => {
                     <option value='data'>Data</option>
                     {state.general.geoType === 'us-county' && <option value='us-geocode'>Geocode</option>}
                     {state.general.geoType === 'world' && <option value='world-geocode'>Geocode</option>}
-                    <option value='navigation'>Navigation</option>
+                    {state.general.geoType !== 'us-county' && <option value='navigation'>Navigation</option>}
                     {(state.general.geoType === 'world' || state.general.geoType === 'us') && <option value='bubble'>Bubble</option>}
                   </select>
                 </label>
@@ -2569,6 +2571,22 @@ const EditorPanel = props => {
                   <label className='checkbox'>
                     <input
                       type='checkbox'
+                      checked={state.table.wrapColumns}
+                      onChange={event => {
+                        setState({
+                          ...state,
+                          table: {
+                            ...state.table,
+                            wrapColumns: event.target.checked
+                          }
+                        })
+                      }}
+                    />
+                    <span className='edit-label column-heading'>WRAP DATA TABLE COLUMNS</span>
+                  </label>
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
                       checked={state.table.forceDisplay !== undefined ? state.table.forceDisplay : !isDashboard}
                       onChange={event => {
                         handleEditorChanges('showDataTable', event.target.checked)
@@ -2609,7 +2627,7 @@ const EditorPanel = props => {
                     updateField={updateField}
                     section='table'
                     fieldName='caption'
-                    label='Data Table Caption'
+                    label='Screen Reader Description'
                     placeholder='Data Table'
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
@@ -2997,6 +3015,7 @@ const EditorPanel = props => {
                 </button>
               </AccordionItemPanel>
             </AccordionItem>
+            <PatternSettings />
           </Accordion>
           <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
         </section>

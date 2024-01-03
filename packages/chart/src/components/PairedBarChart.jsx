@@ -47,11 +47,11 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
   // Set label color
   let labelColor = '#000000'
 
-  if (chroma.contrast(labelColor, groupOne.color) < 4.9) {
+  if (groupOne.color && chroma.contrast(labelColor, groupOne.color) < 4.9) {
     groupOne.labelColor = '#FFFFFF'
   }
 
-  if (chroma.contrast(labelColor, groupTwo.color) < 4.9) {
+  if (groupTwo.color && chroma.contrast(labelColor, groupTwo.color) < 4.9) {
     groupTwo.labelColor = '#FFFFFF'
   }
 
