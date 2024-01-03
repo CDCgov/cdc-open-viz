@@ -1,20 +1,23 @@
 import React from 'react'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
-import Icon from '@cdc/core/components/ui/Icon'
+import Icon from '../ui/Icon'
 import { CheckBox, TextField } from './Inputs'
 import type { Table } from '@cdc/core/types/Table'
+import MultiSelect from '../MultiSelect'
+import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 
 interface DataTableProps {
   config: {
     table: Table
     visualizationType: string
   }
-  updateField: Function
+  updateField: UpdateFieldFunc<string | boolean | string[] | number>
   isDashboard: boolean
   isLoadedFromUrl: boolean
+  columns: string[]
 }
 
-const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard, isLoadedFromUrl }) => {
+const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard, isLoadedFromUrl, columns }) => {
   return (
     <>
       <TextField
@@ -96,9 +99,9 @@ const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard,
       />
       <CheckBox value={config.table.limitHeight} section='table' fieldName='limitHeight' label='Limit Table Height' updateField={updateField} />
       <CheckBox
-        value={config.table.showAllColumns}
-        fieldName='showAllColumns'
-        label='Show All Columns'
+        value={config.table.customTableConfig}
+        fieldName='customTableConfig'
+        label='Customize Table Config'
         section='table'
         updateField={updateField}
         tooltip={
@@ -112,6 +115,7 @@ const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard,
           </Tooltip>
         }
       />
+      {config.table.customTableConfig && <MultiSelect options={columns.map(c => ({ label: c, value: c }))} fieldName='excludeColumns' label='Exclude Columns' section='table' updateField={updateField} />}
       {config.table.limitHeight && <TextField value={config.table.height} fieldName='height' label='Data Table Height' type='number' min={0} max={500} placeholder='Height(px)' updateField={updateField} />}
       <CheckBox value={config.table.expanded} fieldName='expanded' label='Expanded by Default' section='table' updateField={updateField} />
       {isDashboard && <CheckBox value={config.table.showDataTableLink} fieldName='showDataTableLink' label='Show Data Table Name & Link' section='table' updateField={updateField} />}

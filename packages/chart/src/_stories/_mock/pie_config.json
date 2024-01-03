@@ -101,7 +101,7 @@
     "download": false,
     "showVertical": true,
     "show": true,
-    "showAllColumns": true
+    "customTableConfig": true
   },
   "orientation": "vertical",
   "color": "pinkpurple",

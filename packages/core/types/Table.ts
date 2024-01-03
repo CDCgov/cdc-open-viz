@@ -13,5 +13,6 @@ export type Table = {
   download?: boolean
   showDownloadImgButton?: boolean
   showDownloadPdfButton?: boolean
-  showAllColumns?: boolean
+  customTableConfig?: boolean
+  excludeColumns?: string[]
 }

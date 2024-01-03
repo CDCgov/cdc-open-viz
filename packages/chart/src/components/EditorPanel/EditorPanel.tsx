@@ -3255,7 +3255,7 @@ const EditorPanel = () => {
                   <AccordionItemButton>Data Table</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <DataTableEditor config={config} updateField={updateField} isDashboard={isDashboard} isLoadedFromUrl={isLoadedFromUrl} />{' '}
+                  <DataTableEditor config={config} columns={Object.keys(data[0] || {})} updateField={updateField} isDashboard={isDashboard} isLoadedFromUrl={isLoadedFromUrl} />{' '}
                 </AccordionItemPanel>
               </AccordionItem>
             )}
