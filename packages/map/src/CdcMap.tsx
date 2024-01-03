@@ -1315,7 +1315,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (newState.dataUrl && !urlFilters) {
       // handle urls with spaces in the name.
       if (newState.dataUrl) newState.dataUrl = `${newState.dataUrl}`
-      console.log(newState.dataUrl);
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
 
       if (newData && newState.dataDescription) {
