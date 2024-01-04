@@ -106,6 +106,37 @@ const Sankey = ({ width, height }: SankeyProps) => {
     return { textPositionHorizontal, textPositionVertical, classStyle, storyNodes }
   }
 
+  const activeConnection = (id: String) => {
+    const currentNode = sankeyData.nodes.find(node => node.id === id);
+
+    const sourceNodes = [];
+    const activeLinks = [];
+
+    if (currentNode) {
+      links.forEach((link) => {
+        const targetObj: any = link.target
+        const sourceObj: any = link.source
+        if(targetObj.id === id) {
+          sourceNodes.push(sourceObj.id);
+        }
+      })
+
+      sourceNodes.forEach((id) => {
+        links.forEach((link) => {
+          const targetObj: any = link.target
+          const sourceObj: any = link.source
+          if(targetObj.id === tooltipID && sourceObj.id === id) {
+            activeLinks.push(link);
+          }
+        })
+
+      })
+    }
+
+    return {sourceNodes, activeLinks}
+  }
+
+
   const tooltipVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).value}`;
   const tooltipPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).value_pct}%)`;
   const tooltipSummary = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).summary}`;
@@ -141,14 +172,16 @@ const Sankey = ({ width, height }: SankeyProps) => {
   // Draw the nodes
   const allNodes = filteredNodes.map((node, i) => {
     let { textPositionHorizontal, textPositionVertical, classStyle, storyNodes } = nodeStyle(node.id)
+    let { sourceNodes } = activeConnection(tooltipID);
 
     let opacityValue = sankeyConfig.opacity.nodeOpacityDefault
     let nodeColor = sankeyConfig.nodeColor.default
 
-    if (tooltipID !== node.id && tooltipID !== '') {
+    if (tooltipID !== node.id && tooltipID !== '' && !sourceNodes.includes(node.id)) {
       nodeColor = sankeyConfig.nodeColor.inactive
       opacityValue = sankeyConfig.opacity.nodeOpacityInactive
     }
+
 
     return (
       <Group className='' key={i} innerRef={el => (groupRefs.current[i] = el)}>
@@ -249,7 +282,9 @@ const Sankey = ({ width, height }: SankeyProps) => {
     let opacityValue = sankeyConfig.opacity.LinkOpacityDefault
     let strokeColor = sankeyConfig.linkColor.default
 
-    if (tooltipID !== targetObj.id && tooltipID !== sourceObj.id && tooltipID !== '') {
+    let { activeLinks } = activeConnection(tooltipID)
+
+    if (!activeLinks.includes(link) && tooltipID !== '') {
       strokeColor = sankeyConfig.linkColor.inactive
       opacityValue = sankeyConfig.opacity.LinkOpacityInactive
     }
