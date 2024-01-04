@@ -69,17 +69,17 @@ const iconHash = {
 
 export const ICON_TYPES = Object.keys(iconHash)
 
-const Icon = ({ display = '', base, alt = '', size, color, style, ...attributes }) => {
+const Icon = ({ display = '', base = undefined, alt = '', size = undefined, color = undefined, style = undefined, ...attributes }) => {
   const IconObj = iconHash[display] || null
 
   const filteredAttrs = { ...attributes }
   delete filteredAttrs.className
 
   const styles = {
-    ...style,
     color: color ? color : null,
     width: size ? size + 'px' : null,
-    cursor: display === 'move' ? 'move' : 'default'
+    cursor: display === 'move' ? 'move' : 'default',
+    ...style
   }
 
   return (
