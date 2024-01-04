@@ -1053,7 +1053,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                   )}
                 </>
               )}
-              {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
+              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Forest Plot' && <Legend />}
             </div>
             {/* Link */}
             {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
