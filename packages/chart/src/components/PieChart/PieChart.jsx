@@ -94,7 +94,7 @@ const PieChart = props => {
             </Group>
           )
         })}
-        {transitions.map(({ item: arc, key }) => {
+        {transitions.map(({ item: arc, key }, i) => {
           const [centroidX, centroidY] = path.centroid(arc)
           const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1
 
@@ -104,7 +104,7 @@ const PieChart = props => {
           }
 
           return (
-            <animated.g key={key}>
+            <animated.g key={`${key}${i}`}>
               {hasSpaceForLabel && (
                 <Text style={{ fill: textColor }} x={centroidX} y={centroidY} dy='.33em' textAnchor='middle' pointerEvents='none'>
                   {Math.round((((arc.endAngle - arc.startAngle) * 180) / Math.PI / 360) * 100) + '%'}

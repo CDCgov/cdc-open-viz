@@ -1,4 +1,5 @@
 export type Table = {
+  cellMinWidth?: number
   label?: string
   show?: boolean
   showVertical?: boolean
@@ -12,5 +13,6 @@ export type Table = {
   download?: boolean
   showDownloadImgButton?: boolean
   showDownloadPdfButton?: boolean
-  showAllColumns?: boolean
+  customTableConfig?: boolean
+  excludeColumns?: string[]
 }
