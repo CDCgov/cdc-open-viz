@@ -89,7 +89,7 @@ export const RowType: Story = {
         label: 'Data Table',
         expanded: true,
         show: true,
-        showAllColumns: true
+        customTableConfig: true
       }
     } as unknown as TableConfig,
     dataConfig: { data: rowTypeData },

@@ -17,7 +17,7 @@ type TableProps = {
     'aria-rowcount'?: number
     cellMinWidth?: number
   }
-  wrapColumns: boolean
+  wrapColumns?: boolean
   hasRowType?: boolean // if it has row type then the first column is the row type which will explain how to render the row
 }
 

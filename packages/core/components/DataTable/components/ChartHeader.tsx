@@ -31,16 +31,19 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
           const text = getSeriesName(column, config)
 
           return (
-            <th style={{minWidth: (config.table.cellMinWidth || 0) + 'px'}}
+            <th
+              style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
               key={`col-header-${column}__${index}`}
               tabIndex={0}
               title={text}
               role='columnheader'
               scope='col'
               onClick={() => {
+                if (hasRowType) return
                 setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false, colIndex: index })
               }}
               onKeyDown={e => {
+                if (hasRowType) return
                 if (e.keyCode === 13) {
                   setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false, colIndex: index })
                 }
@@ -66,7 +69,8 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
           let column = config.xAxis?.dataKey
           let text = row !== '__series__' ? getChartCellValue(row, column, config, data) : '__series__'
           return (
-            <th style={{minWidth: (config.table.cellMinWidth || 0) + 'px'}}
+            <th
+              style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
               key={`col-header-${text}__${index}`}
               tabIndex={0}
               title={text}

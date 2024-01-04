@@ -23,7 +23,7 @@ export type DataTableProps = {
   colorScale?: Function
   columns?: { navigate: { name: string } }
   // determines if columns should be wrapped in the table
-  wrapColumns: boolean
+  wrapColumns?: boolean
   config: TableConfig
   dataConfig?: Object
   displayDataAsText?: Function

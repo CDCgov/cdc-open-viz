@@ -1,6 +1,6 @@
-const Cell = ({ children, wrapColumns, cellMinWidth, isBold = false }) => {
+const Cell = ({ children, style, isBold = false }) => {
   return (
-    <td tabIndex={0} role='gridcell' style={{ whiteSpace: wrapColumns ? 'unset' : 'nowrap', minWidth: (cellMinWidth || 0) + 'px' }}>
+    <td tabIndex={0} role='gridcell' style={style}>
       {isBold ? <strong>{children}</strong> : children}
     </td>
   )
