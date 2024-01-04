@@ -1,0 +1,42 @@
+[
+  {
+    "type": "row_group",
+    "overall": "",
+    "male": "",
+    "female": "",
+    "row_type": "row_group",
+    "nullColumn": null
+  },
+  {
+    "type": "row_group_total",
+    "overall": "100",
+    "male": "50",
+    "female": "50",
+    "row_type": "row_group_total",
+    "nullColumn": null
+  },
+  {
+    "type": "regular",
+    "overall": "50",
+    "male": "25",
+    "female": "25",
+    "row_type": null,
+    "nullColumn": null
+  },
+  {
+    "type": "regular",
+    "overall": "50",
+    "male": "25",
+    "female": "25",
+    "row_type": null,
+    "nullColumn": null
+  },
+  {
+    "type": "total",
+    "overall": "100",
+    "male": "50",
+    "female": "50",
+    "row_type": "total",
+    "nullColumn": null
+  }
+]

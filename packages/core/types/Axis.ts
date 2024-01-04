@@ -36,5 +36,6 @@ export type Axis = {
   target?: number
   targetLabel?: string
   tickRotation?: number
+  tickWidthMax?: number
   type: string
 }

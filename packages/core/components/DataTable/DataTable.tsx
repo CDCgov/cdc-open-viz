@@ -15,6 +15,7 @@ import Table from '../Table'
 import chartCellMatrix from './helpers/chartCellMatrix'
 import regionCellMatrix from './helpers/regionCellMatrix'
 import boxplotCellMatrix from './helpers/boxplotCellMatrix'
+import customColumns from './helpers/customColumns'
 import { TableConfig } from './types/TableConfig'
 
 export type DataTableProps = {
@@ -22,7 +23,7 @@ export type DataTableProps = {
   colorScale?: Function
   columns?: { navigate: { name: string } }
   // determines if columns should be wrapped in the table
-  wrapColumns: boolean
+  wrapColumns?: boolean
   config: TableConfig
   dataConfig?: Object
   displayDataAsText?: Function
@@ -91,19 +92,21 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const rawRows = Object.keys(runtimeData)
+  const _runtimeData = config.table.customTableConfig ? customColumns(runtimeData, config.table.excludeColumns) : runtimeData
+
+  const rawRows = Object.keys(_runtimeData)
   const rows = isVertical
     ? rawRows.sort((a, b) => {
         let dataA
         let dataB
         if (config.type === 'map' && config.columns) {
           const sortByColName = config.columns[sortBy.column].name
-          dataA = runtimeData[a][sortByColName]
-          dataB = runtimeData[b][sortByColName]
+          dataA = _runtimeData[a][sortByColName]
+          dataB = _runtimeData[b][sortByColName]
         }
         if (config.type === 'chart' || config.type === 'dashboard') {
-          dataA = runtimeData[a][sortBy.column]
-          dataB = runtimeData[b][sortBy.column]
+          dataA = _runtimeData[a][sortBy.column]
+          dataB = _runtimeData[b][sortBy.column]
         }
         return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
       })
@@ -113,6 +116,8 @@ const DataTable = (props: DataTableProps) => {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
     OverflowY: 'scroll'
   }
+
+  const hasRowType = !!Object.keys(rawData[0]).find((v: string) => v.match(/row[_-]?type/i))
 
   const caption = useMemo(() => {
     if (config.type === 'map') {
@@ -154,12 +159,13 @@ const DataTable = (props: DataTableProps) => {
           <div className='table-container' style={limitHeight}>
             <Table
               wrapColumns={wrapColumns}
-              childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, wrapColumns, ...props }) : chartCellMatrix({ rows, ...props, isVertical, sortBy })}
+              childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData: _runtimeData }) : chartCellMatrix({ rows, ...props, runtimeData: _runtimeData, isVertical, sortBy, hasRowType })}
               tableName={config.type}
               caption={caption}
               stickyHeader
-              headContent={config.type === 'map' ? <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} /> : <ChartHeader data={runtimeData} {...props} isVertical={isVertical} sortBy={sortBy} setSortBy={setSortBy} />}
-              tableOptions={{ className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`, 'aria-live': 'assertive', 'aria-rowcount': config?.data?.length ? config.data.length : -1, hidden: !expanded, cellMinWidth: config.table.cellMinWidth }}
+              hasRowType={hasRowType}
+              headContent={config.type === 'map' ? <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} /> : <ChartHeader data={_runtimeData} {...props} hasRowType={hasRowType} isVertical={isVertical} sortBy={sortBy} setSortBy={setSortBy} />}
+              tableOptions={{ className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`, 'aria-live': 'assertive', 'aria-rowcount': config?.data?.length ? config.data.length : -1, hidden: !expanded }}
             />
 
             {/* REGION Data Table */}

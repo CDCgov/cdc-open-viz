@@ -1,4 +1,4 @@
-import Icon from '@cdc/core/components/ui/Icon'
+import Icon from '../../ui/Icon'
 
 const ExpandCollapse = ({ expanded, setExpanded, tableTitle }) => (
   <div
