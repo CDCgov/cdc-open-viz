@@ -5,14 +5,17 @@ type RowProps = {
   childRow: ReactNode[]
   rowKey: string
   wrapColumns: boolean
-  cellMinWidth: Number
+  isTotal?: boolean
+  cellMinWidth?: number
 }
 
-const Row = ({ childRow, rowKey, wrapColumns, cellMinWidth }: RowProps) => {
+const Row = ({ childRow, rowKey, wrapColumns, cellMinWidth = 0, isTotal }: RowProps) => {
+  const whiteSpace = wrapColumns ? 'unset' : 'nowrap'
+  const minWidth = cellMinWidth + 'px'
   return (
     <tr>
       {childRow.map((child, i) => (
-        <Cell key={rowKey + '__' + i} wrapColumns={wrapColumns} cellMinWidth={cellMinWidth}>
+        <Cell key={rowKey + '__' + i} style={{ whiteSpace, minWidth }} isBold={isTotal}>
           {child}
         </Cell>
       ))}

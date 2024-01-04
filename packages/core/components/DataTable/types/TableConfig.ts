@@ -1,18 +1,11 @@
 import { Axis } from '@cdc/core/types/Axis'
 import { Series } from '@cdc/core/types/Series'
 import { Runtime } from '@cdc/core/types/Runtime'
+import { Table } from '@cdc/core/types/Table'
 
 export type TableConfig = {
   type?: string
-  table: {
-    showVertical?: boolean
-    indexLabel: string
-    limitHeight: boolean
-    height: string | number
-    caption: string
-    download: boolean,
-    cellMinWidth?: number
-  }
+  table: Table
   xAxis?: Axis
   yAxis?: Axis
   boxplot?: {
@@ -47,7 +40,8 @@ export type TableConfig = {
     }
   }
   legend?: {
-    specialClasses: { key: string; label: string; value: string }[]
+    specialClasses?: { key: string; label: string; value: string }[]
+    hide?: boolean
   }
   series?: Series
   regions?: { label: string; from: string; to: string }[]
