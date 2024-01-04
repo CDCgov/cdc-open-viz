@@ -158,6 +158,69 @@
     ],
     "tooltips": [
       {
+        "node": "Suicide EMS Responses",
+        "value": 467136,
+        "value_pct": "100",
+        "summary": "Total number of suicide EMS responses.",
+        "Gender" : [
+            {
+              "gender": "Female",
+              "dem_value": "218195",
+              "dem_pct": "46.71"
+            },
+            {
+              "gender": "Male",
+              "dem_value": "243481",
+              "dem_pct": "52.12"
+            },
+            {
+              "gender": "Unknown",
+              "dem_value": "5460",
+              "dem_pct": "1.17"
+            }
+
+        ],
+        "Race and ethnicity" : [
+         {
+            "race_ethnicity": "Non-Hispanic White",
+            "dem_value": "245998",
+            "dem_pct": "52.66"
+          },
+          {
+            "race_ethnicity": "Non-Hispanic Black",
+            "dem_value": "93244",
+            "dem_pct": "19.96"
+          },
+          {
+            "race_ethnicity": "Hispanic",
+            "dem_value": "41396",
+            "dem_pct": "8.86"
+          },
+          {
+            "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
+            "dem_value": "4470",
+            "dem_pct": "0.96"
+          },
+          {
+            "race_ethnicity": "Non-Hispanic Asian",
+            "dem_value": "6160",
+            "dem_pct": "1.32"
+          },
+          
+          {
+            "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "dem_value": "1287",
+            "dem_pct": "0.28" 
+          },
+          {
+            "race_ethnicity": "Missing",
+            "dem_value" : "74581",
+            "dem_pct": "15.97"
+          }
+        ]
+
+      },
+      {
         "node": "Dead",
         "value": 4736,
         "value_pct": "1.01",
