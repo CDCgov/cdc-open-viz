@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 // visx
 import { Group } from '@visx/group'
@@ -21,25 +21,7 @@ const ForestPlot = (props: ForestPlotProps) => {
   const { xScale, yScale, config, height, width, handleTooltipMouseOff, handleTooltipMouseOver } = props
   const { forestPlot } = config as ChartConfig
   const labelPosition = config.xAxis.tickWidthMax + 10
-
-  // Requirements for forest plot
-  // - force legend to be hidden for this chart type
-  // - reset the date category axis to zero
-  useEffect(() => {
-    if (!config.legend.hide) {
-      updateConfig({
-        ...config,
-        legend: {
-          ...config.legend,
-          hide: true
-        },
-        xAxis: {
-          ...config.xAxis,
-          size: 0
-        }
-      })
-    }
-  }, [])
+  const [initialLogTicksSet, setInitialLogTicks] = useState(false)
 
   useEffect(() => {
     try {
@@ -64,6 +46,16 @@ const ForestPlot = (props: ForestPlotProps) => {
         })
       }
 
+      // Add weight column into tooltip and data table.
+      if (config.forestPlot.radius.scalingColumn) {
+        newConfig.columns[config.forestPlot.radius.scalingColumn] = {}
+        newConfig.columns[config.forestPlot.radius.scalingColumn].dataKey = newConfig.forestPlot.radius.scalingColumn
+        newConfig.columns[config.forestPlot.radius.scalingColumn].name = newConfig.forestPlot.radius.scalingColumn
+        newConfig.columns[config.forestPlot.radius.scalingColumn].label = newConfig.forestPlot.radius.scalingColumn
+        newConfig.columns[config.forestPlot.radius.scalingColumn].dataTable = true
+        newConfig.columns[config.forestPlot.radius.scalingColumn].tooltips = true
+      }
+
       if (newConfig.table.showVertical) {
         newConfig.table.indexLabel = config.xAxis.dataKey
       }
@@ -73,6 +65,19 @@ const ForestPlot = (props: ForestPlotProps) => {
       console.log(e.message)
     }
   }, [])
+
+  useEffect(() => {
+    if (!initialLogTicksSet && config.forestPlot.type === 'Logarithmic') {
+      updateConfig({
+        ...config,
+        dataFormat: {
+          ...config.dataFormat,
+          roundTo: 2
+        }
+      })
+      setInitialLogTicks(true)
+    }
+  }, [config.forestPlot.type])
 
   const pooledData = config.data.find(d => d[config.xAxis.dataKey] === config.forestPlot.pooledResult.column)
 
@@ -108,7 +113,7 @@ const ForestPlot = (props: ForestPlotProps) => {
 
   return (
     <>
-      <Group>
+      <Group width={width}>
         {forestPlot.title && (
           <Text className={`forest-plot--title`} x={forestPlot.type === 'Linear' ? xScale(0) : xScale(1)} y={0} textAnchor='middle' verticalAnchor='start' fontSize={getFontSize(config.fontSize)} fill={'black'}>
             {forestPlot.title}

@@ -11,7 +11,6 @@ import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemB
 
 type ForestPlotSettingsProps = {}
 
-// TODO: Rename to panel?
 const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
   const { config, rawData: unfilteredData, updateConfig } = useContext<ChartContext>(ConfigContext)
 
@@ -286,28 +285,29 @@ const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
           options={getColumns(false)}
         />
 
-        <Select
-          value={config.forestPlot.pooledResult.column}
-          label='Pooled Result Row'
-          initial={config.forestPlot.pooledResult.column || 'Select'}
-          required={false}
-          onChange={e => {
-            if (e.target.value !== '' && e.target.value !== 'Select') {
-              updateConfig({
-                ...config,
-                forestPlot: {
-                  ...config.forestPlot,
-                  pooledResult: {
-                    ...config.forestPlot.pooledResult,
-                    column: e.target.value
+        <label>
+          <span className='edit-label column-heading'>
+            Pooled Result Column
+            <input
+              type='text'
+              value={config.forestPlot.pooledResult.column || ''}
+              label='Pooled Result Row'
+              onChange={e => {
+                updateConfig({
+                  ...config,
+                  forestPlot: {
+                    ...config.forestPlot,
+                    pooledResult: {
+                      ...config.forestPlot.pooledResult,
+                      column: e.target.value
+                    }
                   }
-                }
-              })
-            }
-            e.target.value = ''
-          }}
-          options={['None', ...config.data.map(d => d[config.xAxis.dataKey])]}
-        />
+                })
+                e.target.value = ''
+              }}
+            />
+          </span>
+        </label>
 
         <CheckBox value={config.forestPlot?.lineOfNoEffect?.show || false} section='forestPlot' subsection='lineOfNoEffect' fieldName='show' label='Show Line of No Effect' updateField={updateField} />
 
