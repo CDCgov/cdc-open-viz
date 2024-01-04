@@ -8,6 +8,7 @@
 
 .cdc-open-viz-module.type-chart {
   .editor-panel {
+    @import './components/panels.scss';
     display: flex;
     flex-direction: column;
     position: fixed;

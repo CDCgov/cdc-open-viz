@@ -8,6 +8,15 @@ import { Table } from '@cdc/core/types/Table'
 
 export type ChartColumns = Record<string, Column>
 
+type Region = {
+  from: string
+  to: string
+  label: string
+  color: string
+  background: string
+  range: 'Custom' | string
+}
+
 type BoxPlot = {
   firstQuartilePercentage: number
   [key: string]: any
@@ -146,6 +155,7 @@ type AllChartsConfig = {
   yAxis: Axis
   xScale: Function
   yScale: Function
+  regions: Region[]
 }
 
 export type ForestPlotConfig = {
