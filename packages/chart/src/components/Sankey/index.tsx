@@ -106,8 +106,36 @@ const Sankey = ({ width, height }: SankeyProps) => {
     return { textPositionHorizontal, textPositionVertical, classStyle, storyNodes }
   }
 
+  const tooltipVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).value}`;
+  const tooltipPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).value_pct}%)`;
+  const tooltipSummary = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).summary}`;
+  
   const sankeyToolTip = `<div class="sankey-chart__tooltip">
-                    <span class="sankey-chart__tooltip--header">${tooltipID}</span>
+                    <span class="sankey-chart__tooltip--tooltip-header">${tooltipID}</span>
+                    <span class="sankey-chart__tooltip--tooltip-header">${tooltipVal}${tooltipPct}</span>
+                    <span><strong>Summary:</strong>${tooltipSummary}</span>
+                    <div class="sankey-chart__tooltip--info-section">
+                    <div>
+                      <h3>Gender</h3>
+                        <ul>
+                          <li>Male:</li>
+                          <li>Female:</li>
+                          <li>Unknown:</li>
+                        </ul>
+                      </div>
+                      <div>
+                      <h3>Race and ethnicity</h3>
+                        <ul>
+                          <li>Non-Hispanic White:</li>
+                          <li>Non-Hispanic Black:</li>
+                          <li>Hispanic:</li>
+                          <li>Non-Hispanic American Indian or Alaska Native:</li>
+                          <li>Non-Hispanic Asian:</li>
+                          <li>Non-Hispanic Native Hawaiian or Other Pacific Islander:</li>
+                          <li>Missing</li>
+                          </ul>
+                      </div>
+                    </div>
                   </div>`
 
   // Draw the nodes

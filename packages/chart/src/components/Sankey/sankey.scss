@@ -36,8 +36,21 @@
   /* Hover card */
   .sankey-chart__tooltip {
     color: black;
+    display: flex;
+    flex-direction: column;
+    margin:10px;
     &--tooltip-header {
       font-weight: var(--font-weight-bold);
     }
+    &--info-section {
+      display:flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  span {
+    max-width: 500px;
+    word-wrap: break-word;
   }
 }
