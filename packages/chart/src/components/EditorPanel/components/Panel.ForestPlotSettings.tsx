@@ -6,12 +6,11 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { type ChartContext } from '../../../types/ChartContext'
 import { Select, CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { type PanelProps } from './PanelProps'
 
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
-type ForestPlotSettingsProps = {}
-
-const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
+const ForestPlotSettings = ({ name }: PanelProps) => {
   const { config, rawData: unfilteredData, updateConfig } = useContext<ChartContext>(ConfigContext)
 
   const enforceRestrictions = updatedConfig => {
@@ -142,7 +141,7 @@ const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
     <AccordionItem>
       <AccordionItemHeading>
         <AccordionItemButton>
-          Forest Plot Settings
+          {name}
           {(!config.forestPlot.estimateField || !config.forestPlot.upper || !config.forestPlot.lower) && <WarningImage width='25' className='warning-icon' />}
         </AccordionItemButton>
       </AccordionItemHeading>

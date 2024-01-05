@@ -237,7 +237,6 @@ export default {
     leftLabel: '',
     rightLabel: ''
   },
-
   area: {
     isStacked: false
   }
