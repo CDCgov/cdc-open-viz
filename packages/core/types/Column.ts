@@ -1,5 +1,3 @@
-import { Series } from './Series'
-
 export type Column = {
   name?: string
   label: string

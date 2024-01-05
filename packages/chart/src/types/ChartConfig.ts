@@ -56,7 +56,7 @@ type Filter = {
   values: string[]
 }
 
-type Legend = {
+export type Legend = {
   additionalCategories: string[]
   // general legend onClick behavior
   behavior: 'highlight' | 'isolate' | string
@@ -95,6 +95,10 @@ type AllChartsConfig = {
   barStyle: string
   barThickness: number
   boxplot: BoxPlot
+  brush: {
+    active: boolean
+    height: number
+  }
   chartMessage: { noData?: string }
   colorMatchLineSeriesLabels: boolean
   columns: ChartColumns
@@ -104,6 +108,7 @@ type AllChartsConfig = {
   dataFormat: DataFormat
   dataKey: string
   description: string
+  dynamicMarginTop: number
   exclusions: Exclusions
   filters: Filter[]
   filterBehavior: FilterBehavior

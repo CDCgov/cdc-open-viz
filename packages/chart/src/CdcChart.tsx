@@ -12,7 +12,6 @@ import { timeParse, timeFormat } from 'd3-time-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
-import chroma from 'chroma-js'
 
 // Primary Components
 import ConfigContext from './ConfigContext'
@@ -25,6 +24,15 @@ import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
+import { abbreviateNumber } from './helpers/abbreviateNumber'
+import { getQuartiles } from './helpers/getQuartiles'
+import { sortAsc, sortDesc } from './helpers/sort'
+import { filterData } from './helpers/filterData'
+import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
+import { lineOptions } from './helpers/lineOptions'
+import { handleLineType } from './helpers/handleLineType'
+import { generateColorsArray } from './helpers/generateColorsArray'
+import { computeMarginBottom } from './helpers/computeMarginBottom'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -44,13 +52,6 @@ import './scss/main.scss'
 import DataTable from '@cdc/core/components/DataTable'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
-
-const generateColorsArray = (color = '#000000', special = false) => {
-  let colorObj = chroma(color)
-  let hoverColor = special ? colorObj.brighten(0.5).hex() : colorObj.saturate(1.3).hex()
-
-  return [color, hoverColor, colorObj.darken(0.3).hex()]
-}
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
@@ -87,34 +88,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
-
-  const sortAsc = (a, b) => {
-    return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
-  }
-
-  const sortDesc = (a, b) => {
-    return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
-  }
-
-  const handleChartAriaLabels = (state, testing = false) => {
-    if (testing) console.log(`handleChartAriaLabels Testing On:`, state) // eslint-disable-line
-    try {
-      if (!state.visualizationType) throw Error('handleChartAriaLabels: no visualization type found in state')
-      let ariaLabel = ''
-
-      if (state.visualizationType) {
-        ariaLabel += `${state.visualizationType} chart`
-      }
-
-      if (state.title && state.visualizationType) {
-        ariaLabel += ` with the title: ${state.title}`
-      }
-
-      return ariaLabel
-    } catch (e) {
-      console.error('COVE: ', e.message) // eslint-disable-line
-    }
-  }
 
   const reloadURLData = async () => {
     if (config.dataUrl) {
@@ -181,44 +154,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     }
   }
-
-  const handleLineType = lineType => {
-    switch (lineType) {
-      case 'dashed-sm':
-        return '5 5'
-      case 'Dashed Small':
-        return '5 5'
-      case 'dashed-md':
-        return '10 5'
-      case 'Dashed Medium':
-        return '10 5'
-      case 'dashed-lg':
-        return '15 5'
-      case 'Dashed Large':
-        return '15 5'
-      default:
-        return 0
-    }
-  }
-
-  const lineOptions = [
-    {
-      value: 'Dashed Small',
-      key: 'dashed-sm'
-    },
-    {
-      value: 'Dashed Medium',
-      key: 'dashed-md'
-    },
-    {
-      value: 'Dashed Large',
-      key: 'dashed-lg'
-    },
-    {
-      value: 'Solid Line',
-      key: 'solid-line'
-    }
-  ]
 
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
@@ -392,37 +327,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       let tableData: any[] = []
       const plots: any[] = []
 
-      /**
-       * Calculates the first quartile (q1) and third quartile (q3) from an array of integers or decimals.
-       *
-       * @param {Array} arr - The array of integers or decimals.
-       * @returns {Object} An object containing the q1 and q3 values.
-       */
-      const getQuartiles = arr => {
-        arr.sort((a, b) => a - b)
-
-        // Calculate the index of the median value of the array
-        const medianIndex = Math.floor(arr.length / 2)
-
-        // Check if the length of the array is even or odd
-        const isEvenLength = arr.length % 2 === 0
-
-        // Split the array into two subarrays based on the median index
-        const q1Array = isEvenLength ? arr.slice(0, medianIndex) : arr.slice(0, medianIndex + 1)
-        const q3Array = isEvenLength ? arr.slice(medianIndex) : arr.slice(medianIndex + 1)
-
-        // Calculate the median of the first subarray to get the q1 value
-        const q1Index = Math.floor(q1Array.length / 2)
-        const q1 = isEvenLength ? (q1Array[q1Index - 1] + q1Array[q1Index]) / 2 : q1Array[q1Index]
-
-        // Calculate the median of the second subarray to get the q3 value
-        const q3Index = Math.floor(q3Array.length / 2)
-        const q3 = isEvenLength ? (q3Array[q3Index - 1] + q3Array[q3Index]) / 2 : q3Array[q3Index]
-
-        // Return an object containing the q1 and q3 values
-        return { q1, q3 }
-      }
-
       // group specific statistics
       // prevent re-renders
       if (!groups) return
@@ -563,25 +467,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
 
     setConfig(newConfig)
-  }
-
-  const filterData = (filters, data) => {
-    let filteredData: any[] = []
-
-    data.forEach(row => {
-      let add = true
-      filters
-        .filter(filter => filter.type !== 'url')
-        .forEach(filter => {
-          if (row[filter.columnName] != filter.active) {
-            add = false
-          }
-        })
-
-      if (add) filteredData.push(row)
-    })
-
-    return filteredData
   }
 
   // Gets filter values from dataset
@@ -839,24 +724,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     context.font = font || getComputedStyle(document.body).font
 
     return Math.ceil(context.measureText(text).width)
-  }
-
-  const abbreviateNumber = num => {
-    let unit = ''
-    let absNum = Math.abs(num)
-
-    if (absNum >= 1e9) {
-      unit = 'B'
-      num = num / 1e9
-    } else if (absNum >= 1e6) {
-      unit = 'M'
-      num = num / 1e6
-    } else if (absNum >= 1e3) {
-      unit = 'K'
-      num = num / 1e3
-    }
-
-    return num + unit
   }
 
   // Format numeric data based on settings in config OR from passed in settings for Additional Columns
@@ -1138,62 +1005,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return key
   }
 
-  const computeMarginBottom = (config: Config, asNumber = false): string => {
-    const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
-    const isHorizontal = config.orientation === 'horizontal'
-    const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
-    const isBrush = config.brush.active
-    const offset = 20
-    const brushHeight = config.brush.height
-    let bottom = 0
-    if (!isLegendBottom && isHorizontal && !config.yAxis.label) {
-      bottom = Number(config.xAxis.labelOffset)
-    }
-    if (!isLegendBottom && isHorizontal && config.yAxis.label && !config.isResponsiveTicks) {
-      bottom = Number(config.runtime.xAxis.size) + Number(config.xAxis.labelOffset)
-    }
-    if (!isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks) {
-      bottom = config.dynamicMarginTop + offset
-    }
-    if (!isLegendBottom && isHorizontal && !config.yAxis.label && config.isResponsiveTicks) {
-      bottom = config.dynamicMarginTop ? config.dynamicMarginTop - offset : Number(config.xAxis.labelOffset) - offset
-    }
-    if (!isLegendBottom && isHorizontal && config.yAxis.label && config.isResponsiveTicks) {
-      bottom = config.dynamicMarginTop ? config.dynamicMarginTop + offset : Number(config.xAxis.labelOffset)
-    }
-
-    if (!isHorizontal && !isLegendBottom && config.xAxis.label && tickRotation && !config.isResponsiveTicks) {
-      bottom = isBrush ? brushHeight + config.xAxis.tickWidthMax + -config.xAxis.size + config.xAxis.labelOffset + offset : config.xAxis.tickWidthMax + offset + -config.xAxis.size + config.xAxis.labelOffset
-    }
-    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && tickRotation && !config.isResponsiveTicks) {
-    }
-    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && tickRotation && !config.dynamicMarginTop && !config.isResponsiveTicks) {
-      bottom = isBrush ? config.xAxis.tickWidthMax + brushHeight + offset + -config.xAxis.size : 0
-    }
-
-    if (!isHorizontal && !isLegendBottom && config.xAxis.label && !tickRotation && !config.isResponsiveTicks) {
-      bottom = isBrush ? brushHeight + -config.xAxis.size + config.xAxis.labelOffset + offset : -config.xAxis.size + config.xAxis.labelOffset + offset
-    }
-    if (!isHorizontal && !isLegendBottom && config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks) {
-      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + config.xAxis.tickWidthMax : config.dynamicMarginTop + -config.xAxis.size + offset
-    }
-    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && config.dynamicMarginTop && config.isResponsiveTicks) {
-      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + config.xAxis.tickWidthMax : config.dynamicMarginTop + -config.xAxis.size - offset
-    }
-    if (!isHorizontal && !isLegendBottom && config.xAxis.label && !config.dynamicMarginTop && config.isResponsiveTicks) {
-      bottom = isBrush ? brushHeight + config.xAxis.labelOffset + -config.xAxis.size + 25 : config.xAxis.labelOffset + -config.xAxis.size + offset
-    }
-    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && !config.dynamicMarginTop && config.isResponsiveTicks) {
-      bottom = -config.xAxis.size + offset + config.xAxis.labelOffset
-    }
-    if (!isHorizontal && !isLegendBottom && !config.xAxis.label && !tickRotation && !config.dynamicMarginTop && !config.isResponsiveTicks) {
-      bottom = isBrush ? brushHeight + -config.xAxis.size + config.xAxis.labelOffset : 0
-    }
-
-    if (asNumber) return bottom
-    return `${bottom}px`
-  }
-
   // Prevent render if loading
   let body = <Loading />
 
@@ -1218,7 +1029,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Visualization */}
             {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
             <div
-              style={{ marginBottom: computeMarginBottom(config) }}
+              style={{ marginBottom: computeMarginBottom(config, legend, currentViewport) }}
               className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')} ${isDebug ? 'debug' : ''}`}
             >
               {/* All charts except sparkline */}
@@ -1242,7 +1053,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                   )}
                 </>
               )}
-              {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
+              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Forest Plot' && <Legend />}
             </div>
             {/* Link */}
             {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
