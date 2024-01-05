@@ -53,7 +53,7 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
                       d={path(stack) || ''}
                       strokeWidth={2}
                       stroke={displayArea ?  colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[stack.key] : stack.key) : '#000' : 'transparent'}
-                      fillOpacity={transparentArea ? 0.25 : 0.5}
+                      fillOpacity={transparentArea ? 0.2 : 1}
                       fill={displayArea ? colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[stack.key] : stack.key) : '#000' : 'transparent'}
                     />
                   )
