@@ -71,7 +71,7 @@ const Regions = memo(({ config, updateConfig }: { config: ChartConfig; updateCon
               <TextField value={background} label='Background' fieldName='background' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
             </div>
 
-            <Select
+            {/* <Select
               value={config.regions[i].range ?? 'Custom'}
               label='Region Range'
               initial={'Select'}
@@ -88,9 +88,9 @@ const Regions = memo(({ config, updateConfig }: { config: ChartConfig; updateCon
                 e.target.value = ''
               }}
               options={relativeRegionOptions}
-            />
+            /> */}
 
-            {range === 'Custom' && (
+            {true && (
               <div className='two-col-inputs'>
                 <TextField
                   value={from}
