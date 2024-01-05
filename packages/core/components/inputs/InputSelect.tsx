@@ -1,9 +1,19 @@
-import React, { memo } from 'react'
-
 import '../../styles/v2/components/input/index.scss'
 
-const InputSelect = memo(({ label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes }) => {
-  let optionsJsx = ''
+interface InputProps {
+  label?
+  value?
+  options: string[] | { [key: string]: string }
+  fieldName
+  section?
+  subsection?
+  required?
+  updateField
+  initial?
+}
+
+const InputSelect = ({ label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes }: InputProps) => {
+  let optionsJsx = []
 
   if (Array.isArray(options)) {
     //Handle basic array
@@ -48,6 +58,6 @@ const InputSelect = memo(({ label, value, options, fieldName, section = null, su
       </select>
     </label>
   )
-})
+}
 
 export default InputSelect
