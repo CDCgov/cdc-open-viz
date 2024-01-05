@@ -189,6 +189,8 @@ const Header = (props: HeaderProps) => {
 
       newFilter[name] = value
 
+      console.log('newFilter', newFilter)
+
       overlay?.actions.openOverlay(filterModal(newFilter, index))
     }
 
@@ -376,14 +378,14 @@ const Header = (props: HeaderProps) => {
                   <select
                     value={filter.parents || []}
                     onChange={e => {
-                      updateFilterProp('parent', index, e.target.value)
+                      updateFilterProp('parents', index, e.target.value)
                     }}
                   >
                     <option value=''>Select a filter</option>
                     {config.dashboard.sharedFilters &&
                       config.dashboard.sharedFilters.map(sharedFilter => {
                         if (sharedFilter.key !== filter.key && sharedFilter.type !== 'datafilter') {
-                          return <option>{sharedFilter.key}</option>
+                          return <option value={sharedFilter.key}>{sharedFilter.key}</option>
                         }
                       })}
                   </select>
