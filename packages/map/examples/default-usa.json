@@ -1,4 +1,162 @@
 {
+  "general": {
+    "geoType": "us",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "showTitle": true,
+    "showSidebar": true,
+    "showDownloadButton": true,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "territoriesLabel": "Territories",
+    "language": "en",
+    "hasRegions": false,
+    "expandDataTable": true,
+    "fullBorder": false,
+    "type": "data",
+    "title": "Default US Map",
+    "territoriesAlwaysShow": false,
+    "geoLabelOverride": "",
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "statePicked": {
+      "fipsCode": "01",
+      "stateName": "Alabama"
+    }
+  },
+  "type": "map",
+  "color": "pinkpurple",
+  "columns": {
+    "geo": {
+      "name": "State",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": "",
+      "name": "Condition",
+      "label": ""
+    },
+    "navigate": {
+      "name": "Condition"
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": false,
+    "dynamicDescription": false,
+    "type": "category",
+    "numberOfItems": 3,
+    "position": "side",
+    "title": "Legend",
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "categoryValuesOrder": [
+      "Arboviral 2",
+      "Arboviral 3",
+      "Arboviral 4",
+      "Arboviral 5",
+      "Arboviral 6",
+      "Arboviral 7",
+      "Arboviral 8",
+      "Arboviral 9",
+      "Arboviral 10",
+      "Arboviral 11",
+      "Arboviral 12",
+      "Arboviral",
+      "Babesiosis",
+      "Congenital Syphilis",
+      "FDD",
+      "Generic v2.0"
+    ]
+  },
+  "filters": [],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": false,
+    "indexLabel": ""
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "geoCodeCircleSize": 2,
+    "showBubbleZeros": false
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": [
+      {
+        "dataKey": "State",
+        "pattern": "circles",
+        "dataValue": "GU"
+      }
+    ]
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
   "data": [
     {
       "Condition": "Arboviral 2",
@@ -906,26 +1064,6 @@
   "dataDescription": {
     "horizontal": true
   },
-  "newViz": true,
-  "type": "map",
-  "general": {
-    "geoType": "us",
-    "geoBorderColor": "darkGray",
-    "headerColor": "theme-blue",
-    "showTitle": true,
-    "showSidebar": true,
-    "showDownloadButton": true,
-    "showDownloadMediaButton": false,
-    "displayAsHex": false,
-    "displayStateLabels": false,
-    "territoriesLabel": "Territories",
-    "language": "en",
-    "hasRegions": false,
-    "expandDataTable": true,
-    "fullBorder": false,
-    "type": "data",
-    "title": "Default US Map"
-  },
   "geoType": "us",
   "geoBorderColor": "darkGray",
   "headerColor": "theme-blue",
@@ -940,45 +1078,9 @@
   "hasRegions": false,
   "expandDataTable": true,
   "fullBorder": false,
-  "color": "pinkpurple",
-  "columns": {
-    "geo": {
-      "name": "State",
-      "label": "Location",
-      "tooltip": false,
-      "dataTable": true
-    },
-    "primary": {
-      "dataTable": true,
-      "tooltip": true,
-      "prefix": "",
-      "suffix": "",
-      "name": "Condition",
-      "label": ""
-    },
-    "navigate": {
-      "name": "Condition"
-    }
-  },
-  "legend": {
-    "descriptions": {},
-    "specialClasses": [],
-    "unified": false,
-    "singleColumn": false,
-    "dynamicDescription": false,
-    "type": "category",
-    "numberOfItems": 3,
-    "position": "side",
-    "title": "Legend"
-  },
-  "filters": [],
   "dataTable": {
     "title": "Data Table",
     "forceDisplay": true
   },
-  "tooltips": {
-    "appearanceType": "hover",
-    "linkLabel": "Learn More",
-    "capitalizeLabels": true
-  }
+  "validated": 4.23
 }
