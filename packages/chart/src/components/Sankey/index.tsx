@@ -140,30 +140,52 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const tooltipVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).value}`;
   const tooltipPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).value_pct}%)`;
   const tooltipSummary = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).summary}`;
-  
+  const tooltipMaleVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Male')))?.Gender.find(g => g.gender === 'Male')?.dem_value}`;
+  const tooltipMalePct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Male')))?.Gender.find(g => g.gender === 'Male')?.dem_pct}%)`;
+  const tooltipFemaleVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Female')))?.Gender.find(g => g.gender === 'Female')?.dem_value}`;
+  const tooltipFemalePct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Female')))?.Gender.find(g => g.gender === 'Female')?.dem_pct}%)`;
+  const tooltipUnknownVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Unknown')))?.Gender.find(g => g.gender === 'Unknown')?.dem_value}`;
+  const tooltipUnknownPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Unknown')))?.Gender.find(g => g.gender === 'Unknown')?.dem_pct}%)`;
+  const tooltipNonHispanicWVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic White')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic White')?.dem_value}`;
+  const tooltipNonHispanicWPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic White')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic White')?.dem_pct}%)`;
+  const tooltipNonHispanicBVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Black')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Black')?.dem_value}`;
+  const tooltipNonHispanicBPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Black')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Black')?.dem_pct}%)`;
+  const tooltipHispanicVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Hispanic')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Hispanic')?.dem_value}`;
+  const tooltipHispanicPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Hispanic')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Hispanic')?.dem_pct}%)`;
+  const tooltipNonHispanicAIVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')?.dem_value}`;
+  const tooltipNonHispanicAIPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')?.dem_pct}%)`;
+  const tooltipNonHispanicAsianVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Asian')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Asian')?.dem_value}`;
+  const tooltipNonHispanicAsianPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Asian')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Asian')?.dem_pct}%)`;
+  const tooltipNonHispanicNAVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')?.dem_value}`;
+  const tooltipNonHispanicNAPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')?.dem_pct}%)`;
+  const tooltipMissingVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Missing')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Missing')?.dem_value}`;
+  const tooltipMissingNAPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Missing')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Missing')?.dem_pct}%)`;
+
   const sankeyToolTip = `<div class="sankey-chart__tooltip">
                     <span class="sankey-chart__tooltip--tooltip-header">${tooltipID}</span>
-                    <span class="sankey-chart__tooltip--tooltip-header">${tooltipVal}${tooltipPct}</span>
-                    <span><strong>Summary:</strong>${tooltipSummary}</span>
+                    <span class="sankey-chart__tooltip--tooltip-header">${tooltipVal} ${tooltipPct}</span>
+                    <div class="divider"></div>
+                    <span><strong>Summary: </strong>${tooltipSummary}</span>
+                    <div class="divider"></div>
                     <div class="sankey-chart__tooltip--info-section">
                     <div>
-                      <h3>Gender</h3>
+                      <span><strong>Gender<strong></span>
                         <ul>
-                          <li>Male:</li>
-                          <li>Female:</li>
-                          <li>Unknown:</li>
+                          <li>Male: ${tooltipMaleVal} ${tooltipMalePct}</li>
+                          <li>Female: ${tooltipFemaleVal} ${tooltipFemalePct}</li>
+                          <li>Unknown: ${tooltipUnknownVal} ${tooltipUnknownPct}</li>
                         </ul>
                       </div>
                       <div>
-                      <h3>Race and ethnicity</h3>
+                      <span><strong>Race and ethnicity<strong></span>
                         <ul>
-                          <li>Non-Hispanic White:</li>
-                          <li>Non-Hispanic Black:</li>
-                          <li>Hispanic:</li>
-                          <li>Non-Hispanic American Indian or Alaska Native:</li>
-                          <li>Non-Hispanic Asian:</li>
-                          <li>Non-Hispanic Native Hawaiian or Other Pacific Islander:</li>
-                          <li>Missing</li>
+                          <li>Non-Hispanic White: ${tooltipNonHispanicWVal} ${tooltipNonHispanicWPct}</li>
+                          <li>Non-Hispanic Black: ${tooltipNonHispanicBVal} ${tooltipNonHispanicBPct}</li>
+                          <li>Hispanic: ${tooltipHispanicVal} ${tooltipHispanicPct}</li>
+                          <li>Non-Hispanic American Indian or Alaska Native: ${tooltipNonHispanicAIVal} ${tooltipNonHispanicAIPct}</li>
+                          <li>Non-Hispanic Asian: ${tooltipNonHispanicAsianVal} ${tooltipNonHispanicAsianPct}</li>
+                          <li>Non-Hispanic Native Hawaiian or Other Pacific Islander: ${tooltipNonHispanicNAVal} ${tooltipNonHispanicNAPct}</li>
+                          <li>Missing: ${tooltipMissingVal} ${tooltipMissingNAPct}</li>
                           </ul>
                       </div>
                     </div>
