@@ -1,31 +1,44 @@
 import React, { useState, useEffect, memo, useContext } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { geoCentroid, geoPath } from 'd3-geo'
-import { feature } from 'topojson-client'
+
+// United States Topojson resources
 import topoJSON from '../data/us-topo.json'
 import hexTopoJSON from '../data/us-hex-topo.json'
+
+import { geoCentroid, geoPath } from 'd3-geo'
+import { feature } from 'topojson-client'
 import { AlbersUsa, Mercator } from '@visx/geo'
 import chroma from 'chroma-js'
-import CityList from './CityList'
-import BubbleList from './BubbleList'
-import { supportedCities, supportedStates } from '../data/supported-geos'
+import CityList from '../../CityList'
+import BubbleList from '../../BubbleList'
+import { supportedCities, supportedStates } from '../../../data/supported-geos'
 import { geoAlbersUsa } from 'd3-composite-projections'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
 
-import useMapLayers from '../hooks/useMapLayers'
-import ConfigContext from '../context'
+import useMapLayers from '../../../hooks/useMapLayers'
+import ConfigContext from '../../../context'
+import { MapContext } from '../../../types/MapContext'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
+
+// todo: move this somewhere that makes better sense for pattern sizes.
+const sizes = {
+  small: '8',
+  medium: '10',
+  large: '12'
+}
 
 // todo: combine hexagonLabel & geoLabel functions
 // todo: move geoLabel functions outside of components for reusability
 const Hexagon = ({ label, text, stroke, strokeWidth, textColor, territory, territoryData, ...props }) => {
   const { state } = useContext(ConfigContext)
+
+  const isHex = state.general.displayAsHex
 
   // Labels
   const hexagonLabel = (geo, bgColor = '#FFFFFF', projection) => {
@@ -123,12 +136,6 @@ const Rect = ({ label, text, stroke, strokeWidth, textColor, patternData, patter
     defaultPatternColor = 'white'
   }
 
-  const sizes = {
-    small: '8',
-    medium: '10',
-    large: '12'
-  }
-
   return (
     <svg viewBox='0 0 45 28'>
       {patternData?.pattern === 'waves' && <PatternWaves id={`territory-${patternData?.dataKey}--${patternIndex}`} height={sizes[patternData?.size] ?? 10} width={sizes[patternData?.size] ?? 10} fill={defaultPatternColor} complement />}
@@ -181,7 +188,7 @@ const nudges = {
   'US-WV': [-2, 2]
 }
 
-const UsaMap = props => {
+const UsaMap = () => {
   // prettier-ignore
   const {
       applyLegendToRow,
@@ -195,7 +202,7 @@ const UsaMap = props => {
       state,
       supportedTerritories,
       titleCase,
-    } = useContext(ConfigContext)
+    } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
 
@@ -232,12 +239,6 @@ const UsaMap = props => {
   const isHex = state.general.displayAsHex
 
   const [territoriesData, setTerritoriesData] = useState([])
-
-  const sizes = {
-    small: '8',
-    medium: '10',
-    large: '12'
-  }
 
   const territoriesKeys = Object.keys(supportedTerritories) // data will have already mapped abbreviated territories to their full names
 
@@ -306,7 +307,6 @@ const UsaMap = props => {
       return (
         <>
           {state.map.patterns.map((patternData, patternIndex) => {
-            let { pattern, dataKey, size } = patternData
             let defaultPatternColor = 'black'
             const hasMatchingValues = supportedTerritories[territory].includes(patternData.dataValue)
 
@@ -476,8 +476,8 @@ const UsaMap = props => {
                 return (
                   hasMatchingValues && (
                     <>
-                      {pattern === 'waves' && <PatternWaves id={`${dataKey}--${patternIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
-                      {pattern === 'circles' && <PatternCircles id={`${dataKey}--${patternIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
+                      {pattern === 'waves' && <PatternWaves id={`${dataKey}--${patternIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
+                      {pattern === 'circles' && <PatternCircles id={`${dataKey}--${patternIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
                       {pattern === 'lines' && <PatternLines id={`${dataKey}--${patternIndex}`} height={sizes[size] ?? 6} width={sizes[size] ?? 6} stroke={defaultPatternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
                       <path className={`pattern-geoKey--${dataKey}`} tabIndex={-1} stroke='transparent' d={path} fill={`url(#${dataKey}--${patternIndex})`} />
                     </>

@@ -13,6 +13,7 @@ export type MapContext = {
   generateColorsArray
   generateRuntimeData
   geoClickHandler
+  handleCircleClick: Function
   handleMapAriaLabels
   hasZoom
   innerContainerRef

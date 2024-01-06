@@ -5,12 +5,14 @@ import chroma from 'chroma-js'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
-import HexSetting from './HexShapeSettings'
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import ConfigContext from '../context'
-import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
+import LegendItemHex from './LegendItem.Hex'
 
-const Sidebar = () => {
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import ConfigContext from '../../../context'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
+import './index.scss'
+
+const Legend = () => {
   // prettier-ignore
   const {
     displayDataAsText,
@@ -175,10 +177,10 @@ const Sidebar = () => {
             </ul>
           </section>
         </aside>
-        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <HexSetting.Legend state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}
+        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <LegendItemHex state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}
       </div>
     </ErrorBoundary>
   )
 }
 
-export default Sidebar
+export default Legend

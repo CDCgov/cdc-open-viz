@@ -1,3 +1,3 @@
-import EditorPanel from './EditorPanel'
+import EditorPanel from './components/EditorPanel'
 
 export default EditorPanel

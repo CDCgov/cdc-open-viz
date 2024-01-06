@@ -6,28 +6,27 @@ import { geoPath } from 'd3-geo'
 import { feature, mesh } from 'topojson-client'
 import { CustomProjection } from '@visx/geo'
 import Loading from '@cdc/core/components/Loading'
-import colorPalettes from '../../../core/data/colorPalettes'
+import colorPalettes from '@cdc/core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
-import CityList from './CityList'
-import ConfigContext from '../context'
+import CityList from '../../CityList'
+import ConfigContext from '../../../context'
 
 // SVG ITEMS
 const WIDTH = 880
 const HEIGHT = 500
 const PADDING = 25
 
-
-const getCountyTopoURL = (year) => {
-  return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`;
+const getCountyTopoURL = year => {
+  return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
 }
 
 const getTopoData = year => {
   return new Promise((resolve, reject) => {
     const resolveWithTopo = async response => {
-      if(response.status !== 200){
-        response = await import('../data/cb_2019_us_county_20m.json');
+      if (response.status !== 200) {
+        response = await import('../../../data/cb_2019_us_county_20m.json')
       } else {
-        response = await response.json();
+        response = await response.json()
       }
       let topoData = {}
 
