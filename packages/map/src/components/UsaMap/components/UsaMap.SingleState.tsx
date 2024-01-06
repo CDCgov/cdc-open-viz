@@ -24,7 +24,7 @@ const getTopoData = year => {
   return new Promise((resolve, reject) => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
-        response = await import('../../../data/cb_2019_us_county_20m.json')
+        response = await import('./../data/cb_2019_us_county_20m.json')
       } else {
         response = await response.json()
       }

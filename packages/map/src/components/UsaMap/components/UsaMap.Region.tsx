@@ -36,11 +36,9 @@ const UsaRegionMap = props => {
     data,
     displayGeoName,
     geoClickHandler,
-    handleCircleClick,
     handleMapAriaLabels,
     state,
     supportedTerritories,
-    titleCase,
   } = useContext(ConfigContext)
 
   // "Choose State" options
