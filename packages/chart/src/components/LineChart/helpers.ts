@@ -3,7 +3,7 @@ import { type PreliminaryDataItem, DataItem, Config } from './LineChartProps'
 export const splitData = (seriesKey: string, data: DataItem[], config: Config) => {
   const validPreliminaryData = config.preliminaryData.filter(pd => pd.seriesKey && pd.column && pd.value && pd.type && pd.style)
 
-  const getMatchingPd = (point: DataItem) => validPreliminaryData.find(pd => pd.seriesKey === seriesKey && point[pd.column] === pd.value && pd.type === 'effect')
+  const getMatchingPd = (point: DataItem) => validPreliminaryData.find(pd => pd.seriesKey === seriesKey && point[pd.column] === pd.value && pd.type === 'effect' && pd.style !== 'Open Circles')
 
   const createSegment = (points: DataItem[], dashed: boolean, style: string) => ({
     data: points.filter(Boolean), // Filter out any null/undefined points
@@ -26,6 +26,7 @@ export const splitData = (seriesKey: string, data: DataItem[], config: Config) =
       }
 
       const dashedSegment = index > 0 ? [data[index - 1], d, nextD] : [d, nextD]
+
       segments.push(createSegment(dashedSegment, true, matchingPd.style))
 
       if (isNextMatch) index++
@@ -48,20 +49,10 @@ export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: Data
   let filteredData: DataItem[] = []
 
   // Process data to find matching items
-  data.forEach((item, index) => {
+  data.forEach(item => {
     if (circlesFiltered.some(d => item[d.column] === d.value && d.seriesKey === seriesKey)) {
-      // Add previous item if it exists
-      if (index > 0) {
-        filteredData.push(data[index - 1])
-      }
-
       // Add current item
       filteredData.push(item)
-
-      // Add next item if it exists
-      if (index < data.length - 1) {
-        filteredData.push(data[index + 1])
-      }
     }
   })
 
