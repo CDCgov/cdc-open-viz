@@ -1,138 +1,32 @@
 import React, { useState, useEffect, memo, useContext } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { geoCentroid, geoPath } from 'd3-geo'
-import { feature } from 'topojson-client'
+
+// United States Topojson resources
 import topoJSON from '../data/us-topo.json'
 import hexTopoJSON from '../data/us-hex-topo.json'
+
+import { geoCentroid, geoPath } from 'd3-geo'
+import { feature } from 'topojson-client'
 import { AlbersUsa, Mercator } from '@visx/geo'
 import chroma from 'chroma-js'
-import CityList from './CityList'
-import BubbleList from './BubbleList'
-import { supportedCities, supportedStates } from '../data/supported-geos'
+import CityList from '../../CityList'
+import BubbleList from '../../BubbleList'
+import { supportedCities, supportedStates } from '../../../data/supported-geos'
 import { geoAlbersUsa } from 'd3-composite-projections'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
-
 import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
 
-import useMapLayers from '../hooks/useMapLayers'
-import ConfigContext from '../context'
+import Territory from './Territory'
+
+import useMapLayers from '../../../hooks/useMapLayers'
+import ConfigContext from '../../../context'
+import { MapContext } from '../../../types/MapContext'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
-
-// todo: combine hexagonLabel & geoLabel functions
-// todo: move geoLabel functions outside of components for reusability
-const Hexagon = ({ label, text, stroke, strokeWidth, textColor, territory, territoryData, ...props }) => {
-  const { state } = useContext(ConfigContext)
-
-  // Labels
-  const hexagonLabel = (geo, bgColor = '#FFFFFF', projection) => {
-    let centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
-
-    let abbr = geo?.properties?.iso ? geo.properties.iso : geo.uid
-
-    const getArrowDirection = (geoData, geo, isTerritory = false) => {
-      if (!isTerritory) {
-        centroid = projection(geoCentroid(geo))
-      }
-
-      return (
-        <>
-          {state.hexMap.shapeGroups.map((group, groupIndex) => {
-            return group.items.map((item, itemIndex) => {
-              if (item.operator === '=') {
-                if (geoData[item.key] === item.value) {
-                  return (
-                    <Group style={{ transform: `translate(36%, 50%)`, fill: 'currentColor' }}>
-                      {item.shape === 'Arrow Down' && <AiOutlineArrowDown size={12} stroke='none' fontWeight={100} />}
-                      {item.shape === 'Arrow Up' && <AiOutlineArrowUp size={12} stroke='none' fontWeight={100} />}
-                      {item.shape === 'Arrow Right' && <AiOutlineArrowRight size={12} stroke='none' fontWeight={100} />}
-                    </Group>
-                  )
-                }
-              }
-            })
-          })}
-        </>
-      )
-    }
-
-    if (undefined === abbr) return null
-
-    let textColor = '#FFF'
-
-    // Dynamic text color
-    if (chroma.contrast(textColor, bgColor) < 3.5) {
-      textColor = '#202020' // dark gray
-    }
-
-    // always make HI black since it is off to the side
-    if (abbr === 'US-HI') {
-      textColor = '#000'
-    }
-
-    let x = 0,
-      y = state.hexMap.type === 'shapes' ? -10 : 5
-
-    // used to nudge/move some of the labels for better readability
-    if (nudges[abbr] && false === isHex) {
-      x += nudges[abbr][0]
-      y += nudges[abbr][1]
-    }
-
-    if (undefined === offsets[abbr] || isHex) {
-      let y = state.hexMap.type === 'shapes' ? '30%' : '50%'
-      return (
-        <>
-          <Text fontSize={14} x={'50%'} y={y} style={{ fill: 'currentColor', stroke: 'initial', fontWeight: 400, opacity: 1, fillOpacity: 1 }} textAnchor='middle' verticalAnchor='middle'>
-            {abbr.substring(3)}
-          </Text>
-          {state.general.displayAsHex && state.hexMap.type === 'shapes' && getArrowDirection(territoryData, geo, true)}
-        </>
-      )
-    }
-
-    let [dx, dy] = offsets[abbr]
-
-    return (
-      <g>
-        <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />
-        <text x={4} strokeWidth='0' fontSize={13} style={{ fill: '#202020' }} alignmentBaseline='middle' transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
-          {abbr.substring(3)}
-        </text>
-      </g>
-    )
-  }
-
-  return (
-    <svg viewBox='0 0 45 51' className='territory-wrapper--hex'>
-      <g {...props}>
-        <polygon stroke={stroke} strokeWidth={strokeWidth} points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702' />
-        {state.general.displayAsHex && hexagonLabel(territoryData ? territoryData : geo, stroke, false)}
-      </g>
-    </svg>
-  )
-}
-
-const Rect = ({ label, text, stroke, strokeWidth, textColor, ...props }) => {
-  return (
-    <svg viewBox='0 0 45 28'>
-      <g {...props} strokeLinejoin='round'>
-        <path
-          stroke={stroke}
-          strokeWidth={strokeWidth}
-          d='M40,0.5 C41.2426407,0.5 42.3676407,1.00367966 43.1819805,1.81801948 C43.9963203,2.63235931 44.5,3.75735931 44.5,5 L44.5,5 L44.5,23 C44.5,24.2426407 43.9963203,25.3676407 43.1819805,26.1819805 C42.3676407,26.9963203 41.2426407,27.5 40,27.5 L40,27.5 L5,27.5 C3.75735931,27.5 2.63235931,26.9963203 1.81801948,26.1819805 C1.00367966,25.3676407 0.5,24.2426407 0.5,23 L0.5,23 L0.5,5 C0.5,3.75735931 1.00367966,2.63235931 1.81801948,1.81801948 C2.63235931,1.00367966 3.75735931,0.5 5,0.5 L5,0.5 Z'
-        />
-        <text textAnchor='middle' dominantBaseline='middle' x='50%' y='54%' fill={text} stroke={textColor}>
-          {label}
-        </text>
-      </g>
-    </svg>
-  )
-}
 
 const offsets = {
   'US-VT': [50, -8],
@@ -157,7 +51,7 @@ const nudges = {
   'US-WV': [-2, 2]
 }
 
-const UsaMap = props => {
+const UsaMap = () => {
   // prettier-ignore
   const {
       applyLegendToRow,
@@ -171,7 +65,7 @@ const UsaMap = props => {
       state,
       supportedTerritories,
       titleCase,
-    } = useContext(ConfigContext)
+    } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
 
@@ -225,7 +119,7 @@ const UsaMap = props => {
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const territories = territoriesData.map(territory => {
-    const Shape = isHex ? Hexagon : Rect
+    const Shape = isHex ? Territory.Hexagon : Territory.Rectangle
 
     const territoryData = data[territory]
 
@@ -272,11 +166,18 @@ const UsaMap = props => {
           fill: legendColors[2]
         }
       }
-      return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} territory={territory} territoryData={territoryData} />
+
+      return (
+        <>
+          <Shape key={label} label={label} style={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} territory={territory} territoryData={territoryData} />
+        </>
+      )
     }
   })
 
   let pathGenerator = geoPath().projection(geoAlbersUsa().translate(translate))
+
+  // Note: Layers are different than patterns
   const { pathArray } = useMapLayers(state, '', pathGenerator)
 
   // Constructs and displays markup for all geos on the map (except territories right now)
@@ -396,8 +297,9 @@ const UsaMap = props => {
             <g className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
               {state.map.patterns.map((patternData, patternIndex) => {
-                const { pattern, dataKey, size } = patternData
+                let { pattern, dataKey, size } = patternData
                 let defaultPatternColor = 'black'
+
                 const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
 
                 if (chroma.contrast(defaultPatternColor, legendColors[0]) < 3.5) {
@@ -407,10 +309,10 @@ const UsaMap = props => {
                 return (
                   hasMatchingValues && (
                     <>
-                      {pattern === 'waves' && <PatternWaves id={`${dataKey}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
-                      {pattern === 'circles' && <PatternCircles id={`${dataKey}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
-                      {pattern === 'lines' && <PatternLines id={`${dataKey}`} height={sizes[size] ?? 6} width={sizes[size] ?? 6} stroke={defaultPatternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
-                      <path className={`pattern-geoKey--${dataKey}`} tabIndex={-1} stroke='transparent' d={path} fill={`url(#${dataKey})`} />
+                      {pattern === 'waves' && <PatternWaves id={`${dataKey}--${patternIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
+                      {pattern === 'circles' && <PatternCircles id={`${dataKey}--${patternIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
+                      {pattern === 'lines' && <PatternLines id={`${dataKey}--${patternIndex}`} height={sizes[size] ?? 6} width={sizes[size] ?? 6} stroke={defaultPatternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
+                      <path className={`pattern-geoKey--${dataKey}`} tabIndex={-1} stroke='transparent' d={path} fill={`url(#${dataKey}--${patternIndex})`} />
                     </>
                   )
                 )

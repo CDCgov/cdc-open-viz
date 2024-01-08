@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
 
-import PatternSettings from './PatternSettings'
-
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
 // import ReactTags from 'react-tag-autocomplete'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import Panels from './Panels.tsx'
 
 // Data
 import colorPalettes from '@cdc/core/data/colorPalettes'
-import { supportedStatesFipsCodes } from '../data/supported-geos'
+import { supportedStatesFipsCodes } from '../../../data/supported-geos.js'
 
 // Components - Core
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
@@ -26,51 +25,17 @@ import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'
 import UsaRegionGraphic from '@cdc/core/assets/usa-region-graphic.svg'
 import WorldGraphic from '@cdc/core/assets/icon-map-world.svg'
 import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
-import worldDefaultConfig from '../../examples/default-world.json'
-import usaDefaultConfig from '../../examples/default-usa.json'
-import countyDefaultConfig from '../../examples/default-county.json'
-import useMapLayers from '../hooks/useMapLayers'
+import worldDefaultConfig from '../../../../examples/default-world.json'
+import usaDefaultConfig from '../../../../examples/default-usa.json'
+import countyDefaultConfig from '../../../../examples/default-county.json'
+import useMapLayers from '../../../hooks/useMapLayers.tsx'
 
 import { useFilters } from '@cdc/core/components/Filters'
 
-import HexSetting from './HexShapeSettings'
-import ConfigContext from '../context'
-
-const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
-  const [value, setValue] = useState(stateValue)
-
-  const [debouncedValue] = useDebounce(value, 500)
-
-  useEffect(() => {
-    if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
-      updateField(section, subsection, fieldName, debouncedValue)
-    }
-  }, [debouncedValue]) // eslint-disable-line
-
-  let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
-
-  const onChange = e => setValue(e.target.value)
-
-  let formElement = <input type='text' name={name} onChange={onChange} {...attributes} value={value} />
-
-  if ('textarea' === type) {
-    formElement = <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
-  }
-
-  if ('number' === type) {
-    formElement = <input type='number' name={name} onChange={onChange} {...attributes} value={value} />
-  }
-
-  return (
-    <label>
-      <span className='edit-label column-heading'>
-        {label}
-        {tooltip}
-      </span>
-      {formElement}
-    </label>
-  )
-}
+import HexSetting from './HexShapeSettings.jsx'
+import ConfigContext from '../../../context.ts'
+import { MapContext } from '../../../types/MapContext.js'
+import { Checkbox, TextField } from './Inputs'
 
 // Todo: move to useReducer, seperate files out.
 const EditorPanel = props => {
@@ -88,7 +53,7 @@ const EditorPanel = props => {
     setRuntimeFilters,
     setState,
     state,
-  } = useContext(ConfigContext)
+  } = useContext<MapContext>(ConfigContext)
 
   const { general, columns, legend, table, tooltips } = state
 
@@ -152,24 +117,6 @@ const EditorPanel = props => {
     specialClasses = legend.specialClasses || []
   }
 
-  const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-    <label className='checkbox column-heading'>
-      <input
-        type='checkbox'
-        name={fieldName}
-        checked={value}
-        onChange={e => {
-          updateField(section, subsection, fieldName, !value)
-        }}
-        {...attributes}
-      />
-      <span className='edit-label'>
-        {label}
-        {tooltip}
-      </span>
-    </label>
-  ))
-
   const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', ...attributes }) => {
     const [value, setValue] = useState(stateValue)
 
@@ -187,6 +134,8 @@ const EditorPanel = props => {
   }
 
   const handleEditorChanges = async (property, value) => {
+    console.log('prop', property)
+    console.log('value', value)
     switch (property) {
       // change these to be more generic.
       // updateVisualPropertyValue
@@ -3015,7 +2964,7 @@ const EditorPanel = props => {
                 </button>
               </AccordionItemPanel>
             </AccordionItem>
-            <PatternSettings />
+            {state.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
           </Accordion>
           <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
         </section>
