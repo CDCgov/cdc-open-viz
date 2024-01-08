@@ -1,12 +1,14 @@
 import { useContext } from 'react'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
-import ConfigContext from '../context'
-import { type MapContext } from './../types/MapContext'
+import ConfigContext from '../../../context'
+import { type MapContext } from '../../../types/MapContext'
 import Button from '@cdc/core/components/elements/Button'
 
-type PatternSettingProps = {}
+type PanelProps = {
+  name: string
+}
 
-const PatternSettings = (props: PatternSettingProps) => {
+const PatternSettings = ({ name }: PanelProps) => {
   const { state, setState } = useContext<MapContext>(ConfigContext)
   const defaultPattern = 'circles'
   const patternTypes = ['circles', 'waves', 'lines']
@@ -58,7 +60,7 @@ const PatternSettings = (props: PatternSettingProps) => {
   return (
     <AccordionItem>
       <AccordionItemHeading>
-        <AccordionItemButton>Geo Pattern Settings</AccordionItemButton>
+        <AccordionItemButton>{name}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
         {patterns &&
@@ -70,12 +72,12 @@ const PatternSettings = (props: PatternSettingProps) => {
 
             dataValueOptions.sort()
             dataKeyOptions.sort()
-            console.log('dataValue', dataValueOptions)
+
             return (
               <Accordion allowZeroExpanded>
                 <AccordionItem>
                   <AccordionItemHeading>
-                    <AccordionItemButton>{pattern.dataKey || 'Select State'}</AccordionItemButton>
+                    <AccordionItemButton>{pattern.dataKey ? `${pattern.dataKey}: ${pattern.dataValue ?? 'No Value'}` : 'Select Column'}</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
                     <>

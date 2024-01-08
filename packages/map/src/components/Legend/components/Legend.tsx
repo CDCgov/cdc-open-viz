@@ -1,18 +1,18 @@
 //TODO: Move legends to core
 import { useContext } from 'react'
 import parse from 'html-react-parser'
+import chroma from 'chroma-js'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
-import HexSetting from './HexShapeSettings'
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import ConfigContext from '../context'
-import { Legend } from '@visx/legend'
-import { scaleOrdinal } from '@visx/scale'
-import { Text } from '@visx/text'
-import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
+import LegendItemHex from './LegendItem.Hex'
 
-const Sidebar = () => {
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import ConfigContext from '../../../context'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
+import './index.scss'
+
+const Legend = () => {
   // prettier-ignore
   const {
     displayDataAsText,
@@ -110,20 +110,23 @@ const Sidebar = () => {
           large: '12'
         }
 
+        // Dynamic text color
+        console.log('patternColor', defaultPatternColor)
+
         const legendSize = 16
 
         legendItems.push(
           <>
-            <li className={`legend-container__li legend-container__li--geo-pattern`} style={{ alignItems: 'center' }}>
+            <li className={`legend-container__li legend-container__li--geo-pattern`}>
               <span className='legend-item' style={{ border: 'unset' }}>
                 <svg width={legendSize} height={legendSize}>
-                  <circle id={dataKey} fill={`url(#${dataKey})`} r={legendSize / 2} cx={legendSize / 2} cy={legendSize / 2} stroke='#0000004d' strokeWidth={1} />
-                  {pattern === 'waves' && <PatternWaves id={`${dataKey}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
-                  {pattern === 'circles' && <PatternCircles id={`${dataKey}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} complement />}
-                  {pattern === 'lines' && <PatternLines id={`${dataKey}`} height={sizes[size] ?? 6} width={sizes[size] ?? 6} stroke={defaultPatternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
+                  {pattern === 'waves' && <PatternWaves id={`${dataKey}--${patternDataIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
+                  {pattern === 'circles' && <PatternCircles id={`${dataKey}--${patternDataIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
+                  {pattern === 'lines' && <PatternLines id={`${dataKey}--${patternDataIndex}`} height={sizes[size] ?? 6} width={sizes[size] ?? 10} stroke={defaultPatternColor} strokeWidth={2} orientation={['diagonalRightToLeft']} />}
+                  <circle id={dataKey} fill={`url(#${dataKey}--${patternDataIndex})`} r={legendSize / 2} cx={legendSize / 2} cy={legendSize / 2} stroke='#0000004d' strokeWidth={1} />
                 </svg>
               </span>
-              <p>{patternData.dataValue}</p>
+              <p style={{ lineHeight: '22.4px' }}>{patternData.dataValue}</p>
             </li>
           </>
         )
@@ -174,10 +177,10 @@ const Sidebar = () => {
             </ul>
           </section>
         </aside>
-        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <HexSetting.Legend state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}
+        {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <LegendItemHex state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}
       </div>
     </ErrorBoundary>
   )
 }
 
-export default Sidebar
+export default Legend
