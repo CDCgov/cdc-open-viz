@@ -34,7 +34,7 @@ export const filterData = (filters: SharedFilter[], _data: Object[], filterBehav
 
         filters.forEach(filter => {
           // eslint-disable-next-line eqeqeq
-          if (filter.type !== 'urlfilter' && ((!filter.tier && i === 0) || filter.tier === i + 1) && filter.active && row[filter.columnName!] != filter.active) {
+          if (filter.type !== 'urlfilter' && ((!filter.tier && i === 0) || filter.tier === i + 1) && (filter.queuedActive || filter.active) && row[filter.columnName!] != (filter.queuedActive || filter.active)) {
             add = false
           }
         })
@@ -60,7 +60,7 @@ export const filterData = (filters: SharedFilter[], _data: Object[], filterBehav
 
       filters.forEach(filter => {
         // eslint-disable-next-line eqeqeq
-        if (filter.type !== 'urlfilter' && filter.tier && filter.tier === maxTier - 1 && filter.active && row[filter.columnName!] != filter.active) {
+        if (filter.type !== 'urlfilter' && filter.tier && filter.tier === maxTier - 1 && (filter.queuedActive || filter.active) && row[filter.columnName!] != (filter.queuedActive || filter.active)) {
           add = false
         }
       })
