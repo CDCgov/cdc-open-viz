@@ -89,16 +89,6 @@ export const useFilters = props => {
         filters: newFilters
       })
     }
-
-    // Used for setting active filter, fromHash breaks the filteredData functionality.
-    if (visualizationConfig.type === 'map' && visualizationConfig.filterBehavior === 'Filter Change') {
-      setFilteredData(newFilters)
-    }
-
-    // If we're on a chart and not using the apply button
-    if (visualizationConfig.type === 'chart' && visualizationConfig.filterBehavior === 'Filter Change') {
-      setFilteredData(filterData(newFilters, excludedData))
-    }
   }
 
   const handleApplyButton = newFilters => {
@@ -320,7 +310,7 @@ const Filters = props => {
         const tabValues = []
         const tabBarValues = []
 
-        const { active, label, filterStyle } = singleFilter
+        const { active, queuedActive, label, filterStyle } = singleFilter
 
         handleSorting(singleFilter)
 
@@ -387,7 +377,7 @@ const Filters = props => {
               {filterStyle === 'tab' && !mobileFilterStyle && <Filters.Tabs tabs={tabValues} />}
               {filterStyle === 'pill' && !mobileFilterStyle && <Filters.Pills pills={pillValues} />}
               {filterStyle === 'tab bar' && !mobileFilterStyle && <Filters.TabBar filter={singleFilter} index={outerIndex} />}
-              {(filterStyle === 'dropdown' || mobileFilterStyle) && <Filters.Dropdown filter={singleFilter} index={outerIndex} label={label} active={active} filters={values} />}
+              {(filterStyle === 'dropdown' || mobileFilterStyle) && <Filters.Dropdown filter={singleFilter} index={outerIndex} label={label} active={queuedActive || active} filters={values} />}
             </>
           </div>
         )
