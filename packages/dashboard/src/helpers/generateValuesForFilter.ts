@@ -10,10 +10,6 @@ export const generateValuesForAPIFilter = (columnName, _data): string[] => {
 
 // Gets filter values from dataset
 export const generateValuesForFilter = (columnName, _data, filterBehavior) => {
-  if (filterBehavior === FilterBehavior.Apply) {
-    return generateValuesForAPIFilter(columnName, _data)
-  }
-
   const values: string[] = []
 
   Object.keys(_data).forEach(key => {
