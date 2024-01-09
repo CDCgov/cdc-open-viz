@@ -2964,7 +2964,7 @@ const EditorPanel = props => {
                 </button>
               </AccordionItemPanel>
             </AccordionItem>
-            {state.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
+            {state.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
           </Accordion>
           <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
         </section>
