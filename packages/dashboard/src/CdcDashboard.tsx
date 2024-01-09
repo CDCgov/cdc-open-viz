@@ -416,7 +416,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
     if (setParentConfig && isEditor) {
       setParentConfig(state.config)
     }
-  }, [state.config])
+  }, [JSON.stringify(state.config)])
 
   useEffect(() => {
     const { config } = state
