@@ -46,7 +46,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   // Uses Visx Groups innerRef to get all Group elements that are mapped.
   // Sets the largest group width in state and subtracts that group the svg width to calculate overall width.
   useEffect(() => {
-    let largest = 0
+        let largest = 0
     groupRefs?.current?.map(g => {
       const groupWidth = g?.getBoundingClientRect().width
       if (groupWidth > largest) {
@@ -55,7 +55,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
     })
     setLargestGroupWidth(largest)
   }, [groupRefs])
-
+ 
   //Retrieve all the unique values for the Nodes
   const uniqueNodes = Array.from(new Set(data.links.flatMap(link => [link.source, link.target])))
 
@@ -69,7 +69,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
     }))
   }
 
-  let textPositionHorizontal = 30
+  let textPositionHorizontal = 5
 
   // Set the sankey diagram properties
   const sankeyGenerator = sankey<SankeyNode, { source: number; target: number }>()
@@ -220,14 +220,13 @@ const Sankey = ({ width, height }: SankeyProps) => {
               text-before-edge aligns the text's bottom edge with the bottom edge of the container
               */
               fill={sankeyConfig.nodeFontColor}
-              fontSize={sankeyConfig.nodeFontSize} // font size
               fontWeight='bold' // font weight
               style={{ pointerEvents: 'none' }}
               className='node-text'
             >
               {(sankeyConfig.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
             </Text>
-            <Text verticalAnchor='end' className={classStyle} x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0! + 25) / 2} fill={sankeyConfig.nodeFontColor} fontSize={sankeyConfig.nodeFontSize} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
+            <Text verticalAnchor='end' className={classStyle} x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0! + 25) / 2} fill={sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
               {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
             </Text>
             <Text
@@ -235,7 +234,6 @@ const Sankey = ({ width, height }: SankeyProps) => {
               // plus 50 will move the vertical position down
               y={(node.y1! + node.y0!) / 2 + 50}
               fill={sankeyConfig.nodeFontColor}
-              fontSize={sankeyConfig.nodeFontSize}
               fontWeight='bold'
               textAnchor={filteredNodes.length === i ? 'end' : 'start'}
               style={{ pointerEvents: 'none' }}
@@ -247,7 +245,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
           </>
         ) : (
           <>
-            <text x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0!) / 2 + textPositionVertical} dominantBaseline='text-before-edge' fill={sankeyConfig.nodeFontColor} fontSize={sankeyConfig.nodeFontSize} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
+            <text x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0!) / 2 + textPositionVertical} dominantBaseline='text-before-edge' fill={sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
               <tspan id={node.id} className='node-id'>
                 {node.id}
               </tspan>
@@ -260,7 +258,6 @@ const Sankey = ({ width, height }: SankeyProps) => {
               //fill="black"
               fill={sankeyConfig.nodeFontColor}
               //fontSize={16}
-              fontSize={sankeyConfig.nodeFontSize}
               fontWeight='bold'
               textAnchor='start'
               style={{ pointerEvents: 'none' }}
