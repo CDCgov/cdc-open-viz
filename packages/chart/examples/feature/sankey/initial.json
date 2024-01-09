@@ -159,62 +159,62 @@
     "tooltips": [
       {
         "node": "Suicide EMS Responses",
-        "value": 467136,
+        "value": "467,136",
         "value_pct": "100",
         "summary": "Total number of suicide EMS responses.",
         "Gender" : [
             {
               "gender": "Female",
-              "dem_value": "218195",
+              "dem_value": "218,195",
               "dem_pct": "46.71"
             },
             {
               "gender": "Male",
-              "dem_value": "243481",
+              "dem_value": "243,481",
               "dem_pct": "52.12"
             },
             {
               "gender": "Unknown",
-              "dem_value": "5460",
+              "dem_value": "5,460",
               "dem_pct": "1.17"
             }
 
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
          {
             "race_ethnicity": "Non-Hispanic White",
-            "dem_value": "245998",
+            "dem_value": "245,998",
             "dem_pct": "52.66"
           },
           {
             "race_ethnicity": "Non-Hispanic Black",
-            "dem_value": "93244",
+            "dem_value": "93,244",
             "dem_pct": "19.96"
           },
           {
             "race_ethnicity": "Hispanic",
-            "dem_value": "41396",
+            "dem_value": "41,396",
             "dem_pct": "8.86"
           },
           {
             "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-            "dem_value": "4470",
+            "dem_value": "4,470",
             "dem_pct": "0.96"
           },
           {
             "race_ethnicity": "Non-Hispanic Asian",
-            "dem_value": "6160",
+            "dem_value": "6,160",
             "dem_pct": "1.32"
           },
           
           {
             "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-            "dem_value": "1287",
+            "dem_value": "1,287",
             "dem_pct": "0.28" 
           },
           {
             "race_ethnicity": "Missing",
-            "dem_value" : "74581",
+            "dem_value" : "74,581",
             "dem_pct": "15.97"
           }
         ]
@@ -222,18 +222,18 @@
       },
       {
         "node": "Dead",
-        "value": 4736,
+        "value": "4,736",
         "value_pct": "1.01",
         "summary": "Patiend Died",
         "Gender" : [
             {
               "gender": "Female",
-              "dem_value": "1244",
+              "dem_value": "1,244",
               "dem_pct": "26.47"
             },
             {
               "gender": "Male",
-              "dem_value": "3440",
+              "dem_value": "3,440",
               "dem_pct": "72.64"
             },
             {
@@ -242,10 +242,10 @@
               "dem_pct": "1.1"
             }
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
           {
             "race_ethnicity": "Non-Hispanic White",
-            "dem_value": "3235",
+            "dem_value": "3,235",
             "dem_pct": "68.31"
           },
           {
@@ -283,18 +283,18 @@
       },
       {
         "node": "Released",
-        "value": 27252,
+        "value": "27,252",
         "value_pct": "5.83",
         "summary": "Patient was released.",
         "Gender" : [
             {
               "gender": "Female",
-              "dem_value": "13835",
+              "dem_value": "13,835",
               "dem_pct": "50.77"
             },
             {
               "gender": "Male",
-              "dem_value": "12900",
+              "dem_value": "12,900",
               "dem_pct": "47.34"
             },
             {
@@ -303,20 +303,20 @@
               "dem_pct": "1.9"
             }
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
           {
             "race_ethnicity": "Non-Hispanic White",
-            "dem_value": "15088",
+            "dem_value": "15,088",
             "dem_pct": "55.36"
           },
           {
             "race_ethnicity": "Non-Hispanic Black",
-            "dem_value": "4749",
+            "dem_value": "4,749",
             "dem_pct": "17.43"
           },
           {
             "race_ethnicity": "Hispanic",
-            "dem_value": "2177",
+            "dem_value": "2,177",
             "dem_pct": "7.99"
           },
           {
@@ -337,25 +337,25 @@
           },
           {
             "race_ethnicity": "Missing",
-            "dem_value" : "4565",
+            "dem_value" : "4,565",
             "dem_pct": "16.75"
           }
         ]
       },
       {
         "node": "Transported to facility",
-        "value": 4504,
+        "value": "4,504",
         "value_pct": "0.96",
         "summary": "Patient was transported to a facility.",
         "Gender" : [
             {
               "gender": "Female",
-              "dem_value": "1938",
+              "dem_value": "1,938",
               "dem_pct": "43.03"
             },
             {
               "gender": "Male",
-              "dem_value": "2522",
+              "dem_value": "2,522",
               "dem_pct": "55.99"
             },
             {
@@ -364,15 +364,15 @@
               "dem_pct": "0.98"
             }
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
          {
             "race_ethnicity": "Non-Hispanic White",
-            "dem_value": "2093",
+            "dem_value": "2,093",
             "dem_pct": "46.47"
           },
           {
             "race_ethnicity": "Non-Hispanic Black",
-            "dem_value": "1113",
+            "dem_value": "1,113",
             "dem_pct": "24.71"
           },
           {
@@ -405,92 +405,92 @@
       },
       {
         "node": "Transported to hospital",
-        "value": 424380,
+        "value": "424,380",
         "value_pct": "90.85",
         "summary": "Patient was transported to the hospital by the EMS Unit or another EMS unit.",
         "Gender" : [
             {
               "gender": "Female",
-              "dem_value": "199301",
+              "dem_value": "199,301",
               "dem_pct": "46.96"
             },
             {
               "gender": "Male",
-              "dem_value": "222583",
+              "dem_value": "222,583",
               "dem_pct": "52.45"
             },
             {
               "gender": "Unknown",
-              "dem_value": "2496",
+              "dem_value": "2,496",
               "dem_pct": "0.59"
             }
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
          {
             "race_ethnicity": "Non-Hispanic White",
-            "dem_value": "223907",
+            "dem_value": "223,907",
             "dem_pct": "52.76"
           },
           {
             "race_ethnicity": "Non-Hispanic Black",
-            "dem_value": "86562",
+            "dem_value": "86,562",
             "dem_pct": "20.4"
           },
           {
             "race_ethnicity": "Hispanic",
-            "dem_value": "38084",
+            "dem_value": "38,084",
             "dem_pct": "8.97"
           },
           {
             "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-            "dem_value": "4036",
+            "dem_value": "4,036",
             "dem_pct": "0.95"
           },
           {
             "race_ethnicity": "Non-Hispanic Asian",
-            "dem_value": "5650",
+            "dem_value": "5,650",
             "dem_pct": "1.33"
           },
           
           {
             "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-            "dem_value": "1193",
+            "dem_value": "1,193",
             "dem_pct": "0.28" 
           },
           {
             "race_ethnicity": "Missing",
-            "dem_value" : "64954",
+            "dem_value" : "64,954",
             "dem_pct": "15.31"
           }
         ]
       },
       {
         "node": "Assisted",
-        "value": 5701,
+        "value": "5,701",
         "value_pct": "1.22",
         "summary": "EMS unit only provided assistance (e.g., manpower, equipment) to another agency, member of the public, or another EMS unit.",
         "Gender" : [
             {
               "gender": "Female",
-              "dem_value": "1791",
+              "dem_value": "1,791",
               "dem_pct": "31.42"
             },
             {
               "gender": "Male",
-              "dem_value": "1910",
+              "dem_value": "1,910",
               "dem_pct": "33.5"
             },
             {
               "gender": "Unknown",
-              "dem_value": "2000",
+              "dem_value": "2,000",
               "dem_pct": "35.08"
             }
 
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
          {
             "race_ethnicity": "Non-Hispanic White",
-            "dem_value": "1593",
+            "dem_value": "1,593",
             "dem_pct": "27.94"
           },
           {
@@ -521,25 +521,25 @@
           },
           {
             "race_ethnicity": "Missing",
-            "dem_value" : "3237",
+            "dem_value" : "3,237",
             "dem_pct": "56.78"
           }
         ]
       },
       {
         "node": "Dead at Scene",
-        "value": 4088,
+        "value": "4,088",
         "value_pct": "0.88",
         "summary": "Patient showed obvious signs of death or Do Not Resuscitate (DNR) order was presented, and no attempt was made to resuscitate the patient.",
         "Gender" : [
             {
               "gender": "Female",
-              "dem_value": "1023",
+              "dem_value": "1,023",
               "dem_pct": "25.02"
             },
             {
               "gender": "Male",
-              "dem_value": "3014",
+              "dem_value": "3,014",
               "dem_pct": "73.73"
             },
             {
@@ -549,10 +549,10 @@
             }
 
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
          {
             "race_ethnicity": "Non-Hispanic White",
-            "dem_value": "2802",
+            "dem_value": "2,802",
             "dem_pct": "68.54"
           },
           {
@@ -590,18 +590,18 @@
       },
       {
         "node": "Evaluated no treatment required",
-        "value": 5169,
+        "value": "5,169",
         "value_pct": "1.11",
         "summary": "Patient was evaluated and no further treatment/transportation to the hospital was required",
         "Gender" : [
             {
               "gender": "Female",
-              "dem_value": "2545",
+              "dem_value": "2,545",
               "dem_pct": "49.24"
             },
             {
               "gender": "Male",
-              "dem_value": "2505",
+              "dem_value": "2,505",
               "dem_pct": "48.46"
             },
             {
@@ -611,10 +611,10 @@
             }
 
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
          {
             "race_ethnicity": "Non-Hispanic White",
-            "dem_value": "2783",
+            "dem_value": "2,783",
             "dem_pct": "53.84"
           },
           {
@@ -652,7 +652,7 @@
       },
       {
         "node": "No patient contact",
-        "value": 459,
+        "value": "459",
         "value_pct": "0.1",
         "summary": "No patient contact was made (e.g., EMS unit was on standby in case of a medical/traumatic emergency, response was for the purpose of transporting objects, personnel, or equipment not involving a patient).",
         "Gender" : [
@@ -673,7 +673,7 @@
             }
 
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
          {
             "race_ethnicity": "Non-Hispanic White",
             "dem_value": "41",
@@ -714,18 +714,18 @@
       },
       {
         "node": "Refused evaluation care",
-        "value": 12641,
+        "value": "12,641",
         "value_pct": "2.71",
         "summary": "Patient refused any evaluation or care.",
         "Gender" : [
             {
               "gender": "Female",
-              "dem_value": "6314",
+              "dem_value": "6,314",
               "dem_pct": "49.95"
             },
             {
               "gender": "Male",
-              "dem_value": "6009",
+              "dem_value": "6,009",
               "dem_pct": "47.54"
             },
             {
@@ -735,20 +735,20 @@
             }
 
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
          {
             "race_ethnicity": "Non-Hispanic White",
-            "dem_value": "7112",
+            "dem_value": "7,112",
             "dem_pct": "56.26"
           },
           {
             "race_ethnicity": "Non-Hispanic Black",
-            "dem_value": "2366",
+            "dem_value": "2,366",
             "dem_pct": "18.72"
           },
           {
             "race_ethnicity": "Hispanic",
-            "dem_value": "1056",
+            "dem_value": "1,056",
             "dem_pct": "8.35"
           },
           {
@@ -769,76 +769,76 @@
           },
           {
             "race_ethnicity": "Missing",
-            "dem_value" : "1823",
+            "dem_value" : "1,823",
             "dem_pct": "14.42"
           }
         ]
       },
       {
         "node": "Treated",
-        "value": 438974,
+        "value": "438,974",
         "value_pct": "93.97",
         "summary": "Patient was evaluated and treatment was provided.",
         "Gender" : [
             {
               "gender": "Female",
-              "dem_value": "206436",
+              "dem_value": "206,436",
               "dem_pct": "47.03"
             },
             {
               "gender": "Male",
-              "dem_value": "229917",
+              "dem_value": "229,917",
               "dem_pct": "52.38"
             },
             {
               "gender": "Unknown",
-              "dem_value": "2621",
+              "dem_value": "2,621",
               "dem_pct": "0.6"
             }
 
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
          {
             "race_ethnicity": "Non-Hispanic White",
-            "dem_value": "231620",
+            "dem_value": "231,620",
             "dem_pct": "52.76"
           },
           {
             "race_ethnicity": "Non-Hispanic Black",
-            "dem_value": "89207",
+            "dem_value": "89,207",
             "dem_pct": "20.32"
           },
           {
             "race_ethnicity": "Hispanic",
-            "dem_value": "39497",
+            "dem_value": "39,497",
             "dem_pct": "9"
           },
           {
             "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-            "dem_value": "4214",
+            "dem_value": "4,214",
             "dem_pct": "0.96"
           },
           {
             "race_ethnicity": "Non-Hispanic Asian",
-            "dem_value": "5820",
+            "dem_value": "5,820",
             "dem_pct": "1.33"
           },
           
           {
             "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-            "dem_value": "1222",
+            "dem_value": "1,222",
             "dem_pct": "0.28" 
           },
           {
             "race_ethnicity": "Missing",
-            "dem_value" : "67394",
+            "dem_value" : "67,394",
             "dem_pct": "15.35"
           }
         ]
       },
       {
         "node": "Unknown",
-        "value": 104,
+        "value": "104",
         "value_pct": "0.02",
         "summary": "Type of treatment provided is unknown.",
         "Gender" : [
@@ -859,7 +859,7 @@
             }
 
         ],
-        "Race and ethnicity" : [
+        "race_and_ethnicity" : [
          {
             "race_ethnicity": "Non-Hispanic White",
             "dem_value": "47",

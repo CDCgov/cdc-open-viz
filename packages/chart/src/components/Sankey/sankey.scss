@@ -51,6 +51,7 @@
       font-weight: var(--font-weight-bold);
     }
     &--info-section {
+      column-gap: 10px;
       display:flex;
       flex-direction: row;
       justify-content: space-between;
@@ -140,5 +141,10 @@
     .node-value {
       font-size: var(--font-size-xxxs);
     }
+
+  .divider {
+    border-top: 1px solid #000;
+    margin: 10px 0;
   }
+
 }
