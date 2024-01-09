@@ -32,7 +32,7 @@ const PatternSettings = ({ name }: PanelProps) => {
   }
 
   /** Updates the map pattern at a given index */
-  const handleUpdateGeoPattern = (value: string, index: number, keyToUpdate: 'dataKey' | 'pattern' | 'dataValue' | 'size') => {
+  const handleUpdateGeoPattern = (value: string, index: number, keyToUpdate: 'dataKey' | 'pattern' | 'dataValue' | 'size' | 'label') => {
     const updatedPatterns = [...state.map.patterns]
     updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value }
 
@@ -93,21 +93,15 @@ const PatternSettings = ({ name }: PanelProps) => {
                         })}
                       </select>
 
-                      {
-                        <>
-                          <label htmlFor={`pattern-dataValue--${patternIndex}`}>Data Value:</label>
-                          <select id={`pattern-dataValue--${patternIndex}`} value={pattern.dataValue === '' ? 'Select' : pattern.dataValue} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'dataValue')}>
-                            {/* TODO: sort these? */}
-                            {dataValueOptions?.map((d, index) => {
-                              return (
-                                <option value={d} key={index}>
-                                  {d}
-                                </option>
-                              )
-                            })}
-                          </select>
-                        </>
-                      }
+                      <label htmlFor={`pattern-dataValue--${patternIndex}`}>
+                        Data Value:
+                        <input type='text' onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'dataValue')} id={`pattern-dataValue--${patternIndex}`} value={pattern.dataValue === '' ? '' : pattern.dataValue} />
+                      </label>
+
+                      <label htmlFor={`pattern-label--${patternIndex}`}>
+                        Label (optional):
+                        <input type='text' onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'label')} id={`pattern-dataValue--${patternIndex}`} value={pattern.label === '' ? '' : pattern.label} />
+                      </label>
 
                       <label htmlFor={`pattern-type--${patternIndex}`}>Pattern Type:</label>
                       <select id={`pattern-type--${patternIndex}`} value={pattern?.pattern} onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'pattern')}>

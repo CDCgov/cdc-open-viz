@@ -18,9 +18,14 @@ export type MapVisualSettings = {
 }
 
 type PatternSelection = {
+  // dropdown selection for getting the column used on a pattern
   dataKey: string
+  // text field input to match values found in the column
   dataValue: string
+  // style of pattern to use
   pattern: 'lines' | 'circles' | 'waves'
+  // optional legend update
+  label: string
 }
 
 export type GeoColumnProperties = Pick<EditorColumnProperties, 'name' | 'label' | 'tooltip' | 'dataTable'>

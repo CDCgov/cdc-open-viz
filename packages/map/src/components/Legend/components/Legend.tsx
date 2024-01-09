@@ -110,9 +110,6 @@ const Legend = () => {
           large: '12'
         }
 
-        // Dynamic text color
-        console.log('patternColor', defaultPatternColor)
-
         const legendSize = 16
 
         legendItems.push(
@@ -126,7 +123,7 @@ const Legend = () => {
                   <circle id={dataKey} fill={`url(#${dataKey}--${patternDataIndex})`} r={legendSize / 2} cx={legendSize / 2} cy={legendSize / 2} stroke='#0000004d' strokeWidth={1} />
                 </svg>
               </span>
-              <p style={{ lineHeight: '22.4px' }}>{patternData.dataValue}</p>
+              <p style={{ lineHeight: '22.4px' }}>{patternData.label || patternData.dataValue || ''}</p>
             </li>
           </>
         )
