@@ -8,7 +8,7 @@ export const getFileExtension = (url: string): string => {
   const regexForExtension = /(?:\.([^.]+))$/
   const regexForQueryParam = /[?&]wt=(csv|json)(?:&|$)/ // Regular expression for 'wt' query parameter
 
-  const urlObject = new URL(url)
+  const urlObject = new URL(url, window.location.origin)
   const pathname = urlObject.pathname
   const searchParams = urlObject.search
 
