@@ -260,7 +260,6 @@ export default {
       nodeHeight: 40
     },
     nodePadding: 55,
-    nodeFontSize: '16px',
     nodeFontColor: 'black',
     nodeColor: {
       default: '#ff8500',
