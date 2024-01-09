@@ -8,7 +8,7 @@ import '../../styles/v2/components/data-designer.scss'
 
 type DataDesignerProps = {
   configureData?: any // todo: add description here when understood better
-  updateDescriptionProp?: () => void // used to update data description fields
+  updateDescriptionProp?: (vizKey: string, dataKey: string, propName: string, value: any) => void // used to update data description fields
   visualizationKey?: any // todo: add description here when understood better
   dataKey?: string // appears to be the data file name, ie valid-data.csv
   config?: any // can be one of many different types of chart configs that aren't fully established yet
@@ -198,16 +198,16 @@ const DataDesigner = (props: DataDesignerProps) => {
                   </div>
                   <div className='mb-2'>
                     <div className='mb-1'>Which properties in the dataset represent the numeric value? (all remaining properties will be treated as filters)</div>
-                    {configureData.dataDescription.valueKeys && configureData.dataDescription.valueKeys.length > 0 && (
+                    {configureData.dataDescription.valueKeysTallSupport && configureData.dataDescription.valueKeysTallSupport.length > 0 && (
                       <ul className='value-list'>
-                        {configureData.dataDescription.valueKeys.map((valueKey, index) => (
+                        {configureData.dataDescription.valueKeysTallSupport.map((valueKey, index) => (
                           <li key={`value-keys-list-${index}`}>
                             {valueKey}
                             <button
                               onClick={() => {
-                                let newValueKeys = configureData.dataDescription.valueKeys
+                                let newValueKeys = configureData.dataDescription.valueKeysTallSupport
                                 newValueKeys.splice(index, 1)
-                                updateDescriptionProp(visualizationKey, dataKey, 'valueKeys', newValueKeys)
+                                updateDescriptionProp(visualizationKey, dataKey, 'valueKeysTallSupport', newValueKeys)
                               }}
                             >
                               X
@@ -218,14 +218,14 @@ const DataDesigner = (props: DataDesignerProps) => {
                     )}
                     <select
                       onChange={e => {
-                        if (e.target.value && (!configureData.dataDescription.valueKeys || configureData.dataDescription.valueKeys.indexOf(e.target.value) === -1)) {
-                          updateDescriptionProp(visualizationKey, dataKey, 'valueKeys', [...(configureData.dataDescription.valueKeys || []), e.target.value])
+                        if (e.target.value && (!configureData.dataDescription.valueKeysTallSupport || configureData.dataDescription.valueKeysTallSupport.indexOf(e.target.value) === -1)) {
+                          updateDescriptionProp(visualizationKey, dataKey, 'valueKeysTallSupport', [...(configureData.dataDescription.valueKeysTallSupport || []), e.target.value])
                         }
                       }}
                     >
                       <option value=''>Choose an option</option>
                       {Object.keys(configureData.data[0])
-                        .filter(value => !configureData.dataDescription.valueKeys || configureData.dataDescription.valueKeys.indexOf(value) === -1)
+                        .filter(value => !configureData.dataDescription.valueKeysTallSupport || configureData.dataDescription.valueKeysTallSupport.indexOf(value) === -1)
                         .map((value, index) => (
                           <option value={value} key={`value-keys-option-${index}`}>
                             {value}
