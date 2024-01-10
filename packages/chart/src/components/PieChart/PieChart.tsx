@@ -52,7 +52,7 @@ const PieChart = props => {
       // parent element is visible
       setAnimatePie(prevState => true)
     }
-  }, [])
+  })
 
   useEffect(() => {
     if (dataRef?.isIntersecting && config.animate && !animatedPie) {
@@ -153,7 +153,7 @@ const PieChart = props => {
     } else {
       setFilteredData(undefined)
     }
-  }, [seriesHighlight, config.columns.length]) // eslint-disable-line
+  }, [seriesHighlight]) // eslint-disable-line
 
   return (
     <ErrorBoundary component='PieChart'>
