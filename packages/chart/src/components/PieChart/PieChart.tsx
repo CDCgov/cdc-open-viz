@@ -153,7 +153,7 @@ const PieChart = props => {
     } else {
       setFilteredData(undefined)
     }
-  }, [seriesHighlight]) // eslint-disable-line
+  }, [seriesHighlight, config.columns.length]) // eslint-disable-line
 
   return (
     <ErrorBoundary component='PieChart'>
