@@ -52,7 +52,7 @@ const PieChart = props => {
       // parent element is visible
       setAnimatePie(prevState => true)
     }
-  })
+  }, [])
 
   useEffect(() => {
     if (dataRef?.isIntersecting && config.animate && !animatedPie) {

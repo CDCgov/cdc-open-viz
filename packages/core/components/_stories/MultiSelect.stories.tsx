@@ -20,5 +20,16 @@ export const Primary: Story = {
     updateField: (section, subsection, fieldName, value) => {}
   }
 }
+export const Secondary: Story = {
+  args: {
+    options: [
+      { value: '1', label: 'One' },
+      { value: '2', label: 'Two' },
+      { value: '3', label: 'Three' }
+    ],
+    label: 'MultiSelect 2',
+    updateField: (section, subsection, fieldName, value) => {}
+  }
+}
 
 export default meta
