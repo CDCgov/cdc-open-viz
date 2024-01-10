@@ -1,9 +1,9 @@
 import { type ChartConfig } from './ChartConfig'
 import { PickD3Scale } from '@visx/scale'
 
-export type ColorScale = PickD3Scale<'ordinal', any, any>
+type ColorScale = PickD3Scale<'ordinal', any, any>
 
-export type TransformedData = {
+type TransformedData = {
   dataKey?: string
   [key: string]: any
 }
