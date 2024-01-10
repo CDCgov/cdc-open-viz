@@ -12,6 +12,7 @@ import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import ConfigContext from '../../ConfigContext'
 import { useTooltip as useCoveTooltip } from '../../hooks/useTooltip'
 import useIntersectionObserver from '../../hooks/useIntersectionObserver'
+import { handleChartAriaLabels } from '../../helpers/handleChartAriaLabels'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 const enterUpdateTransition = ({ startAngle, endAngle }) => ({
@@ -19,9 +20,17 @@ const enterUpdateTransition = ({ startAngle, endAngle }) => ({
   endAngle
 })
 
+type TooltipData = {
+  data: {
+    [key: string]: string | number
+  }
+  dataXPosition: number
+  dataYPosition: number
+}
+
 const PieChart = props => {
-  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels, isEditor } = useContext(ConfigContext)
-  const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip()
+  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, currentViewport } = useContext(ConfigContext)
+  const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip<TooltipData>()
   const { handleTooltipMouseOver, handleTooltipMouseOff, TooltipListItem } = useCoveTooltip({
     xScale: false,
     yScale: false,
@@ -144,7 +153,7 @@ const PieChart = props => {
     } else {
       setFilteredData(undefined)
     }
-  }, [seriesHighlight]) // eslint-disable-line
+  }, [seriesHighlight, config.columns.length]) // eslint-disable-line
 
   return (
     <ErrorBoundary component='PieChart'>

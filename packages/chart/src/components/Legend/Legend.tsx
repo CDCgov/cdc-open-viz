@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import ConfigContext from '../../ConfigContext'
 import parse from 'html-react-parser'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
@@ -6,31 +6,36 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 
 import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
+import { handleLineType } from '../../helpers/handleLineType'
 import { Line } from '@visx/shape'
-import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChart as colorPalettes, sequentialPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 import { scaleOrdinal } from '@visx/scale'
 import { FaStar } from 'react-icons/fa'
+
+type Label = {
+  datum: string
+  index: number
+  text: string
+  value: string
+  icon?: any
+}
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const Legend = () => {
   // prettier-ignore
   const {
     config,
-    legend,
     colorScale,
     seriesHighlight,
     highlight,
-    twoColorPalette,
     tableData,
     highlightReset,
     transformedData: data,
-    colorPalettes,
-    currentViewport,
-    handleLineType
+    currentViewport
   } = useContext(ConfigContext)
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
-  const { visualizationType, visualizationSubType, series, runtime, orientation } = config
+  const { visualizationType, visualizationSubType, series, runtime, orientation, legend } = config
   // create fn to reverse labels while legend is Bottom.  Legend-right , legend-left works by default.
   const reverseLabels = labels => (config.legend.reverseLabelOrder && config.legend.position === 'bottom' ? labels.reverse() : labels)
   const displayScale = scaleOrdinal({
@@ -39,7 +44,7 @@ const Legend = () => {
     unknown: 'block'
   })
 
-  const createLegendLabels = defaultLabels => {
+  const createLegendLabels = (defaultLabels): Label[] => {
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
       const [belowColor, aboveColor] = twoColorPalette[config.twoColor.palette]
@@ -89,7 +94,6 @@ const Legend = () => {
       let seriesLabels = []
 
       //store unique values to Set by colorCode
-
       // loop through each stage/group/area on the chart and create a label
       config.runtime?.forecastingSeriesKeys?.map((outerGroup, index) => {
         return outerGroup?.stages?.map((stage, index) => {
@@ -159,11 +163,7 @@ const Legend = () => {
       const lastIndex = defaultLabels.length - 1
       let newLabels = []
 
-      config.suppressedData?.forEach(({ label, icon, value }, index) => {
-        const dataExists = data.some(d => {
-          return runtime.seriesKeys.some(column => d[column] === value)
-        })
-
+      config.suppressedData?.forEach(({ label, icon }, index) => {
         if (label && icon) {
           const newLabel = {
             datum: label,
