@@ -6,7 +6,6 @@ export type Column = {
   roundToPlace: number
   commas: boolean
   dataTable: boolean
-  showInViz?: boolean
   startingPoint: string
   series?: string
   tooltips: boolean
