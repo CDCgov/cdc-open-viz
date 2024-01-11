@@ -16,31 +16,31 @@ type RegionsProps = {
 }
 
 const Regions = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, handleTooltipMouseOff, handleTooltipMouseOver, handleTooltipClick, tooltipData, showTooltip, hideTooltip }: RegionsProps) => {
-  const { parseDate, config, formatDate } = useContext<ChartContext>(ConfigContext)
+  const { parseDate, config } = useContext<ChartContext>(ConfigContext)
 
-  const { runtime, regions, visualizationType } = config
+  const { runtime, regions, visualizationType, orientation, xAxis } = config
 
   let from
   let to
   let width
 
-  if (regions && config.orientation === 'vertical') {
+  if (regions && orientation === 'vertical') {
     return regions.map(region => {
-      if (config.xAxis.type === 'date' && region.fromType !== 'Previous Days') {
+      if (xAxis.type === 'date' && region.fromType !== 'Previous Days') {
         from = xScale(parseDate(region.from).getTime())
         to = xScale(parseDate(region.to).getTime())
         width = to - from
       }
 
-      if (config.xAxis.type === 'categorical') {
+      if (xAxis.type === 'categorical') {
         from = xScale(region.from)
         to = xScale(region.to)
         width = to - from
       }
 
-      if ((visualizationType === 'Bar' || config.visualizationType === 'Combo') && config.xAxis.type === 'date' && region.fromType !== 'Previous Days') {
-        from = xScale(parseDate(region.from).getTime()) - (barWidth * totalBarsInGroup) / 2
-        to = xScale(parseDate(region.to).getTime()) + (barWidth * totalBarsInGroup) / 2
+      if ((visualizationType === 'Bar' || config.visualizationType === 'Combo') && xAxis.type === 'date') {
+        from = region.fromType !== 'Previous Days' ? xScale(parseDate(region.from).getTime()) - (barWidth * totalBarsInGroup) / 2 : null
+        to = region.toType !== 'Last Date' ? xScale(parseDate(region.to).getTime()) + (barWidth * totalBarsInGroup) / 2 : null
 
         width = to - from
       }
@@ -52,7 +52,7 @@ const Regions = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, handleToolt
       }
 
       if (region.fromType === 'Previous Days') {
-        to = xScale(parseDate(region.to).getTime()) + (barWidth * totalBarsInGroup) / 2
+        to = region.toType !== 'Last Date' ? xScale(parseDate(region.to).getTime()) + (barWidth * totalBarsInGroup) / 2 : null
 
         let domain = xScale.domain()
         let bisectDate = d3.bisector(d => d).left
@@ -77,6 +77,7 @@ const Regions = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, handleToolt
         }
 
         from = Number(xScale(closestValue) - (visualizationType === 'Bar' || visualizationType === 'Combo' ? (barWidth * totalBarsInGroup) / 2 : 0))
+
         width = to - from
       }
 

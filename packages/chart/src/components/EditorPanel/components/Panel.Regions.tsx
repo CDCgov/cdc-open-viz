@@ -91,7 +91,7 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
               options={fromOptions}
             />
 
-            {(config.regions[i].fromType === 'Fixed' || config.regions[i].fromType === 'Previous Days') && (
+            {(config.regions[i].fromType === 'Fixed' || config.regions[i].fromType === 'Previous Days' || !config.regions[i].fromType) && (
               <>
                 <TextField
                   value={from}
@@ -131,7 +131,7 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
               options={toOptions}
             />
 
-            {config.regions[i].toType === 'Fixed' && <TextField value={to} label='To Value' fieldName='to' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />}
+            {(config.regions[i].toType === 'Fixed' || !config.regions[i].toType) && <TextField value={to} label='To Value' fieldName='to' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />}
           </div>
         ))}
       {!config.regions && <p style={{ textAlign: 'center' }}>There are currently no regions.</p>}
