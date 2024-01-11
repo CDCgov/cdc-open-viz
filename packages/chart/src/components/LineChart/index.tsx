@@ -10,6 +10,7 @@ import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
 import { splitData, filterCircles } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
+import Regions from './../Regions'
 
 // types
 import { type ChartContext } from '../../types/ChartContext'
@@ -23,11 +24,14 @@ const LineChart = (props: LineChartProps) => {
     handleTooltipClick,
     handleTooltipMouseOff,
     handleTooltipMouseOver,
+    showTooltip,
+    hideTooltip,
     tooltipData,
     xMax,
     xScale,
     yMax,
     yScale,
+    width
   } = props
 
   // prettier-ignore

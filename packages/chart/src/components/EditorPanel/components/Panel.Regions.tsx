@@ -9,7 +9,7 @@ import { type ChartContext } from '../../../types/ChartContext'
 import { type PanelProps } from './PanelProps'
 import ConfigContext from '../../../ConfigContext'
 
-const Regions = memo(({ config, updateConfig }: { config: ChartConfig; updateConfig: Function }) => {
+const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; updateConfig: Function }) => {
   let regionUpdate = (fieldName, value, i) => {
     let regions = []
 
@@ -48,7 +48,8 @@ const Regions = memo(({ config, updateConfig }: { config: ChartConfig; updateCon
     updateConfig({ ...config, regions })
   }
 
-  const relativeRegionOptions = ['Custom', 'Last Week', 'Last Month', 'Last Quarter', 'Last Year']
+  const fromOptions = ['Fixed', 'Previous Days']
+  const toOptions = ['Last Date', 'Fixed']
 
   return (
     <>
@@ -71,15 +72,15 @@ const Regions = memo(({ config, updateConfig }: { config: ChartConfig; updateCon
               <TextField value={background} label='Background' fieldName='background' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
             </div>
 
-            {/* <Select
-              value={config.regions[i].range ?? 'Custom'}
-              label='Region Range'
+            <Select
+              value={config.regions[i].fromType ?? 'Fixed'}
+              label='Minimum Region Type'
               initial={'Select'}
               required={true}
               onChange={e => {
                 if (e.target.value !== '' && e.target.value !== 'Select') {
                   const newRegions = [...config.regions]
-                  newRegions[i].range = e.target.value
+                  newRegions[i].fromType = e.target.value
                   updateConfig({
                     ...config,
                     regions: newRegions
@@ -87,14 +88,14 @@ const Regions = memo(({ config, updateConfig }: { config: ChartConfig; updateCon
                 }
                 e.target.value = ''
               }}
-              options={relativeRegionOptions}
-            /> */}
+              options={fromOptions}
+            />
 
-            {true && (
-              <div className='two-col-inputs'>
+            {(config.regions[i].fromType === 'Fixed' || config.regions[i].fromType === 'Previous Days' || !config.regions[i].fromType) && (
+              <>
                 <TextField
                   value={from}
-                  label='From Value'
+                  label={config.regions[i].fromType === 'Fixed' ? 'From Value' : 'Previous Number of Days'}
                   fieldName='from'
                   updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
                   tooltip={
@@ -108,9 +109,29 @@ const Regions = memo(({ config, updateConfig }: { config: ChartConfig; updateCon
                     </Tooltip>
                   }
                 />
-                <TextField value={to} label='To Value' fieldName='to' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
-              </div>
+              </>
             )}
+
+            <Select
+              value={config.regions[i].toType ?? 'Fixed'}
+              label='Maximum Region Type'
+              initial={'Select'}
+              required={true}
+              onChange={e => {
+                if (e.target.value !== '' && e.target.value !== 'Select') {
+                  const newRegions = [...config.regions]
+                  newRegions[i].toType = e.target.value
+                  updateConfig({
+                    ...config,
+                    regions: newRegions
+                  })
+                }
+                e.target.value = ''
+              }}
+              options={toOptions}
+            />
+
+            {(config.regions[i].toType === 'Fixed' || !config.regions[i].toType) && <TextField value={to} label='To Value' fieldName='to' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />}
           </div>
         ))}
       {!config.regions && <p style={{ textAlign: 'center' }}>There are currently no regions.</p>}
@@ -138,7 +159,7 @@ const RegionsPanel = ({ name }: PanelProps) => {
         <AccordionItemButton>{name}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        <Regions config={config} updateConfig={updateConfig} />
+        <RegionSettings config={config} updateConfig={updateConfig} />
       </AccordionItemPanel>
     </AccordionItem>
   ) : null
