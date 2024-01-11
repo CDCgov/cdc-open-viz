@@ -2,9 +2,10 @@ import { colorPalettesChart as colorPalettes, sequentialPalettes, twoColorPalett
 import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
+import { ChartConfig } from '../../../types/ChartConfig'
 
 export const createFormatLabels =
-  (config, tableData: Object[], data: TransformedData[], colorScale: ColorScale) =>
+  (config: ChartConfig, tableData: Object[], data: TransformedData[], colorScale: ColorScale) =>
   (defaultLabels: Label[]): Label[] => {
     const { visualizationType, visualizationSubType, series, runtime } = config
 
@@ -93,20 +94,13 @@ export const createFormatLabels =
     }
 
     // DEV-4161: replaceable series name in the legend
-    const hasNewSeriesName = config.series.map(s => s.name).filter(item => item).length > 0
+    const hasNewSeriesName = config.series.filter(item => !!item.name).length > 0
     if (hasNewSeriesName) {
-      let palette = colorPalettes[config.palette]
-
-      while (tableData.length > palette.length) {
-        palette = palette.concat(palette)
-      }
-
-      palette = palette.slice(0, data.length)
       //store unique values to Set by colorCode
       const set = new Set()
 
       config.series.forEach(d => {
-        set.add(d['name'] ? d['name'] : d['dataKey'])
+        set.add(d.name || d.dataKey)
       })
 
       // create labels with unique values

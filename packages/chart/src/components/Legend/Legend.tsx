@@ -22,7 +22,7 @@ const Legend = () => {
 
   const createLegendLabels = createFormatLabels(config, tableData, data, colorScale)
 
-  return config.visualizationType !== 'Box Plot' && <LegendComponent config={config} colorScale={colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
+  return !['Box Plot', 'Pie'].includes(config.visualizationType) && <LegendComponent config={config} colorScale={colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
 }
 
 export default Legend
