@@ -25,7 +25,7 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
   const [errors, setErrors] = useState([])
 
   const setTempConfigAndUpdate = config => {
-    updateVizConfig(config)
+    updateVizConfig(JSON.parse(JSON.stringify(config)))
     setTempConfig(config)
   }
 
