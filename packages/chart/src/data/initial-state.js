@@ -53,6 +53,7 @@ export default {
     rightAxisTickColor: '#333',
     numTicks: '',
     axisPadding: 0,
+    scalePadding: 10,
     tickRotation: 0,
     anchors: []
   },
