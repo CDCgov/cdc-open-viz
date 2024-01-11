@@ -181,10 +181,10 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   if (config.yAxis.enablePadding) {
     if (min < 0) {
       // sets with negative data need more padding on the max
-      max *= 1.2
-      min *= 1.2
+      max *= 1 + (config.yAxis.scalePadding * 2) / 100
+      min *= 1 + (config.yAxis.scalePadding * 2) / 100
     } else {
-      max *= 1.1
+      max *= 1 + config.yAxis.scalePadding / 100
     }
   }
 
