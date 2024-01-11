@@ -5,6 +5,7 @@ export type Anchor = {
 }
 
 export type Axis = {
+  scalePadding: number
   anchors?: Anchor[]
   dataKey: string
   dateDisplayFormat: string
