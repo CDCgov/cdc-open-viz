@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Icon from '../ui/Icon'
 
-import './styles.css'
+import './multiselect.styles.css'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 
 interface Option {

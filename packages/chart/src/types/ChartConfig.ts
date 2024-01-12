@@ -134,12 +134,14 @@ type AllChartsConfig = {
   newViz: Object
   orientation: 'vertical' | 'horizontal'
   palette: string
+  pieType?: string
   roundingStyle: string
   runtime: Runtime
   series: Series
   showLineSeriesLabels: boolean
   showTitle: boolean
   stackedAreaChartLineType: string
+  suppressedData?: { label: string; icon: string; value: string }[]
   superTitle: string
   theme: string
   table: Table
