@@ -95,7 +95,7 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
               <>
                 <TextField
                   value={from}
-                  label={config.regions[i].fromType === 'Fixed' ? 'From Value' : 'Previous Number of Days'}
+                  label={config.regions[i].fromType === 'Fixed' || !config.regions[i]?.fromType ? 'From Value' : 'Previous Number of Days'}
                   fieldName='from'
                   updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
                   tooltip={
