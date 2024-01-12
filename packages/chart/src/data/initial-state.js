@@ -209,7 +209,7 @@ export default {
     },
     estimateField: '',
     estimateRadius: '',
-    shape: 'circle',
+    shape: 'square',
     rowHeight: 20,
     description: {
       show: true,
