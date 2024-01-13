@@ -1,3 +1,3 @@
-import { BoxPlot } from '@visx/stats'
+import BoxPlot from './components/BoxPlot.jsx'
 
 export default BoxPlot

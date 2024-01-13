@@ -1,17 +1,38 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../../ConfigContext'
+import EditorPanelContext from './EditorPanelContext'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import { useEditorPermissions } from './../useEditorPermissions.js'
 
 // Core
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import Check from '@cdc/core/assets/icon-check.svg'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
-
 import Icon from '@cdc/core/components/ui/Icon'
 
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
-import { Draggable } from '@hello-pangea/dnd'
-import { colorPalettesChart, sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
+
+const sortableItemStyles = {
+  animate: false,
+  animateReplay: true,
+  display: 'block',
+  boxSizing: 'border-box',
+  border: '1px solid #D1D1D1',
+  borderRadius: '2px',
+  background: '#F1F1F1',
+  padding: '.4em .6em',
+  fontSize: '.8em',
+  marginRight: '.3em',
+  marginBottom: '.3em',
+  cursor: 'move',
+  zIndex: '999'
+}
+
+const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting']
 
 const SeriesContext = React.createContext()
 
@@ -551,7 +572,7 @@ const SeriesButtonRemove = props => {
 const SeriesItem = props => {
   const { config } = useContext(ConfigContext)
 
-  const { series, getItemStyle, sortableItemStyles, chartsWithOptions, index: i } = props
+  const { series, getItemStyle, index: i } = props
 
   return (
     <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
@@ -586,9 +607,9 @@ const SeriesItem = props => {
 }
 
 const SeriesList = props => {
-  const { series, getItemStyle, sortableItemStyles, chartsWithOptions } = props
+  const { series, getItemStyle, chartsWithOptions } = props
   return series.map((series, i) => {
-    return <SeriesItem getItemStyle={getItemStyle} sortableItemStyles={sortableItemStyles} chartsWithOptions={chartsWithOptions} series={series} index={i} key={`series-list-${i}`} />
+    return <SeriesItem getItemStyle={getItemStyle} chartsWithOptions={chartsWithOptions} series={series} index={i} key={`series-list-${i}`} />
   })
 }
 
@@ -616,4 +637,75 @@ const Series = {
   List: SeriesList
 }
 
-export default Series
+const SeriesPanel = props => {
+  const { config, updateConfig } = useContext(ConfigContext)
+  const { data, sortSeries, updateField, getColumns, addNewSeries, getItemStyle, handleSeriesChange } = useContext(EditorPanelContext)
+  const { visSupportsRankByValue } = useEditorPermissions()
+
+  return (
+    <AccordionItem>
+      <AccordionItemHeading>
+        <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
+      </AccordionItemHeading>
+      <AccordionItemPanel>
+        {(!config.series || config.series.length === 0) && config.visualizationType !== 'Paired Bar' && <p className='warning'>At least one series is required</p>}
+        {(!config.series || config.series.length === 0 || config.series.length < 2) && config.visualizationType === 'Paired Bar' && <p className='warning'>Select two data series for paired bar chart (e.g., Male and Female).</p>}
+        <>
+          <Select
+            fieldName='visualizationType'
+            label='Add Data Series'
+            initial='Select'
+            onChange={e => {
+              if (e.target.value !== '' && e.target.value !== 'Select') {
+                addNewSeries(e.target.value)
+              }
+              e.target.value = ''
+            }}
+            options={getColumns()}
+          />
+          {config.series && config.series.length !== 0 && (
+            <Series.Wrapper getColumns={getColumns}>
+              <fieldset>
+                <legend className='edit-label float-left'>Displaying</legend>
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              </fieldset>
+
+              <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
+                <Droppable droppableId='filter_order'>
+                  {/* prettier-ignore */}
+                  {provided => {
+                    return (
+                      <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef}>
+                        <Series.List series={config.series} getItemStyle={getItemStyle} />
+                        {provided.placeholder}
+                      </ul>
+                    )
+                  }}
+                </Droppable>
+              </DragDropContext>
+            </Series.Wrapper>
+          )}
+        </>
+        {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
+          <>
+            <span className='divider-heading'>Confidence Keys</span>
+            <Select value={config.confidenceKeys.upper || ''} section='confidenceKeys' fieldName='upper' label='Upper' updateField={updateField} initial='Select' options={getColumns()} />
+            <Select value={config.confidenceKeys.lower || ''} section='confidenceKeys' fieldName='lower' label='Lower' updateField={updateField} initial='Select' options={getColumns()} />
+          </>
+        )}
+        {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
+        {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
+        {config.visualizationType === 'Line' && props.preliminaryData}
+      </AccordionItemPanel>
+    </AccordionItem>
+  )
+}
+
+export default SeriesPanel

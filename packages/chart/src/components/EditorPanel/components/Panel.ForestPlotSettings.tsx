@@ -12,7 +12,7 @@ import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemB
 
 const ForestPlotSettings = ({ name }: PanelProps) => {
   const { config, rawData: unfilteredData, updateConfig } = useContext<ChartContext>(ConfigContext)
-
+  if (config.visualizationType !== 'Forest Plot') return
   const enforceRestrictions = updatedConfig => {
     if (updatedConfig.orientation === 'horizontal') {
       updatedConfig.labels = false

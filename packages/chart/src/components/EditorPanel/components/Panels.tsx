@@ -1,13 +1,21 @@
-import ForestPlotSettings from './Panel.ForestPlotSettings'
-import Series from './Panel.Series.jsx'
+import ForestPlot from './Panel.ForestPlotSettings'
+import SeriesPanel from './Panel.Series.jsx'
 import DateHighlighting from './Panel.DateHighlighting'
 import Regions from './Panel.Regions'
+import General from './Panel.General'
+import BoxPlot from './Panel.BoxPlot'
+import RightAxis from './Panel.RightAxis'
+import Legend from './Panel.Legend'
 
 const Panels = {
-  ForestPlot: ForestPlotSettings,
-  Series: Series,
+  BoxPlot,
   DateHighlighting,
-  Regions
+  ForestPlot,
+  General,
+  Regions,
+  Series: SeriesPanel,
+  RightAxis,
+  Legend
 }
 
 export default Panels

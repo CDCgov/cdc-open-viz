@@ -16,6 +16,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
   let configOptionsDefault = {
     server: { port: 8080 },
     build: {
+      minify: false,
       commonjsOptions: {
         include: [/@cdc\/core/, /node_modules/]
       },
