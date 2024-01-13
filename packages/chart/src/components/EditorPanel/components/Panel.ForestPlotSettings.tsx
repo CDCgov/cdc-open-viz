@@ -1,16 +1,21 @@
-import React, { useContext, memo, useState, useEffect } from 'react'
-import ConfigContext from '../../../ConfigContext'
-import { useDebounce } from 'use-debounce'
-import WarningImage from '../../../images/warning.svg'
+import { useContext, FC } from 'react'
+
+// cdc
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
-import { type ChartContext } from '../../../types/ChartContext'
 import { Select, CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import WarningImage from '../../../images/warning.svg'
+
+// contexts
+import ConfigContext from '../../../ConfigContext'
+
+// types
+import { type ChartContext } from '../../../types/ChartContext'
 import { type PanelProps } from './PanelProps'
 
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
-const ForestPlotSettings = ({ name }: PanelProps) => {
+const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
   const { config, rawData: unfilteredData, updateConfig } = useContext<ChartContext>(ConfigContext)
   if (config.visualizationType !== 'Forest Plot') return
   const enforceRestrictions = updatedConfig => {

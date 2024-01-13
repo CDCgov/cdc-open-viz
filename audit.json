@@ -1,0 +1,178 @@
+{
+  "type": "auditAdvisory",
+  "data": {
+    "resolution": {
+      "id": 1095374,
+      "path": "@cdc/markup-include>axios>follow-redirects",
+      "dev": false,
+      "optional": false,
+      "bundled": false
+    },
+    "advisory": {
+      "findings": [
+        {
+          "version": "1.15.3",
+          "paths": [
+            "@cdc/markup-include>axios>follow-redirects",
+            "lerna>nx>axios>follow-redirects",
+            "lerna>@lerna/create>nx>axios>follow-redirects"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.15.4",
+      "module_name": "follow-redirects",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-jchw-25xp-jwwc",
+      "cves": [
+        "CVE-2023-26159"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.15.4",
+      "cvss": {
+        "score": 6.1,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N"
+      },
+      "updated": "2024-01-09T19:03:25.000Z",
+      "recommendation": "Upgrade to version 1.15.4 or later",
+      "cwe": [
+        "CWE-20",
+        "CWE-601"
+      ],
+      "found_by": null,
+      "deleted": null,
+      "id": 1095374,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2023-26159\n- https://github.com/follow-redirects/follow-redirects/issues/235\n- https://github.com/follow-redirects/follow-redirects/pull/236\n- https://security.snyk.io/vuln/SNYK-JS-FOLLOWREDIRECTS-6141137\n- https://github.com/follow-redirects/follow-redirects/commit/7a6567e16dfa9ad18a70bfe91784c28653fbf19d\n- https://github.com/advisories/GHSA-jchw-25xp-jwwc",
+      "created": "2024-01-02T06:30:30.000Z",
+      "reported_by": null,
+      "title": "Follow Redirects improperly handles URLs in the url.parse() function",
+      "npm_advisory_id": null,
+      "overview": "Versions of the package follow-redirects before 1.15.4 are vulnerable to Improper Input Validation due to the improper handling of URLs by the url.parse() function. When new URL() throws an error, it can be manipulated to misinterpret the hostname. An attacker could exploit this weakness to redirect traffic to a malicious site, potentially leading to information disclosure, phishing attacks, or other security breaches.",
+      "url": "https://github.com/advisories/GHSA-jchw-25xp-jwwc"
+    }
+  }
+}
+{
+  "type": "auditAdvisory",
+  "data": {
+    "resolution": {
+      "id": 1095374,
+      "path": "lerna>nx>axios>follow-redirects",
+      "dev": false,
+      "optional": false,
+      "bundled": false
+    },
+    "advisory": {
+      "findings": [
+        {
+          "version": "1.15.3",
+          "paths": [
+            "@cdc/markup-include>axios>follow-redirects",
+            "lerna>nx>axios>follow-redirects",
+            "lerna>@lerna/create>nx>axios>follow-redirects"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.15.4",
+      "module_name": "follow-redirects",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-jchw-25xp-jwwc",
+      "cves": [
+        "CVE-2023-26159"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.15.4",
+      "cvss": {
+        "score": 6.1,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N"
+      },
+      "updated": "2024-01-09T19:03:25.000Z",
+      "recommendation": "Upgrade to version 1.15.4 or later",
+      "cwe": [
+        "CWE-20",
+        "CWE-601"
+      ],
+      "found_by": null,
+      "deleted": null,
+      "id": 1095374,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2023-26159\n- https://github.com/follow-redirects/follow-redirects/issues/235\n- https://github.com/follow-redirects/follow-redirects/pull/236\n- https://security.snyk.io/vuln/SNYK-JS-FOLLOWREDIRECTS-6141137\n- https://github.com/follow-redirects/follow-redirects/commit/7a6567e16dfa9ad18a70bfe91784c28653fbf19d\n- https://github.com/advisories/GHSA-jchw-25xp-jwwc",
+      "created": "2024-01-02T06:30:30.000Z",
+      "reported_by": null,
+      "title": "Follow Redirects improperly handles URLs in the url.parse() function",
+      "npm_advisory_id": null,
+      "overview": "Versions of the package follow-redirects before 1.15.4 are vulnerable to Improper Input Validation due to the improper handling of URLs by the url.parse() function. When new URL() throws an error, it can be manipulated to misinterpret the hostname. An attacker could exploit this weakness to redirect traffic to a malicious site, potentially leading to information disclosure, phishing attacks, or other security breaches.",
+      "url": "https://github.com/advisories/GHSA-jchw-25xp-jwwc"
+    }
+  }
+}
+{
+  "type": "auditAdvisory",
+  "data": {
+    "resolution": {
+      "id": 1095374,
+      "path": "lerna>@lerna/create>nx>axios>follow-redirects",
+      "dev": false,
+      "optional": false,
+      "bundled": false
+    },
+    "advisory": {
+      "findings": [
+        {
+          "version": "1.15.3",
+          "paths": [
+            "@cdc/markup-include>axios>follow-redirects",
+            "lerna>nx>axios>follow-redirects",
+            "lerna>@lerna/create>nx>axios>follow-redirects"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.15.4",
+      "module_name": "follow-redirects",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-jchw-25xp-jwwc",
+      "cves": [
+        "CVE-2023-26159"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.15.4",
+      "cvss": {
+        "score": 6.1,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N"
+      },
+      "updated": "2024-01-09T19:03:25.000Z",
+      "recommendation": "Upgrade to version 1.15.4 or later",
+      "cwe": [
+        "CWE-20",
+        "CWE-601"
+      ],
+      "found_by": null,
+      "deleted": null,
+      "id": 1095374,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2023-26159\n- https://github.com/follow-redirects/follow-redirects/issues/235\n- https://github.com/follow-redirects/follow-redirects/pull/236\n- https://security.snyk.io/vuln/SNYK-JS-FOLLOWREDIRECTS-6141137\n- https://github.com/follow-redirects/follow-redirects/commit/7a6567e16dfa9ad18a70bfe91784c28653fbf19d\n- https://github.com/advisories/GHSA-jchw-25xp-jwwc",
+      "created": "2024-01-02T06:30:30.000Z",
+      "reported_by": null,
+      "title": "Follow Redirects improperly handles URLs in the url.parse() function",
+      "npm_advisory_id": null,
+      "overview": "Versions of the package follow-redirects before 1.15.4 are vulnerable to Improper Input Validation due to the improper handling of URLs by the url.parse() function. When new URL() throws an error, it can be manipulated to misinterpret the hostname. An attacker could exploit this weakness to redirect traffic to a malicious site, potentially leading to information disclosure, phishing attacks, or other security breaches.",
+      "url": "https://github.com/advisories/GHSA-jchw-25xp-jwwc"
+    }
+  }
+}
+{
+  "type": "auditSummary",
+  "data": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 3,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 1928,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 1928
+  }
+}

@@ -1,0 +1,574 @@
+{
+  "type": "chart",
+  "title": "Box Plot with Outliers",
+  "showTitle": false,
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "medium",
+  "lineDatapointStyle": "hover",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "56",
+    "gridLines": false,
+    "enablePadding": false,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 50,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "",
+    "axisPadding": 0,
+    "tickRotation": 0,
+    "label": "Score"
+  },
+  "boxplot": {
+    "plots": [
+      {
+        "columnCategory": "Group A",
+        "columnMax": 123,
+        "columnThirdQuartile": "94",
+        "columnMedian": "78",
+        "columnFirstQuartile": "36",
+        "columnMin": 8,
+        "columnTotal": 970,
+        "columnSd": "70",
+        "columnMean": "81",
+        "columnIqr": "58",
+        "columnLowerBounds": 8,
+        "columnUpperBounds": 123,
+        "columnOutliers": [
+          278
+        ],
+        "values": [
+          8,
+          24,
+          32,
+          40,
+          43,
+          72,
+          83,
+          90,
+          92,
+          96,
+          112,
+          278
+        ],
+        "nonOutlierValues": [
+          8,
+          24,
+          32,
+          40,
+          43,
+          72,
+          83,
+          90,
+          92,
+          96,
+          112
+        ]
+      },
+      {
+        "columnCategory": "Group B",
+        "columnMax": 60,
+        "columnThirdQuartile": "48",
+        "columnMedian": "33",
+        "columnFirstQuartile": "18",
+        "columnMin": 5,
+        "columnTotal": 390,
+        "columnSd": "18",
+        "columnMean": "33",
+        "columnIqr": "30",
+        "columnLowerBounds": 5,
+        "columnUpperBounds": 60,
+        "columnOutliers": [],
+        "values": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60
+        ],
+        "nonOutlierValues": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60
+        ]
+      },
+      {
+        "columnCategory": "Group C",
+        "columnMax": 145.25,
+        "columnThirdQuartile": "115",
+        "columnMedian": "91",
+        "columnFirstQuartile": "55",
+        "columnMin": 12,
+        "columnTotal": 1248,
+        "columnSd": "74",
+        "columnMean": "104",
+        "columnIqr": "61",
+        "columnLowerBounds": 12,
+        "columnUpperBounds": 145.25,
+        "columnOutliers": [
+          240,
+          256
+        ],
+        "values": [
+          12,
+          44,
+          46,
+          63,
+          76,
+          88,
+          94,
+          99,
+          112,
+          118,
+          240,
+          256
+        ],
+        "nonOutlierValues": [
+          12,
+          44,
+          46,
+          63,
+          76,
+          88,
+          94,
+          99,
+          112,
+          118
+        ]
+      }
+    ],
+    "borders": "true",
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "plotOutlierValues": true,
+    "plotNonOutlierValues": false,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
+    },
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "total": "Total",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    },
+    "allValues": [
+      8,
+      24,
+      32,
+      40,
+      43,
+      72,
+      83,
+      90,
+      92,
+      96,
+      112,
+      278,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50,
+      55,
+      60,
+      12,
+      44,
+      46,
+      63,
+      76,
+      88,
+      94,
+      99,
+      112,
+      118,
+      240,
+      256
+    ],
+    "categories": [
+      "Group A",
+      "Group B",
+      "Group C"
+    ],
+    "tableData": [
+      {
+        "columnCategory": "Group A",
+        "columnMax": 123,
+        "columnThirdQuartile": "94",
+        "columnMedian": "78",
+        "columnFirstQuartile": "36",
+        "columnMin": 8,
+        "columnTotal": 970,
+        "columnSd": "70",
+        "columnMean": "81",
+        "columnOutliers": [
+          278
+        ],
+        "values": [
+          8,
+          24,
+          32,
+          40,
+          43,
+          72,
+          83,
+          90,
+          92,
+          96,
+          112,
+          278
+        ]
+      },
+      {
+        "columnCategory": "Group B",
+        "columnMax": 60,
+        "columnThirdQuartile": "48",
+        "columnMedian": "33",
+        "columnFirstQuartile": "18",
+        "columnMin": 5,
+        "columnTotal": 390,
+        "columnSd": "18",
+        "columnMean": "33",
+        "columnOutliers": [],
+        "values": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60
+        ]
+      },
+      {
+        "columnCategory": "Group C",
+        "columnMax": 145.25,
+        "columnThirdQuartile": "115",
+        "columnMedian": "91",
+        "columnFirstQuartile": "55",
+        "columnMin": 12,
+        "columnTotal": 1248,
+        "columnSd": "74",
+        "columnMean": "104",
+        "columnOutliers": [
+          240,
+          256
+        ],
+        "values": [
+          12,
+          44,
+          46,
+          63,
+          76,
+          88,
+          94,
+          99,
+          112,
+          118,
+          240,
+          256
+        ]
+      }
+    ]
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": 0.35,
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 750
+  },
+  "xAxis": {
+    "type": "categorical",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 65,
+    "axisPadding": 0,
+    "target": 0,
+    "dataKey": "Group"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "legend": {
+    "behavior": "isolate",
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "hide": true
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "sequential-bluereverse",
+  "isPaletteReversed": true,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true
+  },
+  "filterBehavior": "Filter Change",
+  "visualizationType": "Box Plot",
+  "data": [
+    {
+      "Group": "Group A",
+      "Score": "8"
+    },
+    {
+      "Group": "Group A",
+      "Score": "24"
+    },
+    {
+      "Group": "Group A",
+      "Score": "32"
+    },
+    {
+      "Group": "Group A",
+      "Score": "40"
+    },
+    {
+      "Group": "Group A",
+      "Score": "43"
+    },
+    {
+      "Group": "Group A",
+      "Score": "72"
+    },
+    {
+      "Group": "Group A",
+      "Score": "83"
+    },
+    {
+      "Group": "Group A",
+      "Score": "90"
+    },
+    {
+      "Group": "Group A",
+      "Score": "92"
+    },
+    {
+      "Group": "Group A",
+      "Score": "96"
+    },
+    {
+      "Group": "Group A",
+      "Score": "112"
+    },
+    {
+      "Group": "Group A",
+      "Score": "278"
+    },
+    {
+      "Group": "Group B",
+      "Score": "5"
+    },
+    {
+      "Group": "Group B",
+      "Score": "10"
+    },
+    {
+      "Group": "Group B",
+      "Score": "15"
+    },
+    {
+      "Group": "Group B",
+      "Score": "20"
+    },
+    {
+      "Group": "Group B",
+      "Score": "25"
+    },
+    {
+      "Group": "Group B",
+      "Score": "30"
+    },
+    {
+      "Group": "Group B",
+      "Score": "35"
+    },
+    {
+      "Group": "Group B",
+      "Score": "40"
+    },
+    {
+      "Group": "Group B",
+      "Score": "45"
+    },
+    {
+      "Group": "Group B",
+      "Score": "50"
+    },
+    {
+      "Group": "Group B",
+      "Score": "55"
+    },
+    {
+      "Group": "Group B",
+      "Score": "60"
+    },
+    {
+      "Group": "Group C",
+      "Score": "12"
+    },
+    {
+      "Group": "Group C",
+      "Score": "44"
+    },
+    {
+      "Group": "Group C",
+      "Score": "46"
+    },
+    {
+      "Group": "Group C",
+      "Score": "63"
+    },
+    {
+      "Group": "Group C",
+      "Score": "76"
+    },
+    {
+      "Group": "Group C",
+      "Score": "88"
+    },
+    {
+      "Group": "Group C",
+      "Score": "94"
+    },
+    {
+      "Group": "Group C",
+      "Score": "99"
+    },
+    {
+      "Group": "Group C",
+      "Score": "112"
+    },
+    {
+      "Group": "Group C",
+      "Score": "118"
+    },
+    {
+      "Group": "Group C",
+      "Score": "240"
+    },
+    {
+      "Group": "Group C",
+      "Score": "256"
+    }
+  ],
+  "dataFileName": "51d-box-plot-outliers.csv",
+  "dataFileSourceType": "file",
+  "series": [
+    {
+      "dataKey": "Score",
+      "type": "Box Plot",
+      "axis": "Left"
+    }
+  ]
+}

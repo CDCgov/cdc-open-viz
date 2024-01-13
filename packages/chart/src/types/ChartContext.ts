@@ -8,12 +8,18 @@ type TransformedData = {
   [key: string]: any
 }
 
+type LineOption = {
+  value: string
+  key: string
+}
+
 type SharedChartContext = {
   colorScale?: ColorScale
   config: ChartConfig
   currentViewport?: string
   highlight?: Function
   highlightReset?: Function
+  lineOptions?: LineOption[]
 }
 
 // Line Chart Specific Context
