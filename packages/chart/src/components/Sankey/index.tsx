@@ -8,6 +8,8 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { ChartContext } from '../../types/ChartContext'
 
+import { KPIComponent } from '@cdc/data-bite/src/components/KPIComponent'
+
 type Link = { source: string; target: string; value: number }
 
 type Data = {
@@ -322,13 +324,19 @@ const Sankey = ({ width, height }: SankeyProps) => {
   })
 
   return (
-    <div className='sankey-chart'>
-      <svg className='sankey-chart__diagram' width={width} height={height} style={{ overflow: 'visible' }}>
-        <Group className='links'>{allLinks}</Group>
-        <Group className='nodes'>{allNodes}</Group>
-      </svg>
-      <ReactTooltip id={`tooltip`} afterHide={() => clearNodeClick()} events={['click']} html='true' place='top' style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
-    </div>
+    <>
+      <div className='kpis-container'>
+        <KPIComponent label={sankeyConfig.data.KPIs[0].label} value={sankeyConfig.data.KPIs[0].value}/>
+        <KPIComponent label={sankeyConfig.data.KPIs[1].label} value={sankeyConfig.data.KPIs[1].value}/>
+      </div>
+      <div className='sankey-chart'>
+        <svg className='sankey-chart__diagram' width={width} height={height} style={{ overflow: 'visible' }}>
+          <Group className='links'>{allLinks}</Group>
+          <Group className='nodes'>{allNodes}</Group>
+        </svg>
+        <ReactTooltip id={`tooltip`} afterHide={() => clearNodeClick()} events={['click']} html='true' place='top' style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
+      </div>
+    </>
   )
 }
 export default Sankey

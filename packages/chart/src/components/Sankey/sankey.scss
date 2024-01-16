@@ -1,3 +1,10 @@
+/* KPI */
+.kpis-container {
+  display: flex;
+  flex-direction: row;
+  column-gap: 30px;
+}
+
 .sankey-chart {
   --font-size-xxxs: 8px;
   --font-size-xxs: 10px;
