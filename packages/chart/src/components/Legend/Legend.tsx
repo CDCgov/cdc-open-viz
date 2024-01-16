@@ -296,12 +296,12 @@ const Legend = () => {
                 </div>
                 <>
                   <hr></hr>
-                  <div>
+                  <div className={innerClasses.join(' ')}>
                     {config.preliminaryData.map((pd, index) => {
                       return (
                         <>
                           {pd.label && (
-                            <svg key={index} style={{ display: 'flex', marginTop: '10px', flex: 0.1 }} height={25}>
+                            <svg key={index} style={{ display: 'flex', marginTop: '5px', flex: 0.1 }} height={25}>
                               {pd.style.includes('Dashed') && <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} />}
                               {pd.style.includes('Circles') && <circle strokeWidth={1} cx={20} cy={11} r={6} stroke={'#000'} fill='transparent' />}
                               <Text x={50} y={15}>
