@@ -2642,18 +2642,21 @@ const EditorPanel = () => {
                                 </label>
                               )}
                             </li>
-                            <li>
-                              <label className='checkbox'>
-                                <input
-                                  type='checkbox'
-                                  checked={config.columns[val].showInViz}
-                                  onChange={event => {
-                                    editColumn(val, 'showInViz', event.target.checked)
-                                  }}
-                                />
-                                <span className='edit-label'>Show in Visualization</span>
-                              </label>
-                            </li>
+                            {config.visualizationType === 'Pie' && (
+                              <li>
+                                <label className='checkbox'>
+                                  <input
+                                    type='checkbox'
+                                    checked={config.columns[val].showInViz}
+                                    onChange={event => {
+                                      editColumn(val, 'showInViz', event.target.checked)
+                                    }}
+                                  />
+                                  <span className='edit-label'>Show in Visualization</span>
+                                </label>
+                              </li>
+                            )}
+
                             {/* disable for now */}
 
                             <li>
