@@ -46,6 +46,16 @@
   "sankey": {
     "name": "Outcomes of Emergency Medical Systems (EMS) Responses to Suicide-Related Calls, 2022",
     "data": {
+      "KPIs": [
+        {
+          "label":"Number of EMS Emergent Responses",
+          "value": "467,136"
+        },
+        {
+          "label":"Number of Deaths",
+          "value": "4,736"
+        }
+      ],
       "links": [
         {
           "source": "Suicide EMS Responses",
