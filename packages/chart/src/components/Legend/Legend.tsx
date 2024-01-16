@@ -11,6 +11,7 @@ import { Line } from '@visx/shape'
 import { colorPalettesChart as colorPalettes, sequentialPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 import { scaleOrdinal } from '@visx/scale'
 import { FaStar } from 'react-icons/fa'
+import { Text } from '@visx/text'
 
 type Label = {
   datum: string
@@ -201,97 +202,119 @@ const Legend = () => {
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => {
             return (
-              <div className={innerClasses.join(' ')}>
-                {createLegendLabels(labels).map((label, i) => {
-                  let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
-                  let itemName = label.datum
+              <>
+                <div className={innerClasses.join(' ')}>
+                  {createLegendLabels(labels).map((label, i) => {
+                    let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
+                    let itemName = label.datum
 
-                  // Filter excluded data keys from legend
-                  if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-                    return null
-                  }
-
-                  if (runtime.seriesLabels) {
-                    let index = config.runtime.seriesLabelsAll.indexOf(itemName)
-                    itemName = config.runtime.seriesKeys[index]
-
-                    if (runtime?.forecastingSeriesKeys?.length > 0) {
-                      itemName = label.text
+                    // Filter excluded data keys from legend
+                    if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
+                      return null
                     }
-                  }
 
-                  if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                    className.push('inactive')
-                  }
+                    if (runtime.seriesLabels) {
+                      let index = config.runtime.seriesLabelsAll.indexOf(itemName)
+                      itemName = config.runtime.seriesKeys[index]
 
-                  return (
-                    <LegendItem
-                      className={className.join(' ')}
-                      tabIndex={0}
-                      key={`legend-quantile-${i}`}
-                      onKeyPress={e => {
-                        if (e.key === 'Enter') {
+                      if (runtime?.forecastingSeriesKeys?.length > 0) {
+                        itemName = label.text
+                      }
+                    }
+
+                    if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
+                      className.push('inactive')
+                    }
+
+                    return (
+                      <LegendItem
+                        className={className.join(' ')}
+                        tabIndex={0}
+                        key={`legend-quantile-${i}`}
+                        onKeyPress={e => {
+                          if (e.key === 'Enter') {
+                            highlight(label)
+                          }
+                        }}
+                        onClick={() => {
                           highlight(label)
-                        }
-                      }}
-                      onClick={() => {
-                        highlight(label)
-                      }}
-                    >
-                      {config.visualizationType === 'Line' && config.legend.lineMode ? (
-                        <svg width={40} height={20}>
-                          <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={label.value} strokeWidth={2} strokeDasharray={handleLineType(config.series[i]?.type ? config.series[i]?.type : '')} />
-                        </svg>
-                      ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <LegendCircle margin='0' fill={label.value} display={displayScale(label.datum)} />
-                          <div style={{ marginTop: '2px', marginRight: '6px' }}>{label.icon}</div>
-                        </div>
-                      )}
+                        }}
+                      >
+                        {config.visualizationType === 'Line' && config.legend.lineMode ? (
+                          <svg width={40} height={20}>
+                            <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={label.value} strokeWidth={2} strokeDasharray={handleLineType(config.series[i]?.type ? config.series[i]?.type : '')} />
+                          </svg>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <LegendCircle margin='0' fill={label.value} display={displayScale(label.datum)} />
+                            <div style={{ marginTop: '2px', marginRight: '6px' }}>{label.icon}</div>
+                          </div>
+                        )}
 
-                      <LegendLabel align='left' margin='0 0 0 4px'>
-                        {label.text}
-                      </LegendLabel>
-                    </LegendItem>
-                  )
-                })}
+                        <LegendLabel align='left' margin='0 0 0 4px'>
+                          {label.text}
+                        </LegendLabel>
+                      </LegendItem>
+                    )
+                  })}
 
-                {highLightedLegendItems.map((bar, i) => {
-                  // if duplicates only return first item
-                  let className = 'legend-item'
-                  let itemName = bar.legendLabel
+                  {highLightedLegendItems.map((bar, i) => {
+                    // if duplicates only return first item
+                    let className = 'legend-item'
+                    let itemName = bar.legendLabel
 
-                  if (!itemName) return false
-                  if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                    className += ' inactive'
-                  }
-                  return (
-                    <LegendItem
-                      className={className}
-                      tabIndex={0}
-                      key={`legend-quantile-${i}`}
-                      onKeyPress={e => {
-                        if (e.key === 'Enter') {
+                    if (!itemName) return false
+                    if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
+                      className += ' inactive'
+                    }
+                    return (
+                      <LegendItem
+                        className={className}
+                        tabIndex={0}
+                        key={`legend-quantile-${i}`}
+                        onKeyPress={e => {
+                          if (e.key === 'Enter') {
+                            highlight(bar.legendLabel)
+                          }
+                        }}
+                        onClick={() => {
                           highlight(bar.legendLabel)
-                        }
-                      }}
-                      onClick={() => {
-                        highlight(bar.legendLabel)
-                      }}
-                    >
-                      <LegendCircle fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />{' '}
-                      <LegendLabel align='left' margin='0 0 0 4px'>
-                        {bar.legendLabel ? bar.legendLabel : bar.value}
-                      </LegendLabel>
-                    </LegendItem>
-                  )
-                })}
-                {seriesHighlight.length > 0 && (
-                  <button className={`legend-reset ${config.theme}`} onClick={labels => highlightReset(labels)} tabIndex={0}>
-                    Reset
-                  </button>
-                )}
-              </div>
+                        }}
+                      >
+                        <LegendCircle fill='transparent' borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`} />{' '}
+                        <LegendLabel align='left' margin='0 0 0 4px'>
+                          {bar.legendLabel ? bar.legendLabel : bar.value}
+                        </LegendLabel>
+                      </LegendItem>
+                    )
+                  })}
+                  {seriesHighlight.length > 0 && (
+                    <button className={`legend-reset ${config.theme}`} onClick={labels => highlightReset(labels)} tabIndex={0}>
+                      Reset
+                    </button>
+                  )}
+                </div>
+                <>
+                  <hr></hr>
+                  <div>
+                    {config.preliminaryData.map((pd, index) => {
+                      return (
+                        <>
+                          {pd.label && (
+                            <svg key={index} style={{ display: 'flex', marginTop: '10px', flex: 0.1 }} height={25}>
+                              {pd.style.includes('Dashed') && <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} />}
+                              {pd.style.includes('Circles') && <circle strokeWidth={1} cx={20} cy={11} r={6} stroke={'#000'} fill='transparent' />}
+                              <Text x={50} y={15}>
+                                {pd.label}
+                              </Text>
+                            </svg>
+                          )}
+                        </>
+                      )
+                    })}
+                  </div>
+                </>
+              </>
             )
           }}
         </LegendOrdinal>
