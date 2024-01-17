@@ -44,7 +44,7 @@ export type TableConfig = {
     hide?: boolean
   }
   series?: Series
-  regions?: { label: string; from: string; to: string }[]
+  regions?: { label: string; from: string; to: string; fromType: 'Fixed' | 'Previous Days'; toType: 'Fixed' | 'Last Date' }[]
   runtimeSeriesLabels?: Object
   dataFormat?: Object
   runtime: Runtime
