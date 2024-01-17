@@ -31,3 +31,16 @@ export interface DataItem {
 export interface Config {
   preliminaryData: PreliminaryDataItem[] | []
 }
+export interface StyleProps {
+  preliminaryData: PreliminaryDataItem[]
+  rawData: DataItem[]
+  stroke: string
+  handleLineType: Function
+  lineType: string
+  seriesKey: 'string'
+}
+export interface Style {
+  stroke: string
+  strokeWidth: number
+  strokeDasharray: string
+}

@@ -139,7 +139,7 @@ export default {
   legend: {
     hide: false,
     behavior: 'isolate',
-    singleRow: false,
+    singleRow: true,
     colorCode: '',
     reverseLabelOrder: false,
     description: '',
