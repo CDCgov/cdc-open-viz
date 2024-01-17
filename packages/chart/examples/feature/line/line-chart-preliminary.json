@@ -53,6 +53,22 @@
       "value": "20",
       "style": "Dashed Medium",
       "seriesKey": "Data 3"
+    },
+    {
+      "type": "effect",
+      "label": "Circle Open",
+      "column": "Data 1",
+      "value": "25",
+      "style": "Open Circles",
+      "seriesKey": "Data 3"
+    },
+    {
+      "type": "effect",
+      "label": "Dashed Small",
+      "column": "Data 2",
+      "value": "38",
+      "style": "Dashed Small",
+      "seriesKey": "Data 1"
     }
   ],
   "yAxis": {
