@@ -179,15 +179,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
         const notAllParentsSelected = params?.some(({ value }) => value === '')
         if (notAllParentsSelected) return // don't send request for dependent children filter options
         if (apiFilterDropdowns[_key] && !params && filter.filterBy === 'Query String') return // don't reload filter unless it's a child
-        let endpoint = baseEndpoint + (params ? gatherQueryParams(params) : '')
-        if (filter.filterBy === 'Parent Filter') {
-          let parentFilter = sharedAPIFilters.find(f => f.key === filter.parents)
-          // reset api endpoint
-          // Build API endpiont based on parent filter value
-          // ie. https://data.cdc.gov/resource/tajw-whir.json?$select=distinct%20county&geography=Nevada
-          endpoint = ''
-          endpoint = `${baseEndpoint}&${filter.queryParameter}=${parentFilter.active}`
-        }
+        const endpoint = baseEndpoint + (params ? gatherQueryParams(params) : '')
 
         fetch(endpoint)
           .then(resp => resp.json())
