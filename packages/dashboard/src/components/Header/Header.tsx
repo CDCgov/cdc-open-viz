@@ -267,9 +267,6 @@ const Header = (props: HeaderProps) => {
                         <option key={'file-name'} value={'File Name'}>
                           File Name
                         </option>
-                        <option key={'parent-filter'} value={'Parent Filter'}>
-                          Parent Filter Value
-                        </option>
                       </select>
                     </label>
                     {filter.filterBy === 'File Name' && (
@@ -318,7 +315,7 @@ const Header = (props: HeaderProps) => {
                     )}
                   </>
                 )}
-                {(filter.filterBy === 'Query String' || filter.filterBy === 'Parent Filter') && (
+                {filter.filterBy === 'Query String' && (
                   <label>
                     <span className='edit-label column-heading'>Query string parameter</span> <input type='text' defaultValue={filter.queryParameter} onChange={e => updateFilterProp('queryParameter', index, e.target.value)} />
                   </label>
