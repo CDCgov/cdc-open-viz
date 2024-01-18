@@ -2813,8 +2813,12 @@ const EditorPanel = () => {
                                   updateFilterProp('filterStyle', index, e.target.value)
                                 }}
                               >
-                                {filterStyleOptions.map(item => {
-                                  return <option value={item}>{item}</option>
+                                {filterStyleOptions.map((item, index) => {
+                                  return (
+                                    <option key={`filter-style-${index}`} value={item}>
+                                      {item}
+                                    </option>
+                                  )
                                 })}
                               </select>
                             </label>

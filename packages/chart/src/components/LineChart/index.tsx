@@ -133,11 +133,14 @@ const LineChart = (props: LineChartProps) => {
                 y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                 curve={allCurves[seriesData[0].lineType]}
                 styles={styles}
+                defined={(item, i) => {
+                  return isNumber(item[config.runtime.seriesLabels[seriesKey]])
+                }}
               ></SplitLinePath>
 
               {/* circles for preliminaryData data */}
               {circleData.map((d, i) => {
-                return <circle key={i} cx={xScale(getXAxisData(d))} cy={yScale(getYAxisData(d, seriesKey))} r={6} strokeWidth={2} stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'} fill='#fff' />
+                return <circle key={i} cx={xScale(getXAxisData(d))} cy={yScale(Number(getYAxisData(d, seriesKey)))} r={6} strokeWidth={2} stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'} fill='#fff' />
               })}
 
               {/* ANIMATED LINE */}
@@ -147,7 +150,7 @@ const LineChart = (props: LineChartProps) => {
                   curve={seriesData.lineType}
                   data={data}
                   x={d => xScale(getXAxisData(d))}
-                  y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
+                  y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
                   stroke='#fff'
                   strokeWidth={3}
                   strokeOpacity={1}
