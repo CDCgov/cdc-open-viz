@@ -130,11 +130,9 @@ const DataTable = (props: DataTableProps) => {
   // Determines if a relative region is being shown to the user.
   // If a relative region is found we don't want to display the data table.
   // Takes backwards compatibility into consideration, ie !region.toType || !region.fromType
-  const noRelativeRegions = config.regions.every(region => {
+  const noRelativeRegions = config?.regions?.every(region => {
     return (region.toType === 'Fixed' && region.fromType === 'Fixed') || (!region.toType && !region.fromType) || (!region.toType && region.fromType === 'Fixed') || (!region.fromType && region.toType === 'Fixed')
   })
-
-  console.log('isRel', noRelativeRegions)
 
   // prettier-ignore
   const tableData = useMemo(() => (
