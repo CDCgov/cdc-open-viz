@@ -31,9 +31,6 @@ div.data-table-heading {
 }
 
 table.horizontal {
-  tr {
-    display: flex;
-  }
 
   th,
   td {
@@ -42,7 +39,7 @@ table.horizontal {
 }
 
 table.data-table {
-  width: 100%;
+  min-width: 100%;
   background: #fff;
   position: relative;
   border: none;
@@ -51,7 +48,6 @@ table.data-table {
   overflow: auto;
   appearance: none;
   table-layout: fixed;
-  display: grid;
   * {
     box-sizing: border-box;
   }
@@ -138,7 +134,6 @@ table.data-table {
   }
 
   tbody {
-    display: table-cell;
     tr {
       width: 100%;
       &:hover {
@@ -162,6 +157,7 @@ table.data-table {
 
   th,
   td {
+    width: 1% !important;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -170,7 +166,6 @@ table.data-table {
     }
   }
   tr {
-    display: flex;
     & > * {
       width: 100%;
     }
