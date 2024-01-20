@@ -1,9 +1,9 @@
 import { type ChartConfig } from './ChartConfig'
 import { PickD3Scale } from '@visx/scale'
 
-type ColorScale = PickD3Scale<'ordinal', any, any>
+export type ColorScale = PickD3Scale<'ordinal', any, any>
 
-type TransformedData = {
+export type TransformedData = {
   dataKey?: string
   [key: string]: any
 }
@@ -26,7 +26,7 @@ type LineChartContext = SharedChartContext & {
   isDebug?: boolean
   parseDate: Function
   rawData: Object[]
-  seriesHighlight: String[]
+  seriesHighlight: string[]
   tableData: Object[]
   transformedData: TransformedData[]
   updateConfig: Function
@@ -45,7 +45,7 @@ export type ChartContext =
       isDebug?: boolean
       parseDate?: Function
       rawData?: Object[]
-      seriesHighlight?: String[]
+      seriesHighlight?: string[]
       tableData?: Object[]
       transformedData?: TransformedData[]
       setSharedFilter?: Function
