@@ -10,7 +10,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Icon from '@cdc/core/components/ui/Icon'
 import Modal from '@cdc/core/components/ui/Modal'
-import { Visualization } from '../types/Config'
+import { Visualization } from '@cdc/core/types/Visualization'
 
 const iconHash = {
   'data-bite': <Icon display='databite' base />,
