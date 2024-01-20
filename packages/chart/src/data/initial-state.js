@@ -139,7 +139,7 @@ export default {
   legend: {
     hide: false,
     behavior: 'isolate',
-    singleRow: false,
+    singleRow: true,
     colorCode: '',
     reverseLabelOrder: false,
     description: '',
@@ -209,7 +209,7 @@ export default {
     },
     estimateField: '',
     estimateRadius: '',
-    shape: 'circle',
+    shape: 'square',
     rowHeight: 20,
     description: {
       show: true,
@@ -237,7 +237,6 @@ export default {
     leftLabel: '',
     rightLabel: ''
   },
-
   area: {
     isStacked: false
   }

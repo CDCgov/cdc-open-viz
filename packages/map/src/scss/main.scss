@@ -33,7 +33,6 @@
 
 .cdc-map-inner-container {
   @import './map';
-  @import './sidebar';
   @import './datatable';
   flex-grow: 1;
   text-rendering: geometricPrecision;

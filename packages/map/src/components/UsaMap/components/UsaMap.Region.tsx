@@ -7,7 +7,7 @@ import { feature } from 'topojson-client'
 import topoJSON from '../data/us-regions-topo-2.json'
 import { Mercator } from '@visx/geo'
 import chroma from 'chroma-js'
-import ConfigContext from '../context'
+import ConfigContext from '../../../context'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.regions)
 
@@ -36,11 +36,9 @@ const UsaRegionMap = props => {
     data,
     displayGeoName,
     geoClickHandler,
-    handleCircleClick,
     handleMapAriaLabels,
     state,
     supportedTerritories,
-    titleCase,
   } = useContext(ConfigContext)
 
   // "Choose State" options

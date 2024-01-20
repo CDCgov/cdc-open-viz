@@ -6,13 +6,11 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { type ChartContext } from '../../../types/ChartContext'
 import { Select, CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { type PanelProps } from './PanelProps'
 
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
-type ForestPlotSettingsProps = {}
-
-// TODO: Rename to panel?
-const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
+const ForestPlotSettings = ({ name }: PanelProps) => {
   const { config, rawData: unfilteredData, updateConfig } = useContext<ChartContext>(ConfigContext)
 
   const enforceRestrictions = updatedConfig => {
@@ -143,7 +141,7 @@ const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
     <AccordionItem>
       <AccordionItemHeading>
         <AccordionItemButton>
-          Forest Plot Settings
+          {name}
           {(!config.forestPlot.estimateField || !config.forestPlot.upper || !config.forestPlot.lower) && <WarningImage width='25' className='warning-icon' />}
         </AccordionItemButton>
       </AccordionItemHeading>
@@ -286,28 +284,29 @@ const ForestPlotSettings = (props: ForestPlotSettingsProps) => {
           options={getColumns(false)}
         />
 
-        <Select
-          value={config.forestPlot.pooledResult.column}
-          label='Pooled Result Row'
-          initial={config.forestPlot.pooledResult.column || 'Select'}
-          required={false}
-          onChange={e => {
-            if (e.target.value !== '' && e.target.value !== 'Select') {
-              updateConfig({
-                ...config,
-                forestPlot: {
-                  ...config.forestPlot,
-                  pooledResult: {
-                    ...config.forestPlot.pooledResult,
-                    column: e.target.value
+        <label>
+          <span className='edit-label column-heading'>
+            Pooled Result Column
+            <input
+              type='text'
+              value={config.forestPlot.pooledResult.column || ''}
+              label='Pooled Result Row'
+              onChange={e => {
+                updateConfig({
+                  ...config,
+                  forestPlot: {
+                    ...config.forestPlot,
+                    pooledResult: {
+                      ...config.forestPlot.pooledResult,
+                      column: e.target.value
+                    }
                   }
-                }
-              })
-            }
-            e.target.value = ''
-          }}
-          options={['None', ...config.data.map(d => d[config.xAxis.dataKey])]}
-        />
+                })
+                e.target.value = ''
+              }}
+            />
+          </span>
+        </label>
 
         <CheckBox value={config.forestPlot?.lineOfNoEffect?.show || false} section='forestPlot' subsection='lineOfNoEffect' fieldName='show' label='Show Line of No Effect' updateField={updateField} />
 

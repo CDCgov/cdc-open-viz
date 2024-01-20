@@ -89,6 +89,16 @@ export const useFilters = props => {
         filters: newFilters
       })
     }
+    
+    // Used for setting active filter, fromHash breaks the filteredData functionality.
+    if (visualizationConfig.type === 'map' && visualizationConfig.filterBehavior === 'Filter Change') {
+      setFilteredData(newFilters)
+    }
+
+    // If we're on a chart and not using the apply button
+    if (visualizationConfig.type === 'chart' && visualizationConfig.filterBehavior === 'Filter Change') {
+      setFilteredData(filterData(newFilters, excludedData))
+    }
   }
 
   const handleApplyButton = newFilters => {

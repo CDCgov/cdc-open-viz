@@ -45,14 +45,11 @@ import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
 import ConfigContext from './context'
 import Filters, { useFilters } from '@cdc/core/components/Filters'
 import Modal from './components/Modal'
-import Sidebar from './components/Sidebar'
+import Legend from './components/Legend'
 
-import CountyMap from './components/CountyMap' // Future: Lazy
 import EditorPanel from './components/EditorPanel' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
-import SingleStateMap from './components/SingleStateMap' // Future: Lazy
 import UsaMap from './components/UsaMap' // Future: Lazy
-import UsaRegionMap from './components/UsaRegionMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
 
@@ -1633,17 +1630,17 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 {currentViewport && (
                   <>
                     {modal && <Modal />}
-                    {'single-state' === geoType && <SingleStateMap />}
-                    {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap />}
-                    {'us-region' === geoType && <UsaRegionMap />}
+                    {'single-state' === geoType && <UsaMap.SingleState />}
+                    {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap.State />}
+                    {'us-region' === geoType && <UsaMap.Region />}
+                    {'us-county' === geoType && <UsaMap.County />}
                     {'world' === geoType && <WorldMap />}
-                    {'us-county' === geoType && <CountyMap />}
                     {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
                   </>
                 )}
               </section>
 
-              {general.showSidebar && 'navigation' !== general.type && <Sidebar />}
+              {general.showSidebar && 'navigation' !== general.type && <Legend />}
             </div>
 
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}

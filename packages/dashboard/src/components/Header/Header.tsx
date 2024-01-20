@@ -189,6 +189,8 @@ const Header = (props: HeaderProps) => {
 
       newFilter[name] = value
 
+      console.log('newFilter', newFilter)
+
       overlay?.actions.openOverlay(filterModal(newFilter, index))
     }
 
@@ -265,9 +267,6 @@ const Header = (props: HeaderProps) => {
                         <option key={'file-name'} value={'File Name'}>
                           File Name
                         </option>
-                        <option key={'parent-filter'} value={'Parent Filter'}>
-                          Parent Filter Value
-                        </option>
                       </select>
                     </label>
                     {filter.filterBy === 'File Name' && (
@@ -316,7 +315,7 @@ const Header = (props: HeaderProps) => {
                     )}
                   </>
                 )}
-                {(filter.filterBy === 'Query String' || filter.filterBy === 'Parent Filter') && (
+                {filter.filterBy === 'Query String' && (
                   <label>
                     <span className='edit-label column-heading'>Query string parameter</span> <input type='text' defaultValue={filter.queryParameter} onChange={e => updateFilterProp('queryParameter', index, e.target.value)} />
                   </label>
@@ -376,14 +375,14 @@ const Header = (props: HeaderProps) => {
                   <select
                     value={filter.parents || []}
                     onChange={e => {
-                      updateFilterProp('parent', index, e.target.value)
+                      updateFilterProp('parents', index, e.target.value)
                     }}
                   >
                     <option value=''>Select a filter</option>
                     {config.dashboard.sharedFilters &&
                       config.dashboard.sharedFilters.map(sharedFilter => {
                         if (sharedFilter.key !== filter.key && sharedFilter.type !== 'datafilter') {
-                          return <option>{sharedFilter.key}</option>
+                          return <option value={sharedFilter.key}>{sharedFilter.key}</option>
                         }
                       })}
                   </select>
