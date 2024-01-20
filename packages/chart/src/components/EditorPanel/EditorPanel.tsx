@@ -199,101 +199,6 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
   )
 })
 
-const Regions = memo(({ config, updateConfig }: { config: ChartConfig; updateConfig: Function }) => {
-  let regionUpdate = (fieldName, value, i) => {
-    let regions = []
-
-    if (config.regions) {
-      regions = [...config.regions]
-    }
-
-    regions[i][fieldName] = value
-    updateConfig({ ...config, regions })
-  }
-
-  // only for Regions
-  let updateField = (section, subsection, fieldName, value, i) => regionUpdate(fieldName, value, i)
-
-  let removeColumn = i => {
-    let regions = []
-
-    if (config.regions) {
-      regions = [...config.regions]
-    }
-
-    regions.splice(i, 1)
-
-    updateConfig({ ...config, regions })
-  }
-
-  let addColumn = () => {
-    let regions = []
-
-    if (config.regions) {
-      regions = [...config.regions]
-    }
-
-    regions.push({})
-
-    updateConfig({ ...config, regions })
-  }
-
-  return (
-    <>
-      {config.regions &&
-        config.regions.map(({ label, color, from, to, background }, i) => (
-          <div className='edit-block' key={`region-${i}`}>
-            <button
-              type='button'
-              className='remove-column'
-              onClick={event => {
-                event.preventDefault()
-                removeColumn(i)
-              }}
-            >
-              Remove
-            </button>
-            <TextField value={label} label='Region Label' fieldName='label' i={i} updateField={updateField} />
-            <div className='two-col-inputs'>
-              <TextField value={color} label='Text Color' fieldName='color' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
-              <TextField value={background} label='Background' fieldName='background' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
-            </div>
-            <div className='two-col-inputs'>
-              <TextField
-                value={from}
-                label='From Value'
-                fieldName='from'
-                updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
-                tooltip={
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>The date needs to be in the original format of the data. Not the displayed format of the data.</p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                }
-              />
-              <TextField value={to} label='To Value' fieldName='to' updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
-            </div>
-          </div>
-        ))}
-      {!config.regions && <p style={{ textAlign: 'center' }}>There are currently no regions.</p>}
-      <button
-        type='button'
-        className='btn full-width'
-        onClick={e => {
-          e.preventDefault()
-          addColumn()
-        }}
-      >
-        Add Region
-      </button>
-    </>
-  )
-})
-
 const EditorPanel = () => {
   const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, lineOptions, rawData } = useContext<ChartContext>(ConfigContext)
 
@@ -1245,7 +1150,7 @@ const EditorPanel = () => {
                 {visSupportsChartHeight() && config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
               </AccordionItemPanel>
             </AccordionItem>
-            {config.visualizationType === 'Forest Plot' && <Panels.ForestPlot editColumn={editColumn} setCategoryAxis={setCategoryAxis} />}
+            {config.visualizationType === 'Forest Plot' && <Panels.ForestPlot name='Forest Plot Settings' editColumn={editColumn} setCategoryAxis={setCategoryAxis} />}
             {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && (
               <AccordionItem>
                 <AccordionItemHeading>
@@ -2539,16 +2444,7 @@ const EditorPanel = () => {
                 </AccordionItemPanel>
               </AccordionItem>
             )}
-            {visSupportsRegions() && (
-              <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>Regions</AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <Regions config={config} updateConfig={updateConfig} />
-                </AccordionItemPanel>
-              </AccordionItem>
-            )}{' '}
+            <Panels.Regions name='Regions' />
             {/* Columns */}
             {config.visualizationType !== 'Box Plot' && (
               <AccordionItem>
@@ -2932,8 +2828,12 @@ const EditorPanel = () => {
                                   updateFilterProp('filterStyle', index, e.target.value)
                                 }}
                               >
-                                {filterStyleOptions.map(item => {
-                                  return <option value={item}>{item}</option>
+                                {filterStyleOptions.map((item, index) => {
+                                  return (
+                                    <option key={`filter-style-${index}`} value={item}>
+                                      {item}
+                                    </option>
+                                  )
                                 })}
                               </select>
                             </label>
@@ -3275,6 +3175,7 @@ const EditorPanel = () => {
                 </AccordionItemPanel>
               </AccordionItem>
             )}
+            {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
           </Accordion>
           {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
         </section>

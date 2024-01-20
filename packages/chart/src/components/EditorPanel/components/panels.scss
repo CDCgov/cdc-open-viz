@@ -1,0 +1,72 @@
+@import '@cdc/core/styles/v2/themes/color-definitions';
+
+.date-highlight {
+  select,
+  input {
+    background: $lightestGray;
+  }
+
+  &__day-selection {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 20px 0;
+
+    .week-button {
+      margin-bottom: 0;
+      border-radius: 50%;
+      color: $darkGray;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $lightestGray;
+      margin: 5px 2px 0;
+
+      &--active {
+        background: $primary;
+        color: white;
+      }
+    }
+  }
+
+  &__occurance {
+    display: flex;
+
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number']::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+
+    input[type='number'] {
+      margin: 0 10px;
+      min-width: 50px;
+      width: 50px;
+      max-width: 50px;
+    }
+  }
+
+  .radio-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .group {
+      display: flex;
+    }
+
+    input[type='number'] {
+      margin: 0 10px;
+      min-width: 50px;
+      width: 50px;
+      max-width: 50px;
+    }
+
+    // reset spacing
+    input,
+    label {
+      margin-top: 0 !important;
+    }
+  }
+}

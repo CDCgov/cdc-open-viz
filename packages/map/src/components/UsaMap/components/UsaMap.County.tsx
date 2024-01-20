@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo, useRef, useContext } from 'react'
+import { useEffect, useState, useRef, useContext } from 'react'
 
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import { feature } from 'topojson-client'
@@ -8,11 +8,11 @@ import debounce from 'lodash.debounce'
 import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
-import useMapLayers from '../hooks/useMapLayers'
-import ConfigContext from '../context'
+import useMapLayers from '../../../hooks/useMapLayers'
+import ConfigContext from '../../../context'
 
-const getCountyTopoURL = (year) => {
-  return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`;
+const getCountyTopoURL = year => {
+  return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
 }
 
 const sortById = (a, b) => {
@@ -23,11 +23,11 @@ const sortById = (a, b) => {
 
 const getTopoData = year => {
   return new Promise((resolve, reject) => {
-    const resolveWithTopo = async (response) => {
-      if(response.status !== 200){
-        response = await import('../data/cb_2019_us_county_20m.json');
+    const resolveWithTopo = async response => {
+      if (response.status !== 200) {
+        response = await import('./../data/cb_2019_us_county_20m.json')
       } else {
-        response = await response.json();
+        response = await response.json()
       }
 
       let topoData = {}

@@ -82,7 +82,6 @@ export const useTooltip = props => {
     includedSeries.push(...getColumnNames(config.columns))
 
     const yScaleValues = getYScaleValues(closestXScaleValue, includedSeries)
-
     const xScaleValues = data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))
 
     const resolvedScaleValues = orientation === 'vertical' ? yScaleValues : xScaleValues
@@ -144,7 +143,7 @@ export const useTooltip = props => {
             ?.filter(Boolean)
             ?.flatMap(seriesKey => {
               const formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
-              return resolvedScaleValues?.[0]?.[seriesKey] ? [[seriesKey, formattedValue]] : []
+              return resolvedScaleValues?.[0]?.[seriesKey] ? [[seriesKey, formattedValue, getAxisPosition(seriesKey)]] : []
             })
         )
       }
@@ -203,7 +202,7 @@ export const useTooltip = props => {
    * @function getXValueFromCoordinate
    * @returns {String} - the closest x value to the cursor position
    */
-  const getXValueFromCoordinate = x => {
+  const getXValueFromCoordinate = (x, isClick = false) => {
     if (visualizationType === 'Pie') return
     if (orientation === 'horizontal') return
 
@@ -217,7 +216,7 @@ export const useTooltip = props => {
       data.forEach(d => {
         const xPosition = xAxis.type === 'date' ? xScale(parseDate(d[xAxis.dataKey])) : xScale(d[xAxis.dataKey])
         let bwOffset = config.barHeight
-        const distance = Math.abs(Number(xPosition - offset + bwOffset))
+        const distance = Math.abs(Number(xPosition - offset + (isClick ? bwOffset * 2 : 0)))
 
         if (distance <= minDistance) {
           minDistance = distance
@@ -252,7 +251,6 @@ export const useTooltip = props => {
       const yPositionOnPlot = visualizationType !== 'Forest Plot' ? yScale(d[config.xAxis.dataKey]) : yScale(index)
 
       const distance = Math.abs(yPositionOnPlot - yPosition)
-
       if (distance < minDistance) {
         minDistance = distance
         closestYValue = key ? d[key] : d[config.xAxis.dataKey]
@@ -277,7 +275,7 @@ export const useTooltip = props => {
       const eventSvgCoords = localPoint(e)
       const { x } = eventSvgCoords
       if (!x) throw new Error('COVE: no x value in handleTooltipClick.')
-      let closestXScaleValue = getXValueFromCoordinate(x)
+      let closestXScaleValue = getXValueFromCoordinate(x, true)
       let datum = config.data?.filter(item => item[config.xAxis.dataKey] === closestXScaleValue)
       if (!closestXScaleValue) throw new Error('COVE: no closest x scale value in handleTooltipClick')
       if (xAxis.type === 'date' && closestXScaleValue) {
@@ -307,16 +305,13 @@ export const useTooltip = props => {
    */
   const getYScaleValues = (closestXScaleValue, includedSeries) => {
     try {
-      const formattedDate = formatDate(new Date(closestXScaleValue))
-
       let dataToSearch
 
       if (xAxis.type === 'categorical') {
         dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
       } else {
-        dataToSearch = data.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
+        dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
       }
-
       // Return an empty array if no matching data is found.
       if (!dataToSearch || dataToSearch.length === 0) {
         return []

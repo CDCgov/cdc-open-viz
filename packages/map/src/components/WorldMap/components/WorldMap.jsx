@@ -5,12 +5,12 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
-import topoJSON from '../data/world-topo.json'
-import ZoomableGroup from './ZoomableGroup'
-import Geo from './Geo'
-import CityList from './CityList'
-import BubbleList from './BubbleList'
-import ConfigContext from '../context'
+import topoJSON from './../data/world-topo.json'
+import ZoomableGroup from '../../ZoomableGroup'
+import Geo from '../../Geo'
+import CityList from '../../CityList'
+import BubbleList from '../../BubbleList'
+import ConfigContext from '../../../context'
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 

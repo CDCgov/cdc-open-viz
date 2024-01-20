@@ -15,6 +15,7 @@ type MapContext = {
   generateRuntimeData
   geoClickHandler
   handleMapAriaLabels
+  handleCircleClick: Function
   hasZoom
   innerContainerRef
   isDashboard
