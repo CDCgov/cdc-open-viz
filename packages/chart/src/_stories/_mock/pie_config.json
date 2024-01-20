@@ -97,11 +97,12 @@
     "caption": "",
     "showDownloadUrl": false,
     "showDataTableLink": true,
-    "indexLabel": "",
+    "indexLabel": "Cause Type",
     "download": false,
     "showVertical": true,
     "show": true,
-    "customTableConfig": true
+    "customTableConfig": true,
+    "excludeColumns": ["location", "age", "use", "data_group", "data_sub_group", "cause_category"]
   },
   "orientation": "vertical",
   "color": "pinkpurple",
@@ -182,7 +183,7 @@
   "filters": [
     {
       "values": ["age", "sex"],
-      "active": "age",
+      "active": "sex",
       "filterStyle": "dropdown",
       "order": "asc",
       "columnName": "data_group"

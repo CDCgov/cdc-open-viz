@@ -5,13 +5,10 @@ import { type Series } from '@cdc/core/types/Series'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { Table } from '@cdc/core/types/Table'
+import { BoxPlot } from '@cdc/core/types/BoxPlot'
+import { General } from '@cdc/core/types/General'
 
 export type ChartColumns = Record<string, Column>
-
-type BoxPlot = {
-  firstQuartilePercentage: number
-  [key: string]: any
-}
 
 type DataFormat = {
   abbreviated: boolean
@@ -38,6 +35,7 @@ type Exclusions = {
 }
 
 type Filter = {
+  active: string
   type: 'url'
   columnName: string
   showDropdown: boolean
@@ -45,6 +43,7 @@ type Filter = {
   label: string
   order: 'asc' | 'desc' | 'cust'
   values: string[]
+  queryParameter: string
 }
 
 export type Legend = {
@@ -77,9 +76,7 @@ type Visual = {
 
 type AllChartsConfig = {
   animate: boolean
-  general: {
-    boxplot: BoxPlot
-  }
+  general: General
   barHasBorder: 'true' | 'false'
   barHeight: number
   barSpace: number
@@ -91,11 +88,15 @@ type AllChartsConfig = {
     height: number
   }
   chartMessage: { noData?: string }
+  color: string
   colorMatchLineSeriesLabels: boolean
   columns: ChartColumns
   confidenceKeys: Record<string, any>
+  customColors: string[]
   data: Object[]
+  dataUrl: string
   dataCutoff: number
+  dataDescription: string
   dataFormat: DataFormat
   dataKey: string
   description: string
@@ -106,6 +107,7 @@ type AllChartsConfig = {
   fontSize: 'small' | 'medium' | 'large'
   footnotes: string
   forestPlot: ForestPlotConfigSettings
+  formattedData: Object[] & { urlFiltered: boolean }
   heights: {
     vertical: number
   }
@@ -126,11 +128,15 @@ type AllChartsConfig = {
   orientation: 'vertical' | 'horizontal'
   palette: string
   pieType?: string
+  primary?: DataFormat
   roundingStyle: string
   runtime: Runtime
+  runtimeDataUrl: string
   series: Series
   showLineSeriesLabels: boolean
+  showSidebar: boolean
   showTitle: boolean
+  sortData: 'ascending' | 'descending'
   stackedAreaChartLineType: string
   suppressedData?: { label: string; icon: string; value: string }[]
   superTitle: string
