@@ -134,7 +134,7 @@ const LineChart = (props: LineChartProps) => {
                 curve={allCurves[seriesData[0].lineType]}
                 styles={styles}
                 defined={(item, i) => {
-                  return isNumber(item[config.runtime.seriesLabels[seriesKey]])
+                  return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
                 }}
               ></SplitLinePath>
 
@@ -157,7 +157,7 @@ const LineChart = (props: LineChartProps) => {
                   shapeRendering='geometricPrecision'
                   strokeDasharray={lineType ? handleLineType(lineType) : 0}
                   defined={(item, i) => {
-                    return isNumber(item[config.runtime.seriesLabels[seriesKey]])
+                    return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
                   }}
                 />
               )}

@@ -12,6 +12,7 @@ import { colorPalettesChart as colorPalettes, sequentialPalettes, twoColorPalett
 import { scaleOrdinal } from '@visx/scale'
 import { FaStar } from 'react-icons/fa'
 import { Text } from '@visx/text'
+import { Group } from '@visx/group'
 
 type Label = {
   datum: string
@@ -45,6 +46,25 @@ const Legend = () => {
     unknown: 'block'
   })
 
+  const renderDashes = style => {
+    const dashCount = style === 'Dashed Small' ? 3 : 2
+    const dashClass = `dashes ${style.toLowerCase().replace(' ', '-')}`
+
+    return (
+      <div className={dashClass}>
+        {Array.from({ length: dashCount }, (_, i) => (
+          <span key={i}>-</span>
+        ))}
+      </div>
+    )
+  }
+  const renderDashesOrCircle = style => {
+    if (['Dashed Small', 'Dashed Medium', 'Dashed Large'].includes(style)) {
+      return renderDashes(style)
+    } else if (style === 'Open Circles') {
+      return <div className='dashes open-circles'></div>
+    }
+  }
   const createLegendLabels = (defaultLabels): Label[] => {
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
@@ -298,18 +318,15 @@ const Legend = () => {
                   {config.preliminaryData.some(pd => pd.label) && (
                     <>
                       <hr></hr>
-                      <div className={config.legend.singleRow ? 'legend-container__inner bottom single-row' : ''}>
+                      <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : 'dash-left'}>
                         {config.preliminaryData.map((pd, index) => {
                           return (
-                            <div key={index}>
+                            <div className='dash-container' key={index}>
                               {pd.label && (
-                                <svg style={{ display: 'flex', marginTop: '5px', flex: 0.1 }} height={25}>
-                                  {pd.style.includes('Dashed') && <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} />}
-                                  {pd.style.includes('Circles') && <circle strokeWidth={1} cx={20} cy={11} r={6} stroke={'#000'} fill='transparent' />}
-                                  <Text x={50} y={15}>
-                                    {pd.label}
-                                  </Text>
-                                </svg>
+                                <>
+                                  <div className='dash-inner'>{renderDashesOrCircle(pd.style)}</div>
+                                  <div style={{ marginLeft: '7px' }}>{pd.label}</div>
+                                </>
                               )}
                             </div>
                           )
