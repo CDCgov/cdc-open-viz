@@ -32,7 +32,7 @@ import { type ChartContext } from '../../types/ChartContext'
 import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
 import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
-import EditorPanelContext from './components/EditorPanelContext'
+import EditorPanelContext from './EditorPanelContext'
 
 const DataSuppression = memo(({ config, updateConfig, data }: any) => {
   const getColumnOptions = () => {
@@ -1028,7 +1028,7 @@ const EditorPanel = () => {
     <EditorPanelContext.Provider value={editorContextValues}>
       <ErrorBoundary component='EditorPanel'>
         {config.newViz && <Confirm />}
-        {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+        {undefined === config.newViz && config.runtime && config.runtime?.editorErrorMessage && <Error />}
         <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
         <section className={`${displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'}${isDashboard ? ' dashboard' : ''}`}>
           <div aria-level={2} role='heading' className='heading-2'>

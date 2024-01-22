@@ -11,7 +11,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 
 // contexts
 import { useEditorPermissions } from '../../useEditorPermissions.js'
-import EditorPanelContext, { type EditorPanelContext as EPContext } from '../EditorPanelContext.js'
+import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 
