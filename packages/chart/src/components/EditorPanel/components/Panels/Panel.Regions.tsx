@@ -1,13 +1,13 @@
 import { memo, useContext } from 'react'
-import { useEditorPermissions } from './../useEditorPermissions.js'
+import { useEditorPermissions } from '../../useEditorPermissions.js'
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
-import { type ChartConfig } from './../../../types/ChartConfig.js'
+import { type ChartConfig } from '../../../../types/ChartConfig.js'
 import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
-import { type ChartContext } from '../../../types/ChartContext'
-import { type PanelProps } from './PanelProps'
-import ConfigContext from '../../../ConfigContext'
+import { type ChartContext } from '../../../../types/ChartContext.js'
+import { type PanelProps } from '../PanelProps.js'
+import ConfigContext from '../../../../ConfigContext.js'
 
 const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; updateConfig: Function }) => {
   let regionUpdate = (fieldName, value, i) => {

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import ConfigContext from '../../../ConfigContext'
+import ConfigContext from '../../../../ConfigContext'
 
 // Core
 import InputSelect from '@cdc/core/components/inputs/InputSelect'

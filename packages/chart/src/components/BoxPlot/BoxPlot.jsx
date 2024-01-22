@@ -7,6 +7,7 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {
   const { config, setConfig } = useContext(ConfigContext)
+  const { boxplot } = config
 
   useEffect(() => {
     if (config.legend.hide === false) {
@@ -25,10 +26,10 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
   const handleTooltip = d => {
     return `
       <strong>${d.columnCategory}</strong></br>
-      ${config.boxplot.labels.q1}: ${d.columnFirstQuartile}<br/>
-      ${config.boxplot.labels.q3}: ${d.columnThirdQuartile}<br/>
-      ${config.boxplot.labels.iqr}: ${d.columnIqr}<br/>
-      ${config.boxplot.labels.median}: ${d.columnMedian}
+      ${boxplot.labels.q1}: ${d.columnFirstQuartile}<br/>
+      ${boxplot.labels.q3}: ${d.columnThirdQuartile}<br/>
+      ${boxplot.labels.iqr}: ${d.columnIqr}<br/>
+      ${boxplot.labels.median}: ${d.columnMedian}
     `
   }
 
@@ -46,12 +47,12 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group className='boxplot' key={`boxplot-group`}>
-        {config.boxplot.plots.map((d, i) => {
+        {boxplot.plots.map((d, i) => {
           const offset = boxWidth - constrainedWidth
           const radius = 4
           return (
             <Group key={`boxplotplot-${i}`}>
-              {config.boxplot.plotNonOutlierValues &&
+              {boxplot.plotNonOutlierValues &&
                 d.nonOutlierValues.map((value, index) => {
                   return <circle cx={xScale(d.columnCategory) + Number(config.yAxis.size) + boxWidth / 2} cy={yScale(value)} r={radius} fill={'#ccc'} style={{ opacity: 1, fillOpacity: 1, stroke: 'black' }} key={`boxplot-${i}--circle-${index}`} />
                 })}
@@ -69,7 +70,7 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
                 fillOpacity={fillOpacity}
                 stroke='black'
                 valueScale={yScale}
-                outliers={config.boxplot.plotOutlierValues ? d.columnOutliers : []}
+                outliers={boxplot.plotOutlierValues ? d.columnOutliers : []}
                 outlierProps={{
                   style: {
                     fill: `${color_0}`,
@@ -84,7 +85,7 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
                 boxProps={{
                   style: {
                     stroke: 'black',
-                    strokeWidth: config.boxplot.borders === 'true' ? 1 : 0
+                    strokeWidth: boxplot.borders === 'true' ? 1 : 0
                   }
                 }}
                 maxProps={{
