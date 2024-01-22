@@ -14,7 +14,7 @@ import { useColorPalette } from '../../../../hooks/useColorPalette'
 import { ChartContext } from './../../../../types/ChartContext.js'
 
 import { useEditorPermissions } from '../../useEditorPermissions.js'
-import EditorPanelContext, { type EditorPanelContext as EPContext } from '../EditorPanelContext.js'
+import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 

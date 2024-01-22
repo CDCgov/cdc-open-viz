@@ -31,7 +31,7 @@ type LineChartContext = SharedChartContext & {
   transformedData: TransformedData[]
   updateConfig: Function
   visualizationType: 'Line'
-  colorPalettes: any
+  colorPalettes: Object[]
   twoColorPalette: any
 }
 

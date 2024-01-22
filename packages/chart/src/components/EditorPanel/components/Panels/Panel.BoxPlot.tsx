@@ -4,7 +4,7 @@ import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import ConfigContext from '../../../../ConfigContext'
-import EditorPanelContext, { EditorPanelContext as EPContext } from './../EditorPanelContext'
+import EditorPanelContext, { EditorPanelContext as EPContext } from '../../EditorPanelContext'
 
 // types
 import { type PanelProps } from './../PanelProps'
