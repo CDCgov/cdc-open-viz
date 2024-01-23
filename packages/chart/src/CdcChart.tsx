@@ -1237,6 +1237,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                   )}
                 </>
               )}
+              {/* Sankey */}
               {config.visualizationType === 'Sankey' && (
                 <div style={{ height: `500px`, width: `100%`, overflow: 'visible' }}>
                   <ParentSize>{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>
