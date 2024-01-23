@@ -124,19 +124,21 @@ const LineChart = (props: LineChartProps) => {
                 )}
               </>
               {/* STANDARD LINE */}
-              <SplitLinePath
-                key={index}
-                sampleRate={1}
-                segments={data.map(item => [item])}
-                segmentation='x'
-                x={d => xScale(getXAxisData(d))}
-                y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
+              <LinePath
+                className='animation'
                 curve={allCurves[seriesData[0].lineType]}
-                styles={styles}
+                data={data}
+                x={d => xScale(getXAxisData(d))}
+                y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
+                strokeWidth={2}
+                strokeOpacity={1}
+                shapeRendering='geometricPrecision'
+                strokeDasharray={lineType ? handleLineType(lineType) : 0}
                 defined={(item, i) => {
                   return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
                 }}
-              ></SplitLinePath>
+              />
 
               {/* circles for preliminaryData data */}
               {circleData.map((d, i) => {
