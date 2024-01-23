@@ -30,20 +30,43 @@
       "tickLabelColor": "#333",
       "tickColor": "#333",
       "numTicks": "",
-      "labelOffset": 65,
+      "labelOffset": 180,
       "axisPadding": 0,
       "target": 0,
-      "dataKey": "Date",
+      "dataKey": "x",
       "label": "X Axis Example Label"
     },
     "series": [
       {
-        "dataKey": "Data 1",
+        "dataKey": "Disposition",
+        "type": "Bar"
+      },
+      {
+        "dataKey": "Type of Treatment",
+        "type": "Bar"
+      },
+      {
+        "dataKey": "Final Outcome",
+        "type": "Bar"
+      },
+      {
+        "dataKey": "Number of Patients",
         "type": "Bar"
       }
     ],
+    "dataUrl": "/examples/feature/sankey/sankey_chart_data.csv",
     "table": {
-      "show": false
+      "label": "Sankey Data Table",
+      "expanded": true,
+      "limitHeight": false,
+      "height": "",
+      "caption": "",
+      "showDownloadUrl": true,
+      "showDataTableLink": true,
+      "indexLabel": "",
+      "download": true,
+      "showVertical": true,
+      "show": true
     },
     "visualizationType": "Sankey",
     "sankey": {
