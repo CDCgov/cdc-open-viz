@@ -50,7 +50,6 @@ const LineChart = (props: LineChartProps) => {
   const DEBUG = false
   const { lineDatapointStyle, showLineSeriesLabels, legend } = config
 
-  let wrapObjectsInArrays = rawData.map(item => [item])
   return (
     <ErrorBoundary component='LineChart'>
       <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
@@ -125,7 +124,6 @@ const LineChart = (props: LineChartProps) => {
               </>
               {/* STANDARD LINE */}
               <LinePath
-                className='animation'
                 curve={allCurves[seriesData[0].lineType]}
                 data={data}
                 x={d => xScale(getXAxisData(d))}
