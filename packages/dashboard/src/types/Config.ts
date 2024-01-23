@@ -26,4 +26,6 @@ export type Config = DataSet & {
   rows: any[]
   filterBehavior: FilterBehavior
   runtime: Runtime
+  downloadImageButton: boolean
+  downloadPdfButton: boolean
 }

@@ -209,7 +209,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl, window.location.origin)
           let currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
           let updatedQSParams = {}
-
           let isUpdateNeeded = false
 
           config.dashboard.sharedFilters.forEach(filter => {
@@ -267,7 +266,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
               //Data not able to be standardized, leave as is
             }
           }
-
+          newDatasets[datasetKey].data = newDataset
           newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
           newData[datasetKey] = newDataset
           datasetsNeedsUpdate = true
@@ -291,6 +290,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
             newConfig.visualizations[key].formattedData = newData[dataKey]
           }
         })
+
         dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
         newConfig.datasets = newDatasets
         dispatch({ type: 'SET_CONFIG', payload: newConfig })
@@ -762,6 +762,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           <Title title={title} isDashboard={true} classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]} />
           {/* Description */}
           {description && <div className='subtext'>{parse(description)}</div>}
+
           {/* Filters */}
           {config.dashboard.sharedFilters && Object.values(config?.visualizations || {}).filter(viz => viz.visualizationType === 'filter-dropdowns').length === 0 && <Filters hide={undefined} autoLoad={undefined} />}
 

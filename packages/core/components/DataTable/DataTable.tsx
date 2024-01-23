@@ -22,8 +22,6 @@ export type DataTableProps = {
   applyLegendToRow?: Function
   colorScale?: Function
   columns?: { navigate: { name: string } }
-  // determines if columns should be wrapped in the table
-  wrapColumns?: boolean
   config: TableConfig
   dataConfig?: Object
   displayDataAsText?: Function
@@ -32,15 +30,22 @@ export type DataTableProps = {
   formatLegendLocation?: Function
   groupBy?: string
   headerColor?: string
+  imageRef?: string
   indexTitle?: string
+  isDebug?: boolean
+  isEditor?: boolean
   navigationHandler?: Function
+  outerContainerRef?: Function
   rawData: Object[]
   runtimeData: Object[] | Record<string, Object> // UNSAFE
   setFilteredCountryCode?: Function // used for Maps only
+  showDownloadButton?: boolean
   tabbingId: string
   tableTitle: string
   viewport: string
   vizTitle?: string
+  // determines if columns should be wrapped in the table
+  wrapColumns?: boolean
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
