@@ -48,7 +48,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   // Uses Visx Groups innerRef to get all Group elements that are mapped.
   // Sets the largest group width in state and subtracts that group the svg width to calculate overall width.
   useEffect(() => {
-        let largest = 0
+    let largest = 0
     groupRefs?.current?.map(g => {
       const groupWidth = g?.getBoundingClientRect().width
       if (groupWidth > largest) {
@@ -85,11 +85,6 @@ const Sankey = ({ width, height }: SankeyProps) => {
     ])
 
   const { nodes, links } = sankeyGenerator(sankeyData)
-
-  const nodeIdToExclude = 'nothing' // ID of the nothing node since we dont want that displayed
-
-  // Filter out the node to be excluded
-  const filteredNodes = sankeyData.nodes.filter(node => node.id !== nodeIdToExclude)
 
   const nodeStyle = (id: string) => {
     let textPositionHorizontal = 30
@@ -139,29 +134,29 @@ const Sankey = ({ width, height }: SankeyProps) => {
   }
 
 
-  const tooltipVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).value}`;
-  const tooltipPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).value_pct}%)`;
-  const tooltipSummary = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID) || {}).summary}`;
-  const tooltipMaleVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Male')))?.Gender.find(g => g.gender === 'Male')?.dem_value}`;
-  const tooltipMalePct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Male')))?.Gender.find(g => g.gender === 'Male')?.dem_pct}%)`;
-  const tooltipFemaleVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Female')))?.Gender.find(g => g.gender === 'Female')?.dem_value}`;
-  const tooltipFemalePct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Female')))?.Gender.find(g => g.gender === 'Female')?.dem_pct}%)`;
-  const tooltipUnknownVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Unknown')))?.Gender.find(g => g.gender === 'Unknown')?.dem_value}`;
-  const tooltipUnknownPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Unknown')))?.Gender.find(g => g.gender === 'Unknown')?.dem_pct}%)`;
-  const tooltipNonHispanicWVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic White')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic White')?.dem_value}`;
-  const tooltipNonHispanicWPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic White')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic White')?.dem_pct}%)`;
-  const tooltipNonHispanicBVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Black')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Black')?.dem_value}`;
-  const tooltipNonHispanicBPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Black')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Black')?.dem_pct}%)`;
-  const tooltipHispanicVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Hispanic')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Hispanic')?.dem_value}`;
-  const tooltipHispanicPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Hispanic')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Hispanic')?.dem_pct}%)`;
-  const tooltipNonHispanicAIVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')?.dem_value}`;
-  const tooltipNonHispanicAIPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')?.dem_pct}%)`;
-  const tooltipNonHispanicAsianVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Asian')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Asian')?.dem_value}`;
-  const tooltipNonHispanicAsianPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Asian')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Asian')?.dem_pct}%)`;
-  const tooltipNonHispanicNAVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')?.dem_value}`;
-  const tooltipNonHispanicNAPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')?.dem_pct}%)`;
-  const tooltipMissingVal = `${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Missing')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Missing')?.dem_value}`;
-  const tooltipMissingNAPct = `(${(sankeyConfig.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Missing')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Missing')?.dem_pct}%)`;
+  const tooltipVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value}`;
+  const tooltipPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value_pct}%)`;
+  const tooltipSummary = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).summary}`;
+  const tooltipMaleVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Male')))?.Gender.find(g => g.gender === 'Male')?.dem_value}`;
+  const tooltipMalePct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Male')))?.Gender.find(g => g.gender === 'Male')?.dem_pct}%)`;
+  const tooltipFemaleVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Female')))?.Gender.find(g => g.gender === 'Female')?.dem_value}`;
+  const tooltipFemalePct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Female')))?.Gender.find(g => g.gender === 'Female')?.dem_pct}%)`;
+  const tooltipUnknownVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Unknown')))?.Gender.find(g => g.gender === 'Unknown')?.dem_value}`;
+  const tooltipUnknownPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Unknown')))?.Gender.find(g => g.gender === 'Unknown')?.dem_pct}%)`;
+  const tooltipNonHispanicWVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic White')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic White')?.dem_value}`;
+  const tooltipNonHispanicWPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic White')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic White')?.dem_pct}%)`;
+  const tooltipNonHispanicBVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Black')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Black')?.dem_value}`;
+  const tooltipNonHispanicBPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Black')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Black')?.dem_pct}%)`;
+  const tooltipHispanicVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Hispanic')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Hispanic')?.dem_value}`;
+  const tooltipHispanicPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Hispanic')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Hispanic')?.dem_pct}%)`;
+  const tooltipNonHispanicAIVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')?.dem_value}`;
+  const tooltipNonHispanicAIPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')?.dem_pct}%)`;
+  const tooltipNonHispanicAsianVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Asian')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Asian')?.dem_value}`;
+  const tooltipNonHispanicAsianPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Asian')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Asian')?.dem_pct}%)`;
+  const tooltipNonHispanicNAVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')?.dem_value}`;
+  const tooltipNonHispanicNAPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')?.dem_pct}%)`;
+  const tooltipMissingVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Missing')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Missing')?.dem_value}`;
+  const tooltipMissingNAPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Missing')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Missing')?.dem_pct}%)`;
 
   const sankeyToolTip = `<div class="sankey-chart__tooltip">
                     <span class="sankey-chart__tooltip--tooltip-header">${tooltipID}</span>
@@ -194,7 +189,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
                   </div>`
 
   // Draw the nodes
-  const allNodes = filteredNodes.map((node, i) => {
+  const allNodes = sankeyData.nodes.map((node, i) => {
     let { textPositionHorizontal, textPositionVertical, classStyle, storyNodes } = nodeStyle(node.id)
     let { sourceNodes } = activeConnection(tooltipID);
 
@@ -217,7 +212,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
           fill={nodeColor}
           fillOpacity={opacityValue}
           rx={sankeyConfig.rxValue}
-          data-tooltip-html={sankeyToolTip}
+          data-tooltip-html={sankeyConfig.data.tooltips ? sankeyToolTip : false}
           data-tooltip-id={`tooltip`}
           onClick={() => handleNodeClick(node.id)}
           style={{ pointerEvents: 'visible', cursor: 'pointer' }}
@@ -229,7 +224,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
               x0 is the left edge of the node
               # - positions text # units to the right of the left edge of the node */
               x={node.x0! + textPositionHorizontal}
-              textAnchor={filteredNodes.length - 1 === i ? 'end' : 'start'}
+              textAnchor={sankeyData.nodes.length - 1 === i ? 'end' : 'start'}
               verticalAnchor='end'
               /*Text Position Vertical
               y1 and y0 are the top and bottom edges of the node
@@ -248,7 +243,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
               style={{ pointerEvents: 'none' }}
               className='node-text'
             >
-              {(sankeyConfig.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
+              {(sankeyConfig.data.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
             </Text>
             <Text verticalAnchor='end' className={classStyle} x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0! + 25) / 2} fill={sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
               {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
@@ -259,12 +254,12 @@ const Sankey = ({ width, height }: SankeyProps) => {
               y={(node.y1! + node.y0!) / 2 + 50}
               fill={sankeyConfig.nodeFontColor}
               fontWeight='bold'
-              textAnchor={filteredNodes.length === i ? 'end' : 'start'}
+              textAnchor={sankeyData.nodes.length === i ? 'end' : 'start'}
               style={{ pointerEvents: 'none' }}
               className='node-text'
               verticalAnchor='end'
             >
-              {(sankeyConfig.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}
+              {(sankeyConfig.data.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}
             </Text>
           </>
         ) : (
@@ -317,24 +312,29 @@ const Sankey = ({ width, height }: SankeyProps) => {
         stroke={strokeColor}
         fill='none'
         strokeOpacity={opacityValue}
-        strokeWidth={targetObj.id === 'nothing' ? link.width : link.width! + 2}
-        //making link widths larger for those that are really small but excluding nothing nodes
+        strokeWidth={link.width! + 2}
       />
     )
   })
 
   return (
     <>
+    {sankeyConfig.data.KPIs && (
       <div className='kpis-container'>
         <KPIComponent label={sankeyConfig.data.KPIs[0].label} value={sankeyConfig.data.KPIs[0].value}/>
         <KPIComponent label={sankeyConfig.data.KPIs[1].label} value={sankeyConfig.data.KPIs[1].value}/>
-      </div>
+    </div>
+    )}
+      
       <div className='sankey-chart'>
         <svg className='sankey-chart__diagram' width={width} height={height} style={{ overflow: 'visible' }}>
           <Group className='links'>{allLinks}</Group>
           <Group className='nodes'>{allNodes}</Group>
         </svg>
-        <ReactTooltip id={`tooltip`} afterHide={() => clearNodeClick()} events={['click']} html='true' place='top' style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
+
+        {/* ReactTooltip needs to remain even if tooltips are disabled -- it handles when a user clicks off of the node and resets 
+        the sankey diagram. When tooltips are disabled this will nothing */}
+        <ReactTooltip id={`tooltip`} afterHide={() => clearNodeClick()} events={['click']} place='top' style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
       </div>
     </>
   )

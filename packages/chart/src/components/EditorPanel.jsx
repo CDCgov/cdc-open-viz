@@ -16,6 +16,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 // chart components
 import ForestPlotSettings from './ForestPlotSettings'
 import Series from './Series'
+import SankeySettings from './SankeySettings'
 
 // cdc additional
 import { useColorPalette } from '../hooks/useColorPalette'
@@ -1252,7 +1253,8 @@ const EditorPanel = () => {
               </AccordionItemPanel>
             </AccordionItem>
             {config.visualizationType === 'Forest Plot' && <ForestPlotSettings />}
-            {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && (
+            {config.visualizationType === 'Sankey' && <SankeySettings />}
+            {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && config.visualizationType !== 'Sankey' && (
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
