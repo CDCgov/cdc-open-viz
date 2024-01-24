@@ -87,7 +87,6 @@ const config = {
     }
   ],
   type: 'dashboard'
-  //multiDashboards: [{ ...initialState, label: 'New Dashboard 1' }]
 }
 
 export const DashboardEditor: Story = {
