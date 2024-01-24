@@ -714,9 +714,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
     if (!subVisualizationEditing) {
       body = (
         <DndProvider backend={HTML5Backend}>
-          <Header setPreview={setPreview} />
+          <div className='header-container'>
+            <Header setPreview={setPreview} />
+            <VisualizationsPanel loadConfig={newConfig => dispatch({ type: 'UPDATE_CONFIG', payload: [newConfig] })} config={state.config} />
+          </div>
+
           <div className='layout-container'>
-            <VisualizationsPanel loadConfig={loadConfig} config={state.config} />
             <Grid />
           </div>
         </DndProvider>

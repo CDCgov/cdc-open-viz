@@ -3,13 +3,18 @@
 .editor-panel + .cdc-dashboard-inner-container,
 .editor-heading + .cdc-open-viz-module {
   position: relative;
-  top: 3em;
-  .editor-panel {
-    top: 3em;
-  }
-  .editor-toggle {
-    top: 3.5em;
-  }
+  min-height: 80vh
+}
+
+
+.header-container {
+  display: flex;
+  position: sticky;
+  top: 0;
+  flex-direction: column;
+  width: 30%;
+  max-height: 95vh;
+  z-index: 3;
 }
 
 .editor-panel {
@@ -83,12 +88,12 @@
   background: #fff;
   width: $editorWidth;
   overflow-y: overlay;
-  position: fixed;
+  position: absolute;
   z-index: 8;
   display: flex;
   flex-direction: column;
   left: 0;
-  top: 48px;
+  top: 0;
   bottom: 0;
   .accordion__heading {
     background: $lightestGray;
@@ -587,7 +592,7 @@
   color: #000;
   font-size: 1em;
   border: 0;
-  position: fixed;
+  position: absolute;
   z-index: 99;
   transition: 0.1s background;
   cursor: pointer;
