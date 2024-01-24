@@ -87,13 +87,16 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
     updateConfig({ ...config, rows, visualizations })
   }
 
-  const [{ isDragging, ...collected }, drag] = useDrag({
-    type: 'vis-widget',
-    end: handleWidgetMove,
-    collect: monitor => ({
-      isDragging: monitor.isDragging()
-    })
-  })
+  const [{ isDragging, ...collected }, drag] = useDrag(
+    {
+      type: 'vis-widget',
+      end: handleWidgetMove,
+      collect: monitor => ({
+        isDragging: monitor.isDragging()
+      })
+    },
+    [config.activeDashboard, config.rows]
+  )
 
   const deleteWidget = () => {
     if (!data) return
