@@ -15,3 +15,32 @@ export type LineChartProps = {
   handleTooltipClick: Function
   tooltipData: any
 }
+
+export interface PreliminaryDataItem {
+  style: string
+  type: string
+  column: string
+  value: string
+  seriesKey: string
+}
+
+export interface DataItem {
+  [key: string]: any
+}
+
+export interface Config {
+  preliminaryData: PreliminaryDataItem[] | []
+}
+export interface StyleProps {
+  preliminaryData: PreliminaryDataItem[]
+  rawData: DataItem[]
+  stroke: string
+  handleLineType: Function
+  lineType: string
+  seriesKey: 'string'
+}
+export interface Style {
+  stroke: string
+  strokeWidth: number
+  strokeDasharray: string
+}

@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { MapConfig } from './types/MapConfig'
+import { MapConfig } from './MapConfig'
 
 type MapContext = {
   applyLegendToRow
@@ -15,6 +15,7 @@ type MapContext = {
   generateRuntimeData
   geoClickHandler
   handleMapAriaLabels
+  handleCircleClick: Function
   hasZoom
   innerContainerRef
   isDashboard

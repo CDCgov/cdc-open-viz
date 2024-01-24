@@ -11,6 +11,17 @@
   .loading > div.la-ball-beat {
     margin-top: 20%;
   }
+
+  .visually-hidden {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
   @include breakpointClass(md) {
     .map-container.modal-background::before {
       border-bottom: $lightGray 1px solid;
@@ -22,7 +33,6 @@
 
 .cdc-map-inner-container {
   @import './map';
-  @import './sidebar';
   @import './datatable';
   flex-grow: 1;
   text-rendering: geometricPrecision;

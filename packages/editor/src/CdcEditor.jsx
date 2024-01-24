@@ -24,6 +24,11 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
   const [tempConfig, setTempConfig] = useState(null)
   const [errors, setErrors] = useState([])
 
+  const setTempConfigAndUpdate = config => {
+    updateVizConfig(JSON.parse(JSON.stringify(config)))
+    setTempConfig(config)
+  }
+
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [dimensions, setDimensions] = useState([])
 
@@ -127,18 +132,22 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
     return strippedConfig
   }
 
-  // Temp Config is for changes made in the components proper - to prevent render cycles. Regular config is for changes made in the first two tabs.
-  useEffect(() => {
-    if (null !== tempConfig) {
+  const updateVizConfig = newTempConfig => {
+    if (null !== newTempConfig) {
       // Remove runtime/unnecessary items from config before saving to WCMS, performance optimization
-      let strippedConfig = stripConfig(tempConfig)
+      let strippedConfig = stripConfig(newTempConfig)
 
       const parsedData = JSON.stringify(strippedConfig)
       // Emit the data in a regular JS event so it can be consumed by anything.
       const event = new CustomEvent('updateVizConfig', { detail: parsedData, bubbles: true })
       window.dispatchEvent(event)
     }
-  }, [tempConfig])
+  }
+
+  // Temp Config is for changes made in the components proper - to prevent render cycles. Regular config is for changes made in the first two tabs.
+  useEffect(() => {
+    updateVizConfig(tempConfig)
+  }, [JSON.stringify(tempConfig)])
 
   useEffect(() => {
     let strippedConfig = stripConfig(config)
@@ -180,7 +189,7 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
     globalActive,
     setGlobalActive,
     tempConfig,
-    setTempConfig,
+    setTempConfig: setTempConfigAndUpdate,
     sharepath,
     isDebug
   }

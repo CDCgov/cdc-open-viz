@@ -27,7 +27,7 @@ import CdcMarkupInclude from '@cdc/markup-include'
 import CdcFilteredText from '@cdc/filtered-text'
 
 import Grid from './components/Grid'
-import Header, { FilterBehavior } from './components/Header'
+import Header, { FilterBehavior } from './components/Header/Header'
 import defaults from './data/initial-state'
 import DataTable from '@cdc/core/components/DataTable'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -41,6 +41,7 @@ import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import { filterData } from './helpers/filterData'
 import { getFormattedData } from './helpers/getFormattedData'
+import { generateValuesForFilter } from './helpers/generateValuesForFilter'
 import { getVizKeys } from './helpers/getVizKeys'
 import Title from '@cdc/core/components/ui/Title'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
@@ -179,6 +180,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
         if (notAllParentsSelected) return // don't send request for dependent children filter options
         if (apiFilterDropdowns[_key] && !params && filter.filterBy === 'Query String') return // don't reload filter unless it's a child
         const endpoint = baseEndpoint + (params ? gatherQueryParams(params) : '')
+
         fetch(endpoint)
           .then(resp => resp.json())
           .then(data => {
@@ -406,7 +408,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
     if (setParentConfig && isEditor) {
       setParentConfig(state.config)
     }
-  }, [state.config])
+  }, [JSON.stringify(state.config)])
 
   useEffect(() => {
     const { config } = state
@@ -429,8 +431,20 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
 
   const applyFilters = () => {
     if (!state.config) return
-    const allFiltersSelected = !state.config.dashboard.sharedFilters.some(filter => !filter.active)
+    let dashboardConfig = state.config.dashboard
+    const allFiltersSelected = !state.config.dashboard.sharedFilters.some(filter => !filter.active && !filter.queuedActive)
     if (allFiltersSelected) {
+      if (state.config.filterBehavior === FilterBehavior.Apply) {
+        state.config.dashboard.sharedFilters.forEach((sharedFilter, index) => {
+          if (sharedFilter.queuedActive) {
+            dashboardConfig.sharedFilters[index].active = sharedFilter.queuedActive
+            delete dashboardConfig.sharedFilters[index].queuedActive
+          }
+        })
+      }
+
+      dispatch({ type: 'SET_CONFIG', payload: { ...state.config, dashboard: dashboardConfig } })
+      updateDataFilters()
       reloadURLData()
     } else {
       // TODO noftify of required fields
@@ -442,26 +456,37 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
     if (!config) return
     let dashboardConfig = { ...config.dashboard }
 
-    dashboardConfig.sharedFilters[index].active = value
+    if (config.filterBehavior !== FilterBehavior.Apply) {
+      dashboardConfig.sharedFilters[index].active = value
+    } else {
+      dashboardConfig.sharedFilters[index].queuedActive = value
+    }
 
     dispatch({ type: 'SET_CONFIG', payload: { ...config, dashboard: dashboardConfig } })
     if (config.filterBehavior !== FilterBehavior.Apply) {
-      let newFilteredData = {}
-      getVizKeys(config).forEach(key => {
-        let applicableFilters = dashboardConfig.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
-        if (applicableFilters.length > 0) {
-          const visualization = config.visualizations[key]
-          const _data = state.data[visualization.dataKey] || visualization.data
-          const formattedData = visualization.dataDescription ? getFormattedData(_data, visualization.dataDescription) : _data
-
-          newFilteredData[key] = filterData(applicableFilters, formattedData, config.filterBehavior)
-        }
-      })
-
-      const { active, resetLabel } = dashboardConfig.sharedFilters[index]
-      const _filteredData = active === resetLabel ? state.data : newFilteredData
-      dispatch({ type: 'SET_FILTERED_DATA', payload: _filteredData })
+      updateDataFilters()
+      reloadURLData()
     }
+  }
+
+  const updateDataFilters = () => {
+    const { config } = state
+    if (!config) return
+    let dashboardConfig = { ...config.dashboard }
+
+    let newFilteredData = {}
+    getVizKeys(config).forEach(key => {
+      let applicableFilters = dashboardConfig.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
+      if (applicableFilters.length > 0) {
+        const visualization = config.visualizations[key]
+        const _data = state.data[visualization.dataKey] || visualization.data
+        const formattedData = visualization.dataDescription ? getFormattedData(_data, visualization.dataDescription) : _data
+
+        newFilteredData[key] = filterData(applicableFilters, formattedData, config.filterBehavior)
+      }
+    })
+
+    dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
   }
 
   const handleOnChange = (index: number, value: string) => {
@@ -487,7 +512,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
         setAPIFilterDropdowns(newApiDropdowns)
         // remove active from sharedFilters that are autoLoading
         const dashboardConfig = { ...config.dashboard }
-        dashboardConfig.sharedFilters[index].active = value
+        if (config.filterBehavior !== FilterBehavior.Apply) {
+          dashboardConfig.sharedFilters[index].active = value
+        } else {
+          dashboardConfig.sharedFilters[index].queuedActive = value
+        }
         const newSharedFilters = config.dashboard.sharedFilters.map((filter, _index) => {
           const _isAutoSelectFilter = !autoLoadViz?.hide.includes(_index)
           if (_isAutoSelectFilter) filter.active = ''
@@ -506,7 +535,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
     const { config } = state
     if (!config) return <></>
     const isLegacyFilter = !config.filterBehavior
-    const isAutoLoadRow = config.filterBehavior === FilterBehavior.Apply && autoLoad
     return (
       <>
         {config.dashboard.sharedFilters.map((singleFilter, filterIndex) => {
@@ -549,7 +577,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
                   id={`filter-${filterIndex}`}
                   className='filter-select'
                   data-index='0'
-                  value={singleFilter.active}
+                  value={singleFilter.queuedActive || singleFilter.active}
                   onChange={val => {
                     handleOnChange(filterIndex, val.target.value)
                   }}
@@ -561,7 +589,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           )
         })}
 
-        {!isLegacyFilter && !isAutoLoadRow && <button onClick={applyFilters}>GO!</button>}
+        {!isLegacyFilter && config.filterBehavior === FilterBehavior.Apply && <button onClick={applyFilters}>GO!</button>}
       </>
     )
   }
