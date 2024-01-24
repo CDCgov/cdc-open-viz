@@ -10,6 +10,7 @@ export type Visualization = {
   formattedData?: Object[]
   general: any
   hide: any[]
+  multiDashboards?: any[]
   newViz: boolean
   openModal: boolean
   originalFormattedData: any
