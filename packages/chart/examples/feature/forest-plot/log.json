@@ -1,0 +1,26 @@
+[
+  {
+    "description": "Study 1",
+    "low": 0.88,
+    "high": 0.95,
+    "effect": 0.92
+  },
+  {
+    "description": "Study 2",
+    "low": 0.84,
+    "high": 0.94,
+    "effect": 0.89
+  },
+  {
+    "description": "Study 3",
+    "low": 0.88,
+    "high": 0.98,
+    "effect": 0.93
+  },
+  {
+    "description": "Study 4",
+    "low": 0.91,
+    "high": 0.99,
+    "effect": 0.97
+  }
+]

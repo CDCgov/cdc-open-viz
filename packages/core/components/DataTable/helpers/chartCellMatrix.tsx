@@ -12,9 +12,10 @@ type ChartRowsProps = DataTableProps & {
   isVertical: boolean
   sortBy: { colIndex; column }
   groupBy?: string
+  hasRowType?: boolean
 }
 
-const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorScale, groupBy }: ChartRowsProps): CellMatrix | GroupCellMatrix => {
+const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorScale, groupBy, hasRowType }: ChartRowsProps): CellMatrix | GroupCellMatrix => {
   const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
 
   const dataSeriesColumnsSorted = () => {
@@ -55,7 +56,20 @@ const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorSc
       return cellMatrix
     } else {
       return rows.map(row => {
-        return dataSeriesColumns.map((column, j) => getChartCellValue(row, column, config, runtimeData))
+        if (hasRowType) {
+          let rowType
+          let rowValues = []
+          dataSeriesColumns.forEach((column, j) => {
+            if (column.match(/row[_-]?type/i)) {
+              rowType = getChartCellValue(row, column, config, runtimeData)
+            } else {
+              rowValues.push(getChartCellValue(row, column, config, runtimeData))
+            }
+          })
+          return [rowType, ...rowValues]
+        } else {
+          return dataSeriesColumns.map((column, j) => getChartCellValue(row, column, config, runtimeData))
+        }
       })
     }
   } else {

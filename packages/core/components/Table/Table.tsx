@@ -2,6 +2,7 @@ import { ReactNode } from 'react'
 import Row from './components/Row'
 import GroupRow from './components/GroupRow'
 import { CellMatrix, GroupCellMatrix } from './types/CellMatrix'
+import { RowType } from './types/RowType'
 
 type TableProps = {
   childrenMatrix: CellMatrix | GroupCellMatrix
@@ -14,12 +15,15 @@ type TableProps = {
     'aria-live'?: 'off' | 'assertive' | 'polite'
     hidden?: boolean
     'aria-rowcount'?: number
+    cellMinWidth?: number
   }
+  wrapColumns?: boolean
+  hasRowType?: boolean // if it has row type then the first column is the row type which will explain how to render the row
 }
 
 type Position = 'sticky'
 
-const Table = ({ childrenMatrix, tableName, caption, stickyHeader, headContent, tableOptions }: TableProps) => {
+const Table = ({ childrenMatrix, tableName, caption, stickyHeader, headContent, tableOptions, wrapColumns, hasRowType }: TableProps) => {
   const headStyle = stickyHeader ? { position: 'sticky' as Position, top: 0, zIndex: 999 } : {}
   const isGroupedMatrix = !Array.isArray(childrenMatrix)
   return (
@@ -33,13 +37,29 @@ const Table = ({ childrenMatrix, tableName, caption, stickyHeader, headContent, 
               const rows = childrenMatrix[groupName].map((row, i) => {
                 colSpan = row.length
                 const key = `${tableName}-${groupName}-row-${i}`
-                return <Row key={key} rowKey={key} childRow={row} />
+                return <Row key={key} rowKey={key} childRow={row} wrapColumns={wrapColumns} cellMinWidth={tableOptions.cellMinWidth} />
               })
               return [<GroupRow label={groupName} colSpan={colSpan} key={`${tableName}-${groupName}`} />, ...rows]
             })
           : childrenMatrix.map((childRow, i) => {
+              let childRowCopy = [...childRow]
+              let rowType = undefined
+              if (hasRowType) rowType = childRowCopy.shift()
               const key = `${tableName}-row-${i}`
-              return <Row key={key} rowKey={key} childRow={childRow} />
+              if (rowType === undefined) {
+                return <Row key={key} rowKey={key} childRow={childRow} wrapColumns={wrapColumns} cellMinWidth={tableOptions.cellMinWidth} />
+              } else {
+                switch (rowType) {
+                  case RowType.row_group:
+                    return <GroupRow label={childRowCopy[0]} colSpan={childRowCopy.length} key={key} />
+                  case RowType.total:
+                    return <Row key={key} rowKey={key} childRow={childRowCopy} isTotal={true} wrapColumns={wrapColumns} cellMinWidth={tableOptions.cellMinWidth} />
+                  case RowType.row_group_total:
+                    return <GroupRow label={childRowCopy[0]} colSpan={1} key={key} data={childRowCopy.slice(1)} />
+                  default:
+                    return <Row key={key} rowKey={key} childRow={childRowCopy} wrapColumns={wrapColumns} cellMinWidth={tableOptions.cellMinWidth} />
+                }
+              }
             })}
       </tbody>
     </table>

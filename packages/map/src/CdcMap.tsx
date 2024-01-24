@@ -45,14 +45,11 @@ import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
 import ConfigContext from './context'
 import Filters, { useFilters } from '@cdc/core/components/Filters'
 import Modal from './components/Modal'
-import Sidebar from './components/Sidebar'
+import Legend from './components/Legend'
 
-import CountyMap from './components/CountyMap' // Future: Lazy
 import EditorPanel from './components/EditorPanel' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
-import SingleStateMap from './components/SingleStateMap' // Future: Lazy
 import UsaMap from './components/UsaMap' // Future: Lazy
-import UsaRegionMap from './components/UsaRegionMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
 
@@ -118,7 +115,7 @@ const getUniqueValues = (data, columnName) => {
   return Object.keys(result)
 }
 
-const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
+const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, isDebug = false, configUrl, logo = '', setConfig, setSharedFilter, setSharedFilterValue, link }) => {
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
@@ -1313,10 +1310,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     const urlFilters = newState.filters ? (newState.filters.filter(filter => filter.type === 'url').length > 0 ? true : false) : false
 
     if (newState.dataUrl && !urlFilters) {
-      if (newState.dataUrl[0] === '/') {
-        newState.dataUrl = 'http://' + hostname + newState.dataUrl
-      }
-
       // handle urls with spaces in the name.
       if (newState.dataUrl) newState.dataUrl = `${newState.dataUrl}`
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
@@ -1462,6 +1455,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // Data
     if (hashData !== runtimeData.fromHash && state.data?.fromColumn) {
       const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+
       setRuntimeData(newRuntimeData)
     } else {
       if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
@@ -1477,7 +1471,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // Legend - Update when runtimeData does
     const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
     setRuntimeLegend(legend)
-  }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses]) // eslint-disable-line
+  }, [runtimeData, state.legend.unified, state.legend.showSpecialClassesLast, state.legend.separateZero, state.general.equalNumberOptIn, state.legend.numberOfItems, state.legend.specialClasses, state.legend.additionalCategories]) // eslint-disable-line
 
   useEffect(() => {
     reloadURLData()
@@ -1641,17 +1635,17 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 {currentViewport && (
                   <>
                     {modal && <Modal />}
-                    {'single-state' === geoType && <SingleStateMap />}
-                    {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap />}
-                    {'us-region' === geoType && <UsaRegionMap />}
+                    {'single-state' === geoType && <UsaMap.SingleState />}
+                    {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap.State />}
+                    {'us-region' === geoType && <UsaMap.Region />}
+                    {'us-county' === geoType && <UsaMap.County />}
                     {'world' === geoType && <WorldMap />}
-                    {'us-county' === geoType && <CountyMap />}
                     {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
                   </>
                 )}
               </section>
 
-              {general.showSidebar && 'navigation' !== general.type && <Sidebar />}
+              {general.showSidebar && 'navigation' !== general.type && <Legend />}
             </div>
 
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
@@ -1694,6 +1688,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 outerContainerRef={outerContainerRef}
                 imageRef={imageId}
                 isDebug={isDebug}
+                wrapColumns={table.wrapColumns}
               />
             )}
 

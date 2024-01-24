@@ -1,4 +1,4 @@
-import { FilterBehavior } from '../components/Header'
+import { FilterBehavior } from '../components/Header/Header'
 
 // Gets filter values from API response
 export const generateValuesForAPIFilter = (columnName, _data): string[] => {
@@ -10,10 +10,6 @@ export const generateValuesForAPIFilter = (columnName, _data): string[] => {
 
 // Gets filter values from dataset
 export const generateValuesForFilter = (columnName, _data, filterBehavior) => {
-  if (filterBehavior === FilterBehavior.Apply) {
-    return generateValuesForAPIFilter(columnName, _data)
-  }
-
   const values: string[] = []
 
   Object.keys(_data).forEach(key => {

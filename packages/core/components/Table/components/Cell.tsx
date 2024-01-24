@@ -1,7 +1,7 @@
-const Cell = ({ children }) => {
+const Cell = ({ children, style, isBold = false }) => {
   return (
-    <td tabIndex={0} role='gridcell'>
-      {children}
+    <td tabIndex={0} role='gridcell' style={style}>
+      {isBold ? <strong>{children}</strong> : children}
     </td>
   )
 }
