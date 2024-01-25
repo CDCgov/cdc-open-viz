@@ -17,11 +17,12 @@ import regionCellMatrix from './helpers/regionCellMatrix'
 import boxplotCellMatrix from './helpers/boxplotCellMatrix'
 import customColumns from './helpers/customColumns'
 import { TableConfig } from './types/TableConfig'
+import { Column } from '../../types/Column'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
   colorScale?: Function
-  columns?: { navigate: { name: string } }
+  columns?: Record<string, Column>
   config: TableConfig
   dataConfig?: Object
   displayDataAsText?: Function
@@ -97,7 +98,7 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const _runtimeData = config.table.customTableConfig ? customColumns(runtimeData, config.table.excludeColumns) : runtimeData
+  const _runtimeData = config.table.customTableConfig ? customColumns(rawData, config.table.excludeColumns) : runtimeData
 
   const rawRows = Object.keys(_runtimeData)
   const rows = isVertical
