@@ -4,6 +4,7 @@
     "showTitle": true,
     "enableTooltips": true,
     "enableKPIs": true,
+    "numKPIs": "",
     "enableStoryNodes": true,
     "legend": {
       "hide": true
