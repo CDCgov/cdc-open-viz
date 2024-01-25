@@ -159,7 +159,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
       const getParentParams = (childFilter: SharedFilter): Record<'key' | 'value', string>[] | null => {
         const _parents = sharedAPIFilters.filter(parentFilter => childFilter.parents?.includes(parentFilter.key))
         if (!_parents.length) return null
-        return _parents.map(({ queryParameter, active }) => ({ key: queryParameter || '', value: active || '' }))
+        return _parents.map(({ queryParameter, queuedActive }) => ({ key: queryParameter || '', value: queuedActive || '' }))
       }
       const getFilterValues = (filterData: Object | Array<Object>, apiFilter: APIFilter): DropdownOptions => {
         const { textSelector, valueSelector, heirarchyLookup } = apiFilter
