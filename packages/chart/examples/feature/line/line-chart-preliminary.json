@@ -32,42 +32,26 @@
   "preliminaryData": [
     {
       "type": "effect",
-      "label": "Dashed Large",
+      "label": "Cricle  1",
       "column": "Data 2",
       "value": "20",
-      "style": "Dashed Large",
+      "style": "Open Circles",
+      "seriesKey": "Data 1"
+    },
+    {
+      "type": "",
+      "label": "Cricle 2",
+      "column": "Data 3",
+      "value": "20",
+      "style": "Open Circles",
       "seriesKey": "Data 1"
     },
     {
       "type": "effect",
-      "label": "Circle",
-      "column": "Data 1",
-      "value": "35",
-      "style": "Open Circles",
-      "seriesKey": "Data 2"
-    },
-    {
-      "type": "effect",
-      "label": "Dashed Medium",
+      "label": "circle 3",
       "column": "Data 2",
-      "value": "20",
-      "style": "Dashed Medium",
-      "seriesKey": "Data 3"
-    },
-    {
-      "type": "effect",
-      "label": "Circle Open",
-      "column": "Data 1",
-      "value": "25",
+      "value": "30",
       "style": "Open Circles",
-      "seriesKey": "Data 3"
-    },
-    {
-      "type": "effect",
-      "label": "Dashed Small",
-      "column": "Data 2",
-      "value": "38",
-      "style": "Dashed Small",
       "seriesKey": "Data 1"
     }
   ],
