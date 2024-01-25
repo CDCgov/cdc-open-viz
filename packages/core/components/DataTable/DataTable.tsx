@@ -122,7 +122,7 @@ const DataTable = (props: DataTableProps) => {
     OverflowY: 'scroll'
   }
 
-  const hasRowType = !!Object.keys(rawData[0] || {}).find((v: string) => v.match(/row[_-]?type/i))
+  const hasRowType = !!Object.keys(rawData?.[0] || {}).find((v: string) => v.match(/row[_-]?type/i))
 
   const caption = useMemo(() => {
     if (config.type === 'map') {

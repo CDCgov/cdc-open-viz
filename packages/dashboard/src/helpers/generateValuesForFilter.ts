@@ -13,7 +13,7 @@ export const generateValuesForFilter = (columnName, _data, filterBehavior) => {
   const values: string[] = []
 
   Object.keys(_data).forEach(key => {
-    _data[key].forEach(row => {
+    _data[key]?.forEach(row => {
       const value = row[columnName]
       if (value && false === values.includes(value)) {
         values.push(value)
