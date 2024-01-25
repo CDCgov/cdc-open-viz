@@ -2,7 +2,7 @@
   "general": {
     "title": "Default World Map",
     "subtext": "",
-    "type": "world-geocode",
+    "type": "data",
     "geoType": "world",
     "headerColor": "theme-blue",
     "geoBorderColor": "darkGray",
@@ -28,7 +28,9 @@
     "statePicked": {
       "fipsCode": "01",
       "stateName": "Alabama"
-    }
+    },
+    "territoriesAlwaysShow": false,
+    "convertFipsCodes": true
   },
   "type": "map",
   "color": "pinkpurple",
@@ -71,20 +73,30 @@
     "unified": false,
     "singleColumn": false,
     "singleRow": false,
-    "dynamicDescription": false
+    "dynamicDescription": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false
   },
   "filters": [],
-  "dataTable": {
-    "title": "Data Table",
-    "forceDisplay": true
-  },
   "table": {
-    "showDownloadUrl": false
+    "showDownloadUrl": false,
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": false,
+    "indexLabel": ""
   },
   "tooltips": {
     "appearanceType": "hover",
     "linkLabel": "Learn More",
-    "capitalizeLabels": true
+    "capitalizeLabels": true,
+    "opacity": 90
   },
   "runtime": {
     "editorErrorMessage": []
@@ -104,5 +116,66 @@
     ],
     "zoom": 1
   },
-  "dataUrl": "http://localhost:8080/examples/world-geocode-data.json"
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "dataTable": {
+    "title": "Data Table",
+    "forceDisplay": true
+  },
+  "data": [
+    {
+      "Country": "Argentina",
+      "Cases": 100,
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT",
+      "longitude": "-63.6",
+      "latitude": "-38.4"
+    },
+    {
+      "Country": "New York City",
+      "Cases": 300,
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT",
+      "longitude": "-74.006",
+      "latitude": "40.712"
+    },
+    {
+      "Country": "United States of America",
+      "Cases": 10,
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT",
+      "longitude": "-74.006",
+      "latitude": "40.712"
+    },
+    {
+      "Country": "Alaska",
+      "Cases": 500,
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT",
+      "longitude": "-74.006",
+      "latitude": "40.712"
+    }
+  ],
+  "validated": 4.23
 }
