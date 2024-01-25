@@ -18,4 +18,6 @@ export type DashboardConfig = DataSet & {
   rows: ConfigRow[]
   filterBehavior: FilterBehavior
   runtime: Runtime
+  downloadImageButton: boolean
+  downloadPdfButton: boolean
 }
