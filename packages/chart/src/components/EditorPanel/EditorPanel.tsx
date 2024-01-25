@@ -129,7 +129,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
 
   const getStyleOptions = () => {
     if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
-      return ['Dashed Small', 'Dashed Medium', 'Dashed Large', 'Open Circles']
+      return ['Open Circles']
     }
     if (config.visualizationType === 'Bar') {
       return ['star']
@@ -187,7 +187,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
               <TextField value={value} fieldName='value' label='VALUE TO TRIGGER' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
               <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions()} />
 
-              <TextField value={label} fieldName='label' label='Label' placeholder='suppressed' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
+              <TextField value={label} fieldName='label' label='Label' placeholder='' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
             </div>
           )
         })}
