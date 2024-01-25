@@ -1038,6 +1038,7 @@ const EditorPanel = () => {
             <Accordion allowZeroExpanded={true}>
               <Panels.General name='General' />
               <Panels.ForestPlot name='Forest Plot Settings' />
+              <Panels.Sankey name='Sankey' />
               {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && (
                 <AccordionItem>
                   <AccordionItemHeading>

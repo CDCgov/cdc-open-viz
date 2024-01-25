@@ -30,7 +30,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   // Merges initial-state with the passed config in examples/feature/sankey/initial.json
   const DEBUG = true
   const { config } = useContext<ChartContext>(ConfigContext)
-  const { sankey: sankeyConfig } = config
+  const { sankey: sankeyConfig } = config // todo: add sankey type to chart config
   const data = sankeyConfig?.data
   const [largestGroupWidth, setLargestGroupWidth] = useState(0)
   const groupRefs = useRef([])
@@ -57,7 +57,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
     })
     setLargestGroupWidth(largest)
   }, [groupRefs])
- 
+
   //Retrieve all the unique values for the Nodes
   const uniqueNodes = Array.from(new Set(data.links.flatMap(link => [link.source, link.target])))
 
@@ -133,7 +133,9 @@ const Sankey = ({ width, height }: SankeyProps) => {
     return {sourceNodes, activeLinks}
   }
 
-
+  // I know we're aware of these, just adding placeholder todos 🙂
+  // todo: item.Gender/item.race_and_ethnicity/etc should look more like item[columnName]
+  // todo: remove hard coded values
   const tooltipVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value}`;
   const tooltipPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value_pct}%)`;
   const tooltipSummary = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).summary}`;
@@ -158,6 +160,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const tooltipMissingVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Missing')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Missing')?.dem_value}`;
   const tooltipMissingNAPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Missing')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Missing')?.dem_pct}%)`;
 
+  // todo: no hardcode values
   const sankeyToolTip = `<div class="sankey-chart__tooltip">
                     <span class="sankey-chart__tooltip--tooltip-header">${tooltipID}</span>
                     <span class="sankey-chart__tooltip--tooltip-header">${tooltipVal} ${tooltipPct}</span>
@@ -293,8 +296,8 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const allLinks = links.map((link, i) => {
     const linkGenerator = sankeyLinkHorizontal()
     const path = linkGenerator(link)
-    const sourceObj: any = link.source
-    const targetObj: any = link.target
+    const sourceObj: any = link.source // todo: unused atm
+    const targetObj: any = link.target // todo: unused atm
     let opacityValue = sankeyConfig.opacity.LinkOpacityDefault
     let strokeColor = sankeyConfig.linkColor.default
 
@@ -320,19 +323,21 @@ const Sankey = ({ width, height }: SankeyProps) => {
   return (
     <>
     {sankeyConfig.data.KPIs && (
+      // TODO: remove <KPIComponent />. Lets us <CdcDataBite /> with a new type of config.type = 'gradient' or 
+      // a name of your choosing.
       <div className='kpis-container'>
         <KPIComponent label={sankeyConfig.data.KPIs[0].label} value={sankeyConfig.data.KPIs[0].value}/>
         <KPIComponent label={sankeyConfig.data.KPIs[1].label} value={sankeyConfig.data.KPIs[1].value}/>
     </div>
     )}
-      
+
       <div className='sankey-chart'>
         <svg className='sankey-chart__diagram' width={width} height={height} style={{ overflow: 'visible' }}>
           <Group className='links'>{allLinks}</Group>
           <Group className='nodes'>{allNodes}</Group>
         </svg>
 
-        {/* ReactTooltip needs to remain even if tooltips are disabled -- it handles when a user clicks off of the node and resets 
+        {/* ReactTooltip needs to remain even if tooltips are disabled -- it handles when a user clicks off of the node and resets
         the sankey diagram. When tooltips are disabled this will nothing */}
         <ReactTooltip id={`tooltip`} afterHide={() => clearNodeClick()} events={['click']} place='top' style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
       </div>
