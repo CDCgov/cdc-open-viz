@@ -68,6 +68,7 @@ export default {
   },
   filters: [],
   table: {
+    wrapColumns: false,
     label: 'Data Table',
     expanded: false,
     limitHeight: false,
@@ -99,7 +100,8 @@ export default {
   },
   mapPosition: { coordinates: [0, 30], zoom: 1 },
   map: {
-    layers: []
+    layers: [],
+    patterns: []
   },
   hexMap: {
     type: '',

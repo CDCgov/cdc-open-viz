@@ -128,8 +128,36 @@ export class DataTransform {
         return standardized
       }
     } else if (description.series === true && description.singleRow === false) {
-      if (description.seriesKey !== undefined && description.xKey !== undefined && (description.valueKey !== undefined || (description.valueKeys !== undefined && description.valueKeys.length > 0))) {
-        if (description.valueKeys !== undefined) {
+      if (description.seriesKey !== undefined && description.xKey !== undefined && (description.valueKey !== undefined || (description.valueKeys !== undefined && description.valueKeys.length > 0) || (description.valueKeysTallSupport !== undefined && description.valueKeysTallSupport.length > 0))) {
+        if (description.valueKeysTallSupport !== undefined) {
+          let standardizedMapped = {}
+          let standardized: string[] = []
+
+          data.forEach(row => {
+            let uniqueKey = row[description.xKey];
+            Object.keys(row).forEach(key => {
+              if(key !== description.xKey && key !== description.seriesKey && description.valueKeysTallSupport.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)){
+                uniqueKey += "|" + row[key];
+              }
+            })
+
+            if(!standardizedMapped[uniqueKey]){
+              standardizedMapped[uniqueKey] = {[description.xKey]: row[description.xKey]}
+            }
+            Object.keys(row).forEach(key => {
+              if(key !== description.xKey && key !== description.seriesKey && description.valueKeysTallSupport.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)){
+                standardizedMapped[uniqueKey][key] = row[key];
+              }
+            })
+            description.valueKeysTallSupport.forEach(valueKey => {
+              standardizedMapped[uniqueKey][row[description.seriesKey] + '-' + valueKey] = row[valueKey];
+            })
+          })
+
+          standardized = Object.keys(standardizedMapped).map(key => standardizedMapped[key]);
+
+          return standardized
+        } else if (description.valueKeys !== undefined) {
           let standardizedMapped = {}
           let standardized: string[] = []
           let valueKeys = description.valueKeys

@@ -14,5 +14,13 @@
     "AsOf": "11 Jul 2022 5:00 PM EDT",
     "longitude": "-74.006",
     "latitude": "40.712"
+  },
+  {
+    "Country": "United States of America",
+    "Cases": "10",
+    "Category": "Has not historically reported monkeypox",
+    "AsOf": "11 Jul 2022 5:00 PM EDT",
+    "longitude": "-74.006",
+    "latitude": "40.712"
   }
 ]

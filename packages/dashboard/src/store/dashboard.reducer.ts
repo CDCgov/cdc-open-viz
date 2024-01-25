@@ -1,9 +1,9 @@
 import { getUpdateConfig } from '../helpers/getUpdateConfig'
-import { Config } from '../types/Config'
+import { DashboardConfig } from '../types/DashboardConfig'
 import DashboardActions from './dashboard.actions'
 
 export type DashboardState = {
-  config?: Config
+  config?: DashboardConfig
   data: Object
   filteredData: Object
   loading: boolean

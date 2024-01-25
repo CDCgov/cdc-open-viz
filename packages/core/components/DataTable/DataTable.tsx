@@ -15,12 +15,16 @@ import Table from '../Table'
 import chartCellMatrix from './helpers/chartCellMatrix'
 import regionCellMatrix from './helpers/regionCellMatrix'
 import boxplotCellMatrix from './helpers/boxplotCellMatrix'
+import customColumns from './helpers/customColumns'
 import { TableConfig } from './types/TableConfig'
+import { Column } from '../../types/Column'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
   colorScale?: Function
-  columns?: { navigate: { name: string } }
+  columns?: Record<string, Column>
+  // determines if columns should be wrapped in the table
+  wrapColumns?: boolean
   config: TableConfig
   dataConfig?: Object
   displayDataAsText?: Function
@@ -42,7 +46,7 @@ export type DataTableProps = {
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
-  const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId } = props
+  const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId, wrapColumns } = props
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
@@ -89,19 +93,21 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const rawRows = Object.keys(runtimeData)
+  const _runtimeData = config.table.customTableConfig ? customColumns(rawData, config.table.excludeColumns) : runtimeData
+
+  const rawRows = Object.keys(_runtimeData)
   const rows = isVertical
     ? rawRows.sort((a, b) => {
         let dataA
         let dataB
         if (config.type === 'map' && config.columns) {
           const sortByColName = config.columns[sortBy.column].name
-          dataA = runtimeData[a][sortByColName]
-          dataB = runtimeData[b][sortByColName]
+          dataA = _runtimeData[a][sortByColName]
+          dataB = _runtimeData[b][sortByColName]
         }
         if (config.type === 'chart' || config.type === 'dashboard') {
-          dataA = runtimeData[a][sortBy.column]
-          dataB = runtimeData[b][sortBy.column]
+          dataA = _runtimeData[a][sortBy.column]
+          dataB = _runtimeData[b][sortBy.column]
         }
         return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
       })
@@ -112,6 +118,8 @@ const DataTable = (props: DataTableProps) => {
     OverflowY: 'scroll'
   }
 
+  const hasRowType = !!Object.keys(rawData[0] || {}).find((v: string) => v.match(/row[_-]?type/i))
+
   const caption = useMemo(() => {
     if (config.type === 'map') {
       return config.table.caption ? config.table.caption : `Data table showing data for the ${mapLookup[config.general.geoType]} figure.`
@@ -119,6 +127,13 @@ const DataTable = (props: DataTableProps) => {
       return config.table.caption ? config.table.caption : `Data table showing data for the ${config.type} figure.`
     }
   }, [config.table.caption])
+
+  // Determines if a relative region is being shown to the user.
+  // If a relative region is found we don't want to display the data table.
+  // Takes backwards compatibility into consideration, ie !region.toType || !region.fromType
+  const noRelativeRegions = config?.regions?.every(region => {
+    return (region.toType === 'Fixed' && region.fromType === 'Fixed') || (!region.toType && !region.fromType) || (!region.toType && region.fromType === 'Fixed') || (!region.fromType && region.toType === 'Fixed')
+  })
 
   // prettier-ignore
   const tableData = useMemo(() => (
@@ -151,17 +166,20 @@ const DataTable = (props: DataTableProps) => {
           <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           <div className='table-container' style={limitHeight}>
             <Table
-              childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, ...props }) : chartCellMatrix({ rows, ...props, isVertical, sortBy })}
+              wrapColumns={wrapColumns}
+              childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData: _runtimeData }) : chartCellMatrix({ rows, ...props, runtimeData: _runtimeData, isVertical, sortBy, hasRowType })}
               tableName={config.type}
               caption={caption}
               stickyHeader
-              headContent={config.type === 'map' ? <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} /> : <ChartHeader data={runtimeData} {...props} isVertical={isVertical} sortBy={sortBy} setSortBy={setSortBy} />}
+              hasRowType={hasRowType}
+              headContent={config.type === 'map' ? <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} /> : <ChartHeader data={_runtimeData} {...props} hasRowType={hasRowType} isVertical={isVertical} sortBy={sortBy} setSortBy={setSortBy} />}
               tableOptions={{ className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`, 'aria-live': 'assertive', 'aria-rowcount': config?.data?.length ? config.data.length : -1, hidden: !expanded }}
             />
 
             {/* REGION Data Table */}
-            {config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' && (
+            {noRelativeRegions && config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' && (
               <Table
+                wrapColumns={wrapColumns}
                 childrenMatrix={regionCellMatrix({ config })}
                 tableName={config.visualizationType}
                 caption='Table of the highlighted regions in the visualization'
@@ -188,6 +206,7 @@ const DataTable = (props: DataTableProps) => {
           <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           <div className='table-container' style={limitHeight}>
             <Table
+              wrapColumns={wrapColumns}
               childrenMatrix={boxplotCellMatrix({ rows: tableData, config })}
               tableName={config.visualizationType}
               caption={caption}

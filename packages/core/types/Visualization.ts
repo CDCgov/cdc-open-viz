@@ -1,21 +1,21 @@
 export type Visualization = {
-  visualizationType: string
-  dataKey: string
-  formattedData: any
-  dataDescription: Object
+  autoLoad: boolean
   data: any
-  originalFormattedData: any
+  dataDescription: Object
+  dataKey: string
   editing: boolean
-  type: 'chart' | 'map' | 'data-bite' | 'waffle-chart' | 'markup-include' | 'filtered-text' | 'filter-dropdowns'
+  formattedData: any
+  general: any
+  hide: any[]
   newViz: boolean
   openModal: boolean
-  hide: any[]
-  autoLoad: boolean
+  originalFormattedData: any
   table: {
     showDataTableLink: boolean
   }
-  general: any
   title: string
+  type: 'chart' | 'map' | 'data-bite' | 'waffle-chart' | 'markup-include' | 'filtered-text' | 'filter-dropdowns'
   uid: string
   usesSharedFilter: any
+  visualizationType: string
 }

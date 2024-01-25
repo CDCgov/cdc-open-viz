@@ -190,7 +190,7 @@ const useScales = (properties: useScaleProps) => {
       if (config.forestPlot.type === 'Linear') {
         xScale = scaleLinear({
           domain: [Math.min(...data.map(d => parseFloat(d[config.forestPlot.lower]))) - xAxisPadding, Math.max(...data.map(d => parseFloat(d[config.forestPlot.upper]))) + xAxisPadding],
-          range: [leftWidthOffset, xMax - rightWidthOffset]
+          range: [leftWidthOffset, dimensions[0] - rightWidthOffset]
         })
         xScale.type = scaleTypes.LINEAR
       }

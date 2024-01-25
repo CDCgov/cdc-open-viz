@@ -487,7 +487,9 @@ export const supportedCountries = {
   YEM: ['Yemen'],
   ZMB: ['Zambia'],
   ZWE: ['Zimbabwe'],
-  IOT: ['British Indian Ocean Territory']
+  IOT: ['British Indian Ocean Territory'],
+  Alaska: ['Alaska'],
+  Hawaii: ['Hawaii']
 }
 
 export const supportedTerritories = {
