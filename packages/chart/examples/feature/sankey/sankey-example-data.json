@@ -33,14 +33,10 @@
       "labelOffset": 180,
       "axisPadding": 0,
       "target": 0,
-      "dataKey": "x",
+      "dataKey": "Disposition",
       "label": "X Axis Example Label"
     },
     "series": [
-      {
-        "dataKey": "Disposition",
-        "type": "Bar"
-      },
       {
         "dataKey": "Type of Treatment",
         "type": "Bar"
@@ -63,7 +59,7 @@
       "caption": "",
       "showDownloadUrl": true,
       "showDataTableLink": true,
-      "indexLabel": "",
+      "indexLabel": "Disposition",
       "download": true,
       "showVertical": true,
       "show": true
