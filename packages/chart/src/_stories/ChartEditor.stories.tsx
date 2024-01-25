@@ -14,7 +14,7 @@ type Story = StoryObj<typeof Chart>
 
 export const Primary: Story = {
   args: {
-    config: { ...pieChartExample, data: pieData },
+    config: { ...pieChartExample, data: pieData, columns: { someCol: { name: 'females', showInViz: true } } },
     isEditor: true
   }
 }

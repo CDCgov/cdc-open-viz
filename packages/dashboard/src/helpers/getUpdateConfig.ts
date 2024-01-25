@@ -1,5 +1,5 @@
 import { DashboardState } from '../store/dashboard.reducer'
-import { Config } from '../types/Config'
+import { DashboardConfig as Config } from '../types/DashboardConfig'
 import { filterData } from './filterData'
 import { generateValuesForFilter } from './generateValuesForFilter'
 import { getFormattedData } from './getFormattedData'

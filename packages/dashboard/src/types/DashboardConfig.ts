@@ -1,29 +1,21 @@
 import { Series } from '@cdc/core/types/Series'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { DataSet } from './DataSet'
-import { SharedFilter } from './SharedFilter'
+import { ConfigRow } from './ConfigRow'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { Table } from '@cdc/core/types/Table'
 import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
+import { Dashboard } from './Dashboard'
 
-export type Config = DataSet & {
-  dashboard: {
-    sharedFilters: SharedFilter[]
-    datasets: Record<string, DataSet>
-    description: any
-    title: any
-    theme: any
-    filters: any
-  }
+export type DashboardConfig = DataSet & {
+  dashboard: Dashboard
   confidenceKeys: Record<string, any>
-  visualizations: {
-    [vizKey: string]: Visualization
-  }
+  visualizations: Record<string, Visualization>
   series: Series
   datasets: Record<string, DataSet>
   dataFileName: string
   table: Table
-  rows: any[]
+  rows: ConfigRow[]
   filterBehavior: FilterBehavior
   runtime: Runtime
 }
