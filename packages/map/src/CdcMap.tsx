@@ -275,7 +275,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         uid = countyKeys.find(key => key === fips)
       }
 
-      if ('us-geocode' === state.general.type || (state.columns.latitude?.name && state.columns.longitude?.name)) {
+      if ('us-geocode' === state.general.type) {
+        uid = row[state.columns.geo.name]
+      }
+
+      if(!uid && (state.columns.latitude?.name && state.columns.longitude?.name && row[state.columns.latitude?.name] && row[state.columns.longitude?.name])){
         uid = row[state.columns.geo.name]
       }
 
