@@ -346,7 +346,7 @@ const UsaMap = () => {
         displayGeoName={displayGeoName}
         geoClickHandler={geoClickHandler}
         isFilterValueSupported={isFilterValueSupported}
-        isGeoCodeMap={state.general.type === 'us-geocode'}
+        isGeoCodeMap={state.general.type === 'us-geocode' || (state.columns.latitude?.name && state.columns.longitude?.name)}
         key='cities'
         projection={projection}
         setSharedFilterValue={setSharedFilterValue}
