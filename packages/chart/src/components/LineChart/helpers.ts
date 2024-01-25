@@ -1,31 +1,4 @@
-import { type PreliminaryDataItem, DataItem, StyleProps, Style } from './LineChartProps'
-
-export const createStyles = (props: StyleProps): Style[] => {
-  const { preliminaryData, rawData, stroke, handleLineType, lineType, seriesKey } = props
-
-  const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(pd => pd.seriesKey && pd.column && pd.value && pd.type && pd.style)
-  const getMatchingPd = (point: DataItem): PreliminaryDataItem => validPreliminaryData.find(pd => pd.seriesKey === seriesKey && point[pd.column] === pd.value && pd.type === 'effect' && pd.style !== 'Open Circles')
-
-  let styles: Style[] = []
-  const createStyle = (lineStyle): Style => ({
-    stroke: stroke,
-    strokeWidth: 2,
-    strokeDasharray: lineStyle
-  })
-
-  rawData.forEach((d, index) => {
-    let matchingPd: PreliminaryDataItem = getMatchingPd(d)
-    let style: Style = matchingPd ? createStyle(handleLineType(matchingPd.style)) : createStyle(handleLineType(lineType))
-
-    styles.push(style)
-
-    // If matchingPd exists, update the previous style if there is a previous element
-    if (matchingPd && index > 0) {
-      styles[index - 1] = createStyle(handleLineType(matchingPd.style))
-    }
-  })
-  return styles as Style[]
-}
+import { type PreliminaryDataItem, DataItem } from './LineChartProps'
 
 export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: DataItem[], seriesKey: string): DataItem[] => {
   // Filter and map preliminaryData to get circlesFiltered
@@ -42,4 +15,41 @@ export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: Data
   })
 
   return filteredData
+}
+
+export const segmentData = (preliminaryData: PreliminaryDataItem[], data: DataItem[], seriesKey: string, stroke: string, handleLineType: any) => {
+  let result = [[]]
+  let styles = [{}]
+
+  data.forEach(item => {
+    let newLineStyle = ''
+    let preliminaryMatch = preliminaryData.filter(d => item.style !== 'Open Circles' && item[d.column] === d.value && d.seriesKey === seriesKey)
+    if (preliminaryMatch.length > 0) {
+      newLineStyle = preliminaryMatch[0].style
+    }
+
+    newLineStyle = newLineStyle ? handleLineType(newLineStyle) : '1'
+    let currentLineStyle = styles[styles.length - 1].strokeDasharray
+
+    //First line segment, add style properties to first object
+    if (!currentLineStyle) {
+      styles[styles.length - 1].stroke = stroke
+      styles[styles.length - 1].strokeWidth = 2
+      styles[styles.length - 1].strokeDasharray = newLineStyle
+      result[result.length - 1].push(item)
+      //New datapoint is same style as previous, add to current line segment
+    } else if (currentLineStyle === newLineStyle) {
+      result[result.length - 1].push(item)
+      // New datapoint has different style, add new line segment
+    } else {
+      styles.push({
+        stroke: stroke,
+        strokeWidth: 2,
+        strokeDasharray: newLineStyle
+      })
+      result.push([item])
+    }
+  })
+
+  return { segmentedData: result, segmentedStyles: styles }
 }

@@ -8,7 +8,7 @@ import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
-import { filterCircles, createStyles } from './helpers'
+import { segmentData, filterCircles } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 
 // types
@@ -50,7 +50,6 @@ const LineChart = (props: LineChartProps) => {
   const DEBUG = false
   const { lineDatapointStyle, showLineSeriesLabels, legend } = config
 
-  let wrapObjectsInArrays = rawData.map(item => [item])
   return (
     <ErrorBoundary component='LineChart'>
       <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
@@ -62,8 +61,8 @@ const LineChart = (props: LineChartProps) => {
           const seriesAxis = seriesData[0].axis ? seriesData[0].axis : 'left'
           let displayArea = legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
           const circleData = filterCircles(config.preliminaryData, rawData, seriesKey)
-          // styles for preliminary Data  items
-          let styles = createStyles({ preliminaryData: config.preliminaryData, rawData, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), handleLineType, lineType, seriesKey })
+          // Gets data and styles for line segments
+          const { segmentedData, segmentedStyles } = segmentData(config.preliminaryData, data, seriesKey, colorScale(config.runtime.seriesLabels[seriesKey]), handleLineType)
 
           return (
             <Group
@@ -127,12 +126,12 @@ const LineChart = (props: LineChartProps) => {
               <SplitLinePath
                 key={index}
                 sampleRate={1}
-                segments={data.map(item => [item])}
+                segments={segmentedData}
                 segmentation='x'
                 x={d => xScale(getXAxisData(d))}
                 y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                 curve={allCurves[seriesData[0].lineType]}
-                styles={styles}
+                styles={segmentedStyles}
                 defined={(item, i) => {
                   return isNumber(item[config.runtime.seriesLabels[seriesKey]])
                 }}
