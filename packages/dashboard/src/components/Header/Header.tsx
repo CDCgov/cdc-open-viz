@@ -5,7 +5,7 @@ import { DashboardContext, DashboardDispatchContext } from '../../DashboardConte
 // types
 import { type APIFilter } from '../../types/APIFilter'
 import { type SharedFilter } from '../../types/SharedFilter'
-import { type Config } from '../../types/Config'
+import { type DashboardConfig as Config } from '../../types/DashboardConfig'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'

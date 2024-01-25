@@ -52,16 +52,18 @@ import './scss/main.scss'
 import DataTable from '@cdc/core/components/DataTable'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
+import { ChartConfig } from './types/ChartConfig'
+import { Label } from './types/Label'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
-  const [config, setConfig] = useState<any>({})
+  const [config, setConfig] = useState<ChartConfig>(configObj || ({} as ChartConfig))
   const [stateData, setStateData] = useState(config.data || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
-  const [seriesHighlight, setSeriesHighlight] = useState<any[]>([])
+  const [seriesHighlight, setSeriesHighlight] = useState<string[]>([])
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [dimensions, setDimensions] = useState<[number?, number?]>([])
   const [externalFilters, setExternalFilters] = useState<any[]>()
@@ -607,9 +609,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
-    if (stateData && config.xAxis && config.runtime.seriesKeys) {
-      const configPalette = config.customColors ? config.customColors : config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar' ? config.twoColor.palette : config.palette
-      const allPalettes = { ...colorPalettes, ...twoColorPalette }
+    if (stateData && config.xAxis && config.runtime?.seriesKeys) {
+      const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType) ? config.twoColor.palette : config.palette
+      const allPalettes: Record<string, string[]> = { ...colorPalettes, ...twoColorPalette }
       let palette = config.customColors || allPalettes[configPalette]
       let numberOfKeys = config.runtime.seriesKeys.length
       let newColorScale
@@ -637,27 +639,22 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }, [config, stateData]) // eslint-disable-line
 
   // Called on legend click, highlights/unhighlights the data series with the given label
-  const highlight = label => {
-    const newSeriesHighlight: any[] = []
-
+  const highlight = (label: Label) => {
     // If we're highlighting all the series, reset them
     if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
       highlightReset()
       return
     }
 
-    seriesHighlight.forEach(value => {
-      newSeriesHighlight.push(value)
-    })
+    const newSeriesHighlight = [...seriesHighlight]
 
     let newHighlight = label.datum
     if (config.runtime.seriesLabels) {
-      for (let i = 0; i < config.runtime.seriesKeys.length; i++) {
-        if (config.runtime.seriesLabels[config.runtime.seriesKeys[i]] === label.datum) {
-          newHighlight = config.runtime.seriesKeys[i]
-          break
+      config.runtime.seriesKeys.forEach(key => {
+        if (config.runtime.seriesLabels[key] === label.datum) {
+          newHighlight = key
         }
-      }
+      })
     }
 
     if (newSeriesHighlight.indexOf(newHighlight) !== -1) {
@@ -1071,7 +1068,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
               <DataTable
                 config={config}
-                rawData={config.data}
+                rawData={config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
                 runtimeData={transform.applySuppression(filteredData || excludedData, config.suppressedData)}
                 expandDataTable={config.table.expanded}
                 columns={config.columns}
