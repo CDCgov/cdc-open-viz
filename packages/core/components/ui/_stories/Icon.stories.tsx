@@ -2,14 +2,11 @@ import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 
 import Icon, { ICON_TYPES } from '../Icon'
-import { iconHash } from '../Icon'
-
-const iconNames = Object.keys(iconHash)
 
 const IconArray = () => {
   return (
     <>
-      {iconNames.map(name => (
+      {ICON_TYPES.map(name => (
         <div>
           <span>
             <Icon display={name} /> {name}{' '}
