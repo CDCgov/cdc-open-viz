@@ -51,7 +51,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = 
     update(newItems)
   }
 
-  const handleItemRemove = (option: Option, caller: string) => {
+  const handleItemRemove = (option: Option) => {
     const newItems = selectedItems.filter(item => item.value !== option.value)
     setSelectedItems(newItems)
     update(newItems)
@@ -68,9 +68,9 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = 
 
       <div aria-labelledby={label ? multiID : undefined} className='selected'>
         {selectedItems.map(item => (
-          <div key={item.value} role='button' tabIndex={0} onClick={() => handleItemRemove(item, 'button click')} onKeyUp={() => handleItemRemove(item, 'button key up')}>
+          <div key={item.value} role='button' tabIndex={0} onClick={() => handleItemRemove(item)} onKeyUp={() => handleItemRemove(item)}>
             {item.label}
-            <button aria-label='Remove' onClick={() => handleItemRemove(item, 'X')}>
+            <button aria-label='Remove' onClick={() => handleItemRemove(item)}>
               x
             </button>
           </div>
