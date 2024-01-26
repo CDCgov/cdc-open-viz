@@ -39,7 +39,7 @@ type DevTools = {
 // constants
 const withDevTools = typeof window !== 'undefined' && (window as any).__REDUX_DEVTOOLS_EXTENSION__
 const devTools: DevTools = !withDevTools ? null : (window as any).__REDUX_DEVTOOLS_EXTENSION__.connect()
-const devToolsStore = !withDevTools ? null : devTools
+export const devToolsStore = !withDevTools ? null : devTools
 
 export const devToolsWrapper =
   <StateType, ActionTypes>(_reducer: (s: StateType, a: ActionTypes) => StateType) =>
