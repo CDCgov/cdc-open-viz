@@ -5,16 +5,15 @@ export type Visualization = {
   dataFileName: string
   dataFileSourceType: string
   dataKey: string
-  datasets: any
+  datasets: Record<string, any>
   editing: boolean
   formattedData?: Object[]
   general: any
   hide: any[]
-  multiDashboards?: any[]
   newViz: boolean
   openModal: boolean
   originalFormattedData: any
-  orientation: any
+  orientation: 'vertical' | 'horizontal'
   table: {
     showDataTableLink: boolean
   }
