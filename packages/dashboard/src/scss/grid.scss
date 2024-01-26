@@ -3,6 +3,8 @@ $red: #f74242;
 
 .layout-container {
   display: flex;
+  margin-top: -90vh;
+  margin-left: calc(350px + 1em);
 }
 
 .visualizations-panel {
@@ -10,11 +12,8 @@ $red: #f74242;
   padding: 1em;
   width: 350px;
   border-right: #c7c7c7 1px solid;
-  position: fixed;
-  top: 6em;
-  bottom: 0;
   z-index: 1;
-  overflow-y: auto;
+  overflow-y: scroll;
 }
 
 .hidden.editor-panel + .builder-grid {
@@ -29,7 +28,6 @@ $red: #f74242;
 .builder-grid {
   flex-grow: 1;
   padding: 5em 3em 3em;
-  margin-left: calc(350px + 1em);
 }
 
 .column-container {
