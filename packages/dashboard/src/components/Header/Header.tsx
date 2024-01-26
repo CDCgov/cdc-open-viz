@@ -502,13 +502,13 @@ const Header = (props: HeaderProps) => {
                   <select
                     value={filter.parents || []}
                     onChange={e => {
-                      updateFilterProp('parent', index, e.target.value)
+                      updateFilterProp('parents', index, e.target.value)
                     }}
                   >
                     <option value=''>Select a filter</option>
                     {config.dashboard.sharedFilters &&
                       config.dashboard.sharedFilters.map(sharedFilter => {
-                        if (sharedFilter.key !== filter.key && sharedFilter.type !== 'urlfilter') {
+                        if (sharedFilter.key !== filter.key) {
                           return <option>{sharedFilter.key}</option>
                         }
                       })}
