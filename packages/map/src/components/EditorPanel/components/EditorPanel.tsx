@@ -1929,7 +1929,7 @@ const EditorPanel = props => {
                     </label>
                   </fieldset>
                 )}
-                {('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && (
+                {(
                   <>
                     <label>Latitude Column</label>
                     <select
