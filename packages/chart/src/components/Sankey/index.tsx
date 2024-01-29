@@ -1,5 +1,6 @@
 import { SankeyGraph, sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey'
 import React from 'react'
+import ReactDOMServer from 'react-dom/server';
 import './sankey.scss'
 import { useContext, useState, useRef, useEffect } from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
@@ -10,6 +11,7 @@ import { Text } from '@visx/text'
 import { ChartContext } from '../../types/ChartContext'
 
 import { KPIComponent } from '@cdc/data-bite/src/components/KPIComponent'
+import HTMLReactParser from 'html-react-parser'
 
 
 type Link = { source: string; target: string; value: number }
@@ -140,31 +142,26 @@ const Sankey = ({ width, height }: SankeyProps) => {
   // todo: remove hard coded values
   const tooltipVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value}`;
   const tooltipSummary = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).summary}`;
-  
-  console.log(tooltipVal);
-  console.log(tooltipSummary);
   const tooltipColumn1Label = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1Label;
-  const tooltipColumn1FirstSetLabel = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1[0]?.label;
-  const tooltipColumn1FirstSetValue = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1[0].value;
-  const tooltipColumn1FirstSetAdditionalInfo = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1[0].additional_info;
+  const tooltipColumn2Label = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column2Label;
+  const tooltipColumn1 = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1;
+  const tooltipColumn2 = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column2;
 
-  console.log(tooltipColumn1Label);
-  console.log(tooltipColumn1FirstSetLabel);
-  console.log(tooltipColumn1FirstSetValue);
-  console.log(tooltipColumn1FirstSetAdditionalInfo);
+  const ColumnList = ({ columnData }) => {
+    return (
+      <ul>
+        {columnData?.map((entry, index) => (
+          <li key={index}>
+            {entry.label}: {entry.value} ({entry.additional_info}%)
+          </li>
+        ))}
+      </ul>
+    );
+  };
 
+  const tooltipColumn1Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn1} />);
+  const tooltipColumn2Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn2} />);
 
- /*  I'm not sure how to loop through column 1 and column 2 values. rather than relying on the number of items
-  in each column - i would like to loop through it and add an <li> tag for each one 
-
-  I'm also not sure what you mean by keys for column 1 and 2
-
-  To get this example to run first the div that wraps the tooltipColumn1 variables need to be removed 
-  and comment lines 144-154. once the sankey diagram renders then you can click on Suicide EMS 
-  responses node and then uncomment those lines and add the div back in. since i only have the data 
-  for that node in the json file it will throw errors  */
-
-  
   // todo: no hardcode values
   const sankeyToolTip = `<div class="sankey-chart__tooltip">
                     <span class="sankey-chart__tooltip--tooltip-header">${tooltipID}</span>
@@ -172,14 +169,16 @@ const Sankey = ({ width, height }: SankeyProps) => {
                     <div class="divider"></div>
                     <span><strong>Summary: </strong>${tooltipSummary}</span>
                     <div class="divider"></div>
-                    <div class="sankey-chart__tooltip--info-section">
-                    <div>
-                      <span><strong>${tooltipColumn1Label}<strong></span>
-                        <ul>
-                          <li>${tooltipColumn1FirstSetLabel}: ${tooltipColumn1FirstSetValue} (${tooltipColumn1FirstSetAdditionalInfo}%)</li>
-                        </ul>
+                      <div class="sankey-chart__tooltip--info-section">
+                        <div>
+                          <span><strong>${tooltipColumn1Label}<strong></span>
+                          ${tooltipColumn1Data}
+                        </div>
+                        <div>
+                          <span><strong>${tooltipColumn2Label}<strong></span>
+                          ${tooltipColumn2Data}
+                        </div>
                       </div>
-                    </div>
                   </div>`
 
   // Draw the nodes
