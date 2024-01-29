@@ -71,6 +71,11 @@ body.post-type-cdc_visualization .visx-tooltip {
   @import 'button-section';
   @import 'series-list';
   @import 'typography';
+
+  .editor-panel {
+    position: relative !important;
+    top: 0 !important;
+  }
 }
 
 $theme: (
