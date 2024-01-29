@@ -10,6 +10,7 @@ import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Title from '@cdc/core/components/ui/Title'
 import CircleCallout from './components/CircleCallout'
+import KPIComponent from './components/KPIComponent'
 
 // external
 import ResizeObserver from 'resize-observer-polyfill'
@@ -491,6 +492,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 </div>
                 {isBottom && <DataImage />}
                 {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
+                {showBite && 'gradient' === biteStyle && <KPIComponent label={sankeyConfig.data.KPIs[0].label} value={sankeyConfig.data.KPIs[0].value}/>}
               </div>
             </div>
           </div>
@@ -535,7 +537,8 @@ export const BITE_LOCATIONS = {
   split: 'Split Graphic and Message',
   title: 'Value above Message',
   body: 'Value before Message',
-  end: 'Value after Message'
+  end: 'Value after Message',
+  gradient: 'Gradient'
 }
 
 export const IMAGE_POSITION_LEFT = 'Left'
