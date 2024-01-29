@@ -50,7 +50,7 @@ import { type APIFilter } from './types/APIFilter'
 import { type Visualization } from '@cdc/core/types/Visualization'
 import { type WCMSProps } from '@cdc/core/types/WCMSProps'
 import { type InitialState } from './types/InitialState'
-import MultiConfigTabs from './components/MultiConfigTabs/MultiConfigTabs'
+import MultiTabs from './components/MultiConfigTabs'
 import _ from 'lodash'
 import EditorContext from '../../editor/src/ConfigContext'
 
@@ -666,7 +666,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     body = (
       <>
         {isEditor && <Header setPreview={setPreview} />}
-        <MultiConfigTabs />
+        <MultiTabs isEditor={isEditor && !state.preview} />
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
           <Title title={title} isDashboard={true} classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]} />
           {/* Description */}
