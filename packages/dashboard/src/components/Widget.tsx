@@ -267,7 +267,7 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
   }, [data?.openModal])
 
   let isConfigurationReady = false;
-  if(type === 'markup-include' && type === 'filter-dropdowns'){
+  if(type === 'markup-include' || type === 'filter-dropdowns'){
     isConfigurationReady = true;
   } else if(data && data.formattedData) {
     isConfigurationReady = true;
