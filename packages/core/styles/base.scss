@@ -72,8 +72,13 @@ body.post-type-cdc_visualization .visx-tooltip {
   @import 'series-list';
   @import 'typography';
 
+  .editor-toggle {
+    position: absolute !important;
+    top: 10px !important;
+  }
+
   .editor-panel {
-    position: relative !important;
+    position: absolute !important;
     top: 0 !important;
   }
 }
