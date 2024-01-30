@@ -8,6 +8,7 @@ import ConfigContext from '@cdc/chart/src/ConfigContext'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { ChartContext } from '../../types/ChartContext'
+import React from 'react'
 
 type Link = { source: string; target: string; value: number }
 
@@ -131,9 +132,6 @@ const Sankey = ({ width, height }: SankeyProps) => {
     return { sourceNodes, activeLinks }
   }
 
-  // I know we're aware of these, just adding placeholder todos 🙂
-  // todo: item.Gender/item.race_and_ethnicity/etc should look more like item[columnName]
-  // todo: remove hard coded values
   const tooltipVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value}`
   const tooltipSummary = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).summary}`
   const tooltipColumn1Label = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1Label
@@ -156,7 +154,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const tooltipColumn1Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn1} />)
   const tooltipColumn2Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn2} />)
 
-  // todo: no hardcode values
+  
   const sankeyToolTip = `<div class="sankey-chart__tooltip">
                     <span class="sankey-chart__tooltip--tooltip-header">${tooltipID}</span>
                     <span class="sankey-chart__tooltip--tooltip-header">${tooltipVal}</span>
@@ -279,8 +277,6 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const allLinks = links.map((link, i) => {
     const linkGenerator = sankeyLinkHorizontal()
     const path = linkGenerator(link)
-    const sourceObj: any = link.source // todo: unused atm
-    const targetObj: any = link.target // todo: unused atm
     let opacityValue = sankeyConfig.opacity.LinkOpacityDefault
     let strokeColor = sankeyConfig.linkColor.default
 
