@@ -10,7 +10,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Icon from '@cdc/core/components/ui/Icon'
 import Modal from '@cdc/core/components/ui/Modal'
-import { Visualization } from '../types/Config'
+import { Visualization } from '@cdc/core/types/Visualization'
 
 const iconHash = {
   'data-bite': <Icon display='databite' base />,
@@ -266,6 +266,19 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
     }
   }, [data?.openModal])
 
+  let isConfigurationReady = false;
+  if(type === 'markup-include' && type === 'filter-dropdowns'){
+    isConfigurationReady = true;
+  } else if(data && data.formattedData) {
+    isConfigurationReady = true;
+  } else if(data && data.dataKey && data.dataDescription && config.datasets[data.dataKey]){
+    let formattedDataAttempt = transform.autoStandardize(config.datasets[data.dataKey].data);
+    formattedDataAttempt = transform.developerStandardize(formattedDataAttempt, data.dataDescription);
+    if(formattedDataAttempt){
+      isConfigurationReady = true;
+    }
+  }
+
   return (
     <>
       <div className='widget' ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
@@ -273,7 +286,7 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
         <div className='widget__content'>
           {data?.rowIdx !== undefined && (
             <div className='widget-menu'>
-              {((data.dataKey && data.dataDescription && (data.formattedData || (config.datasets[data.dataKey] && transform.autoStandardize(config.datasets[data.dataKey].data)))) || type === 'markup-include') && type !== 'filter-dropdowns' && (
+              {isConfigurationReady && (
                 <button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
                   {iconHash['tools']}
                 </button>

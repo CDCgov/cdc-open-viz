@@ -21,6 +21,7 @@ import LineChart from './LineChart'
 import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './../hooks/useIntersectionObserver'
+import Regions from './Regions'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
@@ -107,7 +108,6 @@ const LinearChart = props => {
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush } = useScales({ ...properties, min, max, leftMax, rightMax, dimensions })
 
-  console.log('xScale', xScale.type)
   // sets the portal x/y for where tooltips should appear on the page.
   const [chartPosition, setChartPosition] = useState(null)
   useEffect(() => {
@@ -269,7 +269,7 @@ const LinearChart = props => {
           {!['Spark Line', 'Forest Plot'].includes(visualizationType) && (
             <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
               {props => {
-                const axisCenter = runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
+                const axisCenter = config.orientation === 'horizontal' ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
                 const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
                 return (
                   <Group className='left-axis'>
@@ -345,7 +345,7 @@ const LinearChart = props => {
           {hasRightAxis && (
             <AxisRight scale={yScaleRight} left={Number(width - config.yAxis.rightAxisSize)} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
               {props => {
-                const axisCenter = runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
+                const axisCenter = config.orientation === 'horizontal' ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
                 const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
                 return (
                   <Group className='right-axis'>
@@ -729,48 +729,10 @@ const LinearChart = props => {
               )
             })}
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
-          {config.regions && config.visualizationType !== 'Bar' && config.orientation === 'vertical'
-            ? config.regions.map(region => {
-                if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
-
-                let from
-                let to
-                let width
-
-                if (config.xAxis.type === 'date') {
-                  from = xScale(parseDate(region.from).getTime())
-                  to = xScale(parseDate(region.to).getTime())
-                  width = to - from
-                }
-
-                if (config.xAxis.type === 'categorical') {
-                  from = xScale(region.from)
-                  to = xScale(region.to)
-                  width = to - from
-                }
-
-                if (!from) return null
-                if (!to) return null
-
-                return (
-                  <Group className='regions' left={Number(runtime.yAxis.size)} key={region.label} onMouseMove={handleTooltipMouseOver} onMouseLeave={handleTooltipMouseOff} handleTooltipClick={handleTooltipClick} tooltipData={JSON.stringify(tooltipData)} showTooltip={showTooltip}>
-                    <path
-                      stroke='#333'
-                      d={`M${from} -5
-                          L${from} 5
-                          M${from} 0
-                          L${to} 0
-                          M${to} -5
-                          L${to} 5`}
-                    />
-                    <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-                    <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-                      {region.label}
-                    </Text>
-                  </Group>
-                )
-              })
-            : ''}
+          {/* prettier-ignore */}
+          {config.visualizationType !== 'Bar' && config.visualizationType !== 'Combo' && (
+            <Regions xScale={xScale} handleTooltipClick={handleTooltipClick} handleTooltipMouseOff={handleTooltipMouseOff} handleTooltipMouseOver={handleTooltipMouseOver} showTooltip={showTooltip} hideTooltip={hideTooltip} tooltipData={tooltipData} yMax={yMax} width={width} />
+          )}
           {chartHasTooltipGuides && showTooltip && tooltipData && config.visual.verticalHoverLine && (
             <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
               <Line from={{ x: tooltipData.dataXPosition - 10, y: 0 }} to={{ x: tooltipData.dataXPosition - 10, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />

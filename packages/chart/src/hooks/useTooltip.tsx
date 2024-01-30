@@ -82,7 +82,6 @@ export const useTooltip = props => {
     includedSeries.push(...getColumnNames(config.columns))
 
     const yScaleValues = getYScaleValues(closestXScaleValue, includedSeries)
-
     const xScaleValues = data.filter(d => d[xAxis.dataKey] === getClosestYValue(y))
 
     const resolvedScaleValues = orientation === 'vertical' ? yScaleValues : xScaleValues
@@ -144,7 +143,7 @@ export const useTooltip = props => {
             ?.filter(Boolean)
             ?.flatMap(seriesKey => {
               const formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
-              return resolvedScaleValues?.[0]?.[seriesKey] ? [[seriesKey, formattedValue]] : []
+              return resolvedScaleValues?.[0]?.[seriesKey] ? [[seriesKey, formattedValue, getAxisPosition(seriesKey)]] : []
             })
         )
       }
@@ -252,7 +251,6 @@ export const useTooltip = props => {
       const yPositionOnPlot = visualizationType !== 'Forest Plot' ? yScale(d[config.xAxis.dataKey]) : yScale(index)
 
       const distance = Math.abs(yPositionOnPlot - yPosition)
-
       if (distance < minDistance) {
         minDistance = distance
         closestYValue = key ? d[key] : d[config.xAxis.dataKey]
@@ -307,16 +305,13 @@ export const useTooltip = props => {
    */
   const getYScaleValues = (closestXScaleValue, includedSeries) => {
     try {
-      const formattedDate = formatDate(new Date(closestXScaleValue))
-
       let dataToSearch
 
       if (xAxis.type === 'categorical') {
         dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
       } else {
-        dataToSearch = data.filter(d => formatDate(parseDate(d[xAxis.dataKey])) === formattedDate)
+        dataToSearch = data.filter(d => d[xAxis.dataKey] === closestXScaleValue)
       }
-
       // Return an empty array if no matching data is found.
       if (!dataToSearch || dataToSearch.length === 0) {
         return []

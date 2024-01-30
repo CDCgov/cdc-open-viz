@@ -8,17 +8,6 @@
 
 .cdc-open-viz-module.type-chart {
   .editor-panel {
-    @import './components/panels.scss';
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 350px;
-    background: #fff;
-    z-index: 8;
-
     &.hidden {
       display: none;
     }
@@ -711,14 +700,13 @@
     color: #000;
     font-size: 1em;
     border: 0;
-    position: fixed;
+    position: absolute;
     z-index: 100;
     transition: 0.1s background;
     cursor: pointer;
     width: 25px;
     height: 25px;
     left: 307px;
-    top: 10px;
     box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
 
     &:before {

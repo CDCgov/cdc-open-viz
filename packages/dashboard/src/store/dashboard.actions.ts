@@ -1,4 +1,4 @@
-import type { Config } from '../types/Config'
+import type { DashboardConfig as Config } from '../types/DashboardConfig'
 
 type Action<T, P> = { type: T; payload: P }
 
