@@ -1,0 +1,161 @@
+{
+  "dashboard": {
+    "theme": "theme-blue"
+  },
+  "rows": [
+    [
+      {
+        "width": 6,
+        "widget": "data-bite1706634442474"
+      },
+      {
+        "width": 6,
+        "widget": "data-bite1706634460793"
+      },
+      {
+        "width": null
+      }
+    ]
+  ],
+  "visualizations": {
+    "data-bite1706634442474": {
+      "type": "data-bite",
+      "data": [
+        {
+          "Text": "Number of EMS Responses",
+          "Value": "467136"
+        }
+      ],
+      "dataBite": "",
+      "dataFunction": "Max",
+      "dataColumn": "Value",
+      "bitePosition": "Left",
+      "biteFontSize": 24,
+      "fontSize": "medium",
+      "biteBody": "",
+      "imageData": {
+        "display": "none",
+        "url": "",
+        "alt": "",
+        "options": []
+      },
+      "dataFormat": {
+        "roundToPlace": 0,
+        "commas": true,
+        "prefix": "",
+        "suffix": "%"
+      },
+      "biteStyle": "gradient",
+      "filters": [],
+      "subtext": "",
+      "title": "TITLE 1",
+      "theme": "theme-blue",
+      "shadow": false,
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      },
+      "general": {
+        "isCompactStyle": false
+      },
+      "openModal": false,
+      "uid": "data-bite1706634442474",
+      "visualizationType": "data-bite",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "FIRST DATA BITE",
+      "editing": false,
+      "validated": 4.23
+    },
+    "data-bite1706634460793": {
+      "type": "data-bite",
+      "dataBite": "",
+      "dataFunction": "Max",
+      "dataColumn": "Value",
+      "bitePosition": "Left",
+      "biteFontSize": 24,
+      "fontSize": "medium",
+      "biteBody": "",
+      "imageData": {
+        "display": "none",
+        "url": "",
+        "alt": "",
+        "options": []
+      },
+      "dataFormat": {
+        "roundToPlace": 0,
+        "commas": true,
+        "prefix": "",
+        "suffix": "%"
+      },
+      "biteStyle": "gradient",
+      "filters": [],
+      "subtext": "",
+      "title": "TITLE 2",
+      "theme": "theme-blue",
+      "shadow": false,
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      },
+      "general": {
+        "isCompactStyle": false
+      },
+      "openModal": false,
+      "uid": "data-bite1706634460793",
+      "visualizationType": "data-bite",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "SECOND DATA BITE",
+      "editing": false,
+      "validated": 4.23
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "newViz": true,
+  "datasets": {
+    "FIRST DATA BITE": {
+      "data": [
+        {
+          "Text": "Number of EMS Responses",
+          "Value": "467136"
+        }
+      ],
+      "dataFileSize": 72,
+      "dataFileName": "data.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON",
+      "preview": false
+    },
+    "SECOND DATA BITE": {
+      "data": [
+        {
+          "Text": "Another Bite",
+          "Value": "2000"
+        }
+      ],
+      "dataFileSize": 59,
+      "dataFileName": "data-2.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON",
+      "preview": true
+    }
+  },
+  "type": "dashboard",
+  "runtime": {}
+}
