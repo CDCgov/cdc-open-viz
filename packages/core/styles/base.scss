@@ -58,6 +58,10 @@ body.post-type-cdc_visualization .visx-tooltip {
   z-index: 1000000;
 }
 
+body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
+  top: 0 !important;
+}
+
 .cdc-open-viz-module {
   position: relative;
   color: $baseColor;
@@ -78,7 +82,7 @@ body.post-type-cdc_visualization .visx-tooltip {
   }
 
   .editor-panel {
-    position: absolute !important;
+    position: relative !important;
     top: 0 !important;
   }
 }
