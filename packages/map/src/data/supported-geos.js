@@ -489,7 +489,9 @@ export const supportedCountries = {
   ZWE: ['Zimbabwe'],
   IOT: ['British Indian Ocean Territory'],
   Alaska: ['Alaska'],
-  Hawaii: ['Hawaii']
+  Hawaii: ['Hawaii'],
+  'US-AK': ['Alaska'],
+  'US-HI': ['Hawaii']
 }
 
 export const supportedTerritories = {
