@@ -28,29 +28,31 @@ _.setChannel(i);
 window.__STORYBOOK_ADDONS_CHANNEL__ = i;
 window.CONFIG_TYPE === "DEVELOPMENT" && (window.__STORYBOOK_SERVER_CHANNEL__ = i);
 const p = {
-  "./_stories/Introduction.stories.mdx": async () => import("./storybook-eda75eea.es.js"),
-  "./_stories/Guide.NewStories.stories.mdx": async () => import("./storybook-19a4ab46.es.js"),
-  "./_stories/Guide.NewIcons.stories.mdx": async () => import("./storybook-22ca668c.es.js"),
-  "./_stories/Guide.NewComponents.stories.mdx": async () => import("./storybook-4b5c37c5.es.js"),
-  "./_stories/Contributions.stories.mdx": async () => import("./storybook-0c2a1aae.es.js"),
-  "./packages/waffle-chart/src/_stories/WaffleChart.stories.tsx": async () => import("./storybook-6cc9d32c.es.js"),
-  "./packages/markup-include/src/_stories/MarkupInclude.stories.tsx": async () => import("./storybook-0b92baa6.es.js"),
-  "./packages/map/src/_stories/CdcMap.stories.tsx": async () => import("./storybook-d2f24a59.es.js"),
-  "./packages/data-bite/src/_stories/DataBite.stories.tsx": async () => import("./storybook-bcf4bc21.es.js"),
-  "./packages/dashboard/src/_stories/Dashboard.stories.tsx": async () => import("./storybook-830ae5b1.es.js"),
+  "./_stories/Introduction.stories.mdx": async () => import("./storybook-a59053da.es.js"),
+  "./_stories/Guide.NewStories.stories.mdx": async () => import("./storybook-7210c201.es.js"),
+  "./_stories/Guide.NewIcons.stories.mdx": async () => import("./storybook-96fa3619.es.js"),
+  "./_stories/Guide.NewComponents.stories.mdx": async () => import("./storybook-0bb9982d.es.js"),
+  "./_stories/Contributions.stories.mdx": async () => import("./storybook-e38fcd55.es.js"),
+  "./packages/waffle-chart/src/_stories/WaffleChart.stories.tsx": async () => import("./storybook-62a3335b.es.js"),
+  "./packages/markup-include/src/_stories/MarkupInclude.stories.tsx": async () => import("./storybook-c9a21f3d.es.js"),
+  "./packages/map/src/_stories/CdcMap.stories.tsx": async () => import("./storybook-c063f006.es.js"),
+  "./packages/editor/src/_stories/Editor.stories.tsx": async () => import("./storybook-5ae4adb6.es.js"),
+  "./packages/data-bite/src/_stories/DataBite.stories.tsx": async () => import("./storybook-e23415e0.es.js"),
+  "./packages/dashboard/src/_stories/Dashboard.stories.tsx": async () => import("./storybook-5dedba2b.es.js"),
   "./packages/core/components/_stories/Table.stories.tsx": async () => import("./storybook-17800994.es.js"),
-  "./packages/core/components/_stories/MultiSelect.stories.tsx": async () => import("./storybook-cae51ea9.es.js"),
+  "./packages/core/components/_stories/MultiSelect.stories.tsx": async () => import("./storybook-8a914b15.es.js"),
   "./packages/core/components/_stories/Inputs.stories.tsx": async () => import("./storybook-f0ab469f.es.js"),
-  "./packages/core/components/_stories/EditorPanel.stories.tsx": async () => import("./storybook-24bfe563.es.js"),
-  "./packages/core/components/_stories/DataTable.stories.tsx": async () => import("./storybook-4a9725db.es.js"),
-  "./packages/chart/src/_stories/ChartSuppress.stories.tsx": async () => import("./storybook-54e554f6.es.js"),
-  "./packages/chart/src/_stories/ChartEditor.stories.tsx": async () => import("./storybook-91c0117f.es.js"),
-  "./packages/chart/src/_stories/ChartBrush.stories.tsx": async () => import("./storybook-706ab305.es.js"),
-  "./packages/chart/src/_stories/Chart.tooltip.stories.tsx": async () => import("./storybook-82a7e36b.es.js"),
-  "./packages/chart/src/_stories/Chart.stories.tsx": async () => import("./storybook-04eb29f2.es.js"),
+  "./packages/core/components/_stories/EditorPanel.stories.tsx": async () => import("./storybook-bd15af70.es.js"),
+  "./packages/core/components/_stories/DataTable.stories.tsx": async () => import("./storybook-5807a35f.es.js"),
+  "./packages/chart/src/_stories/ChartSuppress.stories.tsx": async () => import("./storybook-c90b3256.es.js"),
+  "./packages/chart/src/_stories/ChartEditor.stories.tsx": async () => import("./storybook-ace2716f.es.js"),
+  "./packages/chart/src/_stories/ChartBrush.stories.tsx": async () => import("./storybook-aab3150e.es.js"),
+  "./packages/chart/src/_stories/Chart.tooltip.stories.tsx": async () => import("./storybook-170aeaf5.es.js"),
+  "./packages/chart/src/_stories/Chart.stories.tsx": async () => import("./storybook-4aeb80bf.es.js"),
   "./packages/core/components/ui/_stories/Title.stories.tsx": async () => import("./storybook-074f4ef7.es.js"),
-  "./packages/core/components/ui/_stories/Icon.stories.tsx": async () => import("./storybook-e9d531d0.es.js"),
-  "./packages/core/components/ui/_stories/Accordion.stories.tsx": async () => import("./storybook-887a2db9.es.js"),
+  "./packages/core/components/ui/_stories/Icon.stories.tsx": async () => import("./storybook-d38876f0.es.js"),
+  "./packages/core/components/ui/_stories/Colors.stories.tsx": async () => import("./storybook-0f35c27a.es.js"),
+  "./packages/core/components/ui/_stories/Accordion.stories.tsx": async () => import("./storybook-3a800ff2.es.js"),
   "./packages/core/components/managers/_stories/DataDesigner.stories.tsx": async () => import("./storybook-55b16a59.es.js"),
   "./packages/core/components/elements/_stories/Card.stories.tsx": async () => import("./storybook-26ffaadf.es.js"),
   "./packages/core/components/elements/_stories/Button.stories.tsx": async () => import("./storybook-ba9904c8.es.js")
@@ -58,12 +60,12 @@ const p = {
 async function m(e) {
   return p[e]();
 }
-const { composeConfigs: O, PreviewWeb: d, ClientApi: u } = __STORYBOOK_MODULE_PREVIEW_API__, l = async () => {
+const { composeConfigs: d, PreviewWeb: O, ClientApi: u } = __STORYBOOK_MODULE_PREVIEW_API__, l = async () => {
   const e = await Promise.all([
     import("./storybook-06b0f87c.es.js"),
-    import("./storybook-f672732e.es.js"),
+    import("./storybook-2fa384ab.es.js"),
     import("./storybook-f74a5d48.es.js"),
-    import("./storybook-625d3326.es.js"),
+    import("./storybook-cd00dc8b.es.js"),
     import("./storybook-a0b578d2.es.js"),
     import("./storybook-5495d9d8.es.js"),
     import("./storybook-4185a951.es.js"),
@@ -72,9 +74,9 @@ const { composeConfigs: O, PreviewWeb: d, ClientApi: u } = __STORYBOOK_MODULE_PR
     import("./storybook-22bc17d8.es.js"),
     import("./storybook-0b530603.es.js")
   ]);
-  return O(e);
+  return d(e);
 };
-window.__STORYBOOK_PREVIEW__ = window.__STORYBOOK_PREVIEW__ || new d();
+window.__STORYBOOK_PREVIEW__ = window.__STORYBOOK_PREVIEW__ || new O();
 window.__STORYBOOK_STORY_STORE__ = window.__STORYBOOK_STORY_STORE__ || window.__STORYBOOK_PREVIEW__.storyStore;
 window.__STORYBOOK_CLIENT_API__ = window.__STORYBOOK_CLIENT_API__ || new u({ storyStore: window.__STORYBOOK_PREVIEW__.storyStore });
 window.__STORYBOOK_PREVIEW__.initialize({ importFn: m, getProjectAnnotations: l });
