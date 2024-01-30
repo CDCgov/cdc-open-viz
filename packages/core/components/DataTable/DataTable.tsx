@@ -17,13 +17,12 @@ import regionCellMatrix from './helpers/regionCellMatrix'
 import boxplotCellMatrix from './helpers/boxplotCellMatrix'
 import customColumns from './helpers/customColumns'
 import { TableConfig } from './types/TableConfig'
+import { Column } from '../../types/Column'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
   colorScale?: Function
-  columns?: { navigate: { name: string } }
-  // determines if columns should be wrapped in the table
-  wrapColumns?: boolean
+  columns?: Record<string, Column>
   config: TableConfig
   dataConfig?: Object
   displayDataAsText?: Function
@@ -32,15 +31,22 @@ export type DataTableProps = {
   formatLegendLocation?: Function
   groupBy?: string
   headerColor?: string
+  imageRef?: string
   indexTitle?: string
+  isDebug?: boolean
+  isEditor?: boolean
   navigationHandler?: Function
+  outerContainerRef?: Function
   rawData: Object[]
   runtimeData: Object[] | Record<string, Object> // UNSAFE
   setFilteredCountryCode?: Function // used for Maps only
+  showDownloadButton?: boolean
   tabbingId: string
   tableTitle: string
   viewport: string
   vizTitle?: string
+  // determines if columns should be wrapped in the table
+  wrapColumns?: boolean
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
@@ -92,7 +98,7 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const _runtimeData = config.table.customTableConfig ? customColumns(runtimeData, config.table.excludeColumns) : runtimeData
+  const _runtimeData = config.table.customTableConfig ? customColumns(rawData, config.table.excludeColumns) : runtimeData
 
   const rawRows = Object.keys(_runtimeData)
   const rows = isVertical
@@ -117,7 +123,7 @@ const DataTable = (props: DataTableProps) => {
     OverflowY: 'scroll'
   }
 
-  const hasRowType = !!Object.keys(rawData[0]).find((v: string) => v.match(/row[_-]?type/i))
+  const hasRowType = !!Object.keys(rawData?.[0] || {}).find((v: string) => v.match(/row[_-]?type/i))
 
   const caption = useMemo(() => {
     if (config.type === 'map') {
@@ -126,6 +132,13 @@ const DataTable = (props: DataTableProps) => {
       return config.table.caption ? config.table.caption : `Data table showing data for the ${config.type} figure.`
     }
   }, [config.table.caption])
+
+  // Determines if a relative region is being shown to the user.
+  // If a relative region is found we don't want to display the data table.
+  // Takes backwards compatibility into consideration, ie !region.toType || !region.fromType
+  const noRelativeRegions = config?.regions?.every(region => {
+    return (region.toType === 'Fixed' && region.fromType === 'Fixed') || (!region.toType && !region.fromType) || (!region.toType && region.fromType === 'Fixed') || (!region.fromType && region.toType === 'Fixed')
+  })
 
   // prettier-ignore
   const tableData = useMemo(() => (
@@ -169,7 +182,7 @@ const DataTable = (props: DataTableProps) => {
             />
 
             {/* REGION Data Table */}
-            {config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' && (
+            {noRelativeRegions && config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' && (
               <Table
                 wrapColumns={wrapColumns}
                 childrenMatrix={regionCellMatrix({ config })}

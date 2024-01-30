@@ -279,6 +279,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         uid = row[state.columns.geo.name]
       }
 
+      if(!uid && (state.columns.latitude?.name && state.columns.longitude?.name && row[state.columns.latitude?.name] && row[state.columns.longitude?.name])){
+        uid = row[state.columns.geo.name]
+      }
+
       if (uid) {
         Object.defineProperty(row, 'uid', {
           value: uid,
@@ -687,12 +691,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
           dataSet.forEach((row, dataIndex) => {
             let number = row[state.columns.primary.name]
-            let updated = 0
-
-            // check if we're seperating zero out
-            updated = state.legend.separateZero && hasZeroInData ? index : index
-            // check for special classes
-            updated = state.legend.specialClasses ? updated + state.legend.specialClasses.length : index
+            let updated = result.length - 1
 
             if (result[updated]?.min === (null || undefined) || result[updated]?.max === (null || undefined)) return
 

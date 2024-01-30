@@ -1,45 +1,30 @@
-import { type PreliminaryDataItem, DataItem, Config } from './LineChartProps'
+import { type PreliminaryDataItem, DataItem, StyleProps, Style } from './LineChartProps'
 
-export const splitData = (seriesKey: string, data: DataItem[], config: Config) => {
-  const validPreliminaryData = config.preliminaryData.filter(pd => pd.seriesKey && pd.column && pd.value && pd.type && pd.style)
+export const createStyles = (props: StyleProps): Style[] => {
+  const { preliminaryData, rawData, stroke, handleLineType, lineType, seriesKey } = props
 
-  const getMatchingPd = (point: DataItem) => validPreliminaryData.find(pd => pd.seriesKey === seriesKey && point[pd.column] === pd.value && pd.type === 'effect' && pd.style !== 'Open Circles')
+  const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(pd => pd.seriesKey && pd.column && pd.value && pd.type && pd.style)
+  const getMatchingPd = (point: DataItem): PreliminaryDataItem => validPreliminaryData.find(pd => pd.seriesKey === seriesKey && point[pd.column] === pd.value && pd.type === 'effect' && pd.style !== 'Open Circles')
 
-  const createSegment = (points: DataItem[], dashed: boolean, style: string) => ({
-    data: points.filter(Boolean), // Filter out any null/undefined points
-    dashed,
-    lineType: style
+  let styles: Style[] = []
+  const createStyle = (lineStyle): Style => ({
+    stroke: stroke,
+    strokeWidth: 2,
+    strokeDasharray: lineStyle
   })
 
-  let segments = []
-  let currentSegment: DataItem[] = []
+  rawData.forEach((d, index) => {
+    let matchingPd: PreliminaryDataItem = getMatchingPd(d)
+    let style: Style = matchingPd ? createStyle(handleLineType(matchingPd.style)) : createStyle(handleLineType(lineType))
 
-  data.forEach((d, index) => {
-    const matchingPd = getMatchingPd(d)
-    const nextD = data[index + 1]
-    const isNextMatch = nextD && getMatchingPd(nextD)
+    styles.push(style)
 
-    if (matchingPd) {
-      if (currentSegment.length > 0) {
-        segments.push(createSegment(currentSegment, false, 'none'))
-        currentSegment = []
-      }
-
-      const dashedSegment = index > 0 ? [data[index - 1], d, nextD] : [d, nextD]
-
-      segments.push(createSegment(dashedSegment, true, matchingPd.style))
-
-      if (isNextMatch) index++
-    } else {
-      currentSegment.push(d)
+    // If matchingPd exists, update the previous style if there is a previous element
+    if (matchingPd && index > 0) {
+      styles[index - 1] = createStyle(handleLineType(matchingPd.style))
     }
   })
-
-  if (currentSegment.length > 0) {
-    segments.push(createSegment(currentSegment, false, 'none'))
-  }
-
-  return segments
+  return styles as Style[]
 }
 
 export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: DataItem[], seriesKey: string): DataItem[] => {

@@ -1,26 +1,21 @@
-const getLabel = (name, config) => {
-  let custLabel = ''
-  if (config.columns && Object.keys(config.columns).length > 0) {
-    Object.keys(config.columns).forEach(function (key) {
-      var tmpColumn = config.columns[key]
-      // add if not the index AND it is enabled to be added to data table
-      if (tmpColumn.name === name) {
-        custLabel = tmpColumn.label
-      }
-    })
-    return custLabel
+import { TableConfig } from '../types/TableConfig'
+
+const getLabel = (name: string, config: TableConfig) => {
+  const columns = Object.values(config.columns || {})
+  const matchingConfiguredColumn = columns.find(col => col.name === name)
+  if (matchingConfiguredColumn?.label) {
+    return matchingConfiguredColumn.label
   }
+  return name
 }
 
-export const getSeriesName = (column, config) => {
+export const getSeriesName = (column: string, config: TableConfig) => {
   // If a user sets the name on a series use that.
-  let userUpdatedSeriesName = config.series ? config.series.filter(series => series.dataKey === column)?.[0]?.name : ''
-  if (userUpdatedSeriesName) return userUpdatedSeriesName
-
+  const userDefinedSeries = config.series?.find(series => series.dataKey === column)
+  if (userDefinedSeries?.name) {
+    return userDefinedSeries.name
+  }
   if (config.runtimeSeriesLabels && config.runtimeSeriesLabels[column]) return config.runtimeSeriesLabels[column]
-
-  let custLabel = getLabel(column, config) ? getLabel(column, config) : column
-  let text = column === config.xAxis?.dataKey ? config.table.indexLabel : custLabel
-
-  return text
+  const columnIsDataKey = column === config.xAxis?.dataKey
+  return columnIsDataKey ? config.table.indexLabel : getLabel(column, config)
 }

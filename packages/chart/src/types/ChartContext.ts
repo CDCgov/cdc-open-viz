@@ -1,14 +1,23 @@
 import { type ChartConfig } from './ChartConfig'
+import { PickD3Scale } from '@visx/scale'
 
-type TransformedData = {
+export type ColorScale = PickD3Scale<'ordinal', any, any>
+
+export type TransformedData = {
   dataKey?: string
   [key: string]: any
 }
 
-// Line Chart Specific Context
-type LineChartContext = {
-  colorScale: Function
+type SharedChartContext = {
+  colorScale?: ColorScale
   config: ChartConfig
+  currentViewport?: string
+  highlight?: Function
+  highlightReset?: Function
+}
+
+// Line Chart Specific Context
+type LineChartContext = SharedChartContext & {
   dimensions: [screenWidth: number, screenHeight: number]
   formatDate: Function
   formatNumber: Function
@@ -17,18 +26,18 @@ type LineChartContext = {
   isDebug?: boolean
   parseDate: Function
   rawData: Object[]
-  seriesHighlight: String[]
+  seriesHighlight: string[]
   tableData: Object[]
   transformedData: TransformedData[]
   updateConfig: Function
   visualizationType: 'Line'
+  colorPalettes: Record<string, string[]>
+  twoColorPalette: Record<string, string[]>
 }
 
 export type ChartContext =
   | LineChartContext
-  | {
-      colorScale?: Function
-      config?: ChartConfig
+  | (SharedChartContext & {
       dimensions: [screenWidth: number, screenHeight: number]
       formatDate?: Function
       formatNumber?: Function
@@ -38,10 +47,12 @@ export type ChartContext =
       isDebug?: boolean
       parseDate?: Function
       rawData?: Object[]
-      seriesHighlight?: String[]
+      seriesHighlight?: string[]
       tableData?: Object[]
       transformedData?: TransformedData[]
       setSharedFilter?: Function
       sharedFilterValue?: string
       updateConfig?: Function
-    }
+      colorPalettes: any
+      twoColorPalette: any
+    })

@@ -7,6 +7,7 @@ import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { FaStar } from 'react-icons/fa'
+import Regions from './../../Regions'
 
 // third party
 import chroma from 'chroma-js'
@@ -323,49 +324,7 @@ export const BarChartVertical = () => {
             })
           : ''}
 
-        {config.regions && config.visualizationType !== 'Combo'
-          ? config.regions.map(region => {
-              if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
-
-              let from
-              let to
-              let width
-
-              if (config.xAxis.type === 'date') {
-                from = xScale(parseDate(region.from).getTime()) - (barWidth * totalBarsInGroup) / 2
-                to = xScale(parseDate(region.to).getTime()) + (barWidth * totalBarsInGroup) / 2
-
-                width = to - from
-              }
-
-              if (config.xAxis.type === 'categorical') {
-                from = xScale(region.from)
-                to = xScale(region.to)
-                width = to - from
-              }
-
-              if (!from) return null
-              if (!to) return null
-
-              return (
-                <Group className='regions' left={0} key={region.label}>
-                  <path
-                    stroke='#333'
-                    d={`M${from} -5
-                          L${from} 5
-                          M${from} 0
-                          L${to} 0
-                          M${to} -5
-                          L${to} 5`}
-                  />
-                  <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-                  <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-                    {region.label}
-                  </Text>
-                </Group>
-              )
-            })
-          : ''}
+        <Regions xScale={xScale} yMax={yMax} barWidth={barWidth} totalBarsInGroup={totalBarsInGroup} />
       </Group>
     )
   )

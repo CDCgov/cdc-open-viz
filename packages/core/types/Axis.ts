@@ -32,6 +32,7 @@ export type Axis = {
   rightMax?: string
   rightNumTicks?: number
   sortDates?: boolean
+  sortKey?: string
   showTargetLabel?: boolean
   size?: number
   target?: number
