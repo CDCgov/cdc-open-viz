@@ -1,6 +1,5 @@
 import { SankeyGraph, sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey'
-import React from 'react'
-import ReactDOMServer from 'react-dom/server';
+import ReactDOMServer from 'react-dom/server'
 import './sankey.scss'
 import { useContext, useState, useRef, useEffect } from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
@@ -9,10 +8,6 @@ import ConfigContext from '@cdc/chart/src/ConfigContext'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { ChartContext } from '../../types/ChartContext'
-
-import { KPIComponent } from '@cdc/data-bite/src/components/KPIComponent'
-import HTMLReactParser from 'html-react-parser'
-
 
 type Link = { source: string; target: string; value: number }
 
@@ -108,44 +103,43 @@ const Sankey = ({ width, height }: SankeyProps) => {
   }
 
   const activeConnection = (id: String) => {
-    const currentNode = sankeyData.nodes.find(node => node.id === id);
+    const currentNode = sankeyData.nodes.find(node => node.id === id)
 
-    const sourceNodes = [];
-    const activeLinks = [];
+    const sourceNodes = []
+    const activeLinks = []
 
     if (currentNode) {
-      links.forEach((link) => {
+      links.forEach(link => {
         const targetObj: any = link.target
         const sourceObj: any = link.source
-        if(targetObj.id === id) {
-          sourceNodes.push(sourceObj.id);
+        if (targetObj.id === id) {
+          sourceNodes.push(sourceObj.id)
         }
       })
 
-      sourceNodes.forEach((id) => {
-        links.forEach((link) => {
+      sourceNodes.forEach(id => {
+        links.forEach(link => {
           const targetObj: any = link.target
           const sourceObj: any = link.source
-          if(targetObj.id === tooltipID && sourceObj.id === id) {
-            activeLinks.push(link);
+          if (targetObj.id === tooltipID && sourceObj.id === id) {
+            activeLinks.push(link)
           }
         })
-
       })
     }
 
-    return {sourceNodes, activeLinks}
+    return { sourceNodes, activeLinks }
   }
 
   // I know we're aware of these, just adding placeholder todos 🙂
   // todo: item.Gender/item.race_and_ethnicity/etc should look more like item[columnName]
   // todo: remove hard coded values
-  const tooltipVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value}`;
-  const tooltipSummary = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).summary}`;
-  const tooltipColumn1Label = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1Label;
-  const tooltipColumn2Label = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column2Label;
-  const tooltipColumn1 = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1;
-  const tooltipColumn2 = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column2;
+  const tooltipVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value}`
+  const tooltipSummary = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).summary}`
+  const tooltipColumn1Label = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1Label
+  const tooltipColumn2Label = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column2Label
+  const tooltipColumn1 = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1
+  const tooltipColumn2 = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column2
 
   const ColumnList = ({ columnData }) => {
     return (
@@ -156,11 +150,11 @@ const Sankey = ({ width, height }: SankeyProps) => {
           </li>
         ))}
       </ul>
-    );
-  };
+    )
+  }
 
-  const tooltipColumn1Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn1} />);
-  const tooltipColumn2Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn2} />);
+  const tooltipColumn1Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn1} />)
+  const tooltipColumn2Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn2} />)
 
   // todo: no hardcode values
   const sankeyToolTip = `<div class="sankey-chart__tooltip">
@@ -184,7 +178,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   // Draw the nodes
   const allNodes = sankeyData.nodes.map((node, i) => {
     let { textPositionHorizontal, textPositionVertical, classStyle, storyNodes } = nodeStyle(node.id)
-    let { sourceNodes } = activeConnection(tooltipID);
+    let { sourceNodes } = activeConnection(tooltipID)
 
     let opacityValue = sankeyConfig.opacity.nodeOpacityDefault
     let nodeColor = sankeyConfig.nodeColor.default
@@ -193,7 +187,6 @@ const Sankey = ({ width, height }: SankeyProps) => {
       nodeColor = sankeyConfig.nodeColor.inactive
       opacityValue = sankeyConfig.opacity.nodeOpacityInactive
     }
-
 
     return (
       <Group className='' key={i} innerRef={el => (groupRefs.current[i] = el)}>
@@ -298,21 +291,12 @@ const Sankey = ({ width, height }: SankeyProps) => {
       opacityValue = sankeyConfig.opacity.LinkOpacityInactive
     }
 
-    return (
-      <path
-        key={i}
-        d={path!}
-        stroke={strokeColor}
-        fill='none'
-        strokeOpacity={opacityValue}
-        strokeWidth={link.width! + 2}
-      />
-    )
+    return <path key={i} d={path!} stroke={strokeColor} fill='none' strokeOpacity={opacityValue} strokeWidth={link.width! + 2} />
   })
 
   return (
     <>
-    <div className='sankey-chart'>
+      <div className='sankey-chart'>
         <svg className='sankey-chart__diagram' width={width} height={height} style={{ overflow: 'visible' }}>
           <Group className='links'>{allLinks}</Group>
           <Group className='nodes'>{allNodes}</Group>

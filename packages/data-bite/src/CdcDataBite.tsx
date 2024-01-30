@@ -10,7 +10,7 @@ import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Title from '@cdc/core/components/ui/Title'
 import CircleCallout from './components/CircleCallout'
-import KPIComponent from './components/KPIComponent'
+import GradientBite from './components/GradientBite'
 
 // external
 import ResizeObserver from 'resize-observer-polyfill'
@@ -492,7 +492,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 </div>
                 {isBottom && <DataImage />}
                 {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
-                {showBite && 'gradient' === biteStyle && <KPIComponent label={sankeyConfig.data.KPIs[0].label} value={sankeyConfig.data.KPIs[0].value}/>}
               </div>
             </div>
           </div>
@@ -509,9 +508,19 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   return (
     <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
-      <div className={classNames.join(' ')} ref={outerContainerRef}>
-        {body}
-      </div>
+      {biteStyle !== 'gradient' && (
+        <div className={classNames.join(' ')} ref={outerContainerRef}>
+          {body}
+        </div>
+      )}
+      {'gradient' === biteStyle && (
+        <div className={classNames.join(' ')} ref={outerContainerRef}>
+          {isEditor && <EditorPanel />}
+          <div className={isEditor ? 'spacing-wrapper' : ''}>
+            <GradientBite label={config.title} value={calculateDataBite()} />
+          </div>
+        </div>
+      )}
     </Context.Provider>
   )
 }
