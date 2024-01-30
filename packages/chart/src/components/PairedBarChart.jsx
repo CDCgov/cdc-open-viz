@@ -20,6 +20,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
   const groupOne = {
     parentKey: config.dataDescription.seriesKey,
     dataKey: config.series[0].dataKey,
+    dataKeyLabel: config.runtime.seriesLabels[config.series[0].dataKey] || config.series[0].dataKey,
     color: colorScale(config.runtime.seriesLabels[config.series[0].dataKey]),
     max: Math.max.apply(
       Math,
@@ -31,6 +32,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
   const groupTwo = {
     parentKey: config.dataDescription.seriesKey,
     dataKey: config.series[1].dataKey,
+    dataKeyLabel: config.runtime.seriesLabels[config.series[1].dataKey] || config.series[1].dataKey,
     color: colorScale(config.runtime.seriesLabels[config.series[1].dataKey]),
     max: Math.max.apply(
       Math,
@@ -59,7 +61,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
 
   const dataTipOne = d => {
     return `<p>
-				${config.dataDescription.seriesKey}: ${groupOne.dataKey}<br/>
+				${config.dataDescription.seriesKey}: ${groupOne.dataKeyLabel}<br/>
 				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
 				${label}${formatNumber(d[groupOne.dataKey], 'left')}
 			</p>`
@@ -67,7 +69,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
 
   const dataTipTwo = d => {
     return `<p>
-				${config.dataDescription.seriesKey}: ${groupTwo.dataKey}<br/>
+				${config.dataDescription.seriesKey}: ${groupTwo.dataKeyLabel}<br/>
 				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
 				${label}${formatNumber(d[groupTwo.dataKey], 'left')}
 			</p>`
