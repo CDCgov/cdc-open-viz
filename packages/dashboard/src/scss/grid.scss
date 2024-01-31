@@ -3,14 +3,14 @@ $red: #f74242;
 
 .layout-container {
   display: flex;
-  margin-top: -90vh;
-  margin-left: calc(350px + 1em);
+  margin-top: -80vh;
+  margin-left: calc($editorWidth + 1em);
 }
 
 .visualizations-panel {
   background-color: #fff;
   padding: 1em;
-  width: 350px;
+  width: $editorWidth;
   border-right: #c7c7c7 1px solid;
   z-index: 1;
   overflow-y: scroll;
