@@ -178,746 +178,761 @@
     "tooltips": [
         {
           "node": "Suicide EMS Responses",
-          "value": "467,136",
-          "value_pct": "100",
+          "value": "467,136 (100%)",
           "summary": "Total number of suicide EMS responses.",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "218,195",
-                "dem_pct": "46.71"
+                "label": "Female",
+                "value": "218,195",
+                "additional_info": "46.71"
               },
               {
-                "gender": "Male",
-                "dem_value": "243,481",
-                "dem_pct": "52.12"
+                "label": "Male",
+                "value": "243,481",
+                "additional_info": "52.12"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "5,460",
-                "dem_pct": "1.17"
+                "label": "Unknown",
+                "value": "5,460",
+                "additional_info": "1.17"
               }
   
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
            {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "245,998",
-              "dem_pct": "52.66"
+              "label": "Non-Hispanic White",
+              "value": "245,998",
+              "additional_info": "52.66"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "93,244",
-              "dem_pct": "19.96"
+              "label": "Non-Hispanic Black",
+              "value": "93,244",
+              "additional_info": "19.96"
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "41,396",
-              "dem_pct": "8.86"
+              "label": "Hispanic",
+              "value": "41,396",
+              "additional_info": "8.86"
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "4,470",
-              "dem_pct": "0.96"
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "4,470",
+              "additional_info": "0.96"
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "6,160",
-              "dem_pct": "1.32"
+              "label": "Non-Hispanic Asian",
+              "value": "6,160",
+              "additional_info": "1.32"
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "1,287",
-              "dem_pct": "0.28" 
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "1,287",
+              "additional_info": "0.28" 
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "74,581",
-              "dem_pct": "15.97"
+              "label": "Missing",
+              "value" : "74,581",
+              "additional_info": "15.97"
             }
           ]
-  
         },
         {
           "node": "Dead",
-          "value": "4,736",
-          "value_pct": "1.01",
+          "value": "4,736 (1.01%)",
           "summary": "Patiend Died",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "1,244",
-                "dem_pct": "26.47"
+                "label": "Female",
+                "value": "1,244",
+                "additional_info": "26.47"
               },
               {
-                "gender": "Male",
-                "dem_value": "3,440",
-                "dem_pct": "72.64"
+                "label": "Male",
+                "value": "3,440",
+                "additional_info": "72.64"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "52",
-                "dem_pct": "1.1"
+                "label": "Unknown",
+                "value": "52",
+                "additional_info": "1.1"
               }
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
             {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "3,235",
-              "dem_pct": "68.31"
+              "label": "Non-Hispanic White",
+              "value": "3,235",
+              "additional_info": "68.31"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "307",
-              "dem_pct": "6.48"
+              "label": "Non-Hispanic Black",
+              "value": "307",
+              "additional_info": "6.48"
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "242",
-              "dem_pct": "5.11"
+              "label": "Hispanic",
+              "value": "242",
+              "additional_info": "5.11"
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "26",
-              "dem_pct": "0.55"
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "26",
+              "additional_info": "0.55"
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "81",
-              "dem_pct": "1.71"
+              "label": "Non-Hispanic Asian",
+              "value": "81",
+              "additional_info": "1.71"
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "--",
-              "dem_pct": "--"
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "--",
+              "additional_info": "--"
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "834",
-              "dem_pct": "17.61"
+              "label": "Missing",
+              "value" : "834",
+              "additional_info": "17.61"
             }
           ]
         },
         {
           "node": "Released",
-          "value": "27,252",
+          "value": "27,252 (5.83%)",
           "value_pct": "5.83",
           "summary": "Patient was released.",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "13,835",
-                "dem_pct": "50.77"
+                "label": "Female",
+                "value": "13,835",
+                "additional_info": "50.77"
               },
               {
-                "gender": "Male",
-                "dem_value": "12,900",
-                "dem_pct": "47.34"
+                "label": "Male",
+                "value": "12,900",
+                "additional_info": "47.34"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "517",
-                "dem_pct": "1.9"
+                "label": "Unknown",
+                "value": "517",
+                "additional_info": "1.9"
               }
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
             {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "15,088",
-              "dem_pct": "55.36"
+              "label": "Non-Hispanic White",
+              "value": "15,088",
+              "additional_info": "55.36"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "4,749",
-              "dem_pct": "17.43"
+              "label": "Non-Hispanic Black",
+              "value": "4,749",
+              "additional_info": "17.43"
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "2,177",
-              "dem_pct": "7.99"
+              "label": "Hispanic",
+              "value": "2,177",
+              "additional_info": "7.99"
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "287",
-              "dem_pct": "1.05"
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "287",
+              "additional_info": "1.05"
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "321",
-              "dem_pct": "1.18"
+              "label": "Non-Hispanic Asian",
+              "value": "321",
+              "additional_info": "1.18"
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "65",
-              "dem_pct": "0.24" 
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "65",
+              "additional_info": "0.24" 
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "4,565",
-              "dem_pct": "16.75"
+              "label": "Missing",
+              "value" : "4,565",
+              "additional_info": "16.75"
             }
           ]
         },
         {
           "node": "Transported to facility",
-          "value": "4,504",
-          "value_pct": "0.96",
+          "value": "4,504 (0.96%)",
           "summary": "Patient was transported to a facility.",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "1,938",
-                "dem_pct": "43.03"
+                "label": "Female",
+                "value": "1,938",
+                "additional_info": "43.03"
               },
               {
-                "gender": "Male",
-                "dem_value": "2,522",
-                "dem_pct": "55.99"
+                "label": "Male",
+                "value": "2,522",
+                "additional_info": "55.99"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "44",
-                "dem_pct": "0.98"
+                "label": "Unknown",
+                "value": "44",
+                "additional_info": "0.98"
               }
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
            {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "2,093",
-              "dem_pct": "46.47"
+              "label": "Non-Hispanic White",
+              "value": "2,093",
+              "additional_info": "46.47"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "1,113",
-              "dem_pct": "24.71"
+              "label": "Non-Hispanic Black",
+              "value": "1,113",
+              "additional_info": "24.71"
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "608",
-              "dem_pct": "13.5"
+              "label": "Hispanic",
+              "value": "608",
+              "additional_info": "13.5"
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "73",
-              "dem_pct": "1.62"
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "73",
+              "additional_info": "1.62"
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "48",
-              "dem_pct": "1.07"
+              "label": "Non-Hispanic Asian",
+              "value": "48",
+              "additional_info": "1.07"
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "--",
-              "dem_pct": "--" 
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "--",
+              "additional_info": "--" 
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "564",
-              "dem_pct": "12.52"
+              "label": "Missing",
+              "value" : "564",
+              "additional_info": "12.52"
             }
           ]
         },
         {
           "node": "Transported to hospital",
-          "value": "424,380",
-          "value_pct": "90.85",
+          "value": "424,380 (90.85%)",
           "summary": "Patient was transported to the hospital by the EMS Unit or another EMS unit.",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "199,301",
-                "dem_pct": "46.96"
+                "label": "Female",
+                "value": "199,301",
+                "additional_info": "46.96"
               },
               {
-                "gender": "Male",
-                "dem_value": "222,583",
-                "dem_pct": "52.45"
+                "label": "Male",
+                "value": "222,583",
+                "additional_info": "52.45"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "2,496",
-                "dem_pct": "0.59"
+                "label": "Unknown",
+                "value": "2,496",
+                "additional_info": "0.59"
               }
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
            {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "223,907",
-              "dem_pct": "52.76"
+              "label": "Non-Hispanic White",
+              "value": "223,907",
+              "additional_info": "52.76"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "86,562",
-              "dem_pct": "20.4"
+              "label": "Non-Hispanic Black",
+              "value": "86,562",
+              "additional_info": "20.4"
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "38,084",
-              "dem_pct": "8.97"
+              "label": "Hispanic",
+              "value": "38,084",
+              "additional_info": "8.97"
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "4,036",
-              "dem_pct": "0.95"
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "4,036",
+              "additional_info": "0.95"
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "5,650",
-              "dem_pct": "1.33"
+              "label": "Non-Hispanic Asian",
+              "value": "5,650",
+              "additional_info": "1.33"
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "1,193",
-              "dem_pct": "0.28" 
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "1,193",
+              "additional_info": "0.28" 
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "64,954",
-              "dem_pct": "15.31"
+              "label": "Missing",
+              "value" : "64,954",
+              "additional_info": "15.31"
             }
           ]
         },
         {
           "node": "Assisted",
-          "value": "5,701",
+          "value": "5,701 (1.22%)",
           "value_pct": "1.22",
           "summary": "EMS unit only provided assistance (e.g., manpower, equipment) to another agency, member of the public, or another EMS unit.",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "1,791",
-                "dem_pct": "31.42"
+                "label": "Female",
+                "value": "1,791",
+                "additional_info": "31.42"
               },
               {
-                "gender": "Male",
-                "dem_value": "1,910",
-                "dem_pct": "33.5"
+                "label": "Male",
+                "value": "1,910",
+                "additional_info": "33.5"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "2,000",
-                "dem_pct": "35.08"
+                "label": "Unknown",
+                "value": "2,000",
+                "additional_info": "35.08"
               }
   
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
            {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "1,593",
-              "dem_pct": "27.94"
+              "label": "Non-Hispanic White",
+              "value": "1,593",
+              "additional_info": "27.94"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "491",
-              "dem_pct": "8.61"
+              "label": "Non-Hispanic Black",
+              "value": "491",
+              "additional_info": "8.61"
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "270",
-              "dem_pct": "4.74"
+              "label": "Hispanic",
+              "value": "270",
+              "additional_info": "4.74"
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "41",
-              "dem_pct": "0.72"
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "41",
+              "additional_info": "0.72"
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "57",
-              "dem_pct": "1"
+              "label": "Non-Hispanic Asian",
+              "value": "57",
+              "additional_info": "1"
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "--",
-              "dem_pct": "--" 
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "--",
+              "additional_info": "--" 
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "3,237",
-              "dem_pct": "56.78"
+              "label": "Missing",
+              "value" : "3,237",
+              "additional_info": "56.78"
             }
           ]
         },
         {
           "node": "Dead at Scene",
-          "value": "4,088",
+          "value": "4,088 (0.88%)",
           "value_pct": "0.88",
           "summary": "Patient showed obvious signs of death or Do Not Resuscitate (DNR) order was presented, and no attempt was made to resuscitate the patient.",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "1,023",
-                "dem_pct": "25.02"
+                "label": "Female",
+                "value": "1,023",
+                "additional_info": "25.02"
               },
               {
-                "gender": "Male",
-                "dem_value": "3,014",
-                "dem_pct": "73.73"
+                "label": "Male",
+                "value": "3,014",
+                "additional_info": "73.73"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "51",
-                "dem_pct": "1.25"
+                "label": "Unknown",
+                "value": "51",
+                "additional_info": "1.25"
               }
   
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
            {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "2,802",
-              "dem_pct": "68.54"
+              "label": "Non-Hispanic White",
+              "value": "2,802",
+              "additional_info": "68.54"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "273",
-              "dem_pct": "6.68"
+              "label": "Non-Hispanic Black",
+              "value": "273",
+              "additional_info": "6.68"
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "207",
-              "dem_pct": "5.06"
+              "label": "Hispanic",
+              "value": "207",
+              "additional_info": "5.06"
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "--",
-              "dem_pct": "--"
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "--",
+              "additional_info": "--"
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "65",
-              "dem_pct": "1.59"
+              "label": "Non-Hispanic Asian",
+              "value": "65",
+              "additional_info": "1.59"
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "--",
-              "dem_pct": "--" 
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "--",
+              "additional_info": "--" 
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "712",
-              "dem_pct": "17.42"
+              "label": "Missing",
+              "value" : "712",
+              "additional_info": "17.42"
             }
           ]
         },
         {
           "node": "Evaluated no treatment required",
-          "value": "5,169",
+          "value": "5,169 (1.11%)",
           "value_pct": "1.11",
           "summary": "Patient was evaluated and no further treatment/transportation to the hospital was required",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "2,545",
-                "dem_pct": "49.24"
+                "label": "Female",
+                "value": "2,545",
+                "additional_info": "49.24"
               },
               {
-                "gender": "Male",
-                "dem_value": "2,505",
-                "dem_pct": "48.46"
+                "label": "Male",
+                "value": "2,505",
+                "additional_info": "48.46"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "119",
-                "dem_pct": "2.3"
+                "label": "Unknown",
+                "value": "119",
+                "additional_info": "2.3"
               }
   
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
            {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "2,783",
-              "dem_pct": "53.84"
+              "label": "Non-Hispanic White",
+              "value": "2,783",
+              "additional_info": "53.84"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "885",
-              "dem_pct": "17.12"
+              "label": "Non-Hispanic Black",
+              "value": "885",
+              "additional_info": "17.12"
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "351",
-              "dem_pct": "6.79"
+              "label": "Hispanic",
+              "value": "351",
+              "additional_info": "6.79"
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "59",
-              "dem_pct": "1.14"
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "59",
+              "additional_info": "1.14"
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "87",
-              "dem_pct": "1.68"
+              "label": "Non-Hispanic Asian",
+              "value": "87",
+              "additional_info": "1.68"
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "--",
-              "dem_pct": "--" 
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "--",
+              "additional_info": "--" 
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "988",
-              "dem_pct": "19.11"
+              "label": "Missing",
+              "value" : "988",
+              "additional_info": "19.11"
             }
           ]
         },
         {
           "node": "No patient contact",
-          "value": "459",
-          "value_pct": "0.1",
+          "value": "459 (0.1%)",
           "summary": "No patient contact was made (e.g., EMS unit was on standby in case of a medical/traumatic emergency, response was for the purpose of transporting objects, personnel, or equipment not involving a patient).",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "50",
-                "dem_pct": "10.89"
+                "label": "Female",
+                "value": "50",
+                "additional_info": "10.89"
               },
               {
-                "gender": "Male",
-                "dem_value": "70",
-                "dem_pct": "15.25"
+                "label": "Male",
+                "value": "70",
+                "additional_info": "15.25"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "339",
-                "dem_pct": "73.86"
+                "label": "Unknown",
+                "value": "339",
+                "additional_info": "73.86"
               }
   
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
            {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "41",
-              "dem_pct": "8.93"
+              "label": "Non-Hispanic White",
+              "value": "41",
+              "additional_info": "8.93"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "--",
-              "dem_pct": "--"
+              "label": "Non-Hispanic Black",
+              "value": "--",
+              "additional_info": "--"
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "--",
-              "dem_pct": "--"
+              "label": "Hispanic",
+              "value": "--",
+              "additional_info": "--"
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "--",
-              "dem_pct": "--"
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "--",
+              "additional_info": "--"
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "--",
-              "dem_pct": "--"
+              "label": "Non-Hispanic Asian",
+              "value": "--",
+              "additional_info": "--"
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "--",
-              "dem_pct": "--" 
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "--",
+              "additional_info": "--" 
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "388",
-              "dem_pct": "84.53"
+              "label": "Missing",
+              "value" : "388",
+              "additional_info": "84.53"
             }
           ]
         },
         {
           "node": "Refused evaluation care",
-          "value": "12,641",
-          "value_pct": "2.71",
+          "value": "12,641 (2.71%)",
           "summary": "Patient refused any evaluation or care.",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "6,314",
-                "dem_pct": "49.95"
+                "label": "Female",
+                "value": "6,314",
+                "additional_info": "49.95"
               },
               {
-                "gender": "Male",
-                "dem_value": "6,009",
-                "dem_pct": "47.54"
+                "label": "Male",
+                "value": "6,009",
+                "additional_info": "47.54"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "318",
-                "dem_pct": "2.52"
+                "label": "Unknown",
+                "value": "318",
+                "additional_info": "2.52"
               }
-  
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
            {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "7,112",
-              "dem_pct": "56.26"
+              "label": "Non-Hispanic White",
+              "value": "7,112",
+              "additional_info": "56.26"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "2,366",
-              "dem_pct": "18.72"
+              "label": "Non-Hispanic Black",
+              "value": "2,366",
+              "additional_info": "18.72"
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "1,056",
-              "dem_pct": "8.35"
+              "label": "Hispanic",
+              "value": "1,056",
+              "additional_info": "8.35"
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "130",
-              "dem_pct": "1.03"
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "130",
+              "additional_info": "1.03"
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "128",
-              "dem_pct": "1.01"
+              "label": "Non-Hispanic Asian",
+              "value": "128",
+              "additional_info": "1.01"
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "26",
-              "dem_pct": "0.21" 
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "26",
+              "additional_info": "0.21" 
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "1,823",
-              "dem_pct": "14.42"
+              "label": "Missing",
+              "value" : "1,823",
+              "additional_info": "14.42"
             }
           ]
         },
         {
           "node": "Treated",
-          "value": "438,974",
+          "value": "438,974 (93.97%)",
           "value_pct": "93.97",
           "summary": "Patient was evaluated and treatment was provided.",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "206,436",
-                "dem_pct": "47.03"
+                "label": "Female",
+                "value": "206,436",
+                "additional_info": "47.03"
               },
               {
-                "gender": "Male",
-                "dem_value": "229,917",
-                "dem_pct": "52.38"
+                "label": "Male",
+                "value": "229,917",
+                "additional_info": "52.38"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "2,621",
-                "dem_pct": "0.6"
+                "label": "Unknown",
+                "value": "2,621",
+                "additional_info": "0.6"
               }
   
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
            {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "231,620",
-              "dem_pct": "52.76"
+              "label": "Non-Hispanic White",
+              "value": "231,620",
+              "additional_info": "52.76"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "89,207",
-              "dem_pct": "20.32"
+              "label": "Non-Hispanic Black",
+              "value": "89,207",
+              "additional_info": "20.32"
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "39,497",
-              "dem_pct": "9"
+              "label": "Hispanic",
+              "value": "39,497",
+              "additional_info": "9"
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "4,214",
-              "dem_pct": "0.96"
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "4,214",
+              "additional_info": "0.96"
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "5,820",
-              "dem_pct": "1.33"
+              "label": "Non-Hispanic Asian",
+              "value": "5,820",
+              "additional_info": "1.33"
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "1,222",
-              "dem_pct": "0.28" 
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "1,222",
+              "additional_info": "0.28" 
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "67,394",
-              "dem_pct": "15.35"
+              "label": "Missing",
+              "value" : "67,394",
+              "additional_info": "15.35"
             }
           ]
         },
         {
           "node": "Unknown",
-          "value": "104",
-          "value_pct": "0.02",
+          "value": "104 (0.02%)",
           "summary": "Type of treatment provided is unknown.",
-          "Gender" : [
+          "column1Label": "Gender",
+          "column2Label": "Race and Ethnicity",
+          "column1" : [
               {
-                "gender": "Female",
-                "dem_value": "36",
-                "dem_pct": "34.62"
+                "label": "Female",
+                "value": "36",
+                "additional_info": "34.62"
               },
               {
-                "gender": "Male",
-                "dem_value": "56",
-                "dem_pct": "53.85"
+                "label": "Male",
+                "value": "56",
+                "additional_info": "53.85"
               },
               {
-                "gender": "Unknown",
-                "dem_value": "--",
-                "dem_pct": "--"
+                "label": "Unknown",
+                "value": "--",
+                "additional_info": "--"
               }
   
           ],
-          "race_and_ethnicity" : [
+          "column2" : [
            {
-              "race_ethnicity": "Non-Hispanic White",
-              "dem_value": "47",
-              "dem_pct": "45.19"
+              "label": "Non-Hispanic White",
+              "value": "47",
+              "additional_info": "45.19"
             },
             {
-              "race_ethnicity": "Non-Hispanic Black",
-              "dem_value": "",
-              "dem_pct": ""
+              "label": "Non-Hispanic Black",
+              "value": "",
+              "additional_info": ""
             },
             {
-              "race_ethnicity": "Hispanic",
-              "dem_value": "",
-              "dem_pct": ""
+              "label": "Hispanic",
+              "value": "",
+              "additional_info": ""
             },
             {
-              "race_ethnicity": "Non-Hispanic American Indian or Alaska Native",
-              "dem_value": "",
-              "dem_pct": ""
+              "label": "Non-Hispanic American Indian or Alaska Native",
+              "value": "",
+              "additional_info": ""
             },
             {
-              "race_ethnicity": "Non-Hispanic Asian",
-              "dem_value": "",
-              "dem_pct": ""
+              "label": "Non-Hispanic Asian",
+              "value": "",
+              "additional_info": ""
             },
             
             {
-              "race_ethnicity": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "dem_value": "",
-              "dem_pct": "" 
+              "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+              "value": "",
+              "additional_info": "" 
             },
             {
-              "race_ethnicity": "Missing",
-              "dem_value" : "39",
-              "dem_pct": "37.5"
+              "label": "Missing",
+              "value" : "39",
+              "additional_info": "37.5"
             }
           ]
         }
-    ]
-}
-}
+      ]
+    }
+  }
 }

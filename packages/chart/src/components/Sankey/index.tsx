@@ -1,4 +1,5 @@
 import { SankeyGraph, sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey'
+import ReactDOMServer from 'react-dom/server'
 import './sankey.scss'
 import { useContext, useState, useRef, useEffect } from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
@@ -7,8 +8,7 @@ import ConfigContext from '@cdc/chart/src/ConfigContext'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { ChartContext } from '../../types/ChartContext'
-
-import { KPIComponent } from '@cdc/data-bite/src/components/KPIComponent'
+import React from 'react'
 
 type Link = { source: string; target: string; value: number }
 
@@ -104,97 +104,79 @@ const Sankey = ({ width, height }: SankeyProps) => {
   }
 
   const activeConnection = (id: String) => {
-    const currentNode = sankeyData.nodes.find(node => node.id === id);
+    const currentNode = sankeyData.nodes.find(node => node.id === id)
 
-    const sourceNodes = [];
-    const activeLinks = [];
+    const sourceNodes = []
+    const activeLinks = []
 
     if (currentNode) {
-      links.forEach((link) => {
+      links.forEach(link => {
         const targetObj: any = link.target
         const sourceObj: any = link.source
-        if(targetObj.id === id) {
-          sourceNodes.push(sourceObj.id);
+        if (targetObj.id === id) {
+          sourceNodes.push(sourceObj.id)
         }
       })
 
-      sourceNodes.forEach((id) => {
-        links.forEach((link) => {
+      sourceNodes.forEach(id => {
+        links.forEach(link => {
           const targetObj: any = link.target
           const sourceObj: any = link.source
-          if(targetObj.id === tooltipID && sourceObj.id === id) {
-            activeLinks.push(link);
+          if (targetObj.id === tooltipID && sourceObj.id === id) {
+            activeLinks.push(link)
           }
         })
-
       })
     }
 
-    return {sourceNodes, activeLinks}
+    return { sourceNodes, activeLinks }
   }
 
-  // I know we're aware of these, just adding placeholder todos 🙂
-  // todo: item.Gender/item.race_and_ethnicity/etc should look more like item[columnName]
-  // todo: remove hard coded values
-  const tooltipVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value}`;
-  const tooltipPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value_pct}%)`;
-  const tooltipSummary = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).summary}`;
-  const tooltipMaleVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Male')))?.Gender.find(g => g.gender === 'Male')?.dem_value}`;
-  const tooltipMalePct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Male')))?.Gender.find(g => g.gender === 'Male')?.dem_pct}%)`;
-  const tooltipFemaleVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Female')))?.Gender.find(g => g.gender === 'Female')?.dem_value}`;
-  const tooltipFemalePct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Female')))?.Gender.find(g => g.gender === 'Female')?.dem_pct}%)`;
-  const tooltipUnknownVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Unknown')))?.Gender.find(g => g.gender === 'Unknown')?.dem_value}`;
-  const tooltipUnknownPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.Gender.some(g => g.gender === 'Unknown')))?.Gender.find(g => g.gender === 'Unknown')?.dem_pct}%)`;
-  const tooltipNonHispanicWVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic White')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic White')?.dem_value}`;
-  const tooltipNonHispanicWPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic White')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic White')?.dem_pct}%)`;
-  const tooltipNonHispanicBVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Black')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Black')?.dem_value}`;
-  const tooltipNonHispanicBPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Black')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Black')?.dem_pct}%)`;
-  const tooltipHispanicVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Hispanic')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Hispanic')?.dem_value}`;
-  const tooltipHispanicPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Hispanic')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Hispanic')?.dem_pct}%)`;
-  const tooltipNonHispanicAIVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')?.dem_value}`;
-  const tooltipNonHispanicAIPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic American Indian or Alaska Native')?.dem_pct}%)`;
-  const tooltipNonHispanicAsianVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Asian')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Asian')?.dem_value}`;
-  const tooltipNonHispanicAsianPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Asian')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Asian')?.dem_pct}%)`;
-  const tooltipNonHispanicNAVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')?.dem_value}`;
-  const tooltipNonHispanicNAPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Non-Hispanic Native Hawaiian or Other Pacific Islander')?.dem_pct}%)`;
-  const tooltipMissingVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Missing')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Missing')?.dem_value}`;
-  const tooltipMissingNAPct = `(${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID && item.race_and_ethnicity.some(r => r.race_ethnicity === 'Missing')))?.race_and_ethnicity.find(r => r.race_ethnicity === 'Missing')?.dem_pct}%)`;
+  const tooltipVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value}`
+  const tooltipSummary = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).summary}`
+  const tooltipColumn1Label = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1Label
+  const tooltipColumn2Label = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column2Label
+  const tooltipColumn1 = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1
+  const tooltipColumn2 = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column2
 
-  // todo: no hardcode values
+  const ColumnList = ({ columnData }) => {
+    return (
+      <ul>
+        {columnData?.map((entry, index) => (
+          <li key={index}>
+            {entry.label}: {entry.value} ({entry.additional_info}%)
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  const tooltipColumn1Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn1} />)
+  const tooltipColumn2Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn2} />)
+
+  
   const sankeyToolTip = `<div class="sankey-chart__tooltip">
                     <span class="sankey-chart__tooltip--tooltip-header">${tooltipID}</span>
-                    <span class="sankey-chart__tooltip--tooltip-header">${tooltipVal} ${tooltipPct}</span>
+                    <span class="sankey-chart__tooltip--tooltip-header">${tooltipVal}</span>
                     <div class="divider"></div>
                     <span><strong>Summary: </strong>${tooltipSummary}</span>
                     <div class="divider"></div>
-                    <div class="sankey-chart__tooltip--info-section">
-                    <div>
-                      <span><strong>Gender<strong></span>
-                        <ul>
-                          <li>Male: ${tooltipMaleVal} ${tooltipMalePct}</li>
-                          <li>Female: ${tooltipFemaleVal} ${tooltipFemalePct}</li>
-                          <li>Unknown: ${tooltipUnknownVal} ${tooltipUnknownPct}</li>
-                        </ul>
+                      <div class="sankey-chart__tooltip--info-section">
+                        <div>
+                          <span><strong>${tooltipColumn1Label}<strong></span>
+                          ${tooltipColumn1Data}
+                        </div>
+                        <div>
+                          <span><strong>${tooltipColumn2Label}<strong></span>
+                          ${tooltipColumn2Data}
+                        </div>
                       </div>
-                      <div>
-                      <span><strong>Race and ethnicity<strong></span>
-                        <ul>
-                          <li>Non-Hispanic White: ${tooltipNonHispanicWVal} ${tooltipNonHispanicWPct}</li>
-                          <li>Non-Hispanic Black: ${tooltipNonHispanicBVal} ${tooltipNonHispanicBPct}</li>
-                          <li>Hispanic: ${tooltipHispanicVal} ${tooltipHispanicPct}</li>
-                          <li>Non-Hispanic American Indian or Alaska Native: ${tooltipNonHispanicAIVal} ${tooltipNonHispanicAIPct}</li>
-                          <li>Non-Hispanic Asian: ${tooltipNonHispanicAsianVal} ${tooltipNonHispanicAsianPct}</li>
-                          <li>Non-Hispanic Native Hawaiian or Other Pacific Islander: ${tooltipNonHispanicNAVal} ${tooltipNonHispanicNAPct}</li>
-                          <li>Missing: ${tooltipMissingVal} ${tooltipMissingNAPct}</li>
-                          </ul>
-                      </div>
-                    </div>
                   </div>`
 
   // Draw the nodes
   const allNodes = sankeyData.nodes.map((node, i) => {
     let { textPositionHorizontal, textPositionVertical, classStyle, storyNodes } = nodeStyle(node.id)
-    let { sourceNodes } = activeConnection(tooltipID);
+    let { sourceNodes } = activeConnection(tooltipID)
 
     let opacityValue = sankeyConfig.opacity.nodeOpacityDefault
     let nodeColor = sankeyConfig.nodeColor.default
@@ -203,7 +185,6 @@ const Sankey = ({ width, height }: SankeyProps) => {
       nodeColor = sankeyConfig.nodeColor.inactive
       opacityValue = sankeyConfig.opacity.nodeOpacityInactive
     }
-
 
     return (
       <Group className='' key={i} innerRef={el => (groupRefs.current[i] = el)}>
@@ -296,8 +277,6 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const allLinks = links.map((link, i) => {
     const linkGenerator = sankeyLinkHorizontal()
     const path = linkGenerator(link)
-    const sourceObj: any = link.source // todo: unused atm
-    const targetObj: any = link.target // todo: unused atm
     let opacityValue = sankeyConfig.opacity.LinkOpacityDefault
     let strokeColor = sankeyConfig.linkColor.default
 
@@ -308,29 +287,11 @@ const Sankey = ({ width, height }: SankeyProps) => {
       opacityValue = sankeyConfig.opacity.LinkOpacityInactive
     }
 
-    return (
-      <path
-        key={i}
-        d={path!}
-        stroke={strokeColor}
-        fill='none'
-        strokeOpacity={opacityValue}
-        strokeWidth={link.width! + 2}
-      />
-    )
+    return <path key={i} d={path!} stroke={strokeColor} fill='none' strokeOpacity={opacityValue} strokeWidth={link.width! + 2} />
   })
 
   return (
     <>
-    {sankeyConfig.data.KPIs && (
-      // TODO: remove <KPIComponent />. Lets us <CdcDataBite /> with a new type of config.type = 'gradient' or 
-      // a name of your choosing.
-      <div className='kpis-container'>
-        <KPIComponent label={sankeyConfig.data.KPIs[0].label} value={sankeyConfig.data.KPIs[0].value}/>
-        <KPIComponent label={sankeyConfig.data.KPIs[1].label} value={sankeyConfig.data.KPIs[1].value}/>
-    </div>
-    )}
-
       <div className='sankey-chart'>
         <svg className='sankey-chart__diagram' width={width} height={height} style={{ overflow: 'visible' }}>
           <Group className='links'>{allLinks}</Group>
