@@ -31,6 +31,8 @@ type LineChartContext = SharedChartContext & {
   transformedData: TransformedData[]
   updateConfig: Function
   visualizationType: 'Line'
+  colorPalettes: Record<string, string[]>
+  twoColorPalette: Record<string, string[]>
 }
 
 export type ChartContext =
@@ -51,4 +53,6 @@ export type ChartContext =
       setSharedFilter?: Function
       sharedFilterValue?: string
       updateConfig?: Function
+      colorPalettes: any
+      twoColorPalette: any
     })
