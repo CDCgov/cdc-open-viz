@@ -122,21 +122,38 @@ const LineChart = (props: LineChartProps) => {
                   <LineChartCircle circleData={circleData} data={data} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />
                 )}
               </>
-              {/* STANDARD LINE */}
-              <LinePath
-                curve={allCurves[seriesData[0].lineType]}
-                data={data}
-                x={d => xScale(getXAxisData(d))}
-                y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
-                stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
-                strokeWidth={2}
-                strokeOpacity={1}
-                shapeRendering='geometricPrecision'
-                strokeDasharray={lineType ? handleLineType(lineType) : 0}
-                defined={(item, i) => {
-                  return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
-                }}
-              />
+              {/* SPLIT LINE */}
+              {config.preliminaryData.some(d => d.value && d.column) ? (
+                <SplitLinePath
+                  curve={allCurves[seriesData[0].lineType]}
+                  segments={data.map(d => [d])}
+                  segmentation='x'
+                  x={d => xScale(getXAxisData(d))}
+                  y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                  styles={styles}
+                  defined={(item, i) => {
+                    return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                  }}
+                />
+              ) : (
+                <>
+                  {/* STANDARD LINE */}
+                  <LinePath
+                    curve={allCurves[seriesData[0].lineType]}
+                    data={data}
+                    x={d => xScale(getXAxisData(d))}
+                    y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                    stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
+                    strokeWidth={2}
+                    strokeOpacity={1}
+                    shapeRendering='geometricPrecision'
+                    strokeDasharray={lineType ? handleLineType(lineType) : 0}
+                    defined={(item, i) => {
+                      return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                    }}
+                  />
+                </>
+              )}
 
               {/* circles for preliminaryData data */}
               {circleData.map((d, i) => {
