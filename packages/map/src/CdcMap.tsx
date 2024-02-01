@@ -279,6 +279,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         uid = row[state.columns.geo.name]
       }
 
+      if(!uid && (state.columns.latitude?.name && state.columns.longitude?.name && row[state.columns.latitude?.name] && row[state.columns.longitude?.name])){
+        uid = row[state.columns.geo.name]
+      }
+
       if (uid) {
         Object.defineProperty(row, 'uid', {
           value: uid,

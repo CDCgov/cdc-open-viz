@@ -1,0 +1,32 @@
+.multi-config-tabs {
+  .nav-link {
+    font-weight: 400;
+    display: block;
+    padding: 0.5rem 1rem;
+    :is(button) {
+      display: none;
+      background: none;
+    }
+    &:hover {
+      :is(button) {
+        display: inline-block;
+        color: var(--gray);
+        &:hover {
+          color: var(--black);
+          font-weight: bold;
+        }
+      }
+    }
+  }
+  .remove {
+    color: var(--gray);
+    &:hover {
+      color: var(--black);
+      font-weight: bold;
+    }
+  }
+  .add {
+    font-weight: 800;
+    padding: 0.5rem 1rem;
+  }
+}
