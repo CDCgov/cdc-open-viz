@@ -177,19 +177,27 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
       datasetKeys.forEach(async datasetKey => {
         const dataset = config.datasets[datasetKey]
-        if (dataset.dataUrl && config.dashboard && config.dashboard.sharedFilters) {
+        const filters = config.dashboard?.sharedFilters
+        if (dataset.dataUrl && filters) {
           const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl, window.location.origin)
           let currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
           let updatedQSParams = {}
           let isUpdateNeeded = false
 
-          config.dashboard.sharedFilters.forEach(filter => {
+          filters.forEach(filter => {
             if (filter.filterBy === 'File Name') {
-              // if no file name is entered use the default active filter. ie. /activeFilter.json
-              if (!filter.fileName && filter.datasetKey === datasetKey) newFileName = filter.active
-              // if a file name is found, ie, state_${query}, use that, ie. state_activeFilter.json
-              if (filter.datasetKey === datasetKey && filter.fileName) newFileName = capitalizeSplitAndJoin.call(String(filter.fileName), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces'])
-              if (newFileName && newFileName.includes('${query}')) {
+              isUpdateNeeded = true
+              if (filter.datasetKey === datasetKey) {
+                if (filter.fileName) {
+                  // if a file name is found, ie, state_${query}, use that, ie. state_activeFilter.json
+                  newFileName = capitalizeSplitAndJoin.call(String(filter.fileName), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces'])
+                } else {
+                  // if no file name is entered use the default active filter. ie. /activeFilter.json
+                  newFileName = filter.active
+                }
+              }
+
+              if (newFileName?.includes('${query}')) {
                 newFileName = newFileName.replace('${query}', capitalizeSplitAndJoin.call(String(filter.active), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces']))
               }
             }
@@ -201,9 +209,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 updatedQSParams[filter.queryParameter] = filter.active
               }
             }
-            if (filter.filterBy === 'File Name') {
-              isUpdateNeeded = true
-            }
           })
 
           Object.keys(updatedQSParams).forEach(updatedParam => {
@@ -212,36 +217,36 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             }
           })
 
-          if (!isUpdateNeeded) return
+          if (isUpdateNeeded) {
+            datasetsNeedsUpdate = true
+            Object.keys(currentQSParams).forEach(currentParam => {
+              if (!updatedQSParams[currentParam]) {
+                updatedQSParams[currentParam] = currentQSParams[currentParam]
+              }
+            })
+            const _params = Object.keys(updatedQSParams).map(key => ({ key, value: updatedQSParams[key] }))
+            let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${gatherQueryParams(_params)}`
 
-          Object.keys(currentQSParams).forEach(currentParam => {
-            if (!updatedQSParams[currentParam]) {
-              updatedQSParams[currentParam] = currentQSParams[currentParam]
+            if (newFileName !== '') {
+              let fileExtension = dataUrl.pathname.split('.').pop()
+              let pathWithoutFilename = dataUrl.pathname.substring(0, dataUrl.pathname.lastIndexOf('/'))
+              dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${newFileName}.${fileExtension}${gatherQueryParams(_params)}`
             }
-          })
-          const _params = Object.keys(updatedQSParams).map(key => ({ key, value: updatedQSParams[key] }))
-          let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${gatherQueryParams(_params)}`
 
-          if (newFileName !== '') {
-            let fileExtension = dataUrl.pathname.split('.').pop()
-            let pathWithoutFilename = dataUrl.pathname.substring(0, dataUrl.pathname.lastIndexOf('/'))
-            dataUrlFinal = `${dataUrl.origin}${pathWithoutFilename}/${newFileName}.${fileExtension}${gatherQueryParams(_params)}`
-          }
+            let newDataset = await fetchRemoteData(`${dataUrlFinal}`)
 
-          let newDataset = await fetchRemoteData(`${dataUrlFinal}`)
-
-          if (newDataset && dataset.dataDescription) {
-            try {
-              newDataset = transform.autoStandardize(newDataset)
-              newDataset = transform.developerStandardize(newDataset, dataset.dataDescription)
-            } catch (e) {
-              //Data not able to be standardized, leave as is
+            if (newDataset && dataset.dataDescription) {
+              try {
+                newDataset = transform.autoStandardize(newDataset)
+                newDataset = transform.developerStandardize(newDataset, dataset.dataDescription)
+              } catch (e) {
+                //Data not able to be standardized, leave as is
+              }
             }
+            newDatasets[datasetKey].data = newDataset
+            newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
+            newData[datasetKey] = newDataset
           }
-          newDatasets[datasetKey].data = newDataset
-          newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
-          newData[datasetKey] = newDataset
-          datasetsNeedsUpdate = true
         }
       })
 
