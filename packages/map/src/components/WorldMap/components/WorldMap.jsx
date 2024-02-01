@@ -160,7 +160,7 @@ const WorldMap = props => {
 
     // Cities
     geosJsx.push(
-      <CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} isGeoCodeMap={state.general.type === 'world-geocode' || (state.columns.latitude?.name && state.columns.longitude?.name)} key='cities' projection={projection} state={state} titleCase={titleCase} />
+      <CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} key='cities' projection={projection} state={state} titleCase={titleCase} />
     )
 
     // Bubbles
