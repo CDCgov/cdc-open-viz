@@ -10,13 +10,18 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
   useEffect(() => {
     const citiesDictionary = {}
 
-    state.data.map(city => (citiesDictionary[city[state.columns.geo.name]] = city))
+    if (data) {
+      Object.keys(data).forEach(key => {
+        const city = data[key]
+        citiesDictionary[city[state.columns.geo.name]] = city
+      })
+    }
 
     setCitiesData(citiesDictionary)
-  }, [data, state.data])
+  }, [data])
 
   if (state.general.type === 'bubble') {
-    const maxDataValue = Math.max(...state.data.map(d => d[state.columns.primary.name]))
+    const maxDataValue = Math.max(...(data ? Object.keys(data).map(key => data[key][state.columns.primary.name]) : [0]))
     const sortedRuntimeData = Object.values(data).sort((a, b) => (a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1))
     if (!sortedRuntimeData) return
 
@@ -28,9 +33,16 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
 
   // Cities output
   const cities = cityList.map((city, i) => {
-    let geoData = state.data.filter(item => city === item[state.columns.geo.name])[0]
-    if(!geoData){
-      geoData = data[city]
+    let geoData
+    if (data) {
+      Object.keys(data).forEach(key => {
+        if (city === data[key][state.columns.geo.name]) {
+          geoData = data[key]
+        }
+      })
+    }
+    if (!geoData) {
+      geoData = data ? data[city] : undefined
     }
     const cityDisplayName = titleCase(displayGeoName(city))
 
