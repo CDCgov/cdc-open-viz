@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import ConfigContext from '../../../../ConfigContext'
 import { CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import Button from '@cdc/core/components/elements/Button'
 
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../EditorPanelContext'
@@ -10,14 +11,7 @@ const SankeySettings = () => {
   const { sankey } = config
   const { updateField } = useContext<EPContext>(EditorPanelContext)
 
-  /**
-   * !todo: consider moving the checkbox values below underneath config.sankey
-   * I realize that the Checkbox component might limit how you update those values.
-   * If needed just copy the checkbox element from ''@cdc/core/components/EditorPanel/Inputs' and change the handler
-   * Also worth noting is we have an editor panel context now if you need easier access to functions from EditorPanel
-   */
-
-  let storyNodeUpdate = (fieldName, value, i) => {
+  const updateStoryNode = (fieldName, value, i) => {
     let storyNodes = []
 
     if (config.sankey.data.storyNodeText) {
@@ -25,42 +19,49 @@ const SankeySettings = () => {
     }
 
     storyNodes[i][fieldName] = value
-    updateConfig({ ...config, storyNodes })
+    console.log('story nodes', storyNodes[i])
+    updateConfig({
+      ...config,
+      sankey: {
+        ...config.sankey,
+        data: {
+          ...config.sankey.data,
+          storyNodeText: storyNodes
+        }
+      }
+    })
   }
 
-  // only for Regions
-  let updateStoryNode = (fieldName, value, i) => storyNodeUpdate(fieldName, value, i)
-
-  let addStoryNode = () => {
+  const addStoryNode = () => {
     let storyNodes = []
 
     if (config.sankey.data.storyNodeText) {
       storyNodes = [...config.sankey.data.storyNodeText]
-      console.log('inside if statement')
-      console.log('storynodes array') 
-      console.log(storyNodes) //prints storyNodeText array from config but with an extra empty set
-      console.log(storyNodes.length) //prints 2 but when you click the object it says length is 3
-      console.log('array from config')
-      console.log(config.sankey.data.storyNodeText) //prints the two in the config
-      console.log(config.sankey.data.storyNodeText.length) //prints 2
     }
 
     storyNodes.push({
-      "StoryNode": "",
-      "segmentTextBefore": "",
-      "segmentTextAfter": ""
+      StoryNode: '',
+      segmentTextBefore: '',
+      segmentTextAfter: ''
     })
 
-    updateConfig({ ...config, storyNodes });
+    updateConfig({
+      ...config,
+      sankey: {
+        ...config.sankey,
+        data: {
+          ...config.sankey.data,
+          storyNodeText: storyNodes
+        }
+      }
+    })
+  }
 
-    console.log('after update config')
-    console.log(config.sankey.data.storyNodeText) //prints the two in the config
-    console.log(config.sankey.data.storyNodeText.length) //prints 2 
+  const removeStoryNode = index => {
+    const updatedStoryNodeText = [...config.sankey.data.storyNodeText]
+    updatedStoryNodeText.splice(index, 1)
 
-    // after selecting add storynode it should have the three text fields pop up but empty, its not doing that 
-
-    //the button is still there aftere selecting add storynode, it should have updated to 3 entries and hid 
-    //the button 
+    updateConfig({ ...config, sankey: { ...config.sankey, data: { ...config.sankey.data, storyNodeText: updatedStoryNodeText } } })
   }
 
   return (
@@ -70,14 +71,27 @@ const SankeySettings = () => {
       </AccordionItemHeading>
       <AccordionItemPanel>
         <CheckBox value={config.enableKPIs} fieldName='enableKPIs' label='Enable KPIs' updateField={updateField} />
-        {config.sankey.data.storyNodeText && (
-          config.sankey.data.storyNodeText.map(({ StoryNode, segmentTextBefore, segmentTextAfter }, i) =>
-            <div key={i}>
-              <TextField value={StoryNode} fieldName='StoryNode' label='StoryNode' updateField={(fieldName, value) => updateStoryNode(fieldName, value, i)} />
-              <TextField value={segmentTextBefore} fieldName='segmentTextBefore' label='Segment Text Before' updateField={(fieldName, value) => updateStoryNode(fieldName, value, i)} />
-              <TextField value={segmentTextAfter} fieldName='segmentTextAfter' label='Segment Text After' updateField={(fieldName, value) => updateStoryNode(fieldName, value, i)} />
+        {config.sankey.data.storyNodeText &&
+          config.sankey.data.storyNodeText.map(({ StoryNode, segmentTextBefore, segmentTextAfter }, i) => (
+            <div key={i} style={{ border: '1px solid black', margin: '15px auto', padding: '15px', borderRadius: '10px' }}>
+              <label>
+                Story Node Text
+                <input type='text' value={StoryNode} fieldName='StoryNode' label='StoryNode' onChange={e => updateStoryNode('StoryNode', e.target.value, i)} />
+              </label>
+              <label>
+                Story Text Before
+                <input type='text' value={segmentTextBefore} fieldName='segmentTextBefore' label='Segment Text Before' onChange={e => updateStoryNode('segmentTextBefore', e.target.value, i)} />
+              </label>
+              <label>
+                Story Text After
+                <input type='text' value={segmentTextAfter} fieldName='segmentTextAfter' label='Segment Text After' onChange={e => updateStoryNode('segmentTextAfter', e.target.value, i)} />
+              </label>
+              <Button onClick={e => removeStoryNode(i)} className='btn' style={{ background: 'tomato' }}>
+                Remove Story Node
+              </Button>
             </div>
           ))}
+        {`Total Story Nodes: ${config.sankey.data.storyNodeText.length}`}
         {config.sankey.data.storyNodeText.length < 3 && (
           <button
             type='button'
