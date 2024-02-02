@@ -1137,7 +1137,7 @@ const EditorPanel = () => {
                     )}
                     {config.visualizationType !== 'Pie' && (
                       <>
-                        <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
+                        <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label ' updateField={updateField} />
                         {config.runtime.seriesKeys && config.runtime.seriesKeys.length === 1 && !['Box Plot', 'Deviation Bar', 'Forest Plot'].includes(config.visualizationType) && (
                           <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                         )}
@@ -1742,7 +1742,43 @@ const EditorPanel = () => {
                               .
                             </p>
                             <TextField value={config.xAxis.dateParseFormat} section='xAxis' fieldName='dateParseFormat' placeholder='Ex. %Y-%m-%d' label='Date Parse Format' updateField={updateField} />
-                            <TextField value={config.xAxis.dateDisplayFormat} section='xAxis' fieldName='dateDisplayFormat' placeholder='Ex. %Y-%m-%d' label='Date Display Format' updateField={updateField} />
+                            <TextField value={config.xAxis.dateDisplayFormat} section='xAxis' fieldName='dateDisplayFormat' placeholder='Ex. %Y-%m-%d' label='AXIS DATE DISPLAY FORMAT' updateField={updateField} />
+                            <TextField
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>If not populated, Axis Date Display format will be used. </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              value={config.xAxis.dateDisplayFormat}
+                              section='xAxis'
+                              fieldName='tableDateDisplayFormat'
+                              placeholder='Ex. %Y-%m-%d'
+                              label='DATA TABLE DATE FORMAT'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>When this option is checked, you can select source-file values for exclusion from the date/category axis. </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              value={config.xAxis.dateDisplayFormat}
+                              section='xAxis'
+                              fieldName='hoverDateDisplayFormat'
+                              placeholder='Ex. %Y-%m-%d'
+                              label='HOVER DATE FORMAT'
+                              updateField={updateField}
+                            />
                           </>
                         )}
 
