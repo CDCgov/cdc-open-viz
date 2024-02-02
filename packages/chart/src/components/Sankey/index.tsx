@@ -56,7 +56,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
       }
     })
     setLargestGroupWidth(largest)
-  }, [groupRefs])
+  }, [groupRefs, config.sankey.data.storyNodeText])
 
   //Retrieve all the unique values for the Nodes
   const uniqueNodes = Array.from(new Set(data.links.flatMap(link => [link.source, link.target])))
@@ -155,7 +155,6 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const tooltipColumn1Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn1} />)
   const tooltipColumn2Data = ReactDOMServer.renderToString(<ColumnList columnData={tooltipColumn2} />)
 
-  
   const sankeyToolTip = `<div class="sankey-chart__tooltip">
                     <span class="sankey-chart__tooltip--tooltip-header">${tooltipID}</span>
                     <span class="sankey-chart__tooltip--tooltip-header">${tooltipVal}</span>
@@ -197,7 +196,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
           fill={nodeColor}
           fillOpacity={opacityValue}
           rx={sankeyConfig.rxValue}
-          data-tooltip-html={(sankeyConfig.data.tooltips && config.enableTooltips) ? sankeyToolTip : null}
+          data-tooltip-html={sankeyConfig.data.tooltips && config.enableTooltips ? sankeyToolTip : null}
           data-tooltip-id={`tooltip`}
           onClick={() => handleNodeClick(node.id)}
           style={{ pointerEvents: 'visible', cursor: 'pointer' }}
