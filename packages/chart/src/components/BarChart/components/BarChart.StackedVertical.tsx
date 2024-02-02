@@ -29,9 +29,11 @@ const BarChartStackedVertical = () => {
                 let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
                 let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
                 // tooltips
-                const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
+                const rawXValue = bar.bar.data[config.runtime.xAxis.dataKey]
+                const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(rawXValue)) : rawXValue
                 const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                 if (!yAxisValue) return
+                const barX = xScale(config.runtime.xAxis.type === 'date' ? parseDate(rawXValue) : rawXValue) - barThicknessAdjusted / 2
                 const style = applyRadius(barStack.index)
                 const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)
@@ -63,7 +65,7 @@ const BarChartStackedVertical = () => {
                         onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
                         onMouseLeave={onMouseLeaveBar}
                         key={`bar-stack-${barStack.index}-${bar.index}`}
-                        x={barThickness * bar.index + offset}
+                        x={barX}
                         y={bar.y}
                         width={barThicknessAdjusted}
                         height={bar.height}
