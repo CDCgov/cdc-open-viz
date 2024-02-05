@@ -1058,7 +1058,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                   <ParentSize>{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>
                 </div>
               )}
-              {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
+              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend />}
             </div>
             {/* Link */}
             {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}

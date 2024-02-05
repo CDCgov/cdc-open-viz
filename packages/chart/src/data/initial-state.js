@@ -279,6 +279,7 @@ export default {
     nodeValueStyle: {
       textBefore: '(',
       textAfter: ')'
-    }
+    },
+    data: []
   }
 }

@@ -7,6 +7,7 @@ import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General } from '@cdc/core/types/General'
+import { type Link } from './../components/Sankey/types'
 
 export type ChartColumns = Record<string, Column>
 
@@ -169,6 +170,27 @@ type AllChartsConfig = {
   xScale: Function
   yScale: Function
   regions: Region[]
+  sankey: {
+    data: { links: Link[]; storyNodeText: Object[]; tooltips: Object[] }[]
+    nodePadding: number
+    iterations: number
+    nodeSize: {
+      nodeWidth: number
+    }
+    margin: { margin_x: number; margin_y: number }
+    nodeColor: { default: boolean; inactive: boolean }
+    opacity: { LinkOpacityInactive: string; LinkOpacityDefault: string; nodeOpacityInactive: boolean; nodeOpacityDefault: boolean }
+    rxValue: number
+    nodeFontColor: string
+    nodeValueStyle: {
+      textBefore: string
+      textAfter: string
+    }
+    linkColor: {
+      inactive: string
+      default: string
+    }
+  }
 }
 
 export type ForestPlotConfig = {

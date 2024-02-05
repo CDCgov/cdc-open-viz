@@ -5,7 +5,6 @@ import { useDebounce } from 'use-debounce'
 
 // Core
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
-
 const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) => {
   const [filterValue, setFilterValue] = useState(globalFilter)
 
@@ -98,10 +97,10 @@ const PreviewDataTable = ({ data }) => {
     }
 
     let newData = [...data]
-
+    console.log('newData', newData)
     newData = generateColumns(newData)
     validateFipsCodeLength(newData)
-    setTableData(newData)
+    setTableData(config.visualizationType === 'Sankey' ? newData[0]?.links : newData)
   }, [data, generateColumns])
 
   const {
