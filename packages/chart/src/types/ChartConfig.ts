@@ -156,6 +156,7 @@ type AllChartsConfig = {
   tooltips: {
     singleSeries: boolean
     opacity: number
+    dateDisplayFormat: string
   }
   topAxis: { hasLine: boolean }
   twoColor: { palette: string }
