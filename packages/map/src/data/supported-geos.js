@@ -504,7 +504,9 @@ export const supportedCountries = {
   Akrotiri: ['Akrotiri'],
   Dhekelia: ['Dhekelia'],
   Sicily: ['Sicily'],
-  Sardinia: ['Sardinia']
+  Sardinia: ['Sardinia'],
+  'US-AK': ['Alaska'],
+  'US-HI': ['Hawaii']
 }
 
 export const supportedTerritories = {
