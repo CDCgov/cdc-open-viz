@@ -3,7 +3,6 @@
   "title": "Example Sankey Chart",
   "showTitle": true,
   "enableTooltips": true,
-  "enableKPIs": true,
   "legend": {
     "hide": true
   },

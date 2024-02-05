@@ -43,7 +43,6 @@
   },
   "showTitle": true,
   "enableTooltips": true,
-  "enableKPIs": true,
   "enableStoryNodes": true,
   "legend": {
     "hide": true
