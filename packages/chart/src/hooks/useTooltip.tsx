@@ -11,9 +11,9 @@ const transform = new DataTransform()
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 
 export const useTooltip = props => {
-  const { tableData, config, formatNumber, capitalize, formatDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)
+  const { tableData, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, showTooltip, hideTooltip } = props
-  const { xAxis, visualizationType, orientation, yAxis, runtime, barWidth } = config
+  const { xAxis, visualizationType, orientation, yAxis, runtime } = config
   const data = transform.applySuppression(tableData, config.suppressedData)
   /**
    * Provides the tooltip information based on the tooltip data array and svg cursor coordinates
@@ -142,7 +142,8 @@ export const useTooltip = props => {
           ...getIncludedTooltipSeries()
             ?.filter(Boolean)
             ?.flatMap(seriesKey => {
-              const formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
+              const formattedDate = config.tooltips.dateDisplayFormat ? formatTooltipsDate(parseDate(resolvedScaleValues[0]?.[seriesKey])) : formatDate(parseDate(resolvedScaleValues[0]?.[seriesKey]))
+              const formattedValue = seriesKey === config.xAxis.dataKey && config.xAxis.type === 'date' ? formattedDate : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
               return resolvedScaleValues?.[0]?.[seriesKey] ? [[seriesKey, formattedValue, getAxisPosition(seriesKey)]] : []
             })
         )

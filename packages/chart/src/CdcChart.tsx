@@ -710,6 +710,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
   }
 
+  const formatTooltipsDate = date => {
+    return timeFormat(config.tooltips.dateDisplayFormat)(date)
+  }
+
   // function calculates the width of given text and its font-size
   function getTextWidth(text, font) {
     const canvas = document.createElement('canvas')
@@ -1116,6 +1120,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     currentViewport,
     parseDate,
     formatDate,
+    formatTooltipsDate,
     formatNumber,
     loading,
     updateConfig,
