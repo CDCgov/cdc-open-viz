@@ -1,0 +1,1194 @@
+{
+  "general": {
+    "geoType": "world",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "title": "Countries and territories where Zika cases have been reported (as of October 5, 2023)*",
+    "showTitle": false,
+    "showSidebar": true,
+    "showDownloadButton": true,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "territoriesLabel": "Territories",
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoLabelOverride": "",
+    "hasRegions": false,
+    "fullBorder": false,
+    "type": "data",
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": true
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "statePicked": {
+      "fipsCode": "01",
+      "stateName": "Alabama"
+    },
+    "footnotes": "*Does not include countries or territories where only imported cases have been documented. Small island nations might not display on the map but data are included in the table above.",
+    "introText": ""
+  },
+  "type": "map",
+  "color": "sequential-blue-2(MPX)reverse",
+  "columns": {
+    "geo": {
+      "name": "Country",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": "",
+      "name": "Category",
+      "label": ""
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false,
+    "type": "category",
+    "numberOfItems": 3,
+    "position": "bottom",
+    "title": "Legend",
+    "categoryValuesOrder": [
+      "Current or past Zika transmission",
+      "Known to have mosquito that transmits Zika, but no reported Zika cases ",
+      "Not known to have mosquito that transmits Zika"
+    ]
+  },
+  "filters": [],
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": false,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": "",
+    "wrapColumns": false
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "geoCodeCircleSize": 2,
+    "showBubbleZeros": false
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "openModal": false,
+  "uid": "map1701275481219",
+  "editing": true,
+  "validated": 4.23,
+  "data": [
+    {
+      "Country": "Afghanistan",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Alaska",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Albania",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Algeria",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "American Samoa",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Andorra",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Angola",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Anguilla",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Antarctica",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Antigua and Barbuda",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Argentina",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Armenia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Aruba",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Australia",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Austria",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Azerbaijan",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Azores",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Bahamas",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Bahrain",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Bangladesh",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Barbados",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Belarus",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Belgium",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Belize",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Benin",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Bermuda",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Bhutan",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Bolivia",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Bonaire, Sint Eustatius And Saba",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Bosnia and Herzegovina",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Botswana",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Bouvet Island",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Brazil",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "British Indian Ocean Territory",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Brunei",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Bulgaria",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Burkina Faso",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Burma",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Burundi",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Cabo Verde",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Cambodia",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Cameroon",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Canada",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Canary Islands",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Cayman Islands",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Central African Republic",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Chad",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Chile",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "China",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Christmas Island",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Cocos (Keeling) Islands",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Colombia",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Comoros",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Cook Islands",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Corsica",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Costa Rica",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Côte d'Ivoire",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Croatia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Cuba",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Curacao",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Cyprus",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Czechia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Democratic Republic of the Congo",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Denmark",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Djibouti",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Dominica",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Dominican Republic",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Easter Island",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Ecuador",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Egypt",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "El Salvador",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Equatorial Guinea",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Eritrea",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Estonia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Eswatini",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Ethiopia",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Falkland Islands",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Faroe Islands",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Micronesia",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Fiji",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Finland",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "France",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "French Guiana",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "French Polynesia",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "French Southern Territories",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Gabon",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Gambia",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Georgia",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Germany",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Ghana",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Gibraltar",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Greece",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Greenland",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Grenada",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Guadeloupe",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Guam",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Guatemala",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Guernsey",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Guinea",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Guinea-Bissau",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Guyana",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Haiti",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Hawaii",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Heard Island and McDonald Island",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Honduras",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Hong Kong",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Hungary",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Iceland",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "India",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Indonesia",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Iran",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Iraq",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Ireland",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Isle of Man",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Israel",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Italy",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Jamaica",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Japan",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Jersey",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Jordan",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Kazakhstan",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Kenya",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Kiribati",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Kosovo",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Kuwait",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Kyrgyzstan",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Laos",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Latvia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Lebanon",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Lesotho",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Liberia",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Libya",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Liechtenstein",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Lithuania",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Luxembourg",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Macau",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Madagascar",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Madeira Islands",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Malawi",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Malaysia",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Maldives",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Mali",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Malta",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Marshall Islands",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Martinique",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Mauritania",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Mauritius",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Mayotte",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Mexico",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Moldova",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Monaco",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Mongolia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Montenegro",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Montserrat",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Morocco",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Mozambique",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Namibia",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Nauru",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Nepal",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Netherlands",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "New Caledonia",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "New Zealand",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Nicaragua",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Niger",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Nigeria",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Niue",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "No Man's Land",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Norfolk Island",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "North Korea",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "North Macedonia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Northern Mariana Islands",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Norway",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Oman",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Pakistan",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Palau",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Palestinian Territories",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Panama",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Papua New Guinea",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Paraguay",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Peru",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Philippines",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Pitcairn",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Plazas de Soberania",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Poland",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Portugal",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Puerto Rico",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Qatar",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Republic of the Congo",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Réunion",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Romania",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Russia",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Rwanda",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Saint Barthélemy",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Saint Helena",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Saint Kitts and Nevis",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Saint Lucia",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "St-Martin",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Sicily",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Saint Paul and Amsterdam Islands",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Saint Vincent and the Grenadines",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Samoa",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "San Marino",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "São Tomé and Principe",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Saudi Arabia",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Senegal",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Serbia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Seychelles",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Sierra Leone",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Singapore",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Sint Eustatius",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Sint Maarten",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Slovakia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Slovenia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Solomon Islands",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Somalia",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "South Africa",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "South Georgia and the South Sandwich Islands",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "South Korea",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "South Sudan",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Sovereign Base Areas of Akrotiri and Dhekelia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Spain",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Sri Lanka",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Sudan",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Suriname",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Svalbard and Jan Mayen",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Sweden",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Switzerland",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Syria",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Taiwan",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Tajikistan",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Tanzania",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Thailand",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Timor-Leste",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Togo",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Tokelau",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Tonga",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Trinidad and Tobago",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Tunisia",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Turkey",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Turkmenistan",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Turks and Caicos",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Tuvalu",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Uganda",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Ukraine",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "United Arab Emirates",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "United Kingdom",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "United States Minor Outlying Islands",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "United States of America",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Uruguay",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Uzbekistan",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Vanuatu",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Vatican City",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Venezuela",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Vietnam",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Virgin Islands (British)",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Virgin Islands (U.S.)",
+      "Category": "Current or past Zika transmission"
+    },
+    {
+      "Country": "Wallis and Futuna",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Western Sahara",
+      "Category": "Not known to have mosquito that transmits Zika"
+    },
+    {
+      "Country": "Yemen",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Zambia",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    },
+    {
+      "Country": "Dhekelia",
+      "Category": "Known to have mosquito that transmits Zika, but no reported Zika cases "
+    }
+  ],
+  "dataDescription": {
+    "series": false,
+    "horizontal": false
+  },
+  "dataKey": "Map-data-1_23_24-wMali.csv"
+}

@@ -489,7 +489,22 @@ export const supportedCountries = {
   ZWE: ['Zimbabwe'],
   IOT: ['British Indian Ocean Territory'],
   Alaska: ['Alaska'],
-  Hawaii: ['Hawaii']
+  Hawaii: ['Hawaii'],
+  Sardinia: ['Sardinia'],
+  Sicily: ['Sicily'],
+  Corsica: ['Corsica'],
+  'Easter Island': ['Easter Island'],
+  'Canary Islands': ['Canary Islands'],
+  Antarctica: ['Antarctica'],
+  'Madeira Islands': ['Madeira Islands'],
+  'Palestinian Territories': ['Palestinian Territories'],
+  'Saint Paul and New Amsterdamn Islands': ['Saint Paul and New Amsterdamn Islands'],
+  'Sovereign Base Areas of Akrotiri and Dhekelia': ['Sovereign Base Areas of Akrotiri and Dhekelia'],
+  'Plazas de Soberania': ['Plazas de Soberania'],
+  Akrotiri: ['Akrotiri'],
+  Dhekelia: ['Dhekelia'],
+  Sicily: ['Sicily'],
+  Sardinia: ['Sardinia']
 }
 
 export const supportedTerritories = {
