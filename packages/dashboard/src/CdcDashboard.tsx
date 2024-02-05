@@ -370,10 +370,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     }
 
     dispatch({ type: 'SET_CONFIG', payload: { ...config, dashboard: dashboardConfig } })
-    if (config.filterBehavior !== FilterBehavior.Apply) {
-      updateDataFilters()
-      reloadURLData()
-    }
+    //if (config.filterBehavior !== FilterBehavior.Apply) {
+    updateDataFilters()
+    reloadURLData()
+    //}
   }
 
   const updateDataFilters = () => {
@@ -455,7 +455,12 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   // Prevent render if loading
   if (state.loading) return <Loading />
 
-  const GoButton = autoLoad => (state.config.filterBehavior === FilterBehavior.Apply && !autoLoad ? <button onClick={applyFilters}>GO!</button> : null)
+  const GoButton = ({ autoLoad }: { autoLoad?: boolean }) => {
+    if (state.config.filterBehavior === FilterBehavior.Apply && !autoLoad) {
+      return <button onClick={applyFilters}>GO!</button>
+    }
+    return null
+  }
 
   let body: JSX.Element | null = null
   // Editor mode
