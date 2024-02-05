@@ -4,7 +4,7 @@ import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import ConfigContext from '../../../../ConfigContext'
-import EditorPanelContext, { EditorPanelContext as EPContext } from '../../EditorPanelContext'
+import { useEditorPanelContext } from '../../EditorPanelContext'
 
 // types
 import { type PanelProps } from './../PanelProps'
@@ -13,7 +13,7 @@ const PanelBoxPlot: FC<PanelProps> = props => {
   const { config } = useContext(ConfigContext)
   const { boxplot } = config
   if (config.visualizationType !== 'Box Plot') return
-  const { updateField } = useContext<EPContext>(EditorPanelContext)
+  const { updateField } = useEditorPanelContext()
 
   return (
     <AccordionItem>

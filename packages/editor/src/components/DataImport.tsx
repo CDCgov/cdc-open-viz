@@ -28,6 +28,20 @@ import '@cdc/core/styles/v2/components/data-designer.scss'
 import { errorMessages, maxFileSize } from '../helpers/errorMessages'
 import { Visualization } from '@cdc/core/types/Visualization'
 
+const isSolrCsv = dataUrl => {
+  if (dataUrl.includes('wt=csv')) {
+    return true
+  }
+  return false
+}
+
+const isSolrJson = dataUrl => {
+  if (dataUrl?.includes('wt=json')) {
+    return true
+  }
+  return false
+}
+
 export default function DataImport() {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
 
@@ -91,15 +105,15 @@ export default function DataImport() {
   const loadExternal = async () => {
     let dataURL: URL
     // Is URL valid?
+
     try {
-      dataURL = new URL(externalURL, window.location.origin)
+      dataURL = isSolrCsv(externalURL) || isSolrJson(externalURL) ? externalURL : new URL(externalURL, window.location.origin)
     } catch {
       throw errorMessages.urlInvalid
     }
     let responseBlob = null
 
-    const fileExtension = Object.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
-
+    const fileExtension = isSolrCsv(externalURL) ? '.csv' : isSolrJson(externalURL) ? '.json' : Object?.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
     try {
       // eslint-disable-next-line no-unused-vars
       await axios
@@ -110,9 +124,9 @@ export default function DataImport() {
           responseBlob = response.data
 
           // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
-          if (fileExtension === '.csv' && responseBlob.type === 'text/plain') {
+          if ((fileExtension === '.csv' && responseBlob.type === 'text/plain') || isSolrCsv(externalURL)) {
             responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
-          } else if (fileExtension === '.json' && responseBlob.type === 'text/plain') {
+          } else if ((fileExtension === '.json' && responseBlob.type === 'text/plain') || isSolrJson(externalURL)) {
             responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
           }
         })
@@ -181,7 +195,7 @@ export default function DataImport() {
 
       if (fileSourceType === 'url') {
         let urlData = new URL(path, window.location.origin)
-        fileExtension = Object.keys(supportedDataTypes).find(extension => urlData.pathname.endsWith(extension))
+        fileExtension = isSolrCsv(externalURL) ? '.csv' : isSolrJson(externalURL) ? '.json' : Object.keys(supportedDataTypes).find(extension => urlData.pathname.endsWith(extension))
       }
 
       return fileExtension
@@ -207,7 +221,7 @@ export default function DataImport() {
         case 'text/plain':
         case 'application/json':
           try {
-            text = JSON.parse(text)
+            text = isSolrJson(externalURL) ? JSON.parse(text).response.docs : JSON.parse(text)
           } catch (errors) {
             setErrors([errorMessages.formatting])
             return

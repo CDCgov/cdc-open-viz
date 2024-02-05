@@ -10,6 +10,7 @@ import { scaleOrdinal } from '@visx/scale'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
+import { Group } from '@visx/group'
 
 interface LegendProps {
   config: ChartConfig
@@ -165,20 +166,22 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
               </div>
 
               <>
-                {config.preliminaryData.some(pd => pd.label) && (
+                {config.preliminaryData.some(pd => pd.label) && config.visualizationType === 'Line' && (
                   <>
                     <hr></hr>
-                    <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : 'dash-left'}>
+                    <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
                       {config.preliminaryData.map((pd, index) => {
                         return (
-                          <div className='dash-container' key={index}>
+                          <>
                             {pd.label && (
-                              <>
-                                <div className='dash-inner'>{renderDashesOrCircle(pd.style)}</div>
-                                <div style={{ marginLeft: '7px' }}>{pd.label}</div>
-                              </>
+                              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <svg style={{ width: '50px' }} key={index} height={'23px'}>
+                                  {pd.style.includes('Dashed') ? <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} /> : <circle r={6} strokeWidth={2} stroke={'#000'} cx={22} cy={10} fill='transparent' />}
+                                </svg>
+                                <span style={{}}> {pd.label}</span>
+                              </div>
                             )}
-                          </div>
+                          </>
                         )
                       })}
                     </div>
