@@ -130,7 +130,8 @@ export default {
     showDataTableLink: true,
     indexLabel: '',
     download: false,
-    showVertical: true
+    showVertical: true,
+    dateDisplayFormat: ''
   },
   orientation: 'vertical',
   color: 'pinkpurple',
@@ -192,7 +193,8 @@ export default {
   series: [],
   tooltips: {
     opacity: 90,
-    singleSeries: false
+    singleSeries: false,
+    dateDisplayFormat: ''
   },
   forestPlot: {
     startAt: 0,
