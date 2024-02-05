@@ -1754,9 +1754,9 @@ const EditorPanel = () => {
                                   </Tooltip.Content>
                                 </Tooltip>
                               }
-                              value={config.xAxis.dateDisplayFormat}
-                              section='xAxis'
-                              fieldName='tableDateDisplayFormat'
+                              value={config.table.dateDisplayFormat}
+                              section='table'
+                              fieldName='dateDisplayFormat'
                               placeholder='Ex. %Y-%m-%d'
                               label='DATA TABLE DATE FORMAT'
                               updateField={updateField}
@@ -1768,13 +1768,13 @@ const EditorPanel = () => {
                                     <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                   </Tooltip.Target>
                                   <Tooltip.Content>
-                                    <p>When this option is checked, you can select source-file values for exclusion from the date/category axis. </p>
+                                    <p>If not populated, Axis Date Display format will be used. </p>
                                   </Tooltip.Content>
                                 </Tooltip>
                               }
-                              value={config.xAxis.dateDisplayFormat}
-                              section='xAxis'
-                              fieldName='hoverDateDisplayFormat'
+                              value={config.tooltips.dateDisplayFormat}
+                              section='tooltips'
+                              fieldName='dateDisplayFormat'
                               placeholder='Ex. %Y-%m-%d'
                               label='HOVER DATE FORMAT'
                               updateField={updateField}

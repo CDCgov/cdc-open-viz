@@ -17,4 +17,5 @@ export type Table = {
   showDownloadPdfButton?: boolean
   downloadImageButton?: boolean
   downloadPdfButton?: boolean
+  dateDisplayFormat: string
 }
