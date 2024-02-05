@@ -25,7 +25,7 @@ export const useEditorPermissions = () => {
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
   const visSupportsDateCategoryAxis = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -61,6 +61,8 @@ export const useEditorPermissions = () => {
       case 'Forest Plot':
         return false
       case 'Spark Line':
+        return false
+      case 'Sankey':
         return false
       default:
         return true
@@ -187,7 +189,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsRegions = () => {
-    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar', 'Spark Line']
+    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar', 'Spark Line', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -205,7 +207,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsFilters = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -258,7 +260,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsLeftValueAxis = () => {
-    const disabledCharts = ['Spark Line']
+    const disabledCharts = ['Spark Line', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -270,7 +272,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryHeight = () => {
-    const disabledCharts = ['Spark Line']
+    const disabledCharts = ['Spark Line', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }

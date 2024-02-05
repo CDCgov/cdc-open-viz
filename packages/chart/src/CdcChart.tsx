@@ -885,6 +885,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const missingRequiredSections = () => {
+    if (config.visualizationType === 'Sankey') return false // skip checks for now
     if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
     if (config.visualizationType === 'Forest Plot') return false // skip required checks for now.
     if (config.visualizationType === 'Pie') {

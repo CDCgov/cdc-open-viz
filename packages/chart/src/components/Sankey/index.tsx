@@ -56,7 +56,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
       }
     })
     setLargestGroupWidth(largest)
-  }, [groupRefs, config.sankey.data.storyNodeText])
+  }, [groupRefs, config.sankey?.data?.storyNodeText])
 
   //Retrieve all the unique values for the Nodes
   const uniqueNodes = Array.from(new Set(data.links.flatMap(link => [link.source, link.target])))
@@ -94,7 +94,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
 
     // TODO: need a dynamic way to apply classes here instead of checking static values.
 
-    if (sankeyConfig.data.storyNodeText.every(node => node.StoryNode !== id)) {
+    if (sankeyConfig?.data?.storyNodeText.every(node => node.StoryNode !== id)) {
       storyNodes = false
       textPositionVertical = 10
       textPositionHorizontal = 8
@@ -227,7 +227,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
               style={{ pointerEvents: 'none' }}
               className='node-text'
             >
-              {(sankeyConfig.data.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
+              {(sankeyConfig?.data?.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
             </Text>
             <Text verticalAnchor='end' className={classStyle} x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0! + 25) / 2} fill={sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
               {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
@@ -243,7 +243,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
               className='node-text'
               verticalAnchor='end'
             >
-              {(sankeyConfig.data.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}
+              {(sankeyConfig?.data?.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}
             </Text>
           </>
         ) : (

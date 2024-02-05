@@ -14,7 +14,7 @@ const SankeySettings = () => {
   const updateStoryNode = (fieldName, value, i) => {
     let storyNodes = []
 
-    if (config.sankey.data.storyNodeText) {
+    if (config.sankey?.data?.storyNodeText) {
       storyNodes = [...config.sankey.data.storyNodeText]
     }
 
@@ -35,7 +35,7 @@ const SankeySettings = () => {
   const addStoryNode = () => {
     let storyNodes = []
 
-    if (config.sankey.data.storyNodeText) {
+    if (config.sankey?.data?.storyNodeText) {
       storyNodes = [...config.sankey.data.storyNodeText]
     }
 
@@ -58,7 +58,7 @@ const SankeySettings = () => {
   }
 
   const removeStoryNode = index => {
-    const updatedStoryNodeText = [...config.sankey.data.storyNodeText]
+    const updatedStoryNodeText = [...config.sankey?.data?.storyNodeText]
     updatedStoryNodeText.splice(index, 1)
 
     updateConfig({ ...config, sankey: { ...config.sankey, data: { ...config.sankey.data, storyNodeText: updatedStoryNodeText } } })
@@ -71,8 +71,8 @@ const SankeySettings = () => {
       </AccordionItemHeading>
       <AccordionItemPanel>
         <CheckBox value={config.enableKPIs} fieldName='enableKPIs' label='Enable KPIs' updateField={updateField} />
-        {config.sankey.data.storyNodeText &&
-          config.sankey.data.storyNodeText.map(({ StoryNode, segmentTextBefore, segmentTextAfter }, i) => (
+        {config.sankey?.data?.storyNodeText &&
+          config.sankey?.data?.storyNodeText.map(({ StoryNode, segmentTextBefore, segmentTextAfter }, i) => (
             <div key={i} style={{ border: '1px solid black', margin: '15px auto', padding: '15px', borderRadius: '10px' }}>
               <label>
                 Story Node Text
@@ -91,8 +91,8 @@ const SankeySettings = () => {
               </Button>
             </div>
           ))}
-        {`Total Story Nodes: ${config.sankey.data.storyNodeText.length}`}
-        {config.sankey.data.storyNodeText.length < 3 && (
+        {`Total Story Nodes: ${config.sankey?.data?.storyNodeText.length}`}
+        {config.sankey?.data?.storyNodeText.length < 3 && (
           <button
             type='button'
             className='btn full-width'
