@@ -129,7 +129,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
 
   const getStyleOptions = () => {
     if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
-      return ['Open Circles']
+      return ['Dashed Small', 'Dashed Medium', 'Dashed Large', 'Open Circles']
     }
     if (config.visualizationType === 'Bar') {
       return ['star']
