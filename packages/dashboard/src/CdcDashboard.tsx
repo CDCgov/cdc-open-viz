@@ -370,10 +370,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     }
 
     dispatch({ type: 'SET_CONFIG', payload: { ...config, dashboard: dashboardConfig } })
-    //if (config.filterBehavior !== FilterBehavior.Apply) {
-    updateDataFilters()
-    reloadURLData()
-    //}
+    if (config.filterBehavior !== FilterBehavior.Apply) {
+      updateDataFilters()
+      reloadURLData()
+    }
   }
 
   const updateDataFilters = () => {
