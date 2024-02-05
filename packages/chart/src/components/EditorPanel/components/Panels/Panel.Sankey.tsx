@@ -70,7 +70,6 @@ const SankeySettings = () => {
         <AccordionItemButton>Sankey Settings</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        <CheckBox value={config.enableKPIs} fieldName='enableKPIs' label='Enable KPIs' updateField={updateField} />
         {config.sankey.data.storyNodeText &&
           config.sankey.data.storyNodeText.map(({ StoryNode, segmentTextBefore, segmentTextAfter }, i) => (
             <div key={i} style={{ border: '1px solid black', margin: '15px auto', padding: '15px', borderRadius: '10px' }}>
