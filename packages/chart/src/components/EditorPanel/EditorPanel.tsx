@@ -129,7 +129,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
 
   const getStyleOptions = () => {
     if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
-      return ['Open Circles']
+      return ['Dashed Small', 'Dashed Medium', 'Dashed Large', 'Open Circles']
     }
     if (config.visualizationType === 'Bar') {
       return ['star']
@@ -840,7 +840,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting']
+  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar']
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
