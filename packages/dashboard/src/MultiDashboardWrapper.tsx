@@ -8,7 +8,6 @@ import { getVizKeys } from './helpers/getVizKeys'
 import { processDataLegacy } from './helpers/processDataLegacy'
 import { WCMSProps } from '@cdc/core/types/WCMSProps'
 import { initialState } from './DashboardContext'
-import { getUpdateConfig } from './helpers/getUpdateConfig'
 import { InitialState } from './types/InitialState'
 import { DashboardConfig } from './types/DashboardConfig'
 import _ from 'lodash'
@@ -34,17 +33,12 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, confi
     return 0
   }
 
-  const formatInitialState = (newConfig: MultiDashboardConfig | DashboardConfig, datasets: Record<string, Object[]>) => {
-    const [config, filteredData] = getUpdateConfig(initialState)(newConfig, datasets)
-    return { ...initialState, config, filteredData, data: datasets }
-  }
-
   const loadConfig = async (selectedConfig?: string) => {
     const _config: MultiDashboardConfig = editorConfig || (await (await fetch(configUrl)).json())
     const selected = getSelectedConfig(_config, selectedConfig)
 
     const { newConfig, datasets } = selected !== null ? await loadMultiDashboard(_config, selected) : await loadSingleDashboard(_config)
-    setInitial(formatInitialState(newConfig, datasets))
+    setInitial({ ...initialState, config: newConfig, filteredData: [], data: datasets })
   }
 
   useEffect(() => {

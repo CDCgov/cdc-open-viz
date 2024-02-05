@@ -53,13 +53,8 @@ import { type InitialState } from './types/InitialState'
 import MultiTabs from './components/MultiConfigTabs'
 import _ from 'lodash'
 import EditorContext from '../../editor/src/ConfigContext'
-
-type DropdownOptions = Record<'value' | 'text', string>[]
-
-type APIFilterDropdowns = {
-  // null means still loading
-  [filtername: string]: null | DropdownOptions
-}
+import { getApiFilterKey } from './helpers/getApiFilterKey'
+import Filters, { APIFilterDropdowns, DropdownOptions } from './components/Filters'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -95,10 +90,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
   const transform = new DataTransform()
 
-  const getApiFilterKey = ({ apiEndpoint, heirarchyLookup }: APIFilter) => {
-    return apiEndpoint + (heirarchyLookup || '')
-  }
-
   const setAutoLoadDefaultValue = (sharedFilterIndex: number, filterDropdowns: DropdownOptions) => {
     const autoLoadViz = getAutoLoadVisualization()
     if (!autoLoadViz) return // no autoLoading happening
@@ -118,6 +109,12 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     }
   }
 
+  const handleDataLoadSideEffect = () => {
+    // a side effect in the filterData is causing filter values to be generated after they are needed for reference.
+    // running reloadURLData twice is the only thing that fixes it.
+    if (state.config.filterBehavior !== FilterBehavior.Apply) reloadURLData().then(() => reloadURLData())
+  }
+
   const loadAPIFilters = async () => {
     if (state.config.dashboard.sharedFilters) {
       const sharedAPIFilters = state.config.dashboard.sharedFilters.filter(f => f.apiFilter)
@@ -134,15 +131,15 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         if (!_parents.length) return null
         return _parents.map(({ queryParameter, queuedActive }) => ({ key: queryParameter || '', value: queuedActive || '' }))
       }
-      const getFilterValues = (filterData: Object | Array<Object>, apiFilter: APIFilter): DropdownOptions => {
+      const getFilterValues = (data: Object | Array<Object>, apiFilter: APIFilter): DropdownOptions => {
         const { textSelector, valueSelector, heirarchyLookup } = apiFilter
         if (heirarchyLookup) {
           const heirarchy = heirarchyLookup!.split('.')
           const selector = heirarchy.shift() // pop first element
-          return getFilterValues(selector ? filterData[selector] : filterData, { ...apiFilter, heirarchyLookup: heirarchy.join('.') })
+          return getFilterValues(selector ? data[selector] : data, { ...apiFilter, heirarchyLookup: heirarchy.join('.') })
         }
-        if (!Array.isArray(filterData)) throw new Error('the filter data has requires a heirarchy path to access the filter values, This should be in the format key.subkey.subsubkey')
-        return filterData.map(v => ({ text: v[textSelector], value: v[valueSelector] }))
+        if (!Array.isArray(data)) throw new Error('the filter data has requires a heirarchy path to access the filter values, This should be in the format key.subkey.subsubkey')
+        return data.map(v => ({ text: v[textSelector], value: v[valueSelector] }))
       }
       state.config.dashboard.sharedFilters.forEach(async (filter, index) => {
         if (!filter.apiFilter) return
@@ -161,6 +158,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             const _filterValues = getFilterValues(data, apiFilter)
             setAPIFilterDropdowns(dropdowns => ({ ...dropdowns, [_key]: _filterValues }))
             setAutoLoadDefaultValue(index, _filterValues)
+            handleDataLoadSideEffect()
           })
       })
     }
@@ -316,12 +314,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   useEffect(() => {
-    const { config } = state
-    if (config.filterBehavior !== FilterBehavior.Apply) {
-      reloadURLData()
-    }
     loadAPIFilters()
-  }, [JSON.stringify(state.config.dashboard ? state.config.dashboard.sharedFilters : undefined)])
+  }, [])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     const { config } = state
@@ -442,68 +436,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     }
   }
 
-  const Filters = ({ hide, autoLoad }: { hide?: number[]; autoLoad?: boolean }) => {
-    const { config } = state
-    const isLegacyFilter = !config.filterBehavior
-    return (
-      <>
-        {config.dashboard.sharedFilters.map((singleFilter, filterIndex) => {
-          if ((singleFilter.type !== 'urlfilter' && !singleFilter.showDropdown) || (hide && hide.indexOf(filterIndex) !== -1)) return <></>
-          const values: JSX.Element[] = []
-          if (singleFilter.resetLabel) {
-            values.push(
-              <option key={`${singleFilter.resetLabel}-option`} value={singleFilter.resetLabel}>
-                {singleFilter.resetLabel}
-              </option>
-            )
-          }
-          const _key = singleFilter.apiFilter ? getApiFilterKey(singleFilter.apiFilter) : undefined
-          if (_key && apiFilterDropdowns[_key]) {
-            // URL Filter
-            apiFilterDropdowns[_key]!.forEach(({ text, value }, index) => {
-              values.push(
-                <option key={`${value}-option-${index}`} value={value}>
-                  {text}
-                </option>
-              )
-            })
-          } else {
-            // Data Filter
-            singleFilter.values?.forEach((filterOption, index) => {
-              const labeledOpt = singleFilter.labels && singleFilter.labels[filterOption]
-              values.push(
-                <option key={`${singleFilter.key}-option-${index}`} value={filterOption}>
-                  {labeledOpt || filterOption}
-                </option>
-              )
-            })
-          }
-
-          return (
-            <div className='cove-dashboard-filters' key={`${singleFilter.key}-filtersection-${filterIndex}`}>
-              <section className='dashboard-filters-section'>
-                <label htmlFor={`filter-${filterIndex}`}>{singleFilter.key}</label>
-                <select
-                  id={`filter-${filterIndex}`}
-                  className='filter-select'
-                  data-index='0'
-                  value={singleFilter.queuedActive || singleFilter.active}
-                  onChange={val => {
-                    handleOnChange(filterIndex, val.target.value)
-                  }}
-                >
-                  {values}
-                </select>
-              </section>
-            </div>
-          )
-        })}
-
-        {!isLegacyFilter && config.filterBehavior === FilterBehavior.Apply && <button onClick={applyFilters}>GO!</button>}
-      </>
-    )
-  }
-
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let newViewport = getViewport(entry.contentRect.width)
@@ -522,6 +454,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
   // Prevent render if loading
   if (state.loading) return <Loading />
+
+  const GoButton = autoLoad => (state.config.filterBehavior === FilterBehavior.Apply && !autoLoad ? <button onClick={applyFilters}>GO!</button> : null)
 
   let body: JSX.Element | null = null
   // Editor mode
@@ -638,7 +572,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             body = !hideFilter ? (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Filter Dropdowns' />
-                <Filters hide={visualizationConfig.hide} autoLoad={visualizationConfig.autoLoad} />
+                <Filters hide={visualizationConfig.hide} filters={state.config.dashboard.sharedFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
+                <GoButton autoLoad={visualizationConfig.autoLoad} />
               </>
             ) : (
               <></>
@@ -678,7 +613,12 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           {description && <div className='subtext'>{parse(description)}</div>}
 
           {/* Filters */}
-          {config.dashboard.sharedFilters && Object.values(config.visualizations || {}).filter(viz => viz.visualizationType === 'filter-dropdowns').length === 0 && <Filters hide={undefined} autoLoad={undefined} />}
+          {config.dashboard.sharedFilters && Object.values(config.visualizations || {}).filter(viz => viz.visualizationType === 'filter-dropdowns').length === 0 && (
+            <>
+              <Filters filters={state.config.dashboard.sharedFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
+              <GoButton />
+            </>
+          )}
 
           {/* Visualizations */}
           {config.rows &&
@@ -800,7 +740,12 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                                   configUrl={undefined}
                                 />
                               )}
-                              {visualizationConfig.type === 'filter-dropdowns' && !hideFilter && <Filters hide={visualizationConfig.hide} autoLoad={visualizationConfig.autoLoad} />}
+                              {visualizationConfig.type === 'filter-dropdowns' && !hideFilter && (
+                                <>
+                                  <Filters hide={visualizationConfig.hide} filters={state.config.dashboard.sharedFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
+                                  <GoButton autoLoad={visualizationConfig.autoLoad} />
+                                </>
+                              )}
                             </div>
                           </React.Fragment>
                         )
