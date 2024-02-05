@@ -32,23 +32,23 @@
   "preliminaryData": [
     {
       "type": "effect",
-      "label": "Cricle  1",
+      "label": "Dashed Large",
       "column": "Data 2",
       "value": "20",
-      "style": "Open Circles",
-      "seriesKey": "Data 1"
-    },
-    {
-      "type": "",
-      "label": "Cricle 2",
-      "column": "Data 3",
-      "value": "20",
-      "style": "Open Circles",
+      "style": "Dashed Large",
       "seriesKey": "Data 1"
     },
     {
       "type": "effect",
-      "label": "circle 3",
+      "label": "Dashed Small",
+      "column": "Data 3",
+      "value": "20",
+      "style": "Dashed Small",
+      "seriesKey": "Data 1"
+    },
+    {
+      "type": "effect",
+      "label": "Circle",
       "column": "Data 2",
       "value": "30",
       "style": "Open Circles",

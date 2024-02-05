@@ -15,11 +15,8 @@
     border-bottom: #c7c7c7 1px solid;
     padding: 0 1em;
     display: flex;
-    height: 6em;
-    position: fixed;
-    width: 100%;
-    z-index: 19;
-    top: 0;
+    width: 100vw;
+    z-index: 5;
     &.sub-dashboard-viz {
       height: 3em;
     }

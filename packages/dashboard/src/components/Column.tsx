@@ -7,19 +7,22 @@ import Widget from './Widget'
 const Column = ({ data, rowIdx, colIdx }) => {
   const { config } = useContext(DashboardContext)
 
-  const [{ isOver, canDrop }, drop] = useDrop(() => ({
-    accept: 'vis-widget',
-    drop: () => ({
-      rowIdx,
-      colIdx,
-      canDrop
+  const [{ isOver, canDrop }, drop] = useDrop(
+    () => ({
+      accept: 'vis-widget',
+      drop: () => ({
+        rowIdx,
+        colIdx,
+        canDrop
+      }),
+      canDrop: () => !data.widget,
+      collect: monitor => ({
+        isOver: monitor.isOver(),
+        canDrop: !!monitor.canDrop()
+      })
     }),
-    canDrop: () => !data.widget,
-    collect: monitor => ({
-      isOver: monitor.isOver(),
-      canDrop: !!monitor.canDrop()
-    })
-  }))
+    [config.activeDashboard]
+  )
 
   const widget = data.widget ? config?.visualizations[data.widget] : null
   if (widget && !widget.uid) widget.uid = data.widget

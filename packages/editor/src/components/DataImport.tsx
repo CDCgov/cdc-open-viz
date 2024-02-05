@@ -5,7 +5,7 @@ import axios from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
-import ConfigContext from '../ConfigContext'
+import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
 
 import TabPane from './TabPane'
 import Tabs from './Tabs'
@@ -25,6 +25,8 @@ import Icon from '@cdc/core/components/ui/Icon'
 import '../scss/data-import.scss'
 
 import '@cdc/core/styles/v2/components/data-designer.scss'
+import { errorMessages, maxFileSize } from '../helpers/errorMessages'
+import { Visualization } from '@cdc/core/types/Visualization'
 
 const isSolrCsv = dataUrl => {
   if (dataUrl.includes('wt=csv')) {
@@ -41,8 +43,14 @@ const isSolrJson = dataUrl => {
 }
 
 export default function DataImport() {
-  const { config, setConfig, errors, setErrors, errorMessages, maxFileSize, setGlobalActive, tempConfig, setTempConfig, sharepath } = useContext(ConfigContext)
+  const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
 
+  const setConfig = (conf: Visualization) => {
+    dispatch({ type: 'EDITOR_SET_CONFIG', payload: conf })
+  }
+  const setErrors = (err: string[]) => {
+    dispatch({ type: 'EDITOR_SET_ERRORS', payload: err })
+  }
   const transform = new DataTransform()
 
   const [externalURL, setExternalURL] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : config.dataUrl || '')
@@ -51,9 +59,11 @@ export default function DataImport() {
 
   const [addingDataset, setAddingDataset] = useState(config.type === 'dashboard' || !config.data)
 
-  const [editingDataset, setEditingDataset] = useState()
+  const [editingDataset, setEditingDataset] = useState<string>(undefined)
 
-  const [asyncPreviewData, setAsyncPreviewData] = useState()
+  const [asyncPreviewData, setAsyncPreviewData] = useState<any[]>()
+
+  const dispatch = useContext(EditorDispatchContext)
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
@@ -93,7 +103,7 @@ export default function DataImport() {
   }
 
   const loadExternal = async () => {
-    let dataURL = ''
+    let dataURL: URL
     // Is URL valid?
 
     try {
@@ -106,8 +116,8 @@ export default function DataImport() {
     const fileExtension = isSolrCsv(externalURL) ? '.csv' : isSolrJson(externalURL) ? '.json' : Object?.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
     try {
       // eslint-disable-next-line no-unused-vars
-      const response = await axios
-        .get(dataURL, {
+      await axios
+        .get(dataURL.toString(), {
           responseType: 'blob'
         })
         .then(response => {
@@ -270,7 +280,7 @@ export default function DataImport() {
                 data: text,
                 dataFileName: fileSource,
                 dataFileSourceType: fileSourceType
-              },
+              } as Visualization,
               'It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?'
             )
           }
@@ -321,10 +331,7 @@ export default function DataImport() {
   }
 
   useEffect(() => {
-    let newConfig = { ...config }
-    if (tempConfig !== null) {
-      newConfig = { ...tempConfig }
-    }
+    let newConfig = { ...(tempConfig || config) }
 
     if (undefined === config.formattedData && config.dataDescription) {
       const formattedData = transform.developerStandardize(config.data, config.dataDescription)
@@ -332,9 +339,7 @@ export default function DataImport() {
       if (formattedData) newConfig.formattedData = formattedData
     }
 
-    if (tempConfig !== null) setTempConfig(null)
-
-    setConfig(newConfig)
+    dispatch({ type: 'EDITOR_SAVE', payload: newConfig })
   }, []) // eslint-disable-line
 
   useEffect(() => {
@@ -425,14 +430,13 @@ export default function DataImport() {
     )
   }
 
-  const resetEditor = (config = {}, message = 'Are you sure you want to do this?') => {
+  const resetEditor = (config = {} as Visualization, message = 'Are you sure you want to do this?') => {
     config.newViz = true
 
     const confirmDataReset = window.confirm(message)
 
     if (confirmDataReset === true) {
-      setTempConfig(null)
-      setConfig(config)
+      dispatch({ type: 'EDITOR_SAVE', payload: config })
       setAddingDataset(true)
     }
   }
@@ -441,7 +445,7 @@ export default function DataImport() {
     return (
       //todo convert to modal
       <>
-        <button className='btn danger' onClick={() => resetEditor({ type: config.type, visualizationType: config.visualizationType }, 'Resetting will remove your data and settings. Do you want to continue?')}>
+        <button className='btn danger' onClick={() => resetEditor({ type: config.type, visualizationType: config.visualizationType } as Visualization, 'Resetting will remove your data and settings. Do you want to continue?')}>
           Clear
           <CloseIcon />
         </button>
@@ -529,7 +533,7 @@ export default function DataImport() {
   } else {
     previewData = config.data
     configureData = config
-    readyToConfigure = !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data, config.dataDescription))
+    readyToConfigure = !!config.formattedData || (config.data && config.dataDescription && transform.autoStandardize(config.data))
   }
 
   // Box plots skip the data description steps.
@@ -556,7 +560,7 @@ export default function DataImport() {
                 Remove
               </button>
               <label>
-                <span class='edit-label column-heading'>
+                <span className='edit-label column-heading'>
                   Label
                   <Tooltip style={{ textTransform: 'none' }}>
                     <Tooltip.Target>
@@ -578,7 +582,7 @@ export default function DataImport() {
                 />
               </label>
               <label>
-                <span class='edit-label column-heading'>
+                <span className='edit-label column-heading'>
                   Query string parameter
                   <Tooltip style={{ textTransform: 'none' }}>
                     <Tooltip.Target>
@@ -600,7 +604,7 @@ export default function DataImport() {
                 />
               </label>
               <label>
-                <span class='edit-label column-heading'>Values</span>{' '}
+                <span className='edit-label column-heading'>Values</span>{' '}
               </label>
               <ul className='value-list'>
                 {filter.orderedValues &&
@@ -685,7 +689,7 @@ export default function DataImport() {
                   <th>Name</th>
                   <th>Size</th>
                   <th>Type</th>
-                  <th colSpan='4'>Actions</th>
+                  <th colSpan={4}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -759,7 +763,7 @@ export default function DataImport() {
                   {config.dataFileSourceType === 'url' && (
                     <>
                       <div className='url-source-options'>
-                        <div>{loadFileFromUrl(externalURL)}</div>
+                        <div>{loadFileFromUrl(externalURL, editingDataset)}</div>
                         <div>{resetButton()}</div>
                       </div>
                       {config.dataUrl && (config.type === 'chart' || config.type === 'map') && urlFilters}
@@ -769,7 +773,7 @@ export default function DataImport() {
               </>
             )}
 
-            {showDataDesigner && <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} config={config} setConfig={setConfig} />}
+            {showDataDesigner && <DataDesigner visualizationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} config={config} setConfig={setConfig} />}
           </>
         )}
 
@@ -795,7 +799,7 @@ export default function DataImport() {
               </TabPane>
             </Tabs>
             {errors &&
-              (errors.map
+              (Array.isArray(errors)
                 ? errors.map((message, index) => (
                     <div className='error-box slim mt-2' key={`error-${message}`}>
                       <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
@@ -823,7 +827,7 @@ export default function DataImport() {
 
         {readyToConfigure && (
           <p>
-            <button className='btn btn-primary' onClick={() => setGlobalActive(2)}>
+            <button className='btn btn-primary' onClick={() => dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 2 })}>
               Configure your visualization
             </button>
           </p>
