@@ -14,14 +14,14 @@ import { useColorPalette } from '../../../../hooks/useColorPalette'
 import { ChartContext } from './../../../../types/ChartContext.js'
 
 import { useEditorPermissions } from '../../useEditorPermissions.js'
-import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../EditorPanelContext.js'
+import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 
 const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
   const { visual } = config
-  const { setLollipopShape, updateField } = useContext<EPContext>(EditorPanelContext)
+  const { setLollipopShape, updateField } = useEditorPanelContext()
   const { visHasBarBorders, visCanAnimate, visSupportsNonSequentialPallete, headerColors, visSupportsTooltipOpacity, visSupportsTooltipLines, visSupportsBarSpace, visSupportsBarThickness, visHasDataCutoff, visSupportsSequentialPallete, visSupportsReverseColorPalette } = useEditorPermissions()
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
 
