@@ -175,7 +175,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       let datasetKeys = Object.keys(config.datasets)
       let newFileName = ''
 
-      datasetKeys.forEach(async datasetKey => {
+      for (let i = 0; i < datasetKeys.length; i++) {
+        const datasetKey = datasetKeys[i]
         const dataset = config.datasets[datasetKey]
         const filters = config.dashboard?.sharedFilters
         if (dataset.dataUrl && filters) {
@@ -248,13 +249,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             newData[datasetKey] = newDataset
           }
         }
-      })
+      }
 
       if (datasetsNeedsUpdate) {
         dispatch({ type: 'SET_DATA', payload: newData })
 
         let newFilteredData = {}
-        let newConfig = { ...config }
+        let visualizations = { ...config.visualizations }
         getVizKeys(config).forEach(key => {
           let dataKey = config.visualizations[key].dataKey
 
@@ -264,13 +265,12 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           }
 
           if (newData[dataKey]) {
-            newConfig.visualizations[key].formattedData = newData[dataKey]
+            visualizations[key].formattedData = newData[dataKey]
           }
         })
 
         dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-        newConfig.datasets = newDatasets
-        dispatch({ type: 'SET_CONFIG', payload: newConfig })
+        dispatch({ type: 'SET_CONFIG', payload: { ...config, datasets: newDatasets, visualizations } })
       }
     }
   }
