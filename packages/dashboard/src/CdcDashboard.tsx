@@ -175,7 +175,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       let datasetKeys = Object.keys(config.datasets)
       let newFileName = ''
 
-      datasetKeys.forEach(async datasetKey => {
+      for (let i = 0; i < datasetKeys.length; i++) {
+        const datasetKey = datasetKeys[i]
         const dataset = config.datasets[datasetKey]
         if (dataset.dataUrl && config.dashboard && config.dashboard.sharedFilters) {
           const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl, window.location.origin)
@@ -243,7 +244,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           newData[datasetKey] = newDataset
           datasetsNeedsUpdate = true
         }
-      })
+      }
 
       if (datasetsNeedsUpdate) {
         dispatch({ type: 'SET_DATA', payload: newData })
