@@ -4,50 +4,57 @@ import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
 
-const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, projection, titleCase, setSharedFilterValue, isFilterValueSupported, isGeoCodeMap }) => {
+const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, projection, titleCase, setSharedFilterValue, isFilterValueSupported }) => {
   const [citiesData, setCitiesData] = useState({})
 
   useEffect(() => {
-    if (!isGeoCodeMap) {
-      const citiesList = Object.keys(data).filter(item => Object.keys(supportedCities).includes(item))
+    const citiesDictionary = {}
 
-      const citiesDictionary = {}
-
-      citiesList.map(city => (citiesDictionary[city] = data[city]))
-
-      setCitiesData(citiesDictionary)
-    } else {
-      const citiesDictionary = {}
-      state.data.map(city => (citiesDictionary[city[state.columns.geo.name]] = city))
-      setCitiesData(citiesDictionary)
+    if (data) {
+      Object.keys(data).forEach(key => {
+        const city = data[key]
+        citiesDictionary[city[state.columns.geo.name]] = city
+      })
     }
-  }, [data, state.data])
+
+    setCitiesData(citiesDictionary)
+  }, [data])
 
   if (state.general.type === 'bubble') {
-    const maxDataValue = Math.max(...state.data.map(d => d[state.columns.primary.name]))
+    const maxDataValue = Math.max(...(data ? Object.keys(data).map(key => data[key][state.columns.primary.name]) : [0]))
     const sortedRuntimeData = Object.values(data).sort((a, b) => (a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1))
     if (!sortedRuntimeData) return
 
     // Set bubble sizes
     var size = scaleLinear().domain([1, maxDataValue]).range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
   }
-  let cityList = isGeoCodeMap ? Object.keys(citiesData).filter(c => undefined !== c) : Object.keys(citiesData).filter(c => undefined !== data[c])
+  let cityList = Object.keys(citiesData).filter(c => undefined !== c || undefined !== data[c])
   if (!cityList) return true
 
   // Cities output
   const cities = cityList.map((city, i) => {
-    const geoData = isGeoCodeMap ? state.data.filter(item => city === item[state.columns.geo.name])[0] : data[city]
-    const cityDisplayName = isGeoCodeMap ? city : titleCase(displayGeoName(city))
+    let geoData
+    if (data) {
+      Object.keys(data).forEach(key => {
+        if (city === data[key][state.columns.geo.name]) {
+          geoData = data[key]
+        }
+      })
+    }
+    if (!geoData) {
+      geoData = data ? data[city] : undefined
+    }
+    const cityDisplayName = titleCase(displayGeoName(city))
 
-    const legendColors = isGeoCodeMap && geoData ? applyLegendToRow(geoData) : data[city] ? applyLegendToRow(data[city]) : false
+    const legendColors = geoData ? applyLegendToRow(geoData) : data[city] ? applyLegendToRow(data[city]) : false
 
     if (legendColors === false) {
       return true
     }
 
-    const toolTip = applyTooltipsToGeo(cityDisplayName, isGeoCodeMap ? geoData : data[city])
+    const toolTip = applyTooltipsToGeo(cityDisplayName, geoData || data[city])
 
-    const radius = state.general.geoType === 'us' && !isGeoCodeMap ? 8 : isGeoCodeMap ? state.visual.geoCodeCircleSize : 4
+    const radius = state.visual.geoCodeCircleSize || (state.general.geoType === 'us' ? 8 : 4)
 
     const additionalProps = {
       fillOpacity: state.general.type === 'bubble' ? 0.4 : 1
@@ -71,13 +78,13 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
 
     let transform = ''
 
-    if (!isGeoCodeMap) {
-      transform = `translate(${projection(supportedCities[city])})`
+    if (!geoData?.[state.columns.longitude.name] && !geoData?.[state.columns.latitude.name] && city && supportedCities[city.toUpperCase()]) {
+      transform = `translate(${projection(supportedCities[city.toUpperCase()])})`
     }
 
     let needsPointer = false
 
-    if (isGeoCodeMap) {
+    if (geoData?.[state.columns.longitude.name] && geoData?.[state.columns.latitude.name]) {
       let coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
       transform = `translate(${projection(coords)})`
       needsPointer = true
