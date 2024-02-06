@@ -373,6 +373,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     if (config.filterBehavior !== FilterBehavior.Apply) {
       updateDataFilters()
       reloadURLData()
+    } else {
+      loadAPIFilters()
     }
   }
 
