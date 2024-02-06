@@ -24,12 +24,12 @@ export const filterData = (filters: SharedFilter[], _data: Object[], filterBehav
       }
     })
 
-    let filteredData: Object[] = []
+    let filteredData = _data
     // TODO triple loop??
     for (let i = 0; i < maxTier; i++) {
-      let filteredData: any[] = []
+      let filteredDataSubTier: any[] = []
 
-      _data.forEach(row => {
+      filteredData.forEach(row => {
         let add = true
 
         filters.forEach(filter => {
@@ -42,22 +42,23 @@ export const filterData = (filters: SharedFilter[], _data: Object[], filterBehav
           }
         })
 
-        if (add) filteredData.push(row)
+        if (add) filteredDataSubTier.push(row)
       })
 
       filters.forEach(sharedFilter => {
         if (sharedFilter.tier === i + 2) {
-          sharedFilter.values = generateValuesForFilter(sharedFilter.columnName, { data: filteredData }, filterBehavior)
+          sharedFilter.values = generateValuesForFilter(sharedFilter.columnName, { data: filteredDataSubTier }, filterBehavior)
           const valueAlreadySelected = sharedFilter.values.includes(sharedFilter.active)
           if (!valueAlreadySelected && sharedFilter.values.length > 0) {
             sharedFilter.active = sharedFilter.values[0]
           }
         }
       })
+
+      filteredData = filteredDataSubTier
     }
 
-    let filteredDataSubTier: Object[] = []
-    console.log('maxTier', maxTier)
+    let filteredDataSubTier: any[] = []
     filteredData.forEach(row => {
       let add = true
 
