@@ -9,7 +9,7 @@ export type EditorCTX = WCMSProps &
     setTempConfig: Function
   }
 
-const ConfigContext = createContext<EditorCTX>({ displayName: 'ConfigContext' } as EditorCTX)
+const ConfigContext = createContext<EditorCTX>({ displayName: 'ConfigContext', setTempConfig: () => {} } as unknown as EditorCTX)
 
 export default ConfigContext
 export const EditorDispatchContext = createContext<Dispatch<EditorActions>>(() => {})
