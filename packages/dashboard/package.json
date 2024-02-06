@@ -2,7 +2,7 @@
   "name": "@cdc/dashboard",
   "version": "4.23.10-alpha",
   "description": "React component for combining multiple visualizations into a single dashboard",
-  "moduleName": "CdcDashboard",
+  "moduleName": "MultiDashboardWrapper",
   "main": "dist/cdcdashboard",
   "type": "module",
   "scripts": {
@@ -12,7 +12,8 @@
     "graph": "nx graph",
     "prepublishOnly": "lerna run --scope @cdc/dashboard build",
     "test": "vitest watch --reporter verbose",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
