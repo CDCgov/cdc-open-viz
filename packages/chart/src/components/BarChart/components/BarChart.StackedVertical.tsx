@@ -25,15 +25,15 @@ const BarChartStackedVertical = () => {
               barStack.bars.map(bar => {
                 let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                 let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                let barThickness = xMax / barStack.bars.length
-                let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
+                let barThickness = config.xAxis.type === 'date' && config.xAxis.sortDates ? (config.barThickness * (xScale.range()[1] - xScale.range()[0])) : xMax / barStack.bars.length
+                let barThicknessAdjusted = barThickness * (config.xAxis.type === 'date' && config.xAxis.sortDates ? 1 : (config.barThickness || 0.8))
                 let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
                 // tooltips
                 const rawXValue = bar.bar.data[config.runtime.xAxis.dataKey]
                 const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(rawXValue)) : rawXValue
                 const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                 if (!yAxisValue) return
-                const barX = xScale(config.runtime.xAxis.type === 'date' ? parseDate(rawXValue) : rawXValue) - barThicknessAdjusted / 2
+                const barX = xScale(config.runtime.xAxis.type === 'date' ? parseDate(rawXValue) : rawXValue) - (config.xAxis.type === 'date' && config.xAxis.sortDates ? barThicknessAdjusted / 2 : 0)
                 const style = applyRadius(barStack.index)
                 const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)
@@ -58,7 +58,7 @@ const BarChartStackedVertical = () => {
                         `}
                     </style>
                     <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className='stack vertical'>
-                      <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barThickness * bar.index + offset} y={bar.y - 5} fill={'#000'} textAnchor='middle'>
+                      <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barX} y={bar.y - 5} fill={'#000'} textAnchor='middle'>
                         {yAxisValue}
                       </Text>
                       <foreignObject

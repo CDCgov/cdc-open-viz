@@ -56,21 +56,25 @@ const useScales = (properties: useScaleProps) => {
 
   // handle  Vertical bars
   if (!isHorizontal) {
-    xScaleBrush = composeScalePoint(xAxisDataKeysMapped, [0, xMax], 0.5)
-    xScale = composeScalePoint(xAxisDataMapped, [0, xMax], 0.5)
-    xScale.type = scaleTypes.POINT
+    xScaleBrush = composeScalePoint(xAxisDataKeysMapped, [0, xMax], .5)
+    xScale = composeScaleBand(xAxisDataMapped, [0, xMax], 1 - config.barThickness)
     yScale = composeYScale(properties)
-    seriesScale = composeScalePoint(seriesDomain, [0, xMax])
+    seriesScale = composeScaleBand(seriesDomain, [0, xScale.bandwidth()], 0)
   }
 
   // handle Area chart
   if (config.xAxis.type === 'date' && config.xAxis.sortDates) {
+    let xAxisMin = Math.min(...xAxisDataMapped)
+    let xAxisMax = Math.max(...xAxisDataMapped)
+    xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
+    xAxisMax += (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     xScale = scaleTime({
-      domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)],
+      domain: [xAxisMin, xAxisMax],
       range: [0, xMax]
     })
     xScaleBrush = xScale
     xScale.type = scaleTypes.LINEAR
+    seriesScale = composeScaleBand(seriesDomain, [0, config.barThickness * (xMax)], 0)
   }
 
   // handle Deviation bar
@@ -282,5 +286,14 @@ const composeScalePoint = (domain, range, padding = 0) => {
     range: range,
     padding: padding,
     type: 'point'
+  })
+}
+
+const composeScaleBand = (domain, range, padding = 0) => {
+  return scaleBand({
+    domain: domain,
+    range: range,
+    padding: padding,
+    type: 'band'
   })
 }
