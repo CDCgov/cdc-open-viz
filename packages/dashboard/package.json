@@ -12,7 +12,8 @@
     "graph": "nx graph",
     "prepublishOnly": "lerna run --scope @cdc/dashboard build",
     "test": "vitest watch --reporter verbose",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
