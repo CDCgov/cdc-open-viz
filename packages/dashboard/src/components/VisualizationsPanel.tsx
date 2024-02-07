@@ -39,6 +39,7 @@ const VisualizationsPanel = ({ loadConfig, config }) => (
       <Widget addVisualization={() => addVisualization('chart', 'Bar')} type='Bar' />
       <Widget addVisualization={() => addVisualization('chart', 'Line')} type='Line' />
       <Widget addVisualization={() => addVisualization('chart', 'Pie')} type='Pie' />
+      <Widget addVisualization={() => addVisualization('chart', 'Sankey')} type='Sankey' />
     </div>
     <span className='subheading-3'>Map</span>
     <div className='drag-grid'>

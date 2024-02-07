@@ -27,7 +27,8 @@ const iconHash = {
   gear: <Icon display='gear' base />,
   tools: <Icon display='tools' base />,
   'filtered-text': <Icon display='filtered-text' base />,
-  'filter-dropdowns': <Icon display='filter-dropdowns' base />
+  'filter-dropdowns': <Icon display='filter-dropdowns' base />,
+  Sankey: <Icon display='code' base />
 }
 
 const labelHash = {
@@ -43,7 +44,8 @@ const labelHash = {
   world: 'World',
   'single-state': 'U.S. State',
   'filtered-text': 'Filtered Text',
-  'filter-dropdowns': 'Filter Dropdowns'
+  'filter-dropdowns': 'Filter Dropdowns',
+  Sankey: 'Sankey Chart'
 }
 
 type WidgetData = Visualization & { rowIdx: number; colIdx: number }

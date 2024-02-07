@@ -18,7 +18,8 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const DEBUG = true
   const { config } = useContext<ChartContext>(ConfigContext)
   const { sankey: sankeyConfig } = config
-  const data = sankeyConfig?.data[0]
+  // !info - changed config.sankey.data here to work with our current upload pattern saved on config.data
+  const data = config?.data[0]
   const [largestGroupWidth, setLargestGroupWidth] = useState(0)
   const groupRefs = useRef([])
 
@@ -43,7 +44,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
       }
     })
     setLargestGroupWidth(largest)
-  }, [groupRefs, data?.storyNodeText])
+  }, [groupRefs, sankeyConfig])
 
   //Retrieve all the unique values for the Nodes
   const uniqueNodes = Array.from(new Set(data?.links?.flatMap(link => [link.source, link.target])))

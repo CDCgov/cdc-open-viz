@@ -1073,11 +1073,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             </MediaControls.Section>
 
             {/* Data Table */}
-            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
+            {((config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey') || (config.visualizationType === 'Sankey' && config.table.show)) && (
               <DataTable
                 config={config}
-                rawData={config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
-                runtimeData={transform.applySuppression(filteredData || excludedData, config.suppressedData)}
+                rawData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
+                runtimeData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : transform.applySuppression(filteredData || excludedData, config.suppressedData)}
                 expandDataTable={config.table.expanded}
                 columns={config.columns}
                 displayDataAsText={displayDataAsText}

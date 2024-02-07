@@ -97,10 +97,11 @@ const PreviewDataTable = ({ data }) => {
     }
 
     let newData = [...data]
-    console.log('newData', newData)
+
+    const isSanKey = Object.keys(newData[0]).includes('tableData')
     newData = generateColumns(newData)
     validateFipsCodeLength(newData)
-    setTableData(config.visualizationType === 'Sankey' ? newData[0]?.links : newData)
+    setTableData(isSanKey ? newData[0]?.tableData : newData)
   }, [data, generateColumns])
 
   const {

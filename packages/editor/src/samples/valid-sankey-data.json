@@ -827,6 +827,122 @@
           }
         ]
       }
+    ],
+    "tableData": [
+      {
+        "Disposition": "Assist, Agency",
+        "Type of Treatment": "Assisted",
+        "Final Outcome": "N/A",
+        "Number of Patients": 2356
+      },
+      {
+        "Disposition": "Assist, Public",
+        "Type of Treatment": "Assisted",
+        "Final Outcome": "N/A",
+        "Number of Patients": 859
+      },
+      {
+        "Disposition": "Assist, Unit",
+        "Type of Treatment": "Assisted",
+        "Final Outcome": "N/A",
+        "Number of Patients": 2486
+      },
+      {
+        "Disposition": "Patient Dead at Scene-No Resuscitation Attempted (With Transport)",
+        "Type of Treatment": "Dead at scene",
+        "Final Outcome": "Dead",
+        "Number of Patients": 123
+      },
+      {
+        "Disposition": "Patient Dead at Scene-No Resuscitation Attempted (Without Transport)",
+        "Type of Treatment": "Dead at scene",
+        "Final Outcome": "Dead",
+        "Number of Patients": 3965
+      },
+      {
+        "Disposition": "Patient Dead at Scene-Resuscitation Attempted (With Transport)",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Dead",
+        "Number of Patients": "**"
+      },
+      {
+        "Disposition": "Patient Dead at Scene-Resuscitation Attempted (Without Transport)",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Dead",
+        "Number of Patients": 631
+      },
+      {
+        "Disposition": "Patient Evaluated, No Treatment/Transport Required",
+        "Type of Treatment": "Evaluated no treatment required",
+        "Final Outcome": "Released",
+        "Number of Patients": 5169
+      },
+      {
+        "Disposition": "Patient Refused Evaluation/Care (With Transport)",
+        "Type of Treatment": "Refused evaluation care",
+        "Final Outcome": "Transported to hospital",
+        "Number of Patients": 860
+      },
+      {
+        "Disposition": "Patient Refused Evaluation/Care (Without Transport)",
+        "Type of Treatment": "Refused evaluation care",
+        "Final Outcome": "Released",
+        "Number of Patients": 11781
+      },
+      {
+        "Disposition": "Patient Treated, Released (AMA)",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Released",
+        "Number of Patients": 6780
+      },
+      {
+        "Disposition": "Patient Treated, Released (per protocol)",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Released",
+        "Number of Patients": 3522
+      },
+      {
+        "Disposition": "Patient Treated, Transferred Care to Another EMS Unit",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Transported to hospital",
+        "Number of Patients": 24432
+      },
+      {
+        "Disposition": "Patient Treated, Transported by Law Enforcement",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Transported to facility",
+        "Number of Patients": 4227
+      },
+      {
+        "Disposition": "Patient Treated, Transported by Private Vehicle",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Transported to facility",
+        "Number of Patients": 277
+      },
+      {
+        "Disposition": "Patient Treated, Transported by this EMS Unit",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Transported to hospital",
+        "Number of Patients": 399088
+      },
+      {
+        "Disposition": "Standby-Public Safety, Fire, or EMS Operational Support Provided",
+        "Type of Treatment": "No patient contact",
+        "Final Outcome": "N/A",
+        "Number of Patients": 458
+      },
+      {
+        "Disposition": "Transport Non-Patient, Organs, etc.",
+        "Type of Treatment": "No patient contact",
+        "Final Outcome": "N/A",
+        "Number of Patients": "**"
+      },
+      {
+        "Disposition": "Unknown",
+        "Type of Treatment": "Unknown",
+        "Final Outcome": "N/A",
+        "Number of Patients": 104
+      }
     ]
   }
 ]
