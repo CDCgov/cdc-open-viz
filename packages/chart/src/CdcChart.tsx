@@ -296,6 +296,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setFilteredData(currentData)
     }
 
+    if(!(['Area Chart', 'Bar', 'Line', 'Combo'].includes(newConfig.visualizationType)) || newConfig.orientation === 'horizontal'){
+      newConfig.xAxis.sortDates = false
+    }
+
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
     newConfig.runtime.seriesLabels = {}
@@ -465,6 +469,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.yAxis = newConfig.yAxis
       newConfig.runtime.horizontal = false
     }
+
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
 

@@ -1622,7 +1622,7 @@ const EditorPanel = () => {
                         {config.visualizationType !== 'Forest Plot' && (
                           <>
                             <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
-                            <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />{' '}
+                            {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.orientation !== 'horizontal'  && <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />}{' '}
                           </>
                         )}
                         <Select
