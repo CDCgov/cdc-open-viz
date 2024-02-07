@@ -13,9 +13,8 @@ describe('filterData', () => {
       { name: 'John', age: 35 },
       { name: 'Jane', age: 30 }
     ]
-    const filterBehavior = {}
 
-    const result = filterData(filters, data, filterBehavior)
+    const result = filterData(filters, data)
 
     expect(result).toEqual([{ name: 'John', age: 30 }])
   })
@@ -31,9 +30,8 @@ describe('filterData', () => {
       { name: 'John', age: 35 },
       { name: 'Jane', age: 30 }
     ]
-    const filterBehavior = {}
 
-    const result = filterData(filters, data, filterBehavior)
+    const result = filterData(filters, data)
 
     expect(result).toEqual([{ name: 'John', age: 30 }])
   })
@@ -52,9 +50,8 @@ describe('filterData', () => {
       { name: 'John', age: 35, color: 'yellow' },
       { name: 'Jane', age: 30, color: 'green' }
     ]
-    const filterBehavior = {}
 
-    const result = filterData(filters, data, filterBehavior)
+    const result = filterData(filters, data)
 
     expect(result).toEqual([{ name: 'John', age: 30, color: 'blue' }])
 
@@ -83,17 +80,19 @@ describe('filterData', () => {
 
   it('should not include data that does not meet the filter criteria', () => {
     const filters = [
-      { columnName: 'name', active: 'John', queuedActive: 'John', fileName: 'abc', key: 'abc' },
-      { columnName: 'age', fileName: 'abc', key: 'age', parents: ['abc'] }
+      //{ columnName: 'apple', fileName: 'abc', key: 'banana' },
+      { columnName: 'color', active: 'red', queuedActive: 'red', fileName: 'abc', key: 'color' },
+      { columnName: 'name', fileName: 'abc', key: 'name' },
+      { columnName: 'age', fileName: 'abc', key: 'age', parents: ['name'] }
     ] as SharedFilter[]
     const data = [
-      { name: 'Jane', age: 30 },
-      { name: 'John', age: 25 }
+      { name: 'Jane', age: 30, color: 'blue' },
+      { name: 'John', age: 25, color: 'red' },
+      { name: 'John', age: 25, color: 'green' }
+      //{ name: 'John', age: 25, color: 'red', apple: 'banana' }
     ]
-    const filterBehavior = {} // replace with actual behavior if needed
 
-    const result = filterData(filters, data, filterBehavior)
-    console.log(filters)
-    expect(result).toEqual([{ name: 'John', age: 25 }])
+    const result = filterData(filters, data)
+    expect(result).toEqual([{ name: 'John', age: 25, color: 'red' }])
   })
 })
