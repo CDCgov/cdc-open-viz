@@ -454,8 +454,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)) {
-      newConfig.runtime.xAxis = newConfig.yAxis
-      newConfig.runtime.yAxis = newConfig.xAxis
+      newConfig.runtime.xAxis = newConfig.yAxis['yAxis'] ? newConfig.yAxis['yAxis'] : newConfig.yAxis
+      newConfig.runtime.yAxis = newConfig.xAxis['xAxis'] ? newConfig.xAxis['xAxis'] : newConfig.xAxis
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'
@@ -713,6 +713,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const formatDate = date => {
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
+  }
+
+  const formatTooltipsDate = date => {
+    return timeFormat(config.tooltips.dateDisplayFormat)(date)
   }
 
   // function calculates the width of given text and its font-size
@@ -1121,6 +1125,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     currentViewport,
     parseDate,
     formatDate,
+    formatTooltipsDate,
     formatNumber,
     loading,
     updateConfig,

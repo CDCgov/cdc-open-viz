@@ -3,9 +3,8 @@
 .editor-panel + .cdc-dashboard-inner-container,
 .editor-heading + .cdc-open-viz-module {
   position: relative;
-  min-height: 80vh
+  min-height: 80vh;
 }
-
 
 .header-container {
   display: flex;
@@ -599,7 +598,6 @@
   width: 25px;
   height: 25px;
   left: 307px;
-  top: calc(3em + 10px);
   box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
   &:before {
     top: 43%;

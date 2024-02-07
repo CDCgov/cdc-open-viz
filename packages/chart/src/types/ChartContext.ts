@@ -20,6 +20,7 @@ type SharedChartContext = {
 type LineChartContext = SharedChartContext & {
   dimensions: [screenWidth: number, screenHeight: number]
   formatDate: Function
+  formatTooltipsDate: Function
   formatNumber: Function
   handleLineType: Function
   isNumber: unknown
@@ -40,6 +41,7 @@ export type ChartContext =
   | (SharedChartContext & {
       dimensions: [screenWidth: number, screenHeight: number]
       formatDate?: Function
+      formatTooltipsDate: Function
       formatNumber?: Function
       handleLineType?: Function
       isNumber?: boolean
