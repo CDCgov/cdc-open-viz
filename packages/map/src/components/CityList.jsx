@@ -90,6 +90,10 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       needsPointer = true
     }
 
+    if (!transform) {
+      return
+    }
+
     const styles = {
       fill: legendColors[0],
       opacity: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] !== setSharedFilterValue ? 0.5 : 1,
