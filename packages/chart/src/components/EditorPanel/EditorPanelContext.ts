@@ -1,4 +1,4 @@
-import { createContext } from 'react'
+import { createContext, useContext } from 'react'
 
 export type EditorPanelContext = {
   addNewExclusion?: Function
@@ -25,6 +25,16 @@ export type EditorPanelContext = {
   setLollipopShape?: Function
 }
 
-const EditorPanelContext = createContext({})
+const EditorPanelContext = createContext<EditorPanelContext>(null)
+
+export const useEditorPanelContext = () => {
+  const editorPanelCtx = useContext(EditorPanelContext)
+
+  if (editorPanelCtx === null) {
+    throw new Error('COVE: editor panel context is null.')
+  }
+
+  return editorPanelCtx
+}
 
 export default EditorPanelContext

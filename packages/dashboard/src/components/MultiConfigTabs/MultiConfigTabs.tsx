@@ -34,7 +34,9 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
     setEditing(false)
   }
 
-  const onClick = () => {
+  const onClick = e => {
+    // ignore click on delete button
+    if (e.target.className === 'remove') return
     if (active) {
       setEditing(true)
     } else {
@@ -43,7 +45,10 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
   }
 
   const handleRemove = () => {
-    const deleteCallback = () => dispatch({ type: 'REMOVE_MULTIDASHBOARD_AT_INDEX', payload: index })
+    const deleteCallback = () => {
+      dispatch({ type: 'REMOVE_MULTIDASHBOARD_AT_INDEX', payload: index })
+      overlay?.actions.toggleOverlay(false)
+    }
     overlay?.actions.openOverlay(AreYouSure(deleteCallback))
   }
 

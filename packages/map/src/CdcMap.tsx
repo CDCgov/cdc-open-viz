@@ -239,8 +239,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         }
 
         // Cities
-        if (!uid) {
-          uid = cityKeys.find(key => key === geoName)
+        if (!uid && geoName) {
+          uid = cityKeys.find(key => key === geoName.toUpperCase())
         }
       }
 
@@ -266,6 +266,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         // Cities
         if (!uid && 'world-geocode' === state.general.type) {
           uid = cityKeys.find(key => key === geoName?.toUpperCase())
+        }
+
+        // Cities
+        if (!uid && geoName) {
+          uid = cityKeys.find(key => key === geoName.toUpperCase())
         }
       }
 
@@ -1085,6 +1090,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (countryKeys.includes(value)) {
       value = titleCase(supportedCountries[key][0])
+    } else {
+      return value
     }
 
     if (countyKeys.includes(value)) {
