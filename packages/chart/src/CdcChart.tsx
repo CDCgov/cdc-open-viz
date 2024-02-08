@@ -428,6 +428,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         if (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') {
           newConfig.runtime.lineSeriesKeys.push(series.dataKey)
         }
+        if (series.type === 'Combo') {
+          series.type = 'Bar'
+        }
       })
     }
 
