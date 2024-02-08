@@ -53,7 +53,7 @@
       "biteStyle": "gradient",
       "filters": [],
       "subtext": "",
-      "title": "EMS Data...",
+      "title": "Number of EMS Responses",
       "theme": "theme-blue",
       "shadow": false,
       "visual": {
@@ -107,7 +107,7 @@
       "biteStyle": "gradient",
       "filters": [],
       "subtext": "",
-      "title": "Another Data Bite",
+      "title": "Number of Deaths",
       "theme": "theme-blue",
       "shadow": false,
       "visual": {
@@ -132,8 +132,8 @@
       "validated": 4.23,
       "formattedData": [
         {
-          "Text": "Another Bite",
-          "Value": "2000"
+          "Text": "Number of Deaths",
+          "Value": "4736"
         }
       ]
     },
