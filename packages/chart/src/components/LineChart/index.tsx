@@ -97,6 +97,8 @@ const LineChart = (props: LineChartProps) => {
 
                       {(lineDatapointStyle === 'hidden' || lineDatapointStyle === 'always show') && (
                         <LineChartCircle
+                          mode='ALWAYS_SHOW_POINTS'
+                          dataIndex={dataIndex}
                           circleData={circleData}
                           data={data}
                           d={d}
@@ -113,13 +115,47 @@ const LineChart = (props: LineChartProps) => {
                           key={`line-circle--${dataIndex}`}
                         />
                       )}
+
+                      <LineChartCircle
+                        mode='ISOLATED_POINTS'
+                        dataIndex={dataIndex}
+                        circleData={circleData}
+                        data={data}
+                        d={d}
+                        config={config}
+                        seriesKey={seriesKey}
+                        displayArea={displayArea}
+                        tooltipData={tooltipData}
+                        xScale={xScale}
+                        yScale={yScale}
+                        colorScale={colorScale}
+                        parseDate={parseDate}
+                        yScaleRight={yScaleRight}
+                        seriesAxis={seriesAxis}
+                        key={`isolated-circle-${dataIndex}`}
+                      />
                     </Group>
                   )
                 )
               })}
               <>
                 {lineDatapointStyle === 'hover' && (
-                  <LineChartCircle circleData={circleData} data={data} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />
+                  <LineChartCircle
+                    dataIndex={0}
+                    mode='HOVER_POINTS'
+                    circleData={circleData}
+                    data={data}
+                    config={config}
+                    seriesKey={seriesKey}
+                    displayArea={displayArea}
+                    tooltipData={tooltipData}
+                    xScale={xScale}
+                    yScale={yScale}
+                    colorScale={colorScale}
+                    parseDate={parseDate}
+                    yScaleRight={yScaleRight}
+                    seriesAxis={seriesAxis}
+                  />
                 )}
               </>
               {/* SPLIT LINE */}
