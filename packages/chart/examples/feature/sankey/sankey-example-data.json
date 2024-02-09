@@ -258,22 +258,12 @@
       "nodeHeight": 40
     },
     "nodePadding": 55,
-    "nodeFontColor": "black",
-    "nodeColor": {
-      "default": "#ff8500",
-      "inactive": "#808080"
-    },
-    "linkColor": {
-      "default": "#ffc900",
-      "inactive": "#D3D3D3"
-    },
     "opacity": {
       "nodeOpacityDefault": 1,
       "nodeOpacityInactive": 0.1,
       "LinkOpacityDefault": 1,
       "LinkOpacityInactive": 0.1
     },
-    "storyNodeFontColor": "#006778",
     "storyNodeText": [],
     "nodeValueStyle": {
       "textBefore": "(",

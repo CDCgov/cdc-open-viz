@@ -8,8 +8,7 @@ import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../
 
 const SankeySettings = () => {
   const { config, updateConfig } = useContext(ConfigContext)
-  const { sankey } = config
-  const data = sankey?.data?.[0]
+  const data = config.data?.[0]
   const { updateField } = useContext<EPContext>(EditorPanelContext)
 
   const updateStoryNode = (fieldName, value, i) => {
@@ -52,10 +51,10 @@ const SankeySettings = () => {
   }
 
   const removeStoryNode = index => {
-    const updatedStoryNodeText = [...config.sankey?.data?.storyNodeText]
-    updatedStoryNodeText.splice(index, 1)
+    const newData = data
+    newData.storyNodeText.splice(index, 1)
 
-    updateConfig({ ...config, sankey: { ...config.sankey, data: { ...config.sankey.data, storyNodeText: updatedStoryNodeText } } })
+    updateConfig({ ...config, sankey: { ...config.sankey, data: { ...newData } } })
   }
 
   return (

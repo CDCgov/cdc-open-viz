@@ -60,6 +60,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   }
 
   let textPositionHorizontal = 5
+  const BUFFER = 50
 
   // Set the sankey diagram properties
   const sankeyGenerator = sankey<SankeyNode, { source: number; target: number }>()
@@ -68,8 +69,8 @@ const Sankey = ({ width, height }: SankeyProps) => {
     .iterations(sankeyConfig.iterations)
     .nodeAlign(sankeyLeft)
     .extent([
-      [sankeyConfig.margin.margin_x, sankeyConfig.margin.margin_y],
-      [width - textPositionHorizontal - largestGroupWidth, height]
+      [sankeyConfig.margin.margin_x, Number(sankeyConfig.margin.margin_y)],
+      [width - textPositionHorizontal - largestGroupWidth, config.heights.vertical - BUFFER]
     ])
 
   const { nodes, links } = sankeyGenerator(sankeyData)
@@ -218,7 +219,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
             >
               {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
             </Text>
-            <Text verticalAnchor='end' className={classStyle} x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0! + 25) / 2} fill={sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
+            <Text verticalAnchor='end' className={classStyle} x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0! + 25) / 2} fill={sankeyConfig.storyNodeFontColor || sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
               {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
             </Text>
             <Text
@@ -281,7 +282,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   return (
     <>
       <div className='sankey-chart'>
-        <svg className='sankey-chart__diagram' width={width} height={height} style={{ overflow: 'visible' }}>
+        <svg className='sankey-chart__diagram' width={width} height={Number(config.heights.vertical)} style={{ overflow: 'visible' }}>
           <Group className='links'>{allLinks}</Group>
           <Group className='nodes'>{allNodes}</Group>
         </svg>

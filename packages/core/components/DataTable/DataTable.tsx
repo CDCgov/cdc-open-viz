@@ -47,7 +47,6 @@ export type DataTableProps = {
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
   const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId, wrapColumns } = props
-  console.log('rawData', rawData)
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [sortBy, setSortBy] = useState<any>({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
@@ -93,8 +92,8 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const _runtimeData = config.table.customTableConfig || config.visualizationType === 'Sankey' ? customColumns(rawData, config.table.excludeColumns) : runtimeData
-
+  const _runtimeData = config.table.customTableConfig || config.visualizationType === 'Sankey' || config.data?.[0].tableData ? customColumns(rawData, config.table.excludeColumns) : runtimeData
+  console.log('runtime', _runtimeData)
   const rawRows = Object.keys(_runtimeData)
   const rows = isVertical
     ? rawRows.sort((a, b) => {
@@ -137,7 +136,9 @@ const DataTable = (props: DataTableProps) => {
 
   // prettier-ignore
   const tableData = useMemo(() => (
-    config.visualizationType === 'Sankey'
+   config.data?.[0]?.tableData
+    ? config.data?.[0]?.tableData
+    : config.visualizationType === 'Sankey'
       ? config.data?.[0]?.tableData
       : config.visualizationType === 'Pie'
       ? [config.yAxis.dataKey]

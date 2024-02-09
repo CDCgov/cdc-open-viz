@@ -876,8 +876,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
           {config?.table?.show && config?.data && (
             <DataTable
               config={config}
-              rawData={config.data}
-              runtimeData={config.data || []}
+              rawData={config.data?.[0].tableData ? config.data?.[0]?.tableData : config.data}
+              runtimeData={config.data?.[0].tableData ? config.data?.[0]?.tableData : config.data || []}
               expandDataTable={config.table.expanded}
               showDownloadButton={config.table.download}
               tableTitle={config.dashboard.title || ''}
@@ -929,8 +929,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj, isEdit
                   <DataTable
                     config={config as TableConfig}
                     dataConfig={config.datasets[datasetKey]}
-                    rawData={config.datasets[datasetKey].data}
-                    runtimeData={filteredTableData || config.datasets[datasetKey].data || []}
+                    rawData={config.datasets[datasetKey].data?.[0]?.tableData || config.datasets[datasetKey].data}
+                    runtimeData={config.datasets[datasetKey].data?.[0]?.tableData || filteredTableData || config.datasets[datasetKey].data || []}
                     expandDataTable={config.table.expanded}
                     tableTitle={datasetKey}
                     viewport={currentViewport}

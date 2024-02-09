@@ -1053,11 +1053,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 </>
               )}
               {/* Sankey */}
-              {config.visualizationType === 'Sankey' && (
-                <div style={{ height: `500px`, width: `100%`, overflow: 'visible' }}>
-                  <ParentSize>{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>
-                </div>
-              )}
+              {config.visualizationType === 'Sankey' && <ParentSize>{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>}
               {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend />}
             </div>
             {/* Link */}
