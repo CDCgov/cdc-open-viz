@@ -100,8 +100,6 @@ const PreviewDataTable = ({ data }) => {
 
     const isSankey = Object.keys(newData[0]).includes('tableData')
     newData = generateColumns(isSankey ? newData[0].tableData : newData)
-
-    console.log('newData', newData)
     validateFipsCodeLength(newData)
     setTableData(newData)
   }, [data, generateColumns])
