@@ -132,8 +132,8 @@
       "validated": 4.23,
       "formattedData": [
         {
-          "Text": "Number of Deaths",
-          "Value": "4736"
+          "Text": "Another Bite",
+          "Value": "2000"
         }
       ]
     },
@@ -232,7 +232,7 @@
       "barHeight": 25,
       "barSpace": 15,
       "heights": {
-        "vertical": 300,
+        "vertical": "550",
         "horizontal": 750
       },
       "xAxis": {
@@ -268,7 +268,7 @@
         "indexLabel": "",
         "download": false,
         "showVertical": true,
-        "show": true,
+        "show": false,
         "customTableConfig": true
       },
       "orientation": "vertical",
