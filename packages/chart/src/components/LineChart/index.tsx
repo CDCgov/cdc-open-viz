@@ -64,6 +64,10 @@ const LineChart = (props: LineChartProps) => {
           // styles for preliminary Data  items
           let styles = createStyles({ preliminaryData: config.preliminaryData, rawData, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), handleLineType, lineType, seriesKey })
 
+          let xPos = d => {
+            return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+          }
+
           return (
             <Group
               key={`series-${seriesKey}`}
@@ -91,12 +95,14 @@ const LineChart = (props: LineChartProps) => {
                       <Bar key={'bars'} width={Number(xMax)} height={Number(yMax)} fill={DEBUG ? 'red' : 'transparent'} fillOpacity={0.05} onMouseMove={e => handleTooltipMouseOver(e, tableData)} onMouseOut={handleTooltipMouseOff} onClick={e => handleTooltipClick(e, data)} />
 
                       {/* Render legend */}
-                      <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>
+                      <Text display={config.labels ? 'block' : 'none'} x={xPos(d)} y={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))} fill={'#000'} textAnchor='middle'>
                         {formatNumber(d[seriesKey], 'left')}
                       </Text>
 
                       {(lineDatapointStyle === 'hidden' || lineDatapointStyle === 'always show') && (
                         <LineChartCircle
+                          mode='ALWAYS_SHOW_POINTS'
+                          dataIndex={dataIndex}
                           circleData={circleData}
                           data={data}
                           d={d}
@@ -113,34 +119,85 @@ const LineChart = (props: LineChartProps) => {
                           key={`line-circle--${dataIndex}`}
                         />
                       )}
+
+                      <LineChartCircle
+                        mode='ISOLATED_POINTS'
+                        dataIndex={dataIndex}
+                        circleData={circleData}
+                        data={data}
+                        d={d}
+                        config={config}
+                        seriesKey={seriesKey}
+                        displayArea={displayArea}
+                        tooltipData={tooltipData}
+                        xScale={xScale}
+                        yScale={yScale}
+                        colorScale={colorScale}
+                        parseDate={parseDate}
+                        yScaleRight={yScaleRight}
+                        seriesAxis={seriesAxis}
+                        key={`isolated-circle-${dataIndex}`}
+                      />
                     </Group>
                   )
                 )
               })}
               <>
                 {lineDatapointStyle === 'hover' && (
-                  <LineChartCircle circleData={circleData} data={data} config={config} seriesKey={seriesKey} displayArea={displayArea} tooltipData={tooltipData} xScale={xScale} yScale={yScale} colorScale={colorScale} parseDate={parseDate} yScaleRight={yScaleRight} seriesAxis={seriesAxis} />
+                  <LineChartCircle
+                    dataIndex={0}
+                    mode='HOVER_POINTS'
+                    circleData={circleData}
+                    data={data}
+                    config={config}
+                    seriesKey={seriesKey}
+                    displayArea={displayArea}
+                    tooltipData={tooltipData}
+                    xScale={xScale}
+                    yScale={yScale}
+                    colorScale={colorScale}
+                    parseDate={parseDate}
+                    yScaleRight={yScaleRight}
+                    seriesAxis={seriesAxis}
+                  />
                 )}
               </>
-              {/* STANDARD LINE */}
-              <LinePath
-                curve={allCurves[seriesData[0].lineType]}
-                data={data}
-                x={d => xScale(getXAxisData(d))}
-                y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
-                stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
-                strokeWidth={2}
-                strokeOpacity={1}
-                shapeRendering='geometricPrecision'
-                strokeDasharray={lineType ? handleLineType(lineType) : 0}
-                defined={(item, i) => {
-                  return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
-                }}
-              />
+              {/* SPLIT LINE */}
+              {config.preliminaryData.some(d => d.value && d.column) ? (
+                <SplitLinePath
+                  curve={allCurves[seriesData[0].lineType]}
+                  segments={data.map(d => [d])}
+                  segmentation='x'
+                  x={d => xPos(d)}
+                  y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                  styles={styles}
+                  defined={(item, i) => {
+                    return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                  }}
+                />
+              ) : (
+                <>
+                  {/* STANDARD LINE */}
+                  <LinePath
+                    curve={allCurves[seriesData[0].lineType]}
+                    data={data}
+                    x={d => xPos(d)}
+                    y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                    stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
+                    strokeWidth={2}
+                    strokeOpacity={1}
+                    shapeRendering='geometricPrecision'
+                    strokeDasharray={lineType ? handleLineType(lineType) : 0}
+                    defined={(item, i) => {
+                      return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                    }}
+                  />
+                </>
+              )}
 
               {/* circles for preliminaryData data */}
               {circleData.map((d, i) => {
-                return <circle key={i} cx={xScale(getXAxisData(d))} cy={yScale(Number(getYAxisData(d, seriesKey)))} r={6} strokeWidth={2} stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'} fill='#fff' />
+                return <circle key={i} cx={xPos(d)} cy={yScale(Number(getYAxisData(d, seriesKey)))} r={6} strokeWidth={2} stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'} fill='#fff' />
               })}
 
               {/* ANIMATED LINE */}
@@ -149,7 +206,7 @@ const LineChart = (props: LineChartProps) => {
                   className='animation'
                   curve={seriesData.lineType}
                   data={data}
-                  x={d => xScale(getXAxisData(d))}
+                  x={d => xPos(d)}
                   y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
                   stroke='#fff'
                   strokeWidth={3}
@@ -175,7 +232,7 @@ const LineChart = (props: LineChartProps) => {
                     return <></>
                   }
                   return (
-                    <text x={xScale(getXAxisData(lastDatum)) + 5} y={yScale(getYAxisData(lastDatum, seriesKey))} alignmentBaseline='middle' fill={config.colorMatchLineSeriesLabels && colorScale ? colorScale(config.runtime.seriesLabels[seriesKey] || seriesKey) : 'black'}>
+                    <text x={xPos(lastDatum) + 5} y={yScale(getYAxisData(lastDatum, seriesKey))} alignmentBaseline='middle' fill={config.colorMatchLineSeriesLabels && colorScale ? colorScale(config.runtime.seriesLabels[seriesKey] || seriesKey) : 'black'}>
                       {config.runtime.seriesLabels[seriesKey] || seriesKey}
                     </text>
                   )

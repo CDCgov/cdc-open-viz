@@ -280,6 +280,10 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsDateCategoryAxisPadding = () => {
+    return config.xAxis.type === 'date' && config.xAxis.sortDates
+  }
+
   const visSupportsReactTooltip = () => {
     if (['Deviation Bar', 'Box Plot', 'Scatter Plot', 'Paired Bar'].includes(visualizationType) || (visualizationType === 'Bar' && config.tooltips.singleSeries)) {
       return true
@@ -308,6 +312,7 @@ export const useEditorPermissions = () => {
     visSupportsDateCategoryHeight,
     visSupportsDateCategoryNumTicks,
     visSupportsDateCategoryTickRotation,
+    visSupportsDateCategoryAxisPadding,
     visSupportsFilters,
     visSupportsFootnotes,
     visSupportsLeftValueAxis,

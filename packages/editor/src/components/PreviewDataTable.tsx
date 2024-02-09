@@ -1,11 +1,13 @@
 import React, { useState, useContext, useMemo, useCallback, useEffect, memo } from 'react'
 import { useTable, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination } from 'react-table'
-import ConfigContext from '../ConfigContext'
+import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
 import { useDebounce } from 'use-debounce'
 
 // Core
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
-const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) => {
+import { errorMessages } from '../helpers/errorMessages'
+
+const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }: any) => {
   const [filterValue, setFilterValue] = useState(globalFilter)
 
   const [debouncedValue] = useDebounce(filterValue, 200)
@@ -23,14 +25,14 @@ const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) =
   return <input className='filter' value={filterValue} onChange={onChange} type='search' placeholder='Filter...' disabled={disabled} />
 })
 
-const Header = memo(({ globalFilter, data, setGlobalFilter }) => (
+const Header = memo(({ globalFilter, data, setGlobalFilter }: any) => (
   <header className='data-table-header'>
     <h2>Data Preview</h2>
     <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data} />
   </header>
 ))
 
-const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pageNumber, totalPages }) => (
+const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pageNumber, totalPages }: any) => (
   <footer className='data-table-pagination'>
     <ul>
       <li>
@@ -48,14 +50,14 @@ const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pag
 
 const PreviewDataTable = ({ data }) => {
   const [tableData, setTableData] = useState(data ?? [])
-  const { setErrors, errorMessages, config } = useContext(ConfigContext)
+  const dispatch = useContext(EditorDispatchContext)
 
   const tableColumns = useMemo(() => {
     const columns = tableData.columns ?? []
     if (columns.length > 0 && columns.includes('')) {
       // todo find a way to call the errors. Currently they are in DataImport.js
       // maybe these can be moved to a file? but then we need a way to add settings like size...
-      setErrors([errorMessages.emptyCols])
+      dispatch({ type: 'EDITOR_SET_ERRORS', payload: [errorMessages.emptyCols] })
     }
 
     return columns.map((columnName, idx) => {
@@ -83,7 +85,8 @@ const PreviewDataTable = ({ data }) => {
     })
 
     // D3 uses a weird quirk where it attaches a named property to an array. Replicating here.
-    const newData = [...data]
+    type D3Data = any[] & { columns }
+    const newData: D3Data = [...data] as D3Data
 
     if (Array.isArray(newData)) {
       newData.columns = columns
@@ -136,9 +139,9 @@ const PreviewDataTable = ({ data }) => {
           <table className='editor data-table' role='table'>
             <thead>
               <tr role='row'>
-                <th scope='col' colSpan='1' role='columnheader'></th>
-                <th scope='col' colSpan='1' role='columnheader'></th>
-                <th scope='col' colSpan='1' role='columnheader'></th>
+                <th scope='col' colSpan={1} role='columnheader'></th>
+                <th scope='col' colSpan={1} role='columnheader'></th>
+                <th scope='col' colSpan={1} role='columnheader'></th>
               </tr>
             </thead>
             <tbody>

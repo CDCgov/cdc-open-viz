@@ -129,7 +129,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
 
   const getStyleOptions = () => {
     if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
-      return ['Open Circles']
+      return ['Dashed Small', 'Dashed Medium', 'Dashed Large', 'Open Circles']
     }
     if (config.visualizationType === 'Bar') {
       return ['star']
@@ -231,6 +231,7 @@ const EditorPanel = () => {
     visSupportsDateCategoryAxisTicks,
     visSupportsDateCategoryTickRotation,
     visSupportsDateCategoryNumTicks,
+    visSupportsDateCategoryAxisPadding,
     visSupportsRegions,
     visSupportsFilters,
     visSupportsValueAxisGridLines,
@@ -840,7 +841,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting']
+  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar']
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1138,7 +1139,7 @@ const EditorPanel = () => {
                     )}
                     {config.visualizationType !== 'Pie' && (
                       <>
-                        <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
+                        <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label ' updateField={updateField} />
                         {config.runtime.seriesKeys && config.runtime.seriesKeys.length === 1 && !['Box Plot', 'Deviation Bar', 'Forest Plot'].includes(config.visualizationType) && (
                           <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                         )}
@@ -1193,6 +1194,7 @@ const EditorPanel = () => {
                         {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
                         {visSupportsValueAxisGridLines() && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
                         <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
+                        {config.yAxis.enablePadding && <TextField type='number' section='yAxis' fieldName='scalePadding' label='Padding Percentage' className='number-narrow' updateField={updateField} value={config.yAxis.scalePadding} />}
                         {config.visualizationSubType === 'regular' && config.visualizationType !== 'Forest Plot' && <CheckBox value={config.useLogScale} fieldName='useLogScale' label='use logarithmic scale' updateField={updateField} />}
                       </>
                     )}
@@ -1622,7 +1624,7 @@ const EditorPanel = () => {
                         {config.visualizationType !== 'Forest Plot' && (
                           <>
                             <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
-                            <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />{' '}
+                            {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.orientation !== 'horizontal'  && <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />}{' '}
                           </>
                         )}
                         <Select
@@ -1743,7 +1745,43 @@ const EditorPanel = () => {
                               .
                             </p>
                             <TextField value={config.xAxis.dateParseFormat} section='xAxis' fieldName='dateParseFormat' placeholder='Ex. %Y-%m-%d' label='Date Parse Format' updateField={updateField} />
-                            <TextField value={config.xAxis.dateDisplayFormat} section='xAxis' fieldName='dateDisplayFormat' placeholder='Ex. %Y-%m-%d' label='Date Display Format' updateField={updateField} />
+                            <TextField value={config.xAxis.dateDisplayFormat} section='xAxis' fieldName='dateDisplayFormat' placeholder='Ex. %Y-%m-%d' label='AXIS DATE DISPLAY FORMAT' updateField={updateField} />
+                            <TextField
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>If not populated, Axis Date Display format will be used. </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              value={config.table.dateDisplayFormat}
+                              section='table'
+                              fieldName='dateDisplayFormat'
+                              placeholder='Ex. %Y-%m-%d'
+                              label='DATA TABLE DATE FORMAT'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>If not populated, Axis Date Display format will be used. </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              value={config.tooltips.dateDisplayFormat}
+                              section='tooltips'
+                              fieldName='dateDisplayFormat'
+                              placeholder='Ex. %Y-%m-%d'
+                              label='HOVER DATE FORMAT'
+                              updateField={updateField}
+                            />
                           </>
                         )}
 
@@ -1805,6 +1843,8 @@ const EditorPanel = () => {
 
                         {visSupportsDateCategoryNumTicks() && <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />}
                         {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.size} type='number' min={0} section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
+
+                        {visSupportsDateCategoryAxisPadding() && <TextField value={config.xAxis.padding} type='number' min={0} section='xAxis' fieldName='padding' label={'Padding (Percent)'} className='number-narrow' updateField={updateField} />}
 
                         {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                         {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}

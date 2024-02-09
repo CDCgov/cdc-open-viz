@@ -10,7 +10,7 @@
   "theme": "theme-orange",
   "animate": false,
   "fontSize": "medium",
-  "lineDatapointStyle": "hover",
+  "lineDatapointStyle": "always show",
   "lineDatapointColor": "Same as Line",
   "barHasBorder": "false",
   "isLollipopChart": false,
@@ -32,26 +32,10 @@
   "preliminaryData": [
     {
       "type": "effect",
-      "label": "Cricle  1",
+      "label": "dashed",
       "column": "Data 2",
-      "value": "20",
-      "style": "Open Circles",
-      "seriesKey": "Data 1"
-    },
-    {
-      "type": "",
-      "label": "Cricle 2",
-      "column": "Data 3",
-      "value": "20",
-      "style": "Open Circles",
-      "seriesKey": "Data 1"
-    },
-    {
-      "type": "effect",
-      "label": "circle 3",
-      "column": "Data 2",
-      "value": "30",
-      "style": "Open Circles",
+      "value": "38",
+      "style": "Dashed Medium",
       "seriesKey": "Data 1"
     }
   ],
@@ -77,6 +61,7 @@
     "rightAxisTickColor": "#333",
     "numTicks": "",
     "axisPadding": 0,
+    "scalePadding": 10,
     "tickRotation": 0,
     "anchors": [],
     "label": "Y-Axis Label Example"
@@ -158,6 +143,7 @@
     "indexLabel": "",
     "download": true,
     "showVertical": false,
+    "dateDisplayFormat": "",
     "show": true
   },
   "orientation": "vertical",
@@ -186,25 +172,55 @@
     "data": [
       {
         "Year": "2015",
-        "Data 1": "25",
+        "Data 1": "44",
         "Data 2": "20",
         "Data 3": "55"
       },
       {
         "Year": "2016",
-        "Data 1": "35",
+        "Data 1": "",
         "Data 2": "30",
         "Data 3": "35"
       },
       {
         "Year": "2017",
-        "Data 1": "22",
+        "Data 1": "133",
         "Data 2": "38",
-        "Data 3": "40"
+        "Data 3": ""
       },
       {
         "Year": "2018",
-        "Data 1": "40",
+        "Data 1": "122",
+        "Data 2": "40",
+        "Data 3": "20"
+      },
+      {
+        "Year": "2019",
+        "Data 1": "12",
+        "Data 2": "40",
+        "Data 3": ""
+      },
+      {
+        "Year": "2020",
+        "Data 1": "55",
+        "Data 2": "40",
+        "Data 3": "20"
+      },
+      {
+        "Year": "2021",
+        "Data 1": "34",
+        "Data 2": "40",
+        "Data 3": "20"
+      },
+      {
+        "Year": "2022",
+        "Data 1": "",
+        "Data 2": "40",
+        "Data 3": "20"
+      },
+      {
+        "Year": "2023",
+        "Data 1": "65",
         "Data 2": "40",
         "Data 3": "20"
       }
@@ -251,20 +267,21 @@
     },
     {
       "dataKey": "Data 2",
-      "type": "Bar",
-      "tooltip": true,
-      "axis": "Left"
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
     },
     {
       "dataKey": "Data 3",
-      "type": "Bar",
-      "tooltip": true,
-      "axis": "Left"
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
     }
   ],
   "tooltips": {
     "opacity": 90,
-    "singleSeries": false
+    "singleSeries": false,
+    "dateDisplayFormat": ""
   },
   "forestPlot": {
     "startAt": 0,
@@ -317,25 +334,55 @@
   "data": [
     {
       "Year": "2015",
-      "Data 1": "25",
+      "Data 1": "44",
       "Data 2": "20",
       "Data 3": "55"
     },
     {
       "Year": "2016",
-      "Data 1": "35",
+      "Data 1": "",
       "Data 2": "30",
       "Data 3": "35"
     },
     {
       "Year": "2017",
-      "Data 1": "22",
+      "Data 1": "133",
       "Data 2": "38",
-      "Data 3": "40"
+      "Data 3": ""
     },
     {
       "Year": "2018",
-      "Data 1": "40",
+      "Data 1": "122",
+      "Data 2": "40",
+      "Data 3": "20"
+    },
+    {
+      "Year": "2019",
+      "Data 1": "12",
+      "Data 2": "40",
+      "Data 3": ""
+    },
+    {
+      "Year": "2020",
+      "Data 1": "55",
+      "Data 2": "40",
+      "Data 3": "20"
+    },
+    {
+      "Year": "2021",
+      "Data 1": "34",
+      "Data 2": "40",
+      "Data 3": "20"
+    },
+    {
+      "Year": "2022",
+      "Data 1": "",
+      "Data 2": "40",
+      "Data 3": "20"
+    },
+    {
+      "Year": "2023",
+      "Data 1": "65",
       "Data 2": "40",
       "Data 3": "20"
     }

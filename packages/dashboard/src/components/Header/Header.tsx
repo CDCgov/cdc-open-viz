@@ -17,6 +17,7 @@ import Select from '@cdc/core/components/ui/Select'
 import Button from '@cdc/core/components/elements/Button'
 
 import './index.scss'
+import MultiConfigTabs from '../MultiConfigTabs'
 
 type HeaderProps = {
   setPreview?: any
@@ -502,13 +503,13 @@ const Header = (props: HeaderProps) => {
                   <select
                     value={filter.parents || []}
                     onChange={e => {
-                      updateFilterProp('parent', index, e.target.value)
+                      updateFilterProp('parents', index, e.target.value)
                     }}
                   >
                     <option value=''>Select a filter</option>
                     {config.dashboard.sharedFilters &&
                       config.dashboard.sharedFilters.map(sharedFilter => {
-                        if (sharedFilter.key !== filter.key && sharedFilter.type !== 'urlfilter') {
+                        if (sharedFilter.key !== filter.key) {
                           return <option>{sharedFilter.key}</option>
                         }
                       })}
@@ -541,6 +542,15 @@ const Header = (props: HeaderProps) => {
     )
   }
 
+  const handleCheck = e => {
+    const { checked } = e.currentTarget
+    if (checked) {
+      dispatch({ type: 'INITIALIZE_MULTIDASHBOARDS' })
+    }
+  }
+
+  const multiInitialized = !!config.multiDashboards
+
   return (
     <div aria-level={2} role='heading' className={`editor-heading${subEditor ? ' sub-dashboard-viz' : ''}`}>
       {subEditor ? (
@@ -549,13 +559,17 @@ const Header = (props: HeaderProps) => {
         </div>
       ) : (
         <div className='heading-1'>
-          Dashboard Editor
+          Dashboard Editor{' '}
+          <span className='small'>
+            <input type='checkbox' onChange={handleCheck} checked={multiInitialized} disabled={multiInitialized} /> make multidashboard
+          </span>
           <br />
           {<input type='text' placeholder='Enter Dashboard Name Here' defaultValue={config.dashboard?.title} onChange={e => changeConfigValue('dashboard', 'title', e.target.value)} />}
         </div>
       )}
       {!subEditor && (
         <div className='toggle-bar__wrapper'>
+          <MultiConfigTabs isEditor />
           <ul className='toggle-bar'>
             <li
               className={tabSelected === 0 ? 'active' : 'inactive'}

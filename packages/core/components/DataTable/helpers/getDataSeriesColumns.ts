@@ -11,7 +11,7 @@ export const getDataSeriesColumns = (config, isVertical, runtimeData): string[] 
       tmpSeriesColumns = Object.keys(runtimeData[0])
     }
   } else {
-    tmpSeriesColumns = [config.xAxis?.dataKey, config.yAxis?.dataKey] //Object.keys(runtimeData[0])
+    tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey, config.yAxis?.dataKey] : [config.yAxis?.dataKey]
   }
 
   // then add the additional Columns
