@@ -47,7 +47,7 @@ export type DataTableProps = {
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
   const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId, wrapColumns } = props
-
+  console.log('rawData', rawData)
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [sortBy, setSortBy] = useState<any>({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
@@ -85,7 +85,7 @@ const DataTable = (props: DataTableProps) => {
     case 'Box Plot':
       if (!config.boxplot) return <Loading />
       break
-    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar':
+    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar' || 'Sankey':
       if (!runtimeData) return <Loading />
       break
     default:
@@ -93,7 +93,7 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const _runtimeData = config.table.customTableConfig ? customColumns(rawData, config.table.excludeColumns) : runtimeData
+  const _runtimeData = config.table.customTableConfig || config.visualizationType === 'Sankey' ? customColumns(rawData, config.table.excludeColumns) : runtimeData
 
   const rawRows = Object.keys(_runtimeData)
   const rows = isVertical
@@ -137,7 +137,9 @@ const DataTable = (props: DataTableProps) => {
 
   // prettier-ignore
   const tableData = useMemo(() => (
-    config.visualizationType === 'Pie'
+    config.visualizationType === 'Sankey'
+      ? config.data?.[0]?.tableData
+      : config.visualizationType === 'Pie'
       ? [config.yAxis.dataKey]
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])

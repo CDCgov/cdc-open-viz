@@ -24,7 +24,7 @@ const isAdditionalColumn = (column, config) => {
 }
 
 export const getChartCellValue = (row, column, config, runtimeData) => {
-  if (config.table.customTableConfig) return runtimeData[row][column]
+  if (config.table.customTableConfig || config.visualizationType === 'Sankey') return runtimeData[row][column]
   const rowObj = runtimeData[row]
   let cellValue // placeholder for formatting below
   let labelValue = rowObj[column] // just raw X axis string
