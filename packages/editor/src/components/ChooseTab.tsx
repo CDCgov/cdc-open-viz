@@ -4,6 +4,7 @@ import '../scss/choose-vis-tab.scss'
 import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
+import InfoIcon from '@cdc/core/assets/icon-info.svg'
 import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg'
 import BarIcon from '@cdc/core/assets/icon-chart-bar.svg'
 import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
