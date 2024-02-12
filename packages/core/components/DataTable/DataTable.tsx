@@ -23,8 +23,6 @@ export type DataTableProps = {
   applyLegendToRow?: Function
   colorScale?: Function
   columns?: Record<string, Column>
-  // determines if columns should be wrapped in the table
-  wrapColumns?: boolean
   config: TableConfig
   dataConfig?: Object
   displayDataAsText?: Function
@@ -33,21 +31,27 @@ export type DataTableProps = {
   formatLegendLocation?: Function
   groupBy?: string
   headerColor?: string
+  imageRef?: string
   indexTitle?: string
+  isDebug?: boolean
+  isEditor?: boolean
   navigationHandler?: Function
+  outerContainerRef?: Function
   rawData: Object[]
   runtimeData: Object[] | Record<string, Object> // UNSAFE
   setFilteredCountryCode?: Function // used for Maps only
+  showDownloadButton?: boolean
   tabbingId: string
   tableTitle: string
   viewport: string
   vizTitle?: string
+  // determines if columns should be wrapped in the table
+  wrapColumns?: boolean
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
   const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId, wrapColumns } = props
-
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [sortBy, setSortBy] = useState<any>({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
@@ -85,7 +89,7 @@ const DataTable = (props: DataTableProps) => {
     case 'Box Plot':
       if (!config.boxplot) return <Loading />
       break
-    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar':
+    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar' || 'Sankey':
       if (!runtimeData) return <Loading />
       break
     default:
@@ -93,8 +97,8 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const _runtimeData = config.table.customTableConfig ? customColumns(rawData, config.table.excludeColumns) : runtimeData
-
+  const _runtimeData = config.table.customTableConfig || config.visualizationType === 'Sankey' || config.data?.[0].tableData ? customColumns(rawData, config.table.excludeColumns) : runtimeData
+  console.log('runtime', _runtimeData)
   const rawRows = Object.keys(_runtimeData)
   const rows = isVertical
     ? rawRows.sort((a, b) => {
@@ -118,7 +122,7 @@ const DataTable = (props: DataTableProps) => {
     OverflowY: 'scroll'
   }
 
-  const hasRowType = !!Object.keys(rawData[0] || {}).find((v: string) => v.match(/row[_-]?type/i))
+  const hasRowType = !!Object.keys(rawData?.[0] || {}).find((v: string) => v.match(/row[_-]?type/i))
 
   const caption = useMemo(() => {
     if (config.type === 'map') {
@@ -137,7 +141,11 @@ const DataTable = (props: DataTableProps) => {
 
   // prettier-ignore
   const tableData = useMemo(() => (
-    config.visualizationType === 'Pie'
+   config.data?.[0]?.tableData
+    ? config.data?.[0]?.tableData
+    : config.visualizationType === 'Sankey'
+      ? config.data?.[0]?.tableData
+      : config.visualizationType === 'Pie'
       ? [config.yAxis.dataKey]
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])

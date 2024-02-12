@@ -14,16 +14,41 @@ import { useColorPalette } from '../../../../hooks/useColorPalette'
 import { ChartContext } from './../../../../types/ChartContext.js'
 
 import { useEditorPermissions } from '../../useEditorPermissions.js'
-import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../EditorPanelContext.js'
+import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 
 const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
   const { visual } = config
-  const { setLollipopShape, updateField } = useContext<EPContext>(EditorPanelContext)
+  const { setLollipopShape, updateField } = useEditorPanelContext()
   const { visHasBarBorders, visCanAnimate, visSupportsNonSequentialPallete, headerColors, visSupportsTooltipOpacity, visSupportsTooltipLines, visSupportsBarSpace, visSupportsBarThickness, visHasDataCutoff, visSupportsSequentialPallete, visSupportsReverseColorPalette } = useEditorPermissions()
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
+
+  const updateColor = (property, _value) => {
+    console.log('value', _value)
+    if (property === 'storyNodeFontColor') {
+      updateConfig({
+        ...config,
+        sankey: {
+          ...config.sankey,
+          storyNodeFontColor: _value
+        }
+      })
+      return
+    } else {
+      updateConfig({
+        ...config,
+        sankey: {
+          ...config.sankey,
+          [property]: {
+            ...config.sankey[property],
+            default: _value
+          }
+        }
+      })
+    }
+  }
 
   return (
     <AccordionItem>
@@ -173,6 +198,22 @@ const PanelVisual: FC<PanelProps> = props => {
                 </ul>
               </>
             )}
+          </>
+        )}
+        {config.visualizationType === 'Sankey' && (
+          <>
+            <span className='sankey__color-input'>
+              <input type='color' value={config.sankey.nodeColor.default} id='storyNodeColor' name='storyNodeColor' onChange={e => updateColor('nodeColor', e.target.value)} />
+              <label htmlFor='storyNodeColor'>Story Node Color</label>
+            </span>
+            <span className='sankey__color-input'>
+              <input type='color' value={config.sankey.storyNodeFontColor || 'red'} id='storyNodeFontColor' name='storyNodeFontColor' onChange={e => updateColor('storyNodeFontColor', e.target.value)} />
+              <label htmlFor='storyNodeFontColor'>Story Node Font Color</label>
+            </span>
+            <span className='sankey__color-input'>
+              <input type='color' value={config.sankey.linkColor.default} id='linkColor' name='linkColor' onChange={e => updateColor('linkColor', e.target.value)} />
+              <label htmlFor='linkColor'>Link Color</label>
+            </span>
           </>
         )}
         {(config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') && (

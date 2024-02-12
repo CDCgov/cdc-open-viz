@@ -1,37 +1,25 @@
-import { SankeyGraph, sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey'
-import ReactDOMServer from 'react-dom/server'
-import './sankey.scss'
 import { useContext, useState, useRef, useEffect } from 'react'
+
+// External Libraries
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import 'react-tooltip/dist/react-tooltip.css'
-import ConfigContext from '@cdc/chart/src/ConfigContext'
+import { SankeyGraph, sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
+import ReactDOMServer from 'react-dom/server'
+
+// Cdc
+import './sankey.scss'
+import 'react-tooltip/dist/react-tooltip.css'
+import ConfigContext from '@cdc/chart/src/ConfigContext'
 import { ChartContext } from '../../types/ChartContext'
-import React from 'react'
-
-type Link = { source: string; target: string; value: number }
-
-type Data = {
-  links: Link[]
-}
-
-type SankeyNode = {
-  id: string
-}
-
-type SankeyProps = {
-  width: number
-  height: number
-  data: Data
-}
+import type { SankeyNode, SankeyProps } from './types'
 
 const Sankey = ({ width, height }: SankeyProps) => {
-  // Merges initial-state with the passed config in examples/feature/sankey/initial.json
   const DEBUG = true
   const { config } = useContext<ChartContext>(ConfigContext)
-  const { sankey: sankeyConfig } = config // todo: add sankey type to chart config
-  const data = sankeyConfig?.data
+  const { sankey: sankeyConfig } = config
+  // !info - changed config.sankey.data here to work with our current upload pattern saved on config.data
+  const data = config?.data[0]
   const [largestGroupWidth, setLargestGroupWidth] = useState(0)
   const groupRefs = useRef([])
 
@@ -56,15 +44,15 @@ const Sankey = ({ width, height }: SankeyProps) => {
       }
     })
     setLargestGroupWidth(largest)
-  }, [groupRefs, config.sankey.data.storyNodeText])
+  }, [groupRefs, sankeyConfig])
 
   //Retrieve all the unique values for the Nodes
-  const uniqueNodes = Array.from(new Set(data.links.flatMap(link => [link.source, link.target])))
+  const uniqueNodes = Array.from(new Set(data?.links?.flatMap(link => [link.source, link.target])))
 
   // Convert JSON data to the format required
   const sankeyData: SankeyGraph<SankeyNode, { source: number; target: number }> = {
     nodes: uniqueNodes.map(nodeId => ({ id: nodeId })),
-    links: data.links.map(link => ({
+    links: data?.links?.map(link => ({
       source: uniqueNodes.findIndex(node => node === link.source),
       target: uniqueNodes.findIndex(node => node === link.target),
       value: link.value
@@ -72,6 +60,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   }
 
   let textPositionHorizontal = 5
+  const BUFFER = 50
 
   // Set the sankey diagram properties
   const sankeyGenerator = sankey<SankeyNode, { source: number; target: number }>()
@@ -80,8 +69,8 @@ const Sankey = ({ width, height }: SankeyProps) => {
     .iterations(sankeyConfig.iterations)
     .nodeAlign(sankeyLeft)
     .extent([
-      [sankeyConfig.margin.margin_x, sankeyConfig.margin.margin_y],
-      [width - textPositionHorizontal - largestGroupWidth, height]
+      [sankeyConfig.margin.margin_x, Number(sankeyConfig.margin.margin_y)],
+      [width - textPositionHorizontal - largestGroupWidth, config.heights.vertical - BUFFER]
     ])
 
   const { nodes, links } = sankeyGenerator(sankeyData)
@@ -94,7 +83,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
 
     // TODO: need a dynamic way to apply classes here instead of checking static values.
 
-    if (sankeyConfig.data.storyNodeText.every(node => node.StoryNode !== id)) {
+    if (data?.storyNodeText?.every(node => node.StoryNode !== id)) {
       storyNodes = false
       textPositionVertical = 10
       textPositionHorizontal = 8
@@ -133,12 +122,12 @@ const Sankey = ({ width, height }: SankeyProps) => {
     return { sourceNodes, activeLinks }
   }
 
-  const tooltipVal = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).value}`
-  const tooltipSummary = `${(sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).summary}`
-  const tooltipColumn1Label = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1Label
-  const tooltipColumn2Label = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column2Label
-  const tooltipColumn1 = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column1
-  const tooltipColumn2 = (sankeyConfig.data.tooltips.find(item => item.node === tooltipID) || {}).column2
+  const tooltipVal = `${(data?.tooltips.find(item => item.node === tooltipID) || {}).value}`
+  const tooltipSummary = `${(data?.tooltips.find(item => item.node === tooltipID) || {}).summary}`
+  const tooltipColumn1Label = (data?.tooltips.find(item => item.node === tooltipID) || {}).column1Label
+  const tooltipColumn2Label = (data?.tooltips.find(item => item.node === tooltipID) || {}).column2Label
+  const tooltipColumn1 = (data?.tooltips.find(item => item.node === tooltipID) || {}).column1
+  const tooltipColumn2 = (data?.tooltips.find(item => item.node === tooltipID) || {}).column2
 
   const ColumnList = ({ columnData }) => {
     return (
@@ -196,7 +185,8 @@ const Sankey = ({ width, height }: SankeyProps) => {
           fill={nodeColor}
           fillOpacity={opacityValue}
           rx={sankeyConfig.rxValue}
-          data-tooltip-html={sankeyConfig.data.tooltips && config.enableTooltips ? sankeyToolTip : null}
+          // todo: move enable tooltips to sankey
+          data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
           data-tooltip-id={`tooltip`}
           onClick={() => handleNodeClick(node.id)}
           style={{ pointerEvents: 'visible', cursor: 'pointer' }}
@@ -227,9 +217,9 @@ const Sankey = ({ width, height }: SankeyProps) => {
               style={{ pointerEvents: 'none' }}
               className='node-text'
             >
-              {(sankeyConfig.data.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
+              {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextBefore}
             </Text>
-            <Text verticalAnchor='end' className={classStyle} x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0! + 25) / 2} fill={sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
+            <Text verticalAnchor='end' className={classStyle} x={node.x0! + textPositionHorizontal} y={(node.y1! + node.y0! + 25) / 2} fill={sankeyConfig.storyNodeFontColor || sankeyConfig.nodeFontColor} fontWeight='bold' textAnchor='start' style={{ pointerEvents: 'none' }}>
               {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
             </Text>
             <Text
@@ -243,7 +233,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
               className='node-text'
               verticalAnchor='end'
             >
-              {(sankeyConfig.data.storyNodeText.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}
+              {(data?.storyNodeText?.find(storyNode => storyNode.StoryNode === node.id) || {}).segmentTextAfter}
             </Text>
           </>
         ) : (
@@ -258,7 +248,6 @@ const Sankey = ({ width, height }: SankeyProps) => {
               /* adding 30 allows the node value to be on the next line underneath the node id */
               y={(node.y1! + node.y0!) / 2 + 30}
               dominantBaseline='text-before-edge'
-              //fill="black"
               fill={sankeyConfig.nodeFontColor}
               //fontSize={16}
               fontWeight='bold'
@@ -293,7 +282,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   return (
     <>
       <div className='sankey-chart'>
-        <svg className='sankey-chart__diagram' width={width} height={height} style={{ overflow: 'visible' }}>
+        <svg className='sankey-chart__diagram' width={width} height={Number(config.heights.vertical)} style={{ overflow: 'visible' }}>
           <Group className='links'>{allLinks}</Group>
           <Group className='nodes'>{allNodes}</Group>
         </svg>

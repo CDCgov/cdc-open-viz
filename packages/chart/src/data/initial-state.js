@@ -53,6 +53,7 @@ export default {
     rightAxisTickColor: '#333',
     numTicks: '',
     axisPadding: 0,
+    scalePadding: 10,
     tickRotation: 0,
     anchors: []
   },
@@ -129,7 +130,8 @@ export default {
     showDataTableLink: true,
     indexLabel: '',
     download: false,
-    showVertical: true
+    showVertical: true,
+    dateDisplayFormat: ''
   },
   orientation: 'vertical',
   color: 'pinkpurple',
@@ -191,7 +193,8 @@ export default {
   series: [],
   tooltips: {
     opacity: 90,
-    singleSeries: false
+    singleSeries: false,
+    dateDisplayFormat: ''
   },
   forestPlot: {
     startAt: 0,
@@ -279,6 +282,7 @@ export default {
     nodeValueStyle: {
       textBefore: '(',
       textAfter: ')'
-    }
+    },
+    data: []
   }
 }

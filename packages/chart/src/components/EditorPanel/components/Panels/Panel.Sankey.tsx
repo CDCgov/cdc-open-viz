@@ -8,14 +8,14 @@ import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../
 
 const SankeySettings = () => {
   const { config, updateConfig } = useContext(ConfigContext)
-  const { sankey } = config
+  const data = config.data?.[0]
   const { updateField } = useContext<EPContext>(EditorPanelContext)
 
   const updateStoryNode = (fieldName, value, i) => {
     let storyNodes = []
 
-    if (config.sankey.data.storyNodeText) {
-      storyNodes = [...config.sankey.data.storyNodeText]
+    if (data?.storyNodeText) {
+      storyNodes = [...data?.storyNodeText]
     }
 
     storyNodes[i][fieldName] = value
@@ -33,13 +33,9 @@ const SankeySettings = () => {
   }
 
   const addStoryNode = () => {
-    let storyNodes = []
+    const newData = data
 
-    if (config.sankey.data.storyNodeText) {
-      storyNodes = [...config.sankey.data.storyNodeText]
-    }
-
-    storyNodes.push({
+    newData.storyNodeText.push({
       StoryNode: '',
       segmentTextBefore: '',
       segmentTextAfter: ''
@@ -49,19 +45,16 @@ const SankeySettings = () => {
       ...config,
       sankey: {
         ...config.sankey,
-        data: {
-          ...config.sankey.data,
-          storyNodeText: storyNodes
-        }
+        data: [{ ...newData }]
       }
     })
   }
 
   const removeStoryNode = index => {
-    const updatedStoryNodeText = [...config.sankey.data.storyNodeText]
-    updatedStoryNodeText.splice(index, 1)
+    const newData = data
+    newData.storyNodeText.splice(index, 1)
 
-    updateConfig({ ...config, sankey: { ...config.sankey, data: { ...config.sankey.data, storyNodeText: updatedStoryNodeText } } })
+    updateConfig({ ...config, sankey: { ...config.sankey, data: { ...newData } } })
   }
 
   return (
@@ -70,8 +63,8 @@ const SankeySettings = () => {
         <AccordionItemButton>Sankey Settings</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        {config.sankey.data.storyNodeText &&
-          config.sankey.data.storyNodeText.map(({ StoryNode, segmentTextBefore, segmentTextAfter }, i) => (
+        {data?.storyNodeText &&
+          data?.storyNodeText.map(({ StoryNode, segmentTextBefore, segmentTextAfter }, i) => (
             <div key={i} style={{ border: '1px solid black', margin: '15px auto', padding: '15px', borderRadius: '10px' }}>
               <label>
                 Story Node Text
@@ -90,8 +83,8 @@ const SankeySettings = () => {
               </Button>
             </div>
           ))}
-        {`Total Story Nodes: ${config.sankey.data.storyNodeText.length}`}
-        {config.sankey.data.storyNodeText.length < 3 && (
+        {`Total Story Nodes: ${data?.storyNodeText?.length}`}
+        {data?.storyNodeText?.length < 3 && (
           <button
             type='button'
             className='btn full-width'

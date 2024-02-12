@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import '../scss/choose-vis-tab.scss'
 
-import ConfigContext from '../ConfigContext'
+import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg'
@@ -20,25 +20,25 @@ import ScatterPlotIcon from '@cdc/core/assets/icon-chart-scatterplot.svg'
 import BoxPlotIcon from '@cdc/core/assets/icon-chart-box-whisker.svg'
 import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
 import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
-import InfoIcon from '@cdc/core/assets/icon-info.svg'
 import ForestPlotIcon from '@cdc/core/assets/icon-chart-forest-plot.svg'
 import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
 import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
+import { Visualization } from '@cdc/core/types/Visualization'
 
 export default function ChooseTab() {
-  const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(ConfigContext)
+  const { config, tempConfig } = useContext(ConfigContext)
+  const dispatch = useContext(EditorDispatchContext)
 
   useEffect(() => {
-    if (tempConfig !== null) {
-      setConfig(tempConfig)
-      setTempConfig(null)
+    if (tempConfig) {
+      dispatch({ type: 'EDITOR_SAVE', payload: tempConfig })
     }
-  })
+  }, [])
 
   /**
    * IconButton component
    */
-  const IconButton = ({ icon, label, type, subType, barType, orientation, stacked = false, generalType = 'data' }) => {
+  const IconButton = ({ icon, label, type, subType = undefined, orientation = undefined, stacked = false, generalType = 'data' }) => {
     let isSubType = false
     let isHorizontalStackedChart = false
     let classNames
@@ -69,10 +69,9 @@ export default function ChooseTab() {
     let setTypes = () => {
       if (type === config.type) {
         if (subType !== config.visualizationType) {
-          setConfig({ ...config, newViz: true, visualizationType: subType })
+          dispatch({ type: 'EDITOR_SET_CONFIG', payload: { ...config, newViz: true, visualizationType: subType } })
         }
-
-        setGlobalActive(1)
+        dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
       } else {
         let confirmation = !config.type || window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?')
 
@@ -81,7 +80,7 @@ export default function ChooseTab() {
             newViz: true,
             datasets: {},
             type
-          }
+          } as Visualization
 
           if (type === 'map') {
             newConfig.general = {
@@ -97,8 +96,8 @@ export default function ChooseTab() {
             newConfig.orientation = orientation
           }
 
-          setConfig(newConfig)
-          setGlobalActive(1)
+          dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
+          dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
         }
       }
     }
@@ -252,6 +251,15 @@ export default function ChooseTab() {
               <IconButton label='Forest Plot' type='chart' subType='Forest Plot' orientation='vertical' icon={<ForestPlotIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Display a forest plot</Tooltip.Content>
+          </Tooltip>
+        </li>
+
+        <li>
+          <Tooltip>
+            <Tooltip.Target>
+              <IconButton label='Sankey Diagram' type='chart' subType='Sankey' orientation='vertical' icon={<InfoIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Display a sankey diagram</Tooltip.Content>
           </Tooltip>
         </li>
       </ul>

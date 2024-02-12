@@ -11,13 +11,13 @@ import Icon from '@cdc/core/components/ui/Icon'
 
 // contexts
 import { useEditorPermissions } from '../../useEditorPermissions.js'
-import EditorPanelContext, { type EditorPanelContext as EPContext } from '../../EditorPanelContext.js'
+import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 
 const PanelGeneral: FC<PanelProps> = props => {
   const { config } = useContext(ConfigContext)
-  const { updateField } = useContext<EPContext>(EditorPanelContext)
+  const { updateField } = useEditorPanelContext()
   const { enabledChartTypes, visHasNumbersOnBars, visHasLabelOnData, visSupportsChartHeight, visSupportsSuperTitle, visSupportsFootnotes } = useEditorPermissions()
   const { visualizationType, visualizationSubType, barStyle } = config
 

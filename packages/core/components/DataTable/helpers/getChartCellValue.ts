@@ -24,13 +24,13 @@ const isAdditionalColumn = (column, config) => {
 }
 
 export const getChartCellValue = (row, column, config, runtimeData) => {
-  if (config.table.customTableConfig) return runtimeData[row][column]
+  if (config.table.customTableConfig || config.visualizationType === 'Sankey' || runtimeData?.[0]?.tableData) return runtimeData[row][column]
   const rowObj = runtimeData[row]
   let cellValue // placeholder for formatting below
   let labelValue = rowObj[column] // just raw X axis string
   if (column === config.xAxis?.dataKey) {
     // not the prettiest, but helper functions work nicely here.
-    cellValue = config.xAxis?.type === 'date' ? formatDate(config.xAxis?.dateDisplayFormat, parseDate(config.xAxis?.dateParseFormat, labelValue)) : labelValue
+    cellValue = config.xAxis?.type === 'date' ? formatDate(config.table?.dateDisplayFormat || config.xAxis?.dateDisplayFormat, parseDate(config.xAxis?.dateParseFormat, labelValue)) : labelValue
   } else {
     let resolvedAxis = 'left'
     let leftAxisItems = config.series ? config.series.filter(item => item?.axis === 'Left') : []
