@@ -47,6 +47,9 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     }
     return color
   }
+  const getXPos = hoveredXValue => {
+    return (config.xAxis.type === 'categorical' ? xScale(hoveredXValue) : xScale(parseDate(hoveredXValue))) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+  }
   if (lineDatapointStyle === 'always show') {
     const isMatch = circleData?.some(cd => cd[config.xAxis.dataKey] === d[config.xAxis.dataKey] && cd[seriesKey] === d[seriesKey])
     if (isMatch) {
@@ -54,7 +57,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     }
     return (
       <circle
-        cx={config.xAxis.type === 'categorical' ? xScale(d[config.xAxis.dataKey]) : xScale(parseDate(d[config.xAxis.dataKey]))}
+        cx={getXPos(d[config.xAxis.dataKey])}
         cy={filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered.dataKey])}
         r={4.5}
         opacity={d[seriesKey] ? 1 : 0}
@@ -95,7 +98,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       }
       return (
         <circle
-          cx={config.xAxis.type === 'categorical' ? xScale(hoveredXValue) : xScale(parseDate(hoveredXValue))}
+          cx={getXPos(hoveredXValue)}
           cy={hoveredSeriesAxis === 'right' ? yScaleRight(hoveredSeriesValue) : yScale(hoveredSeriesValue)}
           r={4.5}
           opacity={1}
