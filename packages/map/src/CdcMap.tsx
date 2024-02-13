@@ -1079,8 +1079,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const displayGeoName = key => {
     if (!state.general.convertFipsCodes) return key
 
+    // World Map
     // If we're returning a city name instead of a country ISO code, capitalize it for the data table.
-    if (String(key).length > 3) return titleCase(key)
+    if (state.type === 'map' && state.general.geoType === 'world') {
+      if (String(key).length > 3) return titleCase(key)
+    }
     let value = key
     // Map to first item in values array which is the preferred label
     if (stateKeys.includes(value)) {
