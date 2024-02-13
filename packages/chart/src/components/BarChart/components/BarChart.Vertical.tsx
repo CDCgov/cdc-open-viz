@@ -102,7 +102,7 @@ export const BarChartVertical = () => {
                   let barGroupWidth = seriesScale.range()[1]
 
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
-                  let barX = bar.x + (config.isLollipopChart ? (((barGroupWidth / barGroup.bars.length) - lollipopBarWidth) / 2) : 0) - (config.xAxis.type === 'date' && config.xAxis.sortDates ? barGroupWidth / 2 : 0)
+                  let barX = bar.x + (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) - (config.xAxis.type === 'date' && config.xAxis.sortDates ? barGroupWidth / 2 : 0)
                   setBarWidth(barWidth)
                   setTotalBarsInGroup(barGroup.bars.length)
 
@@ -303,7 +303,7 @@ export const BarChartVertical = () => {
               let upperPos
               let lowerPos
               let tickWidth = 5
-              xPos = xScale(getXAxisData(d))
+              xPos = xScale(getXAxisData(d)) + (config.xAxis.type !== 'date' || !config.xAxis.sortDates ? seriesScale.range()[1] / 2 : 0)
               upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
               lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
               return (
