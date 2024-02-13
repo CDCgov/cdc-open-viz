@@ -113,7 +113,6 @@ const WorldMap = props => {
       const geoData = data[geoKey]
 
       const geoDisplayName = displayGeoName(supportedCountries[geoKey]?.[0])
-      console.log('geoDisplayName', geoDisplayName)
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
@@ -159,9 +158,7 @@ const WorldMap = props => {
     })
 
     // Cities
-    geosJsx.push(
-      <CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} key='cities' projection={projection} state={state} titleCase={titleCase} />
-    )
+    geosJsx.push(<CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} key='cities' projection={projection} state={state} titleCase={titleCase} />)
 
     // Bubbles
     if (state.general.type === 'bubble') {
