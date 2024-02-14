@@ -5,26 +5,24 @@ import { CheckBox, TextField } from './Inputs'
 import type { Table } from '@cdc/core/types/Table'
 import MultiSelect from '../MultiSelect'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
+import { Visualization } from '../../types/Visualization'
 
 interface DataTableProps {
-  config: {
-    table: Table
-    visualizationType: string
-  }
+  config: Visualization
   updateField: UpdateFieldFunc<string | boolean | string[] | number>
   isDashboard: boolean
-  isLoadedFromUrl: boolean
   columns: string[]
 }
 
-const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard, isLoadedFromUrl, columns }) => {
+const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard, columns }) => {
+  const isLoadedFromUrl = config.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
   return (
     <>
       <TextField
         value={config.table.label}
         updateField={updateField}
         section='table'
-        fieldName='table-label'
+        fieldName='label'
         id='tableLabel'
         label='Data Table Title'
         placeholder='Data Table'

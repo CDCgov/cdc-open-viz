@@ -1,0 +1,13 @@
+.editor-wrapper {
+  --editorPanelWidth: 350px;
+  position: relative;
+  .editor-panel {
+    :is(form) {
+      border-right: var(--lightGray) 1px solid;
+      flex-grow: 1;
+    }
+  }
+  .preview-wrapper {
+    padding-left: var(--editorPanelWidth);
+  }
+}
