@@ -29,6 +29,7 @@
     "right": 5
   },
   "suppressedData": [],
+  "preliminaryData": [],
   "yAxis": {
     "hideAxis": false,
     "displayNumbersOnBar": false,
@@ -97,7 +98,7 @@
     "horizontal": 750
   },
   "xAxis": {
-    "sortDates": false,
+    "sortDates": true,
     "anchors": [],
     "type": "date",
     "showTargetLabel": true,
@@ -153,6 +154,7 @@
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "lineMode": false,
     "verticalSorted": false,
+    "highlightOnHover": false,
     "position": "right",
     "label": "Type of Data"
   },
@@ -276,7 +278,8 @@
     }
   ],
   "tooltips": {
-    "opacity": 90
+    "opacity": 90,
+    "singleSeries": false
   },
   "forestPlot": {
     "startAt": 0,
@@ -319,9 +322,9 @@
     "leftWidthOffset": 0,
     "rightWidthOffset": 0,
     "showZeroLine": false,
-    "hideDateCategoryCol": false,
     "leftLabel": "",
     "rightLabel": "",
+    "hideDateCategoryCol": false,
     "width": "auto",
     "lowerCiField": "",
     "upperCiField": ""
@@ -387,14 +390,15 @@
       "Data 6": "300"
     }
   ],
-  "visualizationType": "Bar",
+  "visualizationType": "Line",
   "regions": [
     {
       "from": "03/15/2016",
       "to": "05/15/2016",
       "label": "Region Applied to Timeline",
       "color": "Black",
-      "background": "Grey"
+      "background": "Grey",
+      "fromType": "Previous Days"
     }
   ],
   "validated": 4.23,
