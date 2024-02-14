@@ -54,7 +54,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
 
     const toolTip = applyTooltipsToGeo(cityDisplayName, geoData || data[city])
 
-    const radius = state.visual.geoCodeCircleSize || (state.general.geoType === 'us' ? 8 : 4)
+    const radius = state.visual.geoCodeCircleSize || 8
 
     const additionalProps = {
       fillOpacity: state.general.type === 'bubble' ? 0.4 : 1
@@ -88,6 +88,10 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       let coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
       transform = `translate(${projection(coords)})`
       needsPointer = true
+    }
+
+    if (!transform) {
+      return
     }
 
     const styles = {

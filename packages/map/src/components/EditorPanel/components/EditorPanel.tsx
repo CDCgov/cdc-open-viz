@@ -276,6 +276,7 @@ const EditorPanel = props => {
         setState({
           ...state,
           visual: {
+            ...state.visual,
             cityStyle: value
           }
         })

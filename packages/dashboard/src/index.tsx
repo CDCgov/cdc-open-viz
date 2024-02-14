@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import MultiDashboardWrapper from './MultiDashboardWrapper'
+import MultiDashboardWrapper from './CdcDashboard'
 
 let isEditor = window.location.href.includes('editor=true')
 let isDebug = window.location.href.includes('debug=true')

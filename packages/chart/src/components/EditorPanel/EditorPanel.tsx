@@ -231,6 +231,7 @@ const EditorPanel = () => {
     visSupportsDateCategoryAxisTicks,
     visSupportsDateCategoryTickRotation,
     visSupportsDateCategoryNumTicks,
+    visSupportsDateCategoryAxisPadding,
     visSupportsRegions,
     visSupportsFilters,
     visSupportsValueAxisGridLines,
@@ -840,7 +841,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar']
+  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar', 'Deviation Bar']
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1622,7 +1623,7 @@ const EditorPanel = () => {
                         {config.visualizationType !== 'Forest Plot' && (
                           <>
                             <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
-                            <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />{' '}
+                            {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.orientation !== 'horizontal'  && <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />}{' '}
                           </>
                         )}
                         <Select
@@ -1841,6 +1842,8 @@ const EditorPanel = () => {
 
                         {visSupportsDateCategoryNumTicks() && <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />}
                         {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.size} type='number' min={0} section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
+
+                        {visSupportsDateCategoryAxisPadding() && <TextField value={config.xAxis.padding} type='number' min={0} section='xAxis' fieldName='padding' label={'Padding (Percent)'} className='number-narrow' updateField={updateField} />}
 
                         {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                         {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
