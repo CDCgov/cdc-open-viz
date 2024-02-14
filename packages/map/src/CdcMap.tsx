@@ -284,7 +284,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         uid = row[state.columns.geo.name]
       }
 
-      if(!uid && (state.columns.latitude?.name && state.columns.longitude?.name && row[state.columns.latitude?.name] && row[state.columns.longitude?.name])){
+      if (!uid && state.columns.latitude?.name && state.columns.longitude?.name && row[state.columns.latitude?.name] && row[state.columns.longitude?.name]) {
         uid = row[state.columns.geo.name]
       }
 
@@ -1090,8 +1090,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (countryKeys.includes(value)) {
       value = titleCase(supportedCountries[key][0])
-    } else {
-      return value
     }
 
     if (countyKeys.includes(value)) {
