@@ -10,7 +10,7 @@ import '../scss/configure-tab.scss'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
-import MultiDashboardWrapper from '@cdc/dashboard/src/MultiDashboardWrapper'
+import MultiDashboardWrapper from '@cdc/dashboard/src/CdcDashboard'
 
 export default function ConfigureTab({ containerEl }) {
   const { config, setTempConfig, hostname, isDebug } = useContext(ConfigContext)
