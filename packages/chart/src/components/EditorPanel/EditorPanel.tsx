@@ -329,6 +329,9 @@ const EditorPanel = () => {
     if (updatedConfig.visualizationType === 'Combo') {
       updatedConfig.orientation = 'vertical'
     }
+    if(updatedConfig.xAxis.sortDates && !updatedConfig.xAxis.padding){
+      updatedConfig.xAxis.padding = 6
+    }
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
@@ -1624,6 +1627,28 @@ const EditorPanel = () => {
                           <>
                             <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
                             {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.orientation !== 'horizontal'  && <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />}{' '}
+                            {visSupportsDateCategoryAxisPadding() && 
+                              <TextField 
+                                value={config.xAxis.padding} 
+                                type='number' 
+                                min={0} 
+                                section='xAxis' 
+                                fieldName='padding' 
+                                label={'Padding (Percent)'} 
+                                className='number-narrow' 
+                                updateField={updateField}
+                                tooltip={
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      <p>For use with date scale. Extends the earliest and latest dates represented on the scale by the percentage specified.</p>
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                          }
+                              />
+                            }
                           </>
                         )}
                         <Select

@@ -227,10 +227,12 @@ export const useTooltip = props => {
     }
 
     if (config.xAxis.type === 'categorical' || (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')) {
-      let eachBand = xScale.step()
+      let range = xScale.range()[1] - xScale.range()[0]
+      let eachBand = range / (xScale.domain().length + 1)
+
       let numerator = x
-      const index = Math.floor(Number(numerator) / eachBand)
-      return xScale.domain()[index - 1] // fixes off by 1 error
+      const index = Math.floor((Number(numerator) - eachBand / 2) / eachBand)
+      return xScale.domain()[index] // fixes off by 1 error
     }
 
     if (config.xAxis.type === 'date' && visualizationType !== 'Combo' && orientation !== 'horizontal') {
