@@ -59,7 +59,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       }
       return (
         <circle
-          cx={getXPos(hoveredXValue)}
+          cx={getXPos(d[config.xAxis.dataKey])}
           cy={filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered.dataKey])}
           r={4.5}
           opacity={d[seriesKey] ? 1 : 0}
@@ -102,7 +102,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
         }
         return (
           <circle
-            cx={config.xAxis.type === 'categorical' ? xScale(hoveredXValue) : xScale(parseDate(hoveredXValue))}
+            cx={getXPos(hoveredXValue)}
             cy={hoveredSeriesAxis === 'right' ? yScaleRight(hoveredSeriesValue) : yScale(hoveredSeriesValue)}
             r={4.5}
             opacity={1}
