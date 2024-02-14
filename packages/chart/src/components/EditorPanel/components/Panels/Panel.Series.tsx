@@ -468,7 +468,7 @@ const SeriesDisplayInTooltip = props => {
   const { series, index } = props
   const { config, updateConfig } = useContext(ConfigContext)
 
-  if(config.visualizationType === 'Paired Bar' || config.visualizationType === 'Scatter Plot') return
+  if(['Paired Bar', 'Scatter Plot', 'Deviation Bar'].includes(config.visualizationType)) return
 
   const toggleTooltip = seriesIndex => {
     let copiedSeries = [...config.series]

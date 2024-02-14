@@ -142,8 +142,7 @@ export const useTooltip = props => {
           ...getIncludedTooltipSeries()
             ?.filter(Boolean)
             ?.flatMap(seriesKey => {
-              const formattedDate = config.tooltips.dateDisplayFormat ? formatTooltipsDate(parseDate(resolvedScaleValues[0]?.[seriesKey])) : formatDate(parseDate(resolvedScaleValues[0]?.[seriesKey]))
-              const formattedValue = seriesKey === config.xAxis.dataKey && config.xAxis.type === 'date' ? formattedDate : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
+              const formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
               return resolvedScaleValues?.[0]?.[seriesKey] ? [[seriesKey, formattedValue, getAxisPosition(seriesKey)]] : []
             })
         )
@@ -427,10 +426,12 @@ export const useTooltip = props => {
       if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${config.yAxis.type === 'date' ? formatDate(parseDate(key, false)) : value}`}</li>
       return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
     }
+    const formattedDate = config.tooltips.dateDisplayFormat ? formatTooltipsDate(parseDate(value, false)) : formatDate(parseDate(value, false))
 
     // TOOLTIP HEADING
-    if (visualizationType === 'Bar' && orientation === 'horizontal' && key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ` : '')} ${value}`}</li>
-    if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? value : value}`}</li>
+    if (visualizationType === 'Bar' && orientation === 'horizontal' && key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
+
+    if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
 
     // TOOLTIP BODY
     return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${value}`}</li>
