@@ -5,7 +5,7 @@
   column-gap: 30px;
 }
 
-.sankey-chart {
+.cdc-open-viz-module .sankey-chart {
   --font-size-xxxs: 8px;
   --font-size-xxs: 10px;
   --font-size-xs: 12px;
@@ -116,9 +116,21 @@
     .node-value {
       font-size: var(--font-size-xs);
     }
-
     .popup {
       display: block; /* Show the popup on smaller screens */
+    }
+    .sankey-chart__tooltip {
+      margin: 5px;
+      font-size: 12px;
+      &--info-section {
+        column-gap: 5px;
+      }
+    }
+    .react-tooltip ul li {
+      font-size: 12px !important;
+    }
+    .react-tooltip {
+      width: 60%;
     }
   }
   //xs
@@ -135,10 +147,23 @@
     .node-value {
       font-size: var(--font-size-xxs);
     }
-
     .popup {
       display: block; /* Show the popup on smaller screens */
     }
+    .sankey-chart__tooltip {
+      margin: 5px;
+      font-size: 12px;
+      &--info-section {
+        column-gap: 5px;
+      }
+    }
+    .react-tooltip ul li {
+      font-size: 12px !important;
+    }
+    .react-tooltip {
+      width: 70%;
+    }
+
   }
   //xxs
   @media only screen and (max-width: 599px) {
@@ -154,9 +179,21 @@
     .node-value {
       font-size: var(--font-size-xxxs);
     }
-
     .popup {
       display: block; /* Show the popup on smaller screens */
+    }
+    .sankey-chart__tooltip {
+      margin: 5px;
+      font-size: 12px;
+      &--info-section {
+        column-gap: 5px;
+      }
+    }
+    .react-tooltip ul li {
+      font-size: 12px !important; 
+    }
+    .react-tooltip {
+      width: 80%;
     }
   }
 

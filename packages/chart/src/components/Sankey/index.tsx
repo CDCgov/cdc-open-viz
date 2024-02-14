@@ -1,7 +1,7 @@
 import { useContext, useState, useRef, useEffect } from 'react'
 
 // External Libraries
-import { Tooltip as ReactTooltip } from 'react-tooltip'
+import { PlacesType, Tooltip as ReactTooltip } from 'react-tooltip'
 import { SankeyGraph, sankey, sankeyLinkHorizontal, sankeyLeft } from 'd3-sankey'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -36,12 +36,15 @@ const Sankey = ({ width, height }: SankeyProps) => {
 
   //Mobile Pop Up 
   const [showPopup, setShowPopup] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState<PlacesType>('top');
 
   useEffect(() => {
       if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
-        setShowPopup(true);
+        setShowPopup(true)
+        setTooltipPosition('bottom')
+        console.log('position ' + tooltipPosition) //prints out bottom but tooltip is still opening to the top
       } else {
-        setShowPopup(false);
+        setShowPopup(false)
       }
     
   }, [window.innerWidth]);
@@ -302,7 +305,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
 
         {/* ReactTooltip needs to remain even if tooltips are disabled -- it handles when a user clicks off of the node and resets
         the sankey diagram. When tooltips are disabled this will nothing */}
-        <ReactTooltip id={`tooltip`} afterHide={() => clearNodeClick()} events={['click']} place='top' style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
+        <ReactTooltip id={`tooltip`} afterHide={() => clearNodeClick()} events={['click']} place={'bottom'} style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
         {showPopup && (
         <div className="popup">
           <div className="popup-content">
