@@ -251,7 +251,7 @@ export const BarChartVertical = () => {
                         <Text // prettier-ignore
                           display={config.labels && displayBar ? 'block' : 'none'}
                           opacity={transparentBar ? 0.5 : 1}
-                          x={barX}
+                          x={barX + barWidth / 2}
                           y={barY - 5}
                           fill={labelColor}
                           textAnchor='middle'
@@ -303,7 +303,7 @@ export const BarChartVertical = () => {
               let upperPos
               let lowerPos
               let tickWidth = 5
-              xPos = xScale(getXAxisData(d))
+              xPos = xScale(getXAxisData(d)) + (config.xAxis.type !== 'date' || !config.xAxis.sortDates ? seriesScale.range()[1] / 2 : 0)
               upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
               lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
               return (

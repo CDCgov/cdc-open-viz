@@ -100,7 +100,7 @@ const DataTable = (props: DataTableProps) => {
 
   const _runtimeData = config.table.customTableConfig ? customColumns(rawData, config.table.excludeColumns) : runtimeData
 
-  const rawRows = Object.keys(_runtimeData)
+  const rawRows = Object.keys(_runtimeData).filter(column => column != 'columns')
   const rows = isVertical
     ? rawRows.sort((a, b) => {
         let dataA
