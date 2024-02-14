@@ -1096,8 +1096,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (countryKeys.includes(value)) {
       value = titleCase(supportedCountries[key][0])
-    } else {
-      return value
     }
 
     if (countyKeys.includes(value)) {
