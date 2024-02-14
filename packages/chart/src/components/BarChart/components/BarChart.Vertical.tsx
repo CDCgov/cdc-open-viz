@@ -251,7 +251,7 @@ export const BarChartVertical = () => {
                         <Text // prettier-ignore
                           display={config.labels && displayBar ? 'block' : 'none'}
                           opacity={transparentBar ? 0.5 : 1}
-                          x={barX}
+                          x={barX + barWidth / 2}
                           y={barY - 5}
                           fill={labelColor}
                           textAnchor='middle'
