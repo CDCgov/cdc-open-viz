@@ -25,8 +25,8 @@ const BarChartStackedVertical = () => {
               barStack.bars.map(bar => {
                 let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                 let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                let barThickness = config.xAxis.type === 'date' && config.xAxis.sortDates ? config.barThickness * (xScale.range()[1] - xScale.range()[0]) : xMax / barStack.bars.length
-                let barThicknessAdjusted = barThickness * (config.xAxis.type === 'date' && config.xAxis.sortDates ? 1 : config.barThickness || 0.8)
+                let barThickness = config.xAxis.type === 'date' && config.xAxis.sortDates ? (config.barThickness * (xScale.range()[1] - xScale.range()[0])) : xMax / barStack.bars.length
+                let barThicknessAdjusted = barThickness * (config.xAxis.type === 'date' && config.xAxis.sortDates ? 1 : (config.barThickness || 0.8))
                 let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
                 // tooltips
                 const rawXValue = bar.bar.data[config.runtime.xAxis.dataKey]
