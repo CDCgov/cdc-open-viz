@@ -38,7 +38,7 @@ export type DataTableProps = {
   navigationHandler?: Function
   outerContainerRef?: Function
   rawData: Object[]
-  runtimeData: Object[] | Record<string, Object> // UNSAFE
+  runtimeData: Object[] & Record<string, Object>
   setFilteredCountryCode?: Function // used for Maps only
   showDownloadButton?: boolean
   tabbingId: string
@@ -90,7 +90,7 @@ const DataTable = (props: DataTableProps) => {
     case 'Box Plot':
       if (!config.boxplot) return <Loading />
       break
-    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar':
+    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar' || 'Table':
       if (!runtimeData) return <Loading />
       break
     default:
@@ -137,7 +137,16 @@ const DataTable = (props: DataTableProps) => {
   // If a relative region is found we don't want to display the data table.
   // Takes backwards compatibility into consideration, ie !region.toType || !region.fromType
   const noRelativeRegions = config?.regions?.every(region => {
-    return (region.toType === 'Fixed' && region.fromType === 'Fixed') || (!region.toType && !region.fromType) || (!region.toType && region.fromType === 'Fixed') || (!region.fromType && region.toType === 'Fixed')
+    const toTypeFixed = region.toType === 'Fixed'
+    const fromTypeFixed = region.fromType === 'Fixed'
+    const toIsNotSet = !region.toType
+    const fromIsNotSet = !region.fromType
+    const BothFixed = toTypeFixed && fromTypeFixed
+    const NeitherFixed = toIsNotSet && fromIsNotSet
+    const ToFixedFromNotSet = toTypeFixed && fromIsNotSet
+    const FromFixedToNotSet = fromTypeFixed && toIsNotSet
+
+    return BothFixed || NeitherFixed || ToFixedFromNotSet || FromFixedToNotSet
   })
 
   // prettier-ignore
