@@ -23,6 +23,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const [largestGroupWidth, setLargestGroupWidth] = useState(0)
   const groupRefs = useRef([])
 
+  //Tooltip 
   const [tooltipID, setTooltipID] = useState<string>('')
 
   const handleNodeClick = (nodeId: string) => {
@@ -32,6 +33,18 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const clearNodeClick = () => {
     setTooltipID('')
   }
+
+  //Mobile Pop Up 
+  const [showPopup, setShowPopup] = useState(false);
+
+  useEffect(() => {
+      if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
+        setShowPopup(true);
+      } else {
+        setShowPopup(false);
+      }
+    
+  }, [window.innerWidth]);
 
   // Uses Visx Groups innerRef to get all Group elements that are mapped.
   // Sets the largest group width in state and subtracts that group the svg width to calculate overall width.
@@ -290,6 +303,13 @@ const Sankey = ({ width, height }: SankeyProps) => {
         {/* ReactTooltip needs to remain even if tooltips are disabled -- it handles when a user clicks off of the node and resets
         the sankey diagram. When tooltips are disabled this will nothing */}
         <ReactTooltip id={`tooltip`} afterHide={() => clearNodeClick()} events={['click']} place='top' style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
+        {showPopup && (
+        <div className="popup">
+          <div className="popup-content">
+            <p><strong>Please change the orientation of your screen to view the diagram better horizontally.</strong></p>
+          </div>
+        </div>
+      )}
       </div>
     </>
   )
