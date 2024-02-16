@@ -296,8 +296,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setFilteredData(currentData)
     }
 
-    if(!(['Area Chart', 'Bar', 'Line', 'Combo'].includes(newConfig.visualizationType)) || newConfig.orientation === 'horizontal'){
+    if (!['Area Chart', 'Bar', 'Line', 'Combo'].includes(newConfig.visualizationType) || newConfig.orientation === 'horizontal') {
       newConfig.xAxis.sortDates = false
+    }
+
+    if (newConfig.xAxis.sortDates && newConfig.barThickness > 0.1) {
+      newConfig.barThickness = 0.035
+    } else if (!newConfig.xAxis.sortDates && newConfig.barThickness < 0.1) {
+      newConfig.barThickness = 0.35
     }
 
     //Enforce default values that need to be calculated at runtime
