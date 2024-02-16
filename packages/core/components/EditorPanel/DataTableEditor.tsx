@@ -96,30 +96,32 @@ const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard,
         }
       />
       <CheckBox value={config.table.limitHeight} section='table' fieldName='limitHeight' label='Limit Table Height' updateField={updateField} />
-      <CheckBox
-        value={config.table.customTableConfig}
-        fieldName='customTableConfig'
-        label='Customize Table Config'
-        section='table'
-        updateField={updateField}
-        tooltip={
-          <Tooltip style={{ textTransform: 'none' }}>
-            <Tooltip.Target>
-              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
-            </Tooltip.Target>
-            <Tooltip.Content>
-              <p>This will display all available columns in the data set. It will not show any columns where all of the column cells are null.</p>
-            </Tooltip.Content>
-          </Tooltip>
-        }
-      />
+      {config.type !== 'table' && (
+        <CheckBox
+          value={config.table.customTableConfig}
+          fieldName='customTableConfig'
+          label='Customize Table Config'
+          section='table'
+          updateField={updateField}
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>This will display all available columns in the data set. It will not show any columns where all of the column cells are null.</p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+        />
+      )}
       {config.table.customTableConfig && <MultiSelect options={columns.map(c => ({ label: c, value: c }))} fieldName='excludeColumns' label='Exclude Columns' section='table' updateField={updateField} />}
-      {config.table.limitHeight && <TextField value={config.table.height} fieldName='height' label='Data Table Height' type='number' min={0} max={500} placeholder='Height(px)' updateField={updateField} />}
+      {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min={0} max={500} placeholder='Height(px)' updateField={updateField} />}
       <CheckBox value={config.table.expanded} fieldName='expanded' label='Expanded by Default' section='table' updateField={updateField} />
-      {isDashboard && <CheckBox value={config.table.showDataTableLink} fieldName='showDataTableLink' label='Show Data Table Name & Link' section='table' updateField={updateField} />}
+      {isDashboard && config.type !== 'table' && <CheckBox value={config.table.showDataTableLink} fieldName='showDataTableLink' label='Show Data Table Name & Link' section='table' updateField={updateField} />}
       {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' section='table' updateField={updateField} />}
       <CheckBox value={config.table.download} fieldName='download' label='Show Download CSV Link' section='table' updateField={updateField} />
-      <CheckBox value={config.table.showDownloadImgButton} fieldName='showDownloadImgButton' label='Display Image Button' section='table' updateField={updateField} />
+      {config.type !== 'table' && <CheckBox value={config.table.showDownloadImgButton} fieldName='showDownloadImgButton' label='Display Image Button' section='table' updateField={updateField} />}
       <label>
         <span className='edit-label column-heading'>Table Cell Min Width</span>
         <input type='number' value={config.table.cellMinWidth ? config.table.cellMinWidth : 0} onChange={e => updateField('table', null, 'cellMinWidth', e.target.value)} />
