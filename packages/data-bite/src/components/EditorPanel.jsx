@@ -8,6 +8,7 @@ import WarningImage from '@cdc/core/assets/icon-warning-circle.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS, DATA_OPERATORS } from '../CdcDataBite'
 
 const TextField = memo(({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, tooltip, type = 'input', i = null, min = null, max = null, ...attributes }) => {
@@ -131,46 +132,8 @@ const EditorPanel = memo(() => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(Context)
 
   const [displayPanel, setDisplayPanel] = useState(true)
-  const enforceRestrictions = updatedConfig => {
-    //If there are any dependencies between fields, etc../
-  }
 
-  const updateField = (section, subsection, fieldName, newValue) => {
-    // Top level
-    if (null === section && null === subsection) {
-      let updatedConfig = { ...config, [fieldName]: newValue }
-
-      if ('filterColumn' === fieldName) {
-        updatedConfig.filterValue = ''
-      }
-
-      enforceRestrictions(updatedConfig)
-
-      updateConfig(updatedConfig)
-      return
-    }
-
-    const isArray = Array.isArray(config[section])
-
-    let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
-
-    if (null !== subsection) {
-      if (isArray) {
-        sectionValue = [...config[section]]
-        sectionValue[subsection] = { ...sectionValue[subsection], [fieldName]: newValue }
-      } else if (typeof newValue === 'string') {
-        sectionValue[subsection] = newValue
-      } else {
-        sectionValue = { ...config[section], [subsection]: { ...config[section][subsection], [fieldName]: newValue } }
-      }
-    }
-
-    let updatedConfig = { ...config, [section]: sectionValue }
-
-    enforceRestrictions(updatedConfig)
-
-    updateConfig(updatedConfig)
-  }
+  const updateField = updateFieldFactory(config, updateConfig, true)
 
   const missingRequiredSections = () => {
     //Whether to show error message if something is required to show a data-bite and isn't filled in

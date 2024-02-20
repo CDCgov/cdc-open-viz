@@ -55,6 +55,10 @@ import _ from 'lodash'
 import EditorContext from '../../editor/src/ConfigContext'
 import { getApiFilterKey } from './helpers/getApiFilterKey'
 import Filters, { APIFilterDropdowns, DropdownOptions } from './components/Filters'
+import EditorWrapper from './components/EditorWrapper/EditorWrapper'
+import DataTableEditorPanel from '@cdc/core/components/DataTable/components/DataTableEditorPanel'
+import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
+import { ViewPort } from '@cdc/core/types/ViewPort'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -64,7 +68,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   const [state, dispatch] = useReducer(dashboardReducer, initialState)
   const editorContext = useContext(EditorContext)
   const [apiFilterDropdowns, setAPIFilterDropdowns] = useState<APIFilterDropdowns>({})
-  const [currentViewport, setCurrentViewport] = useState('lg')
+  const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const replacements = {
@@ -580,6 +584,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               <></>
             )
             break
+          case 'table':
+            body = (
+              <EditorWrapper component={DataTableStandAlone} visualizationKey={visualizationKey} visualizationConfig={visualizationConfig} updateConfig={_updateConfig} type={'Table'} viewport={currentViewport}>
+                <DataTableEditorPanel key={visualizationKey} config={visualizationConfig} updateConfig={_updateConfig} />
+              </EditorWrapper>
+            )
+            break
           default:
             body = <></>
             break
@@ -747,6 +758,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                                   <GoButton autoLoad={visualizationConfig.autoLoad} />
                                 </>
                               )}
+                              {visualizationConfig.type === 'table' && <DataTableStandAlone key={col.widget} visualizationKey={col.widget} config={visualizationConfig} viewport={currentViewport} />}
                             </div>
                           </React.Fragment>
                         )

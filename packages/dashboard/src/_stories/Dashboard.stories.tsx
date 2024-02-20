@@ -6,6 +6,7 @@ import ExampleConfig_2 from './_mock/dashboard-2.json'
 import ExampleConfig_3 from './_mock/dashboard_no_filter.json'
 import Dashboard_Filter from './_mock/dashboard-filter.json'
 import Dashboard from '../CdcDashboard'
+import StandaloneTable from './_mock/standalone-table.json'
 import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within } from '@storybook/testing-library'
 
@@ -37,6 +38,12 @@ export const Example_3: Story = {
 export const Dashboard_Filters: Story = {
   args: {
     config: Dashboard_Filter as unknown as Config
+  }
+}
+
+export const StandAloneTable: Story = {
+  args: {
+    config: StandaloneTable
   }
 }
 
