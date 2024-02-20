@@ -77,7 +77,7 @@
     "vite-plugin-css-injected-by-js": "^2.4.0",
     "vite-plugin-md": "^0.21.5",
     "vite-plugin-svgr": "^2.4.0",
-    "vitest": "^0.34.6",
+    "vitest": "^1.2.2",
     "whatwg-fetch": "^3.6.2"
   },
   "husky": {
@@ -103,7 +103,8 @@
     "@visx/brush": "^3.0.1",
     "@visx/legend": "^3.0.0",
     "@visx/pattern": "^3.0.0",
-    "@visx/responsive": "^2.10.0"
+    "@visx/responsive": "^2.10.0",
+    "@vitest/coverage-v8": "^1.2.2"
   },
   "resolutions": {
     "jackspeak": "2.1.1"
