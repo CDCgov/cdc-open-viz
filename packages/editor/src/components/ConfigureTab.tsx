@@ -1,6 +1,5 @@
 import React, { useContext } from 'react'
 
-import CdcDashboard from '@cdc/dashboard' // TODO: Lazy load this
 import CdcMap from '@cdc/map' // TODO: Lazy load this
 import CdcChart from '@cdc/chart' // TODO: Lazy load this
 import CdcDataBite from '@cdc/data-bite'
@@ -11,6 +10,7 @@ import '../scss/configure-tab.scss'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
+import MultiDashboardWrapper from '@cdc/dashboard/src/CdcDashboard'
 
 export default function ConfigureTab({ containerEl }) {
   const { config, setTempConfig, hostname, isDebug } = useContext(ConfigContext)
@@ -42,7 +42,7 @@ export default function ConfigureTab({ containerEl }) {
     case 'dashboard':
       return (
         <ErrorBoundary component='CdcDashboard'>
-          <CdcDashboard isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
+          <MultiDashboardWrapper isEditor={true} isDebug={isDebug} config={config} />
         </ErrorBoundary>
       )
     case 'data-bite':

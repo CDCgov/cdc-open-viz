@@ -427,9 +427,7 @@ const SeriesDropdownConfidenceInterval = props => {
 const SeriesInputName = props => {
   const { series, index: i } = props
   const { config, updateConfig } = useContext(ConfigContext)
-  const adjustableNameSeriesTypes = ['Bar', 'Line', 'Area Chart', 'dashed-sm', 'dashed-md', 'dashed-lg']
-
-  if (config.visualizationType === 'Combo') return
+  const adjustableNameSeriesTypes = ['Bar', 'Line', 'Area Chart', 'Combo', 'Deviation', 'Paired', 'Scatter', 'dashed-sm', 'dashed-md', 'dashed-lg']
 
   if (!adjustableNameSeriesTypes.includes(series.type)) return
 
@@ -469,6 +467,8 @@ const SeriesInputName = props => {
 const SeriesDisplayInTooltip = props => {
   const { series, index } = props
   const { config, updateConfig } = useContext(ConfigContext)
+
+  if(['Paired Bar', 'Scatter Plot', 'Deviation Bar'].includes(config.visualizationType)) return
 
   const toggleTooltip = seriesIndex => {
     let copiedSeries = [...config.series]

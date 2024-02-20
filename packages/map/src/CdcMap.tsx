@@ -239,8 +239,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         }
 
         // Cities
-        if (!uid) {
-          uid = cityKeys.find(key => key === geoName)
+        if (!uid && geoName) {
+          uid = cityKeys.find(key => key === geoName.toUpperCase())
         }
       }
 
@@ -267,6 +267,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         if (!uid && 'world-geocode' === state.general.type) {
           uid = cityKeys.find(key => key === geoName?.toUpperCase())
         }
+
+        // Cities
+        if (!uid && geoName) {
+          uid = cityKeys.find(key => key === geoName.toUpperCase())
+        }
       }
 
       // County Check
@@ -276,6 +281,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
 
       if ('us-geocode' === state.general.type) {
+        uid = row[state.columns.geo.name]
+      }
+
+      if (!uid && state.columns.latitude?.name && state.columns.longitude?.name && row[state.columns.latitude?.name] && row[state.columns.longitude?.name]) {
         uid = row[state.columns.geo.name]
       }
 
@@ -1069,6 +1078,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Attempts to find the corresponding value
   const displayGeoName = key => {
     if (!state.general.convertFipsCodes) return key
+
+    // World Map
+    // If we're returning a city name instead of a country ISO code, capitalize it for the data table.
+    if (state.type === 'map' && state.general.geoType === 'world') {
+      if (String(key).length > 3) return titleCase(key)
+    }
     let value = key
     // Map to first item in values array which is the preferred label
     if (stateKeys.includes(value)) {
@@ -1605,6 +1620,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               config={config}
               classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
             />
+            <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
+              Skip Over Map Container
+            </a>
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
@@ -1621,10 +1639,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 }
               }}
             >
-              <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
-                Skip Over Map Container
-              </a>
-
               {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
               <section className='outline-none geography-container' ref={mapSvg} tabIndex='0' style={{ width: '100%' }}>
                 {currentViewport && (

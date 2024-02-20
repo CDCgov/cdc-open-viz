@@ -11,9 +11,9 @@ const transform = new DataTransform()
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 
 export const useTooltip = props => {
-  const { tableData, config, formatNumber, capitalize, formatDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)
+  const { tableData, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, showTooltip, hideTooltip } = props
-  const { xAxis, visualizationType, orientation, yAxis, runtime, barWidth } = config
+  const { xAxis, visualizationType, orientation, yAxis, runtime } = config
   const data = transform.applySuppression(tableData, config.suppressedData)
   /**
    * Provides the tooltip information based on the tooltip data array and svg cursor coordinates
@@ -227,10 +227,12 @@ export const useTooltip = props => {
     }
 
     if (config.xAxis.type === 'categorical' || (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')) {
-      let eachBand = xScale.step()
+      let range = xScale.range()[1] - xScale.range()[0]
+      let eachBand = range / (xScale.domain().length + 1)
+
       let numerator = x
-      const index = Math.floor(Number(numerator) / eachBand)
-      return xScale.domain()[index - 1] // fixes off by 1 error
+      const index = Math.floor((Number(numerator) - eachBand / 2) / eachBand)
+      return xScale.domain()[index] // fixes off by 1 error
     }
 
     if (config.xAxis.type === 'date' && visualizationType !== 'Combo' && orientation !== 'horizontal') {
@@ -426,10 +428,12 @@ export const useTooltip = props => {
       if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${config.yAxis.type === 'date' ? formatDate(parseDate(key, false)) : value}`}</li>
       return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
     }
+    const formattedDate = config.tooltips.dateDisplayFormat ? formatTooltipsDate(parseDate(value, false)) : formatDate(parseDate(value, false))
 
     // TOOLTIP HEADING
-    if (visualizationType === 'Bar' && orientation === 'horizontal' && key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ` : '')} ${value}`}</li>
-    if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? value : value}`}</li>
+    if (visualizationType === 'Bar' && orientation === 'horizontal' && key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
+
+    if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
 
     // TOOLTIP BODY
     return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${value}`}</li>

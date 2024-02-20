@@ -346,7 +346,6 @@ const UsaMap = () => {
         displayGeoName={displayGeoName}
         geoClickHandler={geoClickHandler}
         isFilterValueSupported={isFilterValueSupported}
-        isGeoCodeMap={state.general.type === 'us-geocode'}
         key='cities'
         projection={projection}
         setSharedFilterValue={setSharedFilterValue}
@@ -440,7 +439,7 @@ const UsaMap = () => {
               <span className='territories-label label'>{state.general.territoriesLabel}</span>
             </div>
             <div>
-              <span className={window.visualViewport.width < 500 ? 'territories--mobile' : 'territories'}>{territories}</span>
+              <span className={window.visualViewport.width < 700 ? 'territories--mobile' : 'territories'}>{territories}</span>
             </div>
           </div>
         </>

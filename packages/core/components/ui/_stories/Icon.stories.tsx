@@ -3,20 +3,27 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import Icon, { ICON_TYPES } from '../Icon'
 
-const meta: Meta<typeof Icon> = {
+const IconArray = () => {
+  return (
+    <>
+      {ICON_TYPES.map(name => (
+        <div>
+          <span>
+            <Icon display={name} /> {name}{' '}
+          </span>
+        </div>
+      ))}
+    </>
+  )
+}
+
+const meta: Meta<typeof IconArray> = {
   title: 'Components/Atoms/Icon',
-  component: Icon,
-  parameters: {
-    display: ICON_TYPES
-  }
+  component: IconArray
 }
 
 type Story = StoryObj<typeof Icon>
 
-export const Primary: Story = {
-  args: {
-    display: 'question'
-  }
-}
+export const Primary: Story = {}
 
 export default meta
