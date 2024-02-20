@@ -20,10 +20,6 @@ type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
 
 const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, config: editorConfig, isEditor, isDebug }) => {
   const [initial, setInitial] = useState<InitialState>(undefined)
-<<<<<<< HEAD
-=======
-  console.log('multi dashboard wrapper')
->>>>>>> 4c3a36e6 (added standalone table widget)
 
   const getSelectedConfig = (config: MultiDashboardConfig, selectedConfig?: string): number | null => {
     if (!config.multiDashboards) return null
