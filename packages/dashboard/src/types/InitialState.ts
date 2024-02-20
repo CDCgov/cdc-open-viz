@@ -1,4 +1,5 @@
 import { DashboardConfig } from './DashboardConfig'
+import { Tab } from './Tab'
 
 export type InitialState = {
   config: DashboardConfig
@@ -6,5 +7,5 @@ export type InitialState = {
   loading: boolean
   filteredData: Object
   preview: boolean
-  tabSelected: number
+  tabSelected: Tab
 }
