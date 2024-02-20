@@ -56,6 +56,7 @@ type Filter = {
 }
 
 export type Legend = {
+  seriesHighlight: string[]
   additionalCategories: string[]
   // general legend onClick behavior
   behavior: 'highlight' | 'isolate' | string
