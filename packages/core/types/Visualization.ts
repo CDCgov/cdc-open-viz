@@ -1,27 +1,39 @@
+import { Legend } from './Legend'
+import { Axis } from './Axis'
+import { Column } from './Column'
+import { Series } from './Series'
+import { Table } from './Table'
+import { ConfidenceInterval } from './ConfidenceInterval'
+import { BaseVisualizationType } from './BaseVisualizationType'
+
 export type Visualization = {
   autoLoad: boolean
+  columns: Record<string, Column>
+  confidenceKeys: ConfidenceInterval
   data: any
   dataDescription: Object
   dataFileName: string
   dataFileSourceType: string
+  dataFormat: any
   dataKey: string
   datasets: Record<string, any>
   editing: boolean
-  formattedData?: Object[]
+  formattedData?: Object[] & Record<string, Object>
   general: any
   hide: any[]
+  legend: Legend
   multiDashboards?: any[]
   newViz: boolean
   openModal: boolean
   originalFormattedData: any
   orientation: 'vertical' | 'horizontal'
-  table: {
-    showDataTableLink: boolean
-  }
+  series: Series
+  table: Table
   title: string
-  type: 'dashboard' | 'chart' | 'map' | 'data-bite' | 'waffle-chart' | 'markup-include' | 'filtered-text' | 'filter-dropdowns'
+  type: BaseVisualizationType
   uid: string
   usesSharedFilter: any
   visualizationType: string
   visualizationSubType: string
+  xAxis: Axis
 }
