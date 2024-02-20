@@ -120,6 +120,19 @@ export const useEditorPermissions = () => {
     }
   }
 
+  const visHasSelectableLegendValues = () => {
+    switch (visualizationType) {
+      case 'Box Plot':
+        return false
+      case 'Forest Plot':
+        return false
+      case 'Spark Line':
+        return false
+      default:
+        return true
+    }
+  }
+
   const visSupportsTooltipOpacity = () => {
     const disabledCharts = ['Spark Line']
     if (disabledCharts.includes(visualizationType)) return false
@@ -314,6 +327,7 @@ export const useEditorPermissions = () => {
     visSupportsSequentialPallete,
     visSupportsSuperTitle,
     visSupportsTooltipLines,
+    visHasSelectableLegendValues,
     visSupportsTooltipOpacity,
     visSupportsValueAxisGridLines,
     visSupportsValueAxisLabels,
