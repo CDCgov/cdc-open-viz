@@ -23,7 +23,8 @@ export const getUpdateConfig =
         const setValuesAndActive = filterValues => {
           _filter.values = filterValues
           if (filterValues.length > 0) {
-            _filter.active = _filter.active || _filter.pivot ? _filter.values : _filter.values[0]
+            const defaultValues = _filter.pivot ? _filter.values : _filter.values[0]
+            _filter.active = _filter.active || defaultValues
           }
         }
 
