@@ -62,7 +62,7 @@ const LineChart = (props: LineChartProps) => {
           let displayArea = legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
           const circleData = filterCircles(config.preliminaryData, rawData, seriesKey)
           // styles for preliminary Data  items
-          let styles = createStyles({ preliminaryData: config.preliminaryData, rawData, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), handleLineType, lineType, seriesKey })
+          let styles = createStyles({ preliminaryData: config.preliminaryData, data: tableData, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), handleLineType, lineType, seriesKey })
 
           let xPos = d => {
             return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
