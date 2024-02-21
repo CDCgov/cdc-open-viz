@@ -219,9 +219,7 @@ const EditorPanel = () => {
     lineOptions,
     rawData,
     highlight,
-    highlightReset,
-    legendIsolateValues,
-    setLegendIsolateValues
+    highlightReset
   } = useContext<ChartContext>(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
@@ -352,7 +350,7 @@ const EditorPanel = () => {
     if (updatedConfig.visualizationType === 'Combo') {
       updatedConfig.orientation = 'vertical'
     }
-    if(updatedConfig.xAxis.sortDates && !updatedConfig.xAxis.padding){
+    if (updatedConfig.xAxis.sortDates && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 6
     }
   }
@@ -1033,17 +1031,20 @@ const EditorPanel = () => {
     return colorCodeByCategory ? colorCodeData : getColumns(false).filter(d => d !== config.xAxis.dataKey)
   }
 
-  useEffect(() => {
-    const updatedSeriesHighlight = [...(legendIsolateValues || [])]
-    updateField('legend', null, 'seriesHighlight', updatedSeriesHighlight)
-  }, [legendIsolateValues])
+  const updateSeriesIsolateValues = updatedValues => {
+    updateConfig({ ...config, legend: { ...config.legend, seriesHighlight: updatedValues } })
+  }
 
-  useEffect(() => {
-    if (config.legend.behavior === 'highlight') {
-      setLegendIsolateValues([])
-      highlightReset()
+  const updateBehavior = (section, fieldName, newValue) => {
+    const sectionValue = { ...config[section], [fieldName]: newValue }
+    const updatedConfig = { ...config, [section]: sectionValue }
+
+    if (newValue === 'highlight' && config.legend.seriesHighlight.length) {
+      updatedConfig.legend.seriesHighlight.length = 0
     }
-  }, [config.legend.behavior])
+
+    updateConfig(updatedConfig)
+  }
 
   const editorContextValues = {
     addNewExclusion,
@@ -1668,16 +1669,18 @@ const EditorPanel = () => {
                         {config.visualizationType !== 'Forest Plot' && (
                           <>
                             <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
-                            {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.orientation !== 'horizontal'  && <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />}{' '}
-                            {visSupportsDateCategoryAxisPadding() && 
-                              <TextField 
-                                value={config.xAxis.padding} 
-                                type='number' 
-                                min={0} 
-                                section='xAxis' 
-                                fieldName='padding' 
-                                label={'Padding (Percent)'} 
-                                className='number-narrow' 
+                            {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.orientation !== 'horizontal' && (
+                              <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />
+                            )}{' '}
+                            {visSupportsDateCategoryAxisPadding() && (
+                              <TextField
+                                value={config.xAxis.padding}
+                                type='number'
+                                min={0}
+                                section='xAxis'
+                                fieldName='padding'
+                                label={'Padding (Percent)'}
+                                className='number-narrow'
                                 updateField={updateField}
                                 tooltip={
                                   <Tooltip style={{ textTransform: 'none' }}>
@@ -1688,9 +1691,9 @@ const EditorPanel = () => {
                                       <p>For use with date scale. Extends the earliest and latest dates represented on the scale by the percentage specified.</p>
                                     </Tooltip.Content>
                                   </Tooltip>
-                          }
+                                }
                               />
-                            }
+                            )}
                           </>
                         )}
                         <Select
@@ -2590,7 +2593,7 @@ const EditorPanel = () => {
                     {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
                       <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
                     )}
-                    <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={updateField} options={['highlight', 'isolate']} />
+                    <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)} options={['highlight', 'isolate']} />
                     {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && <CheckBox value={config.legend.highlightOnHover} section='legend' fieldName='highlightOnHover' label='HIGHLIGHT DATA SERIES ON HOVER' updateField={updateField} />}
 
                     {/* start: isolated values */}
@@ -2634,9 +2637,7 @@ const EditorPanel = () => {
                                   const updatedSeriesHighlight = [...config.legend.seriesHighlight]
                                   if (!updatedSeriesHighlight.includes(e.target.value)) {
                                     updatedSeriesHighlight[i] = e.target.value
-                                    setLegendIsolateValues([...updatedSeriesHighlight])
-                                    highlight({ datum: config.legend.seriesHighlight[i] }, true)
-                                    highlight({ datum: e.target.value }, true)
+                                    updateSeriesIsolateValues([...updatedSeriesHighlight])
                                   }
                                 }}
                                 options={getLegendColumns()}
@@ -2648,12 +2649,12 @@ const EditorPanel = () => {
                           onClick={event => {
                             event.preventDefault()
                             const legendColumns = getLegendColumns()
-                            const updatedSeriesHighlight = [...(config.legend.seriesHighlight || [])]
+                            const updatedSeriesHighlight = [...config.legend.seriesHighlight]
                             const seriesLength = updatedSeriesHighlight.length
                             if (seriesLength < legendColumns.length) {
                               const [newSeriesHighlight] = legendColumns.filter(d => !updatedSeriesHighlight.includes(d))
                               updatedSeriesHighlight.push(newSeriesHighlight)
-                              setLegendIsolateValues([...updatedSeriesHighlight])
+                              updateSeriesIsolateValues([...updatedSeriesHighlight])
                             }
                           }}
                         >
