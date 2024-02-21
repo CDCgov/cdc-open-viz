@@ -135,14 +135,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     if (mode) {
       if (drawIsolatedPoints(dataIndex, seriesKey)) {
         return (
-          <circle
-            cx={config.xAxis.type === 'categorical' ? xScale(d[config.xAxis.dataKey]) : xScale(parseDate(d[config.xAxis.dataKey]))}
-            cy={filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered.dataKey])}
-            r={6}
-            strokeWidth={2}
-            stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
-            fill={colorScale(config.runtime.seriesLabels[seriesKey])}
-          />
+          <circle cx={getXPos(d[config.xAxis.dataKey])} cy={filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered.dataKey])} r={5.3} strokeWidth={2} stroke={colorScale(config.runtime.seriesLabels[seriesKey])} fill={colorScale(config.runtime.seriesLabels[seriesKey])} />
         )
       }
     }
