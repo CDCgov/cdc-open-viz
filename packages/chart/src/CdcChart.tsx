@@ -54,6 +54,7 @@ import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
 import { ChartConfig } from './types/ChartConfig'
 import { Label } from './types/Label'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
@@ -97,7 +98,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
-      config.filters.forEach(filter => {
+      config.filters?.forEach(filter => {
         if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
           qsParams[filter.queryParameter] = filter.active
           isUpdateNeeded = true
@@ -119,7 +120,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       try {
         const ext = getFileExtension(dataUrl.href)
-        if ('csv' === ext) {
+        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
           data = await fetch(dataUrlFinal)
             .then(response => response.text())
             .then(responseText => {
@@ -130,7 +131,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               })
               return parsedCsv.data
             })
-        } else if ('json' === ext) {
+        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
           data = await fetch(dataUrlFinal).then(response => response.json())
         } else {
           data = []
@@ -168,7 +169,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (response.dataUrl && !urlFilters) {
       try {
         const ext = getFileExtension(response.dataUrl)
-        if ('csv' === ext) {
+        if ('csv' === ext || isSolrCsv(response.dataUrl)) {
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
             .then(response => response.text())
             .then(responseText => {
@@ -191,7 +192,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             })
         }
 
-        if ('json' === ext) {
+        if ('json' === ext || isSolrJson(response.dataUrl)) {
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
         }
       } catch {
