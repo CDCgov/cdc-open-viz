@@ -64,7 +64,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(configObj?.legend.seriesHighlight.length ? [...configObj?.legend.seriesHighlight] : [])
-  const [legendIsolateValues, setLegendIsolateValues] = useState<string[]>([])
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [dimensions, setDimensions] = useState<[number?, number?]>([])
   const [externalFilters, setExternalFilters] = useState<any[]>()
@@ -297,7 +296,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setFilteredData(currentData)
     }
 
-    if(!(['Area Chart', 'Bar', 'Line', 'Combo'].includes(newConfig.visualizationType)) || newConfig.orientation === 'horizontal'){
+    if (!['Area Chart', 'Bar', 'Line', 'Combo'].includes(newConfig.visualizationType) || newConfig.orientation === 'horizontal') {
       newConfig.xAxis.sortDates = false
     }
 
@@ -652,10 +651,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }, [config, stateData]) // eslint-disable-line
 
   // Called on legend click, highlights/unhighlights the data series with the given label
-  const highlight = (label: Label, update = false) => {
+  const highlight = (label: Label) => {
     // If we're highlighting all the series, reset them
     if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
-      highlightReset(update)
+      highlightReset()
       return
     }
 
@@ -691,11 +690,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // pushDataKeyBySeriesName(label)
 
     setSeriesHighlight(newSeriesHighlight)
-    if (update) updateConfig({ ...config, legend: { ...legend, seriesHighlight: newSeriesHighlight } })
   }
 
   // Called on reset button click, unhighlights all data series
-  const highlightReset = (update = false) => {
+  const highlightReset = () => {
     try {
       const legend = document.getElementById('legend')
       if (!legend) throw new Error('No legend available to set previous focus on.')
@@ -704,7 +702,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       console.error('COVE:', e.message)
     }
     setSeriesHighlight([])
-    if (update) updateConfig({ ...config, legend: { ...legend, seriesHighlight: [] } })
   }
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
@@ -1150,8 +1147,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     highlightReset,
     legend,
     setSeriesHighlight,
-    legendIsolateValues,
-    setLegendIsolateValues,
     dynamicLegendItems,
     setDynamicLegendItems,
     filterData,
