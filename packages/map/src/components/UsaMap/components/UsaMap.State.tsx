@@ -270,9 +270,9 @@ const UsaMap = () => {
               {state.hexMap.shapeGroups.map((group, groupIndex) => {
                 return group.items.map((item, itemIndex) => {
                   if (item.operator === '=') {
-                    if (geoData[item.key] === item.value) {
+                    if (geoData[item.key] === item.value || Number(geoData[item.key]) == Number(item.value)) {
                       return (
-                        <Group top={centroid[1] - 5} left={centroid[0] - iconSize} color={textColor} textAnchor='start'>
+                        <Group top={centroid[1] - 5} left={centroid[0] - iconSize} color={textColor} textAnchor='start' key={`hex--${item.key}-${item.value}-${itemIndex}`}>
                           {item.shape === 'Arrow Down' && <AiOutlineArrowDown />}
                           {item.shape === 'Arrow Up' && <AiOutlineArrowUp />}
                           {item.shape === 'Arrow Right' && <AiOutlineArrowRight />}

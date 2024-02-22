@@ -52,6 +52,7 @@ import NavigationMenu from './components/NavigationMenu' // Future: Lazy
 import UsaMap from './components/UsaMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -1298,18 +1299,19 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const regex = /(?:\.([^.]+))?$/
 
         const ext = regex.exec(dataUrl.pathname)[1]
-        if ('csv' === ext) {
+        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
           data = await fetch(dataUrlFinal)
             .then(response => response.text())
             .then(responseText => {
               const parsedCsv = Papa.parse(responseText, {
                 header: true,
                 dynamicTyping: true,
-                skipEmptyLines: true
+                skipEmptyLines: true,
+                encoding: 'utf-8'
               })
               return parsedCsv.data
             })
-        } else if ('json' === ext) {
+        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
           data = await fetch(dataUrlFinal).then(response => response.json())
         } else {
           data = []
@@ -1324,6 +1326,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         data = transform.autoStandardize(data)
         data = transform.developerStandardize(data, state.dataDescription)
       }
+
+      console.log('data', data)
 
       setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
     }
