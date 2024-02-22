@@ -987,7 +987,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       if (legendMemo.current.has(hash)) {
         let idx = legendMemo.current.get(hash)
-        if (runtimeLegend[idx]?.disabled) return false
+        let disabledIdx = idx
+
+        if (state.legend.showSpecialClassesLast) {
+          disabledIdx = idx - 1 >= 0 ? idx - 1 : runtimeLegend.length - 1
+        }
+
+        if (runtimeLegend[disabledIdx]?.disabled) return false
 
         // changed to use bin prop to get color instead of idx
         // bc we re-order legend when showSpecialClassesLast is checked
