@@ -13,17 +13,19 @@ export const createStyles = (props: StyleProps): Style[] => {
     strokeDasharray: lineStyle
   })
 
-  rawData.forEach((d, index) => {
-    let matchingPd: PreliminaryDataItem = getMatchingPd(d)
-    let style: Style = matchingPd ? createStyle(handleLineType(matchingPd.style)) : createStyle(handleLineType(lineType))
+  if (rawData) {
+    rawData.forEach((d, index) => {
+      let matchingPd: PreliminaryDataItem = getMatchingPd(d)
+      let style: Style = matchingPd ? createStyle(handleLineType(matchingPd.style)) : createStyle(handleLineType(lineType))
 
-    styles.push(style)
+      styles.push(style)
 
-    // If matchingPd exists, update the previous style if there is a previous element
-    if (matchingPd && index > 0) {
-      styles[index - 1] = createStyle(handleLineType(matchingPd.style))
-    }
-  })
+      // If matchingPd exists, update the previous style if there is a previous element
+      if (matchingPd && index > 0) {
+        styles[index - 1] = createStyle(handleLineType(matchingPd.style))
+      }
+    })
+  }
   return styles as Style[]
 }
 
