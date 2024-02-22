@@ -474,8 +474,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.horizontal = false
     }
 
+    
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
+    
+    // Sankey Description box error message
+    newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Sankey' && !newConfig.description ? 'SUBTEXT/CITATION field is empty: A description of the Sankey Diagram data must be inputted.' : ''
+
 
     setConfig(newConfig)
   }

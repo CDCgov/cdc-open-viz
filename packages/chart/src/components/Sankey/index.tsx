@@ -192,7 +192,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
     }
 
     return (
-      <Group className='' key={i} innerRef={el => (groupRefs.current[i] = el)}>
+      <Group className='' aria-hidden="true" key={i} innerRef={el => (groupRefs.current[i] = el)}>
         <rect
           height={node.y1! - node.y0! + 2} // increasing node size to account for smaller nodes
           width={sankeyGenerator.nodeWidth()}
