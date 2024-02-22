@@ -6,24 +6,24 @@
 }
 
 .cdc-open-viz-module .sankey-chart {
-  --font-size-xxxs: 8px;
-  --font-size-xxs: 10px;
-  --font-size-xs: 12px;
-  --font-size-small: 14px;
+  --font-size-small: 12px;
   --font-size-medium: 16px;
   --font-size-large: 18px;
   --font-size-xl: 24px;
 
-  --storynode-font-size--xs: 18px;
-  --storynode-font-size--small: 24px;
-  --storynode-font-size--medium: 26px;
-  --storynode-font-size--large: 32px;
-  --storynode-font-size--default: 40px;
+  --storynode-font-size--small: 26px;
+  --storynode-font-size--medium: 32px;
+  --storynode-font-size--large: 40px;
 
   --font-weight-normal: 400;
   --font-weight-bold: 700;
 
   overflow: visible;
+
+  .divider {
+    border-top: 1px solid #000;
+    margin: 10px 0;
+  }
 
   svg.sankey-chart__diagram {
     font-family: 'Roboto', sans-serif;
@@ -77,33 +77,17 @@
       font-size: var(--font-size-xl);
     }
     .node-value--storynode {
-      font-size: var(--storynode-font-size--default);
-    }
-    .node-id {
-      font-size: var(--font-size-medium);
-    }
-    .node-value {
-      font-size: var(--font-size-medium);
-    }
-  }
-  //medium
-  @media only screen and (min-width: 992px) and (max-width: 1199px) {
-    min-width: none;
-    .node-text {
-      font-size: var(--font-size-large);
-    }
-    .node-value--storynode {
       font-size: var(--storynode-font-size--large);
     }
     .node-id {
-      font-size: var(--font-size-small);
+      font-size: var(--font-size-large);
     }
     .node-value {
-      font-size: var(--font-size-small);
+      font-size: var(--font-size-large);
     }
   }
-  //small
-  @media only screen and (min-width: 768px) and (max-width: 991px) {
+  //medium
+  @media only screen and (max-width: 1199px) {
     .node-text {
       font-size: var(--font-size-medium);
     }
@@ -111,10 +95,25 @@
       font-size: var(--storynode-font-size--medium);
     }
     .node-id {
-      font-size: var(--font-size-xs);
+      font-size: var(--font-size-medium);
     }
     .node-value {
-      font-size: var(--font-size-xs);
+      font-size: var(--font-size-medium);
+    }
+  }
+  //small
+  @media only screen and (max-width: 768px) {
+    .node-text {
+      font-size: var(--font-size-small);
+    }
+    .node-value--storynode {
+      font-size: var(--storynode-font-size--small);
+    }
+    .node-id {
+      font-size: var(--font-size-small);
+    }
+    .node-value {
+      font-size: var(--font-size-small);
     }
     .popup {
       display: block; /* Show the popup on smaller screens */
@@ -132,74 +131,6 @@
     .react-tooltip {
       width: 60%;
     }
-  }
-  //xs
-  @media only screen and (min-width: 600px) and (max-width: 767px) {
-    .node-text {
-      font-size: var(--font-size-xs);
-    }
-    .node-value--storynode {
-      font-size: var(--storynode-font-size--small);
-    }
-    .node-id {
-      font-size: var(--font-size-xxs);
-    }
-    .node-value {
-      font-size: var(--font-size-xxs);
-    }
-    .popup {
-      display: block; /* Show the popup on smaller screens */
-    }
-    .sankey-chart__tooltip {
-      margin: 5px;
-      font-size: 12px;
-      &--info-section {
-        column-gap: 5px;
-      }
-    }
-    .react-tooltip ul li {
-      font-size: 12px !important;
-    }
-    .react-tooltip {
-      width: 70%;
-    }
-
-  }
-  //xxs
-  @media only screen and (max-width: 599px) {
-    .node-text {
-      font-size: var(--font-size-xxxs);
-    }
-    .node-value--storynode {
-      font-size: var(--storynode-font-size--xs);
-    }
-    .node-id {
-      font-size: var(--font-size-xxxs);
-    }
-    .node-value {
-      font-size: var(--font-size-xxxs);
-    }
-    .popup {
-      display: block; /* Show the popup on smaller screens */
-    }
-    .sankey-chart__tooltip {
-      margin: 5px;
-      font-size: 12px;
-      &--info-section {
-        column-gap: 5px;
-      }
-    }
-    .react-tooltip ul li {
-      font-size: 12px !important; 
-    }
-    .react-tooltip {
-      width: 80%;
-    }
-  }
-
-  .divider {
-    border-top: 1px solid #000;
-    margin: 10px 0;
   }
 }
 
