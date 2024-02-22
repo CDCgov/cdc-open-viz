@@ -93,7 +93,7 @@
   "barHeight": 25,
   "barSpace": 15,
   "heights": {
-    "vertical": 300,
+    "vertical": 550,
     "horizontal": 750
   },
   "xAxis": {
@@ -2175,5 +2175,6 @@
     "horizontal": false,
     "series": false
   },
-  "validated": 4.23
+  "validated": 4.23,
+  "description": "This is placeholder text. Use this field to describe the story told by the sankey diagram data."
 }
