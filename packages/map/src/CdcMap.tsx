@@ -134,6 +134,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
+  let legendSpecialClassLastMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
   if (isDebug) console.log('CdcMap state=', state) // eslint-disable-line
@@ -302,6 +303,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // eslint-disable-next-line
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
     const newLegendMemo = new Map() // Reset memoization
+    const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     let primaryCol = obj.columns.primary.name,
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
@@ -522,6 +524,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let otherRows = result.filter(d => !d.special)
         result = [...otherRows, ...specialRows]
       }
+
+      const assignSpecialClassLastIndex = (value, key) => {
+        const newIndex = result.findIndex(d => d.bin === value)
+        newLegendSpecialClassLastMemo.set(key, newIndex)
+      }
+      newLegendMemo.forEach(assignSpecialClassLastIndex)
+      legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
 
       return result
     }
@@ -774,6 +783,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
     //-----------
 
+    const assignSpecialClassLastIndex = (value, key) => {
+      const newIndex = result.findIndex(d => d.bin === value)
+      newLegendSpecialClassLastMemo.set(key, newIndex)
+    }
+    newLegendMemo.forEach(assignSpecialClassLastIndex)
+    legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
+
     return result
   })
 
@@ -990,7 +1006,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let disabledIdx = idx
 
         if (state.legend.showSpecialClassesLast) {
-          disabledIdx = idx - 1 >= 0 ? idx - 1 : runtimeLegend.length - 1
+          disabledIdx = legendSpecialClassLastMemo.current.get(hash)
         }
 
         if (runtimeLegend[disabledIdx]?.disabled) return false
