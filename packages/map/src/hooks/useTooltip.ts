@@ -92,7 +92,7 @@ const useTooltip = props => {
     } = config
 
     if (tooltipEnabledMaps.includes(currentMapType) && undefined !== row) {
-      toolTipText += `<ul className="capitalize">`
+      toolTipText += `<ul>`
 
       // if tooltips are allowed, loop through each column
       Object.keys(columns).forEach(columnKey => {
@@ -120,10 +120,10 @@ const useTooltip = props => {
     // Handle County Location Columns
     toolTipText += handleTooltipStateNameColumn(toolTipText, row)
 
-    // Handle Data > Geo Column In tooltips
+    // Handle Columns > Data Column In tooltips
     toolTipText += handleTooltipGeoColumn(geoName)
 
-    // Handle Data > Primary Column in tooltips
+    // Handle Columns > Geography Column In tooltips
     toolTipText = handleTooltipColumns(toolTipText, row)
 
     return toolTipText
