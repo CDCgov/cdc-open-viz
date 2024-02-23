@@ -14,6 +14,8 @@ export type ChartColumns = Record<string, Column>
 type Region = {
   from: string
   to: string
+  fromType: 'Previous Days' | 'Fixed Date'
+  toType: 'Last Date' | 'Fised Date'
   label: string
   color: string
   background: string
