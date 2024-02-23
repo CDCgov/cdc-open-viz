@@ -2631,7 +2631,7 @@ const EditorPanel = () => {
                     {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && <CheckBox value={config.legend.highlightOnHover} section='legend' fieldName='highlightOnHover' label='HIGHLIGHT DATA SERIES ON HOVER' updateField={updateField} />}
 
                     {/* start: isolated values */}
-                    {visHasSelectableLegendValues() && config.legend.behavior === 'isolate' && !colorCodeByCategory && (
+                    {visHasSelectableLegendValues && config.legend.behavior === 'isolate' && !colorCodeByCategory && (
                       <fieldset className='primary-fieldset edit-block' key={'additional-highlight-values'}>
                         <label>
                           <span className='edit-label'>

@@ -120,18 +120,7 @@ export const useEditorPermissions = () => {
     }
   }
 
-  const visHasSelectableLegendValues = () => {
-    switch (visualizationType) {
-      case 'Box Plot':
-        return false
-      case 'Forest Plot':
-        return false
-      case 'Spark Line':
-        return false
-      default:
-        return true
-    }
-  }
+  const visHasSelectableLegendValues = !['Box Plot', 'Forest Plot', 'Spark Line'].includes(visualizationType)
 
   const visSupportsTooltipOpacity = () => {
     const disabledCharts = ['Spark Line']
