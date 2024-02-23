@@ -49,6 +49,11 @@ header + .map-container.full-border {
       flex-direction: row;
     }
   }
+  .map-container.map {
+    &.side {
+      flex-direction: row;
+    }
+  }
   // Bubble Specific
   .map-container.bubble {
     &.side {
@@ -83,13 +88,13 @@ $medium: 768px;
   }
   // make logo smaller on mobile
   @media screen and (max-width: $small) {
-      .map-logo {
-        position: absolute;
-        bottom: 4em; // needed to align to top of Territories
-        right: 1em;
-        z-index: 3;
-        width: 50px;  // make it smaller
-      }
+    .map-logo {
+      position: absolute;
+      bottom: 4em; // needed to align to top of Territories
+      right: 1em;
+      z-index: 3;
+      width: 50px; // make it smaller
+    }
   }
   // everything else but mobile
   @media screen and (min-width: $small) {
@@ -101,9 +106,7 @@ $medium: 768px;
       width: 75px;
     }
   }
-
 }
-
 
 .single-geo {
   transition: 0.2s fill;
@@ -117,16 +120,18 @@ $medium: 768px;
 .two-col {
   display: flex;
   margin-top: 0;
+
   justify-content: flex-start;
   > label {
     margin-top: 0;
     display: inline-block;
   }
 }
+
 .territories-label {
   margin: 2em 5px 2em 1em;
   font-size: 1.1em;
-  display:block;
+  display: block;
 }
 
 // Cities and Territories
@@ -150,9 +155,14 @@ $medium: 768px;
     }
   }
 
-    &--mobile {
+  &--mobile {
     @extend .territories;
-    width: 70%;
+    width: 60%;
+  }
+}
+
+@media screen and (max-width: $small) {
+  .territories {
   }
 }
 

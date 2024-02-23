@@ -329,6 +329,9 @@ const EditorPanel = () => {
     if (updatedConfig.visualizationType === 'Combo') {
       updatedConfig.orientation = 'vertical'
     }
+    if (updatedConfig.xAxis.sortDates && !updatedConfig.xAxis.padding) {
+      updatedConfig.xAxis.padding = 6
+    }
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
@@ -841,7 +844,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar']
+  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar', 'Deviation Bar']
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1624,7 +1627,31 @@ const EditorPanel = () => {
                         {config.visualizationType !== 'Forest Plot' && (
                           <>
                             <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
-                            {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.orientation !== 'horizontal'  && <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />}{' '}
+                            {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.xAxis.type === 'date' && config.orientation !== 'horizontal' && (
+                              <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />
+                            )}{' '}
+                            {visSupportsDateCategoryAxisPadding() && (
+                              <TextField
+                                value={config.xAxis.padding}
+                                type='number'
+                                min={0}
+                                section='xAxis'
+                                fieldName='padding'
+                                label={'Padding (Percent)'}
+                                className='number-narrow'
+                                updateField={updateField}
+                                tooltip={
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      <p>For use with date scale. Extends the earliest and latest dates represented on the scale by the percentage specified.</p>
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                }
+                              />
+                            )}
                           </>
                         )}
                         <Select
@@ -1744,8 +1771,6 @@ const EditorPanel = () => {
                               </a>
                               .
                             </p>
-                            <TextField value={config.xAxis.dateParseFormat} section='xAxis' fieldName='dateParseFormat' placeholder='Ex. %Y-%m-%d' label='Date Parse Format' updateField={updateField} />
-                            <TextField value={config.xAxis.dateDisplayFormat} section='xAxis' fieldName='dateDisplayFormat' placeholder='Ex. %Y-%m-%d' label='AXIS DATE DISPLAY FORMAT' updateField={updateField} />
                             <TextField
                               tooltip={
                                 <Tooltip style={{ textTransform: 'none' }}>
@@ -1753,15 +1778,15 @@ const EditorPanel = () => {
                                     <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                   </Tooltip.Target>
                                   <Tooltip.Content>
-                                    <p>If not populated, Axis Date Display format will be used. </p>
+                                    <p>This field specifies the pattern used to read and interpret dates in your dataset, ensuring the dates are correctly understood and processed. </p>
                                   </Tooltip.Content>
                                 </Tooltip>
                               }
-                              value={config.table.dateDisplayFormat}
-                              section='table'
-                              fieldName='dateDisplayFormat'
+                              value={config.xAxis.dateParseFormat}
+                              section='xAxis'
+                              fieldName='dateParseFormat'
                               placeholder='Ex. %Y-%m-%d'
-                              label='DATA TABLE DATE FORMAT'
+                              label='Date Parse Format'
                               updateField={updateField}
                             />
                             <TextField
@@ -1771,7 +1796,43 @@ const EditorPanel = () => {
                                     <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                   </Tooltip.Target>
                                   <Tooltip.Content>
-                                    <p>If not populated, Axis Date Display format will be used. </p>
+                                    <p> Adjusts the date display format on the axis for clear, visual date representation.</p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              value={config.xAxis.dateDisplayFormat}
+                              section='xAxis'
+                              fieldName='dateDisplayFormat'
+                              placeholder='Ex. %Y-%m-%d'
+                              label='AXIS DATE DISPLAY FORMAT'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>Specify a custom format for displaying dates in data table. If left empty, dates will adopt the Axis Date Display format. </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              value={config.table.dateDisplayFormat}
+                              section='table'
+                              fieldName='dateDisplayFormat'
+                              placeholder='Ex. %Y-%m-%d'
+                              label='DATA TABLE DATE DISPLAY FORMAT'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>Specify a custom format for displaying dates on hovers. If left empty, dates will adopt the Axis Date Display format. </p>
                                   </Tooltip.Content>
                                 </Tooltip>
                               }
@@ -1779,7 +1840,7 @@ const EditorPanel = () => {
                               section='tooltips'
                               fieldName='dateDisplayFormat'
                               placeholder='Ex. %Y-%m-%d'
-                              label='HOVER DATE FORMAT'
+                              label='HOVER DATE DISPLAY FORMAT'
                               updateField={updateField}
                             />
                           </>

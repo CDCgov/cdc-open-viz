@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
+import { timeParse } from 'd3-time-format'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -97,9 +98,9 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const _runtimeData = config.table.customTableConfig || config.visualizationType === 'Sankey' || config.data?.[0].tableData ? customColumns(rawData, config.table.excludeColumns) : runtimeData
-  console.log('runtime', _runtimeData)
-  const rawRows = Object.keys(_runtimeData)
+  const _runtimeData = config.table.customTableConfig ? customColumns(rawData, config.table.excludeColumns) : runtimeData
+
+  const rawRows = Object.keys(_runtimeData).filter(column => column != 'columns')
   const rows = isVertical
     ? rawRows.sort((a, b) => {
         let dataA
@@ -113,6 +114,11 @@ const DataTable = (props: DataTableProps) => {
           dataA = _runtimeData[a][sortBy.column]
           dataB = _runtimeData[b][sortBy.column]
         }
+        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date' && config.xAxis.sortDates) {
+          dataA = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[a][config.xAxis.dataKey])
+          dataB = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[b][config.xAxis.dataKey])
+        }
+        console.log(dataA, dataB)
         return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
       })
     : rawRows

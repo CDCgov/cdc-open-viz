@@ -103,17 +103,20 @@ const WorldMap = props => {
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
       // If the geo.properties.state value is found in the data use that, otherwise fall back to geo.properties.iso
       const dataHasStateName = state.data.some(d => d[state.columns.geo.name] === geo.properties.state)
-      const geoKey = geo.properties.state !== '' ? geo.properties.state : geo.properties.name ? geo.properties.name : geo.properties.iso
+      const geoKey = geo.properties.state && data[geo.properties.state] ? geo.properties.state : geo.properties.name ? geo.properties.name : geo.properties.iso
 
       const additionalData = {
         name: geo.properties.name
       }
       if (!geoKey) return null
 
-      const geoData = data[geoKey]
+      let geoData = data[geoKey]
+
+      // if ((geoKey === 'Alaska' || geoKey === 'Hawaii') && !geoData) {
+      //   geoData = data['United States']
+      // }
 
       const geoDisplayName = displayGeoName(supportedCountries[geoKey]?.[0])
-      console.log('geoDisplayName', geoDisplayName)
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
@@ -159,9 +162,7 @@ const WorldMap = props => {
     })
 
     // Cities
-    geosJsx.push(
-      <CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} key='cities' projection={projection} state={state} titleCase={titleCase} />
-    )
+    geosJsx.push(<CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} key='cities' projection={projection} state={state} titleCase={titleCase} />)
 
     // Bubbles
     if (state.general.type === 'bubble') {
