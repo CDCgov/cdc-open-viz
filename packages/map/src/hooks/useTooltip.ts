@@ -52,7 +52,7 @@ const useTooltip = props => {
     const prefix = handleTooltipPrefix('')
 
     if (hideGeoColumnInTooltip) return `<strong>${displayGeoName(geoName)}</strong>`
-    return `<p class="tooltip-heading">${prefix}${displayGeoName(geoName)}</p>`
+    return `<p class="tooltip-heading" style="text-transform: none;">${prefix}${displayGeoName(geoName)}</p>`
   }
 
   /**
