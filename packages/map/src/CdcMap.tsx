@@ -1083,7 +1083,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // World Map
     // If we're returning a city name instead of a country ISO code, capitalize it for the data table.
     if (state.type === 'map' && state.general.geoType === 'world') {
-      if (String(key).length > 3) return titleCase(key)
+      if (String(key).length > 3) return key
     }
     let value = key
     // Map to first item in values array which is the preferred label

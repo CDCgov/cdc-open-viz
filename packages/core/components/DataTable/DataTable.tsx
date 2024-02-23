@@ -115,11 +115,10 @@ const DataTable = (props: DataTableProps) => {
           dataA = _runtimeData[a][sortBy.column]
           dataB = _runtimeData[b][sortBy.column]
         }
-        if(!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date' && config.xAxis.sortDates){
+        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date' && config.xAxis.sortDates) {
           dataA = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[a][config.xAxis.dataKey])
           dataB = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[b][config.xAxis.dataKey])
         }
-        console.log(dataA, dataB)
         return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
       })
     : rawRows
