@@ -121,13 +121,13 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       const currentPoint = data[currentIndex]
       const previousPoint = data[currentIndex - 1]
       const nextPoint = data[currentIndex + 1]
-      if (currentIndex === 0 && nextPoint[seriesKey] === '') {
+      if (currentIndex === 0 && !nextPoint[seriesKey]) {
         return true
       }
-      if (currentIndex === data.length - 1 && previousPoint[seriesKey] === '') {
+      if (currentIndex === data.length - 1 && !previousPoint[seriesKey]) {
         return true
       }
-      if (currentIndex !== 0 && currentPoint[seriesKey] !== '' && previousPoint[seriesKey] === '' && nextPoint[seriesKey] === '') {
+      if (currentIndex !== 0 && currentPoint[seriesKey] && !previousPoint[seriesKey] && !nextPoint[seriesKey]) {
         return true
       }
     }
