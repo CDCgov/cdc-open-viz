@@ -163,7 +163,7 @@ const LineChart = (props: LineChartProps) => {
                 )}
               </>
               {/* SPLIT LINE */}
-              {config.preliminaryData.some(d => d.value && d.column) ? (
+              {config?.preliminaryData?.some(d => d.value && d.column) ? (
                 <SplitLinePath
                   curve={allCurves[seriesData[0].lineType]}
                   segments={(config.xAxis.type === 'date' && config.xAxis.sortDates
