@@ -176,7 +176,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
                           ${tooltipColumn2Data}
                         </div>
                       </div>
-                  </div>`
+                    </div>`
 
   // Draw the nodes
   const allNodes = sankeyData.nodes.map((node, i) => {

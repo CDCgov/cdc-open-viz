@@ -351,7 +351,7 @@
         {
           "node": "Dead",
           "value": "4,736 (1.01%)",
-          "summary": "Patiend Died",
+          "summary": "Patient Died",
           "column1Label": "Gender",
           "column2Label": "Race and Ethnicity",
           "column1": [
@@ -1139,18 +1139,6 @@
           "Type of Treatment": "Unknown",
           "Final Outcome": "N/A",
           "Number of Patients": 104
-        },
-        {
-          "Disposition": "",
-          "Type of Treatment": "",
-          "Final Outcome": "",
-          "Number of Patients": ""
-        },
-        {
-          "Disposition": "**Counts fewer than 20 are suppressed for confidentiality reasons.",
-          "Type of Treatment": "",
-          "Final Outcome": "",
-          "Number of Patients": ""
         }
       ]
     }
