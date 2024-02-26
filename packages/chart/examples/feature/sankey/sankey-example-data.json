@@ -1139,6 +1139,18 @@
           "Type of Treatment": "Unknown",
           "Final Outcome": "N/A",
           "Number of Patients": 104
+        },
+        {
+          "Disposition": "",
+          "Type of Treatment": "",
+          "Final Outcome": "",
+          "Number of Patients": ""
+        },
+        {
+          "Disposition": "**Counts fewer than 20 are suppressed for confidentiality reasons.",
+          "Type of Treatment": "",
+          "Final Outcome": "",
+          "Number of Patients": ""
         }
       ]
     }
