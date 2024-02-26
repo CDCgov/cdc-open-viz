@@ -399,8 +399,8 @@
             },
             {
               "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             },
             {
               "label": "Missing",
@@ -522,8 +522,8 @@
             },
             {
               "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             },
             {
               "label": "Missing",
@@ -645,8 +645,8 @@
             },
             {
               "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             },
             {
               "label": "Missing",
@@ -697,8 +697,8 @@
             },
             {
               "label": "Non-Hispanic American Indian or Alaska Native",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             },
             {
               "label": "Non-Hispanic Asian",
@@ -707,8 +707,8 @@
             },
             {
               "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             },
             {
               "label": "Missing",
@@ -769,8 +769,8 @@
             },
             {
               "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             },
             {
               "label": "Missing",
@@ -810,28 +810,28 @@
             },
             {
               "label": "Non-Hispanic Black",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             },
             {
               "label": "Hispanic",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             },
             {
               "label": "Non-Hispanic American Indian or Alaska Native",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             },
             {
               "label": "Non-Hispanic Asian",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             },
             {
               "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             },
             {
               "label": "Missing",
@@ -982,8 +982,8 @@
             },
             {
               "label": "Unknown",
-              "value": "--",
-              "additional_info": "--"
+              "value": "**",
+              "additional_info": "**"
             }
           ],
           "column2": [
@@ -1359,5 +1359,6 @@
     "series": false
   },
   "validated": 4.23,
-  "description": "This is placeholder text. Use this field to describe the story told by the sankey diagram data. Please navigate to the editor panel under General -> SUBTEXT/CITATION to update."
+  "description": "This is placeholder text. Use this field to describe the story told by the sankey diagram data. Please navigate to the editor panel under General -> SUBTEXT/CITATION to update.",
+  "footnotes": "**Counts fewer than 20 are suppressed for confidentiality reasons."
 }
