@@ -113,7 +113,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx, row }) => {
     <li className={curr === '84' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([8, 4])} key='84' title='2 Columns'>
       <EightFourColIcon />
     </li>,
-    <li className={curr === 'toggle' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([12, 12, 12], true)} key='toggle' title='Toggle'>
+    <li className={curr === 'toggle' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([12, 12, 12], true)} key='toggle' title='Toggle between up to three visualizations'>
       <ToggleIcon />
     </li>
   ]
