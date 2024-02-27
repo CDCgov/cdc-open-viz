@@ -2,10 +2,12 @@ import React, { useState, useContext, useMemo, useCallback, useEffect, memo } fr
 import { useTable, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination } from 'react-table'
 import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
 import { useDebounce } from 'use-debounce'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 // Core
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 import { errorMessages } from '../helpers/errorMessages'
+import { DataSet } from '@cdc/dashboard/src/types/DataSet'
 
 const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }: any) => {
   const [filterValue, setFilterValue] = useState(globalFilter)
@@ -48,9 +50,55 @@ const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pag
   </footer>
 ))
 
-const PreviewDataTable = ({ data }) => {
-  const [tableData, setTableData] = useState(data ?? [])
+const PreviewDataTable = () => {
+  const { config } = useContext(ConfigContext)
+  const previewData = useMemo(() => {
+    if (config.type === 'dashboard') {
+      return (
+        Object.values(config.datasets).find((dataset: DataSet) => {
+          return dataset.preview && Array.isArray(dataset.data)
+        }) || []
+      )
+    }
+    return config.data || []
+  }, [config.type, config.data, config.datasets])
+  const [tableData, _setTableData] = useState(previewData)
+  const runSideEffects = td => {
+    const newData = generateColumns(td)
+    validateFipsCodeLength(newData)
+    return newData
+  }
+  const setTableData = td => _setTableData(runSideEffects(td))
+
   const dispatch = useContext(EditorDispatchContext)
+
+  const fetchAsyncData = async () => {
+    if (config.type === 'dashboard') {
+      Object.keys(config.datasets).forEach(async datasetKey => {
+        if (config.datasets[datasetKey].preview) {
+          if (config.datasets[datasetKey].dataUrl) {
+            const remoteData = await fetchRemoteData(config.datasets[datasetKey].dataUrl)
+            if (Array.isArray(remoteData)) {
+              setTableData(remoteData)
+            }
+          } else if (Array.isArray(config.datasets[datasetKey].data)) {
+            setTableData(config.datasets[datasetKey].data)
+          }
+        }
+      })
+    } else {
+      if (config.dataUrl) {
+        const remoteData = await fetchRemoteData(config.dataUrl)
+        if (Array.isArray(remoteData)) {
+          setTableData(remoteData)
+        }
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchAsyncData()
+  }, [config.datasets]) // eslint-disable-line
 
   const tableColumns = useMemo(() => {
     const columns = tableData.columns ?? []
@@ -60,7 +108,7 @@ const PreviewDataTable = ({ data }) => {
       dispatch({ type: 'EDITOR_SET_ERRORS', payload: [errorMessages.emptyCols] })
     }
 
-    return columns.map((columnName, idx) => {
+    return columns.map(columnName => {
       const columnConfig = {
         id: `column-${columnName}`,
         accessor: row => row[columnName],
@@ -73,7 +121,7 @@ const PreviewDataTable = ({ data }) => {
   }, [tableData])
 
   // This adds a columns property just like the D3 function for JSON parsing.
-  const generateColumns = useCallback(data => {
+  const generateColumns = data => {
     let columns = []
 
     data.forEach(rowObj => {
@@ -92,19 +140,7 @@ const PreviewDataTable = ({ data }) => {
       newData.columns = columns
       return newData
     }
-  }, [])
-
-  useEffect(() => {
-    if (!data) {
-      return
-    }
-
-    let newData = [...data]
-
-    newData = generateColumns(newData)
-    validateFipsCodeLength(newData)
-    setTableData(newData)
-  }, [data, generateColumns])
+  }
 
   const {
     getTableProps,
@@ -137,63 +173,22 @@ const PreviewDataTable = ({ data }) => {
         <div className='table-container'>
           <table className='editor data-table' role='table'>
             <thead>
-              <tr role='row'>
+              <tr>
                 <th scope='col' colSpan={1} role='columnheader'></th>
                 <th scope='col' colSpan={1} role='columnheader'></th>
                 <th scope='col' colSpan={1} role='columnheader'></th>
               </tr>
             </thead>
             <tbody>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
+              <>
+                {[...Array(10)].map((_, i) => () => (
+                  <tr key={i}>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                ))}
+              </>
             </tbody>
           </table>
         </div>
@@ -201,7 +196,7 @@ const PreviewDataTable = ({ data }) => {
     )
   }
 
-  if (!data) return [<Header key='header' />, <PlaceholderTable key='table' />]
+  if (!tableData) return [<Header key='header' />, <PlaceholderTable key='table' />]
 
   const footerProps = { previousPage, nextPage, canPreviousPage, canNextPage, pageNumber: pageIndex + 1, totalPages: pageOptions.length }
 
@@ -243,7 +238,7 @@ const PreviewDataTable = ({ data }) => {
     </>
   )
 
-  return [<Header key='header' data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table key='table' />]
+  return [<Header key='header' data={tableData} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table key='table' />]
 }
 
 export default PreviewDataTable

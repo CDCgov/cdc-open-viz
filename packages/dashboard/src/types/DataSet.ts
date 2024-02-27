@@ -1,8 +1,9 @@
 export type DataSet = {
-    data: Object[]
-    dataDescription: {}
-    dataUrl: string
-    runtimeDataUrl: string
-    dataFileSourceType: string
-    formattedData: Object[]
+  data: Object[]
+  dataDescription: {}
+  dataUrl: string
+  runtimeDataUrl: string
+  dataFileSourceType: string
+  formattedData: Object[]
+  preview?: boolean
 }
