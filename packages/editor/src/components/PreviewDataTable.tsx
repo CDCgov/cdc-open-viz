@@ -54,13 +54,11 @@ const PreviewDataTable = () => {
   const { config } = useContext(ConfigContext)
   const previewData = useMemo(() => {
     if (config.type === 'dashboard') {
-      return (
-        Object.values(config.datasets).find((dataset: DataSet) => {
-          return dataset.preview && Array.isArray(dataset.data)
-        }) || []
-      )
+      return Object.values(config.datasets).find((dataset: DataSet) => {
+        return dataset.preview && Array.isArray(dataset.data)
+      })
     }
-    return config.data || []
+    return config.data
   }, [config.type, config.data, config.datasets])
   const [tableData, _setTableData] = useState(previewData)
   const runSideEffects = (td: any[]) => {
@@ -102,6 +100,7 @@ const PreviewDataTable = () => {
   }, [config.datasets]) // eslint-disable-line
 
   const tableColumns = useMemo(() => {
+    if (!tableData) return []
     const columns = tableData.columns ?? []
     if (columns.length > 0 && columns.includes('')) {
       // todo find a way to call the errors. Currently they are in DataImport.js
@@ -158,19 +157,15 @@ const PreviewDataTable = () => {
     previousPage
   } = useTable({ columns: tableColumns, data: tableData, initialState: { pageSize: 25 } }, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination)
 
-  const NoData = () => (
-    <section className='no-data-message'>
-      <section>
-        <h3>No Data</h3>
-        <p>Import data to preview</p>
-      </section>
-    </section>
-  )
-
   const PlaceholderTable = () => {
     return (
       <section className='no-data'>
-        <NoData />
+        <section className='no-data-message'>
+          <section>
+            <h3>No Data</h3>
+            <p>Import data to preview</p>
+          </section>
+        </section>
         <div className='table-container'>
           <table className='editor data-table' role='table'>
             <thead>
@@ -182,7 +177,7 @@ const PreviewDataTable = () => {
             </thead>
             <tbody>
               <>
-                {[...Array(10)].map((_, i) => () => (
+                {[...Array(10)].map((_, i) => (
                   <tr key={i}>
                     <td></td>
                     <td></td>
