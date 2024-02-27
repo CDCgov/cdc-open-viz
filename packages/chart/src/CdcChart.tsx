@@ -658,12 +658,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       stateData.sort(sortData)
     }
   }, [config, stateData]) // eslint-disable-line
-  // if combo selected for each new series update config so each series defaults to "Bar"
-  useEffect(() => {
-    if (config.visualizationType === 'Combo') {
-      updateConfig({ ...config })
-    }
-  }, [config.series, config.visualizationType])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label: Label) => {

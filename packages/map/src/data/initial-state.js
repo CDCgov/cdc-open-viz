@@ -109,7 +109,7 @@ export default {
       {
         legendTitle: '',
         legendDescription: '',
-        items: [{ key: '', shape: 'Arrow up', column: '', operator: '=', value: '' }]
+        items: [{ key: '', shape: 'Arrow Up', column: '', operator: '=', value: '' }]
       }
     ]
   },
