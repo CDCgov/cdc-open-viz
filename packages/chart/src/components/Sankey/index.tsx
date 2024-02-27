@@ -309,7 +309,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
         {showPopup && (
         <div className="popup">
           <div className="popup-content">
-            <p><strong>Please change the orientation of your screen to view the diagram better horizontally.</strong></p>
+            <p><strong>Please change the orientation of your screen or increase the size of your browser to view the diagram better.</strong></p>
           </div>
         </div>
       )}

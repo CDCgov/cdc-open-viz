@@ -11,7 +11,7 @@
   --font-size-large: 18px;
   --font-size-xl: 24px;
 
-  --storynode-font-size--small: 26px;
+  --storynode-font-size--small: 24px;
   --storynode-font-size--medium: 32px;
   --storynode-font-size--large: 40px;
 
@@ -101,8 +101,26 @@
       font-size: var(--font-size-medium);
     }
   }
+
   //small
-  @media only screen and (max-width: 600px) {
+  @media only screen and (max-width: 991px) {
+    .node-text {
+      font-size: var(--font-size-small);
+      overflow-wrap: break-word;
+    }
+    .node-value--storynode {
+      font-size: var(--storynode-font-size--small);
+    }
+    .node-id {
+      font-size: var(--font-size-small);
+    }
+    .node-value {
+      font-size: var(--font-size-small);
+    }
+  }
+
+  //x-small
+  @media only screen and (max-width: 650px) {
     .popup {
       display: block; /* Show the popup on smaller screens */
     }
