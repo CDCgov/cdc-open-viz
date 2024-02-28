@@ -80,8 +80,8 @@ const LinearChart = props => {
     yMax = yMax + config.data.length * config.forestPlot.rowHeight
     width = dimensions[0]
   }
-  if (config.brush.active) {
-    height = height + config.brush.height
+  if (config.brush?.active) {
+    height = height + config.brush?.height
   }
 
   // hooks  % states

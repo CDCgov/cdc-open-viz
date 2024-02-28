@@ -255,7 +255,7 @@ const HexSettingShapeColumns = props => {
                                             ...group.items,
                                             {
                                               key: '',
-                                              shape: 'Arrow up',
+                                              shape: 'Arrow Up',
                                               column: '',
                                               operator: '=',
                                               value: ''
@@ -309,7 +309,7 @@ const HexSettingShapeColumns = props => {
               copy.push({
                 legendTitle: '',
                 legendDescription: '',
-                items: [{ key: '', shape: 'Arrow up', column: '', operator: '=', value: '' }]
+                items: [{ key: '', shape: 'Arrow Up', column: '', operator: '=', value: '' }]
               })
               copy.legendTitle = ''
               copy.legendDescription = ''

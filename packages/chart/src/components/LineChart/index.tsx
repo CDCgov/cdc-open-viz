@@ -62,7 +62,7 @@ const LineChart = (props: LineChartProps) => {
           let displayArea = legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
           const circleData = filterCircles(config.preliminaryData, rawData, seriesKey)
           // styles for preliminary Data  items
-          let styles = createStyles({ preliminaryData: config.preliminaryData, rawData, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), handleLineType, lineType, seriesKey })
+          let styles = createStyles({ preliminaryData: config.preliminaryData, data: tableData, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), handleLineType, lineType, seriesKey })
 
           let xPos = d => {
             return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
@@ -163,10 +163,19 @@ const LineChart = (props: LineChartProps) => {
                 )}
               </>
               {/* SPLIT LINE */}
-              {config.preliminaryData.some(d => d.value && d.column) ? (
+              {config?.preliminaryData?.some(d => d.value && d.column) ? (
                 <SplitLinePath
                   curve={allCurves[seriesData[0].lineType]}
-                  segments={data.map(d => [d])}
+                  segments={(config.xAxis.type === 'date' && config.xAxis.sortDates
+                    ? data.sort((d1, d2) => {
+                        let x1 = getXAxisData(d1)
+                        let x2 = getXAxisData(d2)
+                        if (x1 < x2) return -1
+                        if (x2 < x1) return 1
+                        return 0
+                      })
+                    : data
+                  ).map(d => [d])}
                   segmentation='x'
                   x={d => xPos(d)}
                   y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
@@ -180,7 +189,17 @@ const LineChart = (props: LineChartProps) => {
                   {/* STANDARD LINE */}
                   <LinePath
                     curve={allCurves[seriesData[0].lineType]}
-                    data={data}
+                    data={
+                      config.xAxis.type === 'date' && config.xAxis.sortDates
+                        ? data.sort((d1, d2) => {
+                            let x1 = getXAxisData(d1)
+                            let x2 = getXAxisData(d2)
+                            if (x1 < x2) return -1
+                            if (x2 < x1) return 1
+                            return 0
+                          })
+                        : data
+                    }
                     x={d => xPos(d)}
                     y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
                     stroke={colorScale(config.runtime.seriesLabels[seriesKey])}

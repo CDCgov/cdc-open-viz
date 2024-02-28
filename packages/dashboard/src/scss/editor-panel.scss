@@ -11,7 +11,7 @@
   position: sticky;
   top: 0;
   flex-direction: column;
-  width: 30%;
+  width: calc(350px + 1em);
   max-height: 95vh;
   z-index: 3;
 }

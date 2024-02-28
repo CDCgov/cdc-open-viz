@@ -27,20 +27,7 @@ import '../scss/data-import.scss'
 import '@cdc/core/styles/v2/components/data-designer.scss'
 import { errorMessages, maxFileSize } from '../helpers/errorMessages'
 import { Visualization } from '@cdc/core/types/Visualization'
-
-const isSolrCsv = dataUrl => {
-  if (dataUrl.includes('wt=csv')) {
-    return true
-  }
-  return false
-}
-
-const isSolrJson = dataUrl => {
-  if (dataUrl?.includes('wt=json')) {
-    return true
-  }
-  return false
-}
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 
 export default function DataImport() {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)

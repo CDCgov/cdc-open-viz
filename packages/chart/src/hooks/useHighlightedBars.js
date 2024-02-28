@@ -127,7 +127,7 @@ export const useHighlightedBars = (config, updateConfig) => {
    */
   HighLightedBarUtils.findDuplicates = arr => {
     const duplicates = {}
-    const result = arr.filter(obj => {
+    const result = arr?.filter(obj => {
       const { legendLabel } = obj
       if (!duplicates[legendLabel]) {
         duplicates[legendLabel] = true

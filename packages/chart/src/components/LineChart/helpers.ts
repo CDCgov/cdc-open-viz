@@ -1,7 +1,7 @@
 import { type PreliminaryDataItem, DataItem, StyleProps, Style } from './LineChartProps'
 
 export const createStyles = (props: StyleProps): Style[] => {
-  const { preliminaryData, rawData, stroke, handleLineType, lineType, seriesKey } = props
+  const { preliminaryData, data, stroke, handleLineType, lineType, seriesKey } = props
 
   const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(pd => pd.seriesKey && pd.column && pd.value && pd.type && pd.style)
   const getMatchingPd = (point: DataItem): PreliminaryDataItem => validPreliminaryData.find(pd => pd.seriesKey === seriesKey && point[pd.column] === pd.value && pd.type === 'effect' && pd.style !== 'Open Circles')
@@ -13,7 +13,7 @@ export const createStyles = (props: StyleProps): Style[] => {
     strokeDasharray: lineStyle
   })
 
-  rawData.forEach((d, index) => {
+  data.forEach((d, index) => {
     let matchingPd: PreliminaryDataItem = getMatchingPd(d)
     let style: Style = matchingPd ? createStyle(handleLineType(matchingPd.style)) : createStyle(handleLineType(lineType))
 

@@ -5,9 +5,9 @@ export const computeMarginBottom = (config: ChartConfig, legend: Legend, current
   const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
   const isHorizontal = config.orientation === 'horizontal'
   const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
-  const isBrush = config.brush.active
+  const isBrush = config?.brush?.active
   const offset = 20
-  const brushHeight = config.brush.height
+  const brushHeight = config?.brush?.height
   let bottom = 0
   if (!isLegendBottom && isHorizontal && !config.yAxis.label) {
     bottom = Number(config.xAxis.labelOffset)
