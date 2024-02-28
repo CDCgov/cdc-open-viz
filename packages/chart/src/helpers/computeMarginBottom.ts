@@ -1,4 +1,5 @@
-import { ChartConfig, Legend } from '../types/ChartConfig'
+import { ChartConfig } from '../types/ChartConfig'
+import { Legend } from '@cdc/core/types/Legend'
 
 export const computeMarginBottom = (config: ChartConfig, legend: Legend, currentViewport: string): string | number => {
   const isLegendBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)

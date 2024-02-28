@@ -1,4 +1,5 @@
-import { ChartConfig, Legend } from '../../types/ChartConfig'
+import { ChartConfig } from '../../types/ChartConfig'
+import { Legend } from '@cdc/core/types/Legend'
 import { computeMarginBottom } from '../computeMarginBottom'
 
 describe('computeMarginBottom', () => {

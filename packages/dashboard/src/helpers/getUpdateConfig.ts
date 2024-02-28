@@ -23,7 +23,7 @@ export const getUpdateConfig =
         let _filter = newConfig.dashboard.sharedFilters[i]
 
         if (filterIsSetByVizData) {
-          const filterValues = generateValuesForFilter(filter.columnName, dataOverride || state.data, state.config?.filterBehavior)
+          const filterValues = generateValuesForFilter(filter.columnName, dataOverride || state.data)
 
           if (_filter.order === 'asc') {
             filterValues.sort()
@@ -40,7 +40,7 @@ export const getUpdateConfig =
         }
 
         if ((!filter.values || filter.values.length === 0) && filter.showDropdown) {
-          const generatedValues = generateValuesForFilter(filter.columnName, dataOverride || state.data, state.config?.filterBehavior)
+          const generatedValues = generateValuesForFilter(filter.columnName, dataOverride || state.data)
           setFilter(i, 'values', generatedValues)
           const _filter = newConfig.dashboard.sharedFilters[i]
           if (_filter.values.length > 0) {
@@ -50,14 +50,14 @@ export const getUpdateConfig =
       })
 
       visualizationKeys.forEach(visualizationKey => {
-        let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
+        const applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
 
         if (applicableFilters.length > 0) {
           const visualization = newConfig.visualizations[visualizationKey]
           const _newConfigDataSet = newConfig.datasets[visualization.dataKey]
           const formattedData = getFormattedData(_newConfigDataSet?.data || visualization.data, visualization.dataDescription)
           const _data = formattedData || (dataOverride || state.data)[visualization.dataKey]
-          newFilteredData[visualizationKey] = filterData(applicableFilters, _data, state.config?.filterBehavior)
+          newFilteredData[visualizationKey] = filterData(applicableFilters, _data)
         }
       })
     }
