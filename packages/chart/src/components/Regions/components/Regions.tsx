@@ -5,11 +5,10 @@ import { ChartContext } from '../../../types/ChartContext'
 import { Text } from '@visx/text'
 import { Group } from '@visx/group'
 import * as d3 from 'd3'
+import { formatDate } from '@cdc/core/helpers/cove/date.js'
 
 type RegionsProps = {
   xScale: Function
-  barWidth: number
-  totalBarsInGroup: number
   yMax: number
   barWidth?: number
   totalBarsInGroup?: number
@@ -60,9 +59,9 @@ const Regions = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, handleToolt
 
         let previousDays = Number(region.from)
         let lastDate = region.toType === 'Last Date' ? domain[domain.length - 1] : region.to
-        let fromDate = new Date(lastDate)
+        let toDate = new Date(lastDate)
 
-        from = new Date(fromDate.setDate(fromDate.getDate() - previousDays)).getTime()
+        from = new Date(toDate.setDate(toDate.getDate() - previousDays)).getTime()
         let targetValue = from
 
         let index = bisectDate(domain, targetValue)
@@ -75,7 +74,6 @@ const Regions = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, handleToolt
           let d1 = domain[index]
           closestValue = targetValue - d0 > d1 - targetValue ? d1 : d0
         }
-
         from = Number(xScale(closestValue) - (visualizationType === 'Bar' || visualizationType === 'Combo' ? (barWidth * totalBarsInGroup) / 2 : 0))
 
         width = to - from
@@ -86,6 +84,17 @@ const Regions = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, handleToolt
         let domainValues = xScale.domain()
         let lastDate = domainValues[domainValues.length - 1]
         to = Number(xScale(lastDate) + (visualizationType === 'Bar' || visualizationType === 'Combo' ? (barWidth * totalBarsInGroup) / 2 : 0))
+        width = to - from
+      }
+
+      if (region.fromType === 'Previous Days' && xAxis.type === 'date' && xAxis.sortDates && config.visualizationType === 'Line') {
+        let domain = xScale.domain()
+        let previousDays = Number(region.from)
+        let to = region.toType === 'Last Date' ? formatDate(config.xAxis.dateParseFormat, domain[domain.length - 1]) : region.to
+        let toDate = new Date(to)
+        from = new Date(toDate.setDate(toDate.getDate() - previousDays)).getTime()
+        from = xScale(from)
+        to = xScale(parseDate(to))
         width = to - from
       }
 

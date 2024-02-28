@@ -23,7 +23,7 @@ export type Runtime = {
   xAxis: Axis
   yAxis: Axis
   seriesKeys: any[]
-  seriesLabels: string[]
+  seriesLabels: Record<string, any>
   seriesLabelsAll: string[]
   editorErrorMessage: string
 }

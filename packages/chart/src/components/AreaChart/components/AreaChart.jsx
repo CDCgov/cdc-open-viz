@@ -18,26 +18,8 @@ const AreaChart = props => {
 
   if (!data) return
 
-  // Tooltip helper for getting data to the closest date/category hovered.
-  const getXValueFromCoordinate = x => {
-    if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
-      let eachBand = xScale.step()
-      let numerator = x
-      const index = Math.floor(Number(numerator) / eachBand)
-      return xScale.domain()[index - 1] // fixes off by 1 error
-    }
-
-    if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
-      const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
-      const x0 = xScale.invert(x)
-      const index = bisectDate(config.data, x0, 1)
-      const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
-      return val
-    }
-  }
-
   const handleX = d => {
-    return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])
+    return (config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
   }
 
   const handleY = (d, index, s = undefined) => {
@@ -60,12 +42,6 @@ const AreaChart = props => {
               let curveType = allCurves[s.lineType]
               let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
               let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1
-
-              if (config.xAxis.type === 'date') {
-                data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
-              } else {
-                data.map(d => xScale(d[config.xAxis.dataKey]))
-              }
 
               return (
                 <React.Fragment key={index}>

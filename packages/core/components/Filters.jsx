@@ -74,21 +74,16 @@ export const useFilters = props => {
   const changeFilterActive = (index, value) => {
     let newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
 
-    newFilters[index].active = value
-    setConfig({ ...visualizationConfig })
-
-    // If this is a button filter type show the button.
     if (visualizationConfig.filterBehavior === 'Apply Button') {
+      newFilters[index].queuedActive = value
       setShowApplyButton(true)
+    } else {
+      newFilters[index].active = value
     }
-
-    // If we're not using the apply button we can set the filters right away.
-    if (visualizationConfig.filterBehavior !== 'Apply Button') {
-      setConfig({
-        ...visualizationConfig,
-        filters: newFilters
-      })
-    }
+    setConfig({ 
+      ...visualizationConfig,
+      filters: newFilters 
+    })
     
     // Used for setting active filter, fromHash breaks the filteredData functionality.
     if (visualizationConfig.type === 'map' && visualizationConfig.filterBehavior === 'Filter Change') {
@@ -102,6 +97,13 @@ export const useFilters = props => {
   }
 
   const handleApplyButton = newFilters => {
+    newFilters.forEach(newFilter => {
+      if(newFilter.queuedActive){
+        newFilter.active = newFilter.queuedActive
+        delete newFilter.queuedActive
+      }
+    })
+    
     setConfig({ ...visualizationConfig, filters: newFilters })
 
     if (type === 'map') {

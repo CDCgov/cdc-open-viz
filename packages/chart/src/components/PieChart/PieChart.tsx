@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react'
+import React, { useContext, useState, useEffect, useRef, useMemo } from 'react'
 import { animated, useTransition, interpolate } from 'react-spring'
 import chroma from 'chroma-js'
 
@@ -7,6 +7,7 @@ import { Pie } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
+import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
 
 // cove
 import ConfigContext from '../../ConfigContext'
@@ -14,6 +15,9 @@ import { useTooltip as useCoveTooltip } from '../../hooks/useTooltip'
 import useIntersectionObserver from '../../hooks/useIntersectionObserver'
 import { handleChartAriaLabels } from '../../helpers/handleChartAriaLabels'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import LegendComponent from '../Legend/Legend.Component'
+import { createFormatLabels } from '../Legend/helpers/createFormatLabels'
+import { scaleOrdinal } from '@visx/scale'
 
 const enterUpdateTransition = ({ startAngle, endAngle }) => ({
   startAngle,
@@ -29,7 +33,7 @@ type TooltipData = {
 }
 
 const PieChart = props => {
-  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, currentViewport } = useContext(ConfigContext)
+  const { transformedData: data, config, colorScale, currentViewport, dimensions, highlight, highlightReset, seriesHighlight } = useContext(ConfigContext)
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip<TooltipData>()
   const { handleTooltipMouseOver, handleTooltipMouseOff, TooltipListItem } = useCoveTooltip({
     xScale: false,
@@ -39,6 +43,50 @@ const PieChart = props => {
   })
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
+  const pivotColumns = Object.values(config.columns).filter(column => column.showInViz)
+  const dataNeedsPivot = pivotColumns.length > 0
+  const pivotKey = dataNeedsPivot ? 'pivotColumn' : undefined
+  const _data = useMemo(() => {
+    if (dataNeedsPivot) {
+      let newData = []
+      const primaryColumn = config.yAxis.dataKey
+      const additionalColumns = pivotColumns.map(column => column.name)
+      const allColumns = [primaryColumn, ...additionalColumns]
+      const columnToUpdate = config.xAxis.dataKey
+      data.forEach(d => {
+        allColumns.forEach(col => {
+          const data = d[col]
+          if (data) {
+            newData.push({
+              [pivotKey]: data,
+              [columnToUpdate]: `${d[columnToUpdate]} - ${col}`
+            })
+          }
+        })
+      })
+      return newData
+    }
+    return data
+  }, [data, dataNeedsPivot])
+
+  const _colorScale = useMemo(() => {
+    if (dataNeedsPivot) {
+      const keys = {}
+      _data.forEach(d => {
+        if (!keys[d[config.xAxis.dataKey]]) keys[d[config.xAxis.dataKey]] = true
+      })
+      const numberOfKeys = Object.entries(keys).length
+      let palette = config.customColors || colorPalettes[config.palette]
+      palette = palette.slice(0, numberOfKeys)
+
+      return scaleOrdinal({
+        domain: Object.keys(keys),
+        range: palette,
+        unknown: null
+      })
+    }
+    return colorScale
+  }, [colorScale, dataNeedsPivot])
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -96,7 +144,7 @@ const PieChart = props => {
                     endAngle
                   })
                 )}
-                fill={colorScale(arc.data[config.runtime.xAxis.dataKey])}
+                fill={_colorScale(arc.data[config.runtime.xAxis.dataKey])}
                 onMouseEnter={e => handleTooltipMouseOver(e, { data: arc.data[config.runtime.xAxis.dataKey], arc })}
                 onMouseLeave={e => handleTooltipMouseOff()}
               />
@@ -108,7 +156,7 @@ const PieChart = props => {
           const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1
 
           let textColor = '#FFF'
-          if (colorScale(arc.data[config.runtime.xAxis.dataKey]) && chroma.contrast(textColor, colorScale(arc.data[config.runtime.xAxis.dataKey])) < 3.5) {
+          if (_colorScale(arc.data[config.runtime.xAxis.dataKey]) && chroma.contrast(textColor, _colorScale(arc.data[config.runtime.xAxis.dataKey])) < 3.5) {
             textColor = '000'
           }
 
@@ -143,7 +191,7 @@ const PieChart = props => {
     if (seriesHighlight.length > 0 && config.legend.behavior !== 'highlight') {
       let newFilteredData = []
 
-      data.forEach(d => {
+      _data.forEach(d => {
         if (seriesHighlight.indexOf(d[config.runtime.xAxis.dataKey]) !== -1) {
           newFilteredData.push(d)
         }
@@ -155,33 +203,38 @@ const PieChart = props => {
     }
   }, [seriesHighlight]) // eslint-disable-line
 
+  const createLegendLabels = createFormatLabels(config, [], _data, _colorScale)
+
   return (
-    <ErrorBoundary component='PieChart'>
-      <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
-        <Group top={centerY} left={centerX}>
-          {/* prettier-ignore */}
-          <Pie
-            data={filteredData || data}
-            pieValue={d => d[config.runtime.yAxis.dataKey]}
+    <>
+      <ErrorBoundary component='PieChart'>
+        <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
+          <Group top={centerY} left={centerX}>
+            {/* prettier-ignore */}
+            <Pie
+            data={filteredData || _data}
+            pieValue={d => d[pivotKey || config.runtime.yAxis.dataKey]}
             pieSortValues={() => -1}
             innerRadius={radius - donutThickness}
             outerRadius={radius}
           >
             {pie => <AnimatedPie {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]}/>}
           </Pie>
-        </Group>
-      </svg>
-      <div ref={triggerRef} />
-      {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
-        <>
-          <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important`}</style>
-          <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} left={tooltipLeft} top={tooltipTop}>
-            <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
-          </TooltipWithBounds>
-        </>
-      )}
-      {/* <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' /> */}
-    </ErrorBoundary>
+          </Group>
+        </svg>
+        <div ref={triggerRef} />
+        {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && (
+          <>
+            <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important`}</style>
+            <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} left={tooltipLeft} top={tooltipTop}>
+              <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
+            </TooltipWithBounds>
+          </>
+        )}
+        {/* <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' /> */}
+      </ErrorBoundary>
+      <LegendComponent config={config} colorScale={_colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
+    </>
   )
 }
 

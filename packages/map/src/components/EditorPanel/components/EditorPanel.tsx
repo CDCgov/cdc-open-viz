@@ -134,8 +134,6 @@ const EditorPanel = props => {
   }
 
   const handleEditorChanges = async (property, value) => {
-    console.log('prop', property)
-    console.log('value', value)
     switch (property) {
       // change these to be more generic.
       // updateVisualPropertyValue
@@ -278,6 +276,7 @@ const EditorPanel = props => {
         setState({
           ...state,
           visual: {
+            ...state.visual,
             cityStyle: value
           }
         })
@@ -1929,7 +1928,7 @@ const EditorPanel = props => {
                     </label>
                   </fieldset>
                 )}
-                {('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && (
+                {(
                   <>
                     <label>Latitude Column</label>
                     <select
@@ -2850,7 +2849,7 @@ const EditorPanel = props => {
                     )
                   })}
                 </ul>
-                {('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && state.visual.cityStyle === 'circle' && (
+                {state.visual.cityStyle === 'circle' && (
                   <label>
                     Geocode Settings
                     <TextField type='number' value={state.visual.geoCodeCircleSize} section='visual' max='10' fieldName='geoCodeCircleSize' label='Geocode Circle Size' updateField={updateField} />

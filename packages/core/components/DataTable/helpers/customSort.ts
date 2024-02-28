@@ -8,7 +8,16 @@ export const customSort = (a, b, sortBy, config) => {
   if (config.type === 'map') {
     valueA = standardizeStateName(a)
     valueB = standardizeStateName(b)
+    // sort for Regions table for Map
+    if (String(valueA).toLowerCase().includes('region') && String(valueB).toLowerCase().includes('region')) {
+      const numberA = parseInt(a.match(/\d+$/)[0], 10)
+      const numberB = parseInt(b.match(/\d+$/)[0], 10)
+
+      // Compare the numeric parts
+      return !sortBy.asc ? Number(numberA) - Number(numberB) : Number(numberB) - Number(numberA)
+    }
   }
+
   // Treat booleans and nulls as an empty string
   valueA = valueA === false || valueA === true || valueA === null ? '' : valueA
   valueB = valueB === false || valueB === true || valueB === null ? '' : valueB

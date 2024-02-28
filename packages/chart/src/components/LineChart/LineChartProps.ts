@@ -33,7 +33,7 @@ export interface Config {
 }
 export interface StyleProps {
   preliminaryData: PreliminaryDataItem[]
-  rawData: DataItem[]
+  data: DataItem[]
   stroke: string
   handleLineType: Function
   lineType: string
