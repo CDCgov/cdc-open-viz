@@ -28,6 +28,7 @@ const iconHash = {
   tools: <Icon display='tools' base />,
   'filtered-text': <Icon display='filtered-text' base />,
   'filter-dropdowns': <Icon display='filter-dropdowns' base />,
+  Sankey: <Icon display='code' base />,
   table: <Icon display='table' base />
 }
 
@@ -45,6 +46,7 @@ const labelHash = {
   'single-state': 'U.S. State',
   'filtered-text': 'Filtered Text',
   'filter-dropdowns': 'Filter Dropdowns',
+  Sankey: 'Sankey Chart',
   table: 'Table'
 }
 

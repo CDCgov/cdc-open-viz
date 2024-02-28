@@ -1,0 +1,948 @@
+[
+  {
+    "links": [
+      {
+        "source": "Suicide EMS Responses",
+        "target": "Dead at Scene",
+        "value": 4088
+      },
+      {
+        "source": "Suicide EMS Responses",
+        "target": "Treated",
+        "value": 438974
+      },
+      {
+        "source": "Suicide EMS Responses",
+        "target": "Assisted",
+        "value": 5701
+      },
+      {
+        "source": "Suicide EMS Responses",
+        "target": "No patient contact",
+        "value": 459
+      },
+      {
+        "source": "Suicide EMS Responses",
+        "target": "Refused evaluation care",
+        "value": 12641
+      },
+      {
+        "source": "Suicide EMS Responses",
+        "target": "Evaluated no treatment required",
+        "value": 5169
+      },
+      {
+        "source": "Suicide EMS Responses",
+        "target": "Unknown",
+        "value": 104
+      },
+      {
+        "source": "Dead at Scene",
+        "target": "Dead",
+        "value": 4088
+      },
+      {
+        "source": "Treated",
+        "target": "Dead",
+        "value": 648
+      },
+      {
+        "source": "Treated",
+        "target": "Transported to hospital",
+        "value": 423520
+      },
+      {
+        "source": "Treated",
+        "target": "Transported to facility",
+        "value": 4504
+      },
+      {
+        "source": "Treated",
+        "target": "Released",
+        "value": 10302
+      },
+      {
+        "source": "Refused evaluation care",
+        "target": "Released",
+        "value": 11781
+      },
+      {
+        "source": "Refused evaluation care",
+        "target": "Transported to hospital",
+        "value": 860
+      },
+      {
+        "source": "Evaluated no treatment required",
+        "target": "Released",
+        "value": 5169
+      }
+    ],
+    "storyNodeText": [
+      {
+        "StoryNode": "Suicide EMS Responses",
+        "segmentTextBefore": "In 2022, there were",
+        "segmentTextAfter": "Suicide EMS Responses"
+      },
+      {
+        "StoryNode": "Treated",
+        "segmentTextBefore": "of which,",
+        "segmentTextAfter": "were treated"
+      }
+    ],
+    "tooltips": [
+      {
+        "node": "Suicide EMS Responses",
+        "value": "467,136 (100%)",
+        "summary": "Total number of suicide EMS responses.",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "218,195",
+            "additional_info": "46.71"
+          },
+          {
+            "label": "Male",
+            "value": "243,481",
+            "additional_info": "52.12"
+          },
+          {
+            "label": "Unknown",
+            "value": "5,460",
+            "additional_info": "1.17"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "245,998",
+            "additional_info": "52.66"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "93,244",
+            "additional_info": "19.96"
+          },
+          {
+            "label": "Hispanic",
+            "value": "41,396",
+            "additional_info": "8.86"
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "4,470",
+            "additional_info": "0.96"
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "6,160",
+            "additional_info": "1.32"
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "1,287",
+            "additional_info": "0.28"
+          },
+          {
+            "label": "Missing",
+            "value": "74,581",
+            "additional_info": "15.97"
+          }
+        ]
+      },
+      {
+        "node": "Dead",
+        "value": "4,736 (1.01%)",
+        "summary": "Patiend Died",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "1,244",
+            "additional_info": "26.47"
+          },
+          {
+            "label": "Male",
+            "value": "3,440",
+            "additional_info": "72.64"
+          },
+          {
+            "label": "Unknown",
+            "value": "52",
+            "additional_info": "1.1"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "3,235",
+            "additional_info": "68.31"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "307",
+            "additional_info": "6.48"
+          },
+          {
+            "label": "Hispanic",
+            "value": "242",
+            "additional_info": "5.11"
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "26",
+            "additional_info": "0.55"
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "81",
+            "additional_info": "1.71"
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "--",
+            "additional_info": "--"
+          },
+          {
+            "label": "Missing",
+            "value": "834",
+            "additional_info": "17.61"
+          }
+        ]
+      },
+      {
+        "node": "Released",
+        "value": "27,252 (5.83%)",
+        "value_pct": "5.83",
+        "summary": "Patient was released.",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "13,835",
+            "additional_info": "50.77"
+          },
+          {
+            "label": "Male",
+            "value": "12,900",
+            "additional_info": "47.34"
+          },
+          {
+            "label": "Unknown",
+            "value": "517",
+            "additional_info": "1.9"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "15,088",
+            "additional_info": "55.36"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "4,749",
+            "additional_info": "17.43"
+          },
+          {
+            "label": "Hispanic",
+            "value": "2,177",
+            "additional_info": "7.99"
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "287",
+            "additional_info": "1.05"
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "321",
+            "additional_info": "1.18"
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "65",
+            "additional_info": "0.24"
+          },
+          {
+            "label": "Missing",
+            "value": "4,565",
+            "additional_info": "16.75"
+          }
+        ]
+      },
+      {
+        "node": "Transported to facility",
+        "value": "4,504 (0.96%)",
+        "summary": "Patient was transported to a facility.",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "1,938",
+            "additional_info": "43.03"
+          },
+          {
+            "label": "Male",
+            "value": "2,522",
+            "additional_info": "55.99"
+          },
+          {
+            "label": "Unknown",
+            "value": "44",
+            "additional_info": "0.98"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "2,093",
+            "additional_info": "46.47"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "1,113",
+            "additional_info": "24.71"
+          },
+          {
+            "label": "Hispanic",
+            "value": "608",
+            "additional_info": "13.5"
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "73",
+            "additional_info": "1.62"
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "48",
+            "additional_info": "1.07"
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "--",
+            "additional_info": "--"
+          },
+          {
+            "label": "Missing",
+            "value": "564",
+            "additional_info": "12.52"
+          }
+        ]
+      },
+      {
+        "node": "Transported to hospital",
+        "value": "424,380 (90.85%)",
+        "summary": "Patient was transported to the hospital by the EMS Unit or another EMS unit.",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "199,301",
+            "additional_info": "46.96"
+          },
+          {
+            "label": "Male",
+            "value": "222,583",
+            "additional_info": "52.45"
+          },
+          {
+            "label": "Unknown",
+            "value": "2,496",
+            "additional_info": "0.59"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "223,907",
+            "additional_info": "52.76"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "86,562",
+            "additional_info": "20.4"
+          },
+          {
+            "label": "Hispanic",
+            "value": "38,084",
+            "additional_info": "8.97"
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "4,036",
+            "additional_info": "0.95"
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "5,650",
+            "additional_info": "1.33"
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "1,193",
+            "additional_info": "0.28"
+          },
+          {
+            "label": "Missing",
+            "value": "64,954",
+            "additional_info": "15.31"
+          }
+        ]
+      },
+      {
+        "node": "Assisted",
+        "value": "5,701 (1.22%)",
+        "value_pct": "1.22",
+        "summary": "EMS unit only provided assistance (e.g., manpower, equipment) to another agency, member of the public, or another EMS unit.",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "1,791",
+            "additional_info": "31.42"
+          },
+          {
+            "label": "Male",
+            "value": "1,910",
+            "additional_info": "33.5"
+          },
+          {
+            "label": "Unknown",
+            "value": "2,000",
+            "additional_info": "35.08"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "1,593",
+            "additional_info": "27.94"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "491",
+            "additional_info": "8.61"
+          },
+          {
+            "label": "Hispanic",
+            "value": "270",
+            "additional_info": "4.74"
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "41",
+            "additional_info": "0.72"
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "57",
+            "additional_info": "1"
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "--",
+            "additional_info": "--"
+          },
+          {
+            "label": "Missing",
+            "value": "3,237",
+            "additional_info": "56.78"
+          }
+        ]
+      },
+      {
+        "node": "Dead at Scene",
+        "value": "4,088 (0.88%)",
+        "value_pct": "0.88",
+        "summary": "Patient showed obvious signs of death or Do Not Resuscitate (DNR) order was presented, and no attempt was made to resuscitate the patient.",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "1,023",
+            "additional_info": "25.02"
+          },
+          {
+            "label": "Male",
+            "value": "3,014",
+            "additional_info": "73.73"
+          },
+          {
+            "label": "Unknown",
+            "value": "51",
+            "additional_info": "1.25"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "2,802",
+            "additional_info": "68.54"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "273",
+            "additional_info": "6.68"
+          },
+          {
+            "label": "Hispanic",
+            "value": "207",
+            "additional_info": "5.06"
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "--",
+            "additional_info": "--"
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "65",
+            "additional_info": "1.59"
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "--",
+            "additional_info": "--"
+          },
+          {
+            "label": "Missing",
+            "value": "712",
+            "additional_info": "17.42"
+          }
+        ]
+      },
+      {
+        "node": "Evaluated no treatment required",
+        "value": "5,169 (1.11%)",
+        "value_pct": "1.11",
+        "summary": "Patient was evaluated and no further treatment/transportation to the hospital was required",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "2,545",
+            "additional_info": "49.24"
+          },
+          {
+            "label": "Male",
+            "value": "2,505",
+            "additional_info": "48.46"
+          },
+          {
+            "label": "Unknown",
+            "value": "119",
+            "additional_info": "2.3"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "2,783",
+            "additional_info": "53.84"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "885",
+            "additional_info": "17.12"
+          },
+          {
+            "label": "Hispanic",
+            "value": "351",
+            "additional_info": "6.79"
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "59",
+            "additional_info": "1.14"
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "87",
+            "additional_info": "1.68"
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "--",
+            "additional_info": "--"
+          },
+          {
+            "label": "Missing",
+            "value": "988",
+            "additional_info": "19.11"
+          }
+        ]
+      },
+      {
+        "node": "No patient contact",
+        "value": "459 (0.1%)",
+        "summary": "No patient contact was made (e.g., EMS unit was on standby in case of a medical/traumatic emergency, response was for the purpose of transporting objects, personnel, or equipment not involving a patient).",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "50",
+            "additional_info": "10.89"
+          },
+          {
+            "label": "Male",
+            "value": "70",
+            "additional_info": "15.25"
+          },
+          {
+            "label": "Unknown",
+            "value": "339",
+            "additional_info": "73.86"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "41",
+            "additional_info": "8.93"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "--",
+            "additional_info": "--"
+          },
+          {
+            "label": "Hispanic",
+            "value": "--",
+            "additional_info": "--"
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "--",
+            "additional_info": "--"
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "--",
+            "additional_info": "--"
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "--",
+            "additional_info": "--"
+          },
+          {
+            "label": "Missing",
+            "value": "388",
+            "additional_info": "84.53"
+          }
+        ]
+      },
+      {
+        "node": "Refused evaluation care",
+        "value": "12,641 (2.71%)",
+        "summary": "Patient refused any evaluation or care.",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "6,314",
+            "additional_info": "49.95"
+          },
+          {
+            "label": "Male",
+            "value": "6,009",
+            "additional_info": "47.54"
+          },
+          {
+            "label": "Unknown",
+            "value": "318",
+            "additional_info": "2.52"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "7,112",
+            "additional_info": "56.26"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "2,366",
+            "additional_info": "18.72"
+          },
+          {
+            "label": "Hispanic",
+            "value": "1,056",
+            "additional_info": "8.35"
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "130",
+            "additional_info": "1.03"
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "128",
+            "additional_info": "1.01"
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "26",
+            "additional_info": "0.21"
+          },
+          {
+            "label": "Missing",
+            "value": "1,823",
+            "additional_info": "14.42"
+          }
+        ]
+      },
+      {
+        "node": "Treated",
+        "value": "438,974 (93.97%)",
+        "value_pct": "93.97",
+        "summary": "Patient was evaluated and treatment was provided.",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "206,436",
+            "additional_info": "47.03"
+          },
+          {
+            "label": "Male",
+            "value": "229,917",
+            "additional_info": "52.38"
+          },
+          {
+            "label": "Unknown",
+            "value": "2,621",
+            "additional_info": "0.6"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "231,620",
+            "additional_info": "52.76"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "89,207",
+            "additional_info": "20.32"
+          },
+          {
+            "label": "Hispanic",
+            "value": "39,497",
+            "additional_info": "9"
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "4,214",
+            "additional_info": "0.96"
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "5,820",
+            "additional_info": "1.33"
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "1,222",
+            "additional_info": "0.28"
+          },
+          {
+            "label": "Missing",
+            "value": "67,394",
+            "additional_info": "15.35"
+          }
+        ]
+      },
+      {
+        "node": "Unknown",
+        "value": "104 (0.02%)",
+        "summary": "Type of treatment provided is unknown.",
+        "column1Label": "Gender",
+        "column2Label": "Race and Ethnicity",
+        "column1": [
+          {
+            "label": "Female",
+            "value": "36",
+            "additional_info": "34.62"
+          },
+          {
+            "label": "Male",
+            "value": "56",
+            "additional_info": "53.85"
+          },
+          {
+            "label": "Unknown",
+            "value": "--",
+            "additional_info": "--"
+          }
+        ],
+        "column2": [
+          {
+            "label": "Non-Hispanic White",
+            "value": "47",
+            "additional_info": "45.19"
+          },
+          {
+            "label": "Non-Hispanic Black",
+            "value": "",
+            "additional_info": ""
+          },
+          {
+            "label": "Hispanic",
+            "value": "",
+            "additional_info": ""
+          },
+          {
+            "label": "Non-Hispanic American Indian or Alaska Native",
+            "value": "",
+            "additional_info": ""
+          },
+          {
+            "label": "Non-Hispanic Asian",
+            "value": "",
+            "additional_info": ""
+          },
+          {
+            "label": "Non-Hispanic Native Hawaiian or Other Pacific Islander",
+            "value": "",
+            "additional_info": ""
+          },
+          {
+            "label": "Missing",
+            "value": "39",
+            "additional_info": "37.5"
+          }
+        ]
+      }
+    ],
+    "tableData": [
+      {
+        "Disposition": "Assist, Agency",
+        "Type of Treatment": "Assisted",
+        "Final Outcome": "N/A",
+        "Number of Patients": 2356
+      },
+      {
+        "Disposition": "Assist, Public",
+        "Type of Treatment": "Assisted",
+        "Final Outcome": "N/A",
+        "Number of Patients": 859
+      },
+      {
+        "Disposition": "Assist, Unit",
+        "Type of Treatment": "Assisted",
+        "Final Outcome": "N/A",
+        "Number of Patients": 2486
+      },
+      {
+        "Disposition": "Patient Dead at Scene-No Resuscitation Attempted (With Transport)",
+        "Type of Treatment": "Dead at scene",
+        "Final Outcome": "Dead",
+        "Number of Patients": 123
+      },
+      {
+        "Disposition": "Patient Dead at Scene-No Resuscitation Attempted (Without Transport)",
+        "Type of Treatment": "Dead at scene",
+        "Final Outcome": "Dead",
+        "Number of Patients": 3965
+      },
+      {
+        "Disposition": "Patient Dead at Scene-Resuscitation Attempted (With Transport)",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Dead",
+        "Number of Patients": "**"
+      },
+      {
+        "Disposition": "Patient Dead at Scene-Resuscitation Attempted (Without Transport)",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Dead",
+        "Number of Patients": 631
+      },
+      {
+        "Disposition": "Patient Evaluated, No Treatment/Transport Required",
+        "Type of Treatment": "Evaluated no treatment required",
+        "Final Outcome": "Released",
+        "Number of Patients": 5169
+      },
+      {
+        "Disposition": "Patient Refused Evaluation/Care (With Transport)",
+        "Type of Treatment": "Refused evaluation care",
+        "Final Outcome": "Transported to hospital",
+        "Number of Patients": 860
+      },
+      {
+        "Disposition": "Patient Refused Evaluation/Care (Without Transport)",
+        "Type of Treatment": "Refused evaluation care",
+        "Final Outcome": "Released",
+        "Number of Patients": 11781
+      },
+      {
+        "Disposition": "Patient Treated, Released (AMA)",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Released",
+        "Number of Patients": 6780
+      },
+      {
+        "Disposition": "Patient Treated, Released (per protocol)",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Released",
+        "Number of Patients": 3522
+      },
+      {
+        "Disposition": "Patient Treated, Transferred Care to Another EMS Unit",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Transported to hospital",
+        "Number of Patients": 24432
+      },
+      {
+        "Disposition": "Patient Treated, Transported by Law Enforcement",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Transported to facility",
+        "Number of Patients": 4227
+      },
+      {
+        "Disposition": "Patient Treated, Transported by Private Vehicle",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Transported to facility",
+        "Number of Patients": 277
+      },
+      {
+        "Disposition": "Patient Treated, Transported by this EMS Unit",
+        "Type of Treatment": "Treated",
+        "Final Outcome": "Transported to hospital",
+        "Number of Patients": 399088
+      },
+      {
+        "Disposition": "Standby-Public Safety, Fire, or EMS Operational Support Provided",
+        "Type of Treatment": "No patient contact",
+        "Final Outcome": "N/A",
+        "Number of Patients": 458
+      },
+      {
+        "Disposition": "Transport Non-Patient, Organs, etc.",
+        "Type of Treatment": "No patient contact",
+        "Final Outcome": "N/A",
+        "Number of Patients": "**"
+      },
+      {
+        "Disposition": "Unknown",
+        "Type of Treatment": "Unknown",
+        "Final Outcome": "N/A",
+        "Number of Patients": 104
+      }
+    ]
+  }
+]
