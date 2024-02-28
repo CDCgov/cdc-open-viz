@@ -53,13 +53,12 @@ import { type InitialState } from './types/InitialState'
 import MultiTabs from './components/MultiConfigTabs'
 import _ from 'lodash'
 import EditorContext from '../../editor/src/ConfigContext'
-
-type DropdownOptions = Record<'value' | 'text', string>[]
-
-type APIFilterDropdowns = {
-  // null means still loading
-  [filtername: string]: null | DropdownOptions
-}
+import { getApiFilterKey } from './helpers/getApiFilterKey'
+import Filters, { APIFilterDropdowns, DropdownOptions } from './components/Filters'
+import EditorWrapper from './components/EditorWrapper/EditorWrapper'
+import DataTableEditorPanel from '@cdc/core/components/DataTable/components/DataTableEditorPanel'
+import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
+import { ViewPort } from '@cdc/core/types/ViewPort'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -67,10 +66,9 @@ type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
 
 export default function CdcDashboard({ initialState, isEditor = false, isDebug = false }: DashboardProps) {
   const [state, dispatch] = useReducer(dashboardReducer, initialState)
-  console.log('state', state)
   const editorContext = useContext(EditorContext)
   const [apiFilterDropdowns, setAPIFilterDropdowns] = useState<APIFilterDropdowns>({})
-  const [currentViewport, setCurrentViewport] = useState('lg')
+  const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const replacements = {
@@ -95,10 +93,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   const transform = new DataTransform()
-
-  const getApiFilterKey = ({ apiEndpoint, heirarchyLookup }: APIFilter) => {
-    return apiEndpoint + (heirarchyLookup || '')
-  }
 
   const setAutoLoadDefaultValue = (sharedFilterIndex: number, filterDropdowns: DropdownOptions) => {
     const autoLoadViz = getAutoLoadVisualization()
@@ -135,15 +129,15 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         if (!_parents.length) return null
         return _parents.map(({ queryParameter, queuedActive }) => ({ key: queryParameter || '', value: queuedActive || '' }))
       }
-      const getFilterValues = (filterData: Object | Array<Object>, apiFilter: APIFilter): DropdownOptions => {
+      const getFilterValues = (data: Object | Array<Object>, apiFilter: APIFilter): DropdownOptions => {
         const { textSelector, valueSelector, heirarchyLookup } = apiFilter
         if (heirarchyLookup) {
           const heirarchy = heirarchyLookup!.split('.')
           const selector = heirarchy.shift() // pop first element
-          return getFilterValues(selector ? filterData[selector] : filterData, { ...apiFilter, heirarchyLookup: heirarchy.join('.') })
+          return getFilterValues(selector ? data[selector] : data, { ...apiFilter, heirarchyLookup: heirarchy.join('.') })
         }
-        if (!Array.isArray(filterData)) throw new Error('the filter data has requires a heirarchy path to access the filter values, This should be in the format key.subkey.subsubkey')
-        return filterData.map(v => ({ text: v[textSelector], value: v[valueSelector] }))
+        if (!Array.isArray(data)) throw new Error('the filter data has requires a heirarchy path to access the filter values, This should be in the format key.subkey.subsubkey')
+        return data.map(v => ({ text: v[textSelector], value: v[valueSelector] }))
       }
       state.config.dashboard.sharedFilters.forEach(async (filter, index) => {
         if (!filter.apiFilter) return
@@ -169,53 +163,58 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
   const reloadURLData = async () => {
     const { config } = state
-    if (config.datasets) {
-      let newData = { ...state.data }
-      let newDatasets = { ...config.datasets }
-      let datasetsNeedsUpdate = false
-      let datasetKeys = Object.keys(config.datasets)
-      let newFileName = ''
+    if (!config.datasets) return
+    let newData = { ...state.data }
+    let newDatasets = { ...config.datasets }
+    let datasetsNeedsUpdate = false
+    let datasetKeys = Object.keys(config.datasets)
+    let newFileName = ''
 
-      for (let i = 0; i < datasetKeys.length; i++) {
-        const datasetKey = datasetKeys[i]
-        const dataset = config.datasets[datasetKey]
-        if (dataset.dataUrl && config.dashboard && config.dashboard.sharedFilters) {
-          const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl, window.location.origin)
-          let currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
-          let updatedQSParams = {}
-          let isUpdateNeeded = false
+    for (let i = 0; i < datasetKeys.length; i++) {
+      const datasetKey = datasetKeys[i]
+      const dataset = config.datasets[datasetKey]
+      const filters = config.dashboard?.sharedFilters
+      if (dataset.dataUrl && filters) {
+        const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl, window.location.origin)
+        let currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
+        let updatedQSParams = {}
+        let isUpdateNeeded = false
 
-          config.dashboard.sharedFilters.forEach(filter => {
-            if (filter.filterBy === 'File Name') {
-              // if no file name is entered use the default active filter. ie. /activeFilter.json
-              if (!filter.fileName && filter.datasetKey === datasetKey) newFileName = filter.active
-              // if a file name is found, ie, state_${query}, use that, ie. state_activeFilter.json
-              if (filter.datasetKey === datasetKey && filter.fileName) newFileName = capitalizeSplitAndJoin.call(String(filter.fileName), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces'])
-              if (newFileName && newFileName.includes('${query}')) {
-                newFileName = newFileName.replace('${query}', capitalizeSplitAndJoin.call(String(filter.active), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces']))
-              }
-            }
-
-            if (filter.type === 'urlfilter' && !!filter.queryParameter) {
-              if (updatedQSParams[filter.queryParameter]) {
-                updatedQSParams[filter.queryParameter] = updatedQSParams[filter.queryParameter] + filter.active
+        filters.forEach(filter => {
+          if (filter.filterBy === 'File Name') {
+            isUpdateNeeded = true
+            if (filter.datasetKey === datasetKey) {
+              if (filter.fileName) {
+                // if a file name is found, ie, state_${query}, use that, ie. state_activeFilter.json
+                newFileName = capitalizeSplitAndJoin.call(String(filter.fileName), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces'])
               } else {
-                updatedQSParams[filter.queryParameter] = filter.active
+                // if no file name is entered use the default active filter. ie. /activeFilter.json
+                newFileName = filter.active
               }
             }
-            if (filter.filterBy === 'File Name') {
-              isUpdateNeeded = true
+
+            if (newFileName?.includes('${query}')) {
+              newFileName = newFileName.replace('${query}', capitalizeSplitAndJoin.call(String(filter.active), ' ', replacements[filter.whitespaceReplacement ?? 'Keep Spaces']))
             }
-          })
+          }
 
-          Object.keys(updatedQSParams).forEach(updatedParam => {
-            if (decodeURIComponent(updatedQSParams[updatedParam]) !== currentQSParams[updatedParam]) {
-              isUpdateNeeded = true
+          if (filter.type === 'urlfilter' && !!filter.queryParameter) {
+            if (updatedQSParams[filter.queryParameter]) {
+              updatedQSParams[filter.queryParameter] = updatedQSParams[filter.queryParameter] + filter.active
+            } else {
+              updatedQSParams[filter.queryParameter] = filter.active
             }
-          })
+          }
+        })
 
-          if (!isUpdateNeeded) return
+        Object.keys(updatedQSParams).forEach(updatedParam => {
+          if (decodeURIComponent(updatedQSParams[updatedParam]) !== currentQSParams[updatedParam]) {
+            isUpdateNeeded = true
+          }
+        })
 
+        if (isUpdateNeeded) {
+          datasetsNeedsUpdate = true
           Object.keys(currentQSParams).forEach(currentParam => {
             if (!updatedQSParams[currentParam]) {
               updatedQSParams[currentParam] = currentQSParams[currentParam]
@@ -243,32 +242,30 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           newDatasets[datasetKey].data = newDataset
           newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
           newData[datasetKey] = newDataset
-          datasetsNeedsUpdate = true
         }
       }
+    }
 
-      if (datasetsNeedsUpdate) {
-        dispatch({ type: 'SET_DATA', payload: newData })
+    if (datasetsNeedsUpdate) {
+      dispatch({ type: 'SET_DATA', payload: newData })
 
-        let newFilteredData = {}
-        let newConfig = { ...config }
-        getVizKeys(config).forEach(key => {
-          let dataKey = config.visualizations[key].dataKey
+      let newFilteredData = {}
+      let visualizations = { ...config.visualizations }
+      getVizKeys(config).forEach(key => {
+        let dataKey = config.visualizations[key].dataKey
 
-          let applicableFilters = config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
-          if (applicableFilters.length > 0) {
-            newFilteredData[key] = filterData(applicableFilters, newData[dataKey], state.config.filterBehavior)
-          }
+        let applicableFilters = config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
+        if (applicableFilters.length > 0) {
+          newFilteredData[key] = filterData(applicableFilters, newData[dataKey])
+        }
 
-          if (newData[dataKey]) {
-            newConfig.visualizations[key].formattedData = newData[dataKey]
-          }
-        })
+        if (newData[dataKey]) {
+          visualizations[key].formattedData = newData[dataKey]
+        }
+      })
 
-        dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-        newConfig.datasets = newDatasets
-        dispatch({ type: 'SET_CONFIG', payload: newConfig })
-      }
+      dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+      dispatch({ type: 'SET_CONFIG', payload: { ...config, datasets: newDatasets, visualizations } })
     }
   }
 
@@ -304,7 +301,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
         const formattedData = visualization.dataDescription ? getFormattedData(state.data[visualization.dataKey] || visualization.data, visualization.dataDescription) : undefined
 
-        newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || state.data[visualization.dataKey], state.config.filterBehavior)
+        newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || state.data[visualization.dataKey])
       }
     })
 
@@ -391,7 +388,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         const _data = state.data[visualization.dataKey] || visualization.data
         const formattedData = visualization.dataDescription ? getFormattedData(_data, visualization.dataDescription) : _data
 
-        newFilteredData[key] = filterData(applicableFilters, formattedData, config.filterBehavior)
+        newFilteredData[key] = filterData(applicableFilters, formattedData)
       }
     })
 
@@ -439,68 +436,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     }
   }
 
-  const Filters = ({ hide, autoLoad }: { hide?: number[]; autoLoad?: boolean }) => {
-    const { config } = state
-    const isLegacyFilter = !config.filterBehavior
-    return (
-      <>
-        {config.dashboard.sharedFilters.map((singleFilter, filterIndex) => {
-          if ((singleFilter.type !== 'urlfilter' && !singleFilter.showDropdown) || (hide && hide.indexOf(filterIndex) !== -1)) return <></>
-          const values: JSX.Element[] = []
-          if (singleFilter.resetLabel) {
-            values.push(
-              <option key={`${singleFilter.resetLabel}-option`} value={singleFilter.resetLabel}>
-                {singleFilter.resetLabel}
-              </option>
-            )
-          }
-          const _key = singleFilter.apiFilter ? getApiFilterKey(singleFilter.apiFilter) : undefined
-          if (_key && apiFilterDropdowns[_key]) {
-            // URL Filter
-            apiFilterDropdowns[_key]!.forEach(({ text, value }, index) => {
-              values.push(
-                <option key={`${value}-option-${index}`} value={value}>
-                  {text}
-                </option>
-              )
-            })
-          } else {
-            // Data Filter
-            singleFilter.values?.forEach((filterOption, index) => {
-              const labeledOpt = singleFilter.labels && singleFilter.labels[filterOption]
-              values.push(
-                <option key={`${singleFilter.key}-option-${index}`} value={filterOption}>
-                  {labeledOpt || filterOption}
-                </option>
-              )
-            })
-          }
-
-          return (
-            <div className='cove-dashboard-filters' key={`${singleFilter.key}-filtersection-${filterIndex}`}>
-              <section className='dashboard-filters-section'>
-                <label htmlFor={`filter-${filterIndex}`}>{singleFilter.key}</label>
-                <select
-                  id={`filter-${filterIndex}`}
-                  className='filter-select'
-                  data-index='0'
-                  value={singleFilter.queuedActive || singleFilter.active}
-                  onChange={val => {
-                    handleOnChange(filterIndex, val.target.value)
-                  }}
-                >
-                  {values}
-                </select>
-              </section>
-            </div>
-          )
-        })}
-
-        {!isLegacyFilter && config.filterBehavior === FilterBehavior.Apply && <button onClick={applyFilters}>GO!</button>}
-      </>
-    )
-  }
-
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let newViewport = getViewport(entry.contentRect.width)
@@ -519,6 +454,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
   // Prevent render if loading
   if (state.loading) return <Loading />
+
+  const GoButton = ({ autoLoad }: { autoLoad?: boolean }) => {
+    if (state.config.filterBehavior === FilterBehavior.Apply && !autoLoad) {
+      return <button onClick={applyFilters}>GO!</button>
+    }
+    return null
+  }
 
   let body: JSX.Element | null = null
   // Editor mode
@@ -635,10 +577,18 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             body = !hideFilter ? (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Filter Dropdowns' />
-                <Filters hide={visualizationConfig.hide} autoLoad={visualizationConfig.autoLoad} />
+                <Filters hide={visualizationConfig.hide} filters={state.config.dashboard.sharedFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
+                <GoButton autoLoad={visualizationConfig.autoLoad} />
               </>
             ) : (
               <></>
+            )
+            break
+          case 'table':
+            body = (
+              <EditorWrapper component={DataTableStandAlone} visualizationKey={visualizationKey} visualizationConfig={visualizationConfig} updateConfig={_updateConfig} type={'Table'} viewport={currentViewport}>
+                <DataTableEditorPanel key={visualizationKey} config={visualizationConfig} updateConfig={_updateConfig} />
+              </EditorWrapper>
             )
             break
           default:
@@ -675,7 +625,12 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           {description && <div className='subtext'>{parse(description)}</div>}
 
           {/* Filters */}
-          {config.dashboard.sharedFilters && Object.values(config.visualizations || {}).filter(viz => viz.visualizationType === 'filter-dropdowns').length === 0 && <Filters hide={undefined} autoLoad={undefined} />}
+          {config.dashboard.sharedFilters && Object.values(config.visualizations || {}).filter(viz => viz.visualizationType === 'filter-dropdowns').length === 0 && (
+            <>
+              <Filters filters={state.config.dashboard.sharedFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
+              <GoButton />
+            </>
+          )}
 
           {/* Visualizations */}
           {config.rows &&
@@ -797,7 +752,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                                   configUrl={undefined}
                                 />
                               )}
-                              {visualizationConfig.type === 'filter-dropdowns' && !hideFilter && <Filters hide={visualizationConfig.hide} autoLoad={visualizationConfig.autoLoad} />}
+                              {visualizationConfig.type === 'filter-dropdowns' && !hideFilter && (
+                                <>
+                                  <Filters hide={visualizationConfig.hide} filters={state.config.dashboard.sharedFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
+                                  <GoButton autoLoad={visualizationConfig.autoLoad} />
+                                </>
+                              )}
+                              {visualizationConfig.type === 'table' && <DataTableStandAlone key={col.widget} visualizationKey={col.widget} config={visualizationConfig} viewport={currentViewport} />}
                             </div>
                           </React.Fragment>
                         )
@@ -862,7 +823,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
                 //Applys any applicable filters
                 if (applicableFilters.length > 0) {
-                  filteredTableData = filterData(applicableFilters, config.datasets[datasetKey].data, state.config.filterBehavior)
+                  filteredTableData = filterData(applicableFilters, config.datasets[datasetKey].data)
                 }
               }
 

@@ -1,73 +1,70 @@
+import _ from 'lodash'
 import { SharedFilter } from '../types/SharedFilter'
-import { generateValuesForFilter } from './generateValuesForFilter'
 
 const findFilterTier = (filters: SharedFilter[], sharedFilter: SharedFilter) => {
   if (!sharedFilter.parents?.length) {
     return 1
   } else {
-    let parent = filters.find(filter => sharedFilter.parents!.includes(filter.key))
+    const parent = filters.find(filter => sharedFilter.parents!.includes(filter.key))
     if (!parent) return 1
     return 1 + findFilterTier(filters, parent)
   }
 }
 
-export const filterData = (filters: SharedFilter[], _data: Object[], filterBehavior) => {
-  if (_data) {
-    let maxTier = 1
-    filters.forEach(sharedFilter => {
-      sharedFilter.tier = findFilterTier(filters, sharedFilter)
-    })
+function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
+  let maxTier = 1
+  filters.forEach(sharedFilter => {
+    sharedFilter.tier = findFilterTier(filters, sharedFilter)
+    if (sharedFilter.tier > maxTier) {
+      maxTier = sharedFilter.tier
+    }
+  })
+  return maxTier
+}
 
-    filters.forEach(sharedFilter => {
-      if (sharedFilter.tier && sharedFilter.tier > maxTier) {
-        maxTier = sharedFilter.tier
+function filter(data, filters, condition) {
+  return data.filter(row => {
+    const found = filters.find(filter => {
+      const currentValue = row[filter.columnName]
+      const selectedValue = filter.queuedActive || filter.active
+      const isNotTheSelectedValue = selectedValue && currentValue != selectedValue
+      const isFirstOccurrenceOfTier = filter.tier === condition
+      if (filter.type !== 'urlfilter' && isFirstOccurrenceOfTier && isNotTheSelectedValue) {
+        return true
       }
     })
+    return !found
+  })
+}
 
-    let filteredData = _data
-    // TODO triple loop??
-    for (let i = 0; i < maxTier; i++) {
-      let filteredDataSubTier: any[] = []
-
-      filteredData.forEach(row => {
-        let add = true
-
-        filters.forEach(filter => {
-          // eslint-disable-next-line eqeqeq
-          if (filter.type !== 'urlfilter' && ((!filter.tier && i === 0) || filter.tier === i + 1) && (filter.queuedActive || filter.active) && row[filter.columnName!] != (filter.queuedActive || filter.active)) {
-            add = false
-          }
-        })
-
-        if (add) filteredDataSubTier.push(row)
-      })
-
-      filters.forEach(sharedFilter => {
-        if (sharedFilter.tier && sharedFilter.tier === i + 2) {
-          sharedFilter.values = generateValuesForFilter(sharedFilter.columnName, { data: filteredDataSubTier }, filterBehavior)
-          if (sharedFilter.values.length > 0 && (!sharedFilter.active || sharedFilter.values.indexOf(sharedFilter.active) === -1)) {
-            sharedFilter.active = sharedFilter.values[0]
-          }
-        }
-      })
-
-      filteredData = filteredDataSubTier
+function setFilterValuesAndActiveFilter(filters: SharedFilter[], filteredData: Object[], i: number) {
+  filters.find(sharedFilter => {
+    if (sharedFilter.tier === i + 2) {
+      sharedFilter.values = _.uniq(filteredData.map(row => row[sharedFilter.columnName]))
+      const valueAlreadySelected = sharedFilter.values.includes(sharedFilter.active)
+      if (!valueAlreadySelected && sharedFilter.values.length > 0) {
+        sharedFilter.active = sharedFilter.values[0]
+      }
+      return true
     }
+  })
+}
 
-    let filteredDataSubTier: any[] = []
-    filteredData.forEach(row => {
-      let add = true
+/** This function returns filtered data.
+ * It also manipulates the filters by adding: tiers, filterOptions, and default selections */
+export const filterData = (filters: SharedFilter[], _data: Object[]): Object[] => {
+  const maxTier = getMaxTierAndSetFilterTiers(filters)
 
-      filters.forEach(filter => {
-        // eslint-disable-next-line eqeqeq
-        if (filter.type !== 'urlfilter' && filter.tier && filter.tier === maxTier - 1 && (filter.queuedActive || filter.active) && row[filter.columnName!] != (filter.queuedActive || filter.active)) {
-          add = false
-        }
-      })
+  for (let i = 0; i < maxTier; i++) {
+    const lastIteration = i === maxTier - 1
 
-      if (add) filteredDataSubTier.push(row)
-    })
+    const filteredData = filter(_data, filters, i + 1)
 
-    return filteredDataSubTier
+    setFilterValuesAndActiveFilter(filters, filteredData, i)
+
+    if (lastIteration) {
+      // not sure if this last run of filter() function is necessary.
+      return filter(filteredData, filters, maxTier - 1)
+    }
   }
 }

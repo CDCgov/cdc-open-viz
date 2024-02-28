@@ -7,19 +7,11 @@ import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General } from '@cdc/core/types/General'
+import { Legend } from '@cdc/core/types/Legend'
+import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
+import { Region } from '@cdc/core/types/Region'
 
 export type ChartColumns = Record<string, Column>
-
-type Region = {
-  from: string
-  to: string
-  fromType: 'Previous Days' | 'Fixed Date'
-  toType: 'Last Date' | 'Fised Date'
-  label: string
-  color: string
-  background: string
-  range: 'Custom' | string
-}
 
 type DataFormat = {
   abbreviated: boolean
@@ -57,24 +49,6 @@ type Filter = {
   queryParameter: string
 }
 
-export type Legend = {
-  additionalCategories: string[]
-  // general legend onClick behavior
-  behavior: 'highlight' | 'isolate' | string
-  colorCode: string
-  description: string
-  // show or hide the legend
-  hide: boolean
-  highlightOnHover: boolean
-  label: string
-  lineMode: boolean
-  position: string
-  reverseLabelOrder: boolean
-  singleRow: boolean
-  type: string
-  verticalSorted: boolean
-}
-
 type Visual = {
   border?: boolean
   borderColorTheme?: boolean
@@ -102,7 +76,7 @@ type AllChartsConfig = {
   color: string
   colorMatchLineSeriesLabels: boolean
   columns: ChartColumns
-  confidenceKeys: Record<string, any>
+  confidenceKeys: ConfidenceInterval
   customColors: string[]
   data: Object[]
   dataUrl: string
@@ -162,7 +136,7 @@ type AllChartsConfig = {
   }
   topAxis: { hasLine: boolean }
   twoColor: { palette: string }
-  type: string
+  type: 'chart' | 'dashboard'
   useLogScale: boolean
   visual: Visual
   visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting'
