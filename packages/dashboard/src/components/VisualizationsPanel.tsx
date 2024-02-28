@@ -2,10 +2,11 @@ import React from 'react'
 import type { Visualization } from '@cdc/core/types/Visualization'
 import Widget from './Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
+import { Table } from '@cdc/core/types/Table'
 
 const addVisualization = (type, subType) => {
-  let modalWillOpen = type !== 'markup-include'
-  let newVisualizationConfig: Partial<Visualization> = {
+  const modalWillOpen = type !== 'markup-include'
+  const newVisualizationConfig: Partial<Visualization> = {
     newViz: true,
     openModal: modalWillOpen,
     uid: type + Date.now(),
@@ -21,6 +22,13 @@ const addVisualization = (type, subType) => {
       newVisualizationConfig.general.geoType = subType
       break
     case 'data-bite' || 'waffle-chart' || 'markup-include' || 'filtered-text':
+      newVisualizationConfig.visualizationType = type
+      break
+    case 'table':
+      const tableConfig: Table = { label: 'Data Table', show: true, showDownloadUrl: false, showVertical: true, expanded: true }
+      newVisualizationConfig.table = tableConfig
+      newVisualizationConfig.columns = {}
+      newVisualizationConfig.dataFormat = {}
       newVisualizationConfig.visualizationType = type
       break
     default:
@@ -54,6 +62,7 @@ const VisualizationsPanel = ({ loadConfig, config }) => (
       <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
       <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
       <Widget addVisualization={() => addVisualization('filter-dropdowns', '')} type='filter-dropdowns' />
+      <Widget addVisualization={() => addVisualization('table', '')} type='table' />
     </div>
     <span className='subheading-3'>Advanced</span>
     <AdvancedEditor loadConfig={loadConfig} state={config} convertStateToConfig={undefined} />

@@ -28,7 +28,8 @@ const iconHash = {
   tools: <Icon display='tools' base />,
   'filtered-text': <Icon display='filtered-text' base />,
   'filter-dropdowns': <Icon display='filter-dropdowns' base />,
-  Sankey: <Icon display='code' base />
+  Sankey: <Icon display='code' base />,
+  table: <Icon display='table' base />
 }
 
 const labelHash = {
@@ -45,7 +46,8 @@ const labelHash = {
   'single-state': 'U.S. State',
   'filtered-text': 'Filtered Text',
   'filter-dropdowns': 'Filter Dropdowns',
-  Sankey: 'Sankey Chart'
+  Sankey: 'Sankey Chart',
+  table: 'Table'
 }
 
 type WidgetData = Visualization & { rowIdx: number; colIdx: number }
@@ -271,16 +273,16 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
     }
   }, [data?.openModal])
 
-  let isConfigurationReady = false;
-  if(type === 'markup-include' || type === 'filter-dropdowns'){
-    isConfigurationReady = true;
-  } else if(data && data.formattedData) {
-    isConfigurationReady = true;
-  } else if(data && data.dataKey && data.dataDescription && config.datasets[data.dataKey]){
-    let formattedDataAttempt = transform.autoStandardize(config.datasets[data.dataKey].data);
-    formattedDataAttempt = transform.developerStandardize(formattedDataAttempt, data.dataDescription);
-    if(formattedDataAttempt){
-      isConfigurationReady = true;
+  let isConfigurationReady = false
+  if (type === 'markup-include' || type === 'filter-dropdowns') {
+    isConfigurationReady = true
+  } else if (data && data.formattedData) {
+    isConfigurationReady = true
+  } else if (data && data.dataKey && data.dataDescription && config.datasets[data.dataKey]) {
+    let formattedDataAttempt = transform.autoStandardize(config.datasets[data.dataKey].data)
+    formattedDataAttempt = transform.developerStandardize(formattedDataAttempt, data.dataDescription)
+    if (formattedDataAttempt) {
+      isConfigurationReady = true
     }
   }
 

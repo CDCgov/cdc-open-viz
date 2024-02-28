@@ -1,5 +1,6 @@
 import { parseDate, formatDate } from '@cdc/core/helpers/cove/date'
 import { formatNumber } from '@cdc/core/helpers/cove/number'
+import { TableConfig } from '../types/TableConfig'
 
 // if its additional column, return formatting params
 const isAdditionalColumn = (column, config) => {
@@ -23,8 +24,9 @@ const isAdditionalColumn = (column, config) => {
   return formattingParams
 }
 
-export const getChartCellValue = (row, column, config, runtimeData) => {
+export const getChartCellValue = (row: string, column: string, config: TableConfig, runtimeData: Object[]) => {
   if (config.table.customTableConfig || config.visualizationType === 'Sankey' || runtimeData?.[0]?.tableData) return runtimeData[row][column]
+
   const rowObj = runtimeData[row]
   let cellValue // placeholder for formatting below
   let labelValue = rowObj[column] // just raw X axis string
