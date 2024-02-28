@@ -101,14 +101,22 @@ const WorldMap = props => {
 
   const constructGeoJsx = geographies => {
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
-      const geoKey = geo.properties.iso
+      // If the geo.properties.state value is found in the data use that, otherwise fall back to geo.properties.iso
+      const dataHasStateName = state.data.some(d => d[state.columns.geo.name] === geo.properties.state)
+      const geoKey = geo.properties.state && data[geo.properties.state] ? geo.properties.state : geo.properties.name ? geo.properties.name : geo.properties.iso
 
+      const additionalData = {
+        name: geo.properties.name
+      }
       if (!geoKey) return null
 
-      const geoData = data[geoKey]
+      let geoData = data[geoKey]
 
-      const geoDisplayName = displayGeoName(supportedCountries[geoKey][0])
+      // if ((geoKey === 'Alaska' || geoKey === 'Hawaii') && !geoData) {
+      //   geoData = data['United States']
+      // }
 
+      const geoDisplayName = displayGeoName(supportedCountries[geoKey]?.[0])
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
@@ -146,17 +154,15 @@ const WorldMap = props => {
           styles.cursor = 'pointer'
         }
 
-        return <Geo key={i + '-geo'} css={styles} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
+        return <Geo additionalData={additionalData} geoData={geoData} state={state} key={i + '-geo'} style={styles} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
       }
 
       // Default return state, just geo with no additional information
-      return <Geo key={i + '-geo'} stroke={geoStrokeColor} strokeWidth={strokeWidth} css={styles} path={path} />
+      return <Geo additionalData={additionalData} geoData={geoData} state={state} key={i + '-geo'} stroke={geoStrokeColor} strokeWidth={strokeWidth} style={styles} path={path} />
     })
 
     // Cities
-    geosJsx.push(
-      <CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} isGeoCodeMap={state.general.type === 'world-geocode'} key='cities' projection={projection} state={state} titleCase={titleCase} />
-    )
+    geosJsx.push(<CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} key='cities' projection={projection} state={state} titleCase={titleCase} />)
 
     // Bubbles
     if (state.general.type === 'bubble') {

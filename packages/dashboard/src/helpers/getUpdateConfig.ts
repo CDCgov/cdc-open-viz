@@ -1,12 +1,16 @@
 import { DashboardState } from '../store/dashboard.reducer'
-import { Config } from '../types/Config'
+import { DashboardConfig as Config, DashboardConfig } from '../types/DashboardConfig'
 import { filterData } from './filterData'
 import { generateValuesForFilter } from './generateValuesForFilter'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
 
+type UpdateState = Omit<DashboardState, 'config'> & {
+  config?: DashboardConfig
+}
+
 export const getUpdateConfig =
-  (state: DashboardState) =>
+  (state: UpdateState) =>
   (newConfig, dataOverride?: Object): [Config, Object] => {
     let newFilteredData = {}
     let visualizationKeys = getVizKeys(newConfig)

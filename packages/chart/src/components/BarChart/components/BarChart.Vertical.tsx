@@ -73,7 +73,10 @@ export const BarChartVertical = () => {
           data={data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
           height={yMax}
-          x0={d => d[config.runtime.originalXAxis.dataKey]}
+          x0={d => {
+            const rawXValue = d[config.runtime.originalXAxis.dataKey]
+            return config.runtime.xAxis.type === 'date' ? parseDate(rawXValue) : rawXValue
+          }}
           x0Scale={xScale}
           x1Scale={seriesScale}
           yScale={yScale}
@@ -83,7 +86,7 @@ export const BarChartVertical = () => {
         >
           {barGroups => {
             return barGroups.map((barGroup, index) => (
-              <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={(xMax / barGroups.length) * barGroup.index}>
+              <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={barGroup.x0}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
                   const suppresedBarHeight = 20
@@ -96,14 +99,10 @@ export const BarChartVertical = () => {
                   const supprssedBarY = bar.value >= 0 && isNumber(bar.value) ? yScale(scaleVal) - suppresedBarHeight : yScale(0)
                   const barY = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? supprssedBarY : barYBase
 
-                  let barGroupWidth = (xMax / barGroups.length) * (config.barThickness || 0.8)
-                  let offset = ((xMax / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
-                  // configure left side offset of lollipop bars
-                  if (config.isLollipopChart) {
-                    offset = xMax / barGroups.length / 2 - lollipopBarWidth / 2
-                  }
+                  let barGroupWidth = seriesScale.range()[1]
 
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
+                  let barX = bar.x + (config.isLollipopChart ? (((barGroupWidth / barGroup.bars.length) - lollipopBarWidth) / 2) : 0) - (config.xAxis.type === 'date' && config.xAxis.sortDates ? barGroupWidth / 2 : 0)
                   setBarWidth(barWidth)
                   setTotalBarsInGroup(barGroup.bars.length)
 
@@ -227,7 +226,7 @@ export const BarChartVertical = () => {
                           style={{ overflow: 'visible', transition: 'all 0.2s linear' }}
                           id={`barGroup${barGroup.index}`}
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                          x={barWidth * bar.index + offset}
+                          x={barX}
                           y={barY}
                           width={barWidth}
                           height={barHeight}
@@ -252,7 +251,7 @@ export const BarChartVertical = () => {
                         <Text // prettier-ignore
                           display={config.labels && displayBar ? 'block' : 'none'}
                           opacity={transparentBar ? 0.5 : 1}
-                          x={barWidth * (bar.index + 0.5) + offset}
+                          x={barX + barWidth / 2}
                           y={barY - 5}
                           fill={labelColor}
                           textAnchor='middle'
@@ -263,7 +262,7 @@ export const BarChartVertical = () => {
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
                           <circle
                             display={displaylollipopShape}
-                            cx={barWidth * (barGroup.bars.length - bar.index - 1) + offset + lollipopShapeSize / 3.5}
+                            cx={barX + lollipopShapeSize / 3.5}
                             cy={bar.y}
                             r={lollipopShapeSize / 2}
                             fill={barColor}
@@ -276,7 +275,7 @@ export const BarChartVertical = () => {
                         {config.isLollipopChart && config.lollipopShape === 'square' && (
                           <rect
                             display={displaylollipopShape}
-                            x={offset - lollipopBarWidth / 2}
+                            x={barX - lollipopBarWidth / 2}
                             y={barY}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
@@ -304,7 +303,7 @@ export const BarChartVertical = () => {
               let upperPos
               let lowerPos
               let tickWidth = 5
-              xPos = xScale(getXAxisData(d))
+              xPos = xScale(getXAxisData(d)) + (config.xAxis.type !== 'date' || !config.xAxis.sortDates ? seriesScale.range()[1] / 2 : 0)
               upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
               lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
               return (

@@ -21,7 +21,11 @@ const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, di
           let labelValue
           const mapZoomHandler = config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
           if ((config.general.geoType !== 'single-state' && config.general.geoType !== 'us-county') || config.general.type === 'us-geocode') {
+            const capitalize = str => {
+              return str.charAt(0).toUpperCase() + str.slice(1)
+            }
             labelValue = displayGeoName(row)
+            labelValue = String(labelValue).startsWith('region') ? capitalize(labelValue) : labelValue
           } else {
             labelValue = formatLegendLocation(row)
           }

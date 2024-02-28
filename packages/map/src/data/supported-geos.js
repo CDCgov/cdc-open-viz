@@ -487,7 +487,27 @@ export const supportedCountries = {
   YEM: ['Yemen'],
   ZMB: ['Zambia'],
   ZWE: ['Zimbabwe'],
-  IOT: ['British Indian Ocean Territory']
+  IOT: ['British Indian Ocean Territory'],
+  Alaska: ['Alaska'],
+  Hawaii: ['Hawaii'],
+  Sardinia: ['Sardinia'],
+  Sicily: ['Sicily'],
+  Corsica: ['Corsica'],
+  'Easter Island': ['Easter Island'],
+  'Canary Islands': ['Canary Islands'],
+  Antarctica: ['Antarctica'],
+  ATA: ['Antarctica'],
+  'Madeira Islands': ['Madeira Islands'],
+  'Gaza/West Bank': ['Gaza/West Bank'],
+  'Saint Paul and Amsterdamn Islands': ['Saint Paul and Amsterdamn Islands'],
+  'Sovereign Base Areas of Akrotiri and Dhekelia': ['Sovereign Base Areas of Akrotiri and Dhekelia'],
+  'Plazas de Soberania': ['Plazas de Soberania'],
+  Akrotiri: ['Akrotiri'],
+  Dhekelia: ['Dhekelia'],
+  Sicily: ['Sicily'],
+  Sardinia: ['Sardinia'],
+  'US-AK': ['Alaska'],
+  'US-HI': ['Hawaii']
 }
 
 export const supportedTerritories = {

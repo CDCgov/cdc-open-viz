@@ -52,16 +52,19 @@ import './scss/main.scss'
 import DataTable from '@cdc/core/components/DataTable'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
+import { ChartConfig } from './types/ChartConfig'
+import { Label } from './types/Label'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
-  const [config, setConfig] = useState<any>({})
+  const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
   const [stateData, setStateData] = useState(config.data || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
-  const [seriesHighlight, setSeriesHighlight] = useState<any[]>([])
+  const [seriesHighlight, setSeriesHighlight] = useState<string[]>([])
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [dimensions, setDimensions] = useState<[number?, number?]>([])
   const [externalFilters, setExternalFilters] = useState<any[]>()
@@ -95,7 +98,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
-      config.filters.forEach(filter => {
+      config.filters?.forEach(filter => {
         if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
           qsParams[filter.queryParameter] = filter.active
           isUpdateNeeded = true
@@ -117,7 +120,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       try {
         const ext = getFileExtension(dataUrl.href)
-        if ('csv' === ext) {
+        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
           data = await fetch(dataUrlFinal)
             .then(response => response.text())
             .then(responseText => {
@@ -128,7 +131,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               })
               return parsedCsv.data
             })
-        } else if ('json' === ext) {
+        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
           data = await fetch(dataUrlFinal).then(response => response.json())
         } else {
           data = []
@@ -166,7 +169,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (response.dataUrl && !urlFilters) {
       try {
         const ext = getFileExtension(response.dataUrl)
-        if ('csv' === ext) {
+        if ('csv' === ext || isSolrCsv(response.dataUrl)) {
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
             .then(response => response.text())
             .then(responseText => {
@@ -189,7 +192,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             })
         }
 
-        if ('json' === ext) {
+        if ('json' === ext || isSolrJson(response.dataUrl)) {
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
         }
       } catch {
@@ -292,6 +295,16 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
       currentData = filterData(newConfig.filters, newExcludedData)
       setFilteredData(currentData)
+    }
+
+    if (!['Area Chart', 'Bar', 'Line', 'Combo'].includes(newConfig.visualizationType) || newConfig.orientation === 'horizontal') {
+      newConfig.xAxis.sortDates = false
+    }
+
+    if (newConfig.xAxis.sortDates && newConfig.barThickness > 0.1) {
+      newConfig.barThickness = 0.035
+    } else if (!newConfig.xAxis.sortDates && newConfig.barThickness < 0.1) {
+      newConfig.barThickness = 0.35
     }
 
     //Enforce default values that need to be calculated at runtime
@@ -426,6 +439,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         if (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') {
           newConfig.runtime.lineSeriesKeys.push(series.dataKey)
         }
+        if (series.type === 'Combo') {
+          series.type = 'Bar'
+        }
       })
     }
 
@@ -448,8 +464,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)) {
-      newConfig.runtime.xAxis = newConfig.yAxis
-      newConfig.runtime.yAxis = newConfig.xAxis
+      newConfig.runtime.xAxis = newConfig.yAxis['yAxis'] ? newConfig.yAxis['yAxis'] : newConfig.yAxis
+      newConfig.runtime.yAxis = newConfig.xAxis['xAxis'] ? newConfig.xAxis['xAxis'] : newConfig.xAxis
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'
@@ -463,6 +479,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.yAxis = newConfig.yAxis
       newConfig.runtime.horizontal = false
     }
+
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
 
@@ -607,9 +624,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
-    if (stateData && config.xAxis && config.runtime.seriesKeys) {
-      const configPalette = config.customColors ? config.customColors : config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar' ? config.twoColor.palette : config.palette
-      const allPalettes = { ...colorPalettes, ...twoColorPalette }
+    if (stateData && config.xAxis && config.runtime?.seriesKeys) {
+      const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType) ? config.twoColor.palette : config.palette
+      const allPalettes: Record<string, string[]> = { ...colorPalettes, ...twoColorPalette }
       let palette = config.customColors || allPalettes[configPalette]
       let numberOfKeys = config.runtime.seriesKeys.length
       let newColorScale
@@ -637,27 +654,22 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }, [config, stateData]) // eslint-disable-line
 
   // Called on legend click, highlights/unhighlights the data series with the given label
-  const highlight = label => {
-    const newSeriesHighlight: any[] = []
-
+  const highlight = (label: Label) => {
     // If we're highlighting all the series, reset them
     if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && config.visualizationType !== 'Forecasting') {
       highlightReset()
       return
     }
 
-    seriesHighlight.forEach(value => {
-      newSeriesHighlight.push(value)
-    })
+    const newSeriesHighlight = [...seriesHighlight]
 
     let newHighlight = label.datum
     if (config.runtime.seriesLabels) {
-      for (let i = 0; i < config.runtime.seriesKeys.length; i++) {
-        if (config.runtime.seriesLabels[config.runtime.seriesKeys[i]] === label.datum) {
-          newHighlight = config.runtime.seriesKeys[i]
-          break
+      config.runtime.seriesKeys.forEach(key => {
+        if (config.runtime.seriesLabels[key] === label.datum) {
+          newHighlight = key
         }
-      }
+      })
     }
 
     if (newSeriesHighlight.indexOf(newHighlight) !== -1) {
@@ -711,6 +723,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const formatDate = date => {
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
+  }
+
+  const formatTooltipsDate = date => {
+    return timeFormat(config.tooltips.dateDisplayFormat)(date)
   }
 
   // function calculates the width of given text and its font-size
@@ -1071,7 +1087,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
               <DataTable
                 config={config}
-                rawData={config.data}
+                rawData={config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
                 runtimeData={transform.applySuppression(filteredData || excludedData, config.suppressedData)}
                 expandDataTable={config.table.expanded}
                 columns={config.columns}
@@ -1119,6 +1135,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     currentViewport,
     parseDate,
     formatDate,
+    formatTooltipsDate,
     formatNumber,
     loading,
     updateConfig,

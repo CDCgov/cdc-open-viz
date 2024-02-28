@@ -53,9 +53,9 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
           {state.hexMap.shapeGroups.map((group, groupIndex) => {
             return group.items.map((item, itemIndex) => {
               if (item.operator === '=') {
-                if (geoData[item.key] === item.value) {
+                if (geoData[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
                   return (
-                    <Group style={{ transform: `translate(36%, 50%)`, fill: 'currentColor' }}>
+                    <Group style={{ transform: `translate(36%, 50%)`, fill: 'currentColor' }} key={`territory-hex--${itemIndex}`}>
                       {item.shape === 'Arrow Down' && <AiOutlineArrowDown size={12} stroke='none' fontWeight={100} />}
                       {item.shape === 'Arrow Up' && <AiOutlineArrowUp size={12} stroke='none' fontWeight={100} />}
                       {item.shape === 'Arrow Right' && <AiOutlineArrowRight size={12} stroke='none' fontWeight={100} />}

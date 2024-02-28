@@ -5,6 +5,7 @@ export type Anchor = {
 }
 
 export type Axis = {
+  scalePadding: number
   anchors?: Anchor[]
   dataKey: string
   dateDisplayFormat: string
@@ -31,6 +32,7 @@ export type Axis = {
   rightMax?: string
   rightNumTicks?: number
   sortDates?: boolean
+  sortKey?: string
   showTargetLabel?: boolean
   size?: number
   target?: number

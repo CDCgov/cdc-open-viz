@@ -1,9 +1,11 @@
 import React, { memo } from 'react'
 
 const Geo = ({ path, styles, stroke, strokeWidth, ...props }) => {
+  const { className, ...restProps } = props
+  const geoClassName = String(props.additionalData?.name)?.toLowerCase()?.replaceAll(' ', '') || 'country'
   return (
-    <g className='geo-group' css={styles} {...props}>
-      <path tabIndex={-1} className='single-geo' stroke={stroke} strokeWidth={strokeWidth} d={path} />
+    <g className={`geo-group ${geoClassName}`} style={styles} {...restProps}>
+      <path tabIndex={-1} className={`single-geo ${geoClassName}`} stroke={stroke} strokeWidth={strokeWidth} d={path} />
     </g>
   )
 }

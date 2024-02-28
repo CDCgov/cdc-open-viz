@@ -52,6 +52,7 @@ import NavigationMenu from './components/NavigationMenu' // Future: Lazy
 import UsaMap from './components/UsaMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -239,8 +240,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         }
 
         // Cities
-        if (!uid) {
-          uid = cityKeys.find(key => key === geoName)
+        if (!uid && geoName) {
+          uid = cityKeys.find(key => key === geoName.toUpperCase())
         }
       }
 
@@ -267,6 +268,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         if (!uid && 'world-geocode' === state.general.type) {
           uid = cityKeys.find(key => key === geoName?.toUpperCase())
         }
+
+        // Cities
+        if (!uid && geoName) {
+          uid = cityKeys.find(key => key === geoName.toUpperCase())
+        }
       }
 
       // County Check
@@ -276,6 +282,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
 
       if ('us-geocode' === state.general.type) {
+        uid = row[state.columns.geo.name]
+      }
+
+      if (!uid && state.columns.latitude?.name && state.columns.longitude?.name && row[state.columns.latitude?.name] && row[state.columns.longitude?.name]) {
         uid = row[state.columns.geo.name]
       }
 
@@ -687,12 +697,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
           dataSet.forEach((row, dataIndex) => {
             let number = row[state.columns.primary.name]
-            let updated = 0
-
-            // check if we're seperating zero out
-            updated = state.legend.separateZero && hasZeroInData ? index : index
-            // check for special classes
-            updated = state.legend.specialClasses ? updated + state.legend.specialClasses.length : index
+            let updated = result.length - 1
 
             if (result[updated]?.min === (null || undefined) || result[updated]?.max === (null || undefined)) return
 
@@ -1074,6 +1079,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Attempts to find the corresponding value
   const displayGeoName = key => {
     if (!state.general.convertFipsCodes) return key
+
+    // World Map
+    // If we're returning a city name instead of a country ISO code, capitalize it for the data table.
+    if (state.type === 'map' && state.general.geoType === 'world') {
+      if (String(key).length > 3) return titleCase(key)
+    }
     let value = key
     // Map to first item in values array which is the preferred label
     if (stateKeys.includes(value)) {
@@ -1085,7 +1096,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
 
     if (countryKeys.includes(value)) {
-      value = titleCase(supportedCountries[key][0])
+      value = supportedCountries[key][0]
     }
 
     if (countyKeys.includes(value)) {
@@ -1266,18 +1277,19 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const regex = /(?:\.([^.]+))?$/
 
         const ext = regex.exec(dataUrl.pathname)[1]
-        if ('csv' === ext) {
+        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
           data = await fetch(dataUrlFinal)
             .then(response => response.text())
             .then(responseText => {
               const parsedCsv = Papa.parse(responseText, {
                 header: true,
                 dynamicTyping: true,
-                skipEmptyLines: true
+                skipEmptyLines: true,
+                encoding: 'utf-8'
               })
               return parsedCsv.data
             })
-        } else if ('json' === ext) {
+        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
           data = await fetch(dataUrlFinal).then(response => response.json())
         } else {
           data = []
@@ -1292,6 +1304,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         data = transform.autoStandardize(data)
         data = transform.developerStandardize(data, state.dataDescription)
       }
+
+      console.log('data', data)
 
       setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
     }
@@ -1610,6 +1624,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               config={config}
               classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
             />
+            <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
+              Skip Over Map Container
+            </a>
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
@@ -1626,10 +1643,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 }
               }}
             >
-              <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
-                Skip Over Map Container
-              </a>
-
               {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
               <section className='outline-none geography-container' ref={mapSvg} tabIndex='0' style={{ width: '100%' }}>
                 {currentViewport && (

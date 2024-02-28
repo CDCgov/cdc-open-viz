@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
+import { timeParse } from 'd3-time-format'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -17,13 +18,12 @@ import regionCellMatrix from './helpers/regionCellMatrix'
 import boxplotCellMatrix from './helpers/boxplotCellMatrix'
 import customColumns from './helpers/customColumns'
 import { TableConfig } from './types/TableConfig'
+import { Column } from '../../types/Column'
 
 export type DataTableProps = {
   applyLegendToRow?: Function
   colorScale?: Function
-  columns?: { navigate: { name: string } }
-  // determines if columns should be wrapped in the table
-  wrapColumns?: boolean
+  columns?: Record<string, Column>
   config: TableConfig
   dataConfig?: Object
   displayDataAsText?: Function
@@ -32,15 +32,22 @@ export type DataTableProps = {
   formatLegendLocation?: Function
   groupBy?: string
   headerColor?: string
+  imageRef?: string
   indexTitle?: string
+  isDebug?: boolean
+  isEditor?: boolean
   navigationHandler?: Function
+  outerContainerRef?: Function
   rawData: Object[]
   runtimeData: Object[] | Record<string, Object> // UNSAFE
   setFilteredCountryCode?: Function // used for Maps only
+  showDownloadButton?: boolean
   tabbingId: string
   tableTitle: string
   viewport: string
   vizTitle?: string
+  // determines if columns should be wrapped in the table
+  wrapColumns?: boolean
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
@@ -92,9 +99,9 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const _runtimeData = config.table.customTableConfig ? customColumns(runtimeData, config.table.excludeColumns) : runtimeData
+  const _runtimeData = config.table.customTableConfig ? customColumns(rawData, config.table.excludeColumns) : runtimeData
 
-  const rawRows = Object.keys(_runtimeData)
+  const rawRows = Object.keys(_runtimeData).filter(column => column != 'columns')
   const rows = isVertical
     ? rawRows.sort((a, b) => {
         let dataA
@@ -107,6 +114,10 @@ const DataTable = (props: DataTableProps) => {
         if (config.type === 'chart' || config.type === 'dashboard') {
           dataA = _runtimeData[a][sortBy.column]
           dataB = _runtimeData[b][sortBy.column]
+        }
+        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date' && config.xAxis.sortDates) {
+          dataA = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[a][config.xAxis.dataKey])
+          dataB = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[b][config.xAxis.dataKey])
         }
         return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
       })

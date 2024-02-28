@@ -11,8 +11,11 @@ export type Table = {
   showDataTableLink?: boolean
   showDownloadUrl?: boolean
   download?: boolean
-  showDownloadImgButton?: boolean
-  showDownloadPdfButton?: boolean
   customTableConfig?: boolean
   excludeColumns?: string[]
+  showDownloadImgButton?: boolean
+  showDownloadPdfButton?: boolean
+  downloadImageButton?: boolean
+  downloadPdfButton?: boolean
+  dateDisplayFormat: string
 }
