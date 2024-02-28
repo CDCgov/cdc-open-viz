@@ -166,11 +166,11 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
               </div>
 
               <>
-                {config.preliminaryData.some(pd => pd.label) && config.visualizationType === 'Line' && (
+                {config?.preliminaryData?.some(pd => pd.label) && config.visualizationType === 'Line' && (
                   <>
                     <hr></hr>
                     <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
-                      {config.preliminaryData.map((pd, index) => {
+                      {config?.preliminaryData?.map((pd, index) => {
                         return (
                           <>
                             {pd.label && (
