@@ -1,39 +1,56 @@
 .cove-multiselect {
   position: relative;
-  .selected {
-    border: 1px solid #ccc;
-    padding: 5px;
-    min-height: 40px;
-    :is(button) {
-      border: none;
-      background: none;
-    }
-    :is(div) {
-      display: inline-block;
-      padding: 0 0 0 5px;
-      margin-right: 5px;
-      margin-bottom: 2px;
-      background: #ccc;
-      border-radius: 5px;
-    }
-    .expand {
-      padding: 0 5px;
-      border-radius: 5px;
-      background: #ccc;
-      float: right;
-    }
-    border-radius: 5px;
+  .cove-input__label {
+    display: block;
   }
-  .dropdown {
+  .wrapper {
+    display: inline-flex;
+    align-items: center;
+    .selected {
+      border: 1px solid #ccc;
+      padding: 5px;
+      min-height: 40px;
+      min-width: 200px;
+      display: inline-block;
+      :is(button) {
+        border: none;
+        background: none;
+      }
+      :is(div) {
+        display: inline-block;
+        padding: 0 0 0 5px;
+        margin-right: 5px;
+        margin-bottom: 2px;
+        background: #ccc;
+        border-radius: 5px;
+      }
+      .expand {
+        padding: 0 5px;
+        border-radius: 5px;
+        background: #ccc;
+        float: right;
+      }
+      border-radius: 5px;
+    }
+    .cove-tooltip__content {
+      position: absolute;
+      min-width: 120px;
+      :is(p) {
+        margin-bottom: 0;
+      }
+    }
+  }
+  .dropdown-1 {
     background: white;
     position: absolute;
     margin-top: 5px;
     border: 1px solid #ccc;
-    padding: 0;
+    padding-left: 0;
     min-height: 40px;
-    overflow: scroll;
     max-height: 200px;
-    z-index: 1;
+    overflow-y: scroll;
+    min-width: 200px;
+    z-index: 4;
     &.hide {
       display: none;
     }
@@ -41,10 +58,10 @@
     :is(li) {
       cursor: pointer;
       list-style: none;
-      padding-left: 10px;
+      padding: 0 10px;
       &:hover {
         background: #ccc;
-      } 
+      }
     }
   }
 }

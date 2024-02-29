@@ -56,7 +56,8 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, confi
     let datasets: Record<string, Object[]> = {}
     await Promise.all(
       Object.keys(initialConfig.datasets).map(async key => {
-        datasets[key] = await processData(initialConfig.datasets[key], initialConfig.filterBehavior)
+        const data = await processData(initialConfig.datasets[key], initialConfig.filterBehavior)
+        datasets[key] = data || []
       })
     )
 

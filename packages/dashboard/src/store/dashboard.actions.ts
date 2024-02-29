@@ -1,5 +1,6 @@
 import type { DashboardConfig as Config } from '../types/DashboardConfig'
 import { type Action } from '@cdc/core/types/Action'
+import { Tab } from '../types/Tab'
 
 type SET_CONFIG = Action<'SET_CONFIG', Config>
 type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [Config, Object?]>
@@ -7,7 +8,7 @@ type SET_DATA = Action<'SET_DATA', Object>
 type SET_LOADING = Action<'SET_LOADING', boolean>
 type SET_PREVIEW = Action<'SET_PREVIEW', boolean>
 type SET_FILTERED_DATA = Action<'SET_FILTERED_DATA', Object>
-type SET_TAB_SELECTED = Action<'SET_TAB_SELECTED', number>
+type SET_TAB_SELECTED = Action<'SET_TAB_SELECTED', Tab>
 type RENAME_DASHBOARD_TAB = Action<'RENAME_DASHBOARD_TAB', { current: string; new: string }>
 type INITIALIZE_MULTIDASHBOARDS = Action<'INITIALIZE_MULTIDASHBOARDS', undefined>
 type REMOVE_MULTIDASHBOARD_AT_INDEX = Action<'REMOVE_MULTIDASHBOARD_AT_INDEX', number>
