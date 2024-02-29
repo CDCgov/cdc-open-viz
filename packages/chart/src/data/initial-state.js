@@ -152,7 +152,8 @@ export default {
     dynamicLegendChartMessage: 'Select Options from the Legend',
     lineMode: false,
     verticalSorted: false,
-    highlightOnHover: false
+    highlightOnHover: false,
+    seriesHighlight: []
   },
   brush: {
     height: 25,

@@ -125,6 +125,8 @@ export const useEditorPermissions = () => {
     }
   }
 
+  const visHasSelectableLegendValues = !['Box Plot', 'Forest Plot', 'Spark Line'].includes(visualizationType)
+
   const visSupportsTooltipOpacity = () => {
     const disabledCharts = ['Spark Line', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
@@ -324,6 +326,7 @@ export const useEditorPermissions = () => {
     visSupportsSequentialPallete,
     visSupportsSuperTitle,
     visSupportsTooltipLines,
+    visHasSelectableLegendValues,
     visSupportsTooltipOpacity,
     visSupportsValueAxisGridLines,
     visSupportsValueAxisLabels,

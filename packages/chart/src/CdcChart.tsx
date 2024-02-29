@@ -65,7 +65,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [stateData, setStateData] = useState(config.data || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
-  const [seriesHighlight, setSeriesHighlight] = useState<string[]>([])
+  const [seriesHighlight, setSeriesHighlight] = useState<string[]>(configObj?.legend?.seriesHighlight.length ? [...configObj?.legend?.seriesHighlight] : [])
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [dimensions, setDimensions] = useState<[number?, number?]>([])
   const [externalFilters, setExternalFilters] = useState<any[]>()
@@ -488,6 +488,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // Sankey Description box error message
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Sankey' && !newConfig.description ? 'SUBTEXT/CITATION field is empty: A description of the Sankey Diagram data must be inputted.' : ''
 
+
+    if (newConfig.legend.seriesHighlight.length) {
+      setSeriesHighlight(newConfig.legend.seriesHighlight)
+    }
 
     setConfig(newConfig)
   }
