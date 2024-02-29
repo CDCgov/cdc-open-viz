@@ -1,0 +1,34 @@
+.cdc-open-viz-module {
+  --border: 1px solid var(--lightGray);
+  .toggle-component {
+    display: flex;
+    justify-content: right;
+    width: 100%;
+    margin-bottom: 15px;
+    :first-child:is(div) {
+      border: var(--border);
+      border-radius: 5px 0 0 5px;
+    }
+    :last-child:is(div) {
+      border: var(--border);
+      border-radius: 0 5px 5px 0;
+    }
+    :is(div) {
+      border-top: var(--border);
+      border-bottom: var(--border);
+      padding: 7px 15px;
+      display: inline;
+      float: right;
+      cursor: pointer;
+      &.selected {
+        background-color: var(--primary);
+        color: white;
+      }
+      background-color: var(--white);
+      color: var(--primary);
+      :is(svg) {
+        height: 25px;
+      }
+    }
+  }
+}

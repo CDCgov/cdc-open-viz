@@ -59,6 +59,7 @@ import EditorWrapper from './components/EditorWrapper/EditorWrapper'
 import DataTableEditorPanel from '@cdc/core/components/DataTable/components/DataTableEditorPanel'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import { ViewPort } from '@cdc/core/types/ViewPort'
+import Toggle from './components/Toggle'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -468,7 +469,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     let subVisualizationEditing = false
 
     getVizKeys(state.config).forEach(visualizationKey => {
-      let visualizationConfig = { ...state.config.visualizations[visualizationKey] }
+      const visualizationConfig = _.cloneDeep(state.config.visualizations[visualizationKey])
 
       const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
 
@@ -540,11 +541,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             )
             break
           case 'data-bite':
-            visualizationConfig = { ...visualizationConfig, newViz: true }
             body = (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Data Bite' />
-                <CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={_updateConfig} isDashboard={true} />
+                <CdcDataBite key={visualizationKey} config={{ ...visualizationConfig, newViz: true }} isEditor={true} setConfig={_updateConfig} isDashboard={true} />
               </>
             )
             break
@@ -637,13 +637,15 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             config.rows
               .filter(row => row.filter(col => col.widget).length !== 0)
               .map((row, index) => {
+                const isToggleRow = row[0].toggle
                 return (
-                  <div className={`dashboard-row ${row.equalHeight ? 'equal-height' : ''}`} key={`row__${index}`}>
+                  <div className={`dashboard-row ${row.equalHeight ? 'equal-height' : ''} ${isToggleRow ? 'toggle' : ''}`} key={`row__${index}`}>
+                    {isToggleRow && <Toggle row={row} rowIndex={index} visualizations={config.visualizations} />}
                     {row.map((col, colIndex) => {
                       if (col.width) {
                         if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`dashboard-col dashboard-col-${col.width}`}></div>
 
-                        let visualizationConfig = { ...config.visualizations[col.widget] }
+                        const visualizationConfig = _.cloneDeep(config.visualizations[col.widget])
 
                         const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
 
@@ -669,9 +671,11 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                           </a>
                         )
                         const hideFilter = visualizationConfig.autoLoad && inNoDataState
+
+                        const hiddenToggle = col.toggle && col.hide !== undefined ? col.hide : colIndex === 0
                         return (
                           <React.Fragment key={`vis__${index}__${colIndex}`}>
-                            <div className={`dashboard-col dashboard-col-${col.width}`}>
+                            <div className={`dashboard-col dashboard-col-${col.width} ${!hiddenToggle ? 'hidden-toggle' : ''}`}>
                               {visualizationConfig.type === 'chart' && (
                                 <CdcChart
                                   key={col.widget}

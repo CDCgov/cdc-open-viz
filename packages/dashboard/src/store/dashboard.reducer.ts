@@ -103,6 +103,13 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const newConfigFields = state.config.multiDashboards[slot]
       return { ...state, config: { ...state.config, ...newConfigFields, activeDashboard: slot } }
     }
+    case 'TOGGLE_ROW': {
+      const { rowIndex, colIndex } = action.payload
+      const newRows = state.config.rows.map((row, index) => {
+        return index === rowIndex ? row.map((col, i) => ({ ...col, hide: i === colIndex })) : row
+      })
+      return { ...state, config: { ...state.config, rows: newRows } }
+    }
     default:
       return state
   }

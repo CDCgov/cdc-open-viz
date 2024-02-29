@@ -11,25 +11,7 @@ import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Icon from '@cdc/core/components/ui/Icon'
 import Modal from '@cdc/core/components/ui/Modal'
 import { Visualization } from '@cdc/core/types/Visualization'
-
-const iconHash = {
-  'data-bite': <Icon display='databite' base />,
-  Bar: <Icon display='chartBar' base />,
-  'Spark Line': <Icon display='chartLine' />,
-  'waffle-chart': <Icon display='grid' base />,
-  'markup-include': <Icon display='code' base />,
-  Line: <Icon display='chartLine' base />,
-  Pie: <Icon display='chartPie' base />,
-  us: <Icon display='mapUsa' base />,
-  'us-county': <Icon display='mapUsa' base />,
-  world: <Icon display='mapWorld' base />,
-  'single-state': <Icon display='mapAl' base />,
-  gear: <Icon display='gear' base />,
-  tools: <Icon display='tools' base />,
-  'filtered-text': <Icon display='filtered-text' base />,
-  'filter-dropdowns': <Icon display='filter-dropdowns' base />,
-  table: <Icon display='table' base />
-}
+import { iconHash } from '../helpers/iconHash'
 
 const labelHash = {
   'data-bite': 'Data Bite',
@@ -58,7 +40,6 @@ type WidgetProps = {
 const Widget = ({ data, addVisualization, type }: WidgetProps) => {
   const { overlay } = useGlobalContext()
   const { config } = useContext(DashboardContext)
-  if (!config) return null
   const rows = config.rows
   const visualizations = config.visualizations
   const dispatch = useContext(DashboardDispatchContext)
