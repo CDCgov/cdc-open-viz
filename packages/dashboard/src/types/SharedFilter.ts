@@ -1,14 +1,16 @@
 import { APIFilter } from './APIFilter'
 export type SharedFilter = {
   type?: 'urlfilter' | 'datafilter' | ''
-  fileName: string
+  fileName?: string
   filterBy?: 'Query String' | 'File Name'
   queryParameter?: string
-  active?: string
+  active?: string | string[]
   queuedActive?: string
   usedBy?: string[]
   parents?: string[]
+  pivot?: string
   setBy?: string
+  selectLimit?: number
   columnName?: string
   resetLabel?: string
   showDropdown?: boolean
