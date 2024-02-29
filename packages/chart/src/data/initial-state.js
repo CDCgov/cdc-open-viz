@@ -243,5 +243,47 @@ export default {
   },
   area: {
     isStacked: false
+  },
+  sankey: {
+    title: {
+      defaultColor: 'black'
+    },
+    iterations: 1,
+    rxValue: 0.9,
+    overallSize: {
+      width: 900,
+      height: 700
+    },
+    margin: {
+      margin_y: 25,
+      margin_x: 0
+    },
+    nodeSize: {
+      nodeWidth: 26,
+      nodeHeight: 40
+    },
+    nodePadding: 55,
+    nodeFontColor: 'black',
+    nodeColor: {
+      default: '#ff8500',
+      inactive: '#808080'
+    },
+    linkColor: {
+      default: '#ffc900',
+      inactive: '#D3D3D3'
+    },
+    opacity: {
+      nodeOpacityDefault: 1.0,
+      nodeOpacityInactive: 0.1,
+      LinkOpacityDefault: 1.0,
+      LinkOpacityInactive: 0.1
+    },
+    storyNodeFontColor: '#006778',
+    storyNodeText: [],
+    nodeValueStyle: {
+      textBefore: '(',
+      textAfter: ')'
+    },
+    data: []
   }
 }

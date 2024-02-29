@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
+import { timeParse } from 'd3-time-format'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -38,7 +39,7 @@ export type DataTableProps = {
   navigationHandler?: Function
   outerContainerRef?: Function
   rawData: Object[]
-  runtimeData: Object[] | Record<string, Object> // UNSAFE
+  runtimeData: Object[] & Record<string, Object>
   setFilteredCountryCode?: Function // used for Maps only
   showDownloadButton?: boolean
   tabbingId: string
@@ -52,7 +53,6 @@ export type DataTableProps = {
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
   const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId, wrapColumns } = props
-
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [sortBy, setSortBy] = useState<any>({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
@@ -90,7 +90,7 @@ const DataTable = (props: DataTableProps) => {
     case 'Box Plot':
       if (!config.boxplot) return <Loading />
       break
-    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar':
+    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar' || 'Sankey' || 'Table':
       if (!runtimeData) return <Loading />
       break
     default:
@@ -113,6 +113,10 @@ const DataTable = (props: DataTableProps) => {
         if (config.type === 'chart' || config.type === 'dashboard') {
           dataA = _runtimeData[a][sortBy.column]
           dataB = _runtimeData[b][sortBy.column]
+        }
+        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date' && config.xAxis.sortDates) {
+          dataA = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[a][config.xAxis.dataKey])
+          dataB = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[b][config.xAxis.dataKey])
         }
         return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
       })
@@ -137,12 +141,25 @@ const DataTable = (props: DataTableProps) => {
   // If a relative region is found we don't want to display the data table.
   // Takes backwards compatibility into consideration, ie !region.toType || !region.fromType
   const noRelativeRegions = config?.regions?.every(region => {
-    return (region.toType === 'Fixed' && region.fromType === 'Fixed') || (!region.toType && !region.fromType) || (!region.toType && region.fromType === 'Fixed') || (!region.fromType && region.toType === 'Fixed')
+    const toTypeFixed = region.toType === 'Fixed'
+    const fromTypeFixed = region.fromType === 'Fixed'
+    const toIsNotSet = !region.toType
+    const fromIsNotSet = !region.fromType
+    const BothFixed = toTypeFixed && fromTypeFixed
+    const NeitherFixed = toIsNotSet && fromIsNotSet
+    const ToFixedFromNotSet = toTypeFixed && fromIsNotSet
+    const FromFixedToNotSet = fromTypeFixed && toIsNotSet
+
+    return BothFixed || NeitherFixed || ToFixedFromNotSet || FromFixedToNotSet
   })
 
   // prettier-ignore
   const tableData = useMemo(() => (
-    config.visualizationType === 'Pie'
+   config.data?.[0]?.tableData
+    ? config.data?.[0]?.tableData
+    : config.visualizationType === 'Sankey'
+      ? config.data?.[0]?.tableData
+      : config.visualizationType === 'Pie'
       ? [config.yAxis.dataKey]
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])

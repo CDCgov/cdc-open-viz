@@ -1085,7 +1085,8 @@ const EditorPanel = () => {
             <Accordion allowZeroExpanded={true}>
               <Panels.General name='General' />
               <Panels.ForestPlot name='Forest Plot Settings' />
-              {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && (
+              <Panels.Sankey name='Sankey' />
+              {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && config.visualizationType !== 'Sankey' && (
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>

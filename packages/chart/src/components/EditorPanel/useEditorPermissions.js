@@ -19,13 +19,14 @@ export const useEditorPermissions = () => {
     'Paired Bar',
     'Pie',
     'Scatter Plot',
-    'Spark Line'
+    'Spark Line',
+    'Sankey'
 ]
 
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
   const visSupportsDateCategoryAxis = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -43,13 +44,13 @@ export const useEditorPermissions = () => {
   }
 
   const visHasLabelOnData = () => {
-    const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot', 'Spark Line']
+    const disabledCharts = ['Area Chart', 'Box Plot', 'Pie', 'Scatter Plot', 'Forest Plot', 'Spark Line', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visCanAnimate = () => {
-    const disabledCharts = ['Area Chart', 'Scatter Plot', 'Box Plot', 'Forest Plot', 'Spark Line']
+    const disabledCharts = ['Area Chart', 'Scatter Plot', 'Box Plot', 'Forest Plot', 'Spark Line', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -61,6 +62,8 @@ export const useEditorPermissions = () => {
       case 'Forest Plot':
         return false
       case 'Spark Line':
+        return false
+      case 'Sankey':
         return false
       default:
         return true
@@ -107,6 +110,8 @@ export const useEditorPermissions = () => {
 
   const visHasDataCutoff = () => {
     switch (visualizationType) {
+      case 'Sankey':
+        return false
       case 'Forest Plot':
         return false
       case 'Box Plot':
@@ -123,7 +128,7 @@ export const useEditorPermissions = () => {
   const visHasSelectableLegendValues = !['Box Plot', 'Forest Plot', 'Spark Line'].includes(visualizationType)
 
   const visSupportsTooltipOpacity = () => {
-    const disabledCharts = ['Spark Line']
+    const disabledCharts = ['Spark Line', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -135,19 +140,19 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsSequentialPallete = () => {
-    const disabledCharts = ['Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting']
+    const disabledCharts = ['Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsNonSequentialPallete = () => {
-    const disabledCharts = ['Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting']
+    const disabledCharts = ['Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsReverseColorPalette = () => {
-    const disabledCharts = ['Forest Plot', 'Paired Bar', 'Deviation Bar']
+    const disabledCharts = ['Forest Plot', 'Paired Bar', 'Deviation Bar', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -189,7 +194,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsRegions = () => {
-    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar', 'Spark Line']
+    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar', 'Spark Line', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -207,7 +212,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsFilters = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -260,7 +265,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsLeftValueAxis = () => {
-    const disabledCharts = ['Spark Line']
+    const disabledCharts = ['Spark Line', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -272,7 +277,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryHeight = () => {
-    const disabledCharts = ['Spark Line']
+    const disabledCharts = ['Spark Line', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }

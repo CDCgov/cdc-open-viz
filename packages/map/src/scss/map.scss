@@ -49,6 +49,11 @@ header + .map-container.full-border {
       flex-direction: row;
     }
   }
+  .map-container.map {
+    &.side {
+      flex-direction: row;
+    }
+  }
   // Bubble Specific
   .map-container.bubble {
     &.side {

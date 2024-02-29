@@ -496,6 +496,7 @@ export const supportedCountries = {
   'Easter Island': ['Easter Island'],
   'Canary Islands': ['Canary Islands'],
   Antarctica: ['Antarctica'],
+  ATA: ['Antarctica'],
   'Madeira Islands': ['Madeira Islands'],
   'Gaza/West Bank': ['Gaza/West Bank'],
   'Saint Paul and Amsterdamn Islands': ['Saint Paul and Amsterdamn Islands'],
