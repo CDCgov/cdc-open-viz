@@ -1039,7 +1039,7 @@ const EditorPanel = () => {
     const sectionValue = { ...config[section], [fieldName]: newValue }
     const updatedConfig = { ...config, [section]: sectionValue }
 
-    if (newValue === 'highlight' && config.legend.seriesHighlight.length) {
+    if (newValue === 'highlight' && config.legend.seriesHighlight?.length) {
       updatedConfig.legend.seriesHighlight.length = 0
     }
 
