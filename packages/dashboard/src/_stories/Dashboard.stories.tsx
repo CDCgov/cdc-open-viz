@@ -9,6 +9,7 @@ import Dashboard from '../CdcDashboard'
 import StandaloneTable from './_mock/standalone-table.json'
 import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within } from '@storybook/testing-library'
+import ToggleExampleConfig from './_mock/toggle-example.json'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -44,6 +45,13 @@ export const Dashboard_Filters: Story = {
 export const StandAloneTable: Story = {
   args: {
     config: StandaloneTable
+  }
+}
+
+export const ToggleExample: Story = {
+  args: {
+    config: ToggleExampleConfig,
+    isEditor: true
   }
 }
 
