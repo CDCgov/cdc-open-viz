@@ -65,7 +65,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [stateData, setStateData] = useState(config.data || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
-  const [seriesHighlight, setSeriesHighlight] = useState<string[]>(configObj?.legend?.seriesHighlight.length ? [...configObj?.legend?.seriesHighlight] : [])
+  const [seriesHighlight, setSeriesHighlight] = useState<string[]>(configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : [])
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [dimensions, setDimensions] = useState<[number?, number?]>([])
   const [externalFilters, setExternalFilters] = useState<any[]>()
@@ -481,16 +481,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.horizontal = false
     }
 
-    
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
-    
+
     // Sankey Description box error message
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Sankey' && !newConfig.description ? 'SUBTEXT/CITATION field is empty: A description of the Sankey Diagram data must be inputted.' : ''
 
-
-    if (newConfig.legend.seriesHighlight.length) {
-      setSeriesHighlight(newConfig.legend.seriesHighlight)
+    if (newConfig.legend.seriesHighlight?.length) {
+      setSeriesHighlight(newConfig.legend?.seriesHighlight)
     }
 
     setConfig(newConfig)
@@ -1081,7 +1079,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 </>
               )}
               {/* Sankey */}
-              {config.visualizationType === 'Sankey' && <ParentSize aria-hidden="true">{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>}
+              {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>}
               {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend />}
             </div>
             {/* Link */}
