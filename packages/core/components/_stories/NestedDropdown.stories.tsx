@@ -9,8 +9,6 @@ const meta: Meta<typeof NestedDropdown> = {
 
 type Story = StoryObj<typeof NestedDropdown>
 
-// type MyData = { country: string; regions: Array<Object>}
-
 export const Primary: Story = {
   args: {
     data: [
