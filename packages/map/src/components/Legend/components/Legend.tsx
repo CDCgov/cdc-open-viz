@@ -94,7 +94,7 @@ const Legend = () => {
             toggleLegendActive(idx, legendLabel)
           }}
         >
-          <LegendCircle fill={entry.color} /> <span className='label'>{legendLabel}</span>
+          <LegendCircle fill={entry.color} /> <span>{legendLabel}</span>
         </li>
       )
     })
