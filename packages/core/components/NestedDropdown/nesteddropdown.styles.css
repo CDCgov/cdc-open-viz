@@ -1,0 +1,81 @@
+.nested-dropdown {
+  li {
+    list-style: none;
+    cursor: pointer;
+
+    &:focus {
+      border: 2px solid orange;
+    }
+  }
+
+  .searchInput {
+    border: none;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .nested-dropdown__option {
+    padding: 7px 15px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 325px;
+    cursor: pointer;
+  }
+
+  .secondTierValue {
+    display: inline-block;
+  }
+
+  .selectableItem:hover {
+    background-color: #ccc;
+  }
+
+  & > div {
+    position: relative;
+    & > span {
+      position: absolute;
+      font-size: 10px;
+      top: 4px;
+      right: 12px;
+      padding: 9px;
+      background: #fff;
+      pointer-events: none;
+    }
+  }
+
+  & > ul {
+    max-height: 375px;
+    overflow-y: scroll;
+    position: absolute;
+    z-index: 3;
+    width: 375px;
+
+    & > li {
+      font-weight: bold;
+
+      & > ul > li {
+        position: relative;
+        font-weight: normal;
+        white-space: nowrap;
+        & > span {
+          position: absolute;
+          left: -20px;
+        }
+      }
+    }
+  }
+
+  .nested-dropdown__group--hidden > ul {
+    display: none;
+  }
+
+  .ShowAllItem {
+    margin-left: 20px;
+  }
+
+  .hide {
+    display: none;
+  }
+}
