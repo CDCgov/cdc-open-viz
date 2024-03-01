@@ -87,7 +87,7 @@ const Regions = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, handleToolt
         width = to - from
       }
 
-      if (region.fromType === 'Previous Days' && xAxis.type === 'date' && xAxis.sortDates && config.visualizationType === 'Line') {
+      if (region.fromType === 'Previous Days' && xAxis.type === 'date-time' && config.visualizationType === 'Line') {
         let domain = xScale.domain()
         let previousDays = Number(region.from)
         let to = region.toType === 'Last Date' ? formatDate(config.xAxis.dateParseFormat, domain[domain.length - 1]) : region.to

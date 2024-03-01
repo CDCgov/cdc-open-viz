@@ -55,7 +55,7 @@ const ZoomBrush: FC<Props> = props => {
       .find(item => item !== undefined)
     const startValue = xValues.find(item => item !== undefined)
 
-    const formatIfDate = value => (config.runtime.xAxis.type === 'date' ? formatDate(parseDate(value)) : value)
+    const formatIfDate = value => (config.runtime.xAxis.type === 'date' || config.runtime.xAxis.type === 'date-time' ? formatDate(parseDate(value)) : value)
 
     setTextProps(prev => ({
       ...prev,

@@ -19,7 +19,7 @@ const AreaChart = props => {
   if (!data) return
 
   const handleX = d => {
-    return (config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+    return (config.xAxis.type === 'date' || config.xAxis.type === 'date-time' ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
   }
 
   const handleY = (d, index, s = undefined) => {

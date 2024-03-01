@@ -20,7 +20,7 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
 
   const handleDateCategory = value => {
     if (config.xAxis.type === 'categorical') return xScale(value)
-    if (config.xAxis.type === 'date') {
+    if (config.xAxis.type === 'date' || config.xAxis.type === 'date-time') {
       let date = new Date(value)
       return xScale(date)
     }

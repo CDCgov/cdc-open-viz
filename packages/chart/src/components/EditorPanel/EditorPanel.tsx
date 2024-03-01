@@ -350,7 +350,7 @@ const EditorPanel = () => {
     if (updatedConfig.visualizationType === 'Combo') {
       updatedConfig.orientation = 'vertical'
     }
-    if (updatedConfig.xAxis.sortDates && !updatedConfig.xAxis.padding) {
+    if (updatedConfig.xAxis.type === 'date-time' && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 6
     }
   }
@@ -1669,10 +1669,27 @@ const EditorPanel = () => {
                       <>
                         {config.visualizationType !== 'Forest Plot' && (
                           <>
-                            <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
-                            {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.xAxis.type === 'date' && config.orientation !== 'horizontal' && (
-                              <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />
-                            )}{' '}
+                            <label>
+                              <span className='edit-label'>Data Scaling Type</span>
+                              <select
+                                value={config.xAxis.type}
+                                onChange={e =>
+                                  updateConfig({
+                                    ...config,
+                                    xAxis: {
+                                      ...config.xAxis,
+                                      type: e.target.value
+                                    }
+                                  })
+                                }
+                              >
+                                <option value='categorical'>Categorical (Linear Scale)</option>
+                                <option value='date'>Date (Linear Scale)</option>
+                                {config.visualizationType !== 'Bar' && <option value='date-time'>Date (Date Time Scale)</option>}
+                                {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
+                              </select>
+                            </label>
+
                             {visSupportsDateCategoryAxisPadding() && (
                               <TextField
                                 value={config.xAxis.padding}
@@ -1805,7 +1822,7 @@ const EditorPanel = () => {
                           </>
                         )}
 
-                        {config.xAxis.type === 'date' && (
+                        {(config.xAxis.type === 'date' || config.xAxis.type === 'date-time') && (
                           <>
                             <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                               Format how charts should parse and display your dates using{' '}

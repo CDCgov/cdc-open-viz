@@ -99,7 +99,7 @@ const LinearChart = props => {
   })
 
   // getters & functions
-  const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getXAxisData = d => (config.runtime.xAxis.type === 'date' || config.runtime.xAxis.type === 'date-time' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = config.brush.active && config.brush.data?.length ? config.brush.data.map(d => getXAxisData(d)) : data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
@@ -122,7 +122,7 @@ const LinearChart = props => {
 
     if (config.data && !config.data[index] && visualizationType === 'Forest Plot') return
     if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
-    if (runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
+    if (runtime.yAxis.type === 'date' || runtime.yAxis.type === 'date-time') return formatDate(parseDate(tick))
     if (orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
   }
@@ -133,7 +133,7 @@ const LinearChart = props => {
       tick = 0
     }
 
-    if (runtime.xAxis.type === 'date' && config.visualizationType !== 'Forest Plot') return formatDate(tick)
+    if ((runtime.xAxis.type === 'date' || runtime.xAxis.type === 'date-time') && config.visualizationType !== 'Forest Plot') return formatDate(tick)
     if (orientation === 'horizontal' && config.visualizationType !== 'Forest Plot') return formatNumber(tick, 'left', shouldAbbreviate)
     if (config.xAxis.type === 'continuous' && config.visualizationType !== 'Forest Plot') return formatNumber(tick, 'bottom', shouldAbbreviate)
     if (config.visualizationType === 'Forest Plot') return formatNumber(tick, 'left', config.dataFormat.abbreviated, config.runtime.xAxis.prefix, config.runtime.xAxis.suffix, Number(config.dataFormat.roundTo))
@@ -502,7 +502,16 @@ const LinearChart = props => {
           )}
           {visualizationType === 'Paired Bar' && (
             <>
-              <AxisBottom top={yMax} left={Number(runtime.yAxis.size)} label={runtime.xAxis.label} tickFormat={runtime.xAxis.type === 'date' ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={runtime.xAxis.numTicks || undefined}>
+              <AxisBottom
+                top={yMax}
+                left={Number(runtime.yAxis.size)}
+                label={runtime.xAxis.label}
+                tickFormat={runtime.xAxis.type === 'date' || runtime.xAxis.type === 'date-time' ? formatDate : formatNumber}
+                scale={g1xScale}
+                stroke='#333'
+                tickStroke='#333'
+                numTicks={runtime.xAxis.numTicks || undefined}
+              >
                 {props => {
                   return (
                     <Group className='bottom-axis'>
@@ -529,7 +538,7 @@ const LinearChart = props => {
                 top={yMax}
                 left={Number(runtime.yAxis.size)}
                 label={runtime.xAxis.label}
-                tickFormat={runtime.xAxis.type === 'date' ? formatDate : runtime.xAxis.dataKey !== 'Year' ? formatNumber : tick => tick}
+                tickFormat={runtime.xAxis.type === 'date' || runtime.xAxis.type === 'date-time' ? formatDate : runtime.xAxis.dataKey !== 'Year' ? formatNumber : tick => tick}
                 scale={g2xScale}
                 stroke='#333'
                 tickStroke='#333'
@@ -708,7 +717,7 @@ const LinearChart = props => {
                 newX = yAxis
               }
 
-              let anchorPosition = newX.type === 'date' ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
+              let anchorPosition = newX.type === 'date' || newX.type === 'date-time' ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
 
               // have to move up
               // const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
