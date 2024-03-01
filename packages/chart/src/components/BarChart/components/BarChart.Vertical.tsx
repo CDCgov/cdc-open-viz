@@ -75,7 +75,7 @@ export const BarChartVertical = () => {
           height={yMax}
           x0={d => {
             const rawXValue = d[config.runtime.originalXAxis.dataKey]
-            return config.runtime.xAxis.type === 'date' ? parseDate(rawXValue) : rawXValue
+            return config.runtime.xAxis.type === 'date' || config.runtime.xAxis.type === 'date-time' ? parseDate(rawXValue) : rawXValue
           }}
           x0Scale={xScale}
           x1Scale={seriesScale}

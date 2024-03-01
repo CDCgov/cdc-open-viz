@@ -350,7 +350,7 @@ const EditorPanel = () => {
     if (updatedConfig.visualizationType === 'Combo') {
       updatedConfig.orientation = 'vertical'
     }
-    if (updatedConfig.xAxis.type === 'date-time' && !updatedConfig.xAxis.padding) {
+    if ((updatedConfig.xAxis.type === 'date-time' || config.xAxis.type === 'date') && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 6
     }
   }
@@ -1685,7 +1685,7 @@ const EditorPanel = () => {
                               >
                                 <option value='categorical'>Categorical (Linear Scale)</option>
                                 <option value='date'>Date (Linear Scale)</option>
-                                {config.visualizationType !== 'Bar' && <option value='date-time'>Date (Date Time Scale)</option>}
+                                <option value='date-time'>Date (Date Time Scale)</option>
                                 {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
                               </select>
                             </label>
