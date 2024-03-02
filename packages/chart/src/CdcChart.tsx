@@ -219,6 +219,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     }
     let newConfig = { ...defaults, ...response }
+    if(newConfig.filters){
+      const urlParams = new URLSearchParams(window.location.search);
+      newConfig.filters.forEach((filter, index) => {
+        if(filter.setByQueryParameter && urlParams.get(filter.setByQueryParameter)){
+          if(filter.values && filter.values.includes(urlParams.get(filter.setByQueryParameter))){
+            newConfig.filters[index].active = urlParams.get(filter.setByQueryParameter)
+          }
+        }
+      })
+    }
+
     if (newConfig.visualizationType === 'Box Plot') {
       newConfig.legend.hide = true
     }

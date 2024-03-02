@@ -24,7 +24,13 @@ export const getUpdateConfig =
           _filter.values = filterValues
           if (filterValues.length > 0) {
             const defaultValues = _filter.pivot ? _filter.values : _filter.values[0]
-            _filter.active = _filter.active || defaultValues
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if(_filter.setByQueryParameter && urlParams.get(_filter.setByQueryParameter) && _filter.values && _filter.values.includes(urlParams.get(_filter.setByQueryParameter))){
+              _filter.active = urlParams.get(_filter.setByQueryParameter)
+            } else {
+              _filter.active = _filter.active || defaultValues
+            }
           }
         }
 
