@@ -2703,6 +2703,17 @@ const EditorPanel = () => {
                               </label>
 
                               <label>
+                                <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
+                                <input
+                                  type='text'
+                                  value={filter.setByQueryParameter}
+                                  onChange={e => {
+                                    updateFilterProp('setByQueryParameter', index, e.target.value)
+                                  }}
+                                />
+                              </label>
+
+                              <label>
                                 <span className='edit-filterOrder column-heading'>Filter Order</span>
                                 <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
                                   {filterOrderOptions.map((option, index) => {
