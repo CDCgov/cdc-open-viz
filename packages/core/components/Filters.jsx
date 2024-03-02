@@ -71,6 +71,14 @@ export const useFilters = props => {
 
   const announceChange = text => {}
 
+  const getQueryParams = () => {
+    let queryParams = {};
+    for (const [key, value] of (new URLSearchParams(window.location.search)).entries()) {
+      queryParams[key] = value
+    }
+    return queryParams;
+  }
+
   const changeFilterActive = (index, value) => {
     let newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
 
@@ -78,7 +86,15 @@ export const useFilters = props => {
       newFilters[index].queuedActive = value
       setShowApplyButton(true)
     } else {
-      newFilters[index].active = value
+      let newFilter = newFilters[index];
+      newFilter.active = value
+      
+      let queryParams = getQueryParams();
+      if(newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active){
+        queryParams[newFilter.setByQueryParameter] = newFilter.active;
+        const updateUrl = `${window.location.origin}${window.location.pathname}?${Object.keys(queryParams).map(queryParam => `${queryParam}=${encodeURIComponent(queryParams[queryParam])}`).join('&')}`;
+        window.history.pushState({path: updateUrl}, '', updateUrl);
+      }
     }
     setConfig({ 
       ...visualizationConfig,
@@ -97,12 +113,22 @@ export const useFilters = props => {
   }
 
   const handleApplyButton = newFilters => {
+    let needsQueryUpdate = false;
+    let queryParams = getQueryParams();
     newFilters.forEach(newFilter => {
       if(newFilter.queuedActive){
         newFilter.active = newFilter.queuedActive
         delete newFilter.queuedActive
+        if(newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active){
+          queryParams[newFilter.setByQueryParameter] = newFilter.active;
+          needsQueryUpdate = true;
+        }
       }
     })
+    if(needsQueryUpdate){
+      const updateUrl = `${window.location.origin}${window.location.pathname}?${Object.keys(queryParams).map(queryParam => `${queryParam}=${encodeURIComponent(queryParams[queryParam])}`).join('&')}`;
+      window.history.pushState({path: updateUrl}, '', updateUrl);
+    }
     
     setConfig({ ...visualizationConfig, filters: newFilters })
 
