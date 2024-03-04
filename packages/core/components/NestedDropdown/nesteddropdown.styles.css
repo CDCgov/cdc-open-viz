@@ -4,37 +4,34 @@
     cursor: pointer;
 
     &:focus {
-      border: 2px solid orange;
+      border: 2px solid var(--orange);
     }
   }
 
-  .searchInput {
+  .search-input {
     border: none;
     position: relative;
     display: inline-block;
     width: 100%;
   }
 
-  .nested-dropdown__option {
+  .main-nested-dropdown-container,
+  .nested-dropdown-input-container {
     padding: 7px 15px;
-    background: white;
-    border: 1px solid #ccc;
+    background: #fff;
+    border: 1px solid var(--lightGray);
     border-radius: 5px;
     width: 325px;
     cursor: pointer;
   }
 
-  .secondTierValue {
-    display: inline-block;
-  }
-
-  .selectableItem:hover {
-    background-color: #ccc;
+  .selectable-item:hover {
+    background-color: var(--lightGray);
   }
 
   & > div {
     position: relative;
-    & > span {
+    & > span.list-arrow {
       position: absolute;
       font-size: 10px;
       top: 4px;
@@ -67,12 +64,8 @@
     }
   }
 
-  .nested-dropdown__group--hidden > ul {
+  .nested-dropdown-group-collapsed > ul {
     display: none;
-  }
-
-  .ShowAllItem {
-    margin-left: 20px;
   }
 
   .hide {

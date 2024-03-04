@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import './nesteddropdown.styles.css'
+import Icon from '@cdc/core/components/ui/Icon'
 
 const Options: React.FC<{
   currentOptions: (string | number)[]
@@ -10,12 +11,14 @@ const Options: React.FC<{
 }> = ({ currentOptions, label, handleSecondTierSelect, userSelectedTierTwoLabel, userSearchTerm }) => {
   const [isTierOneExpanded, setIsTierOneExpanded] = useState(true)
 
+  const checkMark = <>&#10004;</>
+
   useEffect(() => {
     setIsTierOneExpanded(userSearchTerm.length > 0 ? true : isTierOneExpanded)
   }, [userSearchTerm])
 
   const handleGroupClick = e => {
-    const leaveExpanded = e.target.className === 'selectableItem' ? true : !isTierOneExpanded
+    const leaveExpanded = e.target.className === 'selectable-item' ? true : !isTierOneExpanded
     setIsTierOneExpanded(leaveExpanded)
   }
 
@@ -27,17 +30,22 @@ const Options: React.FC<{
     const currentItem = e.target
     if (e.key === 'ArrowRight') setIsTierOneExpanded(true)
     else if (e.key === 'ArrowLeft') {
-      if (currentItem.className === 'selectableItem') currentItem.parentNode.parentNode.focus()
+      if (currentItem.className === 'selectable-item') currentItem.parentNode.parentNode.focus()
       setIsTierOneExpanded(false)
     } else if (e.key === 'Enter') {
-      currentItem.className === 'selectableItem' ? handleSecondTierClick(currentItem.dataset.value) : setIsTierOneExpanded(!isTierOneExpanded)
+      currentItem.className === 'selectable-item' ? handleSecondTierClick(currentItem.dataset.value) : setIsTierOneExpanded(!isTierOneExpanded)
     }
   }
 
   return (
     <>
-      <li role='treeitem' key={label} tabIndex={0} aria-label={label} onClick={handleGroupClick} onKeyUp={handleKeyUp} className={isTierOneExpanded ? 'nested-dropdown__group' : 'nested-dropdown__group--hidden'}>
-        <span id={label}>{label}</span> {<span aria-hidden='true'> {isTierOneExpanded ? <>&#9662;</> : <>&#9652;</>}</span>}
+      <li role='treeitem' key={label} tabIndex={0} aria-label={label} onClick={handleGroupClick} onKeyUp={handleKeyUp} className={`nested-dropdown-group${isTierOneExpanded ? '' : '-collapsed'}`}>
+        <span id={label}>{label}</span>{' '}
+        {
+          <span className='list-arrow' aria-hidden='true'>
+            {isTierOneExpanded ? <Icon display='caretFilledUp' /> : <Icon display='caretFilledDown' />}
+          </span>
+        }
         <ul className='' aria-expanded={isTierOneExpanded} role='group' tabIndex={-1} aria-labelledby={label}>
           {currentOptions.map(tierTwo => {
             const regionID = label + tierTwo
@@ -45,7 +53,7 @@ const Options: React.FC<{
             return (
               <li
                 key={regionID}
-                className='selectableItem'
+                className='selectable-item'
                 tabIndex={0}
                 role='treeitem'
                 aria-label={regionID}
@@ -55,7 +63,7 @@ const Options: React.FC<{
                   handleSecondTierClick(tierTwo)
                 }}
               >
-                {isSelected ? <span aria-hidden='true'>&#10004;</span> : ''}
+                {isSelected ? <span aria-hidden='true'>{checkMark}</span> : ''}
 
                 {tierTwo}
               </li>
@@ -108,18 +116,18 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
 
   const handleKeyUp = e => {
     const { nodeName, className, parentNode, nextSibling, lastChild, previousSibling } = e.target
-
+    const Dropdown = searchDropdown.current
     switch (e.key) {
       case 'ArrowDown': {
         if (nodeName === 'INPUT') {
           setIsListOpened(true)
           // Move focus from Input to top of dropdown
-          searchDropdown.current.firstChild.focus()
-        } else if (className === 'selectableItem') {
+          Dropdown.firstChild.focus()
+        } else if (className === 'selectable-item') {
           // Move focus to next item on list: next Tier Two item or the next Tier One or SearchInput
           const itemToFocusOnAfterKeyUp = nextSibling ?? parentNode.parentNode.nextSibling ?? searchInput.current
           itemToFocusOnAfterKeyUp.focus()
-        } else if (className === 'nested-dropdown__group--hidden') {
+        } else if (className === 'nested-dropdown-group-collapsed') {
           // If Tier One is collapsed, move to next Tier One or move focus back to the top Input
           const itemToFocusOnAfterKeyUp = nextSibling ?? searchInput.current
           itemToFocusOnAfterKeyUp.focus()
@@ -133,19 +141,20 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
       case 'ArrowUp': {
         if (nodeName === 'INPUT') {
           setIsListOpened(true)
-          // Move focus from Input to collapsed Tier Two or last item of Tier Two
-          if (searchDropdown.current.lastChild.className === 'nested-dropdown__group--hidden') {
-            searchDropdown.current.lastChild.focus()
+          if (Dropdown.lastChild.className === 'nested-dropdown-group-collapsed') {
+            // Move focus from Input textbox to the last collapsed Tier Two in dropdown
+            Dropdown.lastChild.focus()
           } else {
-            searchDropdown.current.lastChild.lastChild.lastChild.focus()
+            // Move focus to last item of the last collapsed Tier Two in dropdown
+            Dropdown.lastChild.lastChild.lastChild.focus()
           }
-        } else if (className === 'selectableItem') {
+        } else if (className === 'selectable-item') {
           // Move focus to previous Tier Two or Move focus to current Tier One
           const itemToFocusOnAfterKeyUp = previousSibling ?? parentNode.parentNode
           itemToFocusOnAfterKeyUp.focus()
         } else if (previousSibling) {
           // Move focus to previous collapsed Tier One or Move focus from Tier One to the last of the previous Tier Two's items
-          const itemToFocusOnAfterKeyUp = previousSibling.className === 'nested-dropdown__group--hidden' ? previousSibling : previousSibling.lastChild.lastChild
+          const itemToFocusOnAfterKeyUp = previousSibling.className === 'nested-dropdown-group-collapsed' ? previousSibling : previousSibling.lastChild.lastChild
           itemToFocusOnAfterKeyUp.focus()
           // } else if (e.target !== searchInput.current) {
         } else {
@@ -183,11 +192,13 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
     const newOptions: Record<string, (string | number)[]> = {}
     const newRegex = new RegExp(`^${userSearchTerm}`, 'i')
     for (const tierOne in optsMemo) {
-      const newSecondTierOptions = optsMemo[tierOne].filter(tierTwo => String(tierTwo).match(newRegex))
-      if (newSecondTierOptions.length > 0) {
-        newOptions[tierOne] = newSecondTierOptions
-      } else if (tierOne.match(newRegex)) {
+      if (tierOne.match(newRegex)) {
         newOptions[tierOne] = [...optsMemo[tierOne]]
+      } else {
+        const newSecondTierOptions = optsMemo[tierOne].filter(tierTwo => String(tierTwo).match(newRegex))
+        if (newSecondTierOptions.length > 0) {
+          newOptions[tierOne] = newSecondTierOptions
+        }
       }
     }
     return newOptions
@@ -195,7 +206,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
 
   const filterOptionsKeys = Object.keys(filterOptions)
 
-  const handleSearchTermChange = (e: { target: { value: any } }) => {
+  const handleSearchTermChange = e => {
     const newSearchTerm = e.target.value
     setIsListOpened(true)
     setUserSearchTerm(newSearchTerm)
@@ -204,10 +215,10 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
 
   return (
     <>
-      <div id='main-nested-dropdown' className='nested-dropdown' onKeyUp={handleKeyUp}>
-        <div className='nested-dropdown__option' aria-label='searchInput' role='textbox'>
+      <div id='nested-dropdown-container' className='nested-dropdown' onKeyUp={handleKeyUp}>
+        <div className='nested-dropdown-input-container' aria-label='searchInput' role='textbox'>
           <input
-            className='searchInput'
+            className='search-input'
             ref={searchInput}
             aria-label='searchInput'
             aria-haspopup='true'
@@ -222,11 +233,11 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
             onFocus={() => setInputHasFocus(true)}
             onBlur={() => setInputHasFocus(false)}
           />
-          <span className='listArrow' aria-hidden={true}>
-            {isListOpened ? <>&#9660;</> : <>&#9650;</>}
+          <span className='list-arrow' aria-hidden={true}>
+            {isListOpened ? <Icon display='caretFilledUp' /> : <Icon display='caretFilledDown' />}
           </span>
         </div>
-        <ul role='tree' key={listLabel} tabIndex={-1} aria-labelledby='main-nested-dropdown' aria-expanded={isListOpened} ref={searchDropdown} className={`nested-dropdown__option ${isListOpened === true ? '' : ' hide'}`}>
+        <ul role='tree' key={listLabel} tabIndex={-1} aria-labelledby='main-nested-dropdown' aria-expanded={isListOpened} ref={searchDropdown} className={`main-nested-dropdown-container ${isListOpened ? '' : 'hide'}`}>
           {filterOptions && filterOptionsKeys.length > 0
             ? filterOptionsKeys.map((tierOne: string) => {
                 return (
@@ -234,7 +245,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
                     currentOptions={filterOptions[tierOne]}
                     label={tierOne}
                     handleSecondTierSelect={(tierTwo: string) => {
-                      chooseSelectedSecondTier(tierOne, tierTwo), tierTwo
+                      chooseSelectedSecondTier(tierOne, tierTwo)
                     }}
                     userSelectedTierTwoLabel={userSelectedTierTwoLabel}
                     userSearchTerm={userSearchTerm}
