@@ -215,7 +215,7 @@ export const BarChartHorizontal = () => {
                             }
                           }}
                         >
-                          <div style={{ position: 'relative' }}>
+                          <div style={{ position: 'fixed' }}>
                             <div style={iconStyle}>{getIcon(bar, barWidth)}</div>
                             <div style={{ ...finalStyle }}></div>
                           </div>
