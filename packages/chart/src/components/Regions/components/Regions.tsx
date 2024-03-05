@@ -28,7 +28,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       let date = new Date(region.from)
       let f = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
       from = xScale(f)
-      if (visualizationType === 'Bar' || config.visualizationType === 'Combo') {
+      if (visualizationType === 'Bar' || config.visualizationType === 'Combo' || visualizationType === 'Line') {
         from = region.fromType !== 'Previous Days' ? xScale(parseDate(region.from)) : null
       }
     }
@@ -42,20 +42,25 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       let d = region.toType === 'Last Date' ? new Date(domain[domain.length - 1]) : new Date(region.to) // on categorical charts force leading zero 03/15/2016 vs 3/15/2016 for valid date format
       let to = config.xAxis.type === 'categorical' ? formatDate(config.xAxis.dateParseFormat, d) : formatDate(config.xAxis.dateParseFormat, d)
       let toDate = new Date(to)
-      console.log('toDate', toDate)
       from = new Date(toDate.setDate(toDate.getDate() - previousDays))
-      let categoricalFormattedDate = formatDate(config.xAxis.dateParseFormat, from)
-      const isDate = date => date === categoricalFormattedDate
-      let index = categoricalDomain.findIndex(isDate)
-      debugger
-      let categoricalIndexValue = xScale.domain()[index]
 
-      from = config.xAxis.type === 'categorical' ? categoricalIndexValue : from
+      if (xAxis.type === 'categorical') {
+        let categoricalFormattedDate = formatDate(config.xAxis.dateParseFormat, from)
+        const isDate = date => date === categoricalFormattedDate
+        let index = categoricalDomain.findIndex(isDate)
+        let categoricalIndexValue = xScale.domain()[index]
+        from = config.xAxis.type === 'categorical' ? categoricalIndexValue : from
+      }
+
       from = xScale(from)
     }
 
     if (xAxis.type === 'categorical' && region.fromType !== 'Previous Days') {
       from = xScale(region.from)
+    }
+
+    if (visualizationType === 'Line') {
+      from = from + Number((visualizationType === 'Line' && (config.xAxis.type === 'date' || config.xAxis.type === 'date-time')) || config.xAxis.type === 'categorical' ? (xScale.bandwidth ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) : 0)
     }
 
     return from
@@ -69,7 +74,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       to = xScale(region.to)
     }
 
-    if (xAxis.type === 'date') {
+    if (xAxis.type === 'date' || xAxis.type === 'date-time') {
       if (!region?.toType || region.toType === 'Fixed') {
         to = xScale(parseDate(region.to).getTime())
       }
@@ -81,9 +86,16 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     if (region.toType === 'Last Date') {
       let domainValues = xScale.domain()
       let lastDate = domainValues[domainValues.length - 1]
-      to = Number(xScale(lastDate) + (visualizationType === 'Bar' || visualizationType === 'Combo' ? barWidth * totalBarsInGroup : 0))
+      to = Number(xScale(lastDate) + ((visualizationType === 'Bar' || visualizationType === 'Combo') && config.xAxis.type === 'date' ? barWidth * totalBarsInGroup : 0))
     }
-    console.log('to value', to)
+
+    if (visualizationType === 'Line') {
+      to = to + Number((visualizationType === 'Line' && (config.xAxis.type === 'date' || config.xAxis.type === 'date-time')) || config.xAxis.type === 'categorical' ? (xScale.bandwidth ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) : 0)
+    }
+
+    if ((visualizationType === 'Bar' || visualizationType === 'Combo') && xAxis.type === 'categorical') {
+      to = to + (visualizationType === 'Bar' || visualizationType === 'Combo' ? barWidth * totalBarsInGroup : 0)
+    }
     return to
   }
 
@@ -91,8 +103,8 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
 
   if (regions && orientation === 'vertical') {
     return regions.map(region => {
-      const from = getFromValue(region) + Number((visualizationType === 'Line' && config.xAxis.type === 'date') || config.xAxis.type === 'categorical' ? (xScale.bandwidth ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) : 0)
-      const to = getToValue(region) + Number((visualizationType === 'Line' && config.xAxis.type === 'date') || config.xAxis.type === 'categorical' ? (xScale.bandwidth ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) : 0)
+      const from = getFromValue(region)
+      const to = getToValue(region)
       const width = getWidth(to, from)
 
       if (!from) return null
