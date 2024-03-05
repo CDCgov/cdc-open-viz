@@ -52,7 +52,7 @@ const LineChart = (props: LineChartProps) => {
 
   return (
     <ErrorBoundary component='LineChart'>
-      <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
+      <Group left={config.runtime.yAxis.size}>
         {' '}
         {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {

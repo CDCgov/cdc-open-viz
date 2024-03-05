@@ -66,6 +66,7 @@ const LinearChart = props => {
   let [width] = dimensions
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
     width = width * 0.73
+    console.log('width', width)
   }
   //  configure height , yMax, xMax
   const { horizontal: heightHorizontal } = config.heights

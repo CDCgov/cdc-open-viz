@@ -14,89 +14,86 @@ type RegionsProps = {
   totalBarsInGroup?: number
 }
 
-const Regions = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, handleTooltipMouseOff, handleTooltipMouseOver, handleTooltipClick, tooltipData, showTooltip, hideTooltip }: RegionsProps) => {
+// TODO: should regions be removed on categorical axis?
+const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, handleTooltipMouseOff, handleTooltipMouseOver, handleTooltipClick, tooltipData, showTooltip, hideTooltip }) => {
   const { parseDate, config } = useContext<ChartContext>(ConfigContext)
 
   const { runtime, regions, visualizationType, orientation, xAxis } = config
 
-  let from
-  let to
-  let width
+  const getFromValue = region => {
+    let from
+
+    // Fixed Date
+    if (!region?.fromType || region.fromType === 'Fixed') {
+      let date = new Date(region.from)
+      let f = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
+      from = xScale(f)
+      if (visualizationType === 'Bar' || config.visualizationType === 'Combo') {
+        from = region.fromType !== 'Previous Days' ? xScale(parseDate(region.from)) : null
+      }
+    }
+
+    // Previous Date
+    if (region.fromType === 'Previous Days') {
+      let previousDays = Number(region.from) || 0
+
+      let domain = xScale.domain()
+      let categoricalDomain = xScale.domain().map(d => formatDate(config.xAxis.dateParseFormat, new Date(d)))
+      let d = region.toType === 'Last Date' ? new Date(domain[domain.length - 1]) : new Date(region.to) // on categorical charts force leading zero 03/15/2016 vs 3/15/2016 for valid date format
+      let to = config.xAxis.type === 'categorical' ? formatDate(config.xAxis.dateParseFormat, d) : formatDate(config.xAxis.dateParseFormat, d)
+      let toDate = new Date(to)
+      console.log('toDate', toDate)
+      from = new Date(toDate.setDate(toDate.getDate() - previousDays))
+      let categoricalFormattedDate = formatDate(config.xAxis.dateParseFormat, from)
+      const isDate = date => date === categoricalFormattedDate
+      let index = categoricalDomain.findIndex(isDate)
+      debugger
+      let categoricalIndexValue = xScale.domain()[index]
+
+      from = config.xAxis.type === 'categorical' ? categoricalIndexValue : from
+      from = xScale(from)
+    }
+
+    if (xAxis.type === 'categorical' && region.fromType !== 'Previous Days') {
+      from = xScale(region.from)
+    }
+
+    return from
+  }
+
+  const getToValue = region => {
+    let to
+
+    // when xScale is categorical leading zeros are removed, ie. 03/15/2016 is 3/15/2016
+    if (xAxis.type === 'categorical') {
+      to = xScale(region.to)
+    }
+
+    if (xAxis.type === 'date') {
+      if (!region?.toType || region.toType === 'Fixed') {
+        to = xScale(parseDate(region.to).getTime())
+      }
+
+      if (visualizationType === 'Bar' || config.visualizationType === 'Combo') {
+        to = region.toType !== 'Last Date' ? xScale(parseDate(region.to).getTime()) + barWidth * totalBarsInGroup : to
+      }
+    }
+    if (region.toType === 'Last Date') {
+      let domainValues = xScale.domain()
+      let lastDate = domainValues[domainValues.length - 1]
+      to = Number(xScale(lastDate) + (visualizationType === 'Bar' || visualizationType === 'Combo' ? barWidth * totalBarsInGroup : 0))
+    }
+    console.log('to value', to)
+    return to
+  }
+
+  const getWidth = (to, from) => to - from
 
   if (regions && orientation === 'vertical') {
     return regions.map(region => {
-      if (xAxis.type === 'date' && region.fromType !== 'Previous Days') {
-        from = xScale(parseDate(region.from).getTime())
-        to = xScale(parseDate(region.to).getTime())
-        width = to - from
-      }
-
-      if (xAxis.type === 'categorical') {
-        from = xScale(region.from)
-        to = xScale(region.to)
-        width = to - from
-      }
-
-      if ((visualizationType === 'Bar' || config.visualizationType === 'Combo') && xAxis.type === 'date') {
-        from = region.fromType !== 'Previous Days' ? xScale(parseDate(region.from).getTime()) - (barWidth * totalBarsInGroup) / 2 : null
-        to = region.toType !== 'Last Date' ? xScale(parseDate(region.to).getTime()) + (barWidth * totalBarsInGroup) / 2 : null
-
-        width = to - from
-      }
-
-      if ((visualizationType === 'Bar' || config.visualizationType === 'Combo') && config.xAxis.type === 'categorical') {
-        from = xScale(region.from)
-        to = xScale(region.to)
-        width = to - from
-      }
-
-      if (region.fromType === 'Previous Days') {
-        to = region.toType !== 'Last Date' ? xScale(parseDate(region.to).getTime()) + (barWidth * totalBarsInGroup) / 2 : null
-
-        let domain = xScale.domain()
-        let bisectDate = d3.bisector(d => d).left
-        let closestValue
-
-        let previousDays = Number(region.from)
-        let lastDate = region.toType === 'Last Date' ? domain[domain.length - 1] : region.to
-        let toDate = new Date(lastDate)
-
-        from = new Date(toDate.setDate(toDate.getDate() - previousDays)).getTime()
-        let targetValue = from
-
-        let index = bisectDate(domain, targetValue)
-        if (index === 0) {
-          closestValue = domain[0]
-        } else if (index === domain.length) {
-          closestValue = domain[domain.length - 1]
-        } else {
-          let d0 = domain[index - 1]
-          let d1 = domain[index]
-          closestValue = targetValue - d0 > d1 - targetValue ? d1 : d0
-        }
-        from = Number(xScale(closestValue) - (visualizationType === 'Bar' || visualizationType === 'Combo' ? (barWidth * totalBarsInGroup) / 2 : 0))
-
-        width = to - from
-      }
-
-      // set the region max to the charts max range.
-      if (region.toType === 'Last Date') {
-        let domainValues = xScale.domain()
-        let lastDate = domainValues[domainValues.length - 1]
-        to = Number(xScale(lastDate) + (visualizationType === 'Bar' || visualizationType === 'Combo' ? (barWidth * totalBarsInGroup) / 2 : 0))
-        width = to - from
-      }
-
-      if (region.fromType === 'Previous Days' && xAxis.type === 'date-time' && config.visualizationType === 'Line') {
-        let domain = xScale.domain()
-        let previousDays = Number(region.from)
-        let to = region.toType === 'Last Date' ? formatDate(config.xAxis.dateParseFormat, domain[domain.length - 1]) : region.to
-        let toDate = new Date(to)
-        from = new Date(toDate.setDate(toDate.getDate() - previousDays)).getTime()
-        from = xScale(from)
-        to = xScale(parseDate(to))
-        width = to - from
-      }
+      const from = getFromValue(region) + Number((visualizationType === 'Line' && config.xAxis.type === 'date') || config.xAxis.type === 'categorical' ? (xScale.bandwidth ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) : 0)
+      const to = getToValue(region) + Number((visualizationType === 'Line' && config.xAxis.type === 'date') || config.xAxis.type === 'categorical' ? (xScale.bandwidth ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) : 0)
+      const width = getWidth(to, from)
 
       if (!from) return null
       if (!to) return null
@@ -120,16 +117,7 @@ const Regions = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, handleToolt
       }
 
       return (
-        <Group
-          className='regions regions-group--line'
-          left={config.visualizationType === 'Bar' || config.visualizationType === 'Combo' ? 0 : config?.visualizationType === 'Line' ? Number(runtime.yAxis.size) : 0}
-          key={region.label}
-          onMouseMove={handleTooltipMouseOver}
-          onMouseLeave={handleTooltipMouseOff}
-          handleTooltipClick={handleTooltipClick}
-          tooltipData={JSON.stringify(tooltipData)}
-          showTooltip={showTooltip}
-        >
+        <Group height={100} fill='red' className='regions regions-group--line zzz' key={region.label} onMouseMove={handleTooltipMouseOver} onMouseLeave={handleTooltipMouseOff} handleTooltipClick={handleTooltipClick} tooltipData={JSON.stringify(tooltipData)} showTooltip={showTooltip}>
           <TopRegionBorderShape />
           <HighlightedArea />
           <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
