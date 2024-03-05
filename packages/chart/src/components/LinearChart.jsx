@@ -36,37 +36,14 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
-  const {
-    isEditor,
-    isDashboard,
-    computeMarginBottom,
-    transformedData: data,
-    dimensions,
-    config,
-    parseDate,
-    formatDate,
-    currentViewport,
-    formatNumber,
-    handleChartAriaLabels,
-    updateConfig,
-    handleLineType,
-    rawData,
-    capitalize,
-    setSharedFilter,
-    setSharedFilterValue,
-    getTextWidth,
-    isDebug
-  } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth } = useContext(ConfigContext)
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
-
-  const getDate = d => new Date(d[config.xAxis.dataKey])
 
   // configure width
   let [width] = dimensions
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
     width = width * 0.73
-    console.log('width', width)
   }
   //  configure height , yMax, xMax
   const { horizontal: heightHorizontal } = config.heights
@@ -389,7 +366,7 @@ const LinearChart = props => {
           {/* X axis */}
           {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
             <AxisBottom
-              top={runtime.horizontal && config.visualizationType !== 'Forest Plot' ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : config.visualizationType === 'Forest Plot' ? yMax + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
+              top={runtime.horizontal && config.visualizationType !== 'Forest Plot' ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : config.visualizationType === 'Forest Plot' ? yMax + Number(config.xAxis.axisPadding) : yMax}
               left={config.visualizationType !== 'Forest Plot' ? Number(runtime.yAxis.size) : 0}
               label={runtime.xAxis.label}
               tickFormat={handleBottomTickFormatting}
