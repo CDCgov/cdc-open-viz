@@ -31,6 +31,10 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       if (visualizationType === 'Bar' || config.visualizationType === 'Combo' || visualizationType === 'Line') {
         from = region.fromType !== 'Previous Days' ? xScale(parseDate(region.from)) : null
       }
+
+      if (visualizationType === 'Bar' && xAxis.type === 'date-time') {
+        from = from - (barWidth * totalBarsInGroup) / 2
+      }
     }
 
     // Previous Date
@@ -91,6 +95,10 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
 
     if (visualizationType === 'Line') {
       to = to + Number((visualizationType === 'Line' && (config.xAxis.type === 'date' || config.xAxis.type === 'date-time')) || config.xAxis.type === 'categorical' ? (xScale.bandwidth ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) : 0)
+    }
+
+    if (visualizationType === 'Bar' && xAxis.type === 'date-time' && region.toType !== 'Last Date') {
+      to = to - (barWidth * totalBarsInGroup) / 2
     }
 
     if ((visualizationType === 'Bar' || visualizationType === 'Combo') && xAxis.type === 'categorical') {
