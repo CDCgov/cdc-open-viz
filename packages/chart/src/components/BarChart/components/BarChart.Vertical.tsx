@@ -8,6 +8,7 @@ import { BarGroup } from '@visx/shape'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { FaStar } from 'react-icons/fa'
 import Regions from './../../Regions'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 // third party
 import chroma from 'chroma-js'
@@ -75,7 +76,7 @@ export const BarChartVertical = () => {
           height={yMax}
           x0={d => {
             const rawXValue = d[config.runtime.originalXAxis.dataKey]
-            return config.runtime.xAxis.type === 'date' || config.runtime.xAxis.type === 'date-time' ? parseDate(rawXValue) : rawXValue
+            return isDateScale(config.runtime.xAxis) ? parseDate(rawXValue) : rawXValue
           }}
           x0Scale={xScale}
           x1Scale={seriesScale}

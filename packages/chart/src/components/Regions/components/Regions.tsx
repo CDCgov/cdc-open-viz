@@ -72,13 +72,9 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       from = from + scalePadding
     }
 
-    // if (visualizationType === 'Bar' && xAxis.type === 'date') {
-    //   let scalePadding = 0
-    //   if (xScale.bandwidth) {
-    //     scalePadding += xScale.bandwidth() / 2 - barWidth * totalBarsInGroup
-    //   }
-    //   from = from + scalePadding
-    // }
+    if (visualizationType === 'Bar' && config.xAxis.type === 'date-time' && region.fromType === 'Previous Days') {
+      from = from - (barWidth * totalBarsInGroup) / 2
+    }
 
     return from
   }
@@ -91,7 +87,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       to = xScale(region.to)
     }
 
-    if (xAxis.type === 'date' || xAxis.type === 'date-time') {
+    if (isDateScale(xAxis)) {
       if (!region?.toType || region.toType === 'Fixed') {
         to = xScale(parseDate(region.to).getTime())
       }
@@ -113,7 +109,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       to = to + scalePadding
     }
 
-    if (visualizationType === 'Bar' && isDateScale(config) && region.toType !== 'Last Date') {
+    if (visualizationType === 'Bar' && config.xAxis.type === 'date-time' && region.toType !== 'Last Date') {
       to = to - (barWidth * totalBarsInGroup) / 2
     }
 

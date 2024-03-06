@@ -6,6 +6,7 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import BarChartContext from './context'
 import Regions from '../../Regions'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 const BarChartStackedVertical = () => {
   const [barWidth, setBarWidth] = useState(0)
@@ -33,7 +34,7 @@ const BarChartStackedVertical = () => {
                 const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(rawXValue)) : rawXValue
                 const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                 if (!yAxisValue) return
-                const barX = xScale(config.runtime.xAxis.type === 'date' || config.runtime.xAxis.type === 'date-time' ? parseDate(rawXValue) : rawXValue) - (config.xAxis.type === 'date-time' ? barThicknessAdjusted / 2 : 0)
+                const barX = xScale(isDateScale(config.runtime.xAxis) ? parseDate(rawXValue) : rawXValue) - (config.xAxis.type === 'date-time' ? barThicknessAdjusted / 2 : 0)
                 const style = applyRadius(barStack.index)
                 const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)

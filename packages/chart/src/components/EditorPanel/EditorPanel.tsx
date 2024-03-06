@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
 // @cdc/core
@@ -350,7 +350,7 @@ const EditorPanel = () => {
     if (updatedConfig.visualizationType === 'Combo') {
       updatedConfig.orientation = 'vertical'
     }
-    if ((updatedConfig.xAxis.type === 'date-time' || config.xAxis.type === 'date') && !updatedConfig.xAxis.padding) {
+    if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 6
     }
   }
@@ -1822,7 +1822,7 @@ const EditorPanel = () => {
                           </>
                         )}
 
-                        {(config.xAxis.type === 'date' || config.xAxis.type === 'date-time') && (
+                        {isDateScale(config.xAxis) && (
                           <>
                             <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                               Format how charts should parse and display your dates using{' '}
