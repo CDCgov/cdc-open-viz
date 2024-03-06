@@ -80,16 +80,18 @@ export const useFilters = props => {
   }
 
   const changeFilterActive = (index, value) => {
-    let newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
+    console.log('here')
+    const newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
 
     if (visualizationConfig.filterBehavior === 'Apply Button') {
       newFilters[index].queuedActive = value
       setShowApplyButton(true)
     } else {
-      let newFilter = newFilters[index];
+      const newFilter = newFilters[index];
       newFilter.active = value
       
-      let queryParams = getQueryParams();
+      const queryParams = getQueryParams();
+      console.log(newFilter.setByQueryParameter, queryParams[newFilter.setByQueryParameter], newFilter.active)
       if(newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active){
         queryParams[newFilter.setByQueryParameter] = newFilter.active;
         const updateUrl = `${window.location.origin}${window.location.pathname}?${Object.keys(queryParams).map(queryParam => `${queryParam}=${encodeURIComponent(queryParams[queryParam])}`).join('&')}`;
@@ -114,7 +116,7 @@ export const useFilters = props => {
 
   const handleApplyButton = newFilters => {
     let needsQueryUpdate = false;
-    let queryParams = getQueryParams();
+    const queryParams = getQueryParams();
     newFilters.forEach(newFilter => {
       if(newFilter.queuedActive){
         newFilter.active = newFilter.queuedActive

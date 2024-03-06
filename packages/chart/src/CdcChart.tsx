@@ -46,6 +46,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import getQueryStringFilterValue from '@cdc/core/helpers/getQueryStringFilterValue'
 
 import './scss/main.scss'
 // load both then config below determines which to use
@@ -220,12 +221,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     let newConfig = { ...defaults, ...response }
     if(newConfig.filters){
-      const urlParams = new URLSearchParams(window.location.search);
       newConfig.filters.forEach((filter, index) => {
-        if(filter.setByQueryParameter && urlParams.get(filter.setByQueryParameter)){
-          if(filter.values && filter.values.includes(urlParams.get(filter.setByQueryParameter))){
-            newConfig.filters[index].active = urlParams.get(filter.setByQueryParameter)
-          }
+        const queryStringFilterValue = getQueryStringFilterValue(filter)
+        if(queryStringFilterValue){
+          newConfig.filters[index].active = queryStringFilterValue
         }
       })
     }

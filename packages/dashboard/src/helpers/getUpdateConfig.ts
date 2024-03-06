@@ -5,6 +5,8 @@ import { generateValuesForFilter } from './generateValuesForFilter'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
 
+import getQueryStringFilterValue from '@cdc/core/helpers/getQueryStringFilterValue'
+
 type UpdateState = Omit<DashboardState, 'config'> & {
   config?: DashboardConfig
 }
@@ -25,9 +27,9 @@ export const getUpdateConfig =
           if (filterValues.length > 0) {
             const defaultValues = _filter.pivot ? _filter.values : _filter.values[0]
 
-            const urlParams = new URLSearchParams(window.location.search);
-            if(_filter.setByQueryParameter && urlParams.get(_filter.setByQueryParameter) && _filter.values && _filter.values.includes(urlParams.get(_filter.setByQueryParameter))){
-              _filter.active = urlParams.get(_filter.setByQueryParameter)
+            const queryStringFilterValue = getQueryStringFilterValue(_filter)
+            if(queryStringFilterValue){
+              _filter.active = queryStringFilterValue
             } else {
               _filter.active = _filter.active || defaultValues
             }

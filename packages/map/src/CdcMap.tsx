@@ -15,6 +15,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 // Helpers
 import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import getQueryStringFilterValue from '@cdc/core/helpers/getQueryStringFilterValue'
 import Title from '@cdc/core/components/ui/Title'
 
 // Data
@@ -1449,12 +1450,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       if (filters) {
         if(JSON.stringify(runtimeFilters) !== JSON.stringify(filters)){
-          const urlParams = new URLSearchParams(window.location.search);
           filters.forEach((filter, index) => {
-            if(filter.setByQueryParameter && urlParams.get(filter.setByQueryParameter)){
-              if(filter.values && filter.values.includes(urlParams.get(filter.setByQueryParameter))){
-                filters[index].active = urlParams.get(filter.setByQueryParameter)
-              }
+            const queryStringFilterValue = getQueryStringFilterValue(filter)
+            if(queryStringFilterValue){
+              filters[index].active = queryStringFilterValue
             }
           })
         }
