@@ -8,6 +8,7 @@ import { BarGroup } from '@visx/shape'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { FaStar } from 'react-icons/fa'
 import Regions from './../../Regions'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 // third party
 import chroma from 'chroma-js'
@@ -75,7 +76,7 @@ export const BarChartVertical = () => {
           height={yMax}
           x0={d => {
             const rawXValue = d[config.runtime.originalXAxis.dataKey]
-            return config.runtime.xAxis.type === 'date' ? parseDate(rawXValue) : rawXValue
+            return isDateScale(config.runtime.xAxis) ? parseDate(rawXValue) : rawXValue
           }}
           x0Scale={xScale}
           x1Scale={seriesScale}
@@ -102,7 +103,7 @@ export const BarChartVertical = () => {
                   let barGroupWidth = seriesScale.range()[1]
 
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
-                  let barX = bar.x + (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) - (config.xAxis.type === 'date' && config.xAxis.sortDates ? barGroupWidth / 2 : 0)
+                  let barX = bar.x + (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) - (config.xAxis.type === 'date-time' ? barGroupWidth / 2 : 0)
                   setBarWidth(barWidth)
                   setTotalBarsInGroup(barGroup.bars.length)
 
@@ -303,7 +304,7 @@ export const BarChartVertical = () => {
               let upperPos
               let lowerPos
               let tickWidth = 5
-              xPos = xScale(getXAxisData(d)) + (config.xAxis.type !== 'date' || !config.xAxis.sortDates ? seriesScale.range()[1] / 2 : 0)
+              xPos = xScale(getXAxisData(d)) + (config.xAxis.type !== 'date' || config.xAxis.type !== 'date-time' ? seriesScale.range()[1] / 2 : 0)
               upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
               lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
               return (
