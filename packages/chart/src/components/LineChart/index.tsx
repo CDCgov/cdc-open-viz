@@ -52,7 +52,7 @@ const LineChart = (props: LineChartProps) => {
 
   return (
     <ErrorBoundary component='LineChart'>
-      <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
+      <Group left={config.runtime.yAxis.size}>
         {' '}
         {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {
@@ -166,7 +166,7 @@ const LineChart = (props: LineChartProps) => {
               {config?.preliminaryData?.some(d => d.value && d.column) ? (
                 <SplitLinePath
                   curve={allCurves[seriesData[0].lineType]}
-                  segments={(config.xAxis.type === 'date' && config.xAxis.sortDates
+                  segments={(config.xAxis.type === 'date-time'
                     ? data.sort((d1, d2) => {
                         let x1 = getXAxisData(d1)
                         let x2 = getXAxisData(d2)
@@ -190,7 +190,7 @@ const LineChart = (props: LineChartProps) => {
                   <LinePath
                     curve={allCurves[seriesData[0].lineType]}
                     data={
-                      config.xAxis.type === 'date' && config.xAxis.sortDates
+                      config.xAxis.type === 'date-time'
                         ? data.sort((d1, d2) => {
                             let x1 = getXAxisData(d1)
                             let x2 = getXAxisData(d2)
