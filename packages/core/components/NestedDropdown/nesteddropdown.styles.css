@@ -64,10 +64,6 @@
     }
   }
 
-  .nested-dropdown-group-collapsed > ul {
-    display: none;
-  }
-
   .hide {
     display: none;
   }

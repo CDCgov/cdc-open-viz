@@ -26,7 +26,7 @@ const Options: React.FC<{
     handleSecondTierSelect(tierTwo)
   }
 
-  const handleKeyUp = (e: { target: any; key: string }) => {
+  const handleKeyUp = e => {
     const currentItem = e.target
     if (e.key === 'ArrowRight') setIsTierOneExpanded(true)
     else if (e.key === 'ArrowLeft') {
@@ -40,13 +40,13 @@ const Options: React.FC<{
   return (
     <>
       <li role='treeitem' key={label} tabIndex={0} aria-label={label} onClick={handleGroupClick} onKeyUp={handleKeyUp} className={`nested-dropdown-group${isTierOneExpanded ? '' : '-collapsed'}`}>
-        <span id={label}>{label}</span>{' '}
+        <span id={label}>{label} </span>
         {
           <span className='list-arrow' aria-hidden='true'>
             {isTierOneExpanded ? <Icon display='caretFilledUp' /> : <Icon display='caretFilledDown' />}
           </span>
         }
-        <ul className='' aria-expanded={isTierOneExpanded} role='group' tabIndex={-1} aria-labelledby={label}>
+        <ul aria-expanded={isTierOneExpanded} role='group' tabIndex={-1} aria-labelledby={label} className={isTierOneExpanded ? '' : ' hide'}>
           {currentOptions.map(tierTwo => {
             const regionID = label + tierTwo
             let isSelected = regionID === userSelectedTierTwoLabel
@@ -156,7 +156,6 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
           // Move focus to previous collapsed Tier One or Move focus from Tier One to the last of the previous Tier Two's items
           const itemToFocusOnAfterKeyUp = previousSibling.className === 'nested-dropdown-group-collapsed' ? previousSibling : previousSibling.lastChild.lastChild
           itemToFocusOnAfterKeyUp.focus()
-          // } else if (e.target !== searchInput.current) {
         } else {
           // Move focus from top of the dropdown to Input
           searchInput?.current.focus()
