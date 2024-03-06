@@ -72,14 +72,6 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       from = from + scalePadding
     }
 
-    if (visualizationType === 'Bar' && xAxis.type === 'date') {
-      let scalePadding = 0
-      if (xScale.bandwidth) {
-        scalePadding += xScale.bandwidth() / 2 - barWidth * totalBarsInGroup
-      }
-      from = from + scalePadding
-    }
-
     return from
   }
 
