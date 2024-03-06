@@ -3,7 +3,7 @@ import ConfigContext from '../../../ConfigContext'
 import { ChartContext } from '../../../types/ChartContext'
 import { Text } from '@visx/text'
 import { Group } from '@visx/group'
-import { formatDate } from '@cdc/core/helpers/cove/date.js'
+import { formatDate, isDateScale } from '@cdc/core/helpers/cove/date.js'
 
 type RegionsProps = {
   xScale: Function
@@ -33,9 +33,6 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       const date = new Date(region.from)
       const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
       from = xScale(parsedDate)
-      if (visualizationType === 'Bar' || config.visualizationType === 'Combo' || visualizationType === 'Line') {
-        from = region.fromType !== 'Previous Days' ? xScale(parseDate(region.from)) : null
-      }
 
       if (visualizationType === 'Bar' && xAxis.type === 'date-time') {
         from = from - (barWidth * totalBarsInGroup) / 2
@@ -67,8 +64,20 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       from = xScale(region.from)
     }
 
-    if (visualizationType === 'Line') {
-      from = from + Number((visualizationType === 'Line' && (config.xAxis.type === 'date' || config.xAxis.type === 'date-time')) || config.xAxis.type === 'categorical' ? (xScale.bandwidth ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) : 0)
+    if (visualizationType === 'Line' || visualizationType === 'Area Chart') {
+      let scalePadding = Number(config.yAxis.size)
+      if (xScale.bandwidth) {
+        scalePadding += xScale.bandwidth() / 2
+      }
+      from = from + scalePadding
+    }
+
+    if (visualizationType === 'Bar' && xAxis.type === 'date') {
+      let scalePadding = 0
+      if (xScale.bandwidth) {
+        scalePadding += xScale.bandwidth() / 2 - barWidth * totalBarsInGroup
+      }
+      from = from + scalePadding
     }
 
     return from
@@ -96,11 +105,15 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       to = Number(xScale(lastDate) + ((visualizationType === 'Bar' || visualizationType === 'Combo') && config.xAxis.type === 'date' ? barWidth * totalBarsInGroup : 0))
     }
 
-    if (visualizationType === 'Line') {
-      to = to + Number((visualizationType === 'Line' && (config.xAxis.type === 'date' || config.xAxis.type === 'date-time')) || config.xAxis.type === 'categorical' ? (xScale.bandwidth ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) : 0)
+    if (visualizationType === 'Line' || visualizationType === 'Area Chart') {
+      let scalePadding = Number(config.yAxis.size)
+      if (xScale.bandwidth) {
+        scalePadding += xScale.bandwidth() / 2
+      }
+      to = to + scalePadding
     }
 
-    if (visualizationType === 'Bar' && xAxis.type === 'date-time' && region.toType !== 'Last Date') {
+    if (visualizationType === 'Bar' && isDateScale(config) && region.toType !== 'Last Date') {
       to = to - (barWidth * totalBarsInGroup) / 2
     }
 
