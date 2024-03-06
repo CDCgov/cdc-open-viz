@@ -22,10 +22,6 @@ const Options: React.FC<{
     setIsTierOneExpanded(leaveExpanded)
   }
 
-  const handleSecondTierClick = (tierTwo: string | number) => {
-    handleSecondTierSelect(tierTwo)
-  }
-
   const handleKeyUp = e => {
     const currentItem = e.target
     if (e.key === 'ArrowRight') setIsTierOneExpanded(true)
@@ -33,7 +29,7 @@ const Options: React.FC<{
       if (currentItem.className === 'selectable-item') currentItem.parentNode.parentNode.focus()
       setIsTierOneExpanded(false)
     } else if (e.key === 'Enter') {
-      currentItem.className === 'selectable-item' ? handleSecondTierClick(currentItem.dataset.value) : setIsTierOneExpanded(!isTierOneExpanded)
+      currentItem.className === 'selectable-item' ? handleSecondTierSelect(currentItem.dataset.value) : setIsTierOneExpanded(!isTierOneExpanded)
     }
   }
 
@@ -60,7 +56,7 @@ const Options: React.FC<{
                 aria-selected={isSelected}
                 data-value={tierTwo}
                 onClick={e => {
-                  handleSecondTierClick(tierTwo)
+                  handleSecondTierSelect(tierTwo)
                 }}
               >
                 {isSelected ? <span aria-hidden='true'>{checkMark}</span> : ''}
