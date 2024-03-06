@@ -77,10 +77,16 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
   @import 'series-list';
   @import 'typography';
 
+  // Force printing chart images
+  -webkit-print-color-adjust: exact !important; /* Chrome, Safari 6 – 15.3, Edge */
+  color-adjust: exact !important; /* Firefox 48 – 96 */
+  print-color-adjust: exact !important; /* Firefox 97+, Safari 15.4+ */
+
   .editor-panel.cove {
     position: absolute;
     height: 100vh;
     top: 0;
+    width: 350px;
     .editor-toggle {
       position: absolute !important;
       top: 10px !important;

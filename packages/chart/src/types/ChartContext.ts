@@ -14,6 +14,8 @@ type SharedChartContext = {
   currentViewport?: string
   highlight?: Function
   highlightReset?: Function
+  legendIsolateValues?: string[]
+  setLegendIsolateValues?: Function
 }
 
 // Line Chart Specific Context

@@ -1,9 +1,10 @@
-import ForestPlotSettings from './Panel.ForestPlotSettings.js'
-import Series from './Panel.Series.js'
-import Regions from './Panel.Regions.js'
-import General from './Panel.General.js'
-import BoxPlot from './Panel.BoxPlot.js'
-import Visual from './Panel.Visual.js'
+import ForestPlotSettings from './Panel.ForestPlotSettings'
+import Series from './Panel.Series'
+import Regions from './Panel.Regions'
+import General from './Panel.General'
+import BoxPlot from './Panel.BoxPlot'
+import Visual from './Panel.Visual'
+import Sankey from './Panel.Sankey'
 
 const Panels = {
   ForestPlot: ForestPlotSettings,
@@ -11,7 +12,8 @@ const Panels = {
   Regions,
   General,
   BoxPlot,
-  Visual
+  Visual,
+  Sankey
 }
 
 export default Panels
