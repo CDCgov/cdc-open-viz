@@ -80,7 +80,6 @@ export const useFilters = props => {
   }
 
   const changeFilterActive = (index, value) => {
-    console.log('here')
     const newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
 
     if (visualizationConfig.filterBehavior === 'Apply Button') {
@@ -91,7 +90,6 @@ export const useFilters = props => {
       newFilter.active = value
       
       const queryParams = getQueryParams();
-      console.log(newFilter.setByQueryParameter, queryParams[newFilter.setByQueryParameter], newFilter.active)
       if(newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active){
         queryParams[newFilter.setByQueryParameter] = newFilter.active;
         const updateUrl = `${window.location.origin}${window.location.pathname}?${Object.keys(queryParams).map(queryParam => `${queryParam}=${encodeURIComponent(queryParams[queryParam])}`).join('&')}`;
