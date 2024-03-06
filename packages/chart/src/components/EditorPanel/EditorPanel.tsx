@@ -200,7 +200,27 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
 })
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, lineOptions, rawData } = useContext<ChartContext>(ConfigContext)
+  const {
+    config,
+    updateConfig,
+    tableData,
+    transformedData: data,
+    loading,
+    colorScale,
+    colorPalettes,
+    twoColorPalette,
+    unfilteredData,
+    excludedData,
+    isDashboard,
+    setParentConfig,
+    missingRequiredSections,
+    isDebug,
+    setFilteredData,
+    lineOptions,
+    rawData,
+    highlight,
+    highlightReset
+  } = useContext<ChartContext>(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
@@ -220,6 +240,7 @@ const EditorPanel = () => {
     visHasAnchors,
     visHasBarBorders,
     visHasDataCutoff,
+    visHasSelectableLegendValues,
     visCanAnimate,
     visHasLegend,
     visHasBrushChart,
@@ -1003,6 +1024,28 @@ const EditorPanel = () => {
       columns: updatedColumns
     })
   }
+
+  const colorCodeByCategory = config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1
+  const getLegendColumns = () => {
+    const colorCodeData = data.map(d => d[config.legend.colorCode])
+    return colorCodeByCategory ? colorCodeData : getColumns(false).filter(d => d !== config.xAxis.dataKey)
+  }
+
+  const updateSeriesIsolateValues = updatedValues => {
+    updateConfig({ ...config, legend: { ...config.legend, seriesHighlight: updatedValues } })
+  }
+
+  const updateBehavior = (section, fieldName, newValue) => {
+    const sectionValue = { ...config[section], [fieldName]: newValue }
+    const updatedConfig = { ...config, [section]: sectionValue }
+
+    if (newValue === 'highlight' && config.legend.seriesHighlight?.length) {
+      updatedConfig.legend.seriesHighlight.length = 0
+    }
+
+    updateConfig(updatedConfig)
+  }
+
   const editorContextValues = {
     addNewExclusion,
     data,
@@ -1042,7 +1085,8 @@ const EditorPanel = () => {
             <Accordion allowZeroExpanded={true}>
               <Panels.General name='General' />
               <Panels.ForestPlot name='Forest Plot Settings' />
-              {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && (
+              <Panels.Sankey name='Sankey' />
+              {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && config.visualizationType !== 'Sankey' && (
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
@@ -2584,8 +2628,77 @@ const EditorPanel = () => {
                     {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
                       <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
                     )}
-                    <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={updateField} options={['highlight', 'isolate']} />
+                    <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)} options={['highlight', 'isolate']} />
                     {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && <CheckBox value={config.legend.highlightOnHover} section='legend' fieldName='highlightOnHover' label='HIGHLIGHT DATA SERIES ON HOVER' updateField={updateField} />}
+
+                    {/* start: isolated values */}
+                    {visHasSelectableLegendValues && config.legend.behavior === 'isolate' && !colorCodeByCategory && (
+                      <fieldset className='primary-fieldset edit-block' key={'additional-highlight-values'}>
+                        <label>
+                          <span className='edit-label'>
+                            Isolate Data Series
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>You can choose data series that are shown on load. Others will be added when the user clicks on them in the legend.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
+                        </label>
+                        {config.legend.seriesHighlight &&
+                          config.legend.seriesHighlight.map((val, i) => (
+                            <fieldset className='edit-block' key={`${val}-${i}`}>
+                              <button
+                                className='remove-column'
+                                onClick={event => {
+                                  event.preventDefault()
+                                  const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                                  updatedSeriesHighlight.splice(i, 1)
+                                  updateField('legend', null, 'seriesHighlight', updatedSeriesHighlight)
+                                  if (!updatedSeriesHighlight.length) {
+                                    highlightReset()
+                                  }
+                                }}
+                              >
+                                Remove
+                              </button>
+                              <Select
+                                value={config.legend.seriesHighlight[i]}
+                                fieldName='seriesHighlight'
+                                label='Isolate Value'
+                                onChange={e => {
+                                  const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                                  if (!updatedSeriesHighlight.includes(e.target.value)) {
+                                    updatedSeriesHighlight[i] = e.target.value
+                                    updateSeriesIsolateValues([...updatedSeriesHighlight])
+                                  }
+                                }}
+                                options={getLegendColumns()}
+                              />
+                            </fieldset>
+                          ))}
+                        <button
+                          className={'btn full-width'}
+                          onClick={event => {
+                            event.preventDefault()
+                            const legendColumns = getLegendColumns()
+                            const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                            const seriesLength = updatedSeriesHighlight.length
+                            if (seriesLength < legendColumns.length) {
+                              const [newSeriesHighlight] = legendColumns.filter(d => !updatedSeriesHighlight.includes(d))
+                              updatedSeriesHighlight.push(newSeriesHighlight)
+                              updateSeriesIsolateValues([...updatedSeriesHighlight])
+                            }
+                          }}
+                        >
+                          Add Isolate Value
+                        </button>
+                      </fieldset>
+                    )}
+                    {/* end: isolated values */}
+
                     <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
                     <Select value={config.legend.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
                     {config.legend.position === 'bottom' && (

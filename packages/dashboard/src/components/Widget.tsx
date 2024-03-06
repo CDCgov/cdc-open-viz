@@ -27,6 +27,7 @@ const labelHash = {
   'single-state': 'U.S. State',
   'filtered-text': 'Filtered Text',
   'filter-dropdowns': 'Filter Dropdowns',
+  Sankey: 'Sankey Chart',
   table: 'Table'
 }
 

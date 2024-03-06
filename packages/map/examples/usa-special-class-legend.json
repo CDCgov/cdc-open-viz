@@ -1,24 +1,21 @@
 {
   "general": {
-    "title": "Example Data Map with Cities",
-    "subtext": "*: Lorem ipsum; NA: Lorem ipsum.",
-    "type": "data",
     "geoType": "us",
-    "headerColor": "theme-cyan",
-    "showSidebar": true,
-    "showTitle": true,
-    "showDownloadButton": true,
-    "expandDataTable": true,
-    "backgroundColor": "#f5f5f5",
+    "type": "data",
     "geoBorderColor": "darkGray",
-    "territoriesLabel": "Territories",
-    "language": "en",
-    "hasRegions": false,
-    "displayAsHex": true,
+    "headerColor": "theme-blue",
+    "title": "",
+    "showTitle": true,
+    "showSidebar": true,
+    "showDownloadButton": false,
     "showDownloadMediaButton": false,
+    "displayAsHex": false,
     "displayStateLabels": false,
+    "territoriesLabel": "Territories",
     "territoriesAlwaysShow": false,
+    "language": "en",
     "geoLabelOverride": "",
+    "hasRegions": false,
     "fullBorder": false,
     "convertFipsCodes": true,
     "palette": {
@@ -33,37 +30,23 @@
     }
   },
   "type": "map",
-  "color": "yelloworangered",
+  "color": "pinkpurple",
   "columns": {
     "geo": {
-      "dataTable": true,
-      "label": "",
       "name": "STATE",
-      "tooltip": false
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
     },
     "primary": {
       "dataTable": true,
-      "label": "Rate",
-      "name": "Rate",
+      "tooltip": true,
       "prefix": "",
       "suffix": "",
-      "tooltip": false
+      "name": "Rate",
+      "label": ""
     },
     "navigate": {
-      "dataTable": false,
-      "name": "",
-      "tooltip": false
-    },
-    "additionalColumn1": {
-      "label": "Location",
-      "dataTable": true,
-      "tooltips": false,
-      "prefix": "",
-      "suffix": "",
-      "name": "Location",
-      "tooltip": true
-    },
-    "geosInRegion": {
       "name": ""
     },
     "latitude": {
@@ -74,38 +57,25 @@
     }
   },
   "legend": {
-    "numberOfItems": 3,
-    "position": "side",
-    "title": "Legend Title",
-    "description": "Legend Text",
-    "type": "equalnumber",
+    "descriptions": {},
     "specialClasses": [
       {
-        "key": "Rate",
-        "value": "*",
-        "label": "*"
-      },
-      {
-        "key": "Rate",
-        "value": "NA",
-        "label": "N/A"
+        "key": "Location",
+        "value": "NA"
       }
     ],
     "unified": false,
     "singleColumn": false,
-    "dynamicDescription": false,
-    "descriptions": {},
     "singleRow": false,
     "verticalSorted": false,
-    "showSpecialClassesLast": false
+    "showSpecialClassesLast": true,
+    "dynamicDescription": false,
+    "type": "equalnumber",
+    "numberOfItems": 3,
+    "position": "side",
+    "title": "Legend"
   },
-  "filters": [
-    {
-      "label": "",
-      "values": [],
-      "columnName": "Condition"
-    }
-  ],
+  "filters": [],
   "table": {
     "wrapColumns": false,
     "label": "Data Table",
@@ -134,14 +104,11 @@
     "maxBubbleSize": 20,
     "extraBubbleBorder": false,
     "cityStyle": "circle",
-    "geoCodeCircleSize": 8,
+    "geoCodeCircleSize": 2,
     "showBubbleZeros": false
   },
   "mapPosition": {
-    "coordinates": [
-      0,
-      30
-    ],
+    "coordinates": [0, 30],
     "zoom": 1
   },
   "map": {
@@ -149,424 +116,386 @@
     "patterns": []
   },
   "hexMap": {
-    "type": "shapes",
+    "type": "",
     "shapeGroups": [
       {
-        "legendTitle": "Test",
-        "legendDescription": "test",
+        "legendTitle": "",
+        "legendDescription": "",
         "items": [
           {
-            "key": "STATE",
-            "shape": "Arrow Up",
+            "key": "",
+            "shape": "Arrow up",
             "column": "",
             "operator": "=",
-            "value": "NV"
+            "value": ""
           }
         ]
       }
     ]
   },
   "filterBehavior": "Filter Change",
+  "datasets": {},
   "data": [
     {
-      "STATE": "AL",
-      "Rate": 10,
-      "Location": "Home",
-      "URL": "https://www.cdc.gov/"
+      "STATE": "Overall",
+      "Rate": "55",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov"
     },
     {
-      "STATE": "AK",
-      "Rate": 12,
+      "STATE": "Alabama",
+      "Rate": 130,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "AS",
-      "Rate": 14,
+      "STATE": "Alaska",
+      "Rate": 40,
       "Location": "Work",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "AZ",
-      "Rate": 9,
+      "STATE": "American Samoa",
+      "Rate": 55,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Arizona",
+      "Rate": 57,
       "Location": "School",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "AR",
-      "Rate": 17,
+      "STATE": "Arkansas",
+      "Rate": 60,
       "Location": "School",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "CA",
-      "Rate": "*",
-      "Location": "Work",
+      "STATE": "California",
+      "Rate": 30,
+      "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "CO",
-      "Rate": 22,
+      "STATE": "Colorado",
+      "Rate": 40,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "CT",
-      "Rate": 10,
+      "STATE": "Connecticut",
+      "Rate": 55,
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "DE",
-      "Rate": 12,
+      "STATE": "Deleware",
+      "Rate": "57",
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "District of Columbia",
-      "Rate": 14,
+      "STATE": "DC",
+      "Rate": 60,
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "FL",
-      "Rate": 9,
-      "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "GA",
-      "Rate": 17,
+      "STATE": "Florida",
+      "Rate": 30,
       "Location": "Work",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "GU",
-      "Rate": 20,
-      "Location": "School",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "HI",
-      "Rate": 22,
-      "Location": "School",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "ID",
-      "Rate": "*",
+      "STATE": "Georgia",
+      "Rate": 40,
       "Location": "Work",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "IL",
-      "Rate": 12,
-      "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "IN",
-      "Rate": 14,
+      "STATE": "Guam",
+      "Rate": 55,
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "IA",
-      "Rate": 9,
-      "Location": "Home",
+      "STATE": "Hawaii",
+      "Rate": 57,
+      "Location": "School",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "KS",
-      "Rate": "NA",
-      "Location": "Home",
+      "STATE": "Idaho",
+      "Rate": 60,
+      "Location": "School",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "KY",
-      "Rate": 20,
-      "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "LA",
-      "Rate": 22,
+      "STATE": "Illinois",
+      "Rate": 30,
       "Location": "Work",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "ME",
-      "Rate": 10,
-      "Location": "School",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "MH",
-      "Rate": 12,
-      "Location": "School",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "MD",
-      "Rate": "*",
-      "Location": "Work",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "MA",
-      "Rate": 9,
+      "STATE": "Indiana",
+      "Rate": 40,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "MI",
-      "Rate": 17,
+      "STATE": "Iowa",
+      "Rate": 55,
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "FM",
-      "Rate": 20,
+      "STATE": "Kansas",
+      "Rate": 57,
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "MN",
-      "Rate": 22,
-      "Location": "Home",
+      "STATE": "Kentucky",
+      "Rate": 60,
+      "Location": "NA",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "MS",
-      "Rate": 10,
+      "STATE": "Louisiana",
+      "Rate": 30,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "MO",
-      "Rate": 11,
+      "STATE": "Maine",
+      "Rate": 40,
       "Location": "Work",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "MT",
-      "Rate": 14,
-      "Location": "School",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "NE",
-      "Rate": 9,
-      "Location": "School",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "NV",
-      "Rate": 17,
-      "Location": "Work",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "NH",
-      "Rate": 20,
-      "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "NJ",
-      "Rate": 28,
+      "STATE": "Marshall Islands",
+      "Rate": 55,
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "NM",
-      "Rate": 10,
-      "Location": "Home",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "NY",
-      "Rate": 12,
-      "Location": "Home",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "NC",
-      "Rate": 14,
-      "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "ND",
-      "Rate": 9,
-      "Location": "Work",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "MP",
-      "Rate": 17,
+      "STATE": "Maryland",
+      "Rate": 57,
       "Location": "School",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "OH",
-      "Rate": "NA",
+      "STATE": "Massachusetts",
+      "Rate": 60,
       "Location": "School",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "OK",
-      "Rate": 22,
-      "Location": "Work",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "OR",
-      "Rate": 10,
-      "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "PW",
-      "Rate": 12,
-      "Location": "Home",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "PA",
-      "Rate": 14,
-      "Location": "Home",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "PR",
-      "Rate": 6,
-      "Location": "Home",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "RI",
-      "Rate": 17,
-      "Location": "Vehicle",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "SC",
-      "Rate": 20,
-      "Location": "Work",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "SD",
-      "Rate": 22,
-      "Location": "School",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "TN",
-      "Rate": 10,
-      "Location": "School",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "TX",
+      "STATE": "Michigan",
       "Rate": 12,
       "Location": "Work",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "VT",
-      "Rate": 9,
-      "Location": "Home",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "VI",
-      "Rate": 17,
+      "STATE": "Micronesia",
+      "Rate": 65,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "VA",
-      "Rate": 20,
+      "STATE": "Minnesota",
+      "Rate": 55,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Mississippi",
+      "Rate": 57,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Montana",
+      "Rate": 60,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Montana",
+      "Rate": 30,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Nebraska",
+      "Rate": 40,
       "Location": "Work",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "WA",
-      "Rate": 22,
+      "STATE": "Nevada",
+      "Rate": 55,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "New Hampshire",
+      "Rate": 57,
       "Location": "School",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "WV",
-      "Rate": 10,
+      "STATE": "New Jersey",
+      "Rate": 60,
       "Location": "School",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "WI",
+      "STATE": "New Mexico",
       "Rate": 12,
       "Location": "Work",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "WY",
-      "Rate": 14,
-      "Location": "Home",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "Los Angeles",
-      "Rate": 14,
+      "STATE": "New York",
+      "Rate": 40,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "Atlanta",
-      "Rate": 12,
-      "Location": "Work",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "Boston",
-      "Rate": 20,
-      "Location": "School",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "New York City",
-      "Rate": 22,
-      "Location": "School",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "Dallas",
-      "Rate": 18,
-      "Location": "Work",
-      "URL": "https://www.cdc.gov/"
-    },
-    {
-      "STATE": "Seattle",
-      "Rate": 17,
+      "STATE": "North Carolina",
+      "Rate": 55,
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "New Orleans",
-      "Rate": 14,
+      "STATE": "North Dakota",
+      "Rate": 57,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Northern Mariana Islands",
+      "Rate": "60",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Ohio",
+      "Rate": 88,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Oklahoma",
+      "Rate": 40,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Oregon",
+      "Rate": 55,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Palau",
+      "Rate": 15,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Pennsylvania",
+      "Rate": 60,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Puerto Rico",
+      "Rate": 30,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Rhode Island",
+      "Rate": 40,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "South Carolina",
+      "Rate": 55,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "South Dakota",
+      "Rate": 86,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Tennessee",
+      "Rate": 60,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Texas",
+      "Rate": 30,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Utah",
+      "Rate": 54,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Vermont",
+      "Rate": 40,
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Virgin Islands",
+      "Rate": 55,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Virginia",
+      "Rate": 57,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Washington",
+      "Rate": 62,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "West Virginia",
+      "Rate": 25,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Wyoming",
+      "Rate": 43,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     }
   ],
-  "sharing": {
-    "enabled": false,
-    "dataHost": "wcms-wp.cdc.gov",
-    "configUrl": "/wcms/4.0/cdc-wp/data-presentation/examples/city-data-map-example.json"
+  "dataFileName": "valid-data-map.csv",
+  "dataFileSourceType": "file",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
   },
-  "dataTable": {
-    "title": "Data Table"
-  },
-  "usingWidgetLoader": true,
   "validated": 4.23
 }
