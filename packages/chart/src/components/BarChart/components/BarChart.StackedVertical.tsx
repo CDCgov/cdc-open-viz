@@ -6,6 +6,7 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import BarChartContext from './context'
 import Regions from '../../Regions'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 const BarChartStackedVertical = () => {
   const [barWidth, setBarWidth] = useState(0)
@@ -30,7 +31,7 @@ const BarChartStackedVertical = () => {
                 let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
                 // tooltips
                 const rawXValue = bar.bar.data[config.runtime.xAxis.dataKey]
-                const xAxisValue = config.runtime.xAxis.type === 'date' || config.runtime.xAxis.type === 'date-time' ? formatDate(parseDate(rawXValue)) : rawXValue
+                const xAxisValue = isDateScale(config) ? formatDate(parseDate(rawXValue)) : rawXValue
                 const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                 if (!yAxisValue) return
                 const barX = xScale(config.runtime.xAxis.type === 'date' || config.runtime.xAxis.type === 'date-time' ? parseDate(rawXValue) : rawXValue) - (config.xAxis.type === 'date-time' ? barThicknessAdjusted / 2 : 0)
