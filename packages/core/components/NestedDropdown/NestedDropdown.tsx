@@ -39,14 +39,14 @@ const Options: React.FC<{
 
   return (
     <>
-      <li role='treeitem' key={label} tabIndex={0} aria-label={label} onClick={handleGroupClick} onKeyUp={handleKeyUp} className={`nested-dropdown-group${isTierOneExpanded ? '' : '-collapsed'}`}>
+      <li role='treeitem' key={label} tabIndex={0} aria-label={label} onClick={handleGroupClick} onKeyUp={handleKeyUp} className='nested-dropdown-group'>
         <span id={label}>{label} </span>
         {
           <span className='list-arrow' aria-hidden='true'>
             {isTierOneExpanded ? <Icon display='caretFilledUp' /> : <Icon display='caretFilledDown' />}
           </span>
         }
-        <ul aria-expanded={isTierOneExpanded} role='group' tabIndex={-1} aria-labelledby={label} className={isTierOneExpanded ? '' : ' hide'}>
+        <ul aria-expanded={isTierOneExpanded} role='group' tabIndex={-1} aria-labelledby={label} className={isTierOneExpanded ? '' : 'hide'}>
           {currentOptions.map(tierTwo => {
             const regionID = label + tierTwo
             let isSelected = regionID === userSelectedTierTwoLabel
@@ -127,7 +127,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
           // Move focus to next item on list: next Tier Two item or the next Tier One or SearchInput
           const itemToFocusOnAfterKeyUp = nextSibling ?? parentNode.parentNode.nextSibling ?? searchInput.current
           itemToFocusOnAfterKeyUp.focus()
-        } else if (className === 'nested-dropdown-group-collapsed') {
+        } else if (lastChild.className === 'hide') {
           // If Tier One is collapsed, move to next Tier One or move focus back to the top Input
           const itemToFocusOnAfterKeyUp = nextSibling ?? searchInput.current
           itemToFocusOnAfterKeyUp.focus()
@@ -141,7 +141,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
       case 'ArrowUp': {
         if (nodeName === 'INPUT') {
           setIsListOpened(true)
-          if (Dropdown.lastChild.className === 'nested-dropdown-group-collapsed') {
+          if (Dropdown.lastChild.lastChild.className === 'hide') {
             // Move focus from Input textbox to the last collapsed Tier Two in dropdown
             Dropdown.lastChild.focus()
           } else {
@@ -154,7 +154,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({ data, tiers: [firstTier
           itemToFocusOnAfterKeyUp.focus()
         } else if (previousSibling) {
           // Move focus to previous collapsed Tier One or Move focus from Tier One to the last of the previous Tier Two's items
-          const itemToFocusOnAfterKeyUp = previousSibling.className === 'nested-dropdown-group-collapsed' ? previousSibling : previousSibling.lastChild.lastChild
+          const itemToFocusOnAfterKeyUp = previousSibling.lastChild.className === 'hide' ? previousSibling : previousSibling.lastChild.lastChild
           itemToFocusOnAfterKeyUp.focus()
         } else {
           // Move focus from top of the dropdown to Input
