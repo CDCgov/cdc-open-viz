@@ -3,6 +3,7 @@ import { useId } from 'react'
 
 // CDC
 import Button from '@cdc/core/components/elements/Button'
+import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
 
 // Third Party
 import PropTypes from 'prop-types'
@@ -71,14 +72,6 @@ export const useFilters = props => {
 
   const announceChange = text => {}
 
-  const getQueryParams = () => {
-    let queryParams = {};
-    for (const [key, value] of (new URLSearchParams(window.location.search)).entries()) {
-      queryParams[key] = value
-    }
-    return queryParams;
-  }
-
   const changeFilterActive = (index, value) => {
     const newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
 
@@ -92,8 +85,7 @@ export const useFilters = props => {
       const queryParams = getQueryParams();
       if(newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active){
         queryParams[newFilter.setByQueryParameter] = newFilter.active;
-        const updateUrl = `${window.location.origin}${window.location.pathname}?${Object.keys(queryParams).map(queryParam => `${queryParam}=${encodeURIComponent(queryParams[queryParam])}`).join('&')}`;
-        window.history.pushState({path: updateUrl}, '', updateUrl);
+        updateQueryString(queryParams);
       }
     }
     setConfig({ 
@@ -126,8 +118,7 @@ export const useFilters = props => {
       }
     })
     if(needsQueryUpdate){
-      const updateUrl = `${window.location.origin}${window.location.pathname}?${Object.keys(queryParams).map(queryParam => `${queryParam}=${encodeURIComponent(queryParams[queryParam])}`).join('&')}`;
-      window.history.pushState({path: updateUrl}, '', updateUrl);
+      updateQueryString(queryParams);
     }
     
     setConfig({ ...visualizationConfig, filters: newFilters })

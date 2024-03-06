@@ -15,7 +15,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 // Helpers
 import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import getQueryStringFilterValue from '@cdc/core/helpers/getQueryStringFilterValue'
+import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import Title from '@cdc/core/components/ui/Title'
 
 // Data

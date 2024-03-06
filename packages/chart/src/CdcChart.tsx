@@ -46,7 +46,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import getQueryStringFilterValue from '@cdc/core/helpers/getQueryStringFilterValue'
+import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 
 import './scss/main.scss'
 // load both then config below determines which to use

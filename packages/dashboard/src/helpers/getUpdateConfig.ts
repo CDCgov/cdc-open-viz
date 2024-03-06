@@ -5,7 +5,7 @@ import { generateValuesForFilter } from './generateValuesForFilter'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
 
-import getQueryStringFilterValue from '@cdc/core/helpers/getQueryStringFilterValue'
+import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 
 type UpdateState = Omit<DashboardState, 'config'> & {
   config?: DashboardConfig
