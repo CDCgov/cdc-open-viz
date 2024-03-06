@@ -255,7 +255,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (newConfig.exclusions && newConfig.exclusions.active) {
       if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
         newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
-      } else if (isDateScale(newConfig) && (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) && newConfig.xAxis.dateParseFormat) {
+      } else if (isDateScale(newConfig.xAxis) && (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) && newConfig.xAxis.dateParseFormat) {
         // Filter dates
         const timestamp = e => new Date(e).getTime()
 
@@ -1118,7 +1118,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     )
   }
 
-  const getXAxisData = d => (isDateScale(config) ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getXAxisData = d => (isDateScale(config.runtime.xAxis) ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   const capitalize = str => {
