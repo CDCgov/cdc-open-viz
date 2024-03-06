@@ -55,12 +55,13 @@ import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
 import { ChartConfig } from './types/ChartConfig'
 import { Label } from './types/Label'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
-  const [config, setConfig] = useState<ChartConfig>(configObj || ({} as ChartConfig))
+  const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
   const [stateData, setStateData] = useState(config.data || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
@@ -98,7 +99,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
-      config.filters.forEach(filter => {
+      config.filters?.forEach(filter => {
         if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
           qsParams[filter.queryParameter] = filter.active
           isUpdateNeeded = true
@@ -120,7 +121,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       try {
         const ext = getFileExtension(dataUrl.href)
-        if ('csv' === ext) {
+        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
           data = await fetch(dataUrlFinal)
             .then(response => response.text())
             .then(responseText => {
@@ -131,7 +132,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               })
               return parsedCsv.data
             })
-        } else if ('json' === ext) {
+        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
           data = await fetch(dataUrlFinal).then(response => response.json())
         } else {
           data = []
@@ -169,7 +170,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (response.dataUrl && !urlFilters) {
       try {
         const ext = getFileExtension(response.dataUrl)
-        if ('csv' === ext) {
+        if ('csv' === ext || isSolrCsv(response.dataUrl)) {
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
             .then(response => response.text())
             .then(responseText => {
@@ -192,7 +193,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             })
         }
 
-        if ('json' === ext) {
+        if ('json' === ext || isSolrJson(response.dataUrl)) {
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
         }
       } catch {
@@ -297,8 +298,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setFilteredData(currentData)
     }
 
-    if(!(['Area Chart', 'Bar', 'Line', 'Combo'].includes(newConfig.visualizationType)) || newConfig.orientation === 'horizontal'){
+    if (!['Area Chart', 'Bar', 'Line', 'Combo'].includes(newConfig.visualizationType) || newConfig.orientation === 'horizontal') {
       newConfig.xAxis.sortDates = false
+    }
+
+    if (newConfig.xAxis.sortDates && newConfig.barThickness > 0.1) {
+      newConfig.barThickness = 0.035
+    } else if (!newConfig.xAxis.sortDates && newConfig.barThickness < 0.1) {
+      newConfig.barThickness = 0.35
     }
 
     //Enforce default values that need to be calculated at runtime
@@ -474,8 +481,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.runtime.horizontal = false
     }
 
+    
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
+    
+    // Sankey Description box error message
+    newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Sankey' && !newConfig.description ? 'SUBTEXT/CITATION field is empty: A description of the Sankey Diagram data must be inputted.' : ''
+
 
     setConfig(newConfig)
   }
@@ -1065,7 +1077,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 </>
               )}
               {/* Sankey */}
-              {config.visualizationType === 'Sankey' && <ParentSize>{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>}
+              {config.visualizationType === 'Sankey' && <ParentSize aria-hidden="true">{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>}
               {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend />}
             </div>
             {/* Link */}

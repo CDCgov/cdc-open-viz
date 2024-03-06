@@ -1,14 +1,14 @@
 import Papa from 'papaparse'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 
-export default async function (url, visualizationType = '') {
+export default async function (_url, visualizationType = '') {
+  let url = new URL(_url, window.location.origin)
   try {
-    url = new URL(url, window.location.origin)
-
     const path = url.pathname
     const regex = /(?:\.([^.]+))?$/
     const ext = regex.exec(path)[1]
 
-    if ('csv' === ext) {
+    if ('csv' === ext || isSolrCsv(_url)) {
       return await fetch(url.href)
         .then(response => response.text())
         .then(responseText => {
@@ -30,7 +30,7 @@ export default async function (url, visualizationType = '') {
           return parsedCsv.data
         })
     } else {
-      return await fetch(url.href).then(response => response.json())
+      return await fetch(isSolrCsv(_url) ? _url : url.href).then(response => response.json())
     }
   } catch {
     // If we can't parse it, still attempt to fetch it

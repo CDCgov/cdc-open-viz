@@ -45,6 +45,9 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     }
     return color
   }
+  const getXPos = hoveredXValue => {
+    return (config.xAxis.type === 'categorical' ? xScale(hoveredXValue) : xScale(parseDate(hoveredXValue))) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+  }
   if (mode === 'ALWAYS_SHOW_POINTS') {
     if (lineDatapointStyle === 'hidden') return <></>
     const getIndex = seriesKey => config.runtime.seriesLabelsAll.indexOf(seriesKey)
@@ -56,7 +59,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       }
       return (
         <circle
-          cx={config.xAxis.type === 'categorical' ? xScale(d[config.xAxis.dataKey]) : xScale(parseDate(d[config.xAxis.dataKey]))}
+          cx={getXPos(d[config.xAxis.dataKey])}
           cy={filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered.dataKey])}
           r={4.5}
           opacity={d[seriesKey] ? 1 : 0}
@@ -99,7 +102,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
         }
         return (
           <circle
-            cx={config.xAxis.type === 'categorical' ? xScale(hoveredXValue) : xScale(parseDate(hoveredXValue))}
+            cx={getXPos(hoveredXValue)}
             cy={hoveredSeriesAxis === 'right' ? yScaleRight(hoveredSeriesValue) : yScale(hoveredSeriesValue)}
             r={4.5}
             opacity={1}
@@ -118,13 +121,13 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       const currentPoint = data[currentIndex]
       const previousPoint = data[currentIndex - 1]
       const nextPoint = data[currentIndex + 1]
-      if (currentIndex === 0 && nextPoint[seriesKey] === '') {
+      if (currentIndex === 0 && !nextPoint[seriesKey]) {
         return true
       }
-      if (currentIndex === data.length - 1 && previousPoint[seriesKey] === '') {
+      if (currentIndex === data.length - 1 && !previousPoint[seriesKey]) {
         return true
       }
-      if (currentIndex !== 0 && currentPoint[seriesKey] !== '' && previousPoint[seriesKey] === '' && nextPoint[seriesKey] === '') {
+      if (currentIndex !== 0 && currentPoint[seriesKey] && !previousPoint[seriesKey] && !nextPoint[seriesKey]) {
         return true
       }
     }
@@ -132,14 +135,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     if (mode) {
       if (drawIsolatedPoints(dataIndex, seriesKey)) {
         return (
-          <circle
-            cx={config.xAxis.type === 'categorical' ? xScale(d[config.xAxis.dataKey]) : xScale(parseDate(d[config.xAxis.dataKey]))}
-            cy={filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered.dataKey])}
-            r={6}
-            strokeWidth={2}
-            stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
-            fill={colorScale(config.runtime.seriesLabels[seriesKey])}
-          />
+          <circle cx={getXPos(d[config.xAxis.dataKey])} cy={filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered.dataKey])} r={5.3} strokeWidth={2} stroke={colorScale(config.runtime.seriesLabels[seriesKey])} fill={colorScale(config.runtime.seriesLabels[seriesKey])} />
         )
       }
     }

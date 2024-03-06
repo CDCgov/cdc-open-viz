@@ -58,7 +58,7 @@ const BarChartStackedVertical = () => {
                         `}
                     </style>
                     <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className='stack vertical'>
-                      <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barX} y={bar.y - 5} fill={'#000'} textAnchor='middle'>
+                      <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barX + barWidth / 2} y={bar.y - 5} fill={'#000'} textAnchor='middle'>
                         {yAxisValue}
                       </Text>
                       <foreignObject
