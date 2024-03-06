@@ -1,10 +1,8 @@
-import React, { useContext } from 'react'
-import { ChartConfig } from '../../../types/ChartConfig'
+import React, { MouseEventHandler, useContext } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import { ChartContext } from '../../../types/ChartContext'
 import { Text } from '@visx/text'
 import { Group } from '@visx/group'
-import * as d3 from 'd3'
 import { formatDate } from '@cdc/core/helpers/cove/date.js'
 
 type RegionsProps = {
@@ -12,6 +10,12 @@ type RegionsProps = {
   yMax: number
   barWidth?: number
   totalBarsInGroup?: number
+  handleTooltipMouseOff: MouseEventHandler<SVGElement>
+  handleTooltipMouseOver: MouseEventHandler<SVGElement>
+  handleTooltipClick: MouseEventHandler<SVGElement>
+  tooltipData: unknown
+  showTooltip: Function
+  hideTooltip: Function
 }
 
 // TODO: should regions be removed on categorical axis?
@@ -19,15 +23,16 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
   const { parseDate, config } = useContext<ChartContext>(ConfigContext)
 
   const { runtime, regions, visualizationType, orientation, xAxis } = config
+  const domain = xScale.domain()
 
   const getFromValue = region => {
     let from
 
     // Fixed Date
     if (!region?.fromType || region.fromType === 'Fixed') {
-      let date = new Date(region.from)
-      let f = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
-      from = xScale(f)
+      const date = new Date(region.from)
+      const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
+      from = xScale(parsedDate)
       if (visualizationType === 'Bar' || config.visualizationType === 'Combo' || visualizationType === 'Line') {
         from = region.fromType !== 'Previous Days' ? xScale(parseDate(region.from)) : null
       }
@@ -39,20 +44,19 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
 
     // Previous Date
     if (region.fromType === 'Previous Days') {
-      let previousDays = Number(region.from) || 0
+      const previousDays = Number(region.from) || 0
+      const categoricalDomain = domain.map(d => formatDate(config.xAxis.dateParseFormat, new Date(d)))
+      const d = region.toType === 'Last Date' ? new Date(domain[domain.length - 1]) : new Date(region.to) // on categorical charts force leading zero 03/15/2016 vs 3/15/2016 for valid date format
+      const to = config.xAxis.type === 'categorical' ? formatDate(config.xAxis.dateParseFormat, d) : formatDate(config.xAxis.dateParseFormat, d)
+      const toDate = new Date(to)
 
-      let domain = xScale.domain()
-      let categoricalDomain = xScale.domain().map(d => formatDate(config.xAxis.dateParseFormat, new Date(d)))
-      let d = region.toType === 'Last Date' ? new Date(domain[domain.length - 1]) : new Date(region.to) // on categorical charts force leading zero 03/15/2016 vs 3/15/2016 for valid date format
-      let to = config.xAxis.type === 'categorical' ? formatDate(config.xAxis.dateParseFormat, d) : formatDate(config.xAxis.dateParseFormat, d)
-      let toDate = new Date(to)
       from = new Date(toDate.setDate(toDate.getDate() - previousDays))
 
       if (xAxis.type === 'categorical') {
-        let categoricalFormattedDate = formatDate(config.xAxis.dateParseFormat, from)
+        const categoricalFormattedDate = formatDate(config.xAxis.dateParseFormat, from)
         const isDate = date => date === categoricalFormattedDate
-        let index = categoricalDomain.findIndex(isDate)
-        let categoricalIndexValue = xScale.domain()[index]
+        const index = categoricalDomain.findIndex(isDate)
+        const categoricalIndexValue = xScale.domain()[index]
         from = config.xAxis.type === 'categorical' ? categoricalIndexValue : from
       }
 
@@ -88,8 +92,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       }
     }
     if (region.toType === 'Last Date') {
-      let domainValues = xScale.domain()
-      let lastDate = domainValues[domainValues.length - 1]
+      const lastDate = domain[domain.length - 1]
       to = Number(xScale(lastDate) + ((visualizationType === 'Bar' || visualizationType === 'Combo') && config.xAxis.type === 'date' ? barWidth * totalBarsInGroup : 0))
     }
 
