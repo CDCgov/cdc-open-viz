@@ -794,8 +794,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           {config.table?.show && config.data && (
             <DataTable
               config={config}
-              rawData={config.data?.[0].tableData ? config.data?.[0]?.tableData : config.data}
-              runtimeData={config.data?.[0].tableData ? config.data?.[0]?.tableData : config.data || []}
+              rawData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data}
+              runtimeData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data || []}
               expandDataTable={config.table.expanded}
               showDownloadButton={config.table.download}
               tableTitle={config.dashboard.title || ''}
