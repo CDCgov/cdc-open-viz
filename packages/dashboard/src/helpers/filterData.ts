@@ -42,7 +42,6 @@ function setFilterValuesAndActiveFilter(filters: SharedFilter[], filteredData: O
   filters.forEach(sharedFilter => {
     if (sharedFilter.pivot) {
       sharedFilter.values = _.uniq(filteredData.map(row => row[sharedFilter.columnName]))
-      if (!sharedFilter.active?.length) sharedFilter.active = sharedFilter.values
     } else if (sharedFilter.tier === i + 2 && !Array.isArray(sharedFilter.active)) {
       sharedFilter.values = _.uniq(filteredData.map(row => row[sharedFilter.columnName]))
       const valueAlreadySelected = sharedFilter.values.includes(sharedFilter.active)
