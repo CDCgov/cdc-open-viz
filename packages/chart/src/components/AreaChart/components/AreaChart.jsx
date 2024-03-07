@@ -3,6 +3,7 @@ import React, { useContext, memo } from 'react'
 // cdc
 import ConfigContext from '../../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 // visx & d3
 import * as allCurves from '@visx/curve'
@@ -19,7 +20,7 @@ const AreaChart = props => {
   if (!data) return
 
   const handleX = d => {
-    return (config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+    return (isDateScale(config.xAxis) ? xScale(parseDate(d[config.xAxis.dataKey], false)) : xScale(d[config.xAxis.dataKey])) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
   }
 
   const handleY = (d, index, s = undefined) => {

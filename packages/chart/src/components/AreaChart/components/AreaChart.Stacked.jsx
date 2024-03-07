@@ -3,6 +3,7 @@ import React, { useContext, memo } from 'react'
 // cdc
 import ConfigContext from '../../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 // visx & d3
 import * as allCurves from '@visx/curve'
@@ -20,7 +21,7 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
 
   const handleDateCategory = value => {
     if (config.xAxis.type === 'categorical') return xScale(value)
-    if (config.xAxis.type === 'date') {
+    if (isDateScale(config.xAxis)) {
       let date = new Date(value)
       return xScale(date)
     }

@@ -6,6 +6,7 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import BarChartContext from './context'
 import Regions from '../../Regions'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 import createBarElement from '@cdc/core/components/createBarElement'
 
@@ -27,8 +28,8 @@ const BarChartStackedVertical = () => {
               barStack.bars.map(bar => {
                 let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                 let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                let barThickness = config.xAxis.type === 'date' && config.xAxis.sortDates ? (config.barThickness * (xScale.range()[1] - xScale.range()[0])) : xMax / barStack.bars.length
-                let barThicknessAdjusted = barThickness * (config.xAxis.type === 'date' && config.xAxis.sortDates ? 1 : (config.barThickness || 0.8))
+                let barThickness = config.xAxis.type === 'date-time' ? config.barThickness * (xScale.range()[1] - xScale.range()[0]) : xMax / barStack.bars.length
+                let barThicknessAdjusted = barThickness * (config.xAxis.type === 'date-time' ? 1 : config.barThickness || 0.8)
                 let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
                 // tooltips
                 const rawXValue = bar.bar.data[config.runtime.xAxis.dataKey]
@@ -36,6 +37,7 @@ const BarChartStackedVertical = () => {
                 const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                 if (!yAxisValue) return
                 const barX = xScale(config.runtime.xAxis.type === 'date' ? parseDate(rawXValue) : rawXValue) - (config.xAxis.type === 'date' && config.xAxis.sortDates ? barThicknessAdjusted / 2 : 0)
+                const style = applyRadius(barStack.index)
                 const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
