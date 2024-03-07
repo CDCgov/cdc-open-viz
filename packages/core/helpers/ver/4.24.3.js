@@ -5,11 +5,13 @@ const update_4_24_3 = async config => {
 
   newConfig.validated = ver
 
-  if (newConfig.xAxis.sortDates) {
-    newConfig.xAxis.type = 'date-time'
-  }
+  if (newConfig.type === 'chart') {
+    if (newConfig.xAxis.sortDates) {
+      newConfig.xAxis.type = 'date-time'
+    }
 
-  delete newConfig.xAxis.sortDates
+    delete newConfig.xAxis.sortDates
+  }
 
   return newConfig
 }
