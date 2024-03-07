@@ -139,7 +139,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       .filter(d => additionalCityStyles.some(style => String(d[style.column]) === String(style.value)))
       .map(d => {
         const conditionsMatched = additionalCityStyles.find(style => String(d[style.column]) === String(style.value))
-        return { ...conditionsMatched, ...d, hello: 'ddd' }
+        return { ...conditionsMatched, ...d }
       })
       .find(item => {
         return Object.keys(item).find(key => item[key] === city)
