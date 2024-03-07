@@ -95,8 +95,10 @@ export default {
     maxBubbleSize: 20,
     extraBubbleBorder: false,
     cityStyle: 'circle',
+    cityStyleLabel: '',
     geoCodeCircleSize: 2,
-    showBubbleZeros: false
+    showBubbleZeros: false,
+    additionalCityStyles: []
   },
   mapPosition: { coordinates: [0, 30], zoom: 1 },
   map: {
