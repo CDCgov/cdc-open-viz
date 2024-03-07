@@ -95,6 +95,9 @@ export default {
     maxBubbleSize: 20,
     extraBubbleBorder: false,
     cityStyle: 'circle',
+    cityStyleLabel: '',
+    showBubbleZeros: false,
+    additionalCityStyles: [],
     geoCodeCircleSize: 8,
     showBubbleZeros: false
   },

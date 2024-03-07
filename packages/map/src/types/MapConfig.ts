@@ -11,10 +11,15 @@ export type MapVisualSettings = {
   extraBubbleBorder: boolean
   /** cityStyle - visual indicator of cities on state maps */
   cityStyle: 'circle' | 'pin'
+  /** cityStyle - optional visual indicator of label on the Legend */
+  cityStyleLabel: string
   /** geoCodeCircleSize - controls the size of the city style option (circle or pin) */
+
   geoCodeCircleSize: number
   /** showBubbleZeros - shows circles on maps when the data is provided even if its a zero value */
   showBubbleZeros: boolean
+  /** additionalCityStyles - shows Circle, Square, Triangle, Rhombus/Diamond, Star, Map Pin on maps when the additionalCityStyles is added */
+  additionalCityStyles: [] | [{ label: string; column: string; value: string; shape: string }]
 }
 
 type PatternSelection = {
