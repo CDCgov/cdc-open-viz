@@ -18,6 +18,7 @@ import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
 import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 
@@ -254,7 +255,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (newConfig.exclusions && newConfig.exclusions.active) {
       if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
         newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
-      } else if (newConfig.xAxis.type === 'date' && (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) && newConfig.xAxis.dateParseFormat) {
+      } else if (isDateScale(newConfig.xAxis) && (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) && newConfig.xAxis.dateParseFormat) {
         // Filter dates
         const timestamp = e => new Date(e).getTime()
 
@@ -298,13 +299,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setFilteredData(currentData)
     }
 
-    if (!['Area Chart', 'Bar', 'Line', 'Combo'].includes(newConfig.visualizationType) || newConfig.orientation === 'horizontal') {
-      newConfig.xAxis.sortDates = false
-    }
-
-    if (newConfig.xAxis.sortDates && newConfig.barThickness > 0.1) {
+    if (newConfig.xAxis.type === 'date-time' && newConfig.barThickness > 0.1) {
       newConfig.barThickness = 0.035
-    } else if (!newConfig.xAxis.sortDates && newConfig.barThickness < 0.1) {
+    } else if (newConfig.xAxis.type !== 'date-time' && newConfig.barThickness < 0.1) {
       newConfig.barThickness = 0.35
     }
 
@@ -1121,7 +1118,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     )
   }
 
-  const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getXAxisData = d => (isDateScale(config.runtime.xAxis) ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   const capitalize = str => {
