@@ -96,9 +96,10 @@ export default {
     extraBubbleBorder: false,
     cityStyle: 'circle',
     cityStyleLabel: '',
-    geoCodeCircleSize: 2,
     showBubbleZeros: false,
-    additionalCityStyles: []
+    additionalCityStyles: [],
+    geoCodeCircleSize: 8,
+    showBubbleZeros: false
   },
   mapPosition: { coordinates: [0, 30], zoom: 1 },
   map: {
@@ -111,7 +112,7 @@ export default {
       {
         legendTitle: '',
         legendDescription: '',
-        items: [{ key: '', shape: 'Arrow up', column: '', operator: '=', value: '' }]
+        items: [{ key: '', shape: 'Arrow Up', column: '', operator: '=', value: '' }]
       }
     ]
   },

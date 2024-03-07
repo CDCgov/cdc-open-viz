@@ -52,6 +52,7 @@ import NavigationMenu from './components/NavigationMenu' // Future: Lazy
 import UsaMap from './components/UsaMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -134,6 +135,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
+  let legendSpecialClassLastMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
   if (isDebug) console.log('CdcMap state=', state) // eslint-disable-line
@@ -302,6 +304,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // eslint-disable-next-line
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
     const newLegendMemo = new Map() // Reset memoization
+    const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     let primaryCol = obj.columns.primary.name,
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
@@ -522,6 +525,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let otherRows = result.filter(d => !d.special)
         result = [...otherRows, ...specialRows]
       }
+
+      const assignSpecialClassLastIndex = (value, key) => {
+        const newIndex = result.findIndex(d => d.bin === value)
+        newLegendSpecialClassLastMemo.set(key, newIndex)
+      }
+      newLegendMemo.forEach(assignSpecialClassLastIndex)
+      legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
 
       return result
     }
@@ -774,6 +784,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
     //-----------
 
+    const assignSpecialClassLastIndex = (value, key) => {
+      const newIndex = result.findIndex(d => d.bin === value)
+      newLegendSpecialClassLastMemo.set(key, newIndex)
+    }
+    newLegendMemo.forEach(assignSpecialClassLastIndex)
+    legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
+
     return result
   })
 
@@ -987,7 +1004,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       if (legendMemo.current.has(hash)) {
         let idx = legendMemo.current.get(hash)
-        if (runtimeLegend[idx]?.disabled) return false
+        let disabledIdx = idx
+
+        if (state.legend.showSpecialClassesLast) {
+          disabledIdx = legendSpecialClassLastMemo.current.get(hash)
+        }
+
+        if (runtimeLegend[disabledIdx]?.disabled) return false
 
         // changed to use bin prop to get color instead of idx
         // bc we re-order legend when showSpecialClassesLast is checked
@@ -1095,7 +1118,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
 
     if (countryKeys.includes(value)) {
-      value = titleCase(supportedCountries[key][0])
+      value = supportedCountries[key][0]
     }
 
     if (countyKeys.includes(value)) {
@@ -1276,18 +1299,19 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const regex = /(?:\.([^.]+))?$/
 
         const ext = regex.exec(dataUrl.pathname)[1]
-        if ('csv' === ext) {
+        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
           data = await fetch(dataUrlFinal)
             .then(response => response.text())
             .then(responseText => {
               const parsedCsv = Papa.parse(responseText, {
                 header: true,
                 dynamicTyping: true,
-                skipEmptyLines: true
+                skipEmptyLines: true,
+                encoding: 'utf-8'
               })
               return parsedCsv.data
             })
-        } else if ('json' === ext) {
+        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
           data = await fetch(dataUrlFinal).then(response => response.json())
         } else {
           data = []
@@ -1302,6 +1326,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         data = transform.autoStandardize(data)
         data = transform.developerStandardize(data, state.dataDescription)
       }
+
+      console.log('data', data)
 
       setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
     }

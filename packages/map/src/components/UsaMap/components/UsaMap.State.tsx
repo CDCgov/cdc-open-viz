@@ -14,10 +14,8 @@ import CityList from '../../CityList'
 import BubbleList from '../../BubbleList'
 import { supportedCities, supportedStates } from '../../../data/supported-geos'
 import { geoAlbersUsa } from 'd3-composite-projections'
-import { Group } from '@visx/group'
-import { Text } from '@visx/text'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
-import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
+import HexIcon from './HexIcon'
 
 import Territory from './Territory'
 
@@ -254,7 +252,7 @@ const UsaMap = () => {
         }
 
         const getArrowDirection = (geoData, geo, bgColor) => {
-          let centroid = projection(geoCentroid(geo))
+          const centroid = projection(geoCentroid(geo))
 
           const iconSize = 8
 
@@ -269,16 +267,41 @@ const UsaMap = () => {
             <>
               {state.hexMap.shapeGroups.map((group, groupIndex) => {
                 return group.items.map((item, itemIndex) => {
-                  if (item.operator === '=') {
-                    if (geoData[item.key] === item.value) {
-                      return (
-                        <Group top={centroid[1] - 5} left={centroid[0] - iconSize} color={textColor} textAnchor='start'>
-                          {item.shape === 'Arrow Down' && <AiOutlineArrowDown />}
-                          {item.shape === 'Arrow Up' && <AiOutlineArrowUp />}
-                          {item.shape === 'Arrow Right' && <AiOutlineArrowRight />}
-                        </Group>
-                      )
-                    }
+                  switch (item.operator) {
+                    case '=':
+                      if (geoData[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
+                        return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                      }
+                      break
+                    case '≠':
+                      if (geoData[item.key] !== item.value && Number(geoData[item.key]) !== Number(item.value)) {
+                        return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                      }
+                      break
+                    case '<':
+                      if (Number(geoData[item.key]) < Number(item.value)) {
+                        return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                      }
+                      break
+                    case '>':
+                      if (Number(geoData[item.key]) > Number(item.value)) {
+                        return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                      }
+                      break
+                    case '<=':
+                      if (Number(geoData[item.key]) <= Number(item.value)) {
+                        return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                      }
+                      break
+                    case '>=':
+                      if (item.operator === '>=') {
+                        if (Number(geoData[item.key]) >= Number(item.value)) {
+                          return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                        }
+                      }
+                      break
+                    default:
+                      break
                   }
                 })
               })}
