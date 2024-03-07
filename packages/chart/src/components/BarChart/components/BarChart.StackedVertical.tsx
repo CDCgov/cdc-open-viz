@@ -7,6 +7,8 @@ import { Text } from '@visx/text'
 import BarChartContext from './context'
 import Regions from '../../Regions'
 
+import createBarElement from '@cdc/core/components/createBarElement'
+
 const BarChartStackedVertical = () => {
   const [barWidth, setBarWidth] = useState(0)
   const { xScale, yScale, xMax, yMax } = useContext(BarChartContext)
@@ -34,7 +36,6 @@ const BarChartStackedVertical = () => {
                 const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0, 'left')
                 if (!yAxisValue) return
                 const barX = xScale(config.runtime.xAxis.type === 'date' ? parseDate(rawXValue) : rawXValue) - (config.xAxis.type === 'date' && config.xAxis.sortDates ? barThicknessAdjusted / 2 : 0)
-                const style = applyRadius(barStack.index)
                 const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
@@ -48,50 +49,39 @@ const BarChartStackedVertical = () => {
 
                 return (
                   <Group key={`${barStack.index}--${bar.index}--${orientation}`}>
-                    <style>
-                      {`
-                           #barStack${barStack.index}-${bar.index} rect,
-                           #barStack${barStack.index}-${bar.index} foreignObject div{
-                            animation-delay: ${barStack.index * 0.5}s;
-                            transform-origin: ${barThicknessAdjusted / 2}px ${bar.y + bar.height}px
-                          }
-                        `}
-                    </style>
                     <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className='stack vertical'>
                       <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barX + barWidth / 2} y={bar.y - 5} fill={'#000'} textAnchor='middle'>
                         {yAxisValue}
                       </Text>
-                      <foreignObject
-                        onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
-                        onMouseLeave={onMouseLeaveBar}
-                        key={`bar-stack-${barStack.index}-${bar.index}`}
-                        x={barX}
-                        y={bar.y}
-                        width={barThicknessAdjusted}
-                        height={bar.height}
-                        display={displayBar ? 'block' : 'none'}
-                        data-tooltip-html={tooltip}
-                        data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                        onClick={e => {
+                      {createBarElement({
+                        config: config,
+                        index: barStack.index,
+                        background: colorScale(config.runtime.seriesLabels[bar.key]),
+                        borderColor: '#333',
+                        borderStyle: 'solid',
+                        borderWidth: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px`,
+                        width: barThicknessAdjusted,
+                        height: bar.height,
+                        x: barX,
+                        y: bar.y,
+                        onMouseOver: () => onMouseOverBar(xAxisValue, bar.key),
+                        onMouseLeave: onMouseLeaveBar,
+                        tooltipHtml: tooltip,
+                        tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,
+                        onClick: e => {
                           e.preventDefault()
                           if (setSharedFilter) {
                             bar[config.xAxis.dataKey] = xAxisValue
                             setSharedFilter(config.uid, bar)
                           }
-                        }}
-                      >
-                        <div
-                          style={{
-                            transition: 'all 0.2s linear',
-                            opacity: transparentBar ? 0.2 : 1,
-                            width: barThicknessAdjusted,
-                            height: bar.height,
-                            background: colorScale(config.runtime.seriesLabels[bar.key]),
-                            border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`,
-                            ...style
-                          }}
-                        ></div>
-                      </foreignObject>
+                        },
+                        styleOverrides: {
+                          animationDelay: `${barStack.index * 0.5}s`,
+                          transformOrigin: `${barThicknessAdjusted / 2}px ${bar.y + bar.height}px`,
+                          opacity: transparentBar ? 0.2 : 1,
+                          display: displayBar ? 'block' : 'none'
+                        }
+                      })}
                     </Group>
                   </Group>
                 )
