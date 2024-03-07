@@ -3002,16 +3002,6 @@ const EditorPanel = props => {
                         </Tooltip>
                       }
                     />
-                    {/* <label>
-                      <span className='edit-label'>Label</span>
-                      <input
-                        onChange={event => {
-                          handleEditorChanges('handleCityStyleLabel', event.target.value)
-                        }}
-                        value={state.visual.cityStyleLabel}
-                        type='text'
-                      />
-                    </label> */}
                   </>
                 )}
                 {/* <AdditionalCityStyles /> */}

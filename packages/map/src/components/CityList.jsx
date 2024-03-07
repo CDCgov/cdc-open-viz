@@ -135,7 +135,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
     }
 
     const { additionalCityStyles } = state.visual || []
-    const result = Object.values(data)
+    const cityStyle = Object.values(data)
       .filter(d => additionalCityStyles.some(style => String(d[style.column]) === String(style.value)))
       .map(d => {
         const conditionsMatched = additionalCityStyles.find(style => String(d[style.column]) === String(style.value))
@@ -145,13 +145,12 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
         return Object.keys(item).find(key => item[key] === city)
       })
 
-    if (result !== undefined) {
+    if (cityStyle !== undefined) {
       if (!geoData?.[state.columns.longitude.name] && !geoData?.[state.columns.latitude.name] && city && supportedCities[city.toUpperCase()]) {
         let translate = `translate(${projection(supportedCities[city.toUpperCase()])})`
-
         return (
           <g key={i} transform={translate} style={styles} className='geo-point'>
-            {shapes[result.shape.toLowerCase()]}
+            {shapes[cityStyle.shape.toLowerCase()]}
           </g>
         )
       }
