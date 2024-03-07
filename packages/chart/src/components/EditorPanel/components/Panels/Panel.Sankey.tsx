@@ -11,7 +11,7 @@ const SankeySettings = () => {
   const data = config.data?.[0]
   const { updateField } = useContext<EPContext>(EditorPanelContext)
 
-  if (config.visualizationType !== 'Sankey Chart') return
+  if (config.visualizationType !== 'Sankey') return
 
   const updateStoryNode = (fieldName, value, i) => {
     let storyNodes = []

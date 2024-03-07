@@ -3,6 +3,7 @@ import { getUpdateConfig } from '../helpers/getUpdateConfig'
 import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DashboardActions from './dashboard.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
+import { Tab } from '../types/Tab'
 
 const createBlankDashboard = () => ({
   dashboard: {
@@ -24,7 +25,7 @@ export type DashboardState = {
   filteredData: Object
   loading: boolean
   preview: boolean
-  tabSelected: number
+  tabSelected: Tab
 }
 
 const reducer = (state: DashboardState, action: DashboardActions): DashboardState => {
@@ -102,6 +103,13 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const slot = action.payload
       const newConfigFields = state.config.multiDashboards[slot]
       return { ...state, config: { ...state.config, ...newConfigFields, activeDashboard: slot } }
+    }
+    case 'TOGGLE_ROW': {
+      const { rowIndex, colIndex } = action.payload
+      const newRows = state.config.rows.map((row, index) => {
+        return index === rowIndex ? row.map((col, i) => ({ ...col, hide: i === colIndex })) : row
+      })
+      return { ...state, config: { ...state.config, rows: newRows } }
     }
     default:
       return state

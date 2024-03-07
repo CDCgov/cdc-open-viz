@@ -159,7 +159,7 @@ type AllChartsConfig = {
   type: 'chart' | 'dashboard'
   useLogScale: boolean
   visual: Visual
-  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting'
+  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey'
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis

@@ -7,7 +7,7 @@ import { Table } from '@cdc/core/types/Table'
 const addVisualization = (type, subType) => {
   const modalWillOpen = type !== 'markup-include'
   const newVisualizationConfig: Partial<Visualization> = {
-    newViz: true,
+    newViz: type !== 'table',
     openModal: modalWillOpen,
     uid: type + Date.now(),
     type
