@@ -2,6 +2,7 @@ import { getChartCellValue } from '../helpers/getChartCellValue'
 import { getSeriesName } from '../helpers/getSeriesName'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import { DownIcon, UpIcon } from './Icons'
+import { FaSort } from 'react-icons/fa'
 
 type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; groupBy?; hasRowType? }
 
@@ -68,6 +69,7 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
         {['__series__', ...Object.keys(data)].slice(sliceVal).map((row, index) => {
           let column = config.xAxis?.dataKey
           let text = row !== '__series__' ? getChartCellValue(row, column, config, data) : '__series__'
+
           return (
             <th
               style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
@@ -88,10 +90,24 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
               {...(sortBy.column === text ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
             >
               {text === '__series__' ? '' : text}
+              {/* empty div replicates style of old button */}
+              <div style={{ display: 'inline-block', margin: '0 0 0 12px' }} tabIndex={-1}></div>
+              <FaSort
+                role='button'
+                className='cdcdataviz-sr-only-focusable'
+                tabIndex={0}
+                onKeyDown={e => {
+                  console.log(sortBy)
+                  if (e.keyCode === 13) {
+                    e.preventDefault()
+
+                    setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
+                  }
+                }}
+              />
+              <span className='cdcdataviz-sr-only'>{`The data table is currently sorted by the following column: ${String(sortBy.column)}.`}</span>
+              <span className='cdcdataviz-sr-only'>{`Press enter to sort by ${text} in ${sortBy.column === text ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} order`}</span>
               {index === sortBy.colIndex && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
-              <button>
-                <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === text ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
-              </button>
             </th>
           )
         })}
