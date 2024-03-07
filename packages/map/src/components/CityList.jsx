@@ -82,8 +82,6 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       transform = `translate(${projection(supportedCities[city.toUpperCase()])})`
     }
 
-    console.log([state.columns.longitude.name], '!geoData?.[state.columns.longitude.name]')
-
     let needsPointer = false
 
     if (geoData?.[state.columns.longitude.name] && geoData?.[state.columns.latitude.name]) {
