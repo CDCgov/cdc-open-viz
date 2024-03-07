@@ -36,18 +36,16 @@ const Sankey = ({ width, height }: SankeyProps) => {
 
   //Mobile Pop Up 
   const [showPopup, setShowPopup] = useState(false);
-  const [tooltipPosition, setTooltipPosition] = useState<PlacesType>('top');
 
   useEffect(() => {
       if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
         setShowPopup(true)
-        setTooltipPosition('bottom')
-        console.log('position ' + tooltipPosition) //prints out bottom but tooltip is still opening to the top
-      } else {
-        setShowPopup(false)
       }
-    
   }, [window.innerWidth]);
+
+  const closePopUp = () => {
+    setShowPopup(false)
+  }
 
   // Uses Visx Groups innerRef to get all Group elements that are mapped.
   // Sets the largest group width in state and subtracts that group the svg width to calculate overall width.
@@ -309,6 +307,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
         {showPopup && (
         <div className="popup">
           <div className="popup-content">
+            <button className="visually-hidden" onClick={closePopUp}>Select for accessible version.</button>
             <p><strong>Please change the orientation of your screen or increase the size of your browser to view the diagram better.</strong></p>
           </div>
         </div>
