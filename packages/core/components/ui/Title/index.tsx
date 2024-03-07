@@ -21,11 +21,11 @@ const Title = (props: HeaderProps) => {
   return (
     title &&
     showTitle && (
-      <header className={updatedClasses.join(' ')} aria-hidden='true' style={props.style} aria-level={ariaLevel}>
+      <header className={updatedClasses.join(' ')} style={props.style}>
         {superTitle && <sup>{parse(superTitle)}</sup>}
-        <div>
+        <h2>
           {parse(title)} {isDashboard}
-        </div>
+        </h2>
       </header>
     )
   )
