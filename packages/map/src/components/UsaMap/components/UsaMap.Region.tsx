@@ -1,12 +1,14 @@
 import { useState, useEffect, memo, useContext } from 'react'
 
-import { jsx } from '@emotion/react'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+// 3rd party
+import chroma from 'chroma-js'
 import { geoCentroid } from 'd3-geo'
 import { feature } from 'topojson-client'
-import topoJSON from '../data/us-regions-topo-2.json'
 import { Mercator } from '@visx/geo'
-import chroma from 'chroma-js'
+
+// cdc
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import topoJSON from '../data/us-regions-topo-2.json'
 import ConfigContext from '../../../context'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.regions)
@@ -221,7 +223,7 @@ const UsaRegionMap = props => {
         // const barFill = barPositive ? "#fff" : "#fff";
 
         return (
-          <g key={key} className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip}>
+          <g key={key} className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} aria-label={`Region ${index + 1} of ${geographies.length}`}>
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
             <g id={`region-${index + 1}-label`}>
               <circle fill='#fff' stroke='#999' cx={circleRadius} cy={circleRadius} r={circleRadius} />

@@ -231,5 +231,14 @@
         }
       }
     }
+    & .container-shapes {
+      display: flex;
+      align-items: flex-start;
+
+      & > svg {
+        width: 25px;
+        height: 32px;
+      }
+    }
   }
 }

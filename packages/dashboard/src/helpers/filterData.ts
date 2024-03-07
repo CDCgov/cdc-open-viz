@@ -25,6 +25,7 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
 function filter(data, filters, condition) {
   return data.filter(row => {
     const found = filters.find(filter => {
+      if (filter.pivot) return false
       const currentValue = row[filter.columnName]
       const selectedValue = filter.queuedActive || filter.active
       const isNotTheSelectedValue = selectedValue && currentValue != selectedValue
@@ -38,16 +39,37 @@ function filter(data, filters, condition) {
 }
 
 function setFilterValuesAndActiveFilter(filters: SharedFilter[], filteredData: Object[], i: number) {
-  filters.find(sharedFilter => {
-    if (sharedFilter.tier === i + 2) {
+  filters.forEach(sharedFilter => {
+    if (sharedFilter.pivot) {
+      sharedFilter.values = _.uniq(filteredData.map(row => row[sharedFilter.columnName]))
+    } else if (sharedFilter.tier === i + 2 && !Array.isArray(sharedFilter.active)) {
       sharedFilter.values = _.uniq(filteredData.map(row => row[sharedFilter.columnName]))
       const valueAlreadySelected = sharedFilter.values.includes(sharedFilter.active)
       if (!valueAlreadySelected && sharedFilter.values.length > 0) {
         sharedFilter.active = sharedFilter.values[0]
       }
-      return true
     }
   })
+}
+
+const pivotData = (data, pivotFilter: SharedFilter) => {
+  const pivotActive = pivotFilter.active as string[]
+  const inactive = pivotFilter.values.filter(value => !pivotActive.includes(value))
+  const pivotColumn = pivotFilter.columnName
+  const valueColumn = pivotFilter.pivot
+  const grouped = _.groupBy(data, val => val[pivotColumn])
+  const newData = []
+  for (const key in grouped) {
+    const group = grouped[key]
+
+    group.forEach((val, index) => {
+      const row = newData[index] || {}
+      if (!inactive.includes(key)) row[key] = val[valueColumn]
+      const toAdd = _.omit(val, [pivotColumn, valueColumn, ...inactive])
+      newData[index] = { ...row, ...toAdd }
+    })
+  }
+  return newData
 }
 
 /** This function returns filtered data.
@@ -63,6 +85,10 @@ export const filterData = (filters: SharedFilter[], _data: Object[]): Object[] =
     setFilterValuesAndActiveFilter(filters, filteredData, i)
 
     if (lastIteration) {
+      const pivotFilter = filters.find(filter => filter.pivot)
+      if (pivotFilter) {
+        return pivotData(filteredData, pivotFilter)
+      }
       // not sure if this last run of filter() function is necessary.
       return filter(filteredData, filters, maxTier - 1)
     }

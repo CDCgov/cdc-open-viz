@@ -167,11 +167,11 @@
       flex: 0 0 auto;
     }
 
-    h2 {
-      font-size: 1.3em;
+    h3 {
+      font-size: 1.3rem;
     }
 
-    h2,
+    h3,
     p {
       margin-bottom: 0.8em;
     }
@@ -528,21 +528,24 @@
     }
 
     &.animated {
+      .vertical path,
       .vertical rect,
       .vertical foreignObject div {
         opacity: 0;
-        animation: growBar 0.5s linear forwards;
+        animation: growBar 0.5s linear both;
         animation-play-state: paused;
       }
 
+      .horizontal path,
       .horizontal rect,
       .horizontal foreignObject div {
         opacity: 0;
-        animation: growBarH 0.5s linear forwards;
+        animation: growBarH 0.5s linear both;
         animation-play-state: paused;
       }
 
       &.animate {
+        path, 
         rect,
         foreignObject div {
           animation-play-state: running;

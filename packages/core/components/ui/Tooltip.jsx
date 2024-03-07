@@ -26,7 +26,7 @@ const Tooltip = ({ place = 'top', trigger = 'hover', float = false, shadow = tru
 
   return (
     <span className='cove-tooltip' style={style} {...attributes}>
-      <a id={uid} className='cove-tooltip--target' data-tooltip-float={float} data-tooltip-place={place} data-tooltip-events={generateTriggerEvent()}>
+      <a id={uid} role='dialog' tabIndex={0} className='cove-tooltip--target' data-tooltip-float={float} data-tooltip-place={place} data-tooltip-events={generateTriggerEvent()}>
         {tooltipTargetChildren ? tooltipTargetChildren.props.children : null}
       </a>
       {/* prettier-ignore */}

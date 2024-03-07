@@ -30,7 +30,6 @@ const TerritoryRectangle = ({ label, text, stroke, strokeWidth, textColor, hasPa
           let defaultPatternColor = 'black'
 
           const hasMatchingValues = supportedTerritories[territory].includes(patternData?.dataValue)
-          console.log('has match', patternData)
 
           if (chroma.contrast(defaultPatternColor, props.style.fill) < 3.5) {
             defaultPatternColor = 'white'

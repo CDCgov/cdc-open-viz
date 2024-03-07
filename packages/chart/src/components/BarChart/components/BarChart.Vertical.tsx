@@ -10,6 +10,8 @@ import { FaStar } from 'react-icons/fa'
 import Regions from './../../Regions'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 
+import createBarElement from '@cdc/core/components/createBarElement'
+
 // third party
 import chroma from 'chroma-js'
 import BarChartContext, { type BarChartContextValues } from './context'
@@ -112,7 +114,6 @@ export const BarChartVertical = () => {
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
-                  const borderRadius = applyRadius(newIndex)
                   // tooltips
 
                   const additionalColTooltip = getAdditionalColumn(bar.key, data[barGroup.index][config.runtime.originalXAxis.dataKey])
@@ -180,57 +181,43 @@ export const BarChartVertical = () => {
                     return _barColor
                   }
 
-                  const getLeft = () => {
-                    if (barWidth < 50 && barWidth > 15) return barWidth / 2.5
-                    if (barWidth < 15 && barWidth > 5) return barWidth / 6
-                    if (barWidth < 5) return 0
-                    return barWidth / 2
-                  }
-                  const iconStyle: { [key: string]: any } = {
-                    position: 'absolute',
-                    top: bar.value >= 0 && isNumber(bar.value) ? -suppresedBarHeight : undefined,
-                    bottom: bar.value >= 0 && isNumber(bar.value) ? undefined : `-${suppresedBarHeight}px`,
-                    left: getLeft()
-                  }
-
-                  if (config.isLollipopChart) {
-                    iconStyle.left = 0
-                    iconStyle.transform = `translateX(0)`
-                  }
-
-                  const finalStyle = {
-                    background: getBarBackgroundColor(barColor),
-                    borderColor,
-                    borderStyle: 'solid',
-                    borderWidth: `${borderWidth}px`,
-                    width: barWidth,
-                    height: barHeight,
-                    ...borderRadius,
-                    cursor: dashboardConfig ? 'pointer' : 'default'
-                  }
-
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
-                      {/* This feels gross but inline transition was not working well*/}
-                      <style>
-                        {`
-                        .linear #barGroup${barGroup.index} div,
-                        .Combo #barGroup${barGroup.index} div {
-                          transform-origin: 0 ${barY + barHeight}px;
-                        }
-                      `}
-                      </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
-                        <foreignObject
+                        {createBarElement({
+                          config: config,
+                          index: newIndex,
+                          id: `barGroup${barGroup.index}`,
+                          background: getBarBackgroundColor(barColor),
+                          borderColor,
+                          borderStyle: 'solid',
+                          borderWidth: `${borderWidth}px`,
+                          width: barWidth,
+                          height: barHeight,
+                          x: barX,
+                          y: barY,
+                          onMouseOver: () => onMouseOverBar(xAxisValue, bar.key),
+                          onMouseLeave: onMouseLeaveBar,
+                          tooltipHtml: tooltip,
+                          tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,
+                          onClick: e => {
+                            e.preventDefault()
+                            if (setSharedFilter) {
+                              bar[config.xAxis.dataKey] = xAxisValue
+                              setSharedFilter(config.uid, bar)
+                            }
+                          },
+                          styleOverrides: {
+                            transformOrigin: `0 ${barY + barHeight}px`,
+                            opacity: transparentBar ? 0.2 : 1,
+                            display: displayBar ? 'block' : 'none',
+                            cursor: dashboardConfig ? 'pointer' : 'default'
+                          }
+                        })}
+                        <g
+                          transform={`translate(${barX},${yMax - suppresedBarHeight})`}
                           onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
                           onMouseLeave={onMouseLeaveBar}
-                          style={{ overflow: 'visible', transition: 'all 0.2s linear' }}
-                          id={`barGroup${barGroup.index}`}
-                          key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                          x={barX}
-                          y={barY}
-                          width={barWidth}
-                          height={barHeight}
                           opacity={transparentBar ? 0.2 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tooltip-html={tooltip}
@@ -241,13 +228,9 @@ export const BarChartVertical = () => {
                               bar[config.xAxis.dataKey] = xAxisValue
                               setSharedFilter(config.uid, bar)
                             }
-                          }}
-                        >
-                          <div style={{ position: 'fixed' }}>
-                            <div style={iconStyle}>{getIcon(bar, barWidth)}</div>
-                            <div style={{ ...finalStyle }}></div>
-                          </div>
-                        </foreignObject>
+                          }}>
+                          {getIcon(bar, barWidth)}
+                        </g>
 
                         <Text // prettier-ignore
                           display={config.labels && displayBar ? 'block' : 'none'}
