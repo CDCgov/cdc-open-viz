@@ -156,7 +156,7 @@ const Legend = () => {
   return (
     <ErrorBoundary component='Sidebar'>
       <div className='legends'>
-        <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend'>
+        <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0}>
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
             {runtimeLegend.disabledAmt > 0 && (
               <button onClick={handleReset} className={legendClasses.resetButton.join(' ') || ''}>
