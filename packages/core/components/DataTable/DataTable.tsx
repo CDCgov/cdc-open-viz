@@ -53,7 +53,6 @@ export type DataTableProps = {
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
   const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId, wrapColumns } = props
-
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [sortBy, setSortBy] = useState<any>({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
@@ -91,7 +90,7 @@ const DataTable = (props: DataTableProps) => {
     case 'Box Plot':
       if (!config.boxplot) return <Loading />
       break
-    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar' || 'Table':
+    case 'Line' || 'Bar' || 'Combo' || 'Pie' || 'Deviation Bar' || 'Paired Bar' || 'Sankey' || 'Table':
       if (!runtimeData) return <Loading />
       break
     default:
@@ -115,7 +114,7 @@ const DataTable = (props: DataTableProps) => {
           dataA = _runtimeData[a][sortBy.column]
           dataB = _runtimeData[b][sortBy.column]
         }
-        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date' && config.xAxis.sortDates) {
+        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
           dataA = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[a][config.xAxis.dataKey])
           dataB = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[b][config.xAxis.dataKey])
         }
@@ -156,7 +155,11 @@ const DataTable = (props: DataTableProps) => {
 
   // prettier-ignore
   const tableData = useMemo(() => (
-    config.visualizationType === 'Pie'
+   config.data?.[0]?.tableData
+    ? config.data?.[0]?.tableData
+    : config.visualizationType === 'Sankey'
+      ? config.data?.[0]?.tableData
+      : config.visualizationType === 'Pie'
       ? [config.yAxis.dataKey]
       : config.visualizationType === 'Box Plot'
         ? Object.entries(config.boxplot.tableData[0])

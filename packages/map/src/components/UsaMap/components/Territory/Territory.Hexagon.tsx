@@ -2,8 +2,7 @@ import { useContext } from 'react'
 import { geoCentroid, geoPath } from 'd3-geo'
 import ConfigContext from './../../../../context'
 import { MapContext } from './../../../../types/MapContext'
-import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
-import { Group } from '@visx/group'
+import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
 import chroma from 'chroma-js'
 
@@ -52,16 +51,41 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
         <>
           {state.hexMap.shapeGroups.map((group, groupIndex) => {
             return group.items.map((item, itemIndex) => {
-              if (item.operator === '=') {
-                if (geoData[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
-                  return (
-                    <Group style={{ transform: `translate(36%, 50%)`, fill: 'currentColor' }} key={`territory-hex--${itemIndex}`}>
-                      {item.shape === 'Arrow Down' && <AiOutlineArrowDown size={12} stroke='none' fontWeight={100} />}
-                      {item.shape === 'Arrow Up' && <AiOutlineArrowUp size={12} stroke='none' fontWeight={100} />}
-                      {item.shape === 'Arrow Right' && <AiOutlineArrowRight size={12} stroke='none' fontWeight={100} />}
-                    </Group>
-                  )
-                }
+              switch (item.operator) {
+                case '=':
+                  if (geoData[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
+                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                  }
+                  break
+                case '≠':
+                  if (geoData[item.key] !== item.value && Number(geoData[item.key]) !== Number(item.value)) {
+                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                  }
+                  break
+                case '<':
+                  if (Number(geoData[item.key]) < Number(item.value)) {
+                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                  }
+                  break
+                case '>':
+                  if (Number(geoData[item.key]) > Number(item.value)) {
+                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                  }
+                  break
+                case '<=':
+                  if (Number(geoData[item.key]) <= Number(item.value)) {
+                    return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                  }
+                  break
+                case '>=':
+                  if (item.operator === '>=') {
+                    if (Number(geoData[item.key]) >= Number(item.value)) {
+                      return <HexIcon item={item} index={itemIndex} centroid={centroid} isTerritory />
+                    }
+                  }
+                  break
+                default:
+                  break
               }
             })
           })}

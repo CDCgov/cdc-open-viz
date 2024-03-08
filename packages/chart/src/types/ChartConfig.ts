@@ -7,6 +7,7 @@ import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General } from '@cdc/core/types/General'
+import { type Link } from './../components/Sankey/types'
 import { Legend } from '@cdc/core/types/Legend'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
@@ -47,6 +48,25 @@ type Filter = {
   order: 'asc' | 'desc' | 'cust'
   values: string[]
   queryParameter: string
+}
+
+export type Legend = {
+  seriesHighlight: string[]
+  additionalCategories: string[]
+  // general legend onClick behavior
+  behavior: 'highlight' | 'isolate' | string
+  colorCode: string
+  description: string
+  // show or hide the legend
+  hide: boolean
+  highlightOnHover: boolean
+  label: string
+  lineMode: boolean
+  position: string
+  reverseLabelOrder: boolean
+  singleRow: boolean
+  type: string
+  verticalSorted: boolean
 }
 
 type Visual = {
@@ -139,13 +159,34 @@ type AllChartsConfig = {
   type: 'chart' | 'dashboard'
   useLogScale: boolean
   visual: Visual
-  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting'
+  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey'
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis
   xScale: Function
   yScale: Function
   regions: Region[]
+  sankey: {
+    data: { links: Link[]; storyNodeText: Object[]; tooltips: Object[] }[]
+    nodePadding: number
+    iterations: number
+    nodeSize: {
+      nodeWidth: number
+    }
+    margin: { margin_x: number; margin_y: number }
+    nodeColor: { default: boolean; inactive: boolean }
+    opacity: { LinkOpacityInactive: string; LinkOpacityDefault: string; nodeOpacityInactive: boolean; nodeOpacityDefault: boolean }
+    rxValue: number
+    nodeFontColor: string
+    nodeValueStyle: {
+      textBefore: string
+      textAfter: string
+    }
+    linkColor: {
+      inactive: string
+      default: string
+    }
+  }
 }
 
 export type ForestPlotConfig = {

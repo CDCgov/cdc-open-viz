@@ -702,10 +702,11 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                         )
                         const hideFilter = visualizationConfig.autoLoad && inNoDataState
 
-                        const hiddenToggle = col.toggle && col.hide !== undefined ? col.hide : colIndex === 0
+                        const hiddenToggle = col.hide !== undefined ? col.hide : colIndex !== 0
+                        const hidden = col.toggle ? hiddenToggle : false
                         return (
                           <React.Fragment key={`vis__${index}__${colIndex}`}>
-                            <div className={`dashboard-col dashboard-col-${col.width} ${!hiddenToggle ? 'hidden-toggle' : ''}`}>
+                            <div className={`dashboard-col dashboard-col-${col.width} ${hidden ? 'hidden-toggle' : ''}`}>
                               {visualizationConfig.type === 'chart' && (
                                 <CdcChart
                                   key={col.widget}
@@ -813,8 +814,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           {config.table?.show && config.data && (
             <DataTable
               config={config}
-              rawData={config.data}
-              runtimeData={config.data || []}
+              rawData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data}
+              runtimeData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data || []}
               expandDataTable={config.table.expanded}
               showDownloadButton={config.table.download}
               tableTitle={config.dashboard.title || ''}
@@ -853,8 +854,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                   <DataTable
                     config={config as TableConfig}
                     dataConfig={config.datasets[datasetKey]}
-                    rawData={config.datasets[datasetKey].data}
-                    runtimeData={filteredTableData || config.datasets[datasetKey].data || []}
+                    rawData={config.datasets[datasetKey].data?.[0]?.tableData || config.datasets[datasetKey].data}
+                    runtimeData={config.datasets[datasetKey].data?.[0]?.tableData || filteredTableData || config.datasets[datasetKey].data || []}
                     expandDataTable={config.table.expanded}
                     tableTitle={datasetKey}
                     viewport={currentViewport}
