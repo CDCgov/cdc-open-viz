@@ -3,6 +3,7 @@ import { useId } from 'react'
 
 // CDC
 import Button from '@cdc/core/components/elements/Button'
+import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
 
 // Third Party
 import PropTypes from 'prop-types'
@@ -72,13 +73,20 @@ export const useFilters = props => {
   const announceChange = text => {}
 
   const changeFilterActive = (index, value) => {
-    let newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
+    const newFilters = visualizationConfig.type === 'map' ? [...filteredData] : [...visualizationConfig.filters]
 
     if (visualizationConfig.filterBehavior === 'Apply Button') {
       newFilters[index].queuedActive = value
       setShowApplyButton(true)
     } else {
-      newFilters[index].active = value
+      const newFilter = newFilters[index];
+      newFilter.active = value
+      
+      const queryParams = getQueryParams();
+      if(newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active){
+        queryParams[newFilter.setByQueryParameter] = newFilter.active;
+        updateQueryString(queryParams);
+      }
     }
     setConfig({ 
       ...visualizationConfig,
@@ -97,12 +105,21 @@ export const useFilters = props => {
   }
 
   const handleApplyButton = newFilters => {
+    let needsQueryUpdate = false;
+    const queryParams = getQueryParams();
     newFilters.forEach(newFilter => {
       if(newFilter.queuedActive){
         newFilter.active = newFilter.queuedActive
         delete newFilter.queuedActive
+        if(newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active){
+          queryParams[newFilter.setByQueryParameter] = newFilter.active;
+          needsQueryUpdate = true;
+        }
       }
     })
+    if(needsQueryUpdate){
+      updateQueryString(queryParams);
+    }
     
     setConfig({ ...visualizationConfig, filters: newFilters })
 

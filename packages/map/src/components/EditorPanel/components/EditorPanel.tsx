@@ -1359,6 +1359,9 @@ const EditorPanel = props => {
               })}
             </select>
           </label>
+            
+          <TextField value={state.filters[index].setByQueryParameter} section='filters' subsection={index} fieldName='setByQueryParameter' label='Default Value Set By Query String Parameter' updateField={updateField} />
+
 
           {filter.order === 'cust' && (
             <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, state.filters[index])}>

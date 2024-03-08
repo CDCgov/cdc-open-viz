@@ -295,6 +295,16 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                   }}
                 />
               </label>
+              <label>
+                <span className='edit-label column-heading'>Default Value Set By Query String Parameter: </span>
+                <input
+                  type='text'
+                  value={filter.setByQueryParameter || ''}
+                  onChange={e => {
+                    updateFilterProp('setByQueryParameter', e.target.value)
+                  }}
+                />
+              </label>
             </>
           )}
           {filter.type === 'datafilter' && (
@@ -429,6 +439,16 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                       }
                     })}
                 </select>
+              </label>
+              <label>
+                <span className='edit-label column-heading'>Default Value Set By Query String Parameter: </span>
+                <input
+                  type='text'
+                  value={filter.setByQueryParameter || ''}
+                  onChange={e => {
+                    updateFilterProp('setByQueryParameter', e.target.value)
+                  }}
+                />
               </label>
             </>
           )}

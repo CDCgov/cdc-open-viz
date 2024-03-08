@@ -4,6 +4,7 @@ export type SharedFilter = {
   fileName?: string
   filterBy?: 'Query String' | 'File Name'
   queryParameter?: string
+  setByQueryParameter?: string
   active?: string | string[]
   queuedActive?: string
   usedBy?: string[]
