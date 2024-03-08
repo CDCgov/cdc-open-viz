@@ -141,6 +141,7 @@ export default {
   legend: {
     hide: false,
     behavior: 'isolate',
+    axisAlign: true,
     singleRow: true,
     colorCode: '',
     reverseLabelOrder: false,

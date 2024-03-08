@@ -126,6 +126,9 @@ export const useEditorPermissions = () => {
   }
 
   const visHasSelectableLegendValues = !['Box Plot', 'Forest Plot', 'Spark Line'].includes(visualizationType)
+  const visHasLegendAxisAlign = () => {
+    return visualizationType === 'Bar' && visualizationSubType === 'stacked' && config.legend.behavior === 'isolate'
+  }
 
   const visSupportsTooltipOpacity = () => {
     const disabledCharts = ['Spark Line', 'Sankey']
@@ -302,6 +305,7 @@ export const useEditorPermissions = () => {
     visHasLabelOnData,
     visHasDataSuppression,
     visHasLegend,
+    visHasLegendAxisAlign,
     visHasBrushChart,
     visHasNumbersOnBars,
     visSupportsBarSpace,

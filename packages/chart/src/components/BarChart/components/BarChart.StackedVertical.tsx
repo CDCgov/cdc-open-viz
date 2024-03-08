@@ -13,7 +13,7 @@ const BarChartStackedVertical = () => {
   const [barWidth, setBarWidth] = useState(0)
   const { xScale, yScale, xMax, yMax } = useContext(BarChartContext)
   const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, applyRadius, hoveredBar, getAdditionalColumn, onMouseLeaveBar, onMouseOverBar } = useBarChart()
+  const { isHorizontal, barBorderWidth, applyRadius, hoveredBar, getAdditionalColumn, onMouseLeaveBar, onMouseOverBar, barStackedSeriesKeys } = useBarChart()
   const { orientation } = config
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
@@ -21,14 +21,14 @@ const BarChartStackedVertical = () => {
     config.visualizationSubType === 'stacked' &&
     !isHorizontal && (
       <>
-        <BarStack data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={d => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
+        <BarStack data={data} keys={barStackedSeriesKeys} x={d => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
           {barStacks =>
             barStacks.reverse().map(barStack =>
               barStack.bars.map(bar => {
                 let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                 let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                let barThickness = config.xAxis.type === 'date' && config.xAxis.sortDates ? (config.barThickness * (xScale.range()[1] - xScale.range()[0])) : xMax / barStack.bars.length
-                let barThicknessAdjusted = barThickness * (config.xAxis.type === 'date' && config.xAxis.sortDates ? 1 : (config.barThickness || 0.8))
+                let barThickness = config.xAxis.type === 'date' && config.xAxis.sortDates ? config.barThickness * (xScale.range()[1] - xScale.range()[0]) : xMax / barStack.bars.length
+                let barThicknessAdjusted = barThickness * (config.xAxis.type === 'date' && config.xAxis.sortDates ? 1 : config.barThickness || 0.8)
                 let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
                 // tooltips
                 const rawXValue = bar.bar.data[config.runtime.xAxis.dataKey]
@@ -55,6 +55,7 @@ const BarChartStackedVertical = () => {
                       </Text>
                       {createBarElement({
                         config: config,
+                        seriesHighlight,
                         index: barStack.index,
                         background: colorScale(config.runtime.seriesLabels[bar.key]),
                         borderColor: '#333',

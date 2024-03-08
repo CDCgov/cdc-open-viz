@@ -243,6 +243,7 @@ const EditorPanel = () => {
     visHasSelectableLegendValues,
     visCanAnimate,
     visHasLegend,
+    visHasLegendAxisAlign,
     visHasBrushChart,
     visSupportsDateCategoryAxis,
     visSupportsValueAxisMin,
@@ -2629,6 +2630,8 @@ const EditorPanel = () => {
                       <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
                     )}
                     <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)} options={['highlight', 'isolate']} />
+                    {visHasLegendAxisAlign() && <CheckBox value={config.legend.axisAlign} fieldName='axisAlign' section='legend' label='Align to Axis on Isolate' updateField={updateField} />}
+
                     {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && <CheckBox value={config.legend.highlightOnHover} section='legend' fieldName='highlightOnHover' label='HIGHLIGHT DATA SERIES ON HOVER' updateField={updateField} />}
 
                     {/* start: isolated values */}
