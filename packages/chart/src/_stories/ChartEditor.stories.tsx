@@ -27,21 +27,6 @@ export const Url_Filter: Story = {
   args: {
     config: urlFilterExample,
     isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const user = userEvent.setup()
-
-    await sleep(1000)
-    const queryStringParamInput = canvas.getByDisplayValue('location')
-
-    await user.click(canvas.getByText('Filters'))
-    await user.clear(canvas.getByDisplayValue('location'))
-    await user.type(queryStringParamInput, 'Rate')
-
-    await sleep(3000)
-    await user.clear(queryStringParamInput)
-    await user.type(queryStringParamInput, 'location')
   }
 }
 
