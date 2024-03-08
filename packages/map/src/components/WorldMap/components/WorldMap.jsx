@@ -154,7 +154,9 @@ const WorldMap = props => {
           styles.cursor = 'pointer'
         }
 
-        return <Geo additionalData={additionalData} geoData={geoData} state={state} key={i + '-geo'} style={styles} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} />
+        return (
+          <Geo additionalData={additionalData} geoData={geoData} state={state} key={i + '-geo'} style={styles} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} tabIndex={-1} />
+        )
       }
 
       // Default return state, just geo with no additional information
