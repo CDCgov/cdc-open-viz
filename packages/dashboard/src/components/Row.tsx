@@ -37,15 +37,15 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx, row }) => {
 
   const [curr, setCurr] = useState(getCurr())
 
-  const setRowLayout = (layout: number[], toggle = false) => {
+  const setRowLayout = (layout: number[], toggle = undefined) => {
     const newRows = [...rows]
-    const r = newRows[rowIdx]
+    const row = newRows[rowIdx]
 
-    for (let i = 0; i < r.length; i++) {
-      r[i].width = layout[i] ?? null
-      if (toggle) r[i].toggle = true
-    }
-
+    row.forEach((col, i) => {
+      col.width = layout[i] ?? null
+      col.toggle = toggle
+      if (!toggle) col.hide = undefined
+    })
     updateConfig({ ...config, rows: newRows })
     setCurr(toggle ? 'toggle' : layout.join(''))
   }
