@@ -683,10 +683,11 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                         )
                         const hideFilter = visualizationConfig.autoLoad && inNoDataState
 
-                        const hiddenToggle = col.toggle && col.hide !== undefined ? col.hide : colIndex === 0
+                        const hiddenToggle = col.hide !== undefined ? col.hide : colIndex !== 0
+                        const hidden = col.toggle ? hiddenToggle : false
                         return (
                           <React.Fragment key={`vis__${index}__${colIndex}`}>
-                            <div className={`dashboard-col dashboard-col-${col.width} ${!hiddenToggle ? 'hidden-toggle' : ''}`}>
+                            <div className={`dashboard-col dashboard-col-${col.width} ${hidden ? 'hidden-toggle' : ''}`}>
                               {visualizationConfig.type === 'chart' && (
                                 <CdcChart
                                   key={col.widget}

@@ -107,7 +107,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'TOGGLE_ROW': {
       const { rowIndex, colIndex } = action.payload
       const newRows = state.config.rows.map((row, index) => {
-        return index === rowIndex ? row.map((col, i) => ({ ...col, hide: i === colIndex })) : row
+        return index === rowIndex ? row.map((col, i) => ({ ...col, hide: i !== colIndex })) : row
       })
       return { ...state, config: { ...state.config, rows: newRows } }
     }
