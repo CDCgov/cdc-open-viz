@@ -6,7 +6,7 @@ import pieData from './_mock/pie_data.json'
 import urlFilterExample from './_mock/url_filter.json'
 
 const meta: Meta<typeof Chart> = {
-  title: 'Components/Templates/Editor/Chart',
+  title: 'Components/Templates/Chart/Editor',
   component: Chart
 }
 
