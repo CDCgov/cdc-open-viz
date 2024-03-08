@@ -5,6 +5,8 @@ import { generateValuesForFilter } from './generateValuesForFilter'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
 
+import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+
 type UpdateState = Omit<DashboardState, 'config'> & {
   config?: DashboardConfig
 }
@@ -24,7 +26,13 @@ export const getUpdateConfig =
           _filter.values = filterValues
           if (filterValues.length > 0) {
             const defaultValues = _filter.pivot ? _filter.values : _filter.values[0]
-            _filter.active = _filter.active || defaultValues
+
+            const queryStringFilterValue = getQueryStringFilterValue(_filter)
+            if(queryStringFilterValue){
+              _filter.active = queryStringFilterValue
+            } else {
+              _filter.active = _filter.active || defaultValues
+            }
           }
         }
 

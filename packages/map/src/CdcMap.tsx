@@ -15,6 +15,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 // Helpers
 import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import Title from '@cdc/core/components/ui/Title'
 
 // Data
@@ -802,7 +803,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type, showDropdown }, idx) => {
+    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type, showDropdown, setByQueryParameter }, idx) => {
       let newFilter = runtimeFilters[idx]
 
       const sortAsc = (a, b) => {
@@ -845,6 +846,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       newFilter.queryParameter = queryParameter
       newFilter.labels = labels
       newFilter.values = values
+      newFilter.setByQueryParameter = setByQueryParameter
       handleSorting(newFilter)
       newFilter.active = active ?? values[0] // Default to first found value
       newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
@@ -1327,8 +1329,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         data = transform.developerStandardize(data, state.dataDescription)
       }
 
-      console.log('data', data)
-
       setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
     }
   }
@@ -1471,6 +1471,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
       if (filters) {
+        if(JSON.stringify(runtimeFilters) !== JSON.stringify(filters)){
+          filters.forEach((filter, index) => {
+            const queryStringFilterValue = getQueryStringFilterValue(filter)
+            if(queryStringFilterValue){
+              filters[index].active = queryStringFilterValue
+            }
+          })
+        }
         setRuntimeFilters(filters)
       }
     }
