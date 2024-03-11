@@ -43,7 +43,7 @@ const EditorPanel = memo(props => {
   const [showConfigConfirm, setShowConfigConfirm] = useState(false)
   const inputSelectStyle = condition => (condition ? { backgroundColor: '#ffd2d2', color: '#d8000c' } : {})
 
-  const updateField = updateFieldFactory(updateConfig, config, true)
+  const updateField = updateFieldFactory(config, updateConfig, true)
 
   useEffect(() => {
     // Pass up to Editor if needed

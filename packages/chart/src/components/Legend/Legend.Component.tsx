@@ -67,7 +67,7 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
 
   return (
     <aside style={legendClasses} id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
-      {legend.label && <h2>{parse(legend.label)}</h2>}
+      {legend.label && <h3>{parse(legend.label)}</h3>}
       {legend.description && <p>{parse(legend.description)}</p>}
       <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
         {labels => {
@@ -109,6 +109,7 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
                       onClick={() => {
                         highlight(label)
                       }}
+                      role='button'
                     >
                       {config.visualizationType === 'Line' && config.legend.lineMode ? (
                         <svg width={40} height={20}>

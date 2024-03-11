@@ -7,7 +7,7 @@
     display: inline-flex;
     align-items: center;
     .selected {
-      border: 1px solid #ccc;
+      border: 1px solid var(--lightGray);
       padding: 5px;
       min-height: 40px;
       min-width: 200px;
@@ -21,13 +21,13 @@
         padding: 0 0 0 5px;
         margin-right: 5px;
         margin-bottom: 2px;
-        background: #ccc;
+        background: var(--lightGray);
         border-radius: 5px;
       }
       .expand {
         padding: 0 5px;
         border-radius: 5px;
-        background: #ccc;
+        background: var(--lightGray);
         float: right;
       }
       border-radius: 5px;
@@ -40,11 +40,11 @@
       }
     }
   }
-  .dropdown-1 {
+  .dropdown {
     background: white;
     position: absolute;
     margin-top: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--lightGray);
     padding-left: 0;
     min-height: 40px;
     max-height: 200px;
@@ -60,7 +60,7 @@
       list-style: none;
       padding: 0 10px;
       &:hover {
-        background: #ccc;
+        background: var(--lightGray);
       }
     }
   }

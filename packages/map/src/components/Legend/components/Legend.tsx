@@ -1,7 +1,6 @@
 //TODO: Move legends to core
 import { useContext } from 'react'
 import parse from 'html-react-parser'
-import chroma from 'chroma-js'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
@@ -10,6 +9,8 @@ import LegendItemHex from './LegendItem.Hex'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../../../context'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
+import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
+import { Group } from '@visx/group'
 import './index.scss'
 
 const Legend = () => {
@@ -141,10 +142,21 @@ const Legend = () => {
     setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
   }
 
+  const pin = <path className='marker' d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z' strokeWidth={2} stroke={'black'} transform={`scale(0.5)`} />
+
+  const shapes = {
+    pin: pin,
+    circle: <GlyphCircle color='#000' size={150} />,
+    square: <GlyphSquare color='#000' size={150} />,
+    diamond: <GlyphDiamond color='#000' size={150} />,
+    star: <GlyphStar color='#000' size={150} />,
+    triangle: <GlyphTriangle color='#000' size={150} />
+  }
+
   return (
     <ErrorBoundary component='Sidebar'>
       <div className='legends'>
-        <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend'>
+        <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0}>
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
             {runtimeLegend.disabledAmt > 0 && (
               <button onClick={handleReset} className={legendClasses.resetButton.join(' ') || ''}>
@@ -172,6 +184,35 @@ const Legend = () => {
             <ul className={legendClasses.ul.join(' ') || ''} aria-label='Legend items'>
               {legendList()}
             </ul>
+            {(state.visual.additionalCityStyles.some(c => c.label) || state.visual.cityStyleLabel) && (
+              <>
+                <hr />
+                {state.visual.cityStyleLabel && (
+                  <div className='container-shapes'>
+                    <svg>
+                      <Group top={state.visual.cityStyle === 'pin' ? 19 : state.visual.cityStyle === 'triangle' ? 13 : 11} left={10}>
+                        {shapes[state.visual.cityStyle.toLowerCase()]}
+                      </Group>
+                    </svg>
+                    <p>{state.visual.cityStyleLabel}</p>
+                  </div>
+                )}
+
+                {state.visual.additionalCityStyles.map(
+                  ({ shape, label }) =>
+                    label && (
+                      <div className='container-shapes'>
+                        <svg>
+                          <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
+                            {shapes[shape.toLowerCase()]}
+                          </Group>
+                        </svg>
+                        <p>{label}</p>
+                      </div>
+                    )
+                )}
+              </>
+            )}
           </section>
         </aside>
         {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <LegendItemHex state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}
