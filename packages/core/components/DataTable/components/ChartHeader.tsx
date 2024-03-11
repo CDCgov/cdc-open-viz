@@ -2,7 +2,6 @@ import { getChartCellValue } from '../helpers/getChartCellValue'
 import { getSeriesName } from '../helpers/getSeriesName'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import { DownIcon, UpIcon } from './Icons'
-import { FaSort } from 'react-icons/fa'
 
 type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; groupBy?; hasRowType? }
 
@@ -35,8 +34,6 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
             <th
               style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
               key={`col-header-${column}__${index}`}
-              tabIndex={0}
-              title={text}
               role='columnheader'
               scope='col'
               onClick={() => {
@@ -52,11 +49,26 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
               className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
               {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
             >
-              {text}
-              {column === sortBy.column && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
-              <button>
-                <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
-              </button>
+              {text && (
+                <button
+                  data-column-index={index}
+                  onClick={() => {
+                    setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
+                  }}
+                  onKeyDown={e => {
+                    if (e.keyCode === 13) {
+                      e.preventDefault()
+                      setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
+                    }
+                  }}
+                  aria-label={`${text}`}
+                >
+                  <span aria-hidden>{text}</span>
+                  {sortBy.column === text && <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === text ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} order`}</span>}
+                  <div style={{ display: 'inline-block', margin: '0 0 0 12px' }} aria-hidden></div>
+                  {index === sortBy.colIndex && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
+                </button>
+              )}
             </th>
           )
         })}
@@ -74,8 +86,6 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
             <th
               style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
               key={`col-header-${text}__${index}`}
-              tabIndex={0}
-              title={text}
               role='columnheader'
               scope='col'
               onClick={() => {
@@ -89,25 +99,26 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
               className={sortBy.column === text ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
               {...(sortBy.column === text ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
             >
-              {text === '__series__' ? '' : text}
-              {/* empty div replicates style of old button */}
-              <div style={{ display: 'inline-block', margin: '0 0 0 12px' }} tabIndex={-1}></div>
-              <FaSort
-                role='button'
-                className='cdcdataviz-sr-only-focusable'
-                tabIndex={0}
-                onKeyDown={e => {
-                  console.log(sortBy)
-                  if (e.keyCode === 13) {
-                    e.preventDefault()
-
+              {text !== '__series__' && (
+                <button
+                  data-column-index={index}
+                  onClick={() => {
                     setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
-                  }
-                }}
-              />
-              <span className='cdcdataviz-sr-only'>{`The data table is currently sorted by the following column: ${String(sortBy.column)}.`}</span>
-              <span className='cdcdataviz-sr-only'>{`Press enter to sort by ${text} in ${sortBy.column === text ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} order`}</span>
-              {index === sortBy.colIndex && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
+                  }}
+                  onKeyDown={e => {
+                    if (e.keyCode === 13) {
+                      e.preventDefault()
+                      setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
+                    }
+                  }}
+                  aria-label={text}
+                >
+                  <span aria-hidden>{text}</span>
+                  {sortBy.column === text && <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === text ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} order`}</span>}
+                  <div style={{ display: 'inline-block', margin: '0 0 0 12px' }} aria-hidden></div>
+                  {index === sortBy.colIndex && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
+                </button>
+              )}
             </th>
           )
         })}
