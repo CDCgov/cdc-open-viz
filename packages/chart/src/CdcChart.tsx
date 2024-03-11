@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 import * as d3 from 'd3-array'
+import BumpChart from './components/BumpChart'
 
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
@@ -222,10 +223,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     }
     let newConfig = { ...defaults, ...response }
-    if(newConfig.filters){
+    if (newConfig.filters) {
       newConfig.filters.forEach((filter, index) => {
         const queryStringFilterValue = getQueryStringFilterValue(filter)
-        if(queryStringFilterValue){
+        if (queryStringFilterValue) {
           newConfig.filters[index].active = queryStringFilterValue
         }
       })
@@ -914,7 +915,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     'Area Chart': <LinearChart />,
     'Scatter Plot': <LinearChart />,
     'Deviation Bar': <LinearChart />,
-    'Forest Plot': <LinearChart />
+    'Forest Plot': <LinearChart />,
+    'Bump Chart': <BumpChart />
   }
 
   const missingRequiredSections = () => {
