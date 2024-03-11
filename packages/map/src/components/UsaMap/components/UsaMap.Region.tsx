@@ -223,19 +223,23 @@ const UsaRegionMap = props => {
         // const barFill = barPositive ? "#fff" : "#fff";
 
         return (
-          <g key={key} className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} aria-label={`Region ${index + 1} of ${geographies.length}`}>
+          <g
+            key={key}
+            className='geo-group'
+            style={styles}
+            onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            data-tooltip-id='tooltip'
+            data-tooltip-html={toolTip}
+            aria-description={`Region ${index + 1} of ${geographies.length}`}
+            aria-label={`Region ${index + 1} of ${geographies.length}`}
+            tabIndex={0}
+          >
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
             <g id={`region-${index + 1}-label`}>
               <circle fill='#fff' stroke='#999' cx={circleRadius} cy={circleRadius} r={circleRadius} />
               <text fill='#333' x='15px' y='20px' textAnchor='middle'>
                 {index + 1}
               </text>
-              {/* SIDE CHART EXPERIMENT */}
-              {/*<g y={barY*20}>*/}
-              {/*  <rect x="-20" y={barY} width="10" height={barHeight} fill={barFill} stroke="#333"/>*/}
-              {/*  <rect x="-23" y={baseY} width="16" height="2" fill="#000" />*/}
-              {/*</g>*/}
-              {/* / SIDE CHART EXPERIMENT */}
             </g>
             {geoKey === 'region 2' && (
               <g id='region-2-territories'>
