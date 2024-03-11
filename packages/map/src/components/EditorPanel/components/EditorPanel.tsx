@@ -119,18 +119,23 @@ const EditorPanel = props => {
 
   const getCityStyleOptions = target => {
     switch (target) {
-      case 'column': {
-        return (
-          <option value='' key={'Select Option'}>
-            - Select Option -
-          </option>
-        )
-      }
       case 'value': {
         let values = ['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
+        const filteredValues = values.filter(val => {
+          let hasMatch = true
+          if (String(state.visual.cityStyle).toLocaleLowerCase() === String(val).toLocaleLowerCase()) {
+            hasMatch = false
+          }
+
+          return hasMatch
+        })
+
         return (
           <>
-            {values.map((val, i) => {
+            <option value='' key={'Select Option'}>
+              - Select Option -
+            </option>
+            {filteredValues.map((val, i) => {
               return (
                 <option key={i} value={val}>
                   {val}

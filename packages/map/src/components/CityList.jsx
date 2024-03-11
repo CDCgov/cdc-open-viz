@@ -123,7 +123,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       ...additionalProps
     }
 
-    const shapes = {
+    const cityStyleshapes = {
       circle: <GlyphCircle {...shapeProps} />,
       pin: pin,
       square: <GlyphSquare {...shapeProps} />,
@@ -143,19 +143,19 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
         return Object.keys(item).find(key => item[key] === city)
       })
 
-    if (cityStyle !== undefined) {
+    if (cityStyle !== undefined && cityStyle.shape) {
       if (!geoData?.[state.columns.longitude.name] && !geoData?.[state.columns.latitude.name] && city && supportedCities[city.toUpperCase()]) {
         let translate = `translate(${projection(supportedCities[city.toUpperCase()])})`
         return (
           <g key={i} transform={translate} style={styles} className='geo-point'>
-            {shapes[cityStyle.shape.toLowerCase()]}
+            {cityStyleshapes[cityStyle.shape.toLowerCase()]}
           </g>
         )
       }
     }
     return (
       <g key={i} transform={transform} style={styles} className='geo-point'>
-        {shapes[state.visual.cityStyle.toLowerCase()]}
+        {cityStyleshapes[state.visual.cityStyle.toLowerCase()]}
       </g>
     )
   })
