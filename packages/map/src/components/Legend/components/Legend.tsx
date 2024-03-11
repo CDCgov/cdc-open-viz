@@ -144,7 +144,7 @@ const Legend = () => {
 
   const pin = <path className='marker' d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z' strokeWidth={2} stroke={'black'} transform={`scale(0.5)`} />
 
-  const cityStyleshapes = {
+  const cityStyleShapes = {
     pin: pin,
     circle: <GlyphCircle color='#000' size={150} />,
     square: <GlyphSquare color='#000' size={150} />,
@@ -192,7 +192,7 @@ const Legend = () => {
                     <div>
                       <svg>
                         <Group top={state.visual.cityStyle === 'pin' ? 19 : state.visual.cityStyle === 'triangle' ? 13 : 11} left={10}>
-                          {cityStyleshapes[state.visual.cityStyle.toLowerCase()]}
+                          {cityStyleShapes[state.visual.cityStyle.toLowerCase()]}
                         </Group>
                       </svg>
                       <p>{state.visual.cityStyleLabel}</p>
@@ -205,7 +205,7 @@ const Legend = () => {
                         <div>
                           <svg>
                             <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
-                              {cityStyleshapes[shape.toLowerCase()]}
+                              {cityStyleShapes[shape.toLowerCase()]}
                             </Group>
                           </svg>
                           <p>{label}</p>
