@@ -223,17 +223,7 @@ const UsaRegionMap = props => {
         // const barFill = barPositive ? "#fff" : "#fff";
 
         return (
-          <g
-            key={key}
-            className='geo-group'
-            style={styles}
-            onClick={() => geoClickHandler(geoDisplayName, geoData)}
-            data-tooltip-id='tooltip'
-            data-tooltip-html={toolTip}
-            aria-description={`Region ${index + 1} of ${geographies.length}`}
-            aria-label={`Region ${index + 1} of ${geographies.length}`}
-            tabIndex={0}
-          >
+          <g key={key} className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} tabIndex={-1}>
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
             <g id={`region-${index + 1}-label`}>
               <circle fill='#fff' stroke='#999' cx={circleRadius} cy={circleRadius} r={circleRadius} />
