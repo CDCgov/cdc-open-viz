@@ -1473,7 +1473,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       if (filters) {
         filters.forEach((filter, index) => {
           const queryStringFilterValue = getQueryStringFilterValue(filter)
-          if(queryStringFilterValue){
+          if (queryStringFilterValue) {
             filters[index].active = queryStringFilterValue
           }
         })
@@ -1661,7 +1661,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
 
             <div
-              role='button'
+              role='region'
               tabIndex='0'
               className={mapContainerClasses.join(' ')}
               onClick={e => closeModal(e)}
