@@ -87,6 +87,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
 				`}
         </style>
         <svg id='cdc-visualization__paired-bar-chart' width={originalWidth} height={height} viewBox={`0 0 ${width + Number(config.runtime.yAxis.size)} ${height}`} role='img' tabIndex={0}>
+          <title>{`Paired bar chart graphic with the title ${config.title ? config.title : 'No Title Found'}`}</title>
           <Group top={0} left={Number(config.xAxis.size)}>
             {data
               .filter(item => config.series[0].dataKey === groupOne.dataKey)
