@@ -120,15 +120,8 @@ const EditorPanel = props => {
   const getCityStyleOptions = target => {
     switch (target) {
       case 'value': {
-        let values = ['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
-        const filteredValues = values.filter(val => {
-          let hasMatch = true
-          if (String(state.visual.cityStyle).toLocaleLowerCase() === String(val).toLocaleLowerCase()) {
-            hasMatch = false
-          }
-
-          return hasMatch
-        })
+        const values = ['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
+        const filteredValues = values.filter(val => String(state.visual.cityStyle).toLocaleLowerCase() !== val.toLocaleLowerCase())
 
         return (
           <>
@@ -1364,9 +1357,8 @@ const EditorPanel = props => {
               })}
             </select>
           </label>
-            
-          <TextField value={state.filters[index].setByQueryParameter} section='filters' subsection={index} fieldName='setByQueryParameter' label='Default Value Set By Query String Parameter' updateField={updateField} />
 
+          <TextField value={state.filters[index].setByQueryParameter} section='filters' subsection={index} fieldName='setByQueryParameter' label='Default Value Set By Query String Parameter' updateField={updateField} />
 
           {filter.order === 'cust' && (
             <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, state.filters[index])}>

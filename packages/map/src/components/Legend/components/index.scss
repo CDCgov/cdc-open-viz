@@ -118,7 +118,7 @@
           flex-direction: column;
         }
 
-        &:not(.vertical-sorted, .legend-container__ul--single-column) {
+        &:not(.vertical-sorted, .legend-container__ul--single-column, .single-row) {
           width: 100%;
           @include breakpoint(sm) {
             .legend-container__li {
@@ -189,7 +189,7 @@
           justify-items: center;
           line-break: loose;
           align-items: center;
-          width: auto !important;
+          width: auto;
           padding-right: 1em;
           padding-bottom: 1em;
           display: inline-block;
