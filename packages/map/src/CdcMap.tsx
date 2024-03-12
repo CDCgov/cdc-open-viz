@@ -1471,14 +1471,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
       if (filters) {
-        if(JSON.stringify(runtimeFilters) !== JSON.stringify(filters)){
-          filters.forEach((filter, index) => {
-            const queryStringFilterValue = getQueryStringFilterValue(filter)
-            if(queryStringFilterValue){
-              filters[index].active = queryStringFilterValue
-            }
-          })
-        }
+        filters.forEach((filter, index) => {
+          const queryStringFilterValue = getQueryStringFilterValue(filter)
+          if(queryStringFilterValue){
+            filters[index].active = queryStringFilterValue
+          }
+        })
         setRuntimeFilters(filters)
       }
     }
