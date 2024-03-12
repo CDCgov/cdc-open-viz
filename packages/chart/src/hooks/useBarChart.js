@@ -21,7 +21,8 @@ export const useBarChart = () => {
   const stackCount = config.runtime.seriesKeys.length
   const fontSize = { small: 16, medium: 18, large: 20 }
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
-  const barStackedSeriesKeys = config.legend.behavior === 'isolate' && config.legend.axisAlign && seriesHighlight?.length ? seriesHighlight : config.runtime.barSeriesKeys || config.runtime.seriesKeys
+  const isBarAndLegendIsolate = config.visualizationType === 'Bar' && config.legend.behavior === 'isolate' && config.legend.axisAlign
+  const barStackedSeriesKeys = isBarAndLegendIsolate && seriesHighlight?.length ? seriesHighlight : config.runtime.barSeriesKeys || config.runtime.seriesKeys
 
   useEffect(() => {
     if (orientation === 'horizontal' && !config.yAxis.labelPlacement) {
