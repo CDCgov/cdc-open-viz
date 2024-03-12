@@ -32,26 +32,14 @@ const BarChartStackedHorizontal = () => {
   } = useContext<ChartContext>(ConfigContext)
 
   // prettier-ignore
-  const {
-    barBorderWidth,
-    displayNumbersOnBar,
-    fontSize,
-    getAdditionalColumn,
-    hoveredBar,
-    isHorizontal,
-    isLabelBelowBar,
-    onMouseLeaveBar,
-    onMouseOverBar,
-    updateBars
-  } = useBarChart()
+  const { barBorderWidth, displayNumbersOnBar, fontSize, getAdditionalColumn, hoveredBar, isHorizontal, isLabelBelowBar, onMouseLeaveBar, onMouseOverBar, updateBars, barStackedSeriesKeys } = useBarChart()
 
   const { orientation, visualizationSubType } = config
-
   return (
     config.visualizationSubType === 'stacked' &&
     isHorizontal && (
       <>
-        <BarStackHorizontal data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={d => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
+        <BarStackHorizontal data={data} keys={barStackedSeriesKeys} height={yMax} y={d => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
           {barStacks =>
             barStacks.map(barStack =>
               updateBars(barStack.bars).map((bar, index) => {
@@ -82,6 +70,7 @@ const BarChartStackedHorizontal = () => {
                     <Group key={index} id={`barStack${barStack.index}-${bar.index}`} className='stack horizontal'>
                       {createBarElement({
                         config: config,
+                        seriesHighlight,
                         index: barStack.index,
                         className: `animated-chart group ${animatedChart ? 'animated' : ''}`,
                         background: colorScale(config.runtime.seriesLabels[bar.key]),

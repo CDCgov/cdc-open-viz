@@ -182,7 +182,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
                 Remove
               </button>
               <Select value={type} initial='Select' fieldName='type' label='Type' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
-              <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='ASSOCIATE TO SERIES' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={config.runtime?.seriesKeys} />
+              <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='ASSOCIATE TO SERIES' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={config.runtime.lineSeriesKeys ?? config.runtime?.seriesKeys} />
               <Select value={column} initial='Select' fieldName='column' label='COLUMN WITH CONFIGURATION VALUE' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
               <TextField value={value} fieldName='value' label='VALUE TO TRIGGER' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
               <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions()} />
@@ -193,7 +193,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
         })}
 
       <button type='button' onClick={addColumn} className='btn full-width'>
-        {config.visualizationType === 'Line' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Line/Bar'}
+        {config.visualizationType === 'Line' || config.visualizationType === 'Combo' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Line/Bar'}
       </button>
     </>
   )
@@ -243,6 +243,7 @@ const EditorPanel = () => {
     visHasSelectableLegendValues,
     visCanAnimate,
     visHasLegend,
+    visHasLegendAxisAlign,
     visHasBrushChart,
     visSupportsDateCategoryAxis,
     visSupportsValueAxisMin,
@@ -255,6 +256,7 @@ const EditorPanel = () => {
     visSupportsDateCategoryAxisPadding,
     visSupportsRegions,
     visSupportsFilters,
+    visSupportsPreliminaryData,
     visSupportsValueAxisGridLines,
     visSupportsValueAxisLine,
     visSupportsValueAxisTicks,
@@ -1146,7 +1148,7 @@ const EditorPanel = () => {
                     )}
                     {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
                     {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
-                    {config.visualizationType === 'Line' && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
+                    {visSupportsPreliminaryData() && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
@@ -2646,6 +2648,8 @@ const EditorPanel = () => {
                       <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
                     )}
                     <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)} options={['highlight', 'isolate']} />
+                    {visHasLegendAxisAlign() && <CheckBox value={config.legend.axisAlign} fieldName='axisAlign' section='legend' label='Align to Axis on Isolate' updateField={updateField} />}
+
                     {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && <CheckBox value={config.legend.highlightOnHover} section='legend' fieldName='highlightOnHover' label='HIGHLIGHT DATA SERIES ON HOVER' updateField={updateField} />}
 
                     {/* start: isolated values */}
