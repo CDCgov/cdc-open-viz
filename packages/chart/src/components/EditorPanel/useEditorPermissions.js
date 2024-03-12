@@ -298,9 +298,13 @@ export const useEditorPermissions = () => {
   const visSupportsPreliminaryData = () => {
     // check if Line added in Combo
     const lineExist = config?.series.some(item => item?.type === 'Line')
-    if (['Line', 'Combo'].includes(visualizationType) && lineExist) {
+    if (visualizationType === 'Line') {
       return true
     }
+    if (visualizationType === 'Combo' && lineExist) {
+      return true
+    }
+    return false
   }
 
   return {
