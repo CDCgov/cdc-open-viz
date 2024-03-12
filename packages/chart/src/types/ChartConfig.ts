@@ -55,6 +55,7 @@ export type Legend = {
   additionalCategories: string[]
   // general legend onClick behavior
   behavior: 'highlight' | 'isolate' | string
+  axisAlign: boolean
   colorCode: string
   description: string
   // show or hide the legend

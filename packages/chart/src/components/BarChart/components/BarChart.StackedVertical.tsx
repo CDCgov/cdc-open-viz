@@ -14,7 +14,7 @@ const BarChartStackedVertical = () => {
   const [barWidth, setBarWidth] = useState(0)
   const { xScale, yScale, xMax, yMax } = useContext(BarChartContext)
   const { transformedData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter } = useContext(ConfigContext)
-  const { isHorizontal, barBorderWidth, applyRadius, hoveredBar, getAdditionalColumn, onMouseLeaveBar, onMouseOverBar } = useBarChart()
+  const { isHorizontal, barBorderWidth, applyRadius, hoveredBar, getAdditionalColumn, onMouseLeaveBar, onMouseOverBar, barStackedSeriesKeys } = useBarChart()
   const { orientation } = config
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
@@ -22,7 +22,7 @@ const BarChartStackedVertical = () => {
     config.visualizationSubType === 'stacked' &&
     !isHorizontal && (
       <>
-        <BarStack data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={d => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
+        <BarStack data={data} keys={barStackedSeriesKeys} x={d => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
           {barStacks =>
             barStacks.reverse().map(barStack =>
               barStack.bars.map(bar => {
@@ -57,6 +57,7 @@ const BarChartStackedVertical = () => {
                       </Text>
                       {createBarElement({
                         config: config,
+                        seriesHighlight,
                         index: barStack.index,
                         background: colorScale(config.runtime.seriesLabels[bar.key]),
                         borderColor: '#333',

@@ -1,15 +1,15 @@
-export default function createBarElement(props){
-  const { config, index, id, className, background, borderColor, borderWidth, width, height, x, y, onMouseOver, onMouseLeave, onClick, tooltipHtml, tooltipId, styleOverrides } = props
+export default function createBarElement(props) {
+  const { config, index, id, className, background, borderColor, borderWidth, width, height, x, y, onMouseOver, onMouseLeave, onClick, tooltipHtml, tooltipId, styleOverrides, seriesHighlight } = props
 
   const isHorizontal = config.orientation === 'horizontal'
   const isRounded = config.barStyle === 'rounded'
   const isStacked = config.visualizationSubType === 'stacked'
   const tipRounding = config.tipRounding
-  const stackCount = config.runtime.seriesKeys.length
-  
+  const stackCount = config.legend.axisAlign && seriesHighlight?.length ? seriesHighlight?.length : config.runtime.seriesKeys.length
+
   let radius = config.roundingStyle === 'standard' ? 8 : config.roundingStyle === 'shallow' ? 5 : config.roundingStyle === 'finger' ? 15 : 0
-  if(radius > (width / 2) || radius > (height / 2)){
-    radius = Math.min((width / 2), (height / 2))
+  if (radius > width / 2 || radius > height / 2) {
+    radius = Math.min(width / 2, height / 2)
   }
 
   const roundTop = () => {
@@ -51,7 +51,7 @@ export default function createBarElement(props){
       L${x + width},${y + height}
       L${x + radius},${y + height}`
   }
-  
+
   const roundFull = () => {
     return `M${x + radius},${y + height}
       Q${x},${y + height} ${x},${y + height - radius}
@@ -92,20 +92,23 @@ export default function createBarElement(props){
     }
   }
 
-  return <path 
-    id={id}
-    className={className}
-    d={path}
-    fill={background}
-    stroke={borderColor}
-    strokeWidth={borderWidth}
-    onMouseOver={onMouseOver}
-    onMouseLeave={onMouseLeave}
-    onClick={onClick}
-    data-tooltip-html={tooltipHtml}
-    data-tooltip-id={tooltipId}
-    style={{
-      transition: 'all 0.2s linear',
-      ...styleOverrides
-    }}></path>
+  return (
+    <path
+      id={id}
+      className={className}
+      d={path}
+      fill={background}
+      stroke={borderColor}
+      strokeWidth={borderWidth}
+      onMouseOver={onMouseOver}
+      onMouseLeave={onMouseLeave}
+      onClick={onClick}
+      data-tooltip-html={tooltipHtml}
+      data-tooltip-id={tooltipId}
+      style={{
+        transition: 'all 0.2s linear',
+        ...styleOverrides
+      }}
+    ></path>
+  )
 }
