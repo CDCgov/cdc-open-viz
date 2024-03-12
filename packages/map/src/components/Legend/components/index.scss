@@ -118,7 +118,7 @@
           flex-direction: column;
         }
 
-        &:not(.vertical-sorted, .legend-container__ul--single-column) {
+        &:not(.vertical-sorted, .legend-container__ul--single-column, .single-row) {
           width: 100%;
           @include breakpoint(sm) {
             .legend-container__li {
@@ -231,13 +231,33 @@
         }
       }
     }
-    & .container-shapes {
-      display: flex;
-      align-items: flex-start;
+    & .shape-container {
+      &.single-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
 
-      & > svg {
+        & > div {
+          margin-right: 2em;
+        }
+        & > div:last-child {
+          margin-right: 0;
+        }
+      }
+
+      & > div {
+        display: flex;
+        flex-direction: row;
+      }
+      & div > svg {
         width: 25px;
         height: 32px;
+      }
+      & div > p {
+        white-space: nowrap;
+        margin-top: 1px;
       }
     }
   }
