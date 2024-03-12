@@ -222,10 +222,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     }
     let newConfig = { ...defaults, ...response }
-    if(newConfig.filters){
+    if (newConfig.filters) {
       newConfig.filters.forEach((filter, index) => {
         const queryStringFilterValue = getQueryStringFilterValue(filter)
-        if(queryStringFilterValue){
+        if (queryStringFilterValue) {
           newConfig.filters[index].active = queryStringFilterValue
         }
       })
@@ -1134,7 +1134,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
-  console.log(seriesHighlight, 'setSeriesHighlightsetSeriesHighlight')
   const contextValues = {
     capitalize,
     computeMarginBottom,
