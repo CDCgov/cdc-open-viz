@@ -202,7 +202,7 @@ const UsaMap = () => {
       return 0
     })
 
-    const geosJsx = geographies.map(({ feature: geo, path = '' }) => {
+    const geosJsx = geographies.map(({ feature: geo, path = '' }, geoIndex) => {
       const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
 
       let styles = {
@@ -309,33 +309,32 @@ const UsaMap = () => {
           )
         }
 
-        const sizes = {
-          small: '8',
-          medium: '10',
-          large: '12'
+        const patternSizes = {
+          small: 8,
+          medium: 10,
+          large: 12
         }
 
         return (
           <g data-name={geoName} key={key}>
             <g className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
+              {/* state path */}
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
+
+              {/* apply patterns on top of state path*/}
               {state.map.patterns.map((patternData, patternIndex) => {
-                let { pattern, dataKey, size } = patternData
-                let defaultPatternColor = 'black'
-
+                const { pattern, dataKey, size } = patternData
+                const currentFill = styles.fill
                 const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
-
-                if (chroma.contrast(defaultPatternColor, legendColors[0]) < 3.5) {
-                  defaultPatternColor = 'white'
-                }
+                const patternColor = chroma.contrast('#000000', currentFill) < 3.5 ? '#FFF' : '#000'
 
                 return (
                   hasMatchingValues && (
                     <>
-                      {pattern === 'waves' && <PatternWaves id={`${dataKey}--${patternIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
-                      {pattern === 'circles' && <PatternCircles id={`${dataKey}--${patternIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
-                      {pattern === 'lines' && <PatternLines id={`${dataKey}--${patternIndex}`} height={sizes[size] ?? 6} width={sizes[size] ?? 6} stroke={defaultPatternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
-                      <path className={`pattern-geoKey--${dataKey}`} tabIndex={-1} stroke='transparent' d={path} fill={`url(#${dataKey}--${patternIndex})`} />
+                      {pattern === 'waves' && <PatternWaves id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 10} width={patternSizes[size] ?? 10} fill={patternColor} />}
+                      {pattern === 'circles' && <PatternCircles id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 10} width={patternSizes[size] ?? 10} fill={patternColor} />}
+                      {pattern === 'lines' && <PatternLines id={`${dataKey}--${geoIndex}`} height={patternSizes[size] ?? 6} width={patternSizes[size] ?? 6} stroke={patternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
+                      <path className={`pattern-geoKey--${dataKey}`} tabIndex={-1} stroke='transparent' d={path} fill={`url(#${dataKey}--${geoIndex})`} />
                     </>
                   )
                 )
