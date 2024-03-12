@@ -86,7 +86,9 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
     position: absolute;
     height: 100vh;
     top: 0;
+    max-width: 350px;
     width: 350px;
+
     .editor-toggle {
       position: absolute !important;
       top: 10px !important;

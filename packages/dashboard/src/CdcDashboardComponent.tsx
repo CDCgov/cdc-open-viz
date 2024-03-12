@@ -18,6 +18,7 @@ import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 import Loading from '@cdc/core/components/Loading'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
+import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
 
 import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'
@@ -353,12 +354,23 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     const allFiltersSelected = !state.config.dashboard.sharedFilters.some(filter => !filter.active && !filter.queuedActive)
     if (allFiltersSelected) {
       if (state.config.filterBehavior === FilterBehavior.Apply) {
+        const queryParams = getQueryParams();
+        let needsQueryUpdate = false;
         state.config.dashboard.sharedFilters.forEach((sharedFilter, index) => {
           if (sharedFilter.queuedActive) {
             dashboardConfig.sharedFilters[index].active = sharedFilter.queuedActive
             delete dashboardConfig.sharedFilters[index].queuedActive
+
+            if(sharedFilter.setByQueryParameter && queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active){
+              queryParams[sharedFilter.setByQueryParameter] = sharedFilter.active;
+              needsQueryUpdate = true;
+            }
           }
         })
+
+        if(needsQueryUpdate){
+          updateQueryString(queryParams)
+        }
       }
 
       dispatch({ type: 'SET_CONFIG', payload: { ...state.config, dashboard: dashboardConfig } })
@@ -372,9 +384,16 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   const changeFilterActive = (index: number, value: string | string[]) => {
     const { config } = state
     let dashboardConfig = { ...config.dashboard }
+    let filterActive = dashboardConfig.sharedFilters[index];
 
     if (config.filterBehavior !== FilterBehavior.Apply) {
       dashboardConfig.sharedFilters[index].active = value
+
+      const queryParams = getQueryParams();
+      if(filterActive.setByQueryParameter && queryParams[filterActive.setByQueryParameter] !== filterActive.active){
+        queryParams[filterActive.setByQueryParameter] = filterActive.active;
+        updateQueryString(queryParams)
+      }
     } else {
       if (Array.isArray(value)) throw Error(`Cannot set active values on urlfilters. expected: ${JSON.stringify(value)} to be a single value.`)
       dashboardConfig.sharedFilters[index].queuedActive = value
@@ -683,10 +702,11 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                         )
                         const hideFilter = visualizationConfig.autoLoad && inNoDataState
 
-                        const hiddenToggle = col.toggle && col.hide !== undefined ? col.hide : colIndex === 0
+                        const hiddenToggle = col.hide !== undefined ? col.hide : colIndex !== 0
+                        const hidden = col.toggle ? hiddenToggle : false
                         return (
                           <React.Fragment key={`vis__${index}__${colIndex}`}>
-                            <div className={`dashboard-col dashboard-col-${col.width} ${!hiddenToggle ? 'hidden-toggle' : ''}`}>
+                            <div className={`dashboard-col dashboard-col-${col.width} ${hidden ? 'hidden-toggle' : ''}`}>
                               {visualizationConfig.type === 'chart' && (
                                 <CdcChart
                                   key={col.widget}

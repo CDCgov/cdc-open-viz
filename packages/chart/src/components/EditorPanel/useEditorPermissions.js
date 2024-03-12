@@ -286,7 +286,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisPadding = () => {
-    return config.xAxis.type === 'date' && config.xAxis.sortDates
+    return config.xAxis.type === 'date-time'
   }
 
   const visSupportsReactTooltip = () => {

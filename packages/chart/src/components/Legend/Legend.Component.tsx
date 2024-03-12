@@ -109,6 +109,7 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
                       onClick={() => {
                         highlight(label)
                       }}
+                      role='button'
                     >
                       {config.visualizationType === 'Line' && config.legend.lineMode ? (
                         <svg width={40} height={20}>

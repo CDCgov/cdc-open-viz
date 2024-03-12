@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
 // @cdc/core
@@ -351,7 +351,7 @@ const EditorPanel = () => {
     if (updatedConfig.visualizationType === 'Combo') {
       updatedConfig.orientation = 'vertical'
     }
-    if (updatedConfig.xAxis.sortDates && !updatedConfig.xAxis.padding) {
+    if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 6
     }
   }
@@ -1670,10 +1670,27 @@ const EditorPanel = () => {
                       <>
                         {config.visualizationType !== 'Forest Plot' && (
                           <>
-                            <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
-                            {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.xAxis.type === 'date' && config.orientation !== 'horizontal' && (
-                              <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />
-                            )}{' '}
+                            <label>
+                              <span className='edit-label'>Data Scaling Type</span>
+                              <select
+                                value={config.xAxis.type}
+                                onChange={e =>
+                                  updateConfig({
+                                    ...config,
+                                    xAxis: {
+                                      ...config.xAxis,
+                                      type: e.target.value
+                                    }
+                                  })
+                                }
+                              >
+                                <option value='categorical'>Categorical (Linear Scale)</option>
+                                <option value='date'>Date (Linear Scale)</option>
+                                <option value='date-time'>Date (Date Time Scale)</option>
+                                {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
+                              </select>
+                            </label>
+
                             {visSupportsDateCategoryAxisPadding() && (
                               <TextField
                                 value={config.xAxis.padding}
@@ -1806,7 +1823,7 @@ const EditorPanel = () => {
                           </>
                         )}
 
-                        {config.xAxis.type === 'date' && (
+                        {isDateScale(config.xAxis) && (
                           <>
                             <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                               Format how charts should parse and display your dates using{' '}
@@ -2814,6 +2831,17 @@ const EditorPanel = () => {
                                   value={filter.label}
                                   onChange={e => {
                                     updateFilterProp('label', index, e.target.value)
+                                  }}
+                                />
+                              </label>
+
+                              <label>
+                                <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
+                                <input
+                                  type='text'
+                                  value={filter.setByQueryParameter}
+                                  onChange={e => {
+                                    updateFilterProp('setByQueryParameter', index, e.target.value)
                                   }}
                                 />
                               </label>
