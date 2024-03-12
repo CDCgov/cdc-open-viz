@@ -292,6 +292,14 @@ export const useEditorPermissions = () => {
     }
   }
 
+  const visSupportsPreliminaryData = () => {
+    // check if Line added in Combo
+    const lineExist = config?.series.some(item => item?.type === 'Line')
+    if (['Line', 'Combo'].includes(visualizationType) && lineExist) {
+      return true
+    }
+  }
+
   return {
     enabledChartTypes,
     headerColors,
@@ -319,6 +327,7 @@ export const useEditorPermissions = () => {
     visSupportsFootnotes,
     visSupportsLeftValueAxis,
     visSupportsNonSequentialPallete,
+    visSupportsPreliminaryData,
     visSupportsRankByValue,
     visSupportsRegions,
     visSupportsResponsiveTicks,
