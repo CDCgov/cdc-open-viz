@@ -88,11 +88,11 @@ export const useFilters = props => {
         updateQueryString(queryParams);
       }
     }
-    setConfig({ 
+    setConfig({
       ...visualizationConfig,
-      filters: newFilters 
+      filters: newFilters
     })
-    
+
     // Used for setting active filter, fromHash breaks the filteredData functionality.
     if (visualizationConfig.type === 'map' && visualizationConfig.filterBehavior === 'Filter Change') {
       setFilteredData(newFilters)
@@ -108,7 +108,7 @@ export const useFilters = props => {
     let needsQueryUpdate = false;
     const queryParams = getQueryParams();
     newFilters.forEach(newFilter => {
-      if(newFilter.queuedActive){
+      if (newFilter.queuedActive) {
         newFilter.active = newFilter.queuedActive
         delete newFilter.queuedActive
         if(newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active){
@@ -308,7 +308,7 @@ const Filters = props => {
       <select
         id={`filter-${outerIndex}`}
         name={label}
-        aria-label={label}
+        aria-label={`Filter by ${label}`}
         className='filter-select'
         data-index='0'
         value={active}
@@ -370,7 +370,7 @@ const Filters = props => {
           )
 
           values.push(
-            <option key={index} value={filterOption}>
+            <option key={index} value={filterOption} aria-label={filterOption}>
               {singleFilter.labels && singleFilter.labels[filterOption] ? singleFilter.labels[filterOption] : filterOption}
             </option>
           )
