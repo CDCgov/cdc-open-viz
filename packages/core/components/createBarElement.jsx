@@ -5,7 +5,10 @@ export default function createBarElement(props) {
   const isRounded = config.barStyle === 'rounded'
   const isStacked = config.visualizationSubType === 'stacked'
   const tipRounding = config.tipRounding
-  const stackCount = config.legend.axisAlign && seriesHighlight?.length ? seriesHighlight?.length : config.runtime.seriesKeys.length
+  const comboBarSeriesCount = config.visualizationType === 'Combo' && config.runtime?.barSeriesKeys?.length
+  const barSeriesCount = config.runtime.seriesKeys.length
+  const isolateSeriesCount = config.visualizationType === 'Bar' && config.legend.axisAlign && seriesHighlight?.length ? seriesHighlight?.length : 0
+  const stackCount = comboBarSeriesCount ? comboBarSeriesCount : isolateSeriesCount ? isolateSeriesCount : barSeriesCount
 
   let radius = config.roundingStyle === 'standard' ? 8 : config.roundingStyle === 'shallow' ? 5 : config.roundingStyle === 'finger' ? 15 : 0
   if (radius > width / 2 || radius > height / 2) {

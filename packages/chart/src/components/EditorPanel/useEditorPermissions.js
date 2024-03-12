@@ -297,10 +297,15 @@ export const useEditorPermissions = () => {
 
   const visSupportsPreliminaryData = () => {
     // check if Line added in Combo
-    const lineExist = config?.series.some(item => item?.type === 'Line')
-    if (['Line', 'Combo'].includes(visualizationType) && lineExist) {
+    const lineExist = config?.series.some(item => ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg'].includes(item?.type))
+    if (visualizationType === 'Line') {
       return true
     }
+
+    if (visualizationType === 'Combo' && lineExist) {
+      return true
+    }
+    return false
   }
 
   return {
