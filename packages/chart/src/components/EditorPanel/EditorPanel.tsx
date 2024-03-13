@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
 // @cdc/core
@@ -182,7 +182,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
                 Remove
               </button>
               <Select value={type} initial='Select' fieldName='type' label='Type' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
-              <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='ASSOCIATE TO SERIES' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={config.runtime?.seriesKeys} />
+              <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='ASSOCIATE TO SERIES' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={config.runtime.lineSeriesKeys ?? config.runtime?.seriesKeys} />
               <Select value={column} initial='Select' fieldName='column' label='COLUMN WITH CONFIGURATION VALUE' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
               <TextField value={value} fieldName='value' label='VALUE TO TRIGGER' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
               <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions()} />
@@ -193,14 +193,34 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
         })}
 
       <button type='button' onClick={addColumn} className='btn full-width'>
-        {config.visualizationType === 'Line' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Line/Bar'}
+        {config.visualizationType === 'Line' || config.visualizationType === 'Combo' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Line/Bar'}
       </button>
     </>
   )
 })
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, lineOptions, rawData } = useContext<ChartContext>(ConfigContext)
+  const {
+    config,
+    updateConfig,
+    tableData,
+    transformedData: data,
+    loading,
+    colorScale,
+    colorPalettes,
+    twoColorPalette,
+    unfilteredData,
+    excludedData,
+    isDashboard,
+    setParentConfig,
+    missingRequiredSections,
+    isDebug,
+    setFilteredData,
+    lineOptions,
+    rawData,
+    highlight,
+    highlightReset
+  } = useContext<ChartContext>(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
@@ -220,8 +240,10 @@ const EditorPanel = () => {
     visHasAnchors,
     visHasBarBorders,
     visHasDataCutoff,
+    visHasSelectableLegendValues,
     visCanAnimate,
     visHasLegend,
+    visHasLegendAxisAlign,
     visHasBrushChart,
     visSupportsDateCategoryAxis,
     visSupportsValueAxisMin,
@@ -234,6 +256,7 @@ const EditorPanel = () => {
     visSupportsDateCategoryAxisPadding,
     visSupportsRegions,
     visSupportsFilters,
+    visSupportsPreliminaryData,
     visSupportsValueAxisGridLines,
     visSupportsValueAxisLine,
     visSupportsValueAxisTicks,
@@ -328,6 +351,9 @@ const EditorPanel = () => {
     // DEV-3293 - Force combo to always be vertical
     if (updatedConfig.visualizationType === 'Combo') {
       updatedConfig.orientation = 'vertical'
+    }
+    if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
+      updatedConfig.xAxis.padding = 6
     }
   }
 
@@ -1000,6 +1026,28 @@ const EditorPanel = () => {
       columns: updatedColumns
     })
   }
+
+  const colorCodeByCategory = config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1
+  const getLegendColumns = () => {
+    const colorCodeData = data.map(d => d[config.legend.colorCode])
+    return colorCodeByCategory ? colorCodeData : getColumns(false).filter(d => d !== config.xAxis.dataKey)
+  }
+
+  const updateSeriesIsolateValues = updatedValues => {
+    updateConfig({ ...config, legend: { ...config.legend, seriesHighlight: updatedValues } })
+  }
+
+  const updateBehavior = (section, fieldName, newValue) => {
+    const sectionValue = { ...config[section], [fieldName]: newValue }
+    const updatedConfig = { ...config, [section]: sectionValue }
+
+    if (newValue === 'highlight' && config.legend.seriesHighlight?.length) {
+      updatedConfig.legend.seriesHighlight.length = 0
+    }
+
+    updateConfig(updatedConfig)
+  }
+
   const editorContextValues = {
     addNewExclusion,
     data,
@@ -1039,7 +1087,8 @@ const EditorPanel = () => {
             <Accordion allowZeroExpanded={true}>
               <Panels.General name='General' />
               <Panels.ForestPlot name='Forest Plot Settings' />
-              {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && (
+              <Panels.Sankey name='Sankey' />
+              {config.visualizationType !== 'Pie' && config.visualizationType !== 'Forest Plot' && config.visualizationType !== 'Sankey' && (
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>Data Series {(!config.series || config.series.length === 0 || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width='25' className='warning-icon' />}</AccordionItemButton>
@@ -1099,7 +1148,7 @@ const EditorPanel = () => {
                     )}
                     {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
                     {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
-                    {config.visualizationType === 'Line' && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
+                    {visSupportsPreliminaryData() && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
@@ -1622,8 +1671,49 @@ const EditorPanel = () => {
                       <>
                         {config.visualizationType !== 'Forest Plot' && (
                           <>
-                            <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
-                            {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.orientation !== 'horizontal'  && <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />}{' '}
+                            <label>
+                              <span className='edit-label'>Data Scaling Type</span>
+                              <select
+                                value={config.xAxis.type}
+                                onChange={e =>
+                                  updateConfig({
+                                    ...config,
+                                    xAxis: {
+                                      ...config.xAxis,
+                                      type: e.target.value
+                                    }
+                                  })
+                                }
+                              >
+                                <option value='categorical'>Categorical (Linear Scale)</option>
+                                <option value='date'>Date (Linear Scale)</option>
+                                <option value='date-time'>Date (Date Time Scale)</option>
+                                {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
+                              </select>
+                            </label>
+
+                            {visSupportsDateCategoryAxisPadding() && (
+                              <TextField
+                                value={config.xAxis.padding}
+                                type='number'
+                                min={0}
+                                section='xAxis'
+                                fieldName='padding'
+                                label={'Padding (Percent)'}
+                                className='number-narrow'
+                                updateField={updateField}
+                                tooltip={
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      <p>For use with date scale. Extends the earliest and latest dates represented on the scale by the percentage specified.</p>
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                }
+                              />
+                            )}
                           </>
                         )}
                         <Select
@@ -1734,7 +1824,7 @@ const EditorPanel = () => {
                           </>
                         )}
 
-                        {config.xAxis.type === 'date' && (
+                        {isDateScale(config.xAxis) && (
                           <>
                             <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                               Format how charts should parse and display your dates using{' '}
@@ -1743,8 +1833,6 @@ const EditorPanel = () => {
                               </a>
                               .
                             </p>
-                            <TextField value={config.xAxis.dateParseFormat} section='xAxis' fieldName='dateParseFormat' placeholder='Ex. %Y-%m-%d' label='Date Parse Format' updateField={updateField} />
-                            <TextField value={config.xAxis.dateDisplayFormat} section='xAxis' fieldName='dateDisplayFormat' placeholder='Ex. %Y-%m-%d' label='AXIS DATE DISPLAY FORMAT' updateField={updateField} />
                             <TextField
                               tooltip={
                                 <Tooltip style={{ textTransform: 'none' }}>
@@ -1752,15 +1840,15 @@ const EditorPanel = () => {
                                     <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                   </Tooltip.Target>
                                   <Tooltip.Content>
-                                    <p>If not populated, Axis Date Display format will be used. </p>
+                                    <p>This field specifies the pattern used to read and interpret dates in your dataset, ensuring the dates are correctly understood and processed. </p>
                                   </Tooltip.Content>
                                 </Tooltip>
                               }
-                              value={config.table.dateDisplayFormat}
-                              section='table'
-                              fieldName='dateDisplayFormat'
+                              value={config.xAxis.dateParseFormat}
+                              section='xAxis'
+                              fieldName='dateParseFormat'
                               placeholder='Ex. %Y-%m-%d'
-                              label='DATA TABLE DATE FORMAT'
+                              label='Date Parse Format'
                               updateField={updateField}
                             />
                             <TextField
@@ -1770,7 +1858,43 @@ const EditorPanel = () => {
                                     <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                   </Tooltip.Target>
                                   <Tooltip.Content>
-                                    <p>If not populated, Axis Date Display format will be used. </p>
+                                    <p> Adjusts the date display format on the axis for clear, visual date representation.</p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              value={config.xAxis.dateDisplayFormat}
+                              section='xAxis'
+                              fieldName='dateDisplayFormat'
+                              placeholder='Ex. %Y-%m-%d'
+                              label='AXIS DATE DISPLAY FORMAT'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>Specify a custom format for displaying dates in data table. If left empty, dates will adopt the Axis Date Display format. </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              value={config.table.dateDisplayFormat}
+                              section='table'
+                              fieldName='dateDisplayFormat'
+                              placeholder='Ex. %Y-%m-%d'
+                              label='DATA TABLE DATE DISPLAY FORMAT'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>Specify a custom format for displaying dates on hovers. If left empty, dates will adopt the Axis Date Display format. </p>
                                   </Tooltip.Content>
                                 </Tooltip>
                               }
@@ -1778,7 +1902,7 @@ const EditorPanel = () => {
                               section='tooltips'
                               fieldName='dateDisplayFormat'
                               placeholder='Ex. %Y-%m-%d'
-                              label='HOVER DATE FORMAT'
+                              label='HOVER DATE DISPLAY FORMAT'
                               updateField={updateField}
                             />
                           </>
@@ -2523,8 +2647,79 @@ const EditorPanel = () => {
                     {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
                       <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
                     )}
-                    <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={updateField} options={['highlight', 'isolate']} />
+                    <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)} options={['highlight', 'isolate']} />
+                    {visHasLegendAxisAlign() && <CheckBox value={config.legend.axisAlign} fieldName='axisAlign' section='legend' label='Align to Axis on Isolate' updateField={updateField} />}
+
                     {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && <CheckBox value={config.legend.highlightOnHover} section='legend' fieldName='highlightOnHover' label='HIGHLIGHT DATA SERIES ON HOVER' updateField={updateField} />}
+
+                    {/* start: isolated values */}
+                    {visHasSelectableLegendValues && config.legend.behavior === 'isolate' && !colorCodeByCategory && (
+                      <fieldset className='primary-fieldset edit-block' key={'additional-highlight-values'}>
+                        <label>
+                          <span className='edit-label'>
+                            Isolate Data Series
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>You can choose data series that are shown on load. Others will be added when the user clicks on them in the legend.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
+                        </label>
+                        {config.legend.seriesHighlight &&
+                          config.legend.seriesHighlight.map((val, i) => (
+                            <fieldset className='edit-block' key={`${val}-${i}`}>
+                              <button
+                                className='remove-column'
+                                onClick={event => {
+                                  event.preventDefault()
+                                  const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                                  updatedSeriesHighlight.splice(i, 1)
+                                  updateField('legend', null, 'seriesHighlight', updatedSeriesHighlight)
+                                  if (!updatedSeriesHighlight.length) {
+                                    highlightReset()
+                                  }
+                                }}
+                              >
+                                Remove
+                              </button>
+                              <Select
+                                value={config.legend.seriesHighlight[i]}
+                                fieldName='seriesHighlight'
+                                label='Isolate Value'
+                                onChange={e => {
+                                  const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                                  if (!updatedSeriesHighlight.includes(e.target.value)) {
+                                    updatedSeriesHighlight[i] = e.target.value
+                                    updateSeriesIsolateValues([...updatedSeriesHighlight])
+                                  }
+                                }}
+                                options={getLegendColumns()}
+                              />
+                            </fieldset>
+                          ))}
+                        <button
+                          className={'btn full-width'}
+                          onClick={event => {
+                            event.preventDefault()
+                            const legendColumns = getLegendColumns()
+                            const updatedSeriesHighlight = [...config.legend.seriesHighlight]
+                            const seriesLength = updatedSeriesHighlight.length
+                            if (seriesLength < legendColumns.length) {
+                              const [newSeriesHighlight] = legendColumns.filter(d => !updatedSeriesHighlight.includes(d))
+                              updatedSeriesHighlight.push(newSeriesHighlight)
+                              updateSeriesIsolateValues([...updatedSeriesHighlight])
+                            }
+                          }}
+                        >
+                          Add Isolate Value
+                        </button>
+                      </fieldset>
+                    )}
+                    {/* end: isolated values */}
+
                     <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
                     <Select value={config.legend.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
                     {config.legend.position === 'bottom' && (
@@ -2637,6 +2832,17 @@ const EditorPanel = () => {
                                   value={filter.label}
                                   onChange={e => {
                                     updateFilterProp('label', index, e.target.value)
+                                  }}
+                                />
+                              </label>
+
+                              <label>
+                                <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
+                                <input
+                                  type='text'
+                                  value={filter.setByQueryParameter}
+                                  onChange={e => {
+                                    updateFilterProp('setByQueryParameter', index, e.target.value)
                                   }}
                                 />
                               </label>

@@ -29,6 +29,7 @@
     "right": 5
   },
   "suppressedData": [],
+  "preliminaryData": [],
   "yAxis": {
     "hideAxis": false,
     "displayNumbersOnBar": false,
@@ -51,6 +52,7 @@
     "rightAxisTickColor": "#333",
     "numTicks": "9",
     "axisPadding": 0,
+    "scalePadding": 10,
     "tickRotation": 0,
     "anchors": [],
     "label": "Y-Axis Example Label"
@@ -134,6 +136,7 @@
     "indexLabel": "Data Group",
     "download": true,
     "showVertical": false,
+    "dateDisplayFormat": "",
     "show": true
   },
   "orientation": "vertical",
@@ -153,6 +156,8 @@
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "lineMode": false,
     "verticalSorted": false,
+    "highlightOnHover": false,
+    "seriesHighlight": [],
     "position": "right",
     "label": "Type of Data"
   },
@@ -276,7 +281,9 @@
     }
   ],
   "tooltips": {
-    "opacity": 90
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
   },
   "forestPlot": {
     "startAt": 0,
@@ -319,15 +326,57 @@
     "leftWidthOffset": 0,
     "rightWidthOffset": 0,
     "showZeroLine": false,
-    "hideDateCategoryCol": false,
     "leftLabel": "",
     "rightLabel": "",
+    "hideDateCategoryCol": false,
     "width": "auto",
     "lowerCiField": "",
     "upperCiField": ""
   },
   "area": {
     "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
   },
   "showChartBrush": false,
   "height": "375",
@@ -387,17 +436,18 @@
       "Data 6": "300"
     }
   ],
-  "visualizationType": "Bar",
+  "visualizationType": "Line",
   "regions": [
     {
       "from": "03/15/2016",
       "to": "05/15/2016",
       "label": "Region Applied to Timeline",
       "color": "Black",
-      "background": "Grey"
+      "background": "Grey",
+      "fromType": "Fixed"
     }
   ],
-  "validated": 4.23,
+  "validated": "4.24.3",
   "formattedData": [
     {
       "Date": "1/15/2016",

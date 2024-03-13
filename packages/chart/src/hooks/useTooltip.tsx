@@ -9,6 +9,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 const transform = new DataTransform()
 
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 export const useTooltip = props => {
   const { tableData, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)
@@ -188,7 +189,7 @@ export const useTooltip = props => {
       return xScale.domain()[index - 1] // fixes off by 1 error
     }
 
-    if (config.xAxis.type === 'date' && config.visualizationType !== 'Combo') {
+    if (isDateScale(config.xAxis) && config.visualizationType !== 'Combo') {
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
       const x0 = xScale.invert(xScale(x))
       const index = bisectDate(config.data, x0, 1)
@@ -207,33 +208,35 @@ export const useTooltip = props => {
     if (orientation === 'horizontal') return
 
     // Check the type of x equal to point or if the type of xAxis is equal to continuous or date
-    if (xScale.type === 'point' || xAxis.type === 'continuous' || xAxis.type === 'date') {
+    if (xScale.type === 'point' || xAxis.type === 'continuous' || isDateScale(xAxis)) {
       // Find the closest x value by calculating the minimum distance
       let closestX = null
       let minDistance = Number.MAX_VALUE
       let offset = x
 
       data.forEach(d => {
-        const xPosition = xAxis.type === 'date' ? xScale(parseDate(d[xAxis.dataKey])) : xScale(d[xAxis.dataKey])
+        const xPosition = isDateScale(xAxis) ? xScale(parseDate(d[xAxis.dataKey])) : xScale(d[xAxis.dataKey])
         let bwOffset = config.barHeight
         const distance = Math.abs(Number(xPosition - offset + (isClick ? bwOffset * 2 : 0)))
 
         if (distance <= minDistance) {
           minDistance = distance
-          closestX = xAxis.type === 'date' ? d[xAxis.dataKey] : d[xAxis.dataKey]
+          closestX = isDateScale(xAxis) ? d[xAxis.dataKey] : d[xAxis.dataKey]
         }
       })
       return closestX
     }
 
     if (config.xAxis.type === 'categorical' || (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')) {
-      let eachBand = xScale.step()
+      let range = xScale.range()[1] - xScale.range()[0]
+      let eachBand = range / (xScale.domain().length + 1)
+
       let numerator = x
-      const index = Math.floor(Number(numerator) / eachBand)
-      return xScale.domain()[index - 1] // fixes off by 1 error
+      const index = Math.floor((Number(numerator) - eachBand / 2) / eachBand)
+      return xScale.domain()[index] // fixes off by 1 error
     }
 
-    if (config.xAxis.type === 'date' && visualizationType !== 'Combo' && orientation !== 'horizontal') {
+    if (isDateScale(xAxis) && visualizationType !== 'Combo' && orientation !== 'horizontal') {
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
       const x0 = xScale.invert(x)
       const index = bisectDate(config.data, x0, 1)
@@ -278,7 +281,7 @@ export const useTooltip = props => {
       let closestXScaleValue = getXValueFromCoordinate(x, true)
       let datum = config.data?.filter(item => item[config.xAxis.dataKey] === closestXScaleValue)
       if (!closestXScaleValue) throw new Error('COVE: no closest x scale value in handleTooltipClick')
-      if (xAxis.type === 'date' && closestXScaleValue) {
+      if (isDateScale(xAxis) && closestXScaleValue) {
         closestXScaleValue = new Date(closestXScaleValue)
         closestXScaleValue = formatDate(closestXScaleValue)
         datum = config.data?.filter(item => formatDate(new Date(item[config.xAxis.dataKey])) === closestXScaleValue)
@@ -423,7 +426,7 @@ export const useTooltip = props => {
     const [key, value, axisPosition] = additionalData
 
     if (visualizationType === 'Forest Plot') {
-      if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${config.yAxis.type === 'date' ? formatDate(parseDate(key, false)) : value}`}</li>
+      if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value}`}</li>
       return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
     }
     const formattedDate = config.tooltips.dateDisplayFormat ? formatTooltipsDate(parseDate(value, false)) : formatDate(parseDate(value, false))
@@ -431,7 +434,7 @@ export const useTooltip = props => {
     // TOOLTIP HEADING
     if (visualizationType === 'Bar' && orientation === 'horizontal' && key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
 
-    if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
+    if (key === config.xAxis.dataKey) return <li className='tooltip-heading'>{`${capitalize(config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ` : '')} ${isDateScale(xAxis) ? formattedDate : value}`}</li>
 
     // TOOLTIP BODY
     return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${value}`}</li>

@@ -12,13 +12,14 @@ import chroma from 'chroma-js'
 import BarChartContext, { BarChartContextValues } from './context'
 import { ChartContext } from '../../../types/ChartContext'
 
+import createBarElement from '@cdc/core/components/createBarElement'
+
 export const BarChartHorizontal = () => {
   const { xScale, yScale, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getTextWidth, getYAxisData, getXAxisData } = useContext<ChartContext>(ConfigContext)
   const {
     isHorizontal,
     barBorderWidth,
-    applyRadius,
     updateBars,
     assignColorsToValues,
     section,
@@ -112,7 +113,6 @@ export const BarChartHorizontal = () => {
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
-                  const borderRadius = applyRadius(newIndex)
 
                   let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${xAxisValue}` : xAxisValue
                   const additionalColTooltip = getAdditionalColumn(hoveredBar)
@@ -154,15 +154,6 @@ export const BarChartHorizontal = () => {
                       return 12
                     }
                   }
-                  const iconStyle: { [key: string]: any } = {
-                    position: 'absolute',
-                    top: getTop(),
-                    left: suppresedBarWidth * 1.2
-                  }
-
-                  if (config.isLollipopChart) {
-                    iconStyle.top = -9
-                  }
                   const background = () => {
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
@@ -170,39 +161,42 @@ export const BarChartHorizontal = () => {
                     return barColor
                   }
 
-                  const finalStyle = {
-                    background: background(),
-                    borderColor,
-                    borderStyle: 'solid',
-                    borderWidth,
-                    width: barWidth,
-                    transition: 'all 0.2s linear',
-                    height: !config.isLollipopChart ? barHeight : lollipopBarWidth,
-                    ...borderRadius
-                  }
-
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
-                      {/* This feels gross but inline transition was not working well*/}
-                      <style>
-                        {`
-                        .linear #barGroup${barGroup.index} div,
-                        .Combo #barGroup${barGroup.index} div {
-                          transform-origin: 0 ${barY + barHeight}px;
-                        }
-                      `}
-                      </style>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
-                        <foreignObject
+                        {createBarElement({
+                          config: config,
+                          index: newIndex,
+                          id: `barGroup${barGroup.index}`,
+                          background: background(),
+                          borderColor,
+                          borderStyle: 'solid',
+                          borderWidth: `${borderWidth}px`,
+                          width: barWidth,
+                          height: !config.isLollipopChart ? barHeight : lollipopBarWidth,
+                          x: barX,
+                          y: barHeight * bar.index,
+                          onMouseOver: () => onMouseOverBar(xAxisValue, bar.key),
+                          onMouseLeave: onMouseLeaveBar,
+                          tooltipHtml: tooltip,
+                          tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,
+                          onClick: e => {
+                            e.preventDefault()
+                            if (setSharedFilter) {
+                              bar[config.xAxis.dataKey] = yAxisValue
+                              setSharedFilter(config.uid, bar)
+                            }
+                          },
+                          styleOverrides: {
+                            transformOrigin: `0 ${barY + barHeight}px`,
+                            opacity: transparentBar ? 0.2 : 1,
+                            display: displayBar ? 'block' : 'none'
+                          }
+                        })}
+                        <g
+                          transform={`translate(${barX},${barHeight * bar.index})`}
                           onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
                           onMouseLeave={onMouseLeaveBar}
-                          id={`barGroup${barGroup.index}`}
-                          key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                          x={barX}
-                          style={{ overflow: 'visible', ...finalStyle }}
-                          y={barHeight * bar.index}
-                          height={!config.isLollipopChart ? barHeight : lollipopBarWidth}
-                          width={barWidth}
                           opacity={transparentBar ? 0.2 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tooltip-html={tooltip}
@@ -213,13 +207,9 @@ export const BarChartHorizontal = () => {
                               bar[config.xAxis.dataKey] = yAxisValue
                               setSharedFilter(config.uid, bar)
                             }
-                          }}
-                        >
-                          <div style={{ position: 'relative' }}>
-                            <div style={iconStyle}>{getIcon(bar, barWidth)}</div>
-                            <div style={{ ...finalStyle }}></div>
-                          </div>
-                        </foreignObject>
+                          }}>
+                          {getIcon(bar, barWidth)}
+                        </g>
 
                         {!config.isLollipopChart && displayNumbersOnBar && (
                           <Text // prettier-ignore
@@ -262,7 +252,7 @@ export const BarChartHorizontal = () => {
                           <circle
                             display={displaylollipopShape}
                             cx={bar.y}
-                            cy={0 + lollipopBarWidth / 2}
+                            cy={barHeight * bar.index + lollipopBarWidth / 2}
                             r={lollipopShapeSize / 2}
                             fill={barColor}
                             key={`circle--${bar.index}`}

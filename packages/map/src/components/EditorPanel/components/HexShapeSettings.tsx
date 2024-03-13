@@ -4,7 +4,7 @@ import parse from 'html-react-parser'
 import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
-const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'None']
+const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'Arrow Left', 'None']
 
 // todo: Move duplicated operators to CORE
 export const DATA_OPERATOR_LESS = '<'
@@ -221,6 +221,21 @@ const HexSettingShapeColumns = props => {
                                               {[DATA_OPERATOR_EQUAL].map(option => {
                                                 return <option value={option}>{option}</option>
                                               })}
+                                              {[DATA_OPERATOR_NOTEQUAL].map(option => {
+                                                return <option value={option}>{option}</option>
+                                              })}
+                                              {[DATA_OPERATOR_LESS].map(option => {
+                                                return <option value={option}>{option}</option>
+                                              })}
+                                              {[DATA_OPERATOR_GREATER].map(option => {
+                                                return <option value={option}>{option}</option>
+                                              })}
+                                              {[DATA_OPERATOR_LESSEQUAL].map(option => {
+                                                return <option value={option}>{option}</option>
+                                              })}
+                                              {[DATA_OPERATOR_GREATEREQUAL].map(option => {
+                                                return <option value={option}>{option}</option>
+                                              })}
                                             </select>
                                           </div>
                                           <div className='cove-accordion__panel-col cove-input'>
@@ -255,7 +270,7 @@ const HexSettingShapeColumns = props => {
                                             ...group.items,
                                             {
                                               key: '',
-                                              shape: 'Arrow up',
+                                              shape: 'Arrow Up',
                                               column: '',
                                               operator: '=',
                                               value: ''
@@ -309,7 +324,7 @@ const HexSettingShapeColumns = props => {
               copy.push({
                 legendTitle: '',
                 legendDescription: '',
-                items: [{ key: '', shape: 'Arrow up', column: '', operator: '=', value: '' }]
+                items: [{ key: '', shape: 'Arrow Up', column: '', operator: '=', value: '' }]
               })
               copy.legendTitle = ''
               copy.legendDescription = ''

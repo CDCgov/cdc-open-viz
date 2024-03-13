@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
+import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 
 const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, projection, titleCase, setSharedFilterValue, isFilterValueSupported }) => {
   const [citiesData, setCitiesData] = useState({})
@@ -60,18 +61,17 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       fillOpacity: state.general.type === 'bubble' ? 0.4 : 1
     }
 
-    const circle = <circle cx={0} cy={0} r={state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius} title='Click for more information' onClick={() => geoClickHandler(cityDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} {...additionalProps} />
-
     const pin = (
       <path
         className='marker'
         d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
         title='Click for more information'
         onClick={() => geoClickHandler(cityDisplayName, geoData)}
-        strokeWidth={2}
-        stroke={'black'}
         data-tooltip-id='tooltip'
         data-tooltip-html={toolTip}
+        transform={`scale(${radius / 9})`}
+        stroke={state.general.geoBorderColor === 'sameAsBackground' ? '#ffffff' : '#000000'}
+        strokeWidth={'2px'}
         {...additionalProps}
       />
     )
@@ -114,10 +114,50 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       styles.cursor = 'pointer'
     }
 
+    const shapeProps = {
+      onClick: () => geoClickHandler(cityDisplayName, geoData),
+      size: state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius * 30,
+      title: 'Click for more information',
+      'data-tooltip-id': 'tooltip',
+      'data-tooltip-html': toolTip,
+      stroke: state.general.geoBorderColor === 'sameAsBackground' ? '#ffffff' : '#000000',
+      strokeWidth: '2px',
+      ...additionalProps
+    }
+
+    const cityStyleShapes = {
+      circle: <GlyphCircle {...shapeProps} />,
+      pin: pin,
+      square: <GlyphSquare {...shapeProps} />,
+      diamond: <GlyphDiamond {...shapeProps} />,
+      star: <GlyphStar {...shapeProps} />,
+      triangle: <GlyphTriangle {...shapeProps} />
+    }
+
+    const { additionalCityStyles } = state.visual || []
+    const cityStyle = Object.values(data)
+      .filter(d => additionalCityStyles.some(style => String(d[style.column]) === String(style.value)))
+      .map(d => {
+        const conditionsMatched = additionalCityStyles.find(style => String(d[style.column]) === String(style.value))
+        return { ...conditionsMatched, ...d }
+      })
+      .find(item => {
+        return Object.keys(item).find(key => item[key] === city)
+      })
+
+    if (cityStyle !== undefined && cityStyle.shape) {
+      if (!geoData?.[state.columns.longitude.name] && !geoData?.[state.columns.latitude.name] && city && supportedCities[city.toUpperCase()]) {
+        let translate = `translate(${projection(supportedCities[city.toUpperCase()])})`
+        return (
+          <g key={i} transform={translate} style={styles} className='geo-point'>
+            {cityStyleShapes[cityStyle.shape.toLowerCase()]}
+          </g>
+        )
+      }
+    }
     return (
       <g key={i} transform={transform} style={styles} className='geo-point'>
-        {state.visual.cityStyle === 'circle' && circle}
-        {state.visual.cityStyle === 'pin' && pin}
+        {cityStyleShapes[state.visual.cityStyle.toLowerCase()]}
       </g>
     )
   })

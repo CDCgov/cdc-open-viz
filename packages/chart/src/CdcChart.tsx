@@ -15,8 +15,10 @@ import 'react-tooltip/dist/react-tooltip.css'
 
 // Primary Components
 import ConfigContext from './ConfigContext'
-import PieChart from './components/PieChart/PieChart'
+import PieChart from './components/PieChart'
+import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
 
@@ -46,6 +48,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 
 import './scss/main.scss'
 // load both then config below determines which to use
@@ -54,16 +57,17 @@ import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
 import { ChartConfig } from './types/ChartConfig'
 import { Label } from './types/Label'
+import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
-  const [config, setConfig] = useState<ChartConfig>(configObj || ({} as ChartConfig))
+  const [config, setConfig] = useState<ChartConfig>({} as ChartConfig)
   const [stateData, setStateData] = useState(config.data || [])
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
-  const [seriesHighlight, setSeriesHighlight] = useState<string[]>([])
+  const [seriesHighlight, setSeriesHighlight] = useState<string[]>(configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : [])
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [dimensions, setDimensions] = useState<[number?, number?]>([])
   const [externalFilters, setExternalFilters] = useState<any[]>()
@@ -97,7 +101,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       let qsParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
 
       let isUpdateNeeded = false
-      config.filters.forEach(filter => {
+      config.filters?.forEach(filter => {
         if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
           qsParams[filter.queryParameter] = filter.active
           isUpdateNeeded = true
@@ -119,7 +123,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       try {
         const ext = getFileExtension(dataUrl.href)
-        if ('csv' === ext) {
+        if ('csv' === ext || isSolrCsv(dataUrlFinal)) {
           data = await fetch(dataUrlFinal)
             .then(response => response.text())
             .then(responseText => {
@@ -130,7 +134,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               })
               return parsedCsv.data
             })
-        } else if ('json' === ext) {
+        } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
           data = await fetch(dataUrlFinal).then(response => response.json())
         } else {
           data = []
@@ -168,7 +172,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (response.dataUrl && !urlFilters) {
       try {
         const ext = getFileExtension(response.dataUrl)
-        if ('csv' === ext) {
+        if ('csv' === ext || isSolrCsv(response.dataUrl)) {
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
             .then(response => response.text())
             .then(responseText => {
@@ -191,7 +195,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             })
         }
 
-        if ('json' === ext) {
+        if ('json' === ext || isSolrJson(response.dataUrl)) {
           data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`).then(response => response.json())
         }
       } catch {
@@ -218,6 +222,15 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
     }
     let newConfig = { ...defaults, ...response }
+    if (newConfig.filters) {
+      newConfig.filters.forEach((filter, index) => {
+        const queryStringFilterValue = getQueryStringFilterValue(filter)
+        if (queryStringFilterValue) {
+          newConfig.filters[index].active = queryStringFilterValue
+        }
+      })
+    }
+
     if (newConfig.visualizationType === 'Box Plot') {
       newConfig.legend.hide = true
     }
@@ -252,7 +265,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (newConfig.exclusions && newConfig.exclusions.active) {
       if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
         newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
-      } else if (newConfig.xAxis.type === 'date' && (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) && newConfig.xAxis.dateParseFormat) {
+      } else if (isDateScale(newConfig.xAxis) && (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) && newConfig.xAxis.dateParseFormat) {
         // Filter dates
         const timestamp = e => new Date(e).getTime()
 
@@ -296,8 +309,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setFilteredData(currentData)
     }
 
-    if(!(['Area Chart', 'Bar', 'Line', 'Combo'].includes(newConfig.visualizationType)) || newConfig.orientation === 'horizontal'){
-      newConfig.xAxis.sortDates = false
+    if (newConfig.xAxis.type === 'date-time' && newConfig.barThickness > 0.1) {
+      newConfig.barThickness = 0.035
+    } else if (newConfig.xAxis.type !== 'date-time' && newConfig.barThickness < 0.1) {
+      newConfig.barThickness = 0.35
     }
 
     //Enforce default values that need to be calculated at runtime
@@ -475,6 +490,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
+
+    // Sankey Description box error message
+    newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Sankey' && !newConfig.description ? 'SUBTEXT/CITATION field is empty: A description of the Sankey Diagram data must be inputted.' : ''
+
+    if (newConfig.legend.seriesHighlight?.length) {
+      setSeriesHighlight(newConfig.legend?.seriesHighlight)
+    }
 
     setConfig(newConfig)
   }
@@ -896,6 +918,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const missingRequiredSections = () => {
+    if (config.visualizationType === 'Sankey') return false // skip checks for now
     if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
     if (config.visualizationType === 'Forest Plot') return false // skip required checks for now.
     if (config.visualizationType === 'Pie') {
@@ -1062,7 +1085,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                   )}
                 </>
               )}
-              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Forest Plot' && <Legend />}
+              {/* Sankey */}
+              {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>}
+              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend />}
             </div>
             {/* Link */}
             {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
@@ -1077,11 +1102,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             </MediaControls.Section>
 
             {/* Data Table */}
-            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && (
+            {((config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey') || (config.visualizationType === 'Sankey' && config.table.show)) && (
               <DataTable
                 config={config}
-                rawData={config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
-                runtimeData={transform.applySuppression(filteredData || excludedData, config.suppressedData)}
+                rawData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
+                runtimeData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : transform.applySuppression(filteredData || excludedData, config.suppressedData)}
                 expandDataTable={config.table.expanded}
                 columns={config.columns}
                 displayDataAsText={displayDataAsText}
@@ -1103,13 +1128,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     )
   }
 
-  const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getXAxisData = d => (isDateScale(config.runtime.xAxis) ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
-
   const contextValues = {
     capitalize,
     computeMarginBottom,

@@ -7,7 +7,7 @@ import { Table } from '@cdc/core/types/Table'
 const addVisualization = (type, subType) => {
   const modalWillOpen = type !== 'markup-include'
   const newVisualizationConfig: Partial<Visualization> = {
-    newViz: true,
+    newViz: type !== 'table',
     openModal: modalWillOpen,
     uid: type + Date.now(),
     type
@@ -47,6 +47,7 @@ const VisualizationsPanel = ({ loadConfig, config }) => (
       <Widget addVisualization={() => addVisualization('chart', 'Bar')} type='Bar' />
       <Widget addVisualization={() => addVisualization('chart', 'Line')} type='Line' />
       <Widget addVisualization={() => addVisualization('chart', 'Pie')} type='Pie' />
+      <Widget addVisualization={() => addVisualization('chart', 'Sankey')} type='Sankey' />
     </div>
     <span className='subheading-3'>Map</span>
     <div className='drag-grid'>
