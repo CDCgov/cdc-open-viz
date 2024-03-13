@@ -15,7 +15,9 @@ export const getSeriesName = (column: string, config: TableConfig) => {
   if (userDefinedSeries?.name) {
     return userDefinedSeries.name
   }
+
   if (config.runtimeSeriesLabels && config.runtimeSeriesLabels[column]) return config.runtimeSeriesLabels[column]
   const columnIsDataKey = column === config.xAxis?.dataKey
-  return columnIsDataKey ? config.table.indexLabel : getLabel(column, config)
+  const indexLabel = config.table.indexLabel ? config.table.indexLabel : config.xAxis?.dataKey
+  return columnIsDataKey ? indexLabel : getLabel(column, config)
 }
