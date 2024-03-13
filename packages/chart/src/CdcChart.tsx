@@ -94,7 +94,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
 
-  const handleChartTabbing = !config.legend.hide ? `legend` : config?.title ? `dataTableSection__${config.title.replace(/\s/g, '')}` : `dataTableSection`
+  const handleChartTabbing = !config.legend?.hide ? `legend` : config?.title ? `dataTableSection__${config.title.replace(/\s/g, '')}` : `dataTableSection`
 
   const reloadURLData = async () => {
     if (config.dataUrl) {
