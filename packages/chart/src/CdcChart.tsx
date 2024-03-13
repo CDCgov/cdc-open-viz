@@ -713,13 +713,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
-    try {
-      const legend = document.getElementById('legend')
-      if (!legend) throw new Error('No legend available to set previous focus on.')
-      legend.focus()
-    } catch (e) {
-      console.error('COVE:', e.message)
-    }
     setSeriesHighlight([])
   }
 
