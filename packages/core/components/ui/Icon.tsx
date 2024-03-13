@@ -32,6 +32,7 @@ import iconDropdowns from '../../assets/icon-filter-dropdowns.svg'
 import iconPlus from '../../assets/icon-plus.svg'
 import iconMinus from '../../assets/icon-minus.svg'
 import iconTable from '../../assets/icon-table.svg'
+import iconSankey from '../../assets/icon-sankey.svg'
 
 import '../../styles/v2/components/icon.scss'
 
@@ -66,7 +67,8 @@ const iconHash = {
   minus: iconMinus,
   'filtered-text': iconText,
   'filter-dropdowns': iconDropdowns,
-  table: iconTable
+  table: iconTable,
+  sankey: iconSankey
 }
 
 export const ICON_TYPES = Object.keys(iconHash)
