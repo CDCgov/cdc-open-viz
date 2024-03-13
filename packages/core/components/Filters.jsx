@@ -79,13 +79,13 @@ export const useFilters = props => {
       newFilters[index].queuedActive = value
       setShowApplyButton(true)
     } else {
-      const newFilter = newFilters[index];
+      const newFilter = newFilters[index]
       newFilter.active = value
-      
-      const queryParams = getQueryParams();
-      if(newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active){
-        queryParams[newFilter.setByQueryParameter] = newFilter.active;
-        updateQueryString(queryParams);
+
+      const queryParams = getQueryParams()
+      if (newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active) {
+        queryParams[newFilter.setByQueryParameter] = newFilter.active
+        updateQueryString(queryParams)
       }
     }
     setConfig({
@@ -105,22 +105,22 @@ export const useFilters = props => {
   }
 
   const handleApplyButton = newFilters => {
-    let needsQueryUpdate = false;
-    const queryParams = getQueryParams();
+    let needsQueryUpdate = false
+    const queryParams = getQueryParams()
     newFilters.forEach(newFilter => {
       if (newFilter.queuedActive) {
         newFilter.active = newFilter.queuedActive
         delete newFilter.queuedActive
-        if(newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active){
-          queryParams[newFilter.setByQueryParameter] = newFilter.active;
-          needsQueryUpdate = true;
+        if (newFilter.setByQueryParameter && queryParams[newFilter.setByQueryParameter] !== newFilter.active) {
+          queryParams[newFilter.setByQueryParameter] = newFilter.active
+          needsQueryUpdate = true
         }
       }
     })
-    if(needsQueryUpdate){
-      updateQueryString(queryParams);
+    if (needsQueryUpdate) {
+      updateQueryString(queryParams)
     }
-    
+
     setConfig({ ...visualizationConfig, filters: newFilters })
 
     if (type === 'map') {
@@ -238,7 +238,7 @@ const Filters = props => {
 
   const Filters = props => props.children
 
-  const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : theme]
+  const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme]
 
   // Exterior Section Wrapper
   Filters.Section = props => {
