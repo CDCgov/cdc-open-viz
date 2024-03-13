@@ -38,6 +38,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import MediaControls from '@cdc/core/components/MediaControls'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
+import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
@@ -1159,11 +1160,19 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       if (state.columns.hasOwnProperty('navigate') && row[state.columns.navigate.name]) {
         toolTipText.push(
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-          <ul className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[state.columns.navigate.name])}>
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions,jsx-a11y/anchor-is-valid
+          <a
+            href='#'
+            className='navigation-link'
+            key='modal-navigation-link'
+            onClick={e => {
+              e.preventDefault()
+              navigationHandler(row[state.columns.navigate.name])
+            }}
+          >
             {state.tooltips.linkLabel}
-            <ExternalIcon className='inline-icon ml-1' />
-          </ul>
+            {isDomainExternal(row[state.columns.navigate.name]) && <ExternalIcon className='inline-icon ml-1' />}
+          </a>
         )
       }
     }

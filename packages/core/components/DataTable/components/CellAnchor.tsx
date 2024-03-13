@@ -1,22 +1,5 @@
 import ExternalIcon from '@cdc/core/assets/external-link.svg'
-
-const internalDomains = [
-  'cdc.gov',
-  'localhost',
-  'facebook.com',
-  'twitter.com',
-  'linkedin.com',
-  'pinterest.com',
-  'youtube.com',
-  'youtube-nocookie.com',
-  'plus.google.com',
-  'instagram.com',
-  'flickr.com',
-  'tumblr.com',
-  'cdc.sharepoint.com',
-  'vaccines.gov',
-  'vacunas.gov'
-]
+import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 
 // Optionally wrap cell with anchor if config defines a navigation url
 const CellAnchor = ({ markup, row, columns, navigationHandler, mapZoomHandler }) => {
@@ -45,7 +28,7 @@ const CellAnchor = ({ markup, row, columns, navigationHandler, mapZoomHandler })
         }}
       >
         {markup}
-        {external && <ExternalIcon className='inline-icon' />}
+        {isDomainExternal(row[columns.navigate.name]) && <ExternalIcon className='inline-icon' />}
       </span>
     )
   } else if (mapZoomHandler) {
