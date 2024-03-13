@@ -24,6 +24,7 @@ import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
 import ForestPlotIcon from '@cdc/core/assets/icon-chart-forest-plot.svg'
 import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
 import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
+import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
 import { Visualization } from '@cdc/core/types/Visualization'
 
 export default function ChooseTab() {
@@ -258,7 +259,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label='Sankey Diagram' type='chart' subType='Sankey' orientation='vertical' icon={<InfoIcon />} />
+              <IconButton label='Sankey Diagram' type='chart' subType='Sankey' orientation='vertical' icon={<SankeyIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Display a sankey diagram</Tooltip.Content>
           </Tooltip>
