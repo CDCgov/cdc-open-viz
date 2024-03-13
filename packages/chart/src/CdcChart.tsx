@@ -58,6 +58,7 @@ import Title from '@cdc/core/components/ui/Title'
 import { ChartConfig } from './types/ChartConfig'
 import { Label } from './types/Label'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
+import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
@@ -93,7 +94,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
 
-  const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
+  const handleChartTabbing = !config.legend.hide ? `legend` : config?.title ? `dataTableSection__${config.title.replace(/\s/g, '')}` : `dataTableSection`
 
   const reloadURLData = async () => {
     if (config.dataUrl) {
@@ -1052,10 +1053,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         {!missingRequiredSections() && !config.newViz && (
           <div className='cdc-chart-inner-container'>
             <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
+            <SkipTo skipId={handleChartTabbing} skipMessage='Skip Over Chart Container' />
 
-            <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
-              Skip Over Chart Container
-            </a>
             {/* Filters */}
             {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
             {/* Visualization */}
