@@ -7,6 +7,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import MediaControls from '@cdc/core/components/MediaControls'
+import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 import Loading from '@cdc/core/components/Loading'
 
@@ -193,9 +194,7 @@ const DataTable = props => {
         {state.general.showDownloadButton && <DownloadButton />}
       </MediaControls.Section>
       <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
-        <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
-          Skip Navigation or Skip to Content
-        </a>
+        <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
         <div
           className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
           onClick={() => {
@@ -298,6 +297,9 @@ const DataTable = props => {
           </table>
         </div>
       </section>
+      <div id={skipId} className='cdcdataviz-sr-only'>
+        Skipped data table.
+      </div>
     </ErrorBoundary>
   )
 }

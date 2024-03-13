@@ -55,6 +55,7 @@ import UsaMap from './components/UsaMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
+import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -1619,21 +1620,21 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // 1) skip to legend
     if (general.showSidebar) {
-      tabbingID = '#legend'
+      tabbingID = 'legend'
     }
 
     // 2) skip to data table if it exists and not a navigation map
     if (hasDataTable && !general.showSidebar) {
-      tabbingID = `#dataTableSection__${Date.now()}`
+      tabbingID = `dataTableSection__${Date.now()}`
     }
 
     // 3) if it's a navigation map skip to the dropdown.
     if (state.general.type === 'navigation') {
-      tabbingID = `#dropdown-${Date.now()}`
+      tabbingID = `dropdown-${Date.now()}`
     }
 
     // 4) handle other options
-    return tabbingID || '#!'
+    return tabbingID || '!'
   }
 
   const tabId = handleMapTabbing()
@@ -1661,9 +1662,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               config={config}
               classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
             />
-            <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
-              Skip Over Map Container
-            </a>
+            <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
+
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
