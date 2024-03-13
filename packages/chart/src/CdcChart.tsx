@@ -1050,14 +1050,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       <>
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && (
-          <div className='cdc-chart-inner-container'>
+          <div className='cdc-chart-inner-container' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
             <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
 
             <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
+            {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
             {/* Visualization */}
             {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
             <div
@@ -1070,6 +1070,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {/* Sparkline */}
               {config.visualizationType === 'Spark Line' && (
                 <>
+                  <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />
                   {config?.introText && (
                     <section className='introText' style={{ padding: '0px 0 35px' }}>
                       {parse(config.introText)}
