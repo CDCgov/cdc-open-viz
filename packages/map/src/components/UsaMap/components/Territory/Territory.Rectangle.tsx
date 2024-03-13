@@ -3,12 +3,7 @@ import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import chroma from 'chroma-js'
 import ConfigContext from './../../../../context'
 import { type MapContext } from '../../../../types/MapContext'
-// todo: move this somewhere that makes better sense for pattern sizes.
-const sizes = {
-  small: '8',
-  medium: '10',
-  large: '12'
-}
+import { patternSizes } from './../../helpers/patternSizes'
 
 const TerritoryRectangle = ({ label, text, stroke, strokeWidth, textColor, hasPattern, territory, ...props }) => {
   const { state, supportedTerritories } = useContext<MapContext>(ConfigContext)
@@ -29,7 +24,7 @@ const TerritoryRectangle = ({ label, text, stroke, strokeWidth, textColor, hasPa
         {state.map.patterns.map((patternData, patternIndex) => {
           let defaultPatternColor = 'black'
 
-          const hasMatchingValues = supportedTerritories[territory].includes(patternData?.dataValue)
+          const hasMatchingValues = supportedTerritories[territory]?.includes(patternData?.dataValue)
 
           if (chroma.contrast(defaultPatternColor, props.style.fill) < 3.5) {
             defaultPatternColor = 'white'
@@ -40,9 +35,9 @@ const TerritoryRectangle = ({ label, text, stroke, strokeWidth, textColor, hasPa
 
           return (
             <>
-              {patternData?.pattern === 'waves' && <PatternWaves id={`territory-${patternData?.dataKey}--${patternIndex}`} height={sizes[patternData?.size] ?? 10} width={sizes[patternData?.size] ?? 10} fill={defaultPatternColor} complement />}
-              {patternData?.pattern === 'circles' && <PatternCircles id={`territory-${patternData?.dataKey}--${patternIndex}`} height={sizes[patternData?.size] ?? 10} width={sizes[patternData?.size] ?? 10} fill={defaultPatternColor} complement />}
-              {patternData?.pattern === 'lines' && <PatternLines id={`territory-${patternData?.dataKey}--${patternIndex}`} height={sizes[patternData?.size] ?? 6} width={sizes[patternData?.size] ?? 6} stroke={defaultPatternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
+              {patternData?.pattern === 'waves' && <PatternWaves id={`territory-${patternData?.dataKey}--${patternIndex}`} height={patternSizes[patternData?.size] ?? 10} width={patternSizes[patternData?.size] ?? 10} fill={defaultPatternColor} complement />}
+              {patternData?.pattern === 'circles' && <PatternCircles id={`territory-${patternData?.dataKey}--${patternIndex}`} height={patternSizes[patternData?.size] ?? 10} width={patternSizes[patternData?.size] ?? 10} fill={defaultPatternColor} complement />}
+              {patternData?.pattern === 'lines' && <PatternLines id={`territory-${patternData?.dataKey}--${patternIndex}`} height={patternSizes[patternData?.size] ?? 6} width={patternSizes[patternData?.size] ?? 6} stroke={defaultPatternColor} strokeWidth={1} orientation={['diagonalRightToLeft']} />}
               <path
                 stroke={stroke}
                 strokeWidth={strokeWidth}
