@@ -67,11 +67,11 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
         d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
         title='Click for more information'
         onClick={() => geoClickHandler(cityDisplayName, geoData)}
-        strokeWidth={2}
-        stroke={'black'}
         data-tooltip-id='tooltip'
         data-tooltip-html={toolTip}
         transform={`scale(${radius / 9})`}
+        stroke={state.general.geoBorderColor === 'sameAsBackground' ? '#ffffff' : '#000000'}
+        strokeWidth={'2px'}
         {...additionalProps}
       />
     )
@@ -120,6 +120,8 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       title: 'Click for more information',
       'data-tooltip-id': 'tooltip',
       'data-tooltip-html': toolTip,
+      stroke: state.general.geoBorderColor === 'sameAsBackground' ? '#ffffff' : '#000000',
+      strokeWidth: '2px',
       ...additionalProps
     }
 

@@ -16,6 +16,7 @@ import { supportedCities, supportedStates } from '../../../data/supported-geos'
 import { geoAlbersUsa } from 'd3-composite-projections'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import HexIcon from './HexIcon'
+import { patternSizes } from '../helpers/patternSizes'
 
 import Territory from './Territory'
 
@@ -130,7 +131,7 @@ const UsaMap = () => {
 
     const label = supportedTerritories[territory][1]
 
-    if (!territoryData) return <Shape key={label} label={label} css={styles} text={styles.color} />
+    if (!territoryData) return <Shape key={label} label={label} style={styles} text={styles.color} />
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
@@ -307,12 +308,6 @@ const UsaMap = () => {
               })}
             </>
           )
-        }
-
-        const patternSizes = {
-          small: 8,
-          medium: 10,
-          large: 12
         }
 
         return (

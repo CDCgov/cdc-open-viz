@@ -9,6 +9,8 @@ export type TransformedData = {
 }
 
 type SharedChartContext = {
+  // process top level chart aria label for each chart type
+  handleChartAriaLabels: (config: any) => string
   colorScale?: ColorScale
   config: ChartConfig
   currentViewport?: string

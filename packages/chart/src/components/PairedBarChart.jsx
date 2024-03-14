@@ -123,6 +123,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         strokeWidth={borderWidth}
                         opacity={transparentBar ? 0.5 : 1}
                         display={displayBar ? 'block' : 'none'}
+                        tabIndex={-1}
                       />
                       {config.yAxis.displayNumbersOnBar && displayBar && (
                         <Text textAnchor={textFits ? 'start' : 'end'} dx={textFits ? 5 : -5} verticalAnchor='middle' x={halfWidth - barWidth} y={y + config.barHeight / 2} fill={textFits ? groupOne.labelColor : '#000'}>
@@ -174,6 +175,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         stroke='#333'
                         opacity={transparentBar ? 0.5 : 1}
                         display={displayBar ? 'block' : 'none'}
+                        tabIndex={-1}
                       />
                       {config.yAxis.displayNumbersOnBar && displayBar && (
                         <Text textAnchor={isTextFits ? 'end' : 'start'} dx={isTextFits ? -5 : 5} verticalAnchor='middle' x={halfWidth + barWidth} y={y + config.barHeight / 2} fill={isTextFits ? groupTwo.labelColor : '#000'}>

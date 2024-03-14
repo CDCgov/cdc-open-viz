@@ -101,12 +101,14 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
                       className={className.join(' ')}
                       tabIndex={0}
                       key={`legend-quantile-${i}`}
-                      onKeyPress={e => {
+                      onKeyDown={e => {
                         if (e.key === 'Enter') {
+                          e.preventDefault()
                           highlight(label)
                         }
                       }}
-                      onClick={() => {
+                      onClick={e => {
+                        e.preventDefault()
                         highlight(label)
                       }}
                       role='button'
@@ -143,12 +145,14 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
                       className={className}
                       tabIndex={0}
                       key={`legend-quantile-${i}`}
-                      onKeyPress={e => {
+                      onKeyDown={e => {
                         if (e.key === 'Enter') {
+                          e.preventDefault()
                           highlight(bar.legendLabel)
                         }
                       }}
-                      onClick={() => {
+                      onClick={e => {
+                        e.preventDefault()
                         highlight(bar.legendLabel)
                       }}
                     >
