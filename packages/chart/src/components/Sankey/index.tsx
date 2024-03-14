@@ -23,7 +23,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
   const [largestGroupWidth, setLargestGroupWidth] = useState(0)
   const groupRefs = useRef([])
 
-  //Tooltip
+  //Tooltip 
   const [tooltipID, setTooltipID] = useState<string>('')
 
   const handleNodeClick = (nodeId: string) => {
@@ -34,14 +34,14 @@ const Sankey = ({ width, height }: SankeyProps) => {
     setTooltipID('')
   }
 
-  //Mobile Pop Up
-  const [showPopup, setShowPopup] = useState(false)
+  //Mobile Pop Up 
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
-    if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
-      setShowPopup(true)
-    }
-  }, [window.innerWidth])
+      if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
+        setShowPopup(true)
+      }
+  }, [window.innerWidth]);
 
   const closePopUp = () => {
     setShowPopup(false)
@@ -50,18 +50,14 @@ const Sankey = ({ width, height }: SankeyProps) => {
   // Uses Visx Groups innerRef to get all Group elements that are mapped.
   // Sets the largest group width in state and subtracts that group the svg width to calculate overall width.
   useEffect(() => {
-    if (config.sankey.rightOffset) {
-      setLargestGroupWidth(config.sankey.rightOffset)
-    } else {
-      let largest = 0
-      groupRefs?.current?.map(g => {
-        const groupWidth = g?.getBoundingClientRect().width
-        if (groupWidth > largest) {
-          largest = groupWidth
-        }
-      })
-      setLargestGroupWidth(largest)
-    }
+    let largest = 0
+    groupRefs?.current?.map(g => {
+      const groupWidth = g?.getBoundingClientRect().width
+      if (groupWidth > largest) {
+        largest = groupWidth
+      }
+    })
+    setLargestGroupWidth(largest)
   }, [groupRefs, sankeyConfig])
 
   //Retrieve all the unique values for the Nodes
@@ -203,6 +199,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
           fill={nodeColor}
           fillOpacity={opacityValue}
           rx={sankeyConfig.rxValue}
+          // todo: move enable tooltips to sankey
           data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
           data-tooltip-id={`tooltip`}
           onClick={() => handleNodeClick(node.id)}
@@ -308,17 +305,13 @@ const Sankey = ({ width, height }: SankeyProps) => {
         the sankey diagram. When tooltips are disabled this will nothing */}
         <ReactTooltip id={`tooltip`} afterHide={() => clearNodeClick()} events={['click']} place={'bottom'} style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
         {showPopup && (
-          <div className='popup'>
-            <div className='popup-content'>
-              <button className='visually-hidden' onClick={closePopUp}>
-                Select for accessible version.
-              </button>
-              <p>
-                <strong>Please change the orientation of your screen or increase the size of your browser to view the diagram better.</strong>
-              </p>
-            </div>
+        <div className="popup">
+          <div className="popup-content">
+            <button className="visually-hidden" onClick={closePopUp}>Select for accessible version.</button>
+            <p><strong>Please change the orientation of your screen or increase the size of your browser to view the diagram better.</strong></p>
           </div>
-        )}
+        </div>
+      )}
       </div>
     </>
   )
