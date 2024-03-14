@@ -75,7 +75,7 @@ const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard,
           }
         />
       )}
-      <TextField value={config.table.indexLabel ? config.table.indexLabel : config.xAxis?.dataKey} section='table' fieldName='indexLabel' label='Index Column Header ddddd' updateField={updateField} />
+      <TextField value={config.table.indexLabel ? config.table.indexLabel : config.xAxis?.dataKey} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />
       <TextField
         value={config.table.caption}
         updateField={updateField}
