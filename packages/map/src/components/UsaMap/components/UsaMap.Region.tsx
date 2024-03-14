@@ -76,7 +76,7 @@ const UsaRegionMap = props => {
 
     let toolTip
 
-    let styles = {
+    let styles: React.CSSProperties = {
       fill: '#E6E6E6',
       color: '#202020'
     }
@@ -213,14 +213,6 @@ const UsaRegionMap = props => {
         }
 
         const circleRadius = 15
-
-        // SIDE CHART EXPERIMENT
-        // const height = state.data[index].Change;
-        // const barHeight = Math.abs(height * 20 );
-        // const barPositive = height > 0;
-        // const barY = barPositive ? -barHeight + 15 : 15;
-        // const baseY = 14;
-        // const barFill = barPositive ? "#fff" : "#fff";
 
         return (
           <g key={key} className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} tabIndex={-1}>
