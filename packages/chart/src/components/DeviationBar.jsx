@@ -187,6 +187,7 @@ export default function DeviationBar({ height, xScale }) {
                 height={barHeight}
                 data-tooltip-html={tooltip}
                 data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                tabIndex={-1}
               >
                 <div style={{ width: barWidth, height: barHeight, border: `${borderWidth}px solid #333`, backgroundColor: barColor[barPosition], ...borderRadius }}></div>
               </foreignObject>

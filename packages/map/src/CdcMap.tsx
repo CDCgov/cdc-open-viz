@@ -38,6 +38,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import MediaControls from '@cdc/core/components/MediaControls'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
+import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
@@ -54,6 +55,7 @@ import UsaMap from './components/UsaMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
+import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -1159,11 +1161,19 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       if (state.columns.hasOwnProperty('navigate') && row[state.columns.navigate.name]) {
         toolTipText.push(
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-          <ul className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[state.columns.navigate.name])}>
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions,jsx-a11y/anchor-is-valid
+          <a
+            href='#'
+            className='navigation-link'
+            key='modal-navigation-link'
+            onClick={e => {
+              e.preventDefault()
+              navigationHandler(row[state.columns.navigate.name])
+            }}
+          >
             {state.tooltips.linkLabel}
-            <ExternalIcon className='inline-icon ml-1' />
-          </ul>
+            {isDomainExternal(row[state.columns.navigate.name]) && <ExternalIcon className='inline-icon ml-1' />}
+          </a>
         )
       }
     }
@@ -1610,21 +1620,21 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // 1) skip to legend
     if (general.showSidebar) {
-      tabbingID = '#legend'
+      tabbingID = 'legend'
     }
 
     // 2) skip to data table if it exists and not a navigation map
     if (hasDataTable && !general.showSidebar) {
-      tabbingID = `#dataTableSection__${Date.now()}`
+      tabbingID = `dataTableSection__${Date.now()}`
     }
 
     // 3) if it's a navigation map skip to the dropdown.
     if (state.general.type === 'navigation') {
-      tabbingID = `#dropdown-${Date.now()}`
+      tabbingID = `dropdown-${Date.now()}`
     }
 
     // 4) handle other options
-    return tabbingID || '#!'
+    return tabbingID || '!'
   }
 
   const tabId = handleMapTabbing()
@@ -1652,9 +1662,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               config={config}
               classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
             />
-            <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
-              Skip Over Map Container
-            </a>
+            <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
+
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
