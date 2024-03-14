@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../ConfigContext'
 import { Group } from '@visx/group'
+import { Circle } from '@visx/shape'
 
 const ScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
   const { colorScale, transformedData: data, config, formatNumber, seriesHighlight, colorPalettes } = useContext(ConfigContext)
@@ -31,17 +32,16 @@ const ScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
           }
 
           return (
-            <circle
-              key={`${dataIndex}-${index}`}
+            <Circle
+              tabIndex={-1}
               r={circleRadii}
               cx={xScale(item[config.xAxis.dataKey])}
               cy={yScale(item[s])}
               fill={displayArea ? seriesColor : 'transparent'}
-              fillOpacity={transparentArea ? .25 : 1}
+              fillOpacity={transparentArea ? 0.25 : 1}
               style={pointStyles}
               data-tooltip-html={handleTooltip(item, s)}
               data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-              tabIndex={-1}
             />
           )
         })
