@@ -168,7 +168,7 @@ const UsaMap = () => {
 
       return (
         <>
-          <Shape key={label} label={label} style={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} territory={territory} territoryData={territoryData} />
+          <Shape key={label} label={label} style={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} territory={territory} territoryData={territoryData} tabIndex={-1} />
         </>
       )
     }

@@ -10,7 +10,7 @@ const TerritoryRectangle = ({ label, text, stroke, strokeWidth, textColor, hasPa
 
   return (
     <svg viewBox='0 0 45 28'>
-      <g {...props} strokeLinejoin='round'>
+      <g {...props} strokeLinejoin='round' tabIndex={-1}>
         <path
           stroke={stroke}
           strokeWidth={strokeWidth}
