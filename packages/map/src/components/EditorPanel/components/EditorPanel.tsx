@@ -3120,7 +3120,7 @@ const EditorPanel = props => {
                 <button className={'btn full-width'} onClick={handleAddLayer}>
                   Add Map Layer
                 </button>
-                <p>Context should be added to your visualization or associated page to describe the significance of layes that are added to maps.</p>
+                <p>Context should be added to your visualization or associated page to describe the significance of layers that are added to maps.</p>
               </AccordionItemPanel>
             </AccordionItem>
             {state.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
