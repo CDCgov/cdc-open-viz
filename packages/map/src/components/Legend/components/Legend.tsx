@@ -94,6 +94,14 @@ const Legend = () => {
           onClick={() => {
             toggleLegendActive(idx, legendLabel)
           }}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              toggleLegendActive(idx, legendLabel)
+            }
+          }}
+          role='button'
+          tabIndex={0}
         >
           <LegendCircle fill={entry.color} /> <span>{legendLabel}</span>
         </li>
@@ -115,7 +123,7 @@ const Legend = () => {
 
         legendItems.push(
           <>
-            <li className={`legend-container__li legend-container__li--geo-pattern`}>
+            <li className={`legend-container__li legend-container__li--geo-pattern`} aria-label='You are on a pattern button. We dont support toggling patterns on this legend at the moment, but provide the area as being focusable for congruity.' tabIndex={0}>
               <span className='legend-item' style={{ border: 'unset' }}>
                 <svg width={legendSize} height={legendSize}>
                   {pattern === 'waves' && <PatternWaves id={`${dataKey}--${patternDataIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
