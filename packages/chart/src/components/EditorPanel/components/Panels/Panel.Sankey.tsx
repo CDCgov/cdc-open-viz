@@ -100,6 +100,24 @@ const SankeySettings = () => {
         )}
 
         <CheckBox value={config.enableTooltips} fieldName='enableTooltips' label='Enable Tooltips' updateField={updateField} />
+        <label>
+          Right Offset
+          <input
+            type='text'
+            value={config.sankey.rightOffset}
+            fieldName='segmentTextAfter'
+            label='Segment Text After'
+            onChange={e =>
+              updateConfig({
+                ...config,
+                sankey: {
+                  ...config.sankey,
+                  rightOffset: e.target.value
+                }
+              })
+            }
+          />
+        </label>
       </AccordionItemPanel>
     </AccordionItem>
   )
