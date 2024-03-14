@@ -149,14 +149,14 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       if (!geoData?.[state.columns.longitude.name] && !geoData?.[state.columns.latitude.name] && city && supportedCities[city.toUpperCase()]) {
         let translate = `translate(${projection(supportedCities[city.toUpperCase()])})`
         return (
-          <g key={i} transform={translate} style={styles} className='geo-point'>
+          <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
             {cityStyleShapes[cityStyle.shape.toLowerCase()]}
           </g>
         )
       }
     }
     return (
-      <g key={i} transform={transform} style={styles} className='geo-point'>
+      <g key={i} transform={transform} style={styles} className='geo-point' tabIndex={-1}>
         {cityStyleShapes[state.visual.cityStyle.toLowerCase()]}
       </g>
     )
