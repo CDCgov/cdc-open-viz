@@ -397,7 +397,7 @@ const UsaMap = () => {
 
     // Dynamic text color
     if (chroma.contrast(textColor, bgColor) < wcagContrastRatio) {
-      textColor = '#000' // dark gray
+      textColor = '#000'
     }
 
     // always make HI black since it is off to the side
