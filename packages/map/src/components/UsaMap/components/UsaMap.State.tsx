@@ -22,7 +22,7 @@ import Territory from './Territory'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
-import { getContrastColor, WCAG_CONTRAST_RATIO } from '@cdc/core/helpers/cove/accessibility'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
