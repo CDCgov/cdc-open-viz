@@ -9,7 +9,6 @@ import hexTopoJSON from '../data/us-hex-topo.json'
 import { geoCentroid, geoPath } from 'd3-geo'
 import { feature } from 'topojson-client'
 import { AlbersUsa, Mercator } from '@visx/geo'
-import chroma from 'chroma-js'
 import CityList from '../../CityList'
 import BubbleList from '../../BubbleList'
 import { supportedCities, supportedStates } from '../../../data/supported-geos'
@@ -23,7 +22,7 @@ import Territory from './Territory'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
-import { WCAG_CONTRAST_RATIO } from '@cdc/core/helpers/cove/accessibility'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -138,13 +137,8 @@ const UsaMap = () => {
 
     const legendColors = applyLegendToRow(territoryData)
 
-    let textColor = '#FFF'
-
     if (legendColors) {
-      // Use white text if the background is dark, and dark grey if it's light
-      if (chroma.contrast(textColor, legendColors[0]) < WCAG_CONTRAST_RATIO) {
-        textColor = '#202020'
-      }
+      const textColor = getContrastColor('#FFF', legendColors[0])
 
       let needsPointer = false
 
@@ -258,12 +252,7 @@ const UsaMap = () => {
 
           const iconSize = 8
 
-          let textColor = '#FFF'
-
-          // Dynamic text color
-          if (chroma.contrast(textColor, bgColor) < WCAG_CONTRAST_RATIO) {
-            textColor = '#202020' // dark gray
-          }
+          const textColor = getContrastColor('#FFF', bgColor)
 
           return (
             <>
@@ -322,7 +311,7 @@ const UsaMap = () => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
                 const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
-                const patternColor = chroma.contrast('#000000', currentFill) < WCAG_CONTRAST_RATIO ? '#FFF' : '#000'
+                const patternColor = getContrastColor('#000', currentFill)
 
                 return (
                   hasMatchingValues && (
@@ -393,12 +382,7 @@ const UsaMap = () => {
 
     if (undefined === abbr) return null
 
-    let textColor = '#FFF'
-
-    // Dynamic text color
-    if (chroma.contrast(textColor, bgColor) < WCAG_CONTRAST_RATIO) {
-      textColor = '#000'
-    }
+    let textColor = getContrastColor('#FFF', bgColor)
 
     // always make HI black since it is off to the side
     if (abbr === 'US-HI' && !state.general.displayAsHex) {

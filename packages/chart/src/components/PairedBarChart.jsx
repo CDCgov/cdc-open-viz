@@ -5,8 +5,7 @@ import { scaleLinear } from '@visx/scale'
 import { Text } from '@visx/text'
 
 import ConfigContext from '../ConfigContext'
-import chroma from 'chroma-js'
-import { WCAG_CONTRAST_RATIO } from '@cdc/core/helpers/cove/accessibility'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 const PairedBarChart = ({ width, height, originalWidth }) => {
   const { config, colorScale, transformedData: data, formatNumber, seriesHighlight, getTextWidth } = useContext(ConfigContext)
@@ -48,15 +47,8 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
   })
 
   // Set label color
-  let labelColor = '#000000'
-
-  if (groupOne.color && chroma.contrast(labelColor, groupOne.color) < WCAG_CONTRAST_RATIO) {
-    groupOne.labelColor = '#FFFFFF'
-  }
-
-  if (groupTwo.color && chroma.contrast(labelColor, groupTwo.color) < WCAG_CONTRAST_RATIO) {
-    groupTwo.labelColor = '#FFFFFF'
-  }
+  groupOne.labelColor = getContrastColor('#000', groupOne.color)
+  groupTwo.labelColor = getContrastColor('#000', groupTwo.color)
 
   const label = config.yAxis.label ? `${config.yAxis.label}: ` : ''
 
