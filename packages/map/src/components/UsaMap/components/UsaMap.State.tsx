@@ -23,6 +23,7 @@ import Territory from './Territory'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
+import { WCAG_CONTRAST_RATIO } from '@cdc/core/helpers/cove/accessibility'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -141,7 +142,7 @@ const UsaMap = () => {
 
     if (legendColors) {
       // Use white text if the background is dark, and dark grey if it's light
-      if (chroma.contrast(textColor, legendColors[0]) < 3.5) {
+      if (chroma.contrast(textColor, legendColors[0]) < WCAG_CONTRAST_RATIO) {
         textColor = '#202020'
       }
 
@@ -260,7 +261,7 @@ const UsaMap = () => {
           let textColor = '#FFF'
 
           // Dynamic text color
-          if (chroma.contrast(textColor, bgColor) < 3.5) {
+          if (chroma.contrast(textColor, bgColor) < WCAG_CONTRAST_RATIO) {
             textColor = '#202020' // dark gray
           }
 
@@ -321,7 +322,7 @@ const UsaMap = () => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
                 const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
-                const patternColor = chroma.contrast('#000000', currentFill) < 3.5 ? '#FFF' : '#000'
+                const patternColor = chroma.contrast('#000000', currentFill) < WCAG_CONTRAST_RATIO ? '#FFF' : '#000'
 
                 return (
                   hasMatchingValues && (
@@ -395,8 +396,8 @@ const UsaMap = () => {
     let textColor = '#FFF'
 
     // Dynamic text color
-    if (chroma.contrast(textColor, bgColor) < 3.5) {
-      textColor = '#202020' // dark gray
+    if (chroma.contrast(textColor, bgColor) < WCAG_CONTRAST_RATIO) {
+      textColor = '#000'
     }
 
     // always make HI black since it is off to the side

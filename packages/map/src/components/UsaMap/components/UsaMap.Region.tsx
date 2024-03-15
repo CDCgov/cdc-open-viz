@@ -1,4 +1,5 @@
 import { useState, useEffect, memo, useContext } from 'react'
+import { WCAG_CONTRAST_RATIO } from '@cdc/core/helpers/cove/accessibility'
 
 // 3rd party
 import chroma from 'chroma-js'
@@ -93,7 +94,7 @@ const UsaRegionMap = props => {
 
     if (legendColors) {
       // Use white text if the background is dark, and dark grey if it's light
-      if (chroma.contrast(textColor, legendColors[0]) < 3.5) {
+      if (chroma.contrast(textColor, legendColors[0]) < WCAG_CONTRAST_RATIO) {
         textColor = '#202020'
       }
 
@@ -129,7 +130,7 @@ const UsaRegionMap = props => {
     let textColor = '#FFF'
 
     // Dynamic text color
-    if (chroma.contrast(textColor, bgColor) < 3.5) {
+    if (chroma.contrast(textColor, bgColor) < WCAG_CONTRAST_RATIO) {
       textColor = '#202020'
     }
 
