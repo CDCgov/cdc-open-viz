@@ -4,6 +4,7 @@ import chroma from 'chroma-js'
 import ConfigContext from './../../../../context'
 import { type MapContext } from '../../../../types/MapContext'
 import { patternSizes } from './../../helpers/patternSizes'
+import { wcagContrastRatio } from '@cdc/core/helpers/cove/accessibility'
 
 const TerritoryRectangle = ({ label, text, stroke, strokeWidth, textColor, hasPattern, territory, ...props }) => {
   const { state, supportedTerritories } = useContext<MapContext>(ConfigContext)
@@ -26,7 +27,7 @@ const TerritoryRectangle = ({ label, text, stroke, strokeWidth, textColor, hasPa
 
           const hasMatchingValues = supportedTerritories[territory]?.includes(patternData?.dataValue)
 
-          if (chroma.contrast(defaultPatternColor, props.style.fill) < 3.5) {
+          if (chroma.contrast(defaultPatternColor, props.style.fill) < wcagContrastRatio) {
             defaultPatternColor = 'white'
           }
 

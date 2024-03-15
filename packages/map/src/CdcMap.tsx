@@ -21,7 +21,7 @@ import Title from '@cdc/core/components/ui/Title'
 // Data
 import { countryCoordinates } from './data/country-coordinates'
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
-import colorPalettes from '../../core/data/colorPalettes'
+import colorPalettes from '@cdc/core/data/colorPalettes'
 import initialState from './data/initial-state'
 
 // Assets
