@@ -6,6 +6,7 @@ import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { FaStar } from 'react-icons/fa'
+import { WCAG_CONTRAST_RATIO } from '@cdc/core/helpers/cove/accessibility'
 
 // third party
 import chroma from 'chroma-js'
@@ -138,7 +139,7 @@ export const BarChartHorizontal = () => {
                   const displaylollipopShape = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? 'none' : 'block'
                   // update label color
                   if (barColor && labelColor) {
-                    if (chroma.contrast(labelColor, barColor) < 4.9) {
+                    if (chroma.contrast(labelColor, barColor) < WCAG_CONTRAST_RATIO) {
                       labelColor = textFits ? '#FFFFFF' : '#000000'
                     }
                   }
@@ -207,7 +208,8 @@ export const BarChartHorizontal = () => {
                               bar[config.xAxis.dataKey] = yAxisValue
                               setSharedFilter(config.uid, bar)
                             }
-                          }}>
+                          }}
+                        >
                           {getIcon(bar, barWidth)}
                         </g>
 

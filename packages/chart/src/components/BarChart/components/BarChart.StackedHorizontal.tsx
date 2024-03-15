@@ -4,6 +4,7 @@ import { useBarChart } from '../../../hooks/useBarChart'
 import { BarStackHorizontal } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
+import { WCAG_CONTRAST_RATIO } from '@cdc/core/helpers/cove/accessibility'
 
 // third party
 import chroma from 'chroma-js'
@@ -61,7 +62,7 @@ const BarChartStackedHorizontal = () => {
                   <li class="tooltip-body ">${additionalColTooltip}</li>
                     </li></ul>`
 
-                if (chroma.contrast(labelColor, colorScale(config.runtime.seriesLabels[bar.key])) < 4.9) {
+                if (chroma.contrast(labelColor, colorScale(config.runtime.seriesLabels[bar.key])) < WCAG_CONTRAST_RATIO) {
                   labelColor = '#FFFFFF'
                 }
 

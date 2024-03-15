@@ -6,6 +6,7 @@ import { Text } from '@visx/text'
 
 import ConfigContext from '../ConfigContext'
 import chroma from 'chroma-js'
+import { WCAG_CONTRAST_RATIO } from '@cdc/core/helpers/cove/accessibility'
 
 const PairedBarChart = ({ width, height, originalWidth }) => {
   const { config, colorScale, transformedData: data, formatNumber, seriesHighlight, getTextWidth } = useContext(ConfigContext)
@@ -49,11 +50,11 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
   // Set label color
   let labelColor = '#000000'
 
-  if (groupOne.color && chroma.contrast(labelColor, groupOne.color) < 4.9) {
+  if (groupOne.color && chroma.contrast(labelColor, groupOne.color) < WCAG_CONTRAST_RATIO) {
     groupOne.labelColor = '#FFFFFF'
   }
 
-  if (groupTwo.color && chroma.contrast(labelColor, groupTwo.color) < 4.9) {
+  if (groupTwo.color && chroma.contrast(labelColor, groupTwo.color) < WCAG_CONTRAST_RATIO) {
     groupTwo.labelColor = '#FFFFFF'
   }
 
