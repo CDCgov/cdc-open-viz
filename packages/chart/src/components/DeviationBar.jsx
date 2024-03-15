@@ -6,6 +6,7 @@ import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import chroma from 'chroma-js'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
+import { WCAG_CONTRAST_RATIO } from '@cdc/core/helpers/cove/accessibility'
 
 export default function DeviationBar({ height, xScale }) {
   const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig, parseDate, formatDate, currentViewport } = useContext(ConfigContext)
@@ -160,7 +161,7 @@ export default function DeviationBar({ height, xScale }) {
           // colors
           const [leftColor, rightColor] = twoColorPalette[twoColor.palette]
           const barColor = { left: leftColor, right: rightColor }
-          const isBarColorDark = chroma.contrast('#000000', barColor[barPosition]) < 4.9
+          const isBarColorDark = chroma.contrast('#000000', barColor[barPosition]) < WCAG_CONTRAST_RATIO
           const fill = isBarColorDark ? '#FFFFFF' : '#000000'
 
           let textProps = getTextProps(config.isLollipopChart, textFits, lollipopShapeSize, fill)

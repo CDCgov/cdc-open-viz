@@ -5,7 +5,7 @@ import { MapContext } from './../../../../types/MapContext'
 import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
 import chroma from 'chroma-js'
-import { wcagContrastRatio } from '@cdc/core/helpers/cove/accessibility'
+import { WCAG_CONTRAST_RATIO } from '@cdc/core/helpers/cove/accessibility'
 
 const offsets = {
   'US-VT': [50, -8],
@@ -99,7 +99,7 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
     let textColor = '#FFF'
 
     // Dynamic text color
-    if (chroma.contrast(textColor, bgColor) < wcagContrastRatio) {
+    if (chroma.contrast(textColor, bgColor) < WCAG_CONTRAST_RATIO) {
       textColor = '#202020' // dark gray
     }
 
