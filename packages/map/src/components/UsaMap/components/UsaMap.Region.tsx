@@ -1,8 +1,7 @@
 import { useState, useEffect, memo, useContext } from 'react'
-import { WCAG_CONTRAST_RATIO } from '@cdc/core/helpers/cove/accessibility'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 // 3rd party
-import chroma from 'chroma-js'
 import { geoCentroid } from 'd3-geo'
 import { feature } from 'topojson-client'
 import { Mercator } from '@visx/geo'
@@ -90,13 +89,8 @@ const UsaRegionMap = props => {
 
     const legendColors = applyLegendToRow(territoryData)
 
-    let textColor = '#FFF'
-
     if (legendColors) {
-      // Use white text if the background is dark, and dark grey if it's light
-      if (chroma.contrast(textColor, legendColors[0]) < WCAG_CONTRAST_RATIO) {
-        textColor = '#202020'
-      }
+      const textColor = getContrastColor('#FFF', legendColors[0])
 
       let needsPointer = false
 
@@ -127,12 +121,7 @@ const UsaRegionMap = props => {
 
     if (undefined === abbr) return null
 
-    let textColor = '#FFF'
-
-    // Dynamic text color
-    if (chroma.contrast(textColor, bgColor) < WCAG_CONTRAST_RATIO) {
-      textColor = '#202020'
-    }
+    const textColor = getContrastColor('#FFF', bgColor)
 
     let x = 0,
       y = 5
@@ -198,11 +187,7 @@ const UsaRegionMap = props => {
 
         const TerratoryRect = props => {
           const { posX = 0, tName } = props
-          let textColor = '#fff'
-
-          if (chroma.contrast(textColor, legendColors[0]) < 4.5) {
-            textColor = '#202020'
-          }
+          const textColor = getContrastColor('#FFF', legendColors[0])
           return (
             <>
               <rect x={posX} width='36' height='24' rx='6' stroke='#fff' strokeWidth='1' />
