@@ -4,7 +4,7 @@ import ConfigContext from './../../../../context'
 import { MapContext } from './../../../../types/MapContext'
 import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
-import chroma from 'chroma-js'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 const offsets = {
   'US-VT': [50, -8],
@@ -95,12 +95,7 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
 
     if (undefined === abbr) return null
 
-    let textColor = '#FFF'
-
-    // Dynamic text color
-    if (chroma.contrast(textColor, bgColor) < 3.5) {
-      textColor = '#202020' // dark gray
-    }
+    let textColor = getContrastColor('#FFF', bgColor)
 
     // always make HI black since it is off to the side
     if (abbr === 'US-HI') {
@@ -131,7 +126,7 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
     let [dx, dy] = offsets[abbr]
 
     return (
-      <g tabIndex={-1}>
+      <g>
         <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />
         <text x={4} strokeWidth='0' fontSize={13} style={{ fill: '#202020' }} alignmentBaseline='middle' transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
           {abbr.substring(3)}
@@ -142,7 +137,7 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
 
   return (
     <svg viewBox='0 0 45 51' className='territory-wrapper--hex'>
-      <g {...props} tabIndex={-1}>
+      <g {...props}>
         <polygon stroke={stroke} strokeWidth={strokeWidth} points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702' />
         {state.general.displayAsHex && hexagonLabel(territoryData ? territoryData : geo, stroke, false)}
       </g>

@@ -4,8 +4,8 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import chroma from 'chroma-js'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 export default function DeviationBar({ height, xScale }) {
   const { transformedData: data, config, formatNumber, twoColorPalette, getTextWidth, updateConfig, parseDate, formatDate, currentViewport } = useContext(ConfigContext)
@@ -160,8 +160,7 @@ export default function DeviationBar({ height, xScale }) {
           // colors
           const [leftColor, rightColor] = twoColorPalette[twoColor.palette]
           const barColor = { left: leftColor, right: rightColor }
-          const isBarColorDark = chroma.contrast('#000000', barColor[barPosition]) < 4.9
-          const fill = isBarColorDark ? '#FFFFFF' : '#000000'
+          const fill = getContrastColor('#000', barColor[barPosition])
 
           let textProps = getTextProps(config.isLollipopChart, textFits, lollipopShapeSize, fill)
           // tooltips
