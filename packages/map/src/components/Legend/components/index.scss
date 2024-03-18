@@ -89,17 +89,14 @@
       }
       .legend-container__reset-button {
         font-size: 0.75em;
-        color: rgba(0, 0, 0, 0.6);
-        position: absolute;
         right: 1em;
-        background: rgba(0, 0, 0, 0.1);
         text-transform: uppercase;
         transition: 0.2s all;
         padding: 0.2em 0.5em;
         border: rgba(0, 0, 0, 0.2) 1px solid;
+        padding: 0.375rem;
         &:hover {
           text-decoration: none;
-          background: rgba(0, 0, 0, 0.15);
           transition: 0.2s all;
         }
       }

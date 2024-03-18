@@ -1,6 +1,7 @@
 import parse from 'html-react-parser'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendCircle from '@cdc/core/components/LegendCircle'
+import Button from '@cdc/core/components/elements/Button'
 
 import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
@@ -163,11 +164,6 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
                     </LegendItem>
                   )
                 })}
-                {seriesHighlight.length > 0 && (
-                  <button className={`legend-reset ${config.theme}`} onClick={labels => highlightReset(labels)} tabIndex={0}>
-                    Reset
-                  </button>
-                )}
               </div>
 
               <>
@@ -197,6 +193,11 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
           )
         }}
       </LegendOrdinal>
+      {seriesHighlight.length > 0 && (
+        <Button onClick={labels => highlightReset(labels)} style={{ marginTop: '1rem' }}>
+          Reset
+        </Button>
+      )}
     </aside>
   )
 }

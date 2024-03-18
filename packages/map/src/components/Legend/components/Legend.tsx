@@ -5,6 +5,7 @@ import parse from 'html-react-parser'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import LegendItemHex from './LegendItem.Hex'
+import Button from '@cdc/core/components/elements/Button'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../../../context'
@@ -145,7 +146,9 @@ const Legend = () => {
   const { legendClasses } = useDataVizClasses(state, viewport)
 
   const handleReset = e => {
-    e.preventDefault()
+    if (e) {
+      e.preventDefault()
+    }
     resetLegendToggles()
     setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
   }
@@ -166,11 +169,6 @@ const Legend = () => {
       <div className='legends'>
         <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0}>
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
-            {runtimeLegend.disabledAmt > 0 && (
-              <button onClick={handleReset} className={legendClasses.resetButton.join(' ') || ''}>
-                Clear
-              </button>
-            )}
             {legend.title && <span className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</span>}
             {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>}
             {legend.dynamicDescription === true &&
@@ -223,6 +221,7 @@ const Legend = () => {
                 </div>
               </>
             )}
+            {runtimeLegend.disabledAmt > 0 && <Button onClick={handleReset}>Reset</Button>}
           </section>
         </aside>
         {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <LegendItemHex state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}
