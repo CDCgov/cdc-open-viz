@@ -163,11 +163,6 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
                     </LegendItem>
                   )
                 })}
-                {seriesHighlight.length > 0 && (
-                  <button className={`legend-reset ${config.theme}`} onClick={labels => highlightReset(labels)} tabIndex={0}>
-                    Reset
-                  </button>
-                )}
               </div>
 
               <>
@@ -197,6 +192,11 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
           )
         }}
       </LegendOrdinal>
+      {seriesHighlight.length > 0 && (
+        <button className={`legend-reset btn theme-blue`} onClick={labels => highlightReset(labels)} tabIndex={0}>
+          Reset
+        </button>
+      )}
     </aside>
   )
 }

@@ -123,14 +123,14 @@
     .legend-reset {
       font-size: 0.7em;
       color: rgba(0, 0, 0, 0.6);
-      position: absolute;
       right: 1em;
-      background: rgba(0, 0, 0, 0.1);
+      // background: rgba(0, 0, 0, 0.1);
       text-transform: uppercase;
       transition: 0.3s all;
       padding: 0.375rem;
       top: 1em;
       border-radius: 3px;
+      margin-top: 5px;
 
       &--dynamic {
         position: relative;
@@ -139,8 +139,9 @@
       }
 
       &:hover {
-        background: rgba(0, 0, 0, 0.15);
+        // background: rgba(0, 0, 0, 0.15);
         transition: 0.3s all;
+        text-decoration: none;
       }
     }
 
@@ -545,7 +546,7 @@
       }
 
       &.animate {
-        path, 
+        path,
         rect,
         foreignObject div {
           animation-play-state: running;
