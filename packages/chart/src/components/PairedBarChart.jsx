@@ -47,8 +47,8 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
   })
 
   // Set label color
-  groupOne.labelColor = getContrastColor('#000', groupOne.color)
-  groupTwo.labelColor = getContrastColor('#000', groupTwo.color)
+  groupOne.labelColor = groupOne.color ? getContrastColor('#000', groupOne.color) : '#000'
+  groupTwo.labelColor = groupTwo.color ? getContrastColor('#000', groupTwo.color) : '#000'
 
   const label = config.yAxis.label ? `${config.yAxis.label}: ` : ''
 
