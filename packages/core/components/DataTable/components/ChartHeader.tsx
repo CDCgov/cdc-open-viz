@@ -2,6 +2,7 @@ import { getChartCellValue } from '../helpers/getChartCellValue'
 import { getSeriesName } from '../helpers/getSeriesName'
 import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import { DownIcon, UpIcon } from './Icons'
+import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
 
 type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; groupBy?; hasRowType? }
 
@@ -68,12 +69,46 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
         {['__series__', ...Object.keys(data)].slice(sliceVal).map((row, index) => {
           let column = config.xAxis?.dataKey
           let text = row !== '__series__' ? getChartCellValue(row, column, config, data) : '__series__'
+          const notApplicableText = 'Not Applicable'
+
+          const handleHeaderClasses = () => {
+            let classes = ['sort']
+            if (sortBy.column === text) {
+              classes.push('sort-asc')
+            } else {
+              classes.push('sort-desc')
+            }
+            return classes.join(' ')
+          }
+
+          const ScreenReaderSortByText = () => {
+            let columnHeaderText = text
+            if (text !== '__series__') {
+              columnHeaderText = text
+            }
+
+            if (text === '__series__' && !config.table.indexLabel) {
+              columnHeaderText = notApplicableText
+            }
+
+            if (text === '__series__' && config.table.indexLabel) {
+              columnHeaderText = config.table.indexLabel
+            }
+
+            return <span className='cdcdataviz-sr-only'>{`Sort by ${columnHeaderText} in ${sortBy.column === text ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} order`}</span>
+          }
+
+          const ColumnHeadingText = () => {
+            if (text === '__series__' && config.table.indexLabel) return config.table.indexLabel
+            if (text === '__series__' && !config.table.indexLabel) return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
+            return text
+          }
+
           return (
             <th
               style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
               key={`col-header-${text}__${index}`}
               tabIndex={0}
-              title={text}
               role='columnheader'
               scope='col'
               onClick={() => {
@@ -84,14 +119,12 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
                   setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
                 }
               }}
-              className={sortBy.column === text ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
+              className={handleHeaderClasses()}
               {...(sortBy.column === text ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
             >
-              {text === '__series__' ? '' : text}
+              <ColumnHeadingText />
               {index === sortBy.colIndex && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
-              <button>
-                <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === text ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
-              </button>
+              <ScreenReaderSortByText />
             </th>
           )
         })}
