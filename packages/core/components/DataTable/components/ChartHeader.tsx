@@ -17,6 +17,43 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
       dataSeriesColumns = groupHeaderRemoved
     }
   }
+
+  const handleHeaderClasses = (sortBy, text) => {
+    let classes = ['sort']
+    if (sortBy.column === text && sortBy.asc) {
+      classes.push('sort-asc')
+    }
+    if (sortBy.column === text && sortBy.desc) {
+      classes.push('sort-desc')
+    }
+    return classes.join(' ')
+  }
+
+  const ScreenReaderSortByText = ({ text, config, sortBy }) => {
+    const notApplicableText = 'Not Applicable'
+    let columnHeaderText = `${text} `
+    if (text !== '__series__' || text !== '') {
+      columnHeaderText = `${text} `
+    }
+
+    if ((text === '__series__' || text === '') && !config.table.indexLabel) {
+      columnHeaderText = notApplicableText
+    }
+
+    if ((text === '__series__' || text === '') && config.table.indexLabel) {
+      columnHeaderText = config.table.indexLabel
+    }
+
+    return <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'}  order`}</span>
+  }
+
+  const ColumnHeadingText = ({ column, text, config }) => {
+    let notApplicableText = 'Not Applicable'
+    if (text === '__series__' && config.table.indexLabel) return `${config.table.indexLabel} `
+    if (text === '__series__' && !config.table.indexLabel) return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
+    return text
+  }
+
   if (isVertical) {
     if (hasRowType) {
       // find the row type column and place it at the beginning of the array
@@ -26,6 +63,7 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
         dataSeriesColumns.splice(rowTypeIndex, 1)
       }
     }
+
     return (
       <tr>
         {dataSeriesColumns.map((column, index) => {
@@ -36,7 +74,6 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
               style={{ minWidth: (config.table.cellMinWidth || 0) + 'px' }}
               key={`col-header-${column}__${index}`}
               tabIndex={0}
-              title={text}
               role='columnheader'
               scope='col'
               onClick={() => {
@@ -49,14 +86,12 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
                   setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false, colIndex: index })
                 }
               }}
-              className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
+              className={handleHeaderClasses(sortBy, text)}
               {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
             >
-              {text}
+              <ColumnHeadingText text={text} column={column} config={config} />
               {column === sortBy.column && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
-              <button>
-                <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
-              </button>
+              <ScreenReaderSortByText sortBy={sortBy} config={config} text={text} />
             </th>
           )
         })}
@@ -69,40 +104,6 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
         {['__series__', ...Object.keys(data)].slice(sliceVal).map((row, index) => {
           let column = config.xAxis?.dataKey
           let text = row !== '__series__' ? getChartCellValue(row, column, config, data) : '__series__'
-          const notApplicableText = 'Not Applicable'
-
-          const handleHeaderClasses = () => {
-            let classes = ['sort']
-            if (sortBy.column === text) {
-              classes.push('sort-asc')
-            } else {
-              classes.push('sort-desc')
-            }
-            return classes.join(' ')
-          }
-
-          const ScreenReaderSortByText = () => {
-            let columnHeaderText = text
-            if (text !== '__series__') {
-              columnHeaderText = text
-            }
-
-            if (text === '__series__' && !config.table.indexLabel) {
-              columnHeaderText = notApplicableText
-            }
-
-            if (text === '__series__' && config.table.indexLabel) {
-              columnHeaderText = config.table.indexLabel
-            }
-
-            return <span className='cdcdataviz-sr-only'>{`Sort by ${columnHeaderText} in ${sortBy.column === text ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} order`}</span>
-          }
-
-          const ColumnHeadingText = () => {
-            if (text === '__series__' && config.table.indexLabel) return config.table.indexLabel
-            if (text === '__series__' && !config.table.indexLabel) return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
-            return text
-          }
 
           return (
             <th
@@ -119,12 +120,12 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
                   setSortBy({ column: text, asc: sortBy.column === text ? !sortBy.asc : false, colIndex: index })
                 }
               }}
-              className={handleHeaderClasses()}
+              className={handleHeaderClasses(sortBy, text)}
               {...(sortBy.column === text ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
             >
-              <ColumnHeadingText />
+              <ColumnHeadingText text={text} column={column} config={config} />
               {index === sortBy.colIndex && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
-              <ScreenReaderSortByText />
+              <ScreenReaderSortByText text={text} config={config} sortBy={sortBy} />
             </th>
           )
         })}
