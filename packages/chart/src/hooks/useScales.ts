@@ -5,6 +5,8 @@ import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
 import { formatDate, parseDate } from '@cdc/core/helpers/cove/date'
 
+import * as d3 from 'd3';
+
 const scaleTypes = {
   TIME: 'time',
   LOG: 'log',
@@ -107,25 +109,19 @@ const useScales = (properties: useScaleProps) => {
 
   //handle bump chart
   if(config.visualizationType === 'Bump Chart'){
-    let xAxisMin = xAxisDataKeysMapped[0]
-    let xAxisMax = xAxisDataKeysMapped[xAxisDataKeysMapped.length - 1]
+    const parsedYears = xAxisDataKeysMapped.map(yearString => new Date(parseInt(yearString), 0, 1));
+    let xAxisMin = parsedYears[0]
+    let xAxisMax = parsedYears[parsedYears.length - 1]
 
-    console.log('xAxisMin ' + xAxisMin)
-    console.log('xAxisMax ' + xAxisMax)
-    const minDate = new Date(xAxisMin).getFullYear();
-    const maxDate = new Date(xAxisMax).getFullYear();
-
-    console.log('min date ' + minDate)
-    console.log('max date ' + maxDate)
     xScale = scaleTime({
-      domain: [minDate, maxDate],
+      domain: [new Date(xAxisMin).getFullYear(),new Date(xAxisMax).getFullYear()],
       range: [0, xMax]
     })
     yScale = scalePoint({
       range: [yMax,0],
       domain: config.data.map(d => d.item),
       padding: 0.5,
-  });
+    });
   }
   // handle Box plot
   if (visualizationType === 'Box Plot') {
