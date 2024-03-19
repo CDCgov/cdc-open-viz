@@ -1672,7 +1672,15 @@ const EditorPanel = () => {
                         {config.visualizationType !== 'Forest Plot' && (
                           <>
                             <label>
-                              <span className='edit-label'>Data Scaling Type</span>
+                              <span className='edit-label'>
+                                Data Scaling Type
+                                <Tooltip style={{ textTransform: 'none', display: 'inline-block' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>Linear scales are employed for quantitative data, while time scales are used for time-series data.</Tooltip.Content>
+                                </Tooltip>
+                              </span>
                               <select
                                 value={config.xAxis.type}
                                 onChange={e =>
