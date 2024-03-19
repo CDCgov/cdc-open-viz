@@ -1,10 +1,17 @@
 {
   "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
   "title": "Planet Radius (Bar Example)",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
   "barHasBorder": "false",
   "isLollipopChart": false,
   "lollipopShape": "circle",
@@ -13,10 +20,16 @@
   "barStyle": "",
   "roundingStyle": "standard",
   "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "showDownloadButton": false
+  },
   "padding": {
     "left": 5,
     "right": 5
   },
+  "suppressedData": [],
+  "preliminaryData": [],
   "yAxis": {
     "hideAxis": false,
     "displayNumbersOnBar": false,
@@ -24,6 +37,7 @@
     "hideTicks": false,
     "size": 50,
     "gridLines": false,
+    "enablePadding": false,
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -38,8 +52,10 @@
     "rightAxisTickColor": "#333",
     "numTicks": "11",
     "axisPadding": 0,
+    "scalePadding": 10,
     "tickRotation": 0,
-    "label": "Measurement (1000km)",
+    "anchors": [],
+    "label": "",
     "rightSeries": "Diameter"
   },
   "boxplot": {
@@ -74,7 +90,7 @@
     "hasLine": false
   },
   "isLegendValue": false,
-  "barThickness": 0.35,
+  "barThickness": 0.035,
   "barHeight": 25,
   "barSpace": 15,
   "heights": {
@@ -82,7 +98,11 @@
     "horizontal": 405
   },
   "xAxis": {
-    "type": "categorical",
+    "sortDates": false,
+    "anchors": [],
+    "type": "date-time",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
@@ -96,8 +116,14 @@
     "numTicks": "",
     "labelOffset": 65,
     "axisPadding": 0,
-    "label": "Planet",
-    "dataKey": "name"
+    "target": 0,
+    "maxTickRotation": 0,
+    "label": "Year",
+    "dataKey": "year",
+    "tickWidthMax": 80,
+    "dateParseFormat": "%Y",
+    "padding": 6,
+    "dateDisplayFormat": "%Y"
   },
   "table": {
     "label": "Data Table",
@@ -106,12 +132,19 @@
     "height": "",
     "caption": "",
     "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "indexLabel": "",
+    "download": false,
+    "showVertical": false,
+    "dateDisplayFormat": "",
     "show": true
   },
   "orientation": "horizontal",
+  "color": "pinkpurple",
+  "columns": {},
   "legend": {
+    "hide": false,
     "behavior": "isolate",
-    "position": "right",
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
@@ -121,7 +154,16 @@
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
-    "hide": false
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "seriesHighlight": [],
+    "position": "right"
+  },
+  "brush": {
+    "height": 25,
+    "data": [],
+    "active": false
   },
   "exclusions": {
     "active": false,
@@ -129,28 +171,156 @@
   },
   "palette": "qualitative-bold",
   "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
   "labels": false,
   "dataFormat": {
     "commas": false,
     "prefix": "",
-    "suffix": "km",
+    "suffix": "",
     "abbreviated": false,
-    "roundTo": 1
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false,
+    "roundTo": "0"
   },
   "confidenceKeys": {},
   "visual": {
     "border": true,
     "accent": true,
-    "background": true
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false
   },
-  "dataUrl": "/examples/feature/__data__/planet-example-data.json",
-  "visualizationType": "Bump Chart",
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "Radius",
-      "type": "Deviation Bar",
-      "axis": "Left"
+      "dataKey": "item",
+      "type": "Bump Chart",
+      "axis": "Left",
+      "tooltip": true
     }
   ],
-  "dataCutoff": "0.5"
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "visualizationType": "Bump Chart",
+  "dataCutoff": "0.5",
+  "data": [
+    {
+      "item": "Brother Sister Younger Siblings",
+      "rankings": [
+        1,
+        2,
+        3
+      ],
+      "year": "2014"
+    },
+    {
+      "item": "Belt Rope Neck Tied",
+      "rankings": [
+        1,
+        2,
+        3
+      ],
+      "year": "2015"
+    }
+  ],
+  "validated": "4.24.3",
+  "dynamicMarginTop": 0
 }

@@ -3,24 +3,27 @@ import { LinePath } from '@visx/shape';
 import { scaleLinear, scalePoint } from '@visx/scale';
 
 import data from './components/bump-chart.json'
+import { Key } from 'react';
 
-const margin = { top: 20, bottom: 20, left: 30, right: 30 };
-const BumpChartImplementation = ({ width=700, height=900 }) => {
-    const xScale = scaleLinear({
-        range: [margin.left, width - margin.right],
-        domain: [0, data.chartData[0].rankings.length - 1],
-      });
+const BumpChartImplementation = ({ width=700, height=900, config, xScale, yScale }) => {
+    //in future: get moved to use scaling file
+    /* const xScale = scaleLinear({
+        range: [0, width],
+        domain: [0, config.data[0].rankings.length],
+      }); */
 
-    const yScale = scalePoint({
-        range: [height - margin.bottom, margin.top],
-        domain: data.chartData.map(d => d.item),
+    /* const yScale = scalePoint({
+        range: [height,0],
+        domain: config.data.map(d => d.item),
         padding: 0.5,
-    });
+    }); */
+
+    console.log(config)
 
     return (
-        <svg width={width} height={height}>
-            <Group>
-                {data.chartData.map(d => (
+        <svg width={width} height={height} >
+            <Group left={Number(config.runtime.yAxis.size) - config.yAxis.axisPadding}>
+                {config.data.map((d: { item: Key; rankings: any[]; }) => (
                 <LinePath
                     key={d.item}
                     data={d.rankings.map((value, index) => ({ x: index, y: value, item: d.item }))}
