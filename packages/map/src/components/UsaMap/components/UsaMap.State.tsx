@@ -9,7 +9,6 @@ import hexTopoJSON from '../data/us-hex-topo.json'
 import { geoCentroid, geoPath } from 'd3-geo'
 import { feature } from 'topojson-client'
 import { AlbersUsa, Mercator } from '@visx/geo'
-import chroma from 'chroma-js'
 import CityList from '../../CityList'
 import BubbleList from '../../BubbleList'
 import { supportedCities, supportedStates } from '../../../data/supported-geos'
@@ -23,6 +22,7 @@ import Territory from './Territory'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { MapContext } from '../../../types/MapContext'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -137,13 +137,8 @@ const UsaMap = () => {
 
     const legendColors = applyLegendToRow(territoryData)
 
-    let textColor = '#FFF'
-
     if (legendColors) {
-      // Use white text if the background is dark, and dark grey if it's light
-      if (chroma.contrast(textColor, legendColors[0]) < 3.5) {
-        textColor = '#202020'
-      }
+      const textColor = getContrastColor('#FFF', legendColors[0])
 
       let needsPointer = false
 
@@ -168,7 +163,7 @@ const UsaMap = () => {
 
       return (
         <>
-          <Shape key={label} label={label} style={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} territory={territory} territoryData={territoryData} />
+          <Shape key={label} label={label} style={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} territory={territory} territoryData={territoryData} tabIndex={-1} />
         </>
       )
     }
@@ -257,12 +252,7 @@ const UsaMap = () => {
 
           const iconSize = 8
 
-          let textColor = '#FFF'
-
-          // Dynamic text color
-          if (chroma.contrast(textColor, bgColor) < 3.5) {
-            textColor = '#202020' // dark gray
-          }
+          const textColor = getContrastColor('#FFF', bgColor)
 
           return (
             <>
@@ -311,8 +301,8 @@ const UsaMap = () => {
         }
 
         return (
-          <g data-name={geoName} key={key}>
-            <g className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
+          <g data-name={geoName} key={key} tabIndex={-1}>
+            <g className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip} tabIndex={-1}>
               {/* state path */}
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
 
@@ -321,7 +311,7 @@ const UsaMap = () => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
                 const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
-                const patternColor = chroma.contrast('#000000', currentFill) < 3.5 ? '#FFF' : '#000'
+                const patternColor = getContrastColor('#000', currentFill)
 
                 return (
                   hasMatchingValues && (
@@ -343,8 +333,8 @@ const UsaMap = () => {
 
       // Default return state, just geo with no additional information
       return (
-        <g data-name={geoName} key={key}>
-          <g className='geo-group' style={styles}>
+        <g data-name={geoName} key={key} tabIndex={-1}>
+          <g className='geo-group' style={styles} tabIndex={-1}>
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
             {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}
           </g>
@@ -392,12 +382,7 @@ const UsaMap = () => {
 
     if (undefined === abbr) return null
 
-    let textColor = '#FFF'
-
-    // Dynamic text color
-    if (chroma.contrast(textColor, bgColor) < 3.5) {
-      textColor = '#202020' // dark gray
-    }
+    let textColor = getContrastColor('#FFF', bgColor)
 
     // always make HI black since it is off to the side
     if (abbr === 'US-HI' && !state.general.displayAsHex) {
@@ -415,7 +400,7 @@ const UsaMap = () => {
 
     if (undefined === offsets[abbr] || isHex) {
       return (
-        <g transform={`translate(${centroid})`}>
+        <g transform={`translate(${centroid})`} tabIndex={-1}>
           <text x={x} y={y} fontSize={14} strokeWidth='0' style={{ fill: textColor }} textAnchor='middle'>
             {abbr.substring(3)}
           </text>
@@ -426,7 +411,7 @@ const UsaMap = () => {
     let [dx, dy] = offsets[abbr]
 
     return (
-      <g>
+      <g tabIndex={-1}>
         <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke='rgba(0,0,0,.5)' strokeWidth={1} />
         <text x={4} strokeWidth='0' fontSize={13} style={{ fill: '#202020' }} alignmentBaseline='middle' transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
           {abbr.substring(3)}

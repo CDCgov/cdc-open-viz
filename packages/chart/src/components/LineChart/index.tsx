@@ -216,7 +216,7 @@ const LineChart = (props: LineChartProps) => {
 
               {/* circles for preliminaryData data */}
               {circleData.map((d, i) => {
-                return <circle key={i} cx={xPos(d)} cy={yScale(Number(getYAxisData(d, seriesKey)))} r={6} strokeWidth={2} stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'} fill='#fff' />
+                return <circle key={i} cx={xPos(d)} cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey)))} r={6} strokeWidth={2} stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'} fill='#fff' />
               })}
 
               {/* ANIMATED LINE */}

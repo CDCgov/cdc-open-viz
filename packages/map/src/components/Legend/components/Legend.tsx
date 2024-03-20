@@ -5,6 +5,7 @@ import parse from 'html-react-parser'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import LegendItemHex from './LegendItem.Hex'
+import Button from '@cdc/core/components/elements/Button'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import ConfigContext from '../../../context'
@@ -94,6 +95,14 @@ const Legend = () => {
           onClick={() => {
             toggleLegendActive(idx, legendLabel)
           }}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              toggleLegendActive(idx, legendLabel)
+            }
+          }}
+          role='button'
+          tabIndex={0}
         >
           <LegendCircle fill={entry.color} /> <span>{legendLabel}</span>
         </li>
@@ -115,7 +124,7 @@ const Legend = () => {
 
         legendItems.push(
           <>
-            <li className={`legend-container__li legend-container__li--geo-pattern`}>
+            <li className={`legend-container__li legend-container__li--geo-pattern`} aria-label='You are on a pattern button. We dont support toggling patterns on this legend at the moment, but provide the area as being focusable for congruity.' tabIndex={0}>
               <span className='legend-item' style={{ border: 'unset' }}>
                 <svg width={legendSize} height={legendSize}>
                   {pattern === 'waves' && <PatternWaves id={`${dataKey}--${patternDataIndex}`} height={sizes[size] ?? 10} width={sizes[size] ?? 10} fill={defaultPatternColor} />}
@@ -137,7 +146,9 @@ const Legend = () => {
   const { legendClasses } = useDataVizClasses(state, viewport)
 
   const handleReset = e => {
-    e.preventDefault()
+    if (e) {
+      e.preventDefault()
+    }
     resetLegendToggles()
     setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
   }
@@ -158,11 +169,6 @@ const Legend = () => {
       <div className='legends'>
         <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0}>
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
-            {runtimeLegend.disabledAmt > 0 && (
-              <button onClick={handleReset} className={legendClasses.resetButton.join(' ') || ''}>
-                Clear
-              </button>
-            )}
             {legend.title && <span className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</span>}
             {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>}
             {legend.dynamicDescription === true &&
@@ -215,6 +221,7 @@ const Legend = () => {
                 </div>
               </>
             )}
+            {runtimeLegend.disabledAmt > 0 && <Button onClick={handleReset}>Reset</Button>}
           </section>
         </aside>
         {state.hexMap.shapeGroups?.length > 0 && state.hexMap.type === 'shapes' && state.general.displayAsHex && <LegendItemHex state={state} runtimeLegend={runtimeLegend} viewport={viewport} />}

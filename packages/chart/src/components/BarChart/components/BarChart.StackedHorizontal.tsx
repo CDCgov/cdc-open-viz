@@ -4,9 +4,7 @@ import { useBarChart } from '../../../hooks/useBarChart'
 import { BarStackHorizontal } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
-
-// third party
-import chroma from 'chroma-js'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 // types
 import BarChartContext, { type BarChartContextValues } from './context'
@@ -43,15 +41,15 @@ const BarChartStackedHorizontal = () => {
           {barStacks =>
             barStacks.map(barStack =>
               updateBars(barStack.bars).map((bar, index) => {
-                let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
-                let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
+                const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
+                const displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                 config.barHeight = Number(config.barHeight)
-                let labelColor = '#000000'
+                const labelColor = getContrastColor('#000', colorScale(config.runtime.seriesLabels[bar.key]))
                 // tooltips
                 const xAxisValue = formatNumber(data[bar.index][bar.key], 'left')
                 const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
-                let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                const textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
 
                 const additionalColTooltip = getAdditionalColumn(hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${xAxisValue}`
@@ -60,10 +58,6 @@ const BarChartStackedHorizontal = () => {
                   <li class="tooltip-body ">${tooltipBody}</li>
                   <li class="tooltip-body ">${additionalColTooltip}</li>
                     </li></ul>`
-
-                if (chroma.contrast(labelColor, colorScale(config.runtime.seriesLabels[bar.key])) < 4.9) {
-                  labelColor = '#FFFFFF'
-                }
 
                 return (
                   <>
