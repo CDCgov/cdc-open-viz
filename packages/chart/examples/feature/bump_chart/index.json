@@ -4,7 +4,7 @@
   "chartMessage": {
     "noData": "No Data Available"
   },
-  "title": "Planet Radius (Bar Example)",
+  "title": "Bump Chart",
   "showTitle": true,
   "showDownloadMediaButton": false,
   "theme": "theme-blue",
@@ -55,7 +55,7 @@
     "scalePadding": 10,
     "tickRotation": 0,
     "anchors": [],
-    "label": "",
+    "label": "Ranking",
     "rightSeries": "Diameter"
   },
   "boxplot": {
@@ -90,7 +90,7 @@
     "hasLine": false
   },
   "isLegendValue": false,
-  "barThickness": 0.035,
+  "barThickness": 0.35,
   "barHeight": 25,
   "barSpace": 15,
   "heights": {
@@ -100,7 +100,7 @@
   "xAxis": {
     "sortDates": false,
     "anchors": [],
-    "type": "date-time",
+    "type": "categorical",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
@@ -135,7 +135,7 @@
     "showDataTableLink": true,
     "indexLabel": "",
     "download": false,
-    "showVertical": false,
+    "showVertical": true,
     "dateDisplayFormat": "",
     "show": true
   },
@@ -309,20 +309,28 @@
   "dataCutoff": "0.5",
   "data": [
     {
-      "Series 1": 2,
+      "Series 1": "2",
       "year": "2014"
     },
     {
-      "Series 1": 1,
+      "Series 1": "2",
       "year": "2015"
     },
     {
-      "Series 2": 1,
+      "Series 1": "3",
+      "year": "2016"
+    },
+    {
+      "Series 2": "3",
       "year": "2014"
     },
     {
-      "Series 2": 2,
+      "Series 2": "3",
       "year": "2015"
+    },
+    {
+      "Series 2": "2",
+      "year": "2016"
     }
   ],
   "validated": "4.24.3",
