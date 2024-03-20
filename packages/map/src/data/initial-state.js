@@ -5,7 +5,7 @@ export default {
     title: '',
     showTitle: true,
     showSidebar: true,
-    showDownloadButton: false,
+    showDownloadButton: true,
     showDownloadMediaButton: false,
     displayAsHex: false,
     displayStateLabels: false,
@@ -78,7 +78,7 @@ export default {
     showDataTableLink: true,
     showFullGeoNameInCSV: false,
     forceDisplay: true,
-    download: false,
+    download: true,
     indexLabel: ''
   },
   tooltips: {
