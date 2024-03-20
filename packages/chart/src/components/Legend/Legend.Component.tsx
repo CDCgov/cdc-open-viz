@@ -196,12 +196,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
         }}
       </LegendOrdinal>
       {seriesHighlight.length > 0 && (
-        <Button
-          onClick={labels => {
-            highlightReset(labels)
-          }}
-          style={{ marginTop: '1rem' }}
-        >
+        <Button onClick={labels => highlightReset(labels)} style={{ marginTop: '1rem' }}>
           Reset
         </Button>
       )}
