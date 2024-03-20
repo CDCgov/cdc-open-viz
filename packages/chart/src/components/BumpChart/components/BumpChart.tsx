@@ -10,7 +10,7 @@ type BumpChartProps = {
   yScale: () => unknown[]
 }
 
-const BumpChart = props => {
+const BumpChart: React.FC<BumpChartProps> = props => {
   const { width = 700, height = 900, config, xScale, yScale } = props
 
   return (
