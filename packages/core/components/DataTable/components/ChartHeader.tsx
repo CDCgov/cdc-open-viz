@@ -44,6 +44,8 @@ const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, has
       columnHeaderText = config.table.indexLabel
     }
 
+    if (columnHeaderText === notApplicableText) return
+
     return <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'}  order`}</span>
   }
 
