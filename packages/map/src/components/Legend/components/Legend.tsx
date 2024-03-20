@@ -1,5 +1,5 @@
 //TODO: Move legends to core
-import { useContext } from 'react'
+import { forwardRef, useContext } from 'react'
 import parse from 'html-react-parser'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -14,7 +14,7 @@ import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from
 import { Group } from '@visx/group'
 import './index.scss'
 
-const Legend = () => {
+const Legend = forwardRef((props, ref) => {
   // prettier-ignore
   const {
     displayDataAsText,
@@ -146,11 +146,15 @@ const Legend = () => {
   const { legendClasses } = useDataVizClasses(state, viewport)
 
   const handleReset = e => {
+    const legend = ref.current
     if (e) {
       e.preventDefault()
     }
     resetLegendToggles()
     setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.')
+    if (legend) {
+      legend.focus()
+    }
   }
 
   const pin = <path className='marker' d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z' strokeWidth={2} stroke={'black'} transform={`scale(0.5)`} />
@@ -167,7 +171,7 @@ const Legend = () => {
   return (
     <ErrorBoundary component='Sidebar'>
       <div className='legends'>
-        <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0}>
+        <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0} ref={ref}>
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
             {legend.title && <span className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</span>}
             {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>}
@@ -228,6 +232,6 @@ const Legend = () => {
       </div>
     </ErrorBoundary>
   )
-}
+})
 
 export default Legend
