@@ -79,6 +79,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   type Config = typeof config
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
+  const legendRef = useRef(null)
 
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
@@ -713,6 +714,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
+    try {
+      const legend = legendRef.current
+      if (!legend) throw new Error('No legend available to set previous focus on.')
+      legend.focus()
+    } catch (e) {
+      console.error('COVE:', e.message)
+    }
     setSeriesHighlight([])
   }
 
@@ -1080,7 +1088,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               )}
               {/* Sankey */}
               {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>}
-              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend />}
+              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} />}
             </div>
             {/* Link */}
             {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
