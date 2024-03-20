@@ -139,7 +139,6 @@
     "dateDisplayFormat": "",
     "show": true
   },
-  "orientation": "horizontal",
   "color": "pinkpurple",
   "columns": {},
   "legend": {
