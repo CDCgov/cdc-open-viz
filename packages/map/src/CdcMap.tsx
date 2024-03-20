@@ -135,6 +135,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   const [dimensions, setDimensions] = useState()
+  const legendRef = useRef(null)
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
@@ -1695,7 +1696,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 )}
               </section>
 
-              {general.showSidebar && 'navigation' !== general.type && <Legend />}
+              {general.showSidebar && 'navigation' !== general.type && <Legend ref={legendRef} />}
             </div>
 
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
