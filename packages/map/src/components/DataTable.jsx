@@ -228,7 +228,7 @@ const DataTable = props => {
                     return (
                       <th
                         key={`col-header-${column}`}
-                        tabIndex='0'
+                        tabIndex={0}
                         title={text}
                         role='columnheader'
                         scope='col'
@@ -244,9 +244,7 @@ const DataTable = props => {
                         {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
                       >
                         {text}
-                        <button>
-                          <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
-                        </button>
+                        <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} order`}</span>
                       </th>
                     )
                   })}
