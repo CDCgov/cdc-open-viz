@@ -156,7 +156,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       }
 
       if (geoData?.[state.columns.longitude.name] && geoData?.[state.columns.latitude.name]) {
-        let coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
+        const coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
         let translate = `translate(${projection(coords)})`
         return (
           <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
