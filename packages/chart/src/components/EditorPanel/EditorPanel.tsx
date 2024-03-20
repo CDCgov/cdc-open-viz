@@ -865,7 +865,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar', 'Deviation Bar']
+  const chartsWithOptions = ['Bump Chart', 'Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting', 'Scatter Plot', 'Paired Bar', 'Deviation Bar']
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
