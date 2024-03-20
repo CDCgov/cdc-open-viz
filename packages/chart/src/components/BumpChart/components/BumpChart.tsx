@@ -16,8 +16,8 @@ const BumpChart: React.FC<BumpChartProps> = props => {
   return (
     <svg width={width} height={height}>
       <Group left={Number(config.runtime.yAxis.size) - config.yAxis.axisPadding}>
-        {config.data.map(d => {
-          return <LinePath key={d.item} data={d.rankings.map((value, index) => ({ x: index, y: value, item: d.item }))} x={d => xScale(d.x)} y={d => yScale(d.item)} stroke='black' strokeWidth={2} fill='transparent' />
+        {config.series.map((d, seriesIndex) => {
+          return <LinePath key={d[seriesIndex]} data={config.series.map((value, index) => ({ x: index, y: value, item: d[seriesIndex] }))} x={d => xScale(d.x)} y={d => yScale(d.item)} stroke='black' strokeWidth={2} fill='transparent' />
         })}
       </Group>
     </svg>

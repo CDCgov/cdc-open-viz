@@ -38,8 +38,8 @@
     "size": 50,
     "gridLines": false,
     "enablePadding": false,
-    "min": "",
-    "max": "",
+    "min": "0",
+    "max": "2",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
@@ -113,14 +113,14 @@
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "numTicks": "",
+    "numTicks": "2",
     "labelOffset": 65,
     "axisPadding": 0,
     "target": 0,
     "maxTickRotation": 0,
     "label": "Year",
     "dataKey": "year",
-    "tickWidthMax": 80,
+    "tickWidthMax": 41,
     "dateParseFormat": "%Y",
     "padding": 6,
     "dateDisplayFormat": "%Y"
@@ -139,6 +139,7 @@
     "dateDisplayFormat": "",
     "show": true
   },
+  "orientation": "vertical",
   "color": "pinkpurple",
   "columns": {},
   "legend": {
@@ -198,7 +199,13 @@
   "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "item",
+      "dataKey": "Series 1",
+      "type": "Bump Chart",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Series 2",
       "type": "Bump Chart",
       "axis": "Left",
       "tooltip": true
@@ -302,21 +309,19 @@
   "dataCutoff": "0.5",
   "data": [
     {
-      "item": "Brother Sister Younger Siblings",
-      "rankings": [
-        1,
-        2,
-        3
-      ],
+      "Series 1": 2,
       "year": "2014"
     },
     {
-      "item": "Belt Rope Neck Tied",
-      "rankings": [
-        1,
-        2,
-        3
-      ],
+      "Series 1": 1,
+      "year": "2015"
+    },
+    {
+      "Series 2": 1,
+      "year": "2014"
+    },
+    {
+      "Series 2": 2,
       "year": "2015"
     }
   ],
