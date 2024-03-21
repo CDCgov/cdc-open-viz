@@ -125,7 +125,7 @@ $mediumGray: '#f5f5f5';
   justify-content: center;
   position: relative;
   background-color: transparent;
-  // transition: background-color $editorAnimationTimer $transition-expo-out;
+  transition: background-color 400ms cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden auto;
   width: calc(100% - $editorWidth);
   left: $editorWidth;
@@ -146,7 +146,7 @@ $mediumGray: '#f5f5f5';
   min-height: 100vh;
   margin-right: auto;
   margin-left: auto;
-  // transition: max-width $editorAnimationTimer $transition-expo-out;
+  transition: max-width $editorAnimationTimer cubic-bezier(0.16, 1, 0.3, 1);
 
   @at-root {
     .cove-dashboard #{&} {
@@ -203,7 +203,7 @@ $mediumGray: '#f5f5f5';
       background-image: repeating-linear-gradient(90deg, #949da4, #949da4 18px, transparent 18px, transparent 26px);
       transform: translateX(-50%);
       transition: opacity $editorAnimationTimer ease;
-      opacity: 0;
+      opacity: 1;
     }
 
     .cove-editor.panel-shown #{&}::before,
@@ -235,7 +235,7 @@ $mediumGray: '#f5f5f5';
       border-style: solid;
       border-width: 0;
       transition: opacity $editorAnimationTimer ease;
-      opacity: 0;
+      opacity: 1;
     }
 
     .cove-editor__content[data-grid] #{&}::before {
