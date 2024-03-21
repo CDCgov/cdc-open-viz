@@ -1,6 +1,18 @@
 $editorAnimationTimer: 400ms;
 $editorWidth: 350px;
-$mediumGray: '#f5f5f5';
+$mediumGray: #e6e6e6;
+
+.cdc-open-viz-module.isEditor {
+  background: $mediumGray !important;
+}
+
+.cdc-open-viz-module .editor-panel {
+  background-color: white;
+}
+
+.cdc-open-viz-module .form-container {
+  height: 100%;
+}
 
 .cove-editor {
   display: grid;

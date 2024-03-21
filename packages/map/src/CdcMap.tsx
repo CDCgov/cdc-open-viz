@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import * as d3 from 'd3'
+import View from '@cdc/core/components/View'
 
 // IE11
 import 'whatwg-fetch'
@@ -1651,105 +1652,107 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     <ConfigContext.Provider value={mapProps}>
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
         {isEditor && <EditorPanel />}
-        {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-          <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
-              <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
-            )}
-            {/* prettier-ignore */}
-            <Title
+        <View.Responsive isEditor={isEditor}>
+          {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
+            <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
+              {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
+                <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
+              )}
+              {/* prettier-ignore */}
+              <Title
               title={title}
               superTitle={general.superTitle}
               config={config}
               classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
             />
-            <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
+              <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
 
-            {general.introText && <section className='introText'>{parse(general.introText)}</section>}
+              {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
-            {/* prettier-ignore */}
-            {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
+              {/* prettier-ignore */}
+              {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
 
-            <div
-              role='region'
-              tabIndex='0'
-              className={mapContainerClasses.join(' ')}
-              onClick={e => closeModal(e)}
-              onKeyDown={e => {
-                if (e.keyCode === 13) {
-                  closeModal(e)
-                }
-              }}
-            >
-              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-              <section className='outline-none geography-container' ref={mapSvg} tabIndex='0' style={{ width: '100%' }}>
-                {currentViewport && (
-                  <>
-                    {modal && <Modal />}
-                    {'single-state' === geoType && <UsaMap.SingleState />}
-                    {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap.State />}
-                    {'us-region' === geoType && <UsaMap.Region />}
-                    {'us-county' === geoType && <UsaMap.County />}
-                    {'world' === geoType && <WorldMap />}
-                    {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
-                  </>
-                )}
-              </section>
+              <div
+                role='region'
+                tabIndex='0'
+                className={mapContainerClasses.join(' ')}
+                onClick={e => closeModal(e)}
+                onKeyDown={e => {
+                  if (e.keyCode === 13) {
+                    closeModal(e)
+                  }
+                }}
+              >
+                {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+                <section className='outline-none geography-container' ref={mapSvg} tabIndex='0' style={{ width: '100%' }}>
+                  {currentViewport && (
+                    <>
+                      {modal && <Modal />}
+                      {'single-state' === geoType && <UsaMap.SingleState />}
+                      {'us' === geoType && 'us-geocode' !== state.general.type && <UsaMap.State />}
+                      {'us-region' === geoType && <UsaMap.Region />}
+                      {'us-county' === geoType && <UsaMap.County />}
+                      {'world' === geoType && <WorldMap />}
+                      {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+                    </>
+                  )}
+                </section>
 
-              {general.showSidebar && 'navigation' !== general.type && <Legend ref={legendRef} />}
-            </div>
+                {general.showSidebar && 'navigation' !== general.type && <Legend ref={legendRef} />}
+              </div>
 
-            {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
+              {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
-            {/* Link */}
-            {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+              {/* Link */}
+              {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
-            {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+              {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
-            <MediaControls.Section classes={['download-buttons']}>
-              {state.general.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
-              {state.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
-            </MediaControls.Section>
+              <MediaControls.Section classes={['download-buttons']}>
+                {state.general.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
+                {state.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
+              </MediaControls.Section>
 
-            {state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading && (
-              <DataTable
-                config={state}
-                rawData={state.data}
-                navigationHandler={navigationHandler}
-                expandDataTable={general.expandDataTable ? general.expandDataTable : table.expanded ? table.expanded : false}
-                headerColor={general.headerColor}
-                columns={state.columns}
-                showDownloadButton={general.showDownloadButton}
-                showFullGeoNameInCSV={table.showFullGeoNameInCSV}
-                runtimeLegend={runtimeLegend}
-                runtimeData={runtimeData}
-                displayDataAsText={displayDataAsText}
-                displayGeoName={displayGeoName}
-                applyLegendToRow={applyLegendToRow}
-                tableTitle={table.label}
-                indexTitle={table.indexLabel}
-                vizTitle={general.title}
-                viewport={currentViewport}
-                formatLegendLocation={formatLegendLocation}
-                setFilteredCountryCode={setFilteredCountryCode}
-                tabbingId={tabId}
-                showDownloadImgButton={state.general.showDownloadImgButton}
-                showDownloadPdfButton={state.general.showDownloadPdfButton}
-                innerContainerRef={innerContainerRef}
-                outerContainerRef={outerContainerRef}
-                imageRef={imageId}
-                isDebug={isDebug}
-                wrapColumns={table.wrapColumns}
-              />
-            )}
+              {state.runtime.editorErrorMessage.length === 0 && true === table.forceDisplay && general.type !== 'navigation' && false === loading && (
+                <DataTable
+                  config={state}
+                  rawData={state.data}
+                  navigationHandler={navigationHandler}
+                  expandDataTable={general.expandDataTable ? general.expandDataTable : table.expanded ? table.expanded : false}
+                  headerColor={general.headerColor}
+                  columns={state.columns}
+                  showDownloadButton={general.showDownloadButton}
+                  showFullGeoNameInCSV={table.showFullGeoNameInCSV}
+                  runtimeLegend={runtimeLegend}
+                  runtimeData={runtimeData}
+                  displayDataAsText={displayDataAsText}
+                  displayGeoName={displayGeoName}
+                  applyLegendToRow={applyLegendToRow}
+                  tableTitle={table.label}
+                  indexTitle={table.indexLabel}
+                  vizTitle={general.title}
+                  viewport={currentViewport}
+                  formatLegendLocation={formatLegendLocation}
+                  setFilteredCountryCode={setFilteredCountryCode}
+                  tabbingId={tabId}
+                  showDownloadImgButton={state.general.showDownloadImgButton}
+                  showDownloadPdfButton={state.general.showDownloadPdfButton}
+                  innerContainerRef={innerContainerRef}
+                  outerContainerRef={outerContainerRef}
+                  imageRef={imageId}
+                  isDebug={isDebug}
+                  wrapColumns={table.wrapColumns}
+                />
+              )}
 
-            {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
-          </section>
-        )}
+              {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
+            </section>
+          )}
 
-        <div aria-live='assertive' className='cdcdataviz-sr-only'>
-          {accessibleStatus}
-        </div>
+          <div aria-live='assertive' className='cdcdataviz-sr-only'>
+            {accessibleStatus}
+          </div>
+        </View.Responsive>
       </div>
     </ConfigContext.Provider>
   )

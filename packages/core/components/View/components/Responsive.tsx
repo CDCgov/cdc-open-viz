@@ -13,6 +13,8 @@ const breakpoints = [
   '1280' // xl
 ]
 
+const os = navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null
+
 const Responsive = ({ children, isEditor }) => {
   const [displayPanel, setDisplayPanel] = useState(true)
   const [displayGrid, setDisplayGrid] = useState(false)
@@ -43,7 +45,7 @@ const Responsive = ({ children, isEditor }) => {
     console.log('key pressed', key)
     if (key.code === 'Escape') setDisplayPanel(display => !display)
 
-    const viewportCommandKey = false
+    const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
 
     if (viewportCommandKey) {
       let keyIndex = key.key
@@ -165,7 +167,9 @@ const Responsive = ({ children, isEditor }) => {
           <p className={displayPanel ? 'hotkey--active' : null}>esc</p>
           <p className={displayGrid ? 'hotkey--active' : null}>G</p>
           <p className={rotateAnimation ? 'hotkey--active' : null}>R</p>
-          <p className={viewportPreview ? 'hotkey--active' : null}></p>
+          <p className={viewportPreview ? 'hotkey--active' : null}>
+            {os === 'MacOS' ? <Icon style={{ marginRight: '0.25rem' }} display='command' size={12} /> : 'Alt'} + {viewportPreview ? breakpoints.indexOf(viewportPreview) + 1 : `[1 - ${breakpoints.length}]`}
+          </p>
         </div>
       </div>
 
