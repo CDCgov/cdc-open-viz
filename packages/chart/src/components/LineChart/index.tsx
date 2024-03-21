@@ -62,7 +62,7 @@ const LineChart = (props: LineChartProps) => {
           let displayArea = legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
           const circleData = filterCircles(config.preliminaryData, rawData, seriesKey)
           // styles for preliminary Data  items
-          let styles = createStyles({ preliminaryData: config.preliminaryData, data: tableData, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), handleLineType, lineType, seriesKey })
+          let styles = createStyles({ preliminaryData: config.preliminaryData, data: tableData, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), strokeWidth: seriesData[0].weight || 2, handleLineType, lineType, seriesKey })
 
           let xPos = d => {
             return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
@@ -203,7 +203,7 @@ const LineChart = (props: LineChartProps) => {
                     x={d => xPos(d)}
                     y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
                     stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
-                    strokeWidth={2}
+                    strokeWidth={seriesData[0].weight || 2}
                     strokeOpacity={1}
                     shapeRendering='geometricPrecision'
                     strokeDasharray={lineType ? handleLineType(lineType) : 0}
@@ -216,14 +216,14 @@ const LineChart = (props: LineChartProps) => {
 
               {/* circles for preliminaryData data */}
               {circleData.map((d, i) => {
-                return <circle key={i} cx={xPos(d)} cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey)))} r={6} strokeWidth={2} stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'} fill='#fff' />
+                return <circle key={i} cx={xPos(d)} cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey)))} r={6} strokeWidth={seriesData[0].weight || 2} stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'} fill='#fff' />
               })}
 
               {/* ANIMATED LINE */}
               {config.animate && (
                 <LinePath
                   className='animation'
-                  curve={seriesData.lineType}
+                  curve={seriesData[0].lineType}
                   data={data}
                   x={d => xPos(d)}
                   y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
