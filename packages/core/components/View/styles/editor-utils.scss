@@ -1,7 +1,7 @@
 $editorAnimationTimer: 400ms;
-$primary: 'blue';
+$primary: #3e92d5;
 
-.cove-editor-utils__hotkeys {
+.cdc-open-viz-module .cove-editor-utils__hotkeys {
   display: inline-flex;
   flex-flow: row nowrap;
   position: fixed;
@@ -53,7 +53,7 @@ $primary: 'blue';
   }
 }
 
-.cove-editor-utils__breakpoints {
+.cdc-open-viz-module .cove-editor-utils__breakpoints {
   position: fixed;
   bottom: 2rem;
   right: 4rem;
@@ -91,7 +91,7 @@ $primary: 'blue';
   list-style: none;
 }
 
-.cove-editor-utils__breakpoints-item {
+.cdc-open-viz-module .cove-editor-utils__breakpoints-item {
   display: block;
   position: relative;
   margin-right: 1rem;
