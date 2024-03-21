@@ -1,0 +1,490 @@
+$editorAnimationTimer: 400ms;
+$editorWidth: 350px;
+$mediumGray: '#f5f5f5';
+
+.cove-editor {
+  display: grid;
+  grid-template-areas: 'panel content';
+  grid-template-columns: auto 1fr;
+  position: relative;
+  height: 100vh;
+  max-height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+
+  @at-root {
+    .cove-dashboard #{&} {
+      height: calc(100vh - 3rem);
+    }
+
+    .cove-tabs #{&} {
+      // height: calc(100vh - #{$wizardTabsHeight});
+    }
+  }
+}
+
+.cove-editor__toggle {
+  position: absolute;
+  top: 0.5rem;
+  left: 309px;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #000;
+  background-color: #f2f2f2;
+  border: 0;
+  border-radius: 999px;
+  transition: left 300ms ease 60ms, background-color 200ms ease;
+  box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
+  user-select: none;
+  cursor: pointer;
+  z-index: 8;
+
+  &:before {
+    content: '\00ab';
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  &.collapsed {
+    left: 1rem;
+    margin-left: 0;
+
+    &:before {
+      content: '\00bb';
+    }
+  }
+
+  &:hover {
+    background-color: #fff;
+  }
+}
+
+.cove-editor__panel {
+  grid-area: panel;
+  position: relative;
+  width: 0;
+  max-height: 100vh;
+  padding-top: 2.5rem;
+  background-color: #fff;
+  //border-right: 1px solid #c2c2c2;
+  transition: width $editorAnimationTimer ease;
+  overflow: hidden;
+  box-shadow: 1px 0 0 rgb(0 0 0 / 15%);
+  z-index: 7;
+
+  @at-root {
+    .cove-editor {
+      width: $editorWidth;
+    }
+  }
+}
+
+.cove-editor__panel-heading {
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: $editorWidth;
+  padding: 0.5rem 1.125rem;
+  margin: 0;
+  font-size: 1.125em;
+  line-height: 1.5rem;
+  color: #fff;
+  background-color: $mediumGray;
+  user-select: none;
+  z-index: 1;
+}
+
+.cove-editor__panel-container {
+  float: right;
+  width: $editorWidth - 1px;
+  min-width: $editorWidth - 1px;
+  height: 100%;
+  overflow: hidden auto;
+}
+
+.cove-editor__panel-config {
+}
+
+.cove-editor__divider {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 0;
+  border-top: 1px solid #e2e2e2;
+}
+
+.cove-editor__content {
+  display: flex;
+  position: relative;
+  height: 100vh;
+  grid-area: content;
+  justify-content: center;
+  position: relative;
+  background-color: transparent;
+  // transition: background-color $editorAnimationTimer $transition-expo-out;
+  overflow: hidden auto;
+  width: calc(100% - $editorWidth);
+  left: $editorWidth;
+  @at-root {
+    .cove-editor.panel-shown #{&} {
+      background-color: #e7e7e7;
+    }
+  }
+}
+
+.cove-editor__content-wrap--x {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  min-width: 35rem;
+  max-width: 50%;
+  min-height: 100vh;
+  margin-right: auto;
+  margin-left: auto;
+  // transition: max-width $editorAnimationTimer $transition-expo-out;
+
+  @at-root {
+    .cove-dashboard #{&} {
+      min-height: calc(100vh - 3rem);
+    }
+
+    .cove-tabs #{&} {
+      // min-height: calc(100vh - #{$wizardTabsHeight});
+    }
+
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      width: 1px;
+      height: 100%;
+      top: 0;
+      display: block;
+      position: absolute;
+      background-image: repeating-linear-gradient(0deg, #949da4, #949da4 18px, transparent 18px, transparent 26px);
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 1;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -1px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -1px;
+    }
+  }
+}
+
+.cove-editor__content-wrap--y {
+  position: relative;
+  width: 100%;
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 50%;
+      width: 100vw;
+      height: 1px;
+      background-image: repeating-linear-gradient(90deg, #949da4, #949da4 18px, transparent 18px, transparent 26px);
+      transform: translateX(-50%);
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 0;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      top: -1px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      bottom: -1px;
+    }
+  }
+}
+
+.cove-editor__grid-caret--top {
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -20px;
+      width: 14px;
+      height: 14px;
+      border-color: #949da4;
+      border-style: solid;
+      border-width: 0;
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 0;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -20px;
+      border-right-width: 2px;
+      border-bottom-width: 2px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -20px;
+      border-bottom-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+  }
+}
+
+.cove-editor__grid-caret--bottom {
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: -20px;
+      width: 14px;
+      height: 14px;
+      border-color: #949da4;
+      border-style: solid;
+      border-width: 0;
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 0;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -20px;
+      border-top-width: 2px;
+      border-right-width: 2px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -20px;
+      border-top-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+  }
+}
+
+// TODO: What is this stuff? -----------------------------------------------
+.TODO-make-components {
+  .divider-heading {
+    display: block;
+    margin-top: 1em;
+    font-size: 1em;
+  }
+
+  .sort-list {
+    list-style: none;
+
+    > li {
+      margin-right: 0.3em;
+      margin-bottom: 0.3em;
+    }
+
+    li > div {
+      display: block;
+      box-sizing: border-box;
+      padding: 0.4em 0.6em;
+      margin-bottom: 0.3em;
+      font-size: 0.8em;
+      background: #f1f1f1;
+      border: 1px solid #d1d1d1;
+      border-radius: 2px;
+      cursor: move;
+    }
+  }
+
+  .info {
+    padding-top: 10px;
+    font-size: 0.8em;
+    font-style: italic;
+    line-height: 1.4em;
+  }
+
+  .react-tags__search {
+    width: 100%;
+  }
+
+  .react-tags {
+    position: relative;
+    cursor: text;
+
+    input.react-tags__search-input {
+      font-size: 0.8rem;
+    }
+
+    span {
+      display: inline;
+    }
+
+    &.is-focused {
+      border-color: rgba(0, 0, 0, 0.7);
+    }
+  }
+
+  .react-tags__selected {
+    display: inline;
+  }
+
+  .react-tags__selected-tag {
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 0.4em 0.6em;
+    margin-right: 0.3em;
+    margin-bottom: 0.3em;
+    font-size: 0.8em;
+    background: #f1f1f1;
+    border: 1px solid #d1d1d1;
+    border-radius: 2px;
+
+    &::after {
+      content: '\2715';
+      margin-left: 8px;
+      color: #aaa;
+    }
+
+    &:hover,
+    &:focus {
+      border-color: #b1b1b1;
+    }
+  }
+
+  .react-tags__search {
+    display: inline-block;
+    max-width: 100%;
+
+    input {
+      max-width: 100%;
+      padding: 0.5em 0.3em;
+      margin: 0;
+      font-size: inherit;
+      line-height: inherit;
+      outline: none;
+    }
+
+    input::-ms-clear {
+      display: none;
+    }
+  }
+
+  @media screen and (min-width: 30em) {
+    .react-tags__search {
+      position: relative;
+    }
+  }
+
+  .react-tags__suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+
+    ul {
+      padding: 0;
+      margin: 4px -1px;
+      list-style: none;
+      background: white;
+      border: 1px solid #d1d1d1;
+      border-radius: 2px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    li {
+      padding: 6px 8px;
+      border-bottom: 1px solid #ddd;
+
+      &:hover {
+        background: #eee;
+        cursor: pointer;
+      }
+
+      &.is-active {
+        background: #b7cfe0;
+      }
+
+      &.is-disabled {
+        opacity: 0.5;
+        cursor: auto;
+      }
+
+      mark {
+        font-weight: 600;
+        text-decoration: underline;
+        background: none;
+      }
+    }
+  }
+
+  @media screen and (min-width: 30em) {
+    .react-tags__suggestions {
+      width: 240px;
+    }
+  }
+}
+
+// TODO: Advanced??? What is this? -----------------------------------------------
+.advanced {
+  padding: 0 1em 1em;
+  text-align: left;
+
+  p {
+    font-size: 0.8rem;
+  }
+
+  .advanced-toggle-link {
+    display: block;
+    padding-top: 1em;
+    text-align: left;
+    text-decoration: underline;
+    color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+
+    span {
+      display: inline-block;
+      padding-right: 5px;
+      font-family: monospace;
+      text-decoration: none;
+    }
+
+    &:hover {
+      color: rgba(0, 0, 0, 0.7);
+    }
+  }
+
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+    height: 400px;
+    padding: 0.5em;
+    font-family: monospace;
+    font-size: 0.9em;
+  }
+}
