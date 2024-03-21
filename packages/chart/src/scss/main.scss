@@ -599,6 +599,11 @@
   }
 }
 
+.cdc-open-viz-module .cdc-chart-inner-container {
+  overflow: hidden;
+  background-color: var(--white);
+}
+
 .isEditor.type-sparkline .cdc-chart-inner-container {
   margin: 3em auto 0;
   max-width: 60%;

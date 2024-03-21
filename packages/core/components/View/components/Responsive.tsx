@@ -14,8 +14,6 @@ const breakpoints = [
 ]
 
 const Responsive = ({ children, isEditor }) => {
-  if (!isEditor) return children
-
   const [displayPanel, setDisplayPanel] = useState(true)
   const [displayGrid, setDisplayGrid] = useState(false)
   const [viewportPreview, setViewportPreview] = useState(null)
@@ -34,11 +32,63 @@ const Responsive = ({ children, isEditor }) => {
     if (updateParentConfig) updateParentConfig(convertStateToConfig())
   }, [ updateParentConfig ])*/
 
+  const viewportPreviewController = useCallback(
+    breakpoint => {
+      return setViewportPreview(prevState => (prevState !== breakpoint ? breakpoint : null))
+    },
+    [viewportPreview]
+  )
+
+  const onKeypress = key => {
+    console.log('key pressed', key)
+    if (key.code === 'Escape') setDisplayPanel(display => !display)
+
+    const viewportCommandKey = false
+
+    if (viewportCommandKey) {
+      let keyIndex = key.key
+
+      // Validates that the hotkey pressed is a number, and that
+      // the number is within the range of the provided breakpoint list range.
+      if (!isNaN(keyIndex)) {
+        if (keyIndex <= breakpoints.length) {
+          key.preventDefault()
+          viewportPreviewController(breakpoints[keyIndex - 1])
+        }
+      }
+    }
+
+    if (!viewportCommandKey) {
+      if (key.code === 'KeyG') setDisplayGrid(display => !display)
+      if (key.code === 'KeyR') resetPreview()
+    }
+  }
+
   // Set and clean up the event listener for the hotkeys
   useEffect(() => {
     document.addEventListener('keydown', onKeypress)
     return () => document.removeEventListener('keydown', onKeypress)
   }, [])
+
+  //Reset Viewport Preview
+  const resetPreview = useCallback(() => {
+    if (!rotateAnimation && resetIcon.current) {
+      setViewportPreview(null)
+      setRotateAnimation(true)
+      setDisplayGrid(false)
+      resetIcon.current.style.transition = 'transform 800ms cubic-bezier(0.16, 1, 0.3, 1)'
+      resetIcon.current.style.transform = 'rotate(-360deg)'
+
+      const timeoutShow = setTimeout(() => {
+        setRotateAnimation(false)
+        resetIcon.current.style.transition = null
+        resetIcon.current.style.transform = 'rotate(0deg)'
+        resetIcon.current.style.transform = null
+      }, 400)
+
+      return () => clearTimeout(timeoutShow)
+    }
+  }, [rotateAnimation])
 
   // Toggle the grid display with the viewport preview
   useEffect(() => {
@@ -56,15 +106,6 @@ const Responsive = ({ children, isEditor }) => {
   // useEffect(() => {
   //   if (showConfirm === false) updateVisConfig(convertStateToConfig())
   // }, [showConfirm])
-
-  const viewportPreviewController = useCallback(
-    breakpoint => {
-      return setViewportPreview(prevState => (prevState !== breakpoint ? breakpoint : null))
-    },
-    [viewportPreview]
-  )
-
-  const onKeypress = key => {}
 
   // Observe and set editor component widths
   useEffect(() => {
@@ -87,7 +128,7 @@ const Responsive = ({ children, isEditor }) => {
   }, [])
 
   const onBackClick = () => setDisplayPanel(!displayPanel)
-
+  if (!isEditor || !displayPanel) return children
   return (
     <div className='cove-editor__content' data-grid={displayGrid || null}>
       <div className='cove-editor__content-wrap--x' style={viewportPreview ? { maxWidth: viewportPreview + 'px', minWidth: 'unset' } : null}>
@@ -136,7 +177,9 @@ const Responsive = ({ children, isEditor }) => {
               setDisplayGrid(display => !display)
             }}
           >
-            <div className='cove-editor-utils__breakpoints-grid'>Grid</div>
+            <div className='cove-editor-utils__breakpoints-grid'>
+              <Icon display='grid' />
+            </div>
           </li>
           {breakpoints.map((breakpoint, index) => (
             <li className={`cove-editor-utils__breakpoints-item${viewportPreview === breakpoint ? ' active' : ''}`} onClick={() => viewportPreviewController(breakpoint)} key={index}>
@@ -146,11 +189,11 @@ const Responsive = ({ children, isEditor }) => {
           <li
             className='cove-editor-utils__breakpoints-item'
             onClick={() => {
-              // resetPreview()
+              resetPreview()
             }}
           >
             <div className='cove-editor-utils__breakpoints-reset' ref={resetIcon}>
-              {/* <Icon display='rotateLeft' /> */}
+              <Icon display='rotateLeft' />
             </div>
           </li>
         </ul>

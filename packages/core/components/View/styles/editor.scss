@@ -124,7 +124,7 @@ $mediumGray: '#f5f5f5';
   grid-area: content;
   justify-content: center;
   position: relative;
-  background-color: transparent;
+  background-color: #e6e6e6;
   transition: background-color 400ms cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden auto;
   width: calc(100% - $editorWidth);
