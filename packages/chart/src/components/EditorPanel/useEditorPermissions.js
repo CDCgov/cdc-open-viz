@@ -14,7 +14,7 @@ export const useEditorPermissions = () => {
     'Combo',
     'Deviation Bar',
     'Forecasting',
-    'Forest Plot',
+    // 'Forest Plot',
     'Line',
     'Paired Bar',
     'Pie',

@@ -247,14 +247,14 @@ export default function ChooseTab() {
           </Tooltip>
         </li>
 
-        <li>
+        {/* <li>
           <Tooltip>
             <Tooltip.Target>
               <IconButton label='Forest Plot' type='chart' subType='Forest Plot' orientation='vertical' icon={<ForestPlotIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Display a forest plot</Tooltip.Content>
           </Tooltip>
-        </li>
+        </li> */}
 
         <li>
           <Tooltip>
