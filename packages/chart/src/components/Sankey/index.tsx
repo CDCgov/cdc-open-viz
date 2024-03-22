@@ -14,7 +14,7 @@ import ConfigContext from '@cdc/chart/src/ConfigContext'
 import { ChartContext } from '../../types/ChartContext'
 import type { SankeyNode, SankeyProps } from './types'
 
-const Sankey = ({ width, height }: SankeyProps) => {
+const Sankey = ({ width, height, runtime }: SankeyProps) => {
   const DEBUG = true
   const { config } = useContext<ChartContext>(ConfigContext)
   const { sankey: sankeyConfig } = config
@@ -202,7 +202,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
           rx={sankeyConfig.rxValue}
           // todo: move enable tooltips to sankey
           data-tooltip-html={data.tooltips && config.enableTooltips ? sankeyToolTip : null}
-          data-tooltip-id={`tooltip`}
+          data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
           onClick={() => handleNodeClick(node.id)}
           style={{ pointerEvents: 'visible', cursor: 'pointer' }}
         />
@@ -414,7 +414,7 @@ const Sankey = ({ width, height }: SankeyProps) => {
 
         {/* ReactTooltip needs to remain even if tooltips are disabled -- it handles when a user clicks off of the node and resets
         the sankey diagram. When tooltips are disabled this will nothing */}
-        <ReactTooltip id={`tooltip`} afterHide={() => clearNodeClick()} events={['click']} place={'bottom'} style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
+        <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`} afterHide={() => clearNodeClick()} events={['click']} place={'bottom'} style={{ backgroundColor: `rgba(238, 238, 238, 1)`, color: 'black', boxShadow: `0 3px 10px rgb(0 0 0 / 0.2)` }} />
         {showPopup && (
           <div className='popup'>
             <div className='popup-content'>
