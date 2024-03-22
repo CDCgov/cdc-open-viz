@@ -191,7 +191,7 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
     )
 
     content = (
-      <div className={`cove markup-include ${config.theme}`}>
+      <div className={`cdc-open-viz-module cove markup-include ${config.theme}`}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
       </div>

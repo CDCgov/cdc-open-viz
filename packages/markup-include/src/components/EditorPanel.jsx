@@ -1,6 +1,7 @@
 import React, { useState, useEffect, memo, useContext } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import Sidebar from '@cdc/core/components/Sidebar'
 
 import ConfigContext from '../ConfigContext'
 
@@ -149,12 +150,12 @@ const EditorPanel = memo(props => {
       <div className='cove-editor'>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
         {config.newViz && showConfigConfirm && <Confirm />}
-        <button className={`cove-editor--toggle` + (!displayPanel ? ` collapsed` : ``)} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
         <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
-          <div className='cove-editor__panel-container'>
-            <h2 className='cove-editor__heading'>Configure Markup Include</h2>
-            <section className='cove-editor__content'>{editorContent}</section>
-          </div>
+          <Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Markup Include'>
+            <div className='cove-editor__panel-container'>
+              <section className='cove-editor__content'>{editorContent}</section>
+            </div>
+          </Sidebar>
         </section>
         <div className='cove-editor__content'>
           <div className='cove-editor__content-wrap'>{props.children}</div>
