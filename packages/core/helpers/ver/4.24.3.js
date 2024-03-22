@@ -9,8 +9,14 @@ const update_4_24_3 = async config => {
     if (newConfig.xAxis.sortDates) {
       newConfig.xAxis.type = 'date-time'
     }
+    newConfig.table.download = true
 
     delete newConfig.xAxis.sortDates
+  }
+
+  if (newConfig.type === 'map') {
+    newConfig.table.download = true
+    newConfig.general.showDownloadButton = true
   }
 
   return newConfig
