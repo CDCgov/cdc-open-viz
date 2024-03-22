@@ -11,6 +11,7 @@ import { type Link } from './../components/Sankey/types'
 import { Legend } from '@cdc/core/types/Legend'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
+import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps'
 
 export type ChartColumns = Record<string, Column>
 
@@ -134,6 +135,7 @@ type AllChartsConfig = {
   orientation: 'vertical' | 'horizontal'
   palette: string
   pieType?: string
+  preliminaryData: PreliminaryDataItem[]
   primary?: DataFormat
   roundingStyle: string
   runtime: Runtime
