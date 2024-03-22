@@ -2,9 +2,14 @@
 
 &.is-editor {
   position: relative;
-  .cove-component__inner {
-    margin: 3em auto 0;
-    max-width: 35em;
+  > .cove-component__inner {
+    position: relative;
+    left: 350px;
+    width: calc(100% - 350px);
+  }
+
+  .cove-editor__content .spacing-wrapper {
+    padding: 0;
   }
 }
 &.theme-blue {

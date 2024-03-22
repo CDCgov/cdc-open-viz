@@ -16,7 +16,7 @@ const breakpoints = [
 const os = navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null
 
 const Responsive = ({ children, isEditor }) => {
-  const [displayPanel, setDisplayPanel] = useState(true)
+  const [displayPanel, setDisplayPanel] = useState(false)
   const [displayGrid, setDisplayGrid] = useState(false)
   const [viewportPreview, setViewportPreview] = useState(null)
   const [rotateAnimation, setRotateAnimation] = useState(false)
@@ -26,13 +26,6 @@ const Responsive = ({ children, isEditor }) => {
   const resetIcon = useRef(null)
   const editorPanelRef = useRef(null)
   const componentContainerRef = useRef(null)
-
-  // If a subcomponent is being consumbed by Wizard or Dashboard, the update function
-  // is received by the ConfigProxy and registered in the store.
-  // The function is then used below when the config is updated.
-  /*useEffect(() => {
-    if (updateParentConfig) updateParentConfig(convertStateToConfig())
-  }, [ updateParentConfig ])*/
 
   const viewportPreviewController = useCallback(
     breakpoint => {
@@ -97,18 +90,6 @@ const Responsive = ({ children, isEditor }) => {
     return viewportPreview ? setDisplayGrid(true) : setDisplayGrid(false)
   }, [viewportPreview])
 
-  // If missing any required sections, enable the confirmation window,
-  // and keep active until receiving confirmation.
-  // useEffect(() => {
-  //   if (config.missingRequiredSections === true) setShowConfirm(true)
-  //   if (config.missingRequiredSections === false && showConfirm === true) setShowConfirm(false)
-  // }, [config.missingRequiredSections, showConfirm])
-
-  // If there is no longer a confirmation, update the component's config.
-  // useEffect(() => {
-  //   if (showConfirm === false) updateVisConfig(convertStateToConfig())
-  // }, [showConfirm])
-
   // Observe and set editor component widths
   useEffect(() => {
     if (!componentContainerRef.current) return
@@ -130,7 +111,10 @@ const Responsive = ({ children, isEditor }) => {
   }, [])
 
   const onBackClick = () => setDisplayPanel(!displayPanel)
+  console.log('isEditor', isEditor)
+  console.log('d', displayPanel)
   if (!isEditor || !displayPanel) return children
+
   return (
     <div className='cove-editor__content' data-grid={displayGrid || null}>
       <div className='cove-editor__content-wrap--x' style={viewportPreview ? { maxWidth: viewportPreview + 'px', minWidth: 'unset' } : null}>
