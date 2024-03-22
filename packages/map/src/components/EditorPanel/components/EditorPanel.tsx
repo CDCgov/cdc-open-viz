@@ -448,20 +448,6 @@ const EditorPanel = props => {
           }
         })
         break
-      case 'toggleDownloadButton':
-        setState({
-          ...state,
-          general: {
-            ...state.general,
-            showDownloadButton: !state.general.showDownloadButton
-          },
-          table: {
-            // setting both bc DataTable new core needs it here
-            ...state.table,
-            download: !state.general.showDownloadButton
-          }
-        })
-        break
       case 'toggleShowFullGeoNameInCSV':
         setState({
           ...state,
@@ -2705,16 +2691,6 @@ const EditorPanel = props => {
                       <span className='edit-label'>Show URL to Automatically Updated Data</span>
                     </label>
                   )}
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={state.general.showDownloadButton}
-                      onChange={event => {
-                        handleEditorChanges('toggleDownloadButton', event.target.checked)
-                      }}
-                    />
-                    <span className='edit-label'>Show Download CSV Link</span>
-                  </label>
                   <label className='checkbox'>
                     <input
                       type='checkbox'
