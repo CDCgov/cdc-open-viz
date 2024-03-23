@@ -281,7 +281,7 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
   })
 
   return (
-    <div className={''}>
+    <>
       <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
       <div className={contentClasses.join(' ')}>
         <div className='cove-component__content-wrap'>
@@ -330,7 +330,7 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
         </div>
       </div>
       {link && link}
-    </div>
+    </>
   )
 }
 
@@ -416,33 +416,27 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   let content = <Loading />
 
   if (loading === false) {
-    let classNames = ['cove', 'cdc-open-viz-module', 'type-waffle-chart', currentViewport, config.theme, 'font-' + config.overallFontSize]
-
-    if (isEditor) {
-      classNames.push('is-editor')
-    }
-
-    let bodyClasses = ['cove-component', 'waffle-chart']
-
     let body = (
       <Layout.Responsive isEditor={isEditor}>
-        <div className={`${bodyClasses.join(' ')}`} ref={outerContainerRef}>
-          <WaffleChart config={config} isEditor={isEditor} />
-        </div>
+        <WaffleChart config={config} isEditor={isEditor} />
       </Layout.Responsive>
     )
 
     content = (
-      <div className={classNames.join(' ')}>
+      <>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
-      </div>
+      </>
     )
   }
 
   return (
     <ErrorBoundary component='WaffleChart'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>{content}</ConfigContext.Provider>
+      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>
+        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={outerContainerRef}>
+          {content}
+        </Layout.VisualizationWrapper>
+      </ConfigContext.Provider>
     </ErrorBoundary>
   )
 }

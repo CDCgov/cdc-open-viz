@@ -173,36 +173,36 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
 
   let content = <Loading />
 
-  const bodyClasses = ['markup-include']
-
   if (loading === false) {
     let body = (
-      <div className={bodyClasses.join(' ')} ref={container}>
-        <Layout.Responsive isEditor={isEditor}>
-          <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
-          <div className={`cove-component__content ${contentClasses.join(' ')}`}>
-            <div className={`${innerContainerClasses.join(' ')}`}>
-              <div className='cove-component__content-wrap'>
-                {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
-                {markupError && config.srcUrl && <div className='warning'>{errorMessage}</div>}
-              </div>
+      <Layout.Responsive isEditor={isEditor}>
+        <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
+        <div className={`cove-component__content ${contentClasses.join(' ')}`}>
+          <div className={`${innerContainerClasses.join(' ')}`}>
+            <div className='cove-component__content-wrap'>
+              {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
+              {markupError && config.srcUrl && <div className='warning'>{errorMessage}</div>}
             </div>
           </div>
-        </Layout.Responsive>
-      </div>
+        </div>
+      </Layout.Responsive>
     )
 
     content = (
-      <div className={`cdc-open-viz-module cove markup-include ${config.theme}`}>
+      <>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
-      </div>
+      </>
     )
   }
 
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>{content}</ConfigContext.Provider>
+      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
+        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={container}>
+          {content}
+        </Layout.VisualizationWrapper>
+      </ConfigContext.Provider>
     </ErrorBoundary>
   )
 }

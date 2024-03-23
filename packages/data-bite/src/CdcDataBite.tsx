@@ -503,25 +503,16 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     )
   }
 
-  let classNames = ['cove', 'cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, 'font-' + config.fontSize]
-  if (isEditor) {
-    classNames.push('is-editor')
-  }
-
   return (
     <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
-      {biteStyle !== 'gradient' && (
-        <div className={classNames.join(' ')} ref={outerContainerRef}>
-          {body}
-        </div>
-      )}
+      {biteStyle !== 'gradient' && <Layout.VisualizationWrapper ref={outerContainerRef}>{body}</Layout.VisualizationWrapper>}
       {'gradient' === biteStyle && (
-        <div className={classNames.join(' ')} ref={outerContainerRef}>
+        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor}>
           {isEditor && <EditorPanel />}
           <Layout.Responsive isEditor={isEditor}>
             <GradientBite label={config.title} value={calculateDataBite()} />
           </Layout.Responsive>
-        </div>
+        </Layout.VisualizationWrapper>
       )}
     </Context.Provider>
   )

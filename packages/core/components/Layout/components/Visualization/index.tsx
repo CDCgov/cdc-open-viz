@@ -25,6 +25,27 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     if (config.type === 'map') {
       classes.push(`type-map`)
     }
+
+    if (config.type === 'data-bite') {
+      classes.push('cove', 'cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, `font-${config.fontSize}`)
+      if (isEditor) {
+        classes.push('is-editor')
+      }
+    }
+
+    if (config.type === 'markup-include') {
+      classes.push('markup-include', 'cove')
+    }
+
+    if (config.type === 'waffle-chart') {
+      classes.push('cove', 'cdc-open-viz-module', 'type-waffle-chart', currentViewport, config.theme, 'font-' + config.overallFontSize)
+
+      if (isEditor) {
+        classes.push('is-editor')
+      }
+
+      classes.push('cove-component', 'waffle-chart')
+    }
     return classes
   }
 

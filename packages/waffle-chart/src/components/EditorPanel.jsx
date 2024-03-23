@@ -434,8 +434,8 @@ const EditorPanel = memo(props => {
         <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Waffle Chart'>
           {editorContent}
         </Layout.Sidebar>
-        <div className='cdc-map-inner-container'>
-          <div className=''>{props.children}</div>
+        <div className='cove-editor__content'>
+          <div className='cove-editor__content-wrap'>{props.children}</div>
         </div>
       </>
     </ErrorBoundary>
