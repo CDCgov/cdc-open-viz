@@ -152,9 +152,7 @@ const EditorPanel = memo(props => {
         {config.newViz && showConfigConfirm && <Confirm />}
         <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
           <Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Markup Include'>
-            <div className='cove-editor__panel-container'>
-              <section className='cove-editor__content'>{editorContent}</section>
-            </div>
+            {editorContent}
           </Sidebar>
         </section>
         <div className='cove-editor__content'>

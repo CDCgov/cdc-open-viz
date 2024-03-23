@@ -16,6 +16,23 @@
   .cove-component__content.component--hideBackgroundColor {
     background: transparent;
   }
+
+  .cove-editor {
+    width: unset;
+    left: unset;
+  }
+  // .cove-editor__content {
+  //   overflow: unset;
+  // }
+  .cove-editor .cove-editor__content .cove-editor__content-wrap {
+    margin: 0 auto;
+  }
+
+  .cove-editor .cove-editor__content {
+    position: unset;
+    left: unset;
+    width: 100%;
+  }
 }
 
 .cove-accordion__panel-section {

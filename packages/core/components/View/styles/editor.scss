@@ -84,11 +84,11 @@ $mediumGray: #e6e6e6;
   box-shadow: 1px 0 0 rgb(0 0 0 / 15%);
   z-index: 7;
 
-  @at-root {
-    .cove-editor {
-      width: $editorWidth;
-    }
-  }
+  // @at-root {
+  //   .cove-editor {
+  //     width: $editorWidth;
+  //   }
+  // }
 }
 
 .cove-editor__panel-heading {

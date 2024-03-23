@@ -12,6 +12,7 @@ import InputText from '@cdc/core/components/inputs/InputText'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
+import Sidebar from '@cdc/core/components/Sidebar'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 import WarningImage from '../images/warning.svg'
@@ -427,20 +428,16 @@ const EditorPanel = memo(props => {
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <div className='cove-editor'>
+      <>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
         {config.newViz && showConfigConfirm && <Confirm />}
-        <button className={`cove-editor--toggle` + (!displayPanel ? ` collapsed` : ``)} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
-        <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
-          <div className='cove-editor__panel-container'>
-            <h2 className='cove-editor__heading'>Configure Chart</h2>
-            <section className='cove-editor__content'>{editorContent}</section>
-          </div>
-        </section>
-        <div className='cove-editor__content'>
-          <div className='cove-editor__content-wrap'>{props.children}</div>
+        <Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Waffle Chart'>
+          {editorContent}
+        </Sidebar>
+        <div className='cdc-map-inner-container'>
+          <div className=''>{props.children}</div>
         </div>
-      </div>
+      </>
     </ErrorBoundary>
   )
 })

@@ -14,4 +14,13 @@
       content: '\21BB';
     }
   }
+
+  // TODO: build same components for visualizations
+  .cove-component.waffle-chart .cove-component__inner .cove-component__content:not(.component--has-background, .component--hideBackgroundColor) {
+    background-color: white;
+  }
+
+  &.is-editor .cove-component {
+    padding-left: 350px;
+  }
 }

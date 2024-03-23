@@ -16,7 +16,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import markupIncludeReducer from './store/mi.reducer'
-
+import View from '@cdc/core/components/View'
 // styles
 import './scss/main.scss'
 
@@ -177,17 +177,19 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
 
   if (loading === false) {
     let body = (
-      <div className={bodyClasses.join(' ')} ref={container}>
-        <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
-        <div className={`cove-component__content ${contentClasses.join(' ')}`}>
-          <div className={`${innerContainerClasses.join(' ')}`}>
-            <div className='cove-component__content-wrap'>
-              {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
-              {markupError && config.srcUrl && <div className='warning'>{errorMessage}</div>}
+      <View.Responsive isEditor={isEditor}>
+        <div className={bodyClasses.join(' ')} ref={container}>
+          <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
+          <div className={`cove-component__content ${contentClasses.join(' ')}`}>
+            <div className={`${innerContainerClasses.join(' ')}`}>
+              <div className='cove-component__content-wrap'>
+                {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
+                {markupError && config.srcUrl && <div className='warning'>{errorMessage}</div>}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </View.Responsive>
     )
 
     content = (

@@ -27,6 +27,7 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
+import View from '@cdc/core/components/View'
 
 type CdcWaffleChartProps = {
   configUrl?: string
@@ -280,57 +281,55 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
   })
 
   return (
-    <div className={innerContainerClasses.join(' ')}>
-      <>
-        <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
-        <div className={contentClasses.join(' ')}>
-          <div className='cove-component__content-wrap'>
-            {config.visualizationType === 'Gauge' && (
-              <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-                <div className='cove-gauge-chart__chart'>
-                  <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                    {prefix ? prefix : ' '}
-                    {config.showPercent ? dataPercentage : waffleNumerator}
-                    {suffix ? suffix + ' ' : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
-                  </div>
+    <div className={''}>
+      <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
+      <div className={contentClasses.join(' ')}>
+        <div className='cove-component__content-wrap'>
+          {config.visualizationType === 'Gauge' && (
+            <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+              <div className='cove-gauge-chart__chart'>
+                <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                  {prefix ? prefix : ' '}
+                  {config.showPercent ? dataPercentage : waffleNumerator}
+                  {suffix ? suffix + ' ' : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+                </div>
+                <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
+                <svg height={config.gauge.height} width={'100%'}>
+                  <Group>
+                    <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={config.gauge.width} height={config.gauge.height} fill='#fff' />
+                    <Bar x={0} y={0} width={xScale(waffleNumerator)} height={config.gauge.height} fill={gaugeColor} />
+                  </Group>
+                </svg>
+                <div className={'cove-waffle-chart__subtext subtext'}>{parse(subtext)}</div>
+              </div>
+            </div>
+          )}
+          {config.visualizationType !== 'Gauge' && (
+            <div className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+              <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
+                <svg width={setRatio()} height={setRatio()}>
+                  <Group>{buildWaffle()}</Group>
+                </svg>
+              </div>
+              {(dataPercentage || content) && (
+                <div className='cove-waffle-chart__data'>
+                  {dataPercentage && (
+                    <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                      {prefix ? prefix : null}
+                      {dataPercentage}
+                      {suffix ? suffix : null}
+                    </div>
+                  )}
                   <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
-                  <svg height={config.gauge.height} width={'100%'}>
-                    <Group>
-                      <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={config.gauge.width} height={config.gauge.height} fill='#fff' />
-                      <Bar x={0} y={0} width={xScale(waffleNumerator)} height={config.gauge.height} fill={gaugeColor} />
-                    </Group>
-                  </svg>
-                  <div className={'cove-waffle-chart__subtext subtext'}>{parse(subtext)}</div>
-                </div>
-              </div>
-            )}
-            {config.visualizationType !== 'Gauge' && (
-              <div className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-                <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
-                  <svg width={setRatio()} height={setRatio()}>
-                    <Group>{buildWaffle()}</Group>
-                  </svg>
-                </div>
-                {(dataPercentage || content) && (
-                  <div className='cove-waffle-chart__data'>
-                    {dataPercentage && (
-                      <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                        {prefix ? prefix : null}
-                        {dataPercentage}
-                        {suffix ? suffix : null}
-                      </div>
-                    )}
-                    <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
 
-                    {subtext && <div className='cove-waffle-chart__subtext subtext'>{parse(subtext)}</div>}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+                  {subtext && <div className='cove-waffle-chart__subtext subtext'>{parse(subtext)}</div>}
+                </div>
+              )}
+            </div>
+          )}
         </div>
-        {link && link}
-      </>
+      </div>
+      {link && link}
     </div>
   )
 }
@@ -426,9 +425,11 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
     let bodyClasses = ['cove-component', 'waffle-chart']
 
     let body = (
-      <div className={`${bodyClasses.join(' ')}`} ref={outerContainerRef}>
-        <WaffleChart config={config} isEditor={isEditor} />
-      </div>
+      <View.Responsive isEditor={isEditor}>
+        <div className={`${bodyClasses.join(' ')}`} ref={outerContainerRef}>
+          <WaffleChart config={config} isEditor={isEditor} />
+        </div>
+      </View.Responsive>
     )
 
     content = (
