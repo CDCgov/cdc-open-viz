@@ -1548,13 +1548,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
   if (!table.label || table.label === '') table.label = 'Data Table'
 
-  // Outer container classes
-  let outerContainerClasses = ['cdc-open-viz-module', 'outer-container', currentViewport]
-
-  if (className) {
-    outerContainerClasses.push(className)
-  }
-
   // Map container classes
   let mapContainerClasses = ['map-container', state.legend.position, state.general.type, state.general.geoType, 'outline-none']
 
@@ -1650,7 +1643,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   return (
     <ConfigContext.Provider value={mapProps}>
-      <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
+      <Layout.VisualizationWrapper config={state} isEditor={isEditor} ref={outerContainerRef} imageId={imageId}>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
@@ -1660,11 +1653,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               )}
               {/* prettier-ignore */}
               <Title
-              title={title}
-              superTitle={general.superTitle}
-              config={config}
-              classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
-            />
+                title={title}
+                superTitle={general.superTitle}
+                config={config}
+                classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
+              />
               <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
 
               {general.introText && <section className='introText'>{parse(general.introText)}</section>}
@@ -1753,7 +1746,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {accessibleStatus}
           </div>
         </Layout.Responsive>
-      </div>
+      </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
   )
 }

@@ -1188,17 +1188,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     debugSvg: isDebug
   }
 
-  const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
-
-  config.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)
-  isEditor && classes.push('spacing-wrapper')
-  isEditor && classes.push('isEditor')
-
   return (
     <ConfigContext.Provider value={contextValues}>
-      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart} data-download-id={imageId}>
+      <Layout.VisualizationWrapper config={config} isEditor={isEditor} currentViewport={currentViewport} ref={outerContainerRef} imageId={imageId}>
         {body}
-      </div>
+      </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
   )
 }
