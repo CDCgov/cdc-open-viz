@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 import * as d3 from 'd3-array'
-import View from '@cdc/core/components/View'
+import Layout from '@cdc/core/components/Layout'
 
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
@@ -1052,7 +1052,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     body = (
       <>
         {isEditor && <EditorPanel />}
-        <View.Responsive isEditor={isEditor}>
+        <Layout.Responsive isEditor={isEditor}>
           {!missingRequiredSections() && !config.newViz && (
             <div className='cdc-chart-inner-container' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
               <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
@@ -1127,7 +1127,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {/* show pdf or image button */}
             </div>
           )}
-        </View.Responsive>
+        </Layout.Responsive>
       </>
     )
   }

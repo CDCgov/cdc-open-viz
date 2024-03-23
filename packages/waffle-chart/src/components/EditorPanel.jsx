@@ -12,7 +12,7 @@ import InputText from '@cdc/core/components/inputs/InputText'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import Sidebar from '@cdc/core/components/Sidebar'
+import Layout from '@cdc/core/components/Layout'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 import WarningImage from '../images/warning.svg'
@@ -431,9 +431,9 @@ const EditorPanel = memo(props => {
       <>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
         {config.newViz && showConfigConfirm && <Confirm />}
-        <Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Waffle Chart'>
+        <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Waffle Chart'>
           {editorContent}
-        </Sidebar>
+        </Layout.Sidebar>
         <div className='cdc-map-inner-container'>
           <div className=''>{props.children}</div>
         </div>

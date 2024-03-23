@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import './../styles/editor-utils.scss'
-import './../styles/editor.scss'
+import '../styles/editor-utils.scss'
+import '../styles/editor.scss'
 
 import Icon from '../../ui/Icon'
 
@@ -35,11 +35,8 @@ const Responsive = ({ children, isEditor }) => {
   )
 
   const onKeypress = key => {
-    console.log('key pressed', key)
     if (key.code === 'Escape') setDisplayPanel(display => !display)
-
     const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
-
     if (viewportCommandKey) {
       let keyIndex = key.key
 
@@ -111,8 +108,7 @@ const Responsive = ({ children, isEditor }) => {
   }, [])
 
   const onBackClick = () => setDisplayPanel(!displayPanel)
-  console.log('isEditor', isEditor)
-  console.log('d', displayPanel)
+
   if (!isEditor || !displayPanel) return children
 
   return (
@@ -131,12 +127,7 @@ const Responsive = ({ children, isEditor }) => {
             )}
           </div>
           <div className='cove-editor__grid-caret--top' ref={componentContainerRef}>
-            <div className='cove-editor__grid-caret--bottom'>
-              {/* {undefined === config?.newViz && config?.runtime?.editorErrorMessage && config?.runtime?.editorErrorMessage.length > 0 &&
-              <SplashError title="Error With Configuration" message={config.runtime.editorErrorMessage}/>
-            } */}
-              {children}
-            </div>
+            <div className='cove-editor__grid-caret--bottom'>{children}</div>
           </div>
         </div>
       </div>

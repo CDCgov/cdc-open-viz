@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
-import Sidebar from '@cdc/core/components/Sidebar'
+import Layout from '@cdc/core/components/Layout'
 
 // @cdc/core
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
@@ -1079,7 +1079,7 @@ const EditorPanel = () => {
       <ErrorBoundary component='EditorPanel'>
         {config.newViz && <Confirm />}
         {undefined === config.newViz && config.runtime && config.runtime?.editorErrorMessage && <Error />}
-        <Sidebar displayPanel={displayPanel} isDashboard={isDashboard} title={'Configure Chart'} onBackClick={onBackClick}>
+        <Layout.Sidebar displayPanel={displayPanel} isDashboard={isDashboard} title={'Configure Chart'} onBackClick={onBackClick}>
           <Accordion allowZeroExpanded={true}>
             <Panels.General name='General' />
             <Panels.ForestPlot name='Forest Plot Settings' />
@@ -2914,7 +2914,7 @@ const EditorPanel = () => {
             {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
           </Accordion>
           {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
-        </Sidebar>
+        </Layout.Sidebar>
       </ErrorBoundary>
     </EditorPanelContext.Provider>
   )

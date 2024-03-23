@@ -7,7 +7,7 @@ import { useDebounce } from 'use-debounce'
 // import ReactTags from 'react-tag-autocomplete'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import Panels from './Panels.tsx'
-import Sidebar from '@cdc/core/components/Sidebar'
+import Layout from '@cdc/core/components/Layout'
 
 // Data
 import colorPalettes from '@cdc/core/data/colorPalettes'
@@ -1491,7 +1491,7 @@ const EditorPanel = props => {
     <ErrorBoundary component='EditorPanel'>
       {state?.runtime?.editorErrorMessage.length > 0 && <Error />}
       {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
-      <Sidebar isDashboard={isDashboard} displayPanel={displayPanel} title='Configure Map' onBackClick={onBackClick}>
+      <Layout.Sidebar isDashboard={isDashboard} displayPanel={displayPanel} title='Configure Map' onBackClick={onBackClick}>
         <ReactTooltip multiline={true} />
         <Accordion allowZeroExpanded={true}>
           <AccordionItem>
@@ -3123,7 +3123,7 @@ const EditorPanel = props => {
           {state.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
         </Accordion>
         <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
-      </Sidebar>
+      </Layout.Sidebar>
     </ErrorBoundary>
   )
 }

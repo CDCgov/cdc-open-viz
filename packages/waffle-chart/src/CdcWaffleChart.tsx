@@ -27,7 +27,7 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
-import View from '@cdc/core/components/View'
+import Layout from '@cdc/core/components/Layout'
 
 type CdcWaffleChartProps = {
   configUrl?: string
@@ -425,11 +425,11 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
     let bodyClasses = ['cove-component', 'waffle-chart']
 
     let body = (
-      <View.Responsive isEditor={isEditor}>
+      <Layout.Responsive isEditor={isEditor}>
         <div className={`${bodyClasses.join(' ')}`} ref={outerContainerRef}>
           <WaffleChart config={config} isEditor={isEditor} />
         </div>
-      </View.Responsive>
+      </Layout.Responsive>
     )
 
     content = (

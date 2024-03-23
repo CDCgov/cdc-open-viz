@@ -1,14 +1,13 @@
 import React, { useState, useEffect, memo, useContext } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import Sidebar from '@cdc/core/components/Sidebar'
 
 import ConfigContext from '../ConfigContext'
 
 import Accordion from '@cdc/core/components/ui/Accordion'
 import InputText from '@cdc/core/components/inputs/InputText'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-
+import Layout from '@cdc/core/components/Layout'
 import '@cdc/core/styles/v2/components/editor.scss'
 
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
@@ -150,9 +149,9 @@ const EditorPanel = memo(props => {
       <div className='cove-editor'>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
         {config.newViz && showConfigConfirm && <Confirm />}
-        <Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Markup Include'>
+        <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Markup Include'>
           <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>{editorContent}</section>
-        </Sidebar>
+        </Layout.Sidebar>
         <div className='cove-editor__content'>
           <div className='cove-editor__content-wrap'>{props.children}</div>
         </div>

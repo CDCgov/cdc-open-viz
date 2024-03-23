@@ -11,7 +11,7 @@ import Loading from '@cdc/core/components/Loading'
 import Title from '@cdc/core/components/ui/Title'
 import CircleCallout from './components/CircleCallout'
 import GradientBite from './components/GradientBite'
-import View from '@cdc/core/components/View'
+import Layout from '@cdc/core/components/Layout'
 
 // external
 import ResizeObserver from 'resize-observer-polyfill'
@@ -453,7 +453,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     body = (
       <>
         {isEditor && <EditorPanel />}
-        <View.Responsive isEditor={isEditor}>
+        <Layout.Responsive isEditor={isEditor}>
           <div className={isEditor ? 'spacing-wrapper' : ''}>
             <div className={innerContainerClasses.join(' ')}>
               <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
@@ -498,7 +498,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             </div>
             {link && link}
           </div>
-        </View.Responsive>
+        </Layout.Responsive>
       </>
     )
   }
@@ -518,9 +518,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       {'gradient' === biteStyle && (
         <div className={classNames.join(' ')} ref={outerContainerRef}>
           {isEditor && <EditorPanel />}
-          <View.Responsive isEditor={isEditor}>
+          <Layout.Responsive isEditor={isEditor}>
             <GradientBite label={config.title} value={calculateDataBite()} />
-          </View.Responsive>
+          </Layout.Responsive>
         </div>
       )}
     </Context.Provider>

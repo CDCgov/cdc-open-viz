@@ -23,4 +23,8 @@
   &.is-editor .cove-component {
     padding-left: 350px;
   }
+
+  &.is-editor .cove-editor__content .cove-component {
+    padding-left: 0px;
+  }
 }

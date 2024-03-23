@@ -16,7 +16,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import markupIncludeReducer from './store/mi.reducer'
-import View from '@cdc/core/components/View'
+import Layout from '@cdc/core/components/Layout'
 // styles
 import './scss/main.scss'
 
@@ -177,8 +177,8 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
 
   if (loading === false) {
     let body = (
-      <View.Responsive isEditor={isEditor}>
-        <div className={bodyClasses.join(' ')} ref={container}>
+      <div className={bodyClasses.join(' ')} ref={container}>
+        <Layout.Responsive isEditor={isEditor}>
           <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
           <div className={`cove-component__content ${contentClasses.join(' ')}`}>
             <div className={`${innerContainerClasses.join(' ')}`}>
@@ -188,8 +188,8 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
               </div>
             </div>
           </div>
-        </div>
-      </View.Responsive>
+        </Layout.Responsive>
+      </div>
     )
 
     content = (

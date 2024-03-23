@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import * as d3 from 'd3'
-import View from '@cdc/core/components/View'
+import Layout from '@cdc/core/components/Layout'
 
 // IE11
 import 'whatwg-fetch'
@@ -1549,7 +1549,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   if (!table.label || table.label === '') table.label = 'Data Table'
 
   // Outer container classes
-  let outerContainerClasses = ['cdc-open-viz-module', 'cdc-map-outer-container', currentViewport]
+  let outerContainerClasses = ['cdc-open-viz-module', 'outer-container', currentViewport]
 
   if (className) {
     outerContainerClasses.push(className)
@@ -1652,7 +1652,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     <ConfigContext.Provider value={mapProps}>
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
         {isEditor && <EditorPanel />}
-        <View.Responsive isEditor={isEditor}>
+        <Layout.Responsive isEditor={isEditor}>
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
             <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
               {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
@@ -1752,7 +1752,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           <div aria-live='assertive' className='cdcdataviz-sr-only'>
             {accessibleStatus}
           </div>
-        </View.Responsive>
+        </Layout.Responsive>
       </div>
     </ConfigContext.Provider>
   )
