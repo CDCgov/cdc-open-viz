@@ -173,7 +173,7 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
 
   let content = <Loading />
 
-  let bodyClasses = ['markup-include']
+  const bodyClasses = ['markup-include']
 
   if (loading === false) {
     let body = (
