@@ -10,6 +10,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS, DATA_OPERATORS } from '../CdcDataBite'
+import Layout from '@cdc/core/components/Layout'
 
 const TextField = memo(({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, tooltip, type = 'input', i = null, min = null, max = null, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -129,7 +130,7 @@ const Select = memo(({ label, value, options, fieldName, section = null, subsect
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = memo(() => {
-  const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(Context)
+  const { config, updateConfig, loading, data, setParentConfig, isDashboard, isEditor } = useContext(Context)
 
   const [displayPanel, setDisplayPanel] = useState(true)
 
@@ -304,9 +305,7 @@ const EditorPanel = memo(() => {
     <ErrorBoundary component='EditorPanel'>
       {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
       {(!config.dataColumn || !config.dataFunction) && <Confirm />}
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
-      <section className={displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'}>
-        <div className='heading-2'>Configure Data Bite</div>
+      <Layout.Sidebar isEditor={true} config={config} title='Configure Data Bites' onBackClick={onBackClick}>
         <section className='form-container'>
           <form>
             <Accordion allowZeroExpanded={true}>
@@ -664,7 +663,7 @@ const EditorPanel = memo(() => {
             </Accordion>
           </form>
         </section>
-      </section>
+      </Layout.Sidebar>
     </ErrorBoundary>
   )
 })

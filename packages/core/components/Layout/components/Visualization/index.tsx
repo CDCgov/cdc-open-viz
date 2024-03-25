@@ -1,11 +1,11 @@
 // main visualization wrapper
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import React, { forwardRef, useRef } from 'react'
-
+import { Config as DataBiteConfig } from '@cdc/data-bite/src/types/Config'
 import './visualizations.scss'
 
 type VisualizationWrapper = {
-  config: ChartConfig
+  config: ChartConfig | DataBiteConfig
   isEditor: boolean
   currentViewport: string
   imageId: string
@@ -19,6 +19,7 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     const classes = ['cdc-open-viz-module', `${currentViewport}`, `font-${config?.fontSize}`, `${config?.theme}`]
     isEditor && classes.push('spacing-wrapper')
     isEditor && classes.push('isEditor')
+
     if (config.type === 'chart') {
       classes.push('type-chart')
       config?.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)

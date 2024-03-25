@@ -454,50 +454,48 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       <>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
-          <div className={isEditor ? 'spacing-wrapper' : ''}>
-            <div className={innerContainerClasses.join(' ')}>
-              <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
-              <div className={`bite ${biteClasses.join(' ')}`}>
-                <div className={`bite-content-container ${contentClasses.join(' ')}`}>
-                  {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
-                  {isTop && <DataImage />}
-                  <div className={`bite-content`}>
-                    {showBite && 'title' === biteStyle && (
-                      <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
-                        {calculateDataBite()}
-                      </div>
-                    )}
-                    {showBite && 'split' === biteStyle && (
-                      <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
-                        {calculateDataBite()}
-                      </div>
-                    )}
-                    <Fragment>
-                      <div className='bite-content__text-wrap'>
-                        <p className='bite-text'>
-                          {showBite && 'body' === biteStyle && (
-                            <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
-                              {calculateDataBite()}
-                            </span>
-                          )}
-                          {parse(biteBody)}
-                        </p>
-                        {showBite && 'end' === biteStyle && (
+          <div className={`${contentClasses.join(' ')}`}>
+            <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
+            <div className={`bite ${biteClasses.join(' ')}`}>
+              <div className={`bite-content-container ${contentClasses.join(' ')}`}>
+                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
+                {isTop && <DataImage />}
+                <div className={`bite-content`}>
+                  {showBite && 'title' === biteStyle && (
+                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                      {calculateDataBite()}
+                    </div>
+                  )}
+                  {showBite && 'split' === biteStyle && (
+                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                      {calculateDataBite()}
+                    </div>
+                  )}
+                  <Fragment>
+                    <div className='bite-content__text-wrap'>
+                      <p className='bite-text'>
+                        {showBite && 'body' === biteStyle && (
                           <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
                             {calculateDataBite()}
                           </span>
                         )}
-                        {subtext && !config.general.isCompactStyle && <p className='bite-subtext'>{parse(subtext)}</p>}
-                      </div>
-                    </Fragment>
-                  </div>
-                  {isBottom && <DataImage />}
-                  {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
+                        {parse(biteBody)}
+                      </p>
+                      {showBite && 'end' === biteStyle && (
+                        <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
+                          {calculateDataBite()}
+                        </span>
+                      )}
+                      {subtext && !config.general.isCompactStyle && <p className='bite-subtext'>{parse(subtext)}</p>}
+                    </div>
+                  </Fragment>
                 </div>
+                {isBottom && <DataImage />}
+                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
               </div>
             </div>
-            {link && link}
           </div>
+          {link && link}
         </Layout.Responsive>
       </>
     )
@@ -505,7 +503,11 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   return (
     <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
-      {biteStyle !== 'gradient' && <Layout.VisualizationWrapper ref={outerContainerRef}>{body}</Layout.VisualizationWrapper>}
+      {biteStyle !== 'gradient' && (
+        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor}>
+          {body}
+        </Layout.VisualizationWrapper>
+      )}
       {'gradient' === biteStyle && (
         <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor}>
           {isEditor && <EditorPanel />}

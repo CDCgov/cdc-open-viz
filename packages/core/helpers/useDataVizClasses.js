@@ -23,9 +23,12 @@ export default function useDataVizClasses(config, viewport = null) {
   }
 
   if (config.type === 'markup-include') {
-    console.log('here!', contentClasses)
     contentClasses = contentClasses.filter(item => item !== 'cove-component__content')
   }
+
+  // if (config.type === 'data-bite') {
+  //   contentClasses = contentClasses.filter(item => item !== 'cove-component__content')
+  // }
 
   config.showTitle && contentClasses.push('component--has-title')
   config.title && config.visualizationType !== 'chart' && config.visualizationType !== 'Spark Line' && contentClasses.push('component--has-title')
