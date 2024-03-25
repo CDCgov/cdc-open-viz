@@ -176,8 +176,8 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
   if (loading === false) {
     let body = (
       <Layout.Responsive isEditor={isEditor}>
-        <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
         <div className={`cove-component__content ${contentClasses.join(' ')}`}>
+          <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
           <div className={`${innerContainerClasses.join(' ')}`}>
             <div className='cove-component__content-wrap'>
               {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
@@ -190,7 +190,12 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
 
     content = (
       <>
-        {isEditor && <EditorPanel>{body}</EditorPanel>}
+        {isEditor && (
+          <>
+            <EditorPanel />
+            {body}
+          </>
+        )}
         {!isEditor && body}
       </>
     )

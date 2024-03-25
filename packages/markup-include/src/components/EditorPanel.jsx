@@ -146,16 +146,11 @@ const EditorPanel = memo(props => {
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <div className='cove-editor'>
-        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
-        {config.newViz && showConfigConfirm && <Confirm />}
-        <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Markup Include'>
-          <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>{editorContent}</section>
-        </Layout.Sidebar>
-        <div className='cove-editor__content'>
-          <div className='cove-editor__content-wrap'>{props.children}</div>
-        </div>
-      </div>
+      {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+      {config.newViz && showConfigConfirm && <Confirm />}
+      <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Markup Include'>
+        {editorContent}
+      </Layout.Sidebar>
     </ErrorBoundary>
   )
 })

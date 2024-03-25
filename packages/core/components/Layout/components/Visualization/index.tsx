@@ -2,6 +2,8 @@
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import React, { forwardRef, useRef } from 'react'
 
+import './visualizations.scss'
+
 type VisualizationWrapper = {
   config: ChartConfig
   isEditor: boolean
@@ -27,14 +29,14 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     }
 
     if (config.type === 'data-bite') {
-      classes.push('cove', 'cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, `font-${config.fontSize}`)
+      classes.push('cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, `font-${config.fontSize}`)
       if (isEditor) {
         classes.push('is-editor')
       }
     }
 
     if (config.type === 'markup-include') {
-      classes.push('markup-include', 'cove')
+      classes.push('markup-include', 'cdc-open-viz-module')
     }
 
     if (config.type === 'waffle-chart') {
