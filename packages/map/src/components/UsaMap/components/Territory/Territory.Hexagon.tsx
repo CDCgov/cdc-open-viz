@@ -4,7 +4,7 @@ import ConfigContext from './../../../../context'
 import { MapContext } from './../../../../types/MapContext'
 import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
-import chroma from 'chroma-js'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 const offsets = {
   'US-VT': [50, -8],
@@ -95,12 +95,7 @@ const TerritoryHexagon = ({ label, text, stroke, strokeWidth, textColor, territo
 
     if (undefined === abbr) return null
 
-    let textColor = '#FFF'
-
-    // Dynamic text color
-    if (chroma.contrast(textColor, bgColor) < 3.5) {
-      textColor = '#202020' // dark gray
-    }
+    let textColor = getContrastColor('#FFF', bgColor)
 
     // always make HI black since it is off to the side
     if (abbr === 'US-HI') {

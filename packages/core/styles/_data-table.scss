@@ -31,7 +31,6 @@ div.data-table-heading {
 }
 
 table.horizontal {
-
   th,
   td {
     min-width: 200px;
@@ -102,18 +101,6 @@ table.data-table {
       background-position: right 0.5em center;
       background-size: 10px 5px;
     }
-
-    /* doesnt work
-    th.sort-asc,
-    td.sort-asc {
-      background-image: url(../assets/icon-caret-filled-up.svg);
-    }
-
-    th.sort-desc,
-    td.sort-desc {
-      background-image: url(../assets/icon-caret-filled-down.svg);
-    }
-    */
 
     // format the white triangle sort icon in data table headers
     .sort-icon {

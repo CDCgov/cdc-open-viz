@@ -1,28 +1,29 @@
 import React, { useContext } from 'react'
-
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
 import { LinePath } from '@visx/shape'
 import { Text } from '@visx/text'
 import { scaleLinear, scalePoint } from '@visx/scale'
 import { AxisBottom } from '@visx/axis'
-
 import { MarkerArrow } from '@visx/marker'
-
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import useReduceData from '../../../hooks/useReduceData'
+import ConfigContext from '../../../ConfigContext'
+import './../index.scss'
 
-import useReduceData from '../../hooks/useReduceData'
+type SparkLineProps = {
+  width: string | number
+  height: string | number
+}
 
-import ConfigContext from '../../ConfigContext'
-
-const SparkLine = props => {
+const SparkLine: React.FC<SparkLineProps> = props => {
   const { width: parentWidth, height: parentHeight } = props
   const { transformedData: data, config, parseDate, formatDate, seriesHighlight, formatNumber, colorScale, handleChartAriaLabels } = useContext(ConfigContext)
-  let width = parentWidth
+  let width = Number(parentWidth)
   const { minValue, maxValue } = useReduceData(config, data, ConfigContext)
 
   const margin = { top: 5, right: 10, bottom: 10, left: 10 }
-  const height = parentHeight
+  const height = Number(parentHeight)
 
   const xMax = width - config.runtime.yAxis.size
   const yMax = height - margin.top - 20
@@ -38,8 +39,8 @@ const SparkLine = props => {
   const isMinValid = Number(enteredMinValue) <= Number(minValue)
 
   if (data) {
-    let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
-    let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
+    let min = enteredMinValue && isMinValid ? Number(enteredMinValue) : Number(minValue)
+    let max = enteredMaxValue && isMaxValid ? Number(enteredMaxValue) : Number(Number.MIN_VALUE)
 
     if (max === Number.MIN_VALUE) {
       max = maxValue
@@ -94,6 +95,7 @@ const SparkLine = props => {
   return (
     <ErrorBoundary component='SparkLine'>
       <svg role='img' aria-label={handleChartAriaLabels(config)} width={parentWidth} height={100} className={'sparkline'} tabIndex={0}>
+        <title>{`Spark line graphic with the title ${config.title ? config.title : 'No Title Found'}`}</title>
         {config.runtime.lineSeriesKeys?.length > 0
           ? config.runtime.lineSeriesKeys
           : config.runtime.seriesKeys.map((seriesKey, index) => (
@@ -106,15 +108,6 @@ const SparkLine = props => {
                   display={config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
                 >
                   {data.map((d, dataIndex) => {
-                    let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
-                    let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${d[config.runtime.xAxis.dataKey]}` : d[config.runtime.xAxis.dataKey]
-
-                    const tooltip = `<div>
-									${yAxisTooltip}<br />
-									${xAxisTooltip}<br />
-									${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''}
-									</div>`
-
                     return (
                       <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                         <Text display={config.labels ? 'block' : 'none'} x={xScale(getXAxisData(d))} y={yScale(getYAxisData(d, seriesKey))} fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'} textAnchor='middle'>
@@ -134,16 +127,7 @@ const SparkLine = props => {
                     shapeRendering='geometricPrecision'
                     markerEnd={`url(#${'arrow'}--${index})`}
                   />
-                  <MarkerArrow
-                    id={`arrow--${index}`}
-                    refX={2}
-                    size={6}
-                    markerEnd={`url(#${'arrow'}--${index})`}
-                    strokeOpacity={1}
-                    fillOpacity={1}
-                    // stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                    fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                  />
+                  <MarkerArrow id={`arrow--${index}`} refX={2} size={6} markerEnd={`url(#${'arrow'}--${index})`} strokeOpacity={1} fillOpacity={1} fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'} />
                 </Group>
                 <AxisBottom
                   top={yMax + margin.top}

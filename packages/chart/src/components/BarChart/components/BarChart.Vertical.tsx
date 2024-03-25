@@ -228,7 +228,8 @@ export const BarChartVertical = () => {
                               bar[config.xAxis.dataKey] = xAxisValue
                               setSharedFilter(config.uid, bar)
                             }
-                          }}>
+                          }}
+                        >
                           {getIcon(bar, barWidth)}
                         </g>
 

@@ -1,5 +1,6 @@
 import { type ChartConfig } from './ChartConfig'
 import { PickD3Scale } from '@visx/scale'
+import { type SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
 
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
@@ -9,6 +10,9 @@ export type TransformedData = {
 }
 
 type SharedChartContext = {
+  animatedChart?: boolean
+  // process top level chart aria label for each chart type
+  handleChartAriaLabels: (config: any) => string
   colorScale?: ColorScale
   config: ChartConfig
   currentViewport?: string
@@ -16,6 +20,7 @@ type SharedChartContext = {
   highlightReset?: Function
   legendIsolateValues?: string[]
   setLegendIsolateValues?: Function
+  getTextWidth?: () => string | number
 }
 
 // Line Chart Specific Context

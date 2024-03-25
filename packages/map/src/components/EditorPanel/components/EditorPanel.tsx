@@ -119,18 +119,16 @@ const EditorPanel = props => {
 
   const getCityStyleOptions = target => {
     switch (target) {
-      case 'column': {
-        return (
-          <option value='' key={'Select Option'}>
-            - Select Option -
-          </option>
-        )
-      }
       case 'value': {
-        let values = ['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
+        const values = ['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
+        const filteredValues = values.filter(val => String(state.visual.cityStyle).toLocaleLowerCase() !== val.toLocaleLowerCase())
+
         return (
           <>
-            {values.map((val, i) => {
+            <option value='' key={'Select Option'}>
+              - Select Option -
+            </option>
+            {filteredValues.map((val, i) => {
               return (
                 <option key={i} value={val}>
                   {val}
@@ -447,20 +445,6 @@ const EditorPanel = props => {
           legend: {
             ...state.legend,
             separateZero: value
-          }
-        })
-        break
-      case 'toggleDownloadButton':
-        setState({
-          ...state,
-          general: {
-            ...state.general,
-            showDownloadButton: !state.general.showDownloadButton
-          },
-          table: {
-            // setting both bc DataTable new core needs it here
-            ...state.table,
-            download: !state.general.showDownloadButton
           }
         })
         break
@@ -1359,9 +1343,8 @@ const EditorPanel = props => {
               })}
             </select>
           </label>
-            
-          <TextField value={state.filters[index].setByQueryParameter} section='filters' subsection={index} fieldName='setByQueryParameter' label='Default Value Set By Query String Parameter' updateField={updateField} />
 
+          <TextField value={state.filters[index].setByQueryParameter} section='filters' subsection={index} fieldName='setByQueryParameter' label='Default Value Set By Query String Parameter' updateField={updateField} />
 
           {filter.order === 'cust' && (
             <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, state.filters[index])}>
@@ -2711,16 +2694,6 @@ const EditorPanel = props => {
                   <label className='checkbox'>
                     <input
                       type='checkbox'
-                      checked={state.general.showDownloadButton}
-                      onChange={event => {
-                        handleEditorChanges('toggleDownloadButton', event.target.checked)
-                      }}
-                    />
-                    <span className='edit-label'>Show Download CSV Link</span>
-                  </label>
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
                       checked={state.general.showFullGeoNameInCSV}
                       onChange={event => {
                         handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
@@ -3123,6 +3096,7 @@ const EditorPanel = props => {
                 <button className={'btn full-width'} onClick={handleAddLayer}>
                   Add Map Layer
                 </button>
+                <p className='layer-purpose-details'>Context should be added to your visualization or associated page to describe the significance of layers that are added to maps.</p>
               </AccordionItemPanel>
             </AccordionItem>
             {state.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}

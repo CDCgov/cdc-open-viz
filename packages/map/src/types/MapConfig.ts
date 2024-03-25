@@ -31,6 +31,8 @@ type PatternSelection = {
   pattern: 'lines' | 'circles' | 'waves'
   // optional legend update
   label: string
+  // size of pattern
+  size: 'small' | 'medium' | 'large'
 }
 
 export type GeoColumnProperties = Pick<EditorColumnProperties, 'name' | 'label' | 'tooltip' | 'dataTable'>

@@ -89,17 +89,14 @@
       }
       .legend-container__reset-button {
         font-size: 0.75em;
-        color: rgba(0, 0, 0, 0.6);
-        position: absolute;
         right: 1em;
-        background: rgba(0, 0, 0, 0.1);
         text-transform: uppercase;
         transition: 0.2s all;
         padding: 0.2em 0.5em;
         border: rgba(0, 0, 0, 0.2) 1px solid;
+        padding: 0.375rem;
         &:hover {
           text-decoration: none;
-          background: rgba(0, 0, 0, 0.15);
           transition: 0.2s all;
         }
       }
@@ -118,7 +115,7 @@
           flex-direction: column;
         }
 
-        &:not(.vertical-sorted, .legend-container__ul--single-column) {
+        &:not(.vertical-sorted, .legend-container__ul--single-column, .single-row) {
           width: 100%;
           @include breakpoint(sm) {
             .legend-container__li {
@@ -231,13 +228,33 @@
         }
       }
     }
-    & .container-shapes {
-      display: flex;
-      align-items: flex-start;
+    & .shape-container {
+      &.single-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
 
-      & > svg {
+        & > div {
+          margin-right: 2em;
+        }
+        & > div:last-child {
+          margin-right: 0;
+        }
+      }
+
+      & > div {
+        display: flex;
+        flex-direction: row;
+      }
+      & div > svg {
         width: 25px;
         height: 32px;
+      }
+      & div > p {
+        white-space: nowrap;
+        margin-top: 1px;
       }
     }
   }

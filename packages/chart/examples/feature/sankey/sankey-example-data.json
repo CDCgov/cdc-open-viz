@@ -96,7 +96,7 @@
     "download": false,
     "showVertical": true,
     "show": true,
-    "customTableConfig": false
+    "customTableConfig": true
   },
   "orientation": "vertical",
   "color": "pinkpurple",

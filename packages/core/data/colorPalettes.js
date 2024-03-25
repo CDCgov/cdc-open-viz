@@ -11,17 +11,12 @@ const colorPalettesMap = {
   greenblue: ['#f7fcf0', '#e0f3db', '#ccebc5', '#a8ddb5', '#7bccc4', '#4eb3d3', '#267BA6', '#0868ac', '#084081'],
   yellowpurple: ['#FFF0B0', '#F5CC76', '#EDAE4B', '#E3683C', '#BF2A48', '#6D2059', '#8F0C4B', '#310958', '#0E0943'],
   qualitative1: ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#6a3d9a', '#cab2d6', '#E31A90', '#15017A', '#C2C0FC'],
-
   qualitative2: ['#7fc97f', '#beaed4', '#ff9', '#386cb0', '#f0027f', '#bf5b17', '#666', '#fedab8'],
-
   qualitative3: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02', '#a6761d', '#666'],
-
   qualitative4: ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ff3', '#a65628', '#f781bf'],
-
+  // qualitative9 doesn't appear to be used anywhere...
   qualitative9: ['#497d0c', '#84BC49', '#88c3ea', '#fcad90', '#f26b4f', '#c31b1f', '#c31b1f'],
-
   'sequential-blue-2(MPX)': ['#F5FEFF', '#E1FBFF', '#C0F2FD', '#94E2ED', '#5EBAD4', '#3695BE', '#2273A0', '#0E5181', '#093460'],
-
   'sequential-orange(MPX)': ['#FFFDF0', '#FFF7DC', '#FFE9C2', '#FFD097', '#F7A866', '#EB7723', '#B95117', '#853209', '#661F00']
 }
 

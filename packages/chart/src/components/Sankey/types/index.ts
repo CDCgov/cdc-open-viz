@@ -12,4 +12,5 @@ export type SankeyProps = {
   width: number
   height: number
   data: Data
+  runtime: any
 }

@@ -26,6 +26,7 @@
   }
 
   svg.sankey-chart__diagram {
+    position:relative;
     font-family: 'Roboto', sans-serif;
     height: auto;
     width: 100%;
@@ -132,7 +133,7 @@
 /* Pop up */
 
 .popup {
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -141,7 +142,7 @@
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 80%;
-  z-index: 9999;
+  z-index: 999;
   display: none;
 }
 
