@@ -223,7 +223,7 @@ const LineChart = (props: LineChartProps) => {
               {config.animate && (
                 <LinePath
                   className='animation'
-                  curve={seriesData[0].lineType}
+                  curve={allCurves[seriesData[0].lineType]}
                   data={data}
                   x={d => xPos(d)}
                   y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
