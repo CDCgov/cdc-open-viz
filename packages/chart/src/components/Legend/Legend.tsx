@@ -1,10 +1,10 @@
-import { useContext } from 'react'
+import { useContext, forwardRef } from 'react'
 import ConfigContext from '../../ConfigContext'
 import LegendComponent from './Legend.Component'
 import { createFormatLabels } from './helpers/createFormatLabels'
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
-const Legend = () => {
+const Legend = forwardRef((props, ref) => {
   // prettier-ignore
   const {
     config,
@@ -22,7 +22,7 @@ const Legend = () => {
 
   const createLegendLabels = createFormatLabels(config, tableData, data, colorScale)
 
-  return !['Box Plot', 'Pie'].includes(config.visualizationType) && <LegendComponent config={config} colorScale={colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
-}
+  return !['Box Plot', 'Pie'].includes(config.visualizationType) && <LegendComponent ref={ref} config={config} colorScale={colorScale} seriesHighlight={seriesHighlight} highlight={highlight} highlightReset={highlightReset} currentViewport={currentViewport} formatLabels={createLegendLabels} />
+})
 
 export default Legend
