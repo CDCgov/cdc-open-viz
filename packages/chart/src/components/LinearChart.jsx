@@ -231,12 +231,12 @@ const LinearChart = props => {
   ) : (
     <ErrorBoundary component='LinearChart'>
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
-      <div style={{ width: `${width}px`, height: `${height}px`, overflow: 'visible' }} className='tooltip-boundary'>
+      <div style={{ width: `${width}px`, overflow: 'visible' }} className='tooltip-boundary'>
         <svg
           // onMouseLeave={() => setPoint(null)}
           onMouseMove={onMouseMove}
           width={'100%'}
-          height={'100%'}
+          height={height}
           className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${debugSvg && 'debug'}`}
           role='img'
           aria-label={handleChartAriaLabels(config)}
@@ -416,66 +416,65 @@ const LinearChart = props => {
                 config.dynamicMarginTop = dynamicMarginTop
                 config.xAxis.tickWidthMax = tickWidthMax
 
-                return (
-                  <Group className='bottom-axis' width={dimensions[0]}>
-                    {props.ticks.map((tick, i, propsTicks) => {
-                      // when using LogScale show major ticks values only
-                      const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
-                      const tickLength = showTick === 'block' ? 16 : defaultTickLength
-                      const to = { x: tick.to.x, y: tickLength }
-                      let textWidth = getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                      let limitedWidth = 100 / propsTicks.length
-                      //reset rotations by updating config
-                      config.yAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
-                      config.xAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'vertical' ? 0 : config.xAxis.tickRotation
-                      //configure rotation
+                let axisMaxHeight = 40;
 
-                      const tickRotation = config.isResponsiveTicks && areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : -Number(config.runtime.xAxis.tickRotation)
+                const axisContents = <Group className='bottom-axis' width={dimensions[0]}>
+                  {props.ticks.map((tick, i, propsTicks) => {
+                    // when using LogScale show major ticks values only
+                    const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
+                    const tickLength = showTick === 'block' ? 16 : defaultTickLength
+                    const to = { x: tick.to.x, y: tickLength }
+                    let textWidth = getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                    let limitedWidth = 100 / propsTicks.length
+                    //reset rotations by updating config
+                    config.yAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
+                    config.xAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'vertical' ? 0 : config.xAxis.tickRotation
+                    //configure rotation
 
-                      return (
-                        <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                          {!config.xAxis.hideTicks && <Line from={tick.from} to={orientation === 'horizontal' && config.useLogScale ? to : tick.to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' && config.useLogScale ? 1.3 : 1} />}
-                          {!config.xAxis.hideLabel && (
-                            <Text
-                              dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
-                              display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
-                              x={tick.to.x}
-                              y={tick.to.y}
-                              angle={tickRotation}
-                              verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
-                              textAnchor={tickRotation ? 'end' : 'middle'}
-                              width={areTicksTouching && !config.isResponsiveTicks && !Number(config[section].tickRotation) ? limitedWidth : textWidth}
-                              fill={config.xAxis.tickLabelColor}
-                            >
-                              {tick.formattedValue}
-                            </Text>
-                          )}
-                        </Group>
-                      )
-                    })}
-                    {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                    <Text
-                      x={axisCenter}
-                      y={
-                        config.visualizationType === 'Forest Plot'
-                          ? config.xAxis.tickWidthMax + 40
-                          : config.orientation === 'horizontal'
-                          ? dynamicMarginTop || config.xAxis.labelOffset
-                          : config.isResponsiveTicks && dynamicMarginTop && !isHorizontal
-                          ? dynamicMarginTop
-                          : Number(rotation) && !config.isResponsiveTicks && !isHorizontal
-                          ? Number(rotation + tickWidthMax / 1.3)
-                          : Number(config.xAxis.labelOffset)
-                      }
-                      textAnchor='middle'
-                      verticalAnchor='start'
-                      fontWeight='bold'
-                      fill={config.xAxis.labelColor}
-                    >
-                      {props.label}
-                    </Text>
-                  </Group>
-                )
+                    const tickRotation = config.isResponsiveTicks && areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : -Number(config.runtime.xAxis.tickRotation)
+
+                    const axisHeight = textWidth * Math.sin(tickRotation * -1 * (Math.PI / 180));
+
+                    if(axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
+
+                    return (
+                      <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                        {!config.xAxis.hideTicks && <Line from={tick.from} to={orientation === 'horizontal' && config.useLogScale ? to : tick.to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' && config.useLogScale ? 1.3 : 1} />}
+                        {!config.xAxis.hideLabel && (
+                          <Text
+                            dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
+                            display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
+                            x={tick.to.x}
+                            y={tick.to.y}
+                            angle={tickRotation}
+                            verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
+                            textAnchor={tickRotation ? 'end' : 'middle'}
+                            width={areTicksTouching && !config.isResponsiveTicks && !Number(config[section].tickRotation) ? limitedWidth : textWidth}
+                            fill={config.xAxis.tickLabelColor}
+                          >
+                            {tick.formattedValue}
+                          </Text>
+                        )}
+                      </Group>
+                    )
+                  })}
+                  {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
+                  <Text
+                    x={axisCenter}
+                    y={axisMaxHeight + 20}
+                    textAnchor='middle'
+                    verticalAnchor='start'
+                    fontWeight='bold'
+                    fill={config.xAxis.labelColor}
+                  >
+                    {props.label}
+                  </Text>
+                </Group>
+
+console.log(axisMaxHeight)
+                if(svgRef.current) svgRef.current.setAttribute('height',(height + axisMaxHeight + 10 + (runtime.xAxis.label ? 30 : 0)) + 'px')
+
+                return axisContents
               }}
             </AxisBottom>
           )}

@@ -34,7 +34,6 @@ import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
 import { generateColorsArray } from './helpers/generateColorsArray'
-import { computeMarginBottom } from './helpers/computeMarginBottom'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -1061,7 +1060,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Visualization */}
             {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
             <div
-              style={{ marginBottom: computeMarginBottom(config, legend, currentViewport) }}
               className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')} ${isDebug ? 'debug' : ''}`}
             >
               {/* All charts except sparkline */}
@@ -1137,7 +1135,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
   const contextValues = {
     capitalize,
-    computeMarginBottom,
     getXAxisData,
     getYAxisData,
     config,
