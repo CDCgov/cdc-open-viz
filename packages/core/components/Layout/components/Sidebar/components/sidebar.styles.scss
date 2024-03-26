@@ -2,7 +2,7 @@
 
 .cdc-open-viz-module {
   .sidebar {
-    position: absolute;
+    position: fixed;
     height: 100vh;
     top: 0;
     max-width: 350px;
@@ -11,12 +11,12 @@
     grid-area: sidebar;
 
     .editor-toggle {
-      position: absolute !important;
+      position: fixed !important;
       top: 10px !important;
     }
 
     .editor-panel {
-      position: absolute !important;
+      position: fixed !important;
       top: 0 !important;
     }
 
@@ -195,6 +195,8 @@
     .form-container {
       border-right: var(--lightGray) 1px solid;
       flex-grow: 1;
+      height: 100%;
+      overflow: auto;
     }
 
     .guidance-link {
@@ -835,7 +837,7 @@
     color: #000;
     font-size: 1em;
     border: 0;
-    position: absolute;
+    position: fixed;
     z-index: 100;
     transition: 0.1s background;
     cursor: pointer;
