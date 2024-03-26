@@ -1643,7 +1643,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   return (
     <ConfigContext.Provider value={mapProps}>
-      <Layout.VisualizationWrapper config={state} isEditor={isEditor} ref={outerContainerRef} imageId={imageId}>
+      <Layout.VisualizationWrapper config={state} isEditor={isEditor} ref={outerContainerRef} imageId={imageId} showEditorPanel={state.showEditorPanel}>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
