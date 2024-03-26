@@ -1,0 +1,16 @@
+.cdc-open-viz-module.isEditor {
+  overflow: auto;
+  display: grid;
+  grid-template-areas: 'panel content';
+  grid-template-columns: 350px calc(100% - 350px);
+
+  .cove-editor__content,
+  .cove-component__content {
+    grid-area: content;
+    position: relative;
+    left: 0;
+    width: 100% !important;
+    padding-left: 0px !important;
+    grid-area: content;
+  }
+}

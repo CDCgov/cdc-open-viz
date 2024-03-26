@@ -41,21 +41,6 @@ type CdcWaffleChartProps = {
 const WaffleChart = ({ config, isEditor, link = '' }) => {
   const { title, theme, shape, nodeWidth, nodeSpacer, prefix, suffix, subtext, content, orientation, filters, dataColumn, dataFunction, dataConditionalColumn, dataConditionalOperator, dataConditionalComparate, customDenom, dataDenom, dataDenomColumn, dataDenomFunction, roundToPlace } = config
 
-  const handleWaffleChartAriaLabel = (state, testing = false): string => {
-    // eslint-disable-next-line no-console
-    if (testing) console.log(`handleWaffleChartAriaLabels Testing On:`, state)
-    try {
-      let ariaLabel = 'Waffle chart'
-      if (state.title) {
-        ariaLabel += ` with the title: ${state.title}`
-      }
-      return ariaLabel
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e.message)
-    }
-  }
-
   const gaugeColor = config.visual.colors[config.theme]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
@@ -281,9 +266,9 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
   })
 
   return (
-    <>
-      <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
+    <div className='cove-component__content'>
       <div className={contentClasses.join(' ')}>
+        <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
         <div className='cove-component__content-wrap'>
           {config.visualizationType === 'Gauge' && (
             <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
@@ -330,7 +315,7 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
         </div>
       </div>
       {link && link}
-    </>
+    </div>
   )
 }
 

@@ -3,9 +3,10 @@ import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import React, { forwardRef, useRef } from 'react'
 import { Config as DataBiteConfig } from '@cdc/data-bite/src/types/Config'
 import './visualizations.scss'
+import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
 
 type VisualizationWrapper = {
-  config: ChartConfig | DataBiteConfig
+  config: ChartConfig | DataBiteConfig | WaffleChartConfig
   isEditor: boolean
   currentViewport: string
   imageId: string
