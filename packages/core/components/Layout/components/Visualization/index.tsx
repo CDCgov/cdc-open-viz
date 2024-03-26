@@ -14,12 +14,22 @@ type VisualizationWrapper = {
 }
 
 const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) => {
-  const { config = {}, isEditor = false, currentViewport = 'lg', imageId = '' } = props
+  const { config = {}, isEditor = false, currentViewport = 'lg', imageId = '', showEditorPanel = true } = props
 
   const getWrappingClasses = () => {
-    const classes = ['cdc-open-viz-module', `${currentViewport}`, `font-${config?.fontSize}`, `${config?.theme}`]
+    let classes = ['cdc-open-viz-module', `${currentViewport}`, `font-${config?.fontSize}`, `${config?.theme}`]
     isEditor && classes.push('spacing-wrapper')
     isEditor && classes.push('isEditor')
+
+    if (isEditor && showEditorPanel) {
+      classes = classes.filter(item => item !== 'editor-panel--hidden')
+      classes.push('editor-panel--visible')
+    }
+
+    if (isEditor && !showEditorPanel) {
+      classes = classes.filter(item => item !== 'editor-panel--visible')
+      classes.push('editor-panel--hidden')
+    }
 
     if (config.type === 'chart') {
       classes.push('type-chart')

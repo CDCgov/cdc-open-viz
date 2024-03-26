@@ -618,6 +618,10 @@ const EditorPanel = () => {
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
+    updateConfig({
+      ...config,
+      showEditorPanel: !displayPanel
+    })
   }
 
   const Error = () => {

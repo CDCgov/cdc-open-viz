@@ -1190,7 +1190,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   return (
     <ConfigContext.Provider value={contextValues}>
-      <Layout.VisualizationWrapper config={config} isEditor={isEditor} currentViewport={currentViewport} ref={outerContainerRef} imageId={imageId}>
+      <Layout.VisualizationWrapper config={config} isEditor={isEditor} currentViewport={currentViewport} ref={outerContainerRef} imageId={imageId} showEditorPanel={config?.showEditorPanel}>
         {body}
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
