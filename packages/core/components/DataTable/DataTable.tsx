@@ -181,7 +181,7 @@ const DataTable = (props: DataTableProps) => {
       <ErrorBoundary component='DataTable'>
         <MediaControls.Section classes={['download-links']}>
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />
-          {(config.table.download || config.general?.showDownloadButton) && <DownloadButton rawData={getDownloadData()} fileName={`${vizTitle || 'data-table'}.csv`} headerColor={headerColor} skipId={skipId} />}
+          {(config.table.download || config.general?.showDownloadButton) && <DownloadButton rawData={getDownloadData()} fileName={`${vizTitle || 'data-table'}.csv`} headerColor={headerColor} />}
         </MediaControls.Section>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
