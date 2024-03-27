@@ -1265,6 +1265,10 @@ const EditorPanel = props => {
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
+    setState({
+      ...state,
+      showEditorPanel: !displayPanel
+    })
   }
 
   const usedFilterColumns = {}

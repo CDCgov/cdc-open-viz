@@ -3,7 +3,7 @@ import '../scss/kpi.scss'
 
 export const KPIComponent = ({ label, value }) => {
   return (
-    <div className='cove-component__inner kpi-container'>
+    <div className='cove-component__content kpi-container'>
       <div className='kpi-content'>
         <div className='label-container'>
           <span className='label'>

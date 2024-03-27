@@ -1,6 +1,6 @@
-@import '@cdc/core/styles/v2/components/input';
-@import '@cdc/core/styles/v2/main';
 @import '@cdc/core/styles/base';
+@import '@cdc/core/styles/heading-colors';
+@import '@cdc/core/styles/v2/themes/color-definitions';
 @import 'waffle-chart';
 
 .cdc-open-viz-module.type-waffle-chart {
@@ -15,8 +15,7 @@
     }
   }
 
-  // TODO: build same components for visualizations
-  .cove-component.waffle-chart .cove-component__inner .cove-component__content:not(.component--has-background, .component--hideBackgroundColor) {
+  .cove-component__content:not(.component--has-background, .component--hideBackgroundColor) {
     background-color: white;
   }
 

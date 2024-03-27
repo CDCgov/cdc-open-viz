@@ -190,7 +190,12 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
 
     content = (
       <>
-        {isEditor && <EditorPanel>{body}</EditorPanel>}
+        {isEditor && (
+          <>
+            <EditorPanel />
+            {body}
+          </>
+        )}
         {!isEditor && body}
       </>
     )
@@ -199,7 +204,7 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={container}>
+        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={container} showEditorPanel={config?.showEditorPanel}>
           {content}
         </Layout.VisualizationWrapper>
       </ConfigContext.Provider>

@@ -41,21 +41,6 @@ type CdcWaffleChartProps = {
 const WaffleChart = ({ config, isEditor, link = '' }) => {
   const { title, theme, shape, nodeWidth, nodeSpacer, prefix, suffix, subtext, content, orientation, filters, dataColumn, dataFunction, dataConditionalColumn, dataConditionalOperator, dataConditionalComparate, customDenom, dataDenom, dataDenomColumn, dataDenomFunction, roundToPlace } = config
 
-  const handleWaffleChartAriaLabel = (state, testing = false): string => {
-    // eslint-disable-next-line no-console
-    if (testing) console.log(`handleWaffleChartAriaLabels Testing On:`, state)
-    try {
-      let ariaLabel = 'Waffle chart'
-      if (state.title) {
-        ariaLabel += ` with the title: ${state.title}`
-      }
-      return ariaLabel
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e.message)
-    }
-  }
-
   const gaugeColor = config.visual.colors[config.theme]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
@@ -281,7 +266,7 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
   })
 
   return (
-    <>
+    <div className='cove-component__content'>
       <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
       <div className={contentClasses.join(' ')}>
         <div className='cove-component__content-wrap'>
@@ -330,7 +315,7 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
         </div>
       </div>
       {link && link}
-    </>
+    </div>
   )
 }
 
@@ -433,7 +418,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   return (
     <ErrorBoundary component='WaffleChart'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={outerContainerRef}>
+        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={outerContainerRef} showEditorPanel={config?.showEditorPanel}>
           {content}
         </Layout.VisualizationWrapper>
       </ConfigContext.Provider>

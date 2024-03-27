@@ -1643,11 +1643,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   return (
     <ConfigContext.Provider value={mapProps}>
-      <Layout.VisualizationWrapper config={state} isEditor={isEditor} ref={outerContainerRef} imageId={imageId}>
+      <Layout.VisualizationWrapper config={state} isEditor={isEditor} ref={outerContainerRef} imageId={imageId} showEditorPanel={state.showEditorPanel}>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-            <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
+            <section className={`cove-component__content cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
               {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
                 <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
               )}
