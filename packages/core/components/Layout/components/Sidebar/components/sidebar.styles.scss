@@ -8,7 +8,7 @@
     max-width: 350px;
     width: 350px;
     background-color: var(--white);
-    grid-area: sidebar;
+    grid-area: panel;
 
     .editor-toggle {
       position: fixed !important;
@@ -20,7 +20,7 @@
       top: 0 !important;
     }
 
-    &.hidden {
+    &.editor-panel--hidden &.hidden {
       display: none;
     }
 

@@ -504,12 +504,12 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   return (
     <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
       {biteStyle !== 'gradient' && (
-        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor}>
+        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
           {body}
         </Layout.VisualizationWrapper>
       )}
       {'gradient' === biteStyle && (
-        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor}>
+        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
           {isEditor && <EditorPanel />}
           <Layout.Responsive isEditor={isEditor}>
             <GradientBite label={config.title} value={calculateDataBite()} />

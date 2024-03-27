@@ -154,6 +154,10 @@ const EditorPanel = memo(() => {
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
+    updateConfig({
+      ...config,
+      showEditorPanel: !displayPanel
+    })
   }
 
   const Error = () => {
@@ -305,7 +309,7 @@ const EditorPanel = memo(() => {
     <ErrorBoundary component='EditorPanel'>
       {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
       {(!config.dataColumn || !config.dataFunction) && <Confirm />}
-      <Layout.Sidebar isEditor={true} config={config} title='Configure Data Bites' onBackClick={onBackClick}>
+      <Layout.Sidebar isEditor={true} config={config} title='Configure Data Bites' onBackClick={onBackClick} displayPanel={displayPanel}>
         <section className='form-container'>
           <form>
             <Accordion allowZeroExpanded={true}>
