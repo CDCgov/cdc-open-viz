@@ -267,8 +267,8 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
 
   return (
     <div className='cove-component__content'>
+      <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
       <div className={contentClasses.join(' ')}>
-        <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
         <div className='cove-component__content-wrap'>
           {config.visualizationType === 'Gauge' && (
             <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>

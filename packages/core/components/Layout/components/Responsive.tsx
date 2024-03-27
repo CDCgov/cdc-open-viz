@@ -105,7 +105,7 @@ const Responsive = ({ children, isEditor }) => {
       resizeObserver.disconnect()
       resizeObserver = null
     }
-  }, [])
+  })
 
   const onBackClick = () => setDisplayPanel(!displayPanel)
 
