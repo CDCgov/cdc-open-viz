@@ -52,7 +52,7 @@ const LinearChart = props => {
   const shouldAbbreviate = true
   let height = config.aspectRatio ? width * config.aspectRatio : config.visualizationType === 'Forest Plot' ? config.heights['vertical'] : config.heights[orientation]
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.size)
+  let yMax = height - (orientation === 'horizontal' ? 0 : (runtime.xAxis.padding || 0))
 
   if (config.visualizationType === 'Forest Plot') {
     height = height + config.data.length * config.forestPlot.rowHeight
@@ -207,7 +207,7 @@ const LinearChart = props => {
     return false
   }
 
-  const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
+  const padding = orientation === 'horizontal' ? Number(config.xAxis.padding) : Number(config.yAxis.size)
 
   const handleNumTicks = () => {
     // On forest plots we need to return every "study" or y axis value.
@@ -433,7 +433,7 @@ const LinearChart = props => {
 
                     const tickRotation = config.isResponsiveTicks && areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : -Number(config.runtime.xAxis.tickRotation)
 
-                    const axisHeight = textWidth * Math.sin(tickRotation * -1 * (Math.PI / 180));
+                    const axisHeight = textWidth * Math.sin(tickRotation * -1 * (Math.PI / 180)) + 25;
 
                     if(axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
 
@@ -471,8 +471,7 @@ const LinearChart = props => {
                   </Text>
                 </Group>
 
-console.log(axisMaxHeight)
-                if(svgRef.current) svgRef.current.setAttribute('height',(height + axisMaxHeight + 10 + (runtime.xAxis.label ? 30 : 0)) + 'px')
+                if(svgRef.current) svgRef.current.setAttribute('height',(height + axisMaxHeight + (runtime.xAxis.label ? 50 : 0)) + 'px')
 
                 return axisContents
               }}
@@ -722,7 +721,7 @@ console.log(axisMaxHeight)
             </Group>
           )}
           {config.filters && config.filters.values.length === 0 && data.length === 0 && (
-            <Text x={Number(config.yAxis.size) + Number(xMax / 2)} y={height / 2 - config.xAxis.size / 2} textAnchor='middle'>
+            <Text x={Number(config.yAxis.size) + Number(xMax / 2)} y={height / 2 - config.xAxis.padding / 2} textAnchor='middle'>
               {config.chartMessage.noData}
             </Text>
           )}
