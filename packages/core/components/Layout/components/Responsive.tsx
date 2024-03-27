@@ -21,7 +21,7 @@ const Responsive = ({ children, isEditor }) => {
   const [viewportPreview, setViewportPreview] = useState(null)
   const [rotateAnimation, setRotateAnimation] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [previewDimensions, setPreviewDimensions] = useState({})
+  const [previewDimensions, setPreviewDimensions] = useState<{ width: number; height: number }>(null)
 
   const resetIcon = useRef(null)
   const editorPanelRef = useRef(null)
@@ -150,7 +150,7 @@ const Responsive = ({ children, isEditor }) => {
 
       <div className='cove-editor-utils__breakpoints'>
         <ul className={`cove-editor-utils__breakpoints-list${viewportPreview ? ' has-active' : ''}`}>
-          <li
+          <button
             className='cove-editor-utils__breakpoints-item'
             onClick={() => {
               setDisplayGrid(display => !display)
@@ -159,13 +159,13 @@ const Responsive = ({ children, isEditor }) => {
             <div className='cove-editor-utils__breakpoints-grid'>
               <Icon display='grid' />
             </div>
-          </li>
+          </button>
           {breakpoints.map((breakpoint, index) => (
-            <li className={`cove-editor-utils__breakpoints-item${viewportPreview === breakpoint ? ' active' : ''}`} onClick={() => viewportPreviewController(breakpoint)} key={index}>
+            <button className={`cove-editor-utils__breakpoints-item${viewportPreview === breakpoint ? ' active' : ''}`} onClick={() => viewportPreviewController(breakpoint)} key={index}>
               {breakpoint}px
-            </li>
+            </button>
           ))}
-          <li
+          <button
             className='cove-editor-utils__breakpoints-item'
             onClick={() => {
               resetPreview()
@@ -174,7 +174,7 @@ const Responsive = ({ children, isEditor }) => {
             <div className='cove-editor-utils__breakpoints-reset' ref={resetIcon}>
               <Icon display='rotateLeft' />
             </div>
-          </li>
+          </button>
         </ul>
       </div>
     </div>
