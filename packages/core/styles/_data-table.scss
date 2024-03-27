@@ -28,6 +28,9 @@ div.data-table-heading {
     z-index: 2;
     position: relative;
   }
+  @include breakpoint(xs) {
+    font-size: 0.7em;
+  }
 }
 
 table.horizontal {
@@ -139,6 +142,7 @@ table.data-table {
 
   td {
     padding: 0.3em 0.7em;
+
     border-right: 1px solid rgba(0, 0, 0, 0.1);
   }
 
@@ -150,6 +154,10 @@ table.data-table {
     overflow: hidden;
     &:last-child {
       border-right: 0 !important;
+    }
+
+    @include breakpoint(xs) {
+      font-size: 0.7em;
     }
   }
   tr {
