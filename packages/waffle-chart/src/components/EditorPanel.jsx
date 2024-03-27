@@ -81,6 +81,10 @@ const EditorPanel = memo(props => {
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
+    updateConfig({
+      ...config,
+      showEditorPanel: !displayPanel
+    })
 
     // if (isDashboard) {
     //   updateConfig({ ...config, editing: false })
@@ -431,7 +435,7 @@ const EditorPanel = memo(props => {
       <>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
         {config.newViz && showConfigConfirm && <Confirm />}
-        <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Waffle Chart'>
+        <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Waffle Chart' showEditorPanel={displayPanel}>
           {editorContent}
         </Layout.Sidebar>
         {props.children}

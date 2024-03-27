@@ -418,7 +418,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   return (
     <ErrorBoundary component='WaffleChart'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={outerContainerRef}>
+        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={outerContainerRef} showEditorPanel={config?.showEditorPanel}>
           {content}
         </Layout.VisualizationWrapper>
       </ConfigContext.Provider>
