@@ -43,6 +43,10 @@ const EditorPanel = memo(props => {
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
+    updateConfig({
+      ...config,
+      showEditorPanel: !displayPanel
+    })
 
     // if (isDashboard) {
     //   updateConfig({ ...config, editing: false })

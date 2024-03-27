@@ -192,13 +192,6 @@
       }
     }
 
-    .form-container {
-      border-right: var(--lightGray) 1px solid;
-      flex-grow: 1;
-      height: 100%;
-      overflow: auto;
-    }
-
     .guidance-link {
       margin: 2em 1em 0;
       padding: 0.75em 1em;
@@ -817,6 +810,15 @@
           padding-bottom: 5px;
         }
       }
+    }
+  }
+
+  &.editor-panel--visible {
+    .form-container {
+      border-right: var(--lightGray) 1px solid;
+      flex-grow: 1;
+      height: 100%;
+      overflow: auto;
     }
   }
 
