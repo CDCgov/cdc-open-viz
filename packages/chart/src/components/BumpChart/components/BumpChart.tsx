@@ -4,9 +4,8 @@ import { Group } from '@visx/group'
 import { ChartConfig } from '../../../types/ChartConfig'
 import ConfigContext from '../../../ConfigContext'
 import * as allCurves from '@visx/curve'
-import { timeParse, timeFormat } from 'd3-time-format'
+import { timeParse } from 'd3-time-format'
 
-import './bumpchart.scss'
 
 type BumpChartProps = {
   width: number
