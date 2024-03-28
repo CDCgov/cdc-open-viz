@@ -1,5 +1,17 @@
 @import '@cdc/core/styles/v2/themes/_color-definitions.scss';
 
+.configure {
+  .cdc-open-viz-module {
+    &.isEditor .sidebar {
+      top: 56px;
+    }
+
+    &.isEditor .editor-panel__toggle {
+      top: 68px;
+    }
+  }
+}
+
 .cdc-open-viz-module {
   .sidebar {
     position: fixed;
