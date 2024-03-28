@@ -3,6 +3,7 @@ import { useContext } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
+import { formatDate, parseDate } from '@cdc/core/helpers/cove/date'
 
 const scaleTypes = {
   TIME: 'time',

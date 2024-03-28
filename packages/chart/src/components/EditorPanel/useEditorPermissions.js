@@ -11,6 +11,7 @@ export const useEditorPermissions = () => {
     'Area Chart',
     'Bar',
     'Box Plot',
+    'Bump Chart',
     'Combo',
     'Deviation Bar',
     'Forecasting',
