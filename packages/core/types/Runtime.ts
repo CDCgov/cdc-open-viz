@@ -26,4 +26,6 @@ export type Runtime = {
   seriesLabels: Record<string, any>
   seriesLabelsAll: string[]
   editorErrorMessage: string
+  lineSeriesKeys: any[]
+  horizontal: boolean
 }

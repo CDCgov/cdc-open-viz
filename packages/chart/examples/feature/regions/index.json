@@ -52,6 +52,7 @@
     "rightAxisTickColor": "#333",
     "numTicks": "9",
     "axisPadding": 0,
+    "scalePadding": 10,
     "tickRotation": 0,
     "anchors": [],
     "label": "Y-Axis Example Label"
@@ -98,7 +99,7 @@
     "horizontal": 750
   },
   "xAxis": {
-    "sortDates": true,
+    "sortDates": false,
     "anchors": [],
     "type": "date",
     "showTargetLabel": true,
@@ -135,6 +136,7 @@
     "indexLabel": "Data Group",
     "download": true,
     "showVertical": false,
+    "dateDisplayFormat": "",
     "show": true
   },
   "orientation": "vertical",
@@ -155,6 +157,7 @@
     "lineMode": false,
     "verticalSorted": false,
     "highlightOnHover": false,
+    "seriesHighlight": [],
     "position": "right",
     "label": "Type of Data"
   },
@@ -279,7 +282,8 @@
   ],
   "tooltips": {
     "opacity": 90,
-    "singleSeries": false
+    "singleSeries": false,
+    "dateDisplayFormat": ""
   },
   "forestPlot": {
     "startAt": 0,
@@ -331,6 +335,48 @@
   },
   "area": {
     "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
   },
   "showChartBrush": false,
   "height": "375",
@@ -398,10 +444,10 @@
       "label": "Region Applied to Timeline",
       "color": "Black",
       "background": "Grey",
-      "fromType": "Previous Days"
+      "fromType": "Fixed"
     }
   ],
-  "validated": 4.23,
+  "validated": "4.24.3",
   "formattedData": [
     {
       "Date": "1/15/2016",

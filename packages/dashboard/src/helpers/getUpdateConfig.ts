@@ -5,6 +5,8 @@ import { generateValuesForFilter } from './generateValuesForFilter'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
 
+import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+
 type UpdateState = Omit<DashboardState, 'config'> & {
   config?: DashboardConfig
 }
@@ -14,17 +16,28 @@ export const getUpdateConfig =
   (newConfig, dataOverride?: Object): [Config, Object] => {
     let newFilteredData = {}
     let visualizationKeys = getVizKeys(newConfig)
-    const setFilter = (filterIndex: number, key: string, value: any) => {
-      newConfig.dashboard.sharedFilters[filterIndex][key] = value
-    }
+
     if (newConfig.dashboard.sharedFilters) {
       newConfig.dashboard.sharedFilters.forEach((filter, i) => {
         const filterIsSetByVizData = !!visualizationKeys.find(key => key === filter.setBy)
-        let _filter = newConfig.dashboard.sharedFilters[i]
+        const _filter = newConfig.dashboard.sharedFilters[i]
 
+        const setValuesAndActive = filterValues => {
+          _filter.values = filterValues
+          if (filterValues.length > 0) {
+            const defaultValues = _filter.pivot ? _filter.values : _filter.values[0]
+
+            const queryStringFilterValue = getQueryStringFilterValue(_filter)
+            if(queryStringFilterValue){
+              _filter.active = queryStringFilterValue
+            } else {
+              _filter.active = _filter.active || defaultValues
+            }
+          }
+        }
+
+        const filterValues = generateValuesForFilter(filter.columnName, dataOverride || state.data)
         if (filterIsSetByVizData) {
-          const filterValues = generateValuesForFilter(filter.columnName, dataOverride || state.data, state.config?.filterBehavior)
-
           if (_filter.order === 'asc') {
             filterValues.sort()
           }
@@ -32,32 +45,21 @@ export const getUpdateConfig =
             filterValues.sort().reverse()
           }
 
-          setFilter(i, 'values', filterValues)
-          _filter = newConfig.dashboard.sharedFilters[i]
-          if (filterValues.length > 0) {
-            setFilter(i, 'active', _filter.active || _filter.values[0])
-          }
-        }
-
-        if ((!filter.values || filter.values.length === 0) && filter.showDropdown) {
-          const generatedValues = generateValuesForFilter(filter.columnName, dataOverride || state.data, state.config?.filterBehavior)
-          setFilter(i, 'values', generatedValues)
-          const _filter = newConfig.dashboard.sharedFilters[i]
-          if (_filter.values.length > 0) {
-            setFilter(i, 'active', filter.active || _filter.values[0])
-          }
+          setValuesAndActive(filterValues)
+        } else if ((!filter.values || filter.values.length === 0) && filter.showDropdown) {
+          setValuesAndActive(filterValues)
         }
       })
 
       visualizationKeys.forEach(visualizationKey => {
-        let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
+        const applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
 
         if (applicableFilters.length > 0) {
           const visualization = newConfig.visualizations[visualizationKey]
           const _newConfigDataSet = newConfig.datasets[visualization.dataKey]
           const formattedData = getFormattedData(_newConfigDataSet?.data || visualization.data, visualization.dataDescription)
           const _data = formattedData || (dataOverride || state.data)[visualization.dataKey]
-          newFilteredData[visualizationKey] = filterData(applicableFilters, _data, state.config?.filterBehavior)
+          newFilteredData[visualizationKey] = filterData(applicableFilters, _data)
         }
       })
     }

@@ -307,7 +307,7 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
             {config.visualizationType !== 'Gauge' && (
               <div className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
                 <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
-                  <svg width={setRatio()} height={setRatio()} role='img' aria-label={handleWaffleChartAriaLabel(config)} tabIndex={0}>
+                  <svg width={setRatio()} height={setRatio()}>
                     <Group>{buildWaffle()}</Group>
                   </svg>
                 </div>

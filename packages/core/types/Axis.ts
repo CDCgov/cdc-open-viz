@@ -23,6 +23,7 @@ export type Axis = {
   maxTickRotation?: number
   min?: string
   numTicks?: number
+  paddingPercent?: number
   rightAxisSize?: number
   rightHideAxis?: boolean
   rightHideLabel?: boolean

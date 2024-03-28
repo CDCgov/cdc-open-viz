@@ -1,5 +1,7 @@
+type RuntimeData = Object[] & Record<string, Object>
+
 // removes null and excluded columns
-const customColumns = (runtimeData: Object[] | Record<string, Object>, excludeColumns: string[] = []): Object[] | Record<string, Object> => {
+const customColumns = (runtimeData: Object[] | RuntimeData, excludeColumns: string[] = []): RuntimeData => {
   if (!Array.isArray(runtimeData)) {
     // currently we don't support Record types
     return runtimeData
@@ -18,7 +20,7 @@ const customColumns = (runtimeData: Object[] | Record<string, Object>, excludeCo
         if (runtimeDataMemo[key] === true) row[key] = d[key]
       })
       return row
-    })
+    }) as RuntimeData
   }
 }
 

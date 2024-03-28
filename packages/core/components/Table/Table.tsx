@@ -24,7 +24,7 @@ type TableProps = {
 type Position = 'sticky'
 
 const Table = ({ childrenMatrix, tableName, caption, stickyHeader, headContent, tableOptions, wrapColumns, hasRowType }: TableProps) => {
-  const headStyle = stickyHeader ? { position: 'sticky' as Position, top: 0, zIndex: 999 } : {}
+  const headStyle = stickyHeader ? { position: 'sticky' as Position, top: 0, zIndex: 2 } : {}
   const isGroupedMatrix = !Array.isArray(childrenMatrix)
   return (
     <table {...tableOptions}>

@@ -1,0 +1,548 @@
+{
+    "general": {
+        "geoType": "us",
+        "type": "data",
+        "geoBorderColor": "darkGray",
+        "headerColor": "theme-blue",
+        "title": "US <strong>Categorical</strong> Data Map",
+        "showTitle": true,
+        "showSidebar": true,
+        "showDownloadButton": false,
+        "showDownloadMediaButton": false,
+        "displayAsHex": false,
+        "displayStateLabels": false,
+        "territoriesLabel": "Territories",
+        "territoriesAlwaysShow": false,
+        "language": "en",
+        "geoLabelOverride": "",
+        "hasRegions": false,
+        "fullBorder": false,
+        "convertFipsCodes": true,
+        "palette": {
+            "isReversed": false
+        },
+        "allowMapZoom": true,
+        "hideGeoColumnInTooltip": false,
+        "hidePrimaryColumnInTooltip": false,
+        "statePicked": {
+            "fipsCode": "01",
+            "stateName": "Alabama"
+        },
+        "superTitle": "Polygon Overlay and <em>Patterns</em>",
+        "introText": "Lorem ipsum dolor sit amet, <em>consectetur adipiscing elit</em>, sed do eiusmod tempor incididunt ut labore et <strong>dolore magna aliqua</strong>. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <sup> 40</sup>",
+        "subtext": "Lorem ipsum dolor sit amet, <em>consectetur adipiscing elit</em>, sed do eiusmod tempor incididunt ut labore et <strong>dolore magna aliqua</strong>. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <sup> 40</sup>",
+        "footnotes": "Lorem ipsum dolor sit amet, <em>consectetur adipiscing elit</em>, sed do eiusmod tempor incididunt ut labore et <strong>dolore magna aliqua</strong>. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <sup> 40</sup>",
+        "showDownloadImgButton": true
+    },
+    "type": "map",
+    "color": "red",
+    "columns": {
+        "geo": {
+            "name": "State",
+            "label": "Location",
+            "tooltip": false,
+            "dataTable": true
+        },
+        "primary": {
+            "dataTable": true,
+            "tooltip": true,
+            "prefix": "",
+            "suffix": "",
+            "name": "Activity Level",
+            "label": "Activity Level"
+        },
+        "navigate": {
+            "name": "URL"
+        },
+        "latitude": {
+            "name": ""
+        },
+        "longitude": {
+            "name": ""
+        },
+        "additionalColumn1": {
+            "label": "New Column",
+            "dataTable": true,
+            "tooltips": false,
+            "prefix": "",
+            "suffix": "",
+            "name": "Funding Status",
+            "tooltip": true
+        }
+    },
+    "legend": {
+        "descriptions": {},
+        "specialClasses": [
+            {
+                "key": "Funding Status",
+                "value": "*",
+                "label": "Not Funded"
+            },
+            {
+                "key": "Funding Status",
+                "value": "NA",
+                "label": "Not Applicable"
+            }
+        ],
+        "unified": false,
+        "singleColumn": false,
+        "singleRow": false,
+        "verticalSorted": false,
+        "showSpecialClassesLast": false,
+        "dynamicDescription": false,
+        "type": "category",
+        "numberOfItems": 3,
+        "position": "side",
+        "title": "Lorem <em>ipsum dolor</em> sit amet",
+        "categoryValuesOrder": [
+            "Super Duper High",
+            "Very High",
+            "High",
+            "Moderate",
+            "Low",
+            "Minimal",
+            "Very Low",
+            "Zero"
+        ],
+        "description": "Lorem ipsum dolor sit amet, <em>consectetur adipiscing elit</em>, sed do eiusmod tempor incididunt ut labore et <strong>dolore magna aliqua</strong>. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <sup> 40</sup>"
+    },
+    "filters": [],
+    "table": {
+        "wrapColumns": false,
+        "label": "Data Table",
+        "expanded": false,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "showFullGeoNameInCSV": true,
+        "forceDisplay": true,
+        "download": false,
+        "indexLabel": ""
+    },
+    "tooltips": {
+        "appearanceType": "click",
+        "linkLabel": "Learn More",
+        "capitalizeLabels": true,
+        "opacity": 90
+    },
+    "visual": {
+        "minBubbleSize": 1,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": false,
+        "cityStyle": "circle",
+        "geoCodeCircleSize": 2,
+        "showBubbleZeros": false
+    },
+    "mapPosition": {
+        "coordinates": [
+            0,
+            30
+        ],
+        "zoom": 1
+    },
+    "map": {
+        "layers": [
+            {
+                "name": "Oregon",
+                "url": "https://wcms-wp-test.cdc.gov/newtest/adam/custom_map_layers/oregon-topojson.json",
+                "namespace": "cove (1)",
+                "fill": "aqua",
+                "fillOpacity": 1,
+                "tooltip": "Oregon"
+            }
+        ],
+        "patterns": [
+            {
+                "dataKey": "URL",
+                "pattern": "waves",
+                "dataValue": "https://www.cdc.gov/mmwr/",
+                "size": "small"
+            }
+        ]
+    },
+    "hexMap": {
+        "type": "",
+        "shapeGroups": [
+            {
+                "legendTitle": "",
+                "legendDescription": "",
+                "items": [
+                    {
+                        "key": "",
+                        "shape": "Arrow up",
+                        "column": "",
+                        "operator": "=",
+                        "value": ""
+                    }
+                ]
+            }
+        ]
+    },
+    "filterBehavior": "Filter Change",
+    "datasets": {},
+    "data": [
+        {
+            "State": "AL",
+            "Activity Level": "Very High",
+            "Funding Status": "*",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "AK",
+            "Activity Level": "High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "AS",
+            "Activity Level": "Moderate",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "AZ",
+            "Activity Level": "Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "AR",
+            "Activity Level": "Minimal",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "CA",
+            "Activity Level": "Very High",
+            "Funding Status": "NA",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "CO",
+            "Activity Level": "High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "CT",
+            "Activity Level": "Moderate",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "DE",
+            "Activity Level": "Very Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "DC",
+            "Activity Level": "Minimal",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "FL",
+            "Activity Level": "Very High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "GA",
+            "Activity Level": "High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "GU",
+            "Activity Level": "Moderate",
+            "Funding Status": "*",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "HI",
+            "Activity Level": "Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "ID",
+            "Activity Level": "Zero",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "IL",
+            "Activity Level": "Very High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "IN",
+            "Activity Level": "High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "IA",
+            "Activity Level": "Moderate",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "KS",
+            "Activity Level": "Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "KY",
+            "Activity Level": "Minimal",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "LA",
+            "Activity Level": "Very High",
+            "Funding Status": "*",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "ME",
+            "Activity Level": "High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "MH",
+            "Activity Level": "Moderate",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "MD",
+            "Activity Level": "Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "MA",
+            "Activity Level": "Minimal",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "MI",
+            "Activity Level": "Very High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "FM",
+            "Activity Level": "High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "MN",
+            "Activity Level": "Moderate",
+            "Funding Status": "NA",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "MS",
+            "Activity Level": "Very Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "MO",
+            "Activity Level": "Zero",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "MT",
+            "Activity Level": "Very High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "NE",
+            "Activity Level": "High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "NV",
+            "Activity Level": "Moderate",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "NH",
+            "Activity Level": "Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "NJ",
+            "Activity Level": "Minimal",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "NM",
+            "Activity Level": "Very High",
+            "Funding Status": "NA",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "NY",
+            "Activity Level": "High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "NC",
+            "Activity Level": "Zero",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "ND",
+            "Activity Level": "Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "MP",
+            "Activity Level": "Minimal",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "OH",
+            "Activity Level": "Very High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "OK",
+            "Activity Level": "High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "OR",
+            "Activity Level": "Moderate",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "PW",
+            "Activity Level": "Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "PA",
+            "Activity Level": "Minimal",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "PR",
+            "Activity Level": "Super Duper High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "RI",
+            "Activity Level": "High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "SC",
+            "Activity Level": "Moderate",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "SD",
+            "Activity Level": "Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "TN",
+            "Activity Level": "Minimal",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "TX",
+            "Activity Level": "Very High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "UT",
+            "Activity Level": "High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "VT",
+            "Activity Level": "Moderate",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "VI",
+            "Activity Level": "Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "VA",
+            "Activity Level": "Minimal",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "WA",
+            "Activity Level": "Very High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        },
+        {
+            "State": "WV",
+            "Activity Level": "Super Duper High",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "WI",
+            "Activity Level": "Moderate",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/flu/"
+        },
+        {
+            "State": "WY",
+            "Activity Level": "Low",
+            "Funding Status": "Current",
+            "URL": "https://www.cdc.gov/mmwr/"
+        }
+    ],
+    "dataFileName": "https://wwwdev.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data/indexed-data-files/09-map-US-categorical-with-lookup-column.csv",
+    "dataFileSourceType": "url",
+    "dataDescription": {
+        "horizontal": false,
+        "series": false
+    },
+    "validated": 4.23
+}

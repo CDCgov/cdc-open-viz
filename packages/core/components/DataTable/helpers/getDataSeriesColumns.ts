@@ -1,5 +1,13 @@
-export const getDataSeriesColumns = (config, isVertical, runtimeData): string[] => {
+import { TableConfig } from '../types/TableConfig'
+
+export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, runtimeData: Object[]): string[] => {
   if (config.table.customTableConfig) return runtimeData[0] ? Object.keys(runtimeData[0]) : []
+  if (config.type === 'table') {
+    const excludeColumns = Object.values(config.columns)
+      .filter(column => column.dataTable === false)
+      .map(column => column.name)
+    return Object.keys(runtimeData[0]).filter(columnName => !excludeColumns.includes(columnName))
+  }
   let tmpSeriesColumns
   if (config.visualizationType !== 'Pie') {
     tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey] : [] //, ...config.runtime.seriesLabelsAll

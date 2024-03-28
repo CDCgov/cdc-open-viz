@@ -5,6 +5,7 @@ import { useBarChart } from '../hooks/useBarChart'
 import { FC, useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ScaleLinear, ScaleBand } from 'd3-scale'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 interface Props {
   xScaleBrush: ScaleLinear<number, number>
@@ -55,7 +56,7 @@ const ZoomBrush: FC<Props> = props => {
       .find(item => item !== undefined)
     const startValue = xValues.find(item => item !== undefined)
 
-    const formatIfDate = value => (config.runtime.xAxis.type === 'date' ? formatDate(parseDate(value)) : value)
+    const formatIfDate = value => (isDateScale(config.runtime.xAxis) ? formatDate(parseDate(value)) : value)
 
     setTextProps(prev => ({
       ...prev,

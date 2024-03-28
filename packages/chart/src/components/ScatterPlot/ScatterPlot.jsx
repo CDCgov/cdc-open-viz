@@ -41,6 +41,7 @@ const ScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
               style={pointStyles}
               data-tooltip-html={handleTooltip(item, s)}
               data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+              tabIndex={-1}
             />
           )
         })

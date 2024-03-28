@@ -65,8 +65,8 @@ export default function useDataVizClasses(config, viewport = null) {
     ul: getUlClasses(),
     li: ['single-legend-item', 'legend-container__li'],
     title: ['legend-container__title'],
-    resetButton: ['legend-container__reset-button', 'btn', 'clear'],
-    description: ['legend-container__description']
+    description: ['legend-container__description'],
+    div: [legend?.position === 'bottom' && legend?.singleRow ? 'shape-container single-row' : 'shape-container']
   }
 
   return { innerContainerClasses, contentClasses, barBorderClass, lineDatapointClass, sparkLineStyles, legendClasses }

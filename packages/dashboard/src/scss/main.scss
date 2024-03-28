@@ -187,6 +187,9 @@
   .dashboard-row {
     display: flex;
     flex-direction: column;
+    &.toggle {
+      display: block;
+    }
   }
 
   .dashboard-col {
@@ -196,6 +199,9 @@
     .cdc-chart-inner-container > * {
       margin-left: 0;
       margin-right: 0;
+    }
+    &.hidden-toggle {
+      display: none;
     }
   }
 

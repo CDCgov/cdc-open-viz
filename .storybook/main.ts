@@ -1,22 +1,14 @@
 import { mergeConfig } from 'vite'
-import type { StorybookConfig } from '@storybook/react-vite';
+import type { StorybookConfig } from '@storybook/react-vite'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr' // Svg Support
 
 const config: StorybookConfig = {
-  stories: [
-    '../_stories/*.mdx',
-    '../packages/**/_stories/*.stories.@(js|jsx|ts|tsx)',
-  ],
-  addons: [
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@storybook/addon-interactions",
-    "storybook-addon-fetch-mock"
-  ],
+  stories: ['../_stories/*.mdx', '../packages/**/_stories/*.stories.@(js|jsx|ts|tsx)'],
+  addons: ['@storybook/addon-links', '@storybook/addon-essentials', '@storybook/addon-interactions', 'storybook-addon-fetch-mock', '@storybook/addon-a11y'],
   staticDirs: ['./assets'],
   framework: {
-    name: "@storybook/react-vite",
+    name: '@storybook/react-vite',
     options: {}
   },
   features: {
@@ -27,20 +19,19 @@ const config: StorybookConfig = {
     disableTelemetry: true
   },
   docs: {
-    autodocs: "tag"
+    autodocs: 'tag'
   },
   typescript: {
     reactDocgen: false // https://github.com/storybookjs/storybook/issues/22164#issuecomment-1603627308
   },
-  viteFinal: async (config, {configType}) => {
-    console.log("Storybook build mode: ", configType)
+  viteFinal: async (config, { configType }) => {
+    console.log('Storybook build mode: ', configType)
 
-    if(configType === 'DEVELOPMENT') { // run Storybook locally
+    if (configType === 'DEVELOPMENT') {
+      // run Storybook locally
       return mergeConfig(config, {
-        plugins: [
-          svgr({ exportAsDefault: true })
-        ]
-      });
+        plugins: [svgr({ exportAsDefault: true })]
+      })
     }
 
     return mergeConfig(config, {
@@ -56,18 +47,18 @@ const config: StorybookConfig = {
         },
         rollupOptions: {
           output: {
-            chunkFileNames: `storybook-[hash].[format].js`,
+            chunkFileNames: `storybook-[name]-[hash].[format].js`
           }
-        },
+        }
       },
       plugins: [
-        react({jsxRuntime: 'classic'}), //https://github.com/babel/babel/discussions/13013
+        react({ jsxRuntime: 'classic' }), //https://github.com/babel/babel/discussions/13013
         svgr({
           exportAsDefault: true
-        }),
+        })
       ]
     })
   }
-};
+}
 
-export default config;
+export default config

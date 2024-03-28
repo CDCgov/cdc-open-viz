@@ -39,6 +39,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
         const circle = (
           <>
             <circle
+              tabIndex={-1}
               key={`circle-${countryName.replace(' ', '')}`}
               className={`bubble country--${countryName}`}
               cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0} // || 0 handles error on loads where the data isn't ready
@@ -67,6 +68,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
 
             {state.visual.extraBubbleBorder && (
               <circle
+                tabIndex={-1}
                 key={`circle-${countryName.replace(' ', '')}`}
                 className='bubble'
                 cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0} // || 0 handles error on loads where the data isn't ready
@@ -95,7 +97,11 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
           </>
         )
 
-        return <g key={`group-${countryName.replace(' ', '')}`}>{circle}</g>
+        return (
+          <g key={`group-${countryName.replace(' ', '')}`} tabIndex={-1}>
+            {circle}
+          </g>
+        )
       })
     return countries
   }
@@ -132,6 +138,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
         const circle = (
           <>
             <circle
+              tabIndex={-1}
               key={`circle-${stateName.replace(' ', '')}`}
               className='bubble'
               cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
@@ -159,6 +166,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
             />
             {state.visual.extraBubbleBorder && (
               <circle
+                tabIndex={-1}
                 key={`circle-${stateName.replace(' ', '')}`}
                 className='bubble'
                 cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready

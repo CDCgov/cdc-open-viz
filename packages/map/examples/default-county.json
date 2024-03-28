@@ -112,34 +112,6 @@
   },
   "data": [
     {
-      "Insured Rate": 8,
-      "Coverage Status": "Insured",
-      "FIPS Codes": "06071",
-      "Year (Good filter option)": "2010",
-      "link": ""
-    },
-    {
-      "Insured Rate": 0,
-      "Coverage Status": "Insured",
-      "FIPS Codes": "55005",
-      "Year (Good filter option)": "2010",
-      "link": "https://cdc.gov"
-    },
-    {
-      "Insured Rate": 25,
-      "Coverage Status": "Insured",
-      "FIPS Codes": "12103",
-      "Year (Good filter option)": "2010",
-      "link": ""
-    },
-    {
-      "Insured Rate": 25,
-      "Coverage Status": "Insured",
-      "FIPS Codes": "32005",
-      "Year (Good filter option)": "2010",
-      "link": ""
-    },
-    {
       "Insured Rate": 18,
       "Coverage Status": "Insured",
       "FIPS Codes": "06075",

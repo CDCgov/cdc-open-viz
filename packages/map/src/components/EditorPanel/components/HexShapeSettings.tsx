@@ -4,7 +4,7 @@ import parse from 'html-react-parser'
 import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineArrowRight } from 'react-icons/ai'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
-const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'None']
+const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'Arrow Left', 'None']
 
 // todo: Move duplicated operators to CORE
 export const DATA_OPERATOR_LESS = '<'
@@ -219,6 +219,21 @@ const HexSettingShapeColumns = props => {
                                           <div className='cove-accordion__panel-col cove-input'>
                                             <select value={state.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].operator || '-SELECT-'} initial='Select' className='cove-input' onChange={e => handleItemUpdate('operator', e.target.value, shapeGroupIndex, itemIndex)}>
                                               {[DATA_OPERATOR_EQUAL].map(option => {
+                                                return <option value={option}>{option}</option>
+                                              })}
+                                              {[DATA_OPERATOR_NOTEQUAL].map(option => {
+                                                return <option value={option}>{option}</option>
+                                              })}
+                                              {[DATA_OPERATOR_LESS].map(option => {
+                                                return <option value={option}>{option}</option>
+                                              })}
+                                              {[DATA_OPERATOR_GREATER].map(option => {
+                                                return <option value={option}>{option}</option>
+                                              })}
+                                              {[DATA_OPERATOR_LESSEQUAL].map(option => {
+                                                return <option value={option}>{option}</option>
+                                              })}
+                                              {[DATA_OPERATOR_GREATEREQUAL].map(option => {
                                                 return <option value={option}>{option}</option>
                                               })}
                                             </select>

@@ -1,4 +1,6 @@
 import ExternalIcon from '@cdc/core/assets/external-link.svg'
+import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
+
 // Optionally wrap cell with anchor if config defines a navigation url
 const CellAnchor = ({ markup, row, columns, navigationHandler, mapZoomHandler }) => {
   if (columns.navigate && row[columns.navigate.name]) {
@@ -16,7 +18,7 @@ const CellAnchor = ({ markup, row, columns, navigationHandler, mapZoomHandler })
         }}
       >
         {markup}
-        <ExternalIcon className='inline-icon' />
+        {isDomainExternal(row[columns.navigate.name]) && <ExternalIcon className='inline-icon' />}
       </span>
     )
   } else if (mapZoomHandler) {

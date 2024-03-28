@@ -70,3 +70,14 @@
     }
   }
 }
+
+.sankey__color-input {
+  display: flex;
+  align-items: center;
+  margin: 10px auto;
+  label {
+    align-items: center;
+    padding-left: 5px;
+    margin-top: 0 !important;
+  }
+}

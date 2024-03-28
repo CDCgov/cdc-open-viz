@@ -5,9 +5,12 @@ import ExampleConfig_1 from './_mock/dashboard-gallery.json'
 import ExampleConfig_2 from './_mock/dashboard-2.json'
 import ExampleConfig_3 from './_mock/dashboard_no_filter.json'
 import Dashboard_Filter from './_mock/dashboard-filter.json'
-import Dashboard from '../CdcDashboardComponent'
+import Dashboard from '../CdcDashboard'
+import StandaloneTable from './_mock/standalone-table.json'
+import PivotFitlerConfig from './_mock/pivot-filter.json'
 import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within } from '@storybook/testing-library'
+import ToggleExampleConfig from './_mock/toggle-example.json'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -18,25 +21,44 @@ type Story = StoryObj<typeof Dashboard>
 
 export const Example_1: Story = {
   args: {
-    config: ExampleConfig_1 as unknown as Config
+    config: ExampleConfig_1
   }
 }
 
 export const Example_2: Story = {
   args: {
-    config: ExampleConfig_2 as unknown as Config
+    config: ExampleConfig_2
   }
 }
 
 export const Example_3: Story = {
   args: {
-    config: ExampleConfig_3 as unknown as Config
+    config: ExampleConfig_3
   }
 }
 
 export const Dashboard_Filters: Story = {
   args: {
-    config: Dashboard_Filter as unknown as Config
+    config: Dashboard_Filter
+  }
+}
+
+export const StandAloneTable: Story = {
+  args: {
+    config: StandaloneTable
+  }
+}
+
+export const ToggleExample: Story = {
+  args: {
+    config: ToggleExampleConfig,
+    isEditor: true
+  }
+}
+
+export const PivotFilter: Story = {
+  args: {
+    config: PivotFitlerConfig
   }
 }
 

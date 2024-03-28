@@ -1,12 +1,14 @@
 import { useState, useEffect, memo, useContext } from 'react'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
-import { jsx } from '@emotion/react'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+// 3rd party
 import { geoCentroid } from 'd3-geo'
 import { feature } from 'topojson-client'
-import topoJSON from '../data/us-regions-topo-2.json'
 import { Mercator } from '@visx/geo'
-import chroma from 'chroma-js'
+
+// cdc
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import topoJSON from '../data/us-regions-topo-2.json'
 import ConfigContext from '../../../context'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.regions)
@@ -74,7 +76,7 @@ const UsaRegionMap = props => {
 
     let toolTip
 
-    let styles = {
+    let styles: React.CSSProperties = {
       fill: '#E6E6E6',
       color: '#202020'
     }
@@ -87,13 +89,8 @@ const UsaRegionMap = props => {
 
     const legendColors = applyLegendToRow(territoryData)
 
-    let textColor = '#FFF'
-
     if (legendColors) {
-      // Use white text if the background is dark, and dark grey if it's light
-      if (chroma.contrast(textColor, legendColors[0]) < 3.5) {
-        textColor = '#202020'
-      }
+      const textColor = getContrastColor('#FFF', legendColors[0])
 
       let needsPointer = false
 
@@ -124,12 +121,7 @@ const UsaRegionMap = props => {
 
     if (undefined === abbr) return null
 
-    let textColor = '#FFF'
-
-    // Dynamic text color
-    if (chroma.contrast(textColor, bgColor) < 3.5) {
-      textColor = '#202020'
-    }
+    const textColor = getContrastColor('#FFF', bgColor)
 
     let x = 0,
       y = 5
@@ -195,11 +187,7 @@ const UsaRegionMap = props => {
 
         const TerratoryRect = props => {
           const { posX = 0, tName } = props
-          let textColor = '#fff'
-
-          if (chroma.contrast(textColor, legendColors[0]) < 4.5) {
-            textColor = '#202020'
-          }
+          const textColor = getContrastColor('#FFF', legendColors[0])
           return (
             <>
               <rect x={posX} width='36' height='24' rx='6' stroke='#fff' strokeWidth='1' />
@@ -212,28 +200,14 @@ const UsaRegionMap = props => {
 
         const circleRadius = 15
 
-        // SIDE CHART EXPERIMENT
-        // const height = state.data[index].Change;
-        // const barHeight = Math.abs(height * 20 );
-        // const barPositive = height > 0;
-        // const barY = barPositive ? -barHeight + 15 : 15;
-        // const baseY = 14;
-        // const barFill = barPositive ? "#fff" : "#fff";
-
         return (
-          <g key={key} className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip}>
+          <g key={key} className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} tabIndex={-1}>
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
             <g id={`region-${index + 1}-label`}>
               <circle fill='#fff' stroke='#999' cx={circleRadius} cy={circleRadius} r={circleRadius} />
               <text fill='#333' x='15px' y='20px' textAnchor='middle'>
                 {index + 1}
               </text>
-              {/* SIDE CHART EXPERIMENT */}
-              {/*<g y={barY*20}>*/}
-              {/*  <rect x="-20" y={barY} width="10" height={barHeight} fill={barFill} stroke="#333"/>*/}
-              {/*  <rect x="-23" y={baseY} width="16" height="2" fill="#000" />*/}
-              {/*</g>*/}
-              {/* / SIDE CHART EXPERIMENT */}
             </g>
             {geoKey === 'region 2' && (
               <g id='region-2-territories'>

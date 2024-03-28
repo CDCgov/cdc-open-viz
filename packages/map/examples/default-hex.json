@@ -14,9 +14,26 @@
     "territoriesLabel": "Territories",
     "language": "en",
     "hasRegions": false,
-    "displayAsHex": true
+    "displayAsHex": true,
+    "showDownloadMediaButton": false,
+    "displayStateLabels": false,
+    "territoriesAlwaysShow": false,
+    "geoLabelOverride": "",
+    "fullBorder": false,
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "statePicked": {
+      "fipsCode": "01",
+      "stateName": "Alabama"
+    }
   },
-  "filters": [{ "label": "", "values": [], "columnName": "Condition" }],
+  "type": "map",
+  "color": "yelloworangered",
   "columns": {
     "geo": {
       "dataTable": true,
@@ -48,6 +65,12 @@
     },
     "geosInRegion": {
       "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
     }
   },
   "legend": {
@@ -57,13 +80,93 @@
     "description": "Legend Text",
     "type": "equalnumber",
     "specialClasses": [
-      { "key": "Rate", "value": "*", "label": "*" },
-      { "key": "Rate", "value": "NA", "label": "N/A" }
+      {
+        "key": "Rate",
+        "value": "*",
+        "label": "*"
+      },
+      {
+        "key": "Rate",
+        "value": "NA",
+        "label": "N/A"
+      }
     ],
     "unified": false,
     "singleColumn": false,
-    "dynamicDescription": false
+    "dynamicDescription": false,
+    "descriptions": {},
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false
   },
+  "filters": [
+    {
+      "label": "",
+      "values": [],
+      "columnName": "Condition"
+    }
+  ],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": false,
+    "indexLabel": ""
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "geoCodeCircleSize": 8,
+    "showBubbleZeros": false
+  },
+  "mapPosition": {
+    "coordinates": [
+      0,
+      30
+    ],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "shapes",
+    "shapeGroups": [
+      {
+        "legendTitle": "Test",
+        "legendDescription": "test",
+        "items": [
+          {
+            "key": "STATE",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": "NV"
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
   "data": [
     {
       "STATE": "AL",
@@ -464,12 +567,6 @@
   "dataTable": {
     "title": "Data Table"
   },
-  "tooltips": {
-    "appearanceType": "hover",
-    "linkLabel": "Learn More",
-    "capitalizeLabels": true
-  },
-  "color": "yelloworangered",
   "usingWidgetLoader": true,
-  "type": "map"
+  "validated": 4.23
 }
