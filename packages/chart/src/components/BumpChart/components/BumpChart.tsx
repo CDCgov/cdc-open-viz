@@ -6,6 +6,8 @@ import ConfigContext from '../../../ConfigContext'
 import * as allCurves from '@visx/curve'
 import { timeParse, timeFormat } from 'd3-time-format'
 
+import './bumpchart.scss'
+
 type BumpChartProps = {
   width: number
   height: number
@@ -33,20 +35,21 @@ const BumpChart: React.FC<BumpChartProps> = ({ width = 700, height = 900, config
   }
 
   return (
+    
     <Group className='bump-chart-lines' width={width} height={height} left={Number(config.runtime.yAxis.size)} key='bump-chart-lines'>
       {seriesKeys.map(seriesItem =>
         config.data.map((d, dataIndex) => {
           const key = `${seriesItem}-${dataIndex}`
 
           // Basic debug statements
-          // console.log('Processing series:', seriesItem)
-          // console.log('Data:', d)
-          // console.log('yscale', yScale.domain())
-          // console.log('xscale', xScale.domain())
+          //console.log('Processing series:', seriesItem)
+          //console.log('Data:', d)
+          //console.log('yscale', yScale.domain())
+          //console.log('xscale', xScale.domain())
 
+          
           const handleX = xValue => {
             if (config.xAxis.type === 'date') {
-              console.log('testing', parseDate(xValue).getTime())
               return parseDate(xValue).getTime()
             }
             if (config.xAxis.type === 'date-time') {
@@ -57,8 +60,27 @@ const BumpChart: React.FC<BumpChartProps> = ({ width = 700, height = 900, config
             }
           }
           return (
+            <>
+            <g>
+              <circle
+                r={10}
+                cx={Number(xScale(handleX(d.year)))}
+                cy={Number(yScale(d[seriesItem]))}
+                stroke='#CACACA'
+                strokeWidth={1}
+                fill='none'
+                style={{ zIndex: 2}}
+              />
+              <text
+                x={Number(xScale(handleX(d.year))) - 4}
+                y={Number(yScale(d[seriesItem])) + 4}
+                fill='#000000'
+                fontSize={13}
+                style={{ zIndex: 2}}
+              > {d[seriesItem]}</text>
+            </g>
             <LinePath
-              curve={allCurves['curveLinear']}
+              curve={allCurves['curveCardinal']}
               key={key}
               data-key={key}
               data-key-year={seriesItem}
@@ -66,13 +88,16 @@ const BumpChart: React.FC<BumpChartProps> = ({ width = 700, height = 900, config
               x={data => Number(xScale(handleX(data[config.xAxis.dataKey])))}
               y={data => Number(yScale(data[seriesItem]))}
               stroke={colorScale(seriesItem)}
-              strokeWidth={4}
+              strokeWidth={2}
               fill='transparent'
               defined={(item, i) => {
                 return item[seriesItem] !== '' && item[seriesItem] !== null && item[seriesItem] !== undefined
               }}
               shapeRendering='geometricPrecision' // Enable anti-aliasing?
+              style={{ zIndex: 1}}
             />
+            </>
+            
           )
         })
       )}
