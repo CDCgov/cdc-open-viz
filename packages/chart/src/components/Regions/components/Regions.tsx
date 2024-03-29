@@ -149,9 +149,6 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       const to = getToValue(region)
       const width = getWidth(to, from)
 
-      console.log('to', to)
-      console.log('from', from)
-
       if (!from) return null
       if (!to) return null
 
