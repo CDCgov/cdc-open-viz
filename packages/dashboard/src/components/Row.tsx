@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useMemo, useState } from 'react'
 
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 
@@ -13,41 +13,46 @@ import FourEightColIcon from '../images/icon-col-4-8.svg'
 import EightFourColIcon from '../images/icon-col-8-4.svg'
 import ToggleIcon from '../images/icon-toggle.svg'
 import { ConfigRow } from '../types/ConfigRow'
+import { DataDesignerModal } from './DataDesignerModal'
+import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+import { iconHash } from '../helpers/iconHash'
+import _ from 'lodash'
 
 type RowMenuProps = {
   rowIdx: number
-  row: ConfigRow
 }
 
-const RowMenu: React.FC<RowMenuProps> = ({ rowIdx, row }) => {
+const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   const { config } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
-  const { rows } = config
+  const rows = _.cloneDeep(config.rows)
+  const row = config.rows[rowIdx]
 
   const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
-  const getCurr = () => {
-    if (row[0].toggle) return 'toggle'
-    return row.reduce((acc, curr) => {
+  const curr = useMemo(() => {
+    if (row.toggle) return 'toggle'
+    return row.columns.reduce((acc, curr) => {
       if (curr.width) {
         acc += curr.width
       }
       return acc
     }, '')
-  }
-
-  const [curr, setCurr] = useState(getCurr())
+  }, [row])
 
   const setRowLayout = (layout: number[], toggle = undefined) => {
-    const newRows = [...rows]
-    const row = newRows[rowIdx]
+    const newRows = _.cloneDeep(rows)
+    newRows[rowIdx].toggle = toggle
+    const r = newRows[rowIdx].columns
 
-    row.forEach((col, i) => {
-      col.width = layout[i] ?? null
-      col.toggle = toggle
-      if (!toggle) col.hide = undefined
-    })
+    const totalWidgets = r.filter(c => c.widget).length
+    if (totalWidgets > layout.length) {
+      // don't let them change to a smaller layout and lose viz config work
+      return
+    } else {
+      newRows[rowIdx].columns = layout.map((width, i) => (r[i] ? { ...r[i], width } : { width }))
+    }
+
     updateConfig({ ...config, rows: newRows })
-    setCurr(toggle ? 'toggle' : layout.join(''))
   }
 
   const moveRow = (dir = 'down') => {
@@ -138,15 +143,28 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx, row }) => {
 }
 
 const Row = ({ row, idx: rowIdx, uuid }) => {
+  const { overlay } = useGlobalContext()
   return (
     <div className='builder-row' data-row-id={rowIdx}>
-      <RowMenu rowIdx={rowIdx} row={row} />
+      <RowMenu rowIdx={rowIdx} />
       <div className='column-container'>
-        {row
-          .filter(column => column.width)
-          .map((column, colIdx) => (
-            <Column data={column} key={`row-${uuid}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />
-          ))}
+        <>
+          <button
+            title='Configure Data'
+            className='btn btn-configure-row'
+            onClick={() => {
+              overlay?.actions.openOverlay(<DataDesignerModal rowIndex={rowIdx} />)
+            }}
+          >
+            {iconHash['gear']}
+          </button>
+
+          {row.columns
+            .filter(column => column.width)
+            .map((column, colIdx) => (
+              <Column data={column} key={`row-${uuid}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />
+            ))}
+        </>
       </div>
     </div>
   )

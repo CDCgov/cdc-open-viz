@@ -17,15 +17,3 @@ export const DefaultEditor: Story = {
     config: BlankConfig
   }
 }
-
-export const StandAloneTable: Story = {
-  args: {
-    config: StandAloneTableConfig
-  }
-}
-
-export const PivotFilter: Story = {
-  args: {
-    config: PivotFilterConfig
-  }
-}
