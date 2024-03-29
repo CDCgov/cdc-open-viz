@@ -631,7 +631,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                     const dataValue = dataGroups[groupName]
                     return (
                       <React.Fragment key={`row__${index}__${groupName}`}>
-                        <h1>{groupName}</h1>
+                        <h1 className='h4'>{groupName}</h1>
                         <VisualizationRow
                           filteredDataOverride={dataValue}
                           row={row}
