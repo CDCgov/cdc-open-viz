@@ -19,7 +19,6 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
-import Waiting from '@cdc/core/components/Waiting'
 
 // Assets
 import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'
@@ -39,7 +38,7 @@ import { MapContext } from '../../../types/MapContext.js'
 import { Checkbox, TextField } from './Inputs'
 
 // Todo: move to useReducer, seperate files out.
-const EditorPanel = props => {
+const EditorPanel = ({ columnsRequiredChecker }) => {
   // prettier-ignore
   const {
     changeFilterActive,
@@ -57,8 +56,6 @@ const EditorPanel = props => {
   } = useContext<MapContext>(ConfigContext)
 
   const { general, columns, legend, table, tooltips } = state
-
-  const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
 
   const [configTextboxValue, setConfigTextbox] = useState({}) // eslint-disable-line
 
@@ -837,37 +834,6 @@ const EditorPanel = props => {
     }
   }
 
-  const columnsRequiredChecker = useCallback(() => {
-    let columnList = []
-
-    // Geo is always required
-    if ('' === state.columns.geo.name) {
-      columnList.push('Geography')
-    }
-
-    // Primary is required if we're on a data map or a point map
-    if ('navigation' !== state.general.type && '' === state.columns.primary.name) {
-      columnList.push('Primary')
-    }
-
-    // Navigate is required for navigation maps
-    if ('navigation' === state.general.type && ('' === state.columns.navigate.name || undefined === state.columns.navigate)) {
-      columnList.push('Navigation')
-    }
-
-    if (('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && '' === state.columns.latitude.name) {
-      columnList.push('Latitude')
-    }
-
-    if (('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && '' === state.columns.longitude.name) {
-      columnList.push('Longitude')
-    }
-
-    if (columnList.length === 0) columnList = null
-
-    setRequiredColumns(columnList)
-  }, [state.columns, state.general.type])
-
   const editColumn = async (columnName, editTarget, value) => {
     let newSpecialClasses
     switch (editTarget) {
@@ -1462,17 +1428,6 @@ const EditorPanel = props => {
     )
   }
 
-  const Error = () => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{state.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
   const isLoadedFromUrl = state?.dataKey?.includes('http://') || state?.dataKey?.includes('https://')
 
   // if isDebug = true, then try to set the Geography Col and Data col to reduce clicking
@@ -1493,8 +1448,6 @@ const EditorPanel = props => {
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      {state?.runtime?.editorErrorMessage.length > 0 && <Error />}
-      {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
       <Layout.Sidebar isDashboard={isDashboard} displayPanel={displayPanel} title='Configure Map' onBackClick={onBackClick}>
         <ReactTooltip multiline={true} />
         <Accordion allowZeroExpanded={true}>
