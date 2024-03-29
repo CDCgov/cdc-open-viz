@@ -624,39 +624,8 @@ const EditorPanel = () => {
     })
   }
 
-  const Error = () => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
 
-  const Confirm = () => {
-    const confirmDone = e => {
-      e.preventDefault()
 
-      let newConfig = { ...config }
-      delete newConfig.newViz
-
-      updateConfig(newConfig)
-    }
-
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button className='btn' style={{ margin: '1em auto' }} disabled={missingRequiredSections()} onClick={confirmDone}>
-            I'm Done
-          </button>
-        </section>
-      </section>
-    )
-  }
 
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
@@ -1081,8 +1050,7 @@ const EditorPanel = () => {
   return (
     <EditorPanelContext.Provider value={editorContextValues}>
       <ErrorBoundary component='EditorPanel'>
-        {config.newViz && <Confirm />}
-        {undefined === config.newViz && config.runtime && config.runtime?.editorErrorMessage && <Error />}
+
         <Layout.Sidebar displayPanel={displayPanel} isDashboard={isDashboard} title={'Configure Chart'} onBackClick={onBackClick}>
           <Accordion allowZeroExpanded={true}>
             <Panels.General name='General' />
