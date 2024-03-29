@@ -18,7 +18,7 @@ export const getFilteredData = (state: DashboardState, initialFilteredData = {},
     if (applicableFilters) {
       const { dataKey, data, dataDescription } = config.visualizations[key]
       const _data = state.data[dataKey] || data
-      const formattedData = dataOverride?.[dataKey] ?? dataDescription ? getFormattedData(_data, dataDescription) : _data
+      const formattedData = dataOverride?.[dataKey] || (dataDescription ? getFormattedData(_data, dataDescription) : _data)
 
       newFilteredData[key] = filterData(applicableFilters, formattedData)
     }

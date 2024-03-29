@@ -20,15 +20,41 @@ const remapDashboardRows = config => {
   }
 }
 
-const update_4_23 = config => {
-  const ver = '4.23'
+const chartUpdates = newConfig => {
+  if (newConfig.type === 'chart') {
+    if (newConfig.xAxis.sortDates) {
+      newConfig.xAxis.type = 'date-time'
+    }
+    newConfig.table.download = true
+
+    delete newConfig.xAxis.sortDates
+  }
+}
+
+const mapUpdates = newConfig => {
+  if (newConfig.type === 'map') {
+    newConfig.table.download = true
+    newConfig.general.showDownloadButton = true
+  }
+}
+
+const mustHaveDashboardSharedFilters = newConfig => {
+  if (newConfig.dashboard.sharedFilters === undefined) {
+    newConfig.dashboard.sharedFilters = []
+  }
+}
+const update_4_24_3 = config => {
+  const ver = '4.24.3'
 
   const newConfig = _.cloneDeep(config)
 
   remapDashboardRows(newConfig)
+  chartUpdates(newConfig)
+  mapUpdates(newConfig)
+  mustHaveDashboardSharedFilters(newConfig)
 
   newConfig.version = ver
   return newConfig
 }
 
-export default update_4_23
+export default update_4_24_3
