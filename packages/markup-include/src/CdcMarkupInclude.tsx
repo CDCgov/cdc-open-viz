@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef, useReducer } from 'react'
+import { useEffect, useCallback, useRef, useReducer, useState } from 'react'
 
 // external
 import { Markup } from 'interweave'
@@ -35,6 +35,7 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
   const initialState = { config: configObj ?? defaults, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
 
   const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
+  const [showConfigConfirm, setShowConfigConfirm] = useState(false)
 
   const { config, loading, urlMarkup, markupError, errorMessage, coveLoadedHasRan } = state
 
@@ -176,8 +177,8 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
   if (loading === false) {
     let body = (
       <Layout.Responsive isEditor={isEditor}>
-        <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
         <div className={`cove-component__content ${contentClasses.join(' ')}`}>
+          <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
           <div className={`${innerContainerClasses.join(' ')}`}>
             <div className='cove-component__content-wrap'>
               {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
@@ -201,9 +202,43 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
     )
   }
 
+  const Error = () => {
+    return (
+      <section className='waiting'>
+        <section className='waiting-container'>
+          <h3>Error With Configuration</h3>
+          <p>{config.runtime.editorErrorMessage}</p>
+        </section>
+      </section>
+    )
+  }
+
+  const Confirm = () => {
+    const confirmDone = e => {
+      e.preventDefault()
+      let newConfig = { ...config }
+      delete newConfig.newViz
+      updateConfig(newConfig)
+    }
+
+    return (
+      <section className='waiting'>
+        <section className='waiting-container'>
+          <h3>Finish Configuring</h3>
+          <p>Set all required options to the left and confirm below to display a preview of the markup.</p>
+          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
+            I'm Done
+          </button>
+        </section>
+      </section>
+    )
+  }
+
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
+      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, showConfigConfirm }}>
+        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+        {config.newViz && showConfigConfirm && <Confirm />}
         <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={container} showEditorPanel={config?.showEditorPanel}>
           {content}
         </Layout.VisualizationWrapper>
