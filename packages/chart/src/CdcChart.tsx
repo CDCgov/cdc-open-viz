@@ -1010,52 +1010,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return formattedValue
   }
 
-  const Confirm = () => {
-    const confirmDone = e => {
-      if (e) {
-        e.preventDefault()
-      }
-
-      let newConfig = { ...config }
-      delete newConfig.newViz
-
-      updateConfig(newConfig)
-    }
-
-    const styles = {
-      position: 'relative',
-      height: '100vh',
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gridArea: 'content'
-    }
-
-    return (
-      <section className='waiting' style={styles}>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <Button className='btn' style={{ margin: '1em auto' }} disabled={missingRequiredSections()} onClick={e => confirmDone(e)}>
-            I'm Done
-          </Button>
-        </section>
-      </section>
-    )
-  }
-
-  const Error = () => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
   // this is passed DOWN into the various components
   // then they do a lookup based on the bin number as index into here (TT)
   const applyLegendToRow = rowObj => {
@@ -1099,7 +1053,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     body = (
       <>
         {isEditor && <EditorPanel />}
-        <Layout.Responsive isEditor={isEditor}>
+        <Layout.Content isEditor={isEditor} config={config}>
           {!missingRequiredSections() && !config.newViz && (
             <div className='cdc-chart-inner-container cove-component__content' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
               <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
@@ -1174,7 +1128,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {/* show pdf or image button */}
             </div>
           )}
-        </Layout.Responsive>
+        </Layout.Content>
       </>
     )
   }

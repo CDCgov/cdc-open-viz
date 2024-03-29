@@ -3,7 +3,7 @@ import Sidebar from './components/Sidebar'
 import VisualizationWrapper from './components/Visualization'
 
 const Layout = {
-  Responsive: Content,
+  Content,
   Sidebar,
   VisualizationWrapper
 }
