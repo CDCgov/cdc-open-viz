@@ -72,6 +72,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
         transform={`scale(${radius / 9})`}
         stroke={state.general.geoBorderColor === 'sameAsBackground' ? '#ffffff' : '#000000'}
         strokeWidth={'2px'}
+        tabIndex='-1'
         {...additionalProps}
       />
     )
