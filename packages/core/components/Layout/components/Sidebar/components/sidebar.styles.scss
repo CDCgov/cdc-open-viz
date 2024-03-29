@@ -6,6 +6,12 @@
       top: 56px;
     }
 
+    .cdc-open-viz-module.type-dashboard {
+      &.isEditor .sidebar {
+        top: 0px;
+      }
+    }
+
     &.isEditor .editor-panel__toggle {
       top: 68px;
     }

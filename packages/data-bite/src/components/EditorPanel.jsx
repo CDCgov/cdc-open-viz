@@ -136,11 +136,6 @@ const EditorPanel = memo(() => {
 
   const updateField = updateFieldFactory(config, updateConfig, true)
 
-  const missingRequiredSections = () => {
-    //Whether to show error message if something is required to show a data-bite and isn't filled in
-    return false
-  }
-
   useEffect(() => {
     // Pass up to Editor if needed
     if (setParentConfig) {
@@ -158,39 +153,6 @@ const EditorPanel = memo(() => {
       ...config,
       showEditorPanel: !displayPanel
     })
-  }
-
-  const Error = () => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
-  const Confirm = () => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button
-            className='btn'
-            style={{ margin: '1em auto' }}
-            disabled={missingRequiredSections()}
-            onClick={e => {
-              e.preventDefault()
-              updateConfig({ ...config, newViz: false })
-            }}
-          >
-            I'm Done
-          </button>
-        </section>
-      </section>
-    )
   }
 
   const convertStateToConfig = () => {
@@ -307,8 +269,6 @@ const EditorPanel = memo(() => {
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
-      {(!config.dataColumn || !config.dataFunction) && <Confirm />}
       <Layout.Sidebar isEditor={true} config={config} title='Configure Data Bites' onBackClick={onBackClick} displayPanel={displayPanel}>
         <section className='form-container'>
           <form>
