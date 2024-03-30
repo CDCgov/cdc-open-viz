@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer } from 'react'
+import React, { useCallback, useEffect, useReducer, useState } from 'react'
 
 // visx
 import { Circle, Bar } from '@visx/shape'
@@ -38,7 +38,7 @@ type CdcWaffleChartProps = {
   setConfig?: () => void
 }
 
-const WaffleChart = ({ config, isEditor, link = '' }) => {
+const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateConfig }) => {
   const { title, theme, shape, nodeWidth, nodeSpacer, prefix, suffix, subtext, content, orientation, filters, dataColumn, dataFunction, dataConditionalColumn, dataConditionalOperator, dataConditionalComparate, customDenom, dataDenom, dataDenomColumn, dataDenomFunction, roundToPlace } = config
 
   const gaugeColor = config.visual.colors[config.theme]
@@ -265,10 +265,44 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
     range: [0, config.gauge.width]
   })
 
+  const Error = ({ config, updateConfig }) => {
+    return (
+      <section className='waiting'>
+        <section className='waiting-container'>
+          <h3>Error With Configuration</h3>
+          <p>{config.runtime.editorErrorMessage}</p>
+        </section>
+      </section>
+    )
+  }
+
+  const Confirm = ({ updateConfig, config }) => {
+    const confirmDone = e => {
+      e.preventDefault()
+      let newConfig = { ...config }
+      delete newConfig.newViz
+      updateConfig(newConfig)
+    }
+
+    return (
+      <section className='waiting'>
+        <section className='waiting-container'>
+          <h3>Finish Configuring</h3>
+          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
+          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
+            I'm Done
+          </button>
+        </section>
+      </section>
+    )
+  }
+
   return (
     <div className='cove-component__content'>
       <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
       <div className={contentClasses.join(' ')}>
+        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error updateConfig={updateConfig} config={config} />}
+        {config.newViz && showConfigConfirm && <Confirm updateConfig={updateConfig} config={config} />}
         <div className='cove-component__content-wrap'>
           {config.visualizationType === 'Gauge' && (
             <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
@@ -323,6 +357,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   // Default States
   const [state, dispatch] = useReducer(chartReducer, { config: configObj ?? defaults, loading: true, preview: false, viewport: 'lg', coveLoadedHasRan: false, container: null })
   const { loading, config, viewport: currentViewport, coveLoadedHasRan, container } = state
+  const [showConfigConfirm, setShowConfigConfirm] = useState(false)
 
   // Default Functions
   const updateConfig = newConfig => {
@@ -403,13 +438,13 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   if (loading === false) {
     let body = (
       <Layout.Responsive isEditor={isEditor}>
-        <WaffleChart config={config} isEditor={isEditor} />
+        <WaffleChart config={config} isEditor={isEditor} showConfigConfirm={showConfigConfirm} updateConfig={updateConfig} />
       </Layout.Responsive>
     )
 
     content = (
       <>
-        {isEditor && <EditorPanel>{body}</EditorPanel>}
+        {isEditor && <EditorPanel showConfigConfirm={showConfigConfirm}>{body}</EditorPanel>}
         {!isEditor && body}
       </>
     )

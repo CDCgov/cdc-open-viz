@@ -449,12 +449,52 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         break
     }
 
+    const missingRequiredSections = () => {
+      //Whether to show error message if something is required to show a data-bite and isn't filled in
+      return false
+    }
+
+    const Error = () => {
+      return (
+        <section className='waiting'>
+          <section className='waiting-container'>
+            <h3>Error With Configuration</h3>
+            <p>{config.runtime.editorErrorMessage}</p>
+          </section>
+        </section>
+      )
+    }
+
+    const Confirm = () => {
+      return (
+        <section className='waiting'>
+          <section className='waiting-container'>
+            <h3>Finish Configuring</h3>
+            <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
+            <button
+              className='btn'
+              style={{ margin: '1em auto' }}
+              disabled={missingRequiredSections()}
+              onClick={e => {
+                e.preventDefault()
+                updateConfig({ ...config, newViz: false })
+              }}
+            >
+              I'm Done
+            </button>
+          </section>
+        </section>
+      )
+    }
+
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     body = (
       <>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
           <div className={`${contentClasses.join(' ')}`}>
+            {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+            {(!config.dataColumn || !config.dataFunction) && <Confirm />}
             <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className={`bite-content-container ${contentClasses.join(' ')}`}>
@@ -512,6 +552,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
           {isEditor && <EditorPanel />}
           <Layout.Responsive isEditor={isEditor}>
+            {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+            {(!config.dataColumn || !config.dataFunction) && <Confirm />}
             <GradientBite label={config.title} value={calculateDataBite()} />
           </Layout.Responsive>
         </Layout.VisualizationWrapper>
