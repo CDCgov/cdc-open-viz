@@ -266,6 +266,10 @@
 
   .cdc-dashboard-inner-container {
     margin: 1em;
+
+    &.is-editor {
+      margin-top: 7em;
+    }
   }
 
   .sub-editor {

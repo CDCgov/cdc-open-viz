@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer, useState } from 'react'
+import React, { useCallback, useEffect, useReducer } from 'react'
 
 // visx
 import { Circle, Bar } from '@visx/shape'
@@ -321,8 +321,6 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
 
 const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }: CdcWaffleChartProps) => {
   // Default States
-  const [showConfigConfirm, setShowConfigConfirm] = useState(false)
-
   const [state, dispatch] = useReducer(chartReducer, { config: configObj ?? defaults, loading: true, preview: false, viewport: 'lg', coveLoadedHasRan: false, container: null })
   const { loading, config, viewport: currentViewport, coveLoadedHasRan, container } = state
 
@@ -400,54 +398,11 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
     }, [configObj.data])
   }
 
-  const Error = () => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
-  const Confirm = () => {
-    const styles = {
-      position: 'relative',
-      height: '100vh',
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gridArea: 'content'
-    }
-    const confirmDone = e => {
-      e.preventDefault()
-      let newConfig = { ...config }
-      delete newConfig.newViz
-      updateConfig(newConfig)
-    }
-
-    return (
-      <section className='waiting' style={styles}>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
-            I'm Done
-          </button>
-        </section>
-      </section>
-    )
-  }
-
   let content = <Loading />
 
   if (loading === false) {
     let body = (
       <Layout.Responsive isEditor={isEditor}>
-        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
-        {config.newViz && showConfigConfirm && <Confirm />}
         <WaffleChart config={config} isEditor={isEditor} />
       </Layout.Responsive>
     )
@@ -462,7 +417,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
 
   return (
     <ErrorBoundary component='WaffleChart'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef, showConfigConfirm }}>
+      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>
         <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={outerContainerRef} showEditorPanel={config?.showEditorPanel}>
           {content}
         </Layout.VisualizationWrapper>

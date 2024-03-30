@@ -449,60 +449,11 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         break
     }
 
-    const Error = () => {
-      return (
-        <section className='waiting'>
-          <section className='waiting-container'>
-            <h3>Error With Configuration</h3>
-            <p>{config.runtime.editorErrorMessage}</p>
-          </section>
-        </section>
-      )
-    }
-
-    const missingRequiredSections = () => {
-      //Whether to show error message if something is required to show a data-bite and isn't filled in
-      return false
-    }
-
-    const Confirm = () => {
-      const styles = {
-        position: 'relative',
-        height: '100vh',
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gridArea: 'content'
-      }
-      return (
-        <section className='waiting' style={styles}>
-          <section className='waiting-container'>
-            <h3>Finish Configuring</h3>
-            <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-            <button
-              className='btn'
-              style={{ margin: '1em auto' }}
-              disabled={missingRequiredSections()}
-              onClick={e => {
-                e.preventDefault()
-                updateConfig({ ...config, newViz: false })
-              }}
-            >
-              I'm Done
-            </button>
-          </section>
-        </section>
-      )
-    }
-
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     body = (
       <>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
-          {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
-          {(!config.dataColumn || !config.dataFunction) && <Confirm />}
           <div className={`${contentClasses.join(' ')}`}>
             <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
             <div className={`bite ${biteClasses.join(' ')}`}>

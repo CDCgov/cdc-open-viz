@@ -1,9 +1,9 @@
-import Content from './components/Content'
+import Responsive from './components/Responsive'
 import Sidebar from './components/Sidebar'
 import VisualizationWrapper from './components/Visualization'
 
 const Layout = {
-  Content,
+  Responsive,
   Sidebar,
   VisualizationWrapper
 }

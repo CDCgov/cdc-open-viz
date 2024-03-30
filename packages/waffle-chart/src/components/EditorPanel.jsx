@@ -38,9 +38,10 @@ const CheckBox = memo(({ label, value, fieldName, section = null, subsection = n
 ))
 
 const EditorPanel = memo(props => {
-  const { config, updateConfig, loading, data, setParentConfig, isDashboard, showConfigConfirm } = useContext(ConfigContext)
+  const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(ConfigContext)
 
   const [displayPanel, setDisplayPanel] = useState(true)
+  const [showConfigConfirm, setShowConfigConfirm] = useState(false)
   const inputSelectStyle = condition => (condition ? { backgroundColor: '#ffd2d2', color: '#d8000c' } : {})
 
   const updateField = updateFieldFactory(config, updateConfig, true)
@@ -90,6 +91,38 @@ const EditorPanel = memo(props => {
     // } else {
     //   setDisplayPanel(!displayPanel)
     // }
+  }
+
+  const Error = () => {
+    return (
+      <section className='waiting'>
+        <section className='waiting-container'>
+          <h3>Error With Configuration</h3>
+          <p>{config.runtime.editorErrorMessage}</p>
+        </section>
+      </section>
+    )
+  }
+
+  const Confirm = () => {
+    const confirmDone = e => {
+      e.preventDefault()
+      let newConfig = { ...config }
+      delete newConfig.newViz
+      updateConfig(newConfig)
+    }
+
+    return (
+      <section className='waiting'>
+        <section className='waiting-container'>
+          <h3>Finish Configuring</h3>
+          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
+          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
+            I'm Done
+          </button>
+        </section>
+      </section>
+    )
   }
 
   const convertStateToConfig = () => {
@@ -400,6 +433,8 @@ const EditorPanel = memo(props => {
   return (
     <ErrorBoundary component='EditorPanel'>
       <>
+        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+        {config.newViz && showConfigConfirm && <Confirm />}
         <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Waffle Chart' showEditorPanel={displayPanel}>
           {editorContent}
         </Layout.Sidebar>
