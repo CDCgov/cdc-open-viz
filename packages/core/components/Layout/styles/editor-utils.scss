@@ -7,7 +7,7 @@ $primary: #3e92d5;
   position: fixed;
   bottom: 2rem;
   left: 24rem;
-  padding: 0.5rem 0.5rem 0;
+  padding: 0.5rem 1rem;
   font-size: 0.875rem;
   color: #a0a9b0;
   background-color: #fff;
@@ -63,6 +63,11 @@ $primary: #3e92d5;
   border-radius: 999px;
   box-shadow: 5px 5px 10px 0 rgb(0 0 0 / 15%);
   user-select: none;
+
+  button {
+    padding: 0;
+    background: transparent;
+  }
 
   @at-root {
     .cove-editor:not(.panel-shown) #{&} {

@@ -15,8 +15,9 @@ type SidebarProps = {
 }
 
 const Sidebar: React.FC<SidebarProps> = props => {
-  const { displayPanel = 'false', isDashboard = 'false', title = 'Configure Visualization', children, onBackClick } = props
+  const { displayPanel = false, isDashboard = false, title = 'Configure Visualization', children, onBackClick } = props
 
+  console.log('display panel?', displayPanel)
   const getSectionClasses = () => {
     const sectionClasses = ['editor-panel', 'cove', 'sidebar']
     if (!displayPanel) sectionClasses.push('hidden')

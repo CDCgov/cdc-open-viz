@@ -449,55 +449,116 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         break
     }
 
+    const missingRequiredSections = () => {
+      //Whether to show error message if something is required to show a data-bite and isn't filled in
+      return false
+    }
+
+    const Error = () => {
+      const styles = {
+        position: 'absolute',
+        background: 'white',
+        zIndex: '999',
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gridArea: 'content'
+      }
+      return (
+        <section className='waiting' style={styles}>
+          <section className='waiting-container'>
+            <h3>Error With Configuration</h3>
+            <p>{config.runtime.editorErrorMessage}</p>
+          </section>
+        </section>
+      )
+    }
+
+    const Confirm = () => {
+      const styles = {
+        position: 'absolute',
+        background: 'white',
+        zIndex: '999',
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gridArea: 'content'
+      }
+
+      return (
+        <section className='waiting' style={styles}>
+          <section className='waiting-container'>
+            <h3>Finish Configuring</h3>
+            <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
+            <button
+              className='btn'
+              style={{ margin: '1em auto' }}
+              disabled={missingRequiredSections()}
+              onClick={e => {
+                e.preventDefault()
+                updateConfig({ ...config, newViz: false })
+              }}
+            >
+              I'm Done
+            </button>
+          </section>
+        </section>
+      )
+    }
+
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     body = (
       <>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
-          <div className={isEditor ? 'spacing-wrapper' : ''}>
-            <div className={innerContainerClasses.join(' ')}>
-              <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
-              <div className={`bite ${biteClasses.join(' ')}`}>
-                <div className={`bite-content-container ${contentClasses.join(' ')}`}>
-                  {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
-                  {isTop && <DataImage />}
-                  <div className={`bite-content`}>
-                    {showBite && 'title' === biteStyle && (
-                      <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
-                        {calculateDataBite()}
-                      </div>
-                    )}
-                    {showBite && 'split' === biteStyle && (
-                      <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
-                        {calculateDataBite()}
-                      </div>
-                    )}
-                    <Fragment>
-                      <div className='bite-content__text-wrap'>
-                        <p className='bite-text'>
-                          {showBite && 'body' === biteStyle && (
-                            <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
-                              {calculateDataBite()}
-                            </span>
-                          )}
-                          {parse(biteBody)}
-                        </p>
-                        {showBite && 'end' === biteStyle && (
+          <div className={`${contentClasses.join(' ')}`}>
+            {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+            {(!config.dataColumn || !config.dataFunction) && <Confirm />}
+            <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
+            <div className={`bite ${biteClasses.join(' ')}`}>
+              <div className={`bite-content-container ${contentClasses.join(' ')}`}>
+                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
+                {isTop && <DataImage />}
+                <div className={`bite-content`}>
+                  {showBite && 'title' === biteStyle && (
+                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                      {calculateDataBite()}
+                    </div>
+                  )}
+                  {showBite && 'split' === biteStyle && (
+                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                      {calculateDataBite()}
+                    </div>
+                  )}
+                  <Fragment>
+                    <div className='bite-content__text-wrap'>
+                      <p className='bite-text'>
+                        {showBite && 'body' === biteStyle && (
                           <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
                             {calculateDataBite()}
                           </span>
                         )}
-                        {subtext && !config.general.isCompactStyle && <p className='bite-subtext'>{parse(subtext)}</p>}
-                      </div>
-                    </Fragment>
-                  </div>
-                  {isBottom && <DataImage />}
-                  {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
+                        {parse(biteBody)}
+                      </p>
+                      {showBite && 'end' === biteStyle && (
+                        <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
+                          {calculateDataBite()}
+                        </span>
+                      )}
+                      {subtext && !config.general.isCompactStyle && <p className='bite-subtext'>{parse(subtext)}</p>}
+                    </div>
+                  </Fragment>
                 </div>
+                {isBottom && <DataImage />}
+                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
               </div>
             </div>
-            {link && link}
           </div>
+          {link && link}
         </Layout.Responsive>
       </>
     )
@@ -505,11 +566,17 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   return (
     <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
-      {biteStyle !== 'gradient' && <Layout.VisualizationWrapper ref={outerContainerRef}>{body}</Layout.VisualizationWrapper>}
+      {biteStyle !== 'gradient' && (
+        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
+          {body}
+        </Layout.VisualizationWrapper>
+      )}
       {'gradient' === biteStyle && (
-        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor}>
+        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
           {isEditor && <EditorPanel />}
           <Layout.Responsive isEditor={isEditor}>
+            {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+            {(!config.dataColumn || !config.dataFunction) && <Confirm />}
             <GradientBite label={config.title} value={calculateDataBite()} />
           </Layout.Responsive>
         </Layout.VisualizationWrapper>

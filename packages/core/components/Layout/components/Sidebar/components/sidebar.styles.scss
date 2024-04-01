@@ -1,25 +1,61 @@
 @import '@cdc/core/styles/v2/themes/_color-definitions.scss';
 
+.cdc-editor .configure .type-dashboard .sidebar {
+  top: 0;
+}
+
+.cdc-editor .configure .editor-heading + .cdc-open-viz-module .editor-panel__toggle {
+  top: 12px;
+  position: relative;
+}
+
+.cdc-editor .configure .cdc-open-viz-module:not(.type-dashboard) .editor-panel__toggle {
+  position: absolute;
+  top: 10px;
+}
+
+.cdc-editor .configure .cdc-open-viz-module:not(.type-dashboard) .sidebar {
+  position: relative;
+}
+
+.configure {
+  .cdc-open-viz-module:not(.type-dashboard) {
+    //   &.isEditor .sidebar {
+    //     top: 56px;
+    //   }
+
+    //   &.isEditor .editor-panel__toggle {
+    //     top: 68px;
+    //   }
+  }
+}
+
 .cdc-open-viz-module {
-  .editor-panel.cove {
-    position: absolute;
+  .waiting {
+    padding-top: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  .sidebar {
+    position: fixed;
     height: 100vh;
     top: 0;
     max-width: 350px;
     width: 350px;
     background-color: var(--white);
+    grid-area: panel;
 
     .editor-toggle {
-      position: absolute !important;
+      position: fixed !important;
       top: 10px !important;
     }
 
     .editor-panel {
-      position: absolute !important;
+      position: fixed !important;
       top: 0 !important;
     }
 
-    &.hidden {
+    &.editor-panel--hidden &.hidden {
       display: none;
     }
 
@@ -189,11 +225,6 @@
         min-width: auto;
         width: 75px;
       }
-    }
-
-    .form-container {
-      border-right: var(--lightGray) 1px solid;
-      flex-grow: 1;
     }
 
     .guidance-link {
@@ -817,6 +848,15 @@
     }
   }
 
+  &.editor-panel--visible {
+    .form-container {
+      border-right: var(--lightGray) 1px solid;
+      flex-grow: 1;
+      height: 100%;
+      overflow: auto;
+    }
+  }
+
   .editor-panel__title {
     background: #565656;
     color: #fff;
@@ -828,19 +868,26 @@
     margin: 0;
   }
 
+  &.type-dashboard {
+    .editor-panel__toggle {
+      top: 64px;
+    }
+  }
+
   .editor-panel__toggle {
     background: #f2f2f2;
     border-radius: 60px;
     color: #000;
     font-size: 1em;
     border: 0;
-    position: absolute;
+    position: fixed;
     z-index: 100;
     transition: 0.1s background;
     cursor: pointer;
     width: 25px;
     height: 25px;
     left: 307px;
+    top: 10px;
     box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
 
     &:before {

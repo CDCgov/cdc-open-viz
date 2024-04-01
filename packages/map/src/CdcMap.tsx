@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import * as d3 from 'd3'
 import Layout from '@cdc/core/components/Layout'
+import Waiting from '@cdc/core/components/Waiting'
+import Error from './components/EditorPanel/components/Error'
 
 // IE11
 import 'whatwg-fetch'
@@ -124,6 +126,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
+  const [displayPanel, setDisplayPanel] = useState(true)
   const [currentViewport, setCurrentViewport] = useState()
   const [runtimeFilters, setRuntimeFilters] = useState([])
   const [runtimeLegend, setRuntimeLegend] = useState([])
@@ -136,6 +139,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   const [dimensions, setDimensions] = useState()
+  const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
+
   const legendRef = useRef(null)
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
@@ -143,7 +148,38 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   let legendSpecialClassLastMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
-  if (isDebug) console.log('CdcMap state=', state) // eslint-disable-line
+  if (isDebug) console.log('CdcMap state=', state) // <eslint-disable-line></eslint-disable-line>
+
+  const columnsRequiredChecker = useCallback(() => {
+    let columnList = []
+
+    // Geo is always required
+    if ('' === state.columns.geo.name) {
+      columnList.push('Geography')
+    }
+
+    // Primary is required if we're on a data map or a point map
+    if ('navigation' !== state.general.type && '' === state.columns.primary.name) {
+      columnList.push('Primary')
+    }
+
+    // Navigate is required for navigation maps
+    if ('navigation' === state.general.type && ('' === state.columns.navigate.name || undefined === state.columns.navigate)) {
+      columnList.push('Navigation')
+    }
+
+    if (('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && '' === state.columns.latitude.name) {
+      columnList.push('Latitude')
+    }
+
+    if (('us-geocode' === state.general.type || 'world-geocode' === state.general.type) && '' === state.columns.longitude.name) {
+      columnList.push('Longitude')
+    }
+
+    if (columnList.length === 0) columnList = null
+
+    setRequiredColumns(columnList)
+  }, [state.columns, state.general.type])
 
   useEffect(() => {
     try {
@@ -1643,11 +1679,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   return (
     <ConfigContext.Provider value={mapProps}>
-      <Layout.VisualizationWrapper config={state} isEditor={isEditor} ref={outerContainerRef} imageId={imageId}>
-        {isEditor && <EditorPanel />}
+      <Layout.VisualizationWrapper config={state} isEditor={isEditor} ref={outerContainerRef} imageId={imageId} showEditorPanel={state.showEditorPanel}>
+        {isEditor && <EditorPanel columnsRequiredChecker={columnsRequiredChecker} />}
         <Layout.Responsive isEditor={isEditor}>
+          {state?.runtime?.editorErrorMessage.length > 0 && <Error state={state} />}
+          {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-            <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
+            <section className={`cove-component__content cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
               {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
                 <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
               )}

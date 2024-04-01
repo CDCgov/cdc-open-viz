@@ -1,4 +1,4 @@
-@import '@cdc/core/styles/v2/main';
+@import '@cdc/core/styles/base';
 
 .markup-include {
   .checkbox-group {
@@ -9,6 +9,21 @@
     margin-bottom: 24px;
   }
 
+  .cove-component__content-wrap {
+    padding: 1rem;
+
+    h1,
+    h2,
+    h3 {
+      margin-top: 0;
+    }
+
+    p {
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+  }
+
   .cove-component__content {
     background-color: #f2f2f2;
     font-size: 14px;
@@ -17,14 +32,7 @@
     background: transparent;
   }
 
-  .cove-editor {
-    width: unset;
-    left: unset;
-  }
-  // .cove-editor__content {
-  //   overflow: unset;
-  // }
-  .cove-editor .cove-editor__content .cove-editor__content-wrap {
+  .cove-editor__content .cove-editor__content-wrap {
     margin: 0 auto;
   }
 

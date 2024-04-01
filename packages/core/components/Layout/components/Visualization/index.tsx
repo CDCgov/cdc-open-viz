@@ -1,9 +1,12 @@
 // main visualization wrapper
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import React, { forwardRef, useRef } from 'react'
+import { Config as DataBiteConfig } from '@cdc/data-bite/src/types/Config'
+import './visualizations.scss'
+import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
 
 type VisualizationWrapper = {
-  config: ChartConfig
+  config: ChartConfig | DataBiteConfig | WaffleChartConfig
   isEditor: boolean
   currentViewport: string
   imageId: string
@@ -11,12 +14,23 @@ type VisualizationWrapper = {
 }
 
 const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) => {
-  const { config = {}, isEditor = false, currentViewport = 'lg', imageId = '' } = props
+  const { config = {}, isEditor = false, currentViewport = 'lg', imageId = '', showEditorPanel = true } = props
 
   const getWrappingClasses = () => {
-    const classes = ['cdc-open-viz-module', `${currentViewport}`, `font-${config?.fontSize}`, `${config?.theme}`]
+    let classes = ['cdc-open-viz-module', `${currentViewport}`, `font-${config?.fontSize}`, `${config?.theme}`]
     isEditor && classes.push('spacing-wrapper')
     isEditor && classes.push('isEditor')
+
+    if (isEditor && showEditorPanel) {
+      classes = classes.filter(item => item !== 'editor-panel--hidden')
+      classes.push('editor-panel--visible')
+    }
+
+    if (isEditor && !showEditorPanel) {
+      classes = classes.filter(item => item !== 'editor-panel--visible')
+      classes.push('editor-panel--hidden')
+    }
+
     if (config.type === 'chart') {
       classes.push('type-chart')
       config?.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)
@@ -27,14 +41,14 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     }
 
     if (config.type === 'data-bite') {
-      classes.push('cove', 'cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, `font-${config.fontSize}`)
+      classes.push('cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, `font-${config.fontSize}`)
       if (isEditor) {
         classes.push('is-editor')
       }
     }
 
     if (config.type === 'markup-include') {
-      classes.push('markup-include', 'cove')
+      classes.push('markup-include', 'cdc-open-viz-module')
     }
 
     if (config.type === 'waffle-chart') {
