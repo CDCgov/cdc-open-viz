@@ -1046,8 +1046,19 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const Error = () => {
+    const styles = {
+      position: 'absolute',
+      background: 'white',
+      zIndex: '999',
+      height: '100vh',
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gridArea: 'content'
+    }
     return (
-      <section className='waiting'>
+      <section className='waiting' style={styles}>
         <section className='waiting-container'>
           <h3>Error With Configuration</h3>
           <p>{config.runtime.editorErrorMessage}</p>

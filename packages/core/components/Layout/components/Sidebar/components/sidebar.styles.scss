@@ -1,14 +1,32 @@
 @import '@cdc/core/styles/v2/themes/_color-definitions.scss';
 
-.configure {
-  .cdc-open-viz-module {
-    &.isEditor .sidebar {
-      top: 56px;
-    }
+.cdc-editor .configure .type-dashboard .sidebar {
+  top: 0;
+}
 
-    &.isEditor .editor-panel__toggle {
-      top: 68px;
-    }
+.cdc-editor .configure .editor-heading + .cdc-open-viz-module .editor-panel__toggle {
+  top: 12px;
+  position: relative;
+}
+
+.cdc-editor .configure .cdc-open-viz-module:not(.type-dashboard) .editor-panel__toggle {
+  position: absolute;
+  top: 10px;
+}
+
+.cdc-editor .configure .cdc-open-viz-module:not(.type-dashboard) .sidebar {
+  position: relative;
+}
+
+.configure {
+  .cdc-open-viz-module:not(.type-dashboard) {
+    //   &.isEditor .sidebar {
+    //     top: 56px;
+    //   }
+
+    //   &.isEditor .editor-panel__toggle {
+    //     top: 68px;
+    //   }
   }
 }
 
@@ -848,6 +866,12 @@
     border-bottom: #565656 3px solid;
     z-index: 3;
     margin: 0;
+  }
+
+  &.type-dashboard {
+    .editor-panel__toggle {
+      top: 64px;
+    }
   }
 
   .editor-panel__toggle {

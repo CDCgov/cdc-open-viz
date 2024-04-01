@@ -455,8 +455,19 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     }
 
     const Error = () => {
+      const styles = {
+        position: 'absolute',
+        background: 'white',
+        zIndex: '999',
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gridArea: 'content'
+      }
       return (
-        <section className='waiting'>
+        <section className='waiting' style={styles}>
           <section className='waiting-container'>
             <h3>Error With Configuration</h3>
             <p>{config.runtime.editorErrorMessage}</p>
@@ -466,8 +477,20 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     }
 
     const Confirm = () => {
+      const styles = {
+        position: 'absolute',
+        background: 'white',
+        zIndex: '999',
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gridArea: 'content'
+      }
+
       return (
-        <section className='waiting'>
+        <section className='waiting' style={styles}>
           <section className='waiting-container'>
             <h3>Finish Configuring</h3>
             <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
