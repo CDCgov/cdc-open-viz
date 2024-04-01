@@ -39,7 +39,7 @@ const mapUpdates = newConfig => {
 }
 
 const mustHaveDashboardSharedFilters = newConfig => {
-  if (newConfig.dashboard.sharedFilters === undefined) {
+  if (newConfig.dashboard && newConfig.dashboard?.sharedFilters === undefined) {
     newConfig.dashboard.sharedFilters = []
   }
 }
