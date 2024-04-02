@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 export const useBarChart = () => {
-  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight } = useContext(ConfigContext)
+  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, setSeriesHighlight, seriesHighlight } = useContext(ConfigContext)
   const { orientation } = config
   const [hoveredBar, setHoveredBar] = useState(null)
 
@@ -21,6 +21,8 @@ export const useBarChart = () => {
   const stackCount = config.runtime.seriesKeys.length
   const fontSize = { small: 16, medium: 18, large: 20 }
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
+  const isBarAndLegendIsolate = config.visualizationType === 'Bar' && config.legend.behavior === 'isolate' && config.legend.axisAlign
+  const barStackedSeriesKeys = isBarAndLegendIsolate && seriesHighlight?.length ? seriesHighlight : config.runtime.barSeriesKeys || config.runtime.seriesKeys
 
   useEffect(() => {
     if (orientation === 'horizontal' && !config.yAxis.labelPlacement) {
@@ -194,7 +196,7 @@ export const useBarChart = () => {
         return d[config.xAxis.dataKey] === xAxisDataValue
       }) || {}
     Object.keys(columns).forEach(colKeys => {
-      if(series && config.columns[colKeys].series && config.columns[colKeys].series !== series) return
+      if (series && config.columns[colKeys].series && config.columns[colKeys].series !== series) return
       const formattingParams = {
         addColPrefix: config.columns[colKeys].prefix,
         addColSuffix: config.columns[colKeys].suffix,
@@ -235,6 +237,7 @@ export const useBarChart = () => {
     tipRounding,
     radius,
     stackCount,
+    barStackedSeriesKeys,
     fontSize,
     hasMultipleSeries,
     applyRadius,

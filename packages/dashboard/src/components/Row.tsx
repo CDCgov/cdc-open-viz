@@ -11,35 +11,43 @@ import TwoColIcon from '../images/icon-col-6.svg'
 import ThreeColIcon from '../images/icon-col-4.svg'
 import FourEightColIcon from '../images/icon-col-4-8.svg'
 import EightFourColIcon from '../images/icon-col-8-4.svg'
+import ToggleIcon from '../images/icon-toggle.svg'
+import { ConfigRow } from '../types/ConfigRow'
 
-const RowMenu = ({ rowIdx, row }) => {
+type RowMenuProps = {
+  rowIdx: number
+  row: ConfigRow
+}
+
+const RowMenu: React.FC<RowMenuProps> = ({ rowIdx, row }) => {
   const { config } = useContext(DashboardContext)
-  if (!config) return null
-  const { rows } = config
   const dispatch = useContext(DashboardDispatchContext)
+  const { rows } = config
+
   const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
   const getCurr = () => {
-    let res = [] as Object[]
-
-    for (let i = 0; i < row.length; i++) {
-      if (row[i].width) res.push(row[i].width)
-    }
-
-    return res.join('')
+    if (row[0].toggle) return 'toggle'
+    return row.reduce((acc, curr) => {
+      if (curr.width) {
+        acc += curr.width
+      }
+      return acc
+    }, '')
   }
 
   const [curr, setCurr] = useState(getCurr())
 
-  const setRowLayout = layout => {
+  const setRowLayout = (layout: number[], toggle = undefined) => {
     const newRows = [...rows]
-    const r = newRows[rowIdx]
+    const row = newRows[rowIdx]
 
-    for (let i = 0; i < r.length; i++) {
-      r[i].width = layout[i] ?? null
-    }
-
+    row.forEach((col, i) => {
+      col.width = layout[i] ?? null
+      col.toggle = toggle
+      if (!toggle) col.hide = undefined
+    })
     updateConfig({ ...config, rows: newRows })
-    setCurr(layout.join(''))
+    setCurr(toggle ? 'toggle' : layout.join(''))
   }
 
   const moveRow = (dir = 'down') => {
@@ -104,6 +112,9 @@ const RowMenu = ({ rowIdx, row }) => {
     </li>,
     <li className={curr === '84' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([8, 4])} key='84' title='2 Columns'>
       <EightFourColIcon />
+    </li>,
+    <li className={curr === 'toggle' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([12, 12, 12], true)} key='toggle' title='Toggle between up to three visualizations'>
+      <ToggleIcon />
     </li>
   ]
 

@@ -15,12 +15,13 @@ import 'react-tooltip/dist/react-tooltip.css'
 // Helpers
 import { publish } from '@cdc/core/helpers/events'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import Title from '@cdc/core/components/ui/Title'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
-import colorPalettes from '../../core/data/colorPalettes'
+import colorPalettes from '@cdc/core/data/colorPalettes'
 import initialState from './data/initial-state'
 
 // Assets
@@ -37,6 +38,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import MediaControls from '@cdc/core/components/MediaControls'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import getViewport from '@cdc/core/helpers/getViewport'
+import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import DataTable from '@cdc/core/components/DataTable' // Future: Lazy
@@ -53,6 +55,7 @@ import UsaMap from './components/UsaMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
 import useTooltip from './hooks/useTooltip'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
+import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -132,9 +135,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   const [dimensions, setDimensions] = useState()
+  const legendRef = useRef(null)
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
+  let legendSpecialClassLastMemo = useRef(new Map())
   let innerContainerRef = useRef()
 
   if (isDebug) console.log('CdcMap state=', state) // eslint-disable-line
@@ -303,6 +308,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // eslint-disable-next-line
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
     const newLegendMemo = new Map() // Reset memoization
+    const newLegendSpecialClassLastMemo = new Map() // Reset bin memoization
     let primaryCol = obj.columns.primary.name,
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
@@ -523,6 +529,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let otherRows = result.filter(d => !d.special)
         result = [...otherRows, ...specialRows]
       }
+
+      const assignSpecialClassLastIndex = (value, key) => {
+        const newIndex = result.findIndex(d => d.bin === value)
+        newLegendSpecialClassLastMemo.set(key, newIndex)
+      }
+      newLegendMemo.forEach(assignSpecialClassLastIndex)
+      legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
 
       return result
     }
@@ -775,6 +788,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
     //-----------
 
+    const assignSpecialClassLastIndex = (value, key) => {
+      const newIndex = result.findIndex(d => d.bin === value)
+      newLegendSpecialClassLastMemo.set(key, newIndex)
+    }
+    newLegendMemo.forEach(assignSpecialClassLastIndex)
+    legendSpecialClassLastMemo.current = newLegendSpecialClassLastMemo
+
     return result
   })
 
@@ -786,7 +806,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     if (hash) filters.fromHash = hash
 
-    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type, showDropdown }, idx) => {
+    obj?.filters.forEach(({ columnName, label, labels, queryParameter, orderedValues, active, values, type, showDropdown, setByQueryParameter }, idx) => {
       let newFilter = runtimeFilters[idx]
 
       const sortAsc = (a, b) => {
@@ -829,6 +849,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       newFilter.queryParameter = queryParameter
       newFilter.labels = labels
       newFilter.values = values
+      newFilter.setByQueryParameter = setByQueryParameter
       handleSorting(newFilter)
       newFilter.active = active ?? values[0] // Default to first found value
       newFilter.filterStyle = obj.filters[idx].filterStyle ? obj.filters[idx].filterStyle : 'dropdown'
@@ -988,7 +1009,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       if (legendMemo.current.has(hash)) {
         let idx = legendMemo.current.get(hash)
-        if (runtimeLegend[idx]?.disabled) return false
+        let disabledIdx = idx
+
+        if (state.legend.showSpecialClassesLast) {
+          disabledIdx = legendSpecialClassLastMemo.current.get(hash)
+        }
+
+        if (runtimeLegend[disabledIdx]?.disabled) return false
 
         // changed to use bin prop to get color instead of idx
         // bc we re-order legend when showSpecialClassesLast is checked
@@ -1135,11 +1162,19 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       if (state.columns.hasOwnProperty('navigate') && row[state.columns.navigate.name]) {
         toolTipText.push(
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-          <ul className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[state.columns.navigate.name])}>
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions,jsx-a11y/anchor-is-valid
+          <a
+            href='#'
+            className='navigation-link'
+            key='modal-navigation-link'
+            onClick={e => {
+              e.preventDefault()
+              navigationHandler(row[state.columns.navigate.name])
+            }}
+          >
             {state.tooltips.linkLabel}
-            <ExternalIcon className='inline-icon ml-1' />
-          </ul>
+            {isDomainExternal(row[state.columns.navigate.name]) && <ExternalIcon className='inline-icon ml-1' />}
+          </a>
         )
       }
     }
@@ -1305,8 +1340,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         data = transform.developerStandardize(data, state.dataDescription)
       }
 
-      console.log('data', data)
-
       setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
     }
   }
@@ -1449,6 +1482,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
       if (filters) {
+        filters.forEach((filter, index) => {
+          const queryStringFilterValue = getQueryStringFilterValue(filter)
+          if (queryStringFilterValue) {
+            filters[index].active = queryStringFilterValue
+          }
+        })
         setRuntimeFilters(filters)
       }
     }
@@ -1582,21 +1621,21 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // 1) skip to legend
     if (general.showSidebar) {
-      tabbingID = '#legend'
+      tabbingID = 'legend'
     }
 
     // 2) skip to data table if it exists and not a navigation map
     if (hasDataTable && !general.showSidebar) {
-      tabbingID = `#dataTableSection__${Date.now()}`
+      tabbingID = `dataTableSection__${Date.now()}`
     }
 
     // 3) if it's a navigation map skip to the dropdown.
     if (state.general.type === 'navigation') {
-      tabbingID = `#dropdown-${Date.now()}`
+      tabbingID = `dropdown-${Date.now()}`
     }
 
     // 4) handle other options
-    return tabbingID || '#!'
+    return tabbingID || '!'
   }
 
   const tabId = handleMapTabbing()
@@ -1614,9 +1653,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         {isEditor && <EditorPanel />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
-              <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
-            )}
             {/* prettier-ignore */}
             <Title
               title={title}
@@ -1624,16 +1660,15 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               config={config}
               classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${general.headerColor}`]}
             />
-            <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
-              Skip Over Map Container
-            </a>
+            <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
+
             {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
             {/* prettier-ignore */}
             {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
 
             <div
-              role='button'
+              role='region'
               tabIndex='0'
               className={mapContainerClasses.join(' ')}
               onClick={e => closeModal(e)}
@@ -1658,7 +1693,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 )}
               </section>
 
-              {general.showSidebar && 'navigation' !== general.type && <Legend />}
+              {general.showSidebar && 'navigation' !== general.type && <Legend ref={legendRef} />}
             </div>
 
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
@@ -1712,6 +1747,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         <div aria-live='assertive' className='cdcdataviz-sr-only'>
           {accessibleStatus}
         </div>
+
+        {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
+          <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
+        )}
       </div>
     </ConfigContext.Provider>
   )

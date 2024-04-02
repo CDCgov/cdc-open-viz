@@ -1,3 +1,3 @@
-import SparkLine from './SparkLine.jsx'
+import SparkLine from './components/SparkLine'
 
 export default SparkLine

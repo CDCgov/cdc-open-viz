@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect, useRef, useMemo } from 'react'
 import { animated, useTransition, interpolate } from 'react-spring'
-import chroma from 'chroma-js'
 
 // visx
 import { Pie } from '@visx/shape'
@@ -18,6 +17,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendComponent from '../Legend/Legend.Component'
 import { createFormatLabels } from '../Legend/helpers/createFormatLabels'
 import { scaleOrdinal } from '@visx/scale'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 const enterUpdateTransition = ({ startAngle, endAngle }) => ({
   startAngle,
@@ -156,8 +156,8 @@ const PieChart = props => {
           const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1
 
           let textColor = '#FFF'
-          if (_colorScale(arc.data[config.runtime.xAxis.dataKey]) && chroma.contrast(textColor, _colorScale(arc.data[config.runtime.xAxis.dataKey])) < 3.5) {
-            textColor = '000'
+          if (_colorScale(arc.data[config.runtime.xAxis.dataKey])) {
+            textColor = getContrastColor(textColor, _colorScale(arc.data[config.runtime.xAxis.dataKey]))
           }
 
           return (

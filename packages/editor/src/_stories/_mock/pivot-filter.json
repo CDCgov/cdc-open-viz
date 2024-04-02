@@ -1,0 +1,135 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "Race",
+        "type": "datafilter",
+        "showDropdown": true,
+        "columnName": "Race",
+        "pivot": "Age-adjusted rate",
+        "values": ["Hispanic or Latino", "Non-Hispanic American Indian", "Non-Hispanic Black", "Non-Hispanic Asian or Pacific Islander", "Non-Hispanic White"],
+        "active": "Hispanic or Latino",
+        "tier": 1
+      }
+    ]
+  },
+  "rows": [
+    [
+      {
+        "width": 12,
+        "widget": "table1707935263149"
+      },
+      {},
+      {}
+    ]
+  ],
+  "visualizations": {
+    "table1707935263149": {
+      "newViz": true,
+      "openModal": false,
+      "uid": "table1707935263149",
+      "type": "table",
+      "table": {
+        "label": "Data Table",
+        "show": true,
+        "showDownloadUrl": false,
+        "showVertical": true,
+        "expanded": true
+      },
+      "columns": {},
+      "dataFormat": {},
+      "visualizationType": "table",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "formattedData": [
+        {
+          "Race": "Hispanic or Latino",
+          "Age-adjusted rate": "644.2"
+        },
+        {
+          "Race": "Non-Hispanic American Indian",
+          "Age-adjusted rate": "636.1"
+        },
+        {
+          "Race": "Non-Hispanic Black",
+          "Age-adjusted rate": "563.7"
+        },
+        {
+          "Race": "Non-Hispanic Asian or Pacific Islander",
+          "Age-adjusted rate": "202.5"
+        },
+        {
+          "Race": "Non-Hispanic White",
+          "Age-adjusted rate": "183.6"
+        }
+      ],
+      "dataKey": "valid-data-chart.csv",
+      "data": [
+        {
+          "Race": "Hispanic or Latino",
+          "Age-adjusted rate": "644.2"
+        },
+        {
+          "Race": "Non-Hispanic American Indian",
+          "Age-adjusted rate": "636.1"
+        },
+        {
+          "Race": "Non-Hispanic Black",
+          "Age-adjusted rate": "563.7"
+        },
+        {
+          "Race": "Non-Hispanic Asian or Pacific Islander",
+          "Age-adjusted rate": "202.5"
+        },
+        {
+          "Race": "Non-Hispanic White",
+          "Age-adjusted rate": "183.6"
+        }
+      ]
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "newViz": true,
+  "datasets": {
+    "valid-data-chart.csv": {
+      "data": [
+        {
+          "Race": "Hispanic or Latino",
+          "Age-adjusted rate": "644.2"
+        },
+        {
+          "Race": "Non-Hispanic American Indian",
+          "Age-adjusted rate": "636.1"
+        },
+        {
+          "Race": "Non-Hispanic Black",
+          "Age-adjusted rate": "563.7"
+        },
+        {
+          "Race": "Non-Hispanic Asian or Pacific Islander",
+          "Age-adjusted rate": "202.5"
+        },
+        {
+          "Race": "Non-Hispanic White",
+          "Age-adjusted rate": "183.6"
+        }
+      ],
+      "dataFileSize": 178,
+      "dataFileName": "valid-data-chart.csv",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  },
+  "type": "dashboard",
+  "runtime": {},
+  "data": [1, 2, 3]
+}

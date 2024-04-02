@@ -22,6 +22,7 @@
     "label": "X-Axis Example Label",
     "type": "date",
     "dateParseFormat": "%m/%d/%Y",
+    "sortDates": true,
     "dateDisplayFormat": "%m/%d/%Y"
   },
   "table": {

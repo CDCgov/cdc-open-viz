@@ -499,7 +499,7 @@ export const supportedCountries = {
   ATA: ['Antarctica'],
   'Madeira Islands': ['Madeira Islands'],
   'Gaza/West Bank': ['Gaza/West Bank'],
-  'Saint Paul and Amsterdamn Islands': ['Saint Paul and Amsterdamn Islands'],
+  'Saint Paul and Amsterdam Islands': ['Saint Paul and Amsterdam Islands'],
   'Sovereign Base Areas of Akrotiri and Dhekelia': ['Sovereign Base Areas of Akrotiri and Dhekelia'],
   'Plazas de Soberania': ['Plazas de Soberania'],
   Akrotiri: ['Akrotiri'],

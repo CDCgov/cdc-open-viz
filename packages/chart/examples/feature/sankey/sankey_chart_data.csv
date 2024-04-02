@@ -1,0 +1,20 @@
+﻿Disposition,Type of Treatment,Final Outcome,Number of Patients
+"Assist, Agency",Assisted,N/A,2356
+"Assist, Public",Assisted,N/A,859
+"Assist, Unit",Assisted,N/A,2486
+Patient Dead at Scene-No Resuscitation Attempted (With Transport),Dead at scene,Dead,123
+Patient Dead at Scene-No Resuscitation Attempted (Without Transport),Dead at scene,Dead,3965
+Patient Dead at Scene-Resuscitation Attempted (With Transport),Treated,Dead,**
+Patient Dead at Scene-Resuscitation Attempted (Without Transport),Treated,Dead,631
+"Patient Evaluated, No Treatment/Transport Required",Evaluated no treatment required,Released,5169
+Patient Refused Evaluation/Care (With Transport),Refused evaluation care,Transported to hospital,860
+Patient Refused Evaluation/Care (Without Transport),Refused evaluation care,Released,11781
+"Patient Treated, Released (AMA)",Treated,Released,6780
+"Patient Treated, Released (per protocol)",Treated,Released,3522
+"Patient Treated, Transferred Care to Another EMS Unit",Treated,Transported to hospital,24432
+"Patient Treated, Transported by Law Enforcement",Treated,Transported to facility,4227
+"Patient Treated, Transported by Private Vehicle",Treated,Transported to facility,277
+"Patient Treated, Transported by this EMS Unit",Treated,Transported to hospital,399088
+"Standby-Public Safety, Fire, or EMS Operational Support Provided",No patient contact,N/A,458
+"Transport Non-Patient, Organs, etc.",No patient contact,N/A,**
+Unknown,Unknown,N/A,104

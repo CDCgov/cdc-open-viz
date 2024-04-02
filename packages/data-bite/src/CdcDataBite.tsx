@@ -10,6 +10,7 @@ import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Title from '@cdc/core/components/ui/Title'
 import CircleCallout from './components/CircleCallout'
+import GradientBite from './components/GradientBite'
 
 // external
 import ResizeObserver from 'resize-observer-polyfill'
@@ -507,9 +508,19 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   return (
     <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
-      <div className={classNames.join(' ')} ref={outerContainerRef}>
-        {body}
-      </div>
+      {biteStyle !== 'gradient' && (
+        <div className={classNames.join(' ')} ref={outerContainerRef}>
+          {body}
+        </div>
+      )}
+      {'gradient' === biteStyle && (
+        <div className={classNames.join(' ')} ref={outerContainerRef}>
+          {isEditor && <EditorPanel />}
+          <div className={isEditor ? 'spacing-wrapper' : ''}>
+            <GradientBite label={config.title} value={calculateDataBite()} />
+          </div>
+        </div>
+      )}
     </Context.Provider>
   )
 }
@@ -535,7 +546,8 @@ export const BITE_LOCATIONS = {
   split: 'Split Graphic and Message',
   title: 'Value above Message',
   body: 'Value before Message',
-  end: 'Value after Message'
+  end: 'Value after Message',
+  gradient: 'Gradient'
 }
 
 export const IMAGE_POSITION_LEFT = 'Left'

@@ -22,6 +22,7 @@ export interface PreliminaryDataItem {
   column: string
   value: string
   seriesKey: string
+  label: string
 }
 
 export interface DataItem {

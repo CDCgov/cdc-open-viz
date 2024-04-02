@@ -121,7 +121,7 @@
           cursor: pointer;
           width: 1em;
         }
-        span.navigation-link {
+        a.navigation-link {
           text-decoration: underline;
           cursor: pointer;
           color: #075290;
@@ -129,6 +129,7 @@
           svg {
             display: inline-block;
             max-width: 13px;
+            margin-left: .5em;
           }
         }
         &.capitalize p {
