@@ -69,6 +69,15 @@
 // TODO after v2 refactor remove header reference colors
 // Use .font-color/.bg-color, etc. in color definitions or something similar
 // Remove box shadows if we're no longer using them
+.sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) {
+  margin: 3em auto 0;
+  max-width: 35em;
+}
+
+.sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) {
+  background-color: white;
+}
+
 .cove-component__content {
   // Visual: Shadow
   &.shadow {
@@ -132,7 +141,6 @@
       border-top-left-radius: 3px;
       border-top-right-radius: 3px;
     }
-
     .bite-content-container.component--hideBackgroundColor {
       background: transparent;
     }
