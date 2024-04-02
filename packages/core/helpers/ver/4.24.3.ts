@@ -38,11 +38,6 @@ const mapUpdates = newConfig => {
   }
 }
 
-const mustHaveDashboardSharedFilters = newConfig => {
-  if (newConfig.dashboard && newConfig.dashboard?.sharedFilters === undefined) {
-    newConfig.dashboard.sharedFilters = []
-  }
-}
 const update_4_24_3 = config => {
   const ver = '4.24.3'
 
@@ -51,7 +46,6 @@ const update_4_24_3 = config => {
   remapDashboardRows(newConfig)
   chartUpdates(newConfig)
   mapUpdates(newConfig)
-  mustHaveDashboardSharedFilters(newConfig)
 
   newConfig.version = ver
   return newConfig
