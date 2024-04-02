@@ -354,21 +354,21 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     const allFiltersSelected = !state.config.dashboard.sharedFilters.some(filter => !filter.active && !filter.queuedActive)
     if (allFiltersSelected) {
       if (state.config.filterBehavior === FilterBehavior.Apply) {
-        const queryParams = getQueryParams();
-        let needsQueryUpdate = false;
+        const queryParams = getQueryParams()
+        let needsQueryUpdate = false
         state.config.dashboard.sharedFilters.forEach((sharedFilter, index) => {
           if (sharedFilter.queuedActive) {
             dashboardConfig.sharedFilters[index].active = sharedFilter.queuedActive
             delete dashboardConfig.sharedFilters[index].queuedActive
 
-            if(sharedFilter.setByQueryParameter && queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active){
-              queryParams[sharedFilter.setByQueryParameter] = sharedFilter.active;
-              needsQueryUpdate = true;
+            if (sharedFilter.setByQueryParameter && queryParams[sharedFilter.setByQueryParameter] !== sharedFilter.active) {
+              queryParams[sharedFilter.setByQueryParameter] = sharedFilter.active
+              needsQueryUpdate = true
             }
           }
         })
 
-        if(needsQueryUpdate){
+        if (needsQueryUpdate) {
           updateQueryString(queryParams)
         }
       }
@@ -384,14 +384,14 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   const changeFilterActive = (index: number, value: string | string[]) => {
     const { config } = state
     let dashboardConfig = { ...config.dashboard }
-    let filterActive = dashboardConfig.sharedFilters[index];
+    let filterActive = dashboardConfig.sharedFilters[index]
 
     if (config.filterBehavior !== FilterBehavior.Apply) {
       dashboardConfig.sharedFilters[index].active = value
 
-      const queryParams = getQueryParams();
-      if(filterActive.setByQueryParameter && queryParams[filterActive.setByQueryParameter] !== filterActive.active){
-        queryParams[filterActive.setByQueryParameter] = filterActive.active;
+      const queryParams = getQueryParams()
+      if (filterActive.setByQueryParameter && queryParams[filterActive.setByQueryParameter] !== filterActive.active) {
+        queryParams[filterActive.setByQueryParameter] = filterActive.active
         updateQueryString(queryParams)
       }
     } else {
@@ -838,17 +838,21 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               })
 
               //Checks shared filters against list to see if all visualizations are represented
-              const allApplicableFilters = vizKeysUsingDataset.reduce((acc, curr) => {
-                const _applicableFilters = getApplicableFilters(config.dashboard, curr)
-                if (_applicableFilters) {
-                  acc = acc.concat(_applicableFilters)
+              let applicableFilters: SharedFilter[] = []
+              config.dashboard.sharedFilters.forEach(sharedFilter => {
+                let allMatch = true
+                vizKeysUsingDataset.forEach(visualizationKey => {
+                  if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
+                    allMatch = false
+                  }
+                })
+                if (allMatch) {
+                  applicableFilters.push(sharedFilter)
                 }
-                return acc
-              }, [])
+              })
 
               //Applys any applicable filters to the Table
-              const filteredTableData = allApplicableFilters.length > 0 ? filterData(allApplicableFilters, config.datasets[datasetKey].data) : undefined
-
+              const filteredTableData = applicableFilters.length > 0 ? filterData(applicableFilters, config.datasets[datasetKey].data) : undefined
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
                   <DataTable
