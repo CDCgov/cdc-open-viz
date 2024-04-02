@@ -10,6 +10,7 @@
     "@babel/preset-env": "^7.23.2",
     "@babel/preset-react": "^7.22.15",
     "@rollup/plugin-dsv": "^3.0.2",
+    "@storybook/addon-a11y": "^7.6.16",
     "@storybook/addon-docs": "^7.4.6",
     "@storybook/addon-essentials": "^7.4.6",
     "@storybook/addon-interactions": "^7.4.6",
@@ -29,6 +30,7 @@
     "@types/react-dom": "^18.0.9",
     "@types/resize-observer-browser": "^0.1.5",
     "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^7.0.1",
     "@visx/group": "^3.0.0",
     "@visx/heatmap": "^3.0.0",
     "@visx/scale": "^3.0.0",
@@ -77,13 +79,8 @@
     "vite-plugin-css-injected-by-js": "^2.4.0",
     "vite-plugin-md": "^0.21.5",
     "vite-plugin-svgr": "^2.4.0",
-    "vitest": "^0.34.6",
+    "vitest": "^1.2.2",
     "whatwg-fetch": "^3.6.2"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "lint-staged": {
     "./packages/*/src/**/*.{js,jsx,ts,tsx}": [
@@ -103,7 +100,8 @@
     "@visx/brush": "^3.0.1",
     "@visx/legend": "^3.0.0",
     "@visx/pattern": "^3.0.0",
-    "@visx/responsive": "^2.10.0"
+    "@visx/responsive": "^2.10.0",
+    "@vitest/coverage-v8": "^1.2.2"
   },
   "resolutions": {
     "jackspeak": "2.1.1"

@@ -5,7 +5,8 @@
   "moduleName": "CdcCore",
   "main": "dist/cdccore",
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "vitest watch --reporter verbose --globals true",
+    "test:ui": "vitest --ui"
   },
   "repository": {
     "type": "git",

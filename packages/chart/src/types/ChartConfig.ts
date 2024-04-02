@@ -7,19 +7,13 @@ import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General } from '@cdc/core/types/General'
+import { type Link } from './../components/Sankey/types'
+import { Legend } from '@cdc/core/types/Legend'
+import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
+import { Region } from '@cdc/core/types/Region'
+import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps'
 
 export type ChartColumns = Record<string, Column>
-
-type Region = {
-  from: string
-  to: string
-  fromType: 'Previous Days' | 'Fixed Date'
-  toType: 'Last Date' | 'Fised Date'
-  label: string
-  color: string
-  background: string
-  range: 'Custom' | string
-}
 
 type DataFormat = {
   abbreviated: boolean
@@ -58,9 +52,11 @@ type Filter = {
 }
 
 export type Legend = {
+  seriesHighlight: string[]
   additionalCategories: string[]
   // general legend onClick behavior
   behavior: 'highlight' | 'isolate' | string
+  axisAlign: boolean
   colorCode: string
   description: string
   // show or hide the legend
@@ -102,7 +98,7 @@ type AllChartsConfig = {
   color: string
   colorMatchLineSeriesLabels: boolean
   columns: ChartColumns
-  confidenceKeys: Record<string, any>
+  confidenceKeys: ConfidenceInterval
   customColors: string[]
   data: Object[]
   dataUrl: string
@@ -139,6 +135,7 @@ type AllChartsConfig = {
   orientation: 'vertical' | 'horizontal'
   palette: string
   pieType?: string
+  preliminaryData: PreliminaryDataItem[]
   primary?: DataFormat
   roundingStyle: string
   runtime: Runtime
@@ -162,16 +159,37 @@ type AllChartsConfig = {
   }
   topAxis: { hasLine: boolean }
   twoColor: { palette: string }
-  type: string
+  type: 'chart' | 'dashboard'
   useLogScale: boolean
   visual: Visual
-  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting'
+  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey'
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis
   xScale: Function
   yScale: Function
   regions: Region[]
+  sankey: {
+    data: { links: Link[]; storyNodeText: Object[]; tooltips: Object[] }[]
+    nodePadding: number
+    iterations: number
+    nodeSize: {
+      nodeWidth: number
+    }
+    margin: { margin_x: number; margin_y: number }
+    nodeColor: { default: boolean; inactive: boolean }
+    opacity: { LinkOpacityInactive: string; LinkOpacityDefault: string; nodeOpacityInactive: boolean; nodeOpacityDefault: boolean }
+    rxValue: number
+    nodeFontColor: string
+    nodeValueStyle: {
+      textBefore: string
+      textAfter: string
+    }
+    linkColor: {
+      inactive: string
+      default: string
+    }
+  }
 }
 
 export type ForestPlotConfig = {

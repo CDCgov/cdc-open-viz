@@ -11,6 +11,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import InputText from '@cdc/core/components/inputs/InputText'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
+import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 import WarningImage from '../images/warning.svg'
@@ -42,37 +43,7 @@ const EditorPanel = memo(props => {
   const [showConfigConfirm, setShowConfigConfirm] = useState(false)
   const inputSelectStyle = condition => (condition ? { backgroundColor: '#ffd2d2', color: '#d8000c' } : {})
 
-  const updateField = (section, subsection, fieldName, newValue) => {
-    // Top level
-    if (null === section && null === subsection) {
-      let updatedConfig = { ...config, [fieldName]: newValue }
-
-      if ('filterColumn' === fieldName) {
-        updatedConfig.filterValue = ''
-      }
-
-      updateConfig(updatedConfig)
-      return
-    }
-
-    const isArray = Array.isArray(config[section])
-
-    let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
-
-    if (null !== subsection) {
-      if (isArray) {
-        sectionValue = [...config[section]]
-        sectionValue[subsection] = { ...sectionValue[subsection], [fieldName]: newValue }
-      } else if (typeof newValue === 'string') {
-        sectionValue[subsection] = newValue
-      } else {
-        sectionValue = { ...config[section], [subsection]: { ...config[section][subsection], [fieldName]: newValue } }
-      }
-    }
-    let updatedConfig = { ...config, [section]: sectionValue }
-
-    updateConfig(updatedConfig)
-  }
+  const updateField = updateFieldFactory(config, updateConfig, true)
 
   useEffect(() => {
     // Pass up to Editor if needed

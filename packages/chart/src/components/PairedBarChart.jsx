@@ -5,7 +5,7 @@ import { scaleLinear } from '@visx/scale'
 import { Text } from '@visx/text'
 
 import ConfigContext from '../ConfigContext'
-import chroma from 'chroma-js'
+import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 const PairedBarChart = ({ width, height, originalWidth }) => {
   const { config, colorScale, transformedData: data, formatNumber, seriesHighlight, getTextWidth } = useContext(ConfigContext)
@@ -47,15 +47,8 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
   })
 
   // Set label color
-  let labelColor = '#000000'
-
-  if (groupOne.color && chroma.contrast(labelColor, groupOne.color) < 4.9) {
-    groupOne.labelColor = '#FFFFFF'
-  }
-
-  if (groupTwo.color && chroma.contrast(labelColor, groupTwo.color) < 4.9) {
-    groupTwo.labelColor = '#FFFFFF'
-  }
+  groupOne.labelColor = groupOne.color ? getContrastColor('#000', groupOne.color) : '#000'
+  groupTwo.labelColor = groupTwo.color ? getContrastColor('#000', groupTwo.color) : '#000'
 
   const label = config.yAxis.label ? `${config.yAxis.label}: ` : ''
 
@@ -87,6 +80,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
 				`}
         </style>
         <svg id='cdc-visualization__paired-bar-chart' width={originalWidth} height={height} viewBox={`0 0 ${width + Number(config.runtime.yAxis.size)} ${height}`} role='img' tabIndex={0}>
+          <title>{`Paired bar chart graphic with the title ${config.title ? config.title : 'No Title Found'}`}</title>
           <Group top={0} left={Number(config.xAxis.size)}>
             {data
               .filter(item => config.series[0].dataKey === groupOne.dataKey)
@@ -122,6 +116,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         strokeWidth={borderWidth}
                         opacity={transparentBar ? 0.5 : 1}
                         display={displayBar ? 'block' : 'none'}
+                        tabIndex={-1}
                       />
                       {config.yAxis.displayNumbersOnBar && displayBar && (
                         <Text textAnchor={textFits ? 'start' : 'end'} dx={textFits ? 5 : -5} verticalAnchor='middle' x={halfWidth - barWidth} y={y + config.barHeight / 2} fill={textFits ? groupOne.labelColor : '#000'}>
@@ -173,6 +168,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         stroke='#333'
                         opacity={transparentBar ? 0.5 : 1}
                         display={displayBar ? 'block' : 'none'}
+                        tabIndex={-1}
                       />
                       {config.yAxis.displayNumbersOnBar && displayBar && (
                         <Text textAnchor={isTextFits ? 'end' : 'start'} dx={isTextFits ? -5 : 5} verticalAnchor='middle' x={halfWidth + barWidth} y={y + config.barHeight / 2} fill={isTextFits ? groupTwo.labelColor : '#000'}>

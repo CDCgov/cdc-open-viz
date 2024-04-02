@@ -4,6 +4,7 @@ import '../scss/choose-vis-tab.scss'
 import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
+import InfoIcon from '@cdc/core/assets/icon-info.svg'
 import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg'
 import BarIcon from '@cdc/core/assets/icon-chart-bar.svg'
 import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
@@ -23,6 +24,7 @@ import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
 import ForestPlotIcon from '@cdc/core/assets/icon-chart-forest-plot.svg'
 import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
 import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
+import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
 import { Visualization } from '@cdc/core/types/Visualization'
 
 export default function ChooseTab() {
@@ -245,12 +247,21 @@ export default function ChooseTab() {
           </Tooltip>
         </li>
 
-        <li>
+        {/* <li>
           <Tooltip>
             <Tooltip.Target>
               <IconButton label='Forest Plot' type='chart' subType='Forest Plot' orientation='vertical' icon={<ForestPlotIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Display a forest plot</Tooltip.Content>
+          </Tooltip>
+        </li> */}
+
+        <li>
+          <Tooltip>
+            <Tooltip.Target>
+              <IconButton label='Sankey Diagram' type='chart' subType='Sankey' orientation='vertical' icon={<SankeyIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Display a sankey diagram</Tooltip.Content>
           </Tooltip>
         </li>
       </ul>

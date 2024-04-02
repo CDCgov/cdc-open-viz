@@ -31,7 +31,7 @@
     }
   },
   "type": "map",
-  "color": "pinkpurple",
+  "color": "qualitative4",
   "columns": {
     "geo": {
       "name": "State",
@@ -70,24 +70,7 @@
     "singleRow": false,
     "verticalSorted": false,
     "showSpecialClassesLast": false,
-    "categoryValuesOrder": [
-      "Arboviral 2",
-      "Arboviral 3",
-      "Arboviral 4",
-      "Arboviral 5",
-      "Arboviral 6",
-      "Arboviral 7",
-      "Arboviral 8",
-      "Arboviral 9",
-      "Arboviral 10",
-      "Arboviral 11",
-      "Arboviral 12",
-      "Arboviral",
-      "Babesiosis",
-      "Congenital Syphilis",
-      "FDD",
-      "Generic v2.0"
-    ]
+    "categoryValuesOrder": ["Arboviral 2", "Arboviral 3", "Arboviral 4", "Arboviral 5", "Arboviral 6", "Arboviral 7", "Arboviral 8", "Arboviral 9", "Arboviral 10", "Arboviral 11", "Arboviral 12", "Arboviral", "Babesiosis", "Congenital Syphilis", "FDD", "Generic v2.0"]
   },
   "filters": [],
   "table": {
@@ -117,15 +100,33 @@
     "minBubbleSize": 1,
     "maxBubbleSize": 20,
     "extraBubbleBorder": false,
-    "cityStyle": "circle",
-    "geoCodeCircleSize": 2,
-    "showBubbleZeros": false
+    "cityStyle": "pin",
+    "geoCodeCircleSize": "4",
+    "showBubbleZeros": false,
+    "additionalCityStyles": [
+      {
+        "label": "Tampa Diamond",
+        "column": "State",
+        "value": "Tampa",
+        "shape": "Diamond"
+      },
+      {
+        "label": " Production Label",
+        "column": "Status",
+        "value": "Production",
+        "shape": "Star"
+      },
+      {
+        "label": "Onboarding label",
+        "column": "Status",
+        "value": "Onboarding",
+        "shape": "Triangle"
+      }
+    ],
+    "cityStyleLabel": "Default city shape"
   },
   "mapPosition": {
-    "coordinates": [
-      0,
-      30
-    ],
+    "coordinates": [0, 30],
     "zoom": 1
   },
   "map": {
@@ -158,6 +159,46 @@
   },
   "filterBehavior": "Filter Change",
   "data": [
+    {
+      "Condition": "Arboviral 2",
+      "State": "Chicago",
+      "Status": "Onboarding"
+    },
+    {
+      "Condition": "Arboviral 7",
+      "State": "Tampa",
+      "Status": "Onboarding"
+    },
+    {
+      "Condition": "Arboviral 9",
+      "State": "Seatle",
+      "Status": "Onboarding"
+    },
+    {
+      "Condition": "Arboviral 9",
+      "State": "Denver",
+      "Status": "Onboarding"
+    },
+    {
+      "Condition": "Arboviral 4",
+      "State": "Dallas",
+      "Status": "Production"
+    },
+    {
+      "Condition": "Arboviral 4",
+      "State": "Sacramento",
+      "Status": "Production"
+    },
+    {
+      "Condition": "Arboviral 3",
+      "State": "Atlanta",
+      "Status": "Production"
+    },
+    {
+      "Condition": "Arboviral 9",
+      "State": "Orlando",
+      "Status": "Production"
+    },
     {
       "Condition": "Arboviral 2",
       "State": "AL",
@@ -319,7 +360,7 @@
       "Status": "Production"
     },
     {
-      "Condition": "Arboviral",
+      "Condition": "Arboviral 5",
       "State": "New York City",
       "Status": "Production"
     },
