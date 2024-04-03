@@ -5,7 +5,6 @@ import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
 import { Text } from '@visx/text'
-import { Drag, raise } from '@visx/drag'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
@@ -33,7 +32,7 @@ import useScales from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
-
+import Annotations from './Annotations'
 // styles
 import ZoomBrush from './ZoomBrush'
 
@@ -41,7 +40,7 @@ const LinearChart = props => {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth } = useContext(ConfigContext)
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
-  const [draggingItems, setDraggingItems] = useState([])
+
   // configure width
   let [width] = dimensions
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
@@ -70,6 +69,7 @@ const LinearChart = props => {
   const { hasTopAxis } = useTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
+  const annotationRefs = useRef(null)
 
   // refs
   const triggerRef = useRef()
@@ -232,7 +232,7 @@ const LinearChart = props => {
   ) : (
     <ErrorBoundary component='LinearChart'>
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
-      <div style={{ width: `${width}px`, height: `${height}px`, overflow: 'visible' }} className='tooltip-boundary'>
+      <div style={{ width: `${width}px`, height: `${height}px`, overflow: 'visible', touchAction: 'none' }} className='tooltip-boundary'>
         <svg
           // onMouseLeave={() => setPoint(null)}
           onMouseMove={onMouseMove}
@@ -244,46 +244,6 @@ const LinearChart = props => {
           ref={svgRef}
           style={{ overflow: 'visible' }}
         >
-          {config?.annotations &&
-            config.annotations.map((annotation, index) => {
-              return (
-                <Drag
-                  key={`annotation--${index}`}
-                  width={width}
-                  height={height}
-                  x={annotation.coordinates.x}
-                  y={annotation.coordinates.y}
-                  onDragStart={() => {
-                    // svg follows the painter model
-                    // so we need to move the data item
-                    // to end of the array for it to be drawn
-                    // "on top of" the other data items
-                    setDraggingItems(raise(config.annotations, index))
-                  }}
-                >
-                  {({ dragStart, dragEnd, dragMove, isDragging, x, y, dx, dy }) => {
-                    console.log('x', x)
-                    console.log('y', y)
-                    return (
-                      <text
-                        // prettier-ignore
-                        x={y + config.yAxis.size}
-                        y={x}
-                        stroke={isDragging ? 'red' : 'blue'}
-                        onMouseMove={dragMove}
-                        onMouseUp={dragEnd}
-                        onMouseDown={dragStart}
-                        onTouchStart={dragStart}
-                        onTouchMove={dragMove}
-                        onTouchEnd={dragEnd}
-                      >
-                        {annotation.text}
-                      </text>
-                    )
-                  }}
-                </Drag>
-              )
-            })}
           <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
           {/* Y axis */}
           {!['Spark Line', 'Forest Plot'].includes(visualizationType) && (
@@ -711,13 +671,13 @@ const LinearChart = props => {
               return (
                 // prettier-ignore
                 <Line
-                key={`yAxis-${anchor.value}--${index}`}
-                strokeDasharray={handleLineType(anchor.lineStyle)}
-                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                className='anchor-y'
-                from={{ x: 0 + padding, y: anchorPosition - middleOffset}}
-                to={{ x: width - config.yAxis.rightAxisSize, y: anchorPosition - middleOffset }}
-              />
+                  key={`yAxis-${anchor.value}--${index}`}
+                  strokeDasharray={handleLineType(anchor.lineStyle)}
+                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  className='anchor-y'
+                  from={{ x: 0 + padding, y: anchorPosition - middleOffset}}
+                  to={{ x: width - config.yAxis.rightAxisSize, y: anchorPosition - middleOffset }}
+                />
               )
             })}
           {/* x anchors */}
@@ -778,6 +738,7 @@ const LinearChart = props => {
               <Line from={{ x: point.x, y: 0 }} to={{ x: point.x, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
             </Group>
           )}
+          <Annotations xScale={xScale} yScale={yScale} xMax={xMax} />
         </svg>
         {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && !config.tooltips.singleSeries && (
           <>

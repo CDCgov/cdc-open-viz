@@ -10,6 +10,7 @@ export type TransformedData = {
 }
 
 type SharedChartContext = {
+  annotations: any
   animatedChart?: boolean
   // process top level chart aria label for each chart type
   handleChartAriaLabels: (config: any) => string
@@ -46,6 +47,7 @@ type LineChartContext = SharedChartContext & {
 export type ChartContext =
   | LineChartContext
   | (SharedChartContext & {
+      annotations: any
       dimensions: [screenWidth: number, screenHeight: number]
       formatDate?: Function
       formatTooltipsDate: Function
