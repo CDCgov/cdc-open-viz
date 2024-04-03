@@ -5,6 +5,7 @@ import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
 import { Text } from '@visx/text'
+import { Drag, raise } from '@visx/drag'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
@@ -40,7 +41,7 @@ const LinearChart = props => {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth } = useContext(ConfigContext)
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
-
+  const [draggingItems, setDraggingItems] = useState([])
   // configure width
   let [width] = dimensions
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
@@ -243,6 +244,46 @@ const LinearChart = props => {
           ref={svgRef}
           style={{ overflow: 'visible' }}
         >
+          {config?.annotations &&
+            config.annotations.map((annotation, index) => {
+              return (
+                <Drag
+                  key={`annotation--${index}`}
+                  width={width}
+                  height={height}
+                  x={annotation.coordinates.x}
+                  y={annotation.coordinates.y}
+                  onDragStart={() => {
+                    // svg follows the painter model
+                    // so we need to move the data item
+                    // to end of the array for it to be drawn
+                    // "on top of" the other data items
+                    setDraggingItems(raise(config.annotations, index))
+                  }}
+                >
+                  {({ dragStart, dragEnd, dragMove, isDragging, x, y, dx, dy }) => {
+                    console.log('x', x)
+                    console.log('y', y)
+                    return (
+                      <text
+                        // prettier-ignore
+                        x={y + config.yAxis.size}
+                        y={x}
+                        stroke={isDragging ? 'red' : 'blue'}
+                        onMouseMove={dragMove}
+                        onMouseUp={dragEnd}
+                        onMouseDown={dragStart}
+                        onTouchStart={dragStart}
+                        onTouchMove={dragMove}
+                        onTouchEnd={dragEnd}
+                      >
+                        {annotation.text}
+                      </text>
+                    )
+                  }}
+                </Drag>
+              )
+            })}
           <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
           {/* Y axis */}
           {!['Spark Line', 'Forest Plot'].includes(visualizationType) && (

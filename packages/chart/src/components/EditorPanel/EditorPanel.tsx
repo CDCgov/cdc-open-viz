@@ -2915,6 +2915,7 @@ const EditorPanel = () => {
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
+              <Panels.Annotate name='Annotate Visualization' />
               {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
             </Accordion>
             {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
