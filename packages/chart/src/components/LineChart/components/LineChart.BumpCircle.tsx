@@ -1,7 +1,8 @@
 import React from 'react'
+import { Group } from '@visx/group'
 
 const LineChartBumpCircle = props => {
-  const { config, d, displayArea, seriesKey, tooltipData, xScale, yScale, colorScale, parseDate, yScaleRight, data, circleData, dataIndex, mode } = props
+  const { config, xScale, yScale, parseDate } = props
 
   const handleX = xValue => {
     if (config.xAxis.type === 'date') {
@@ -15,12 +16,21 @@ const LineChartBumpCircle = props => {
     }
   }
 
+  const checkBandScale = xValue => {
+    return xScale.bandwidth ? xScale.bandwidth() / 2 + Number(xValue) : Number(xValue)
+  }
   // get xScale and yScale...
   if (!config.series) return
   return config?.series.map((series, seriesIndex) => {
     return config.data.map((d, dataIndex) => {
-      console.log(xScale(d[config.xAxis.dataKey]))
-      return <circle className='bump-circle' r={10} cx={Number(xScale(handleX(d[config.xAxis.dataKey])))} cy={Number(yScale(d[series.dataKey]))} stroke='#CACACA' strokeWidth={1} fill='none' style={{ zIndex: 2 }} />
+      return (
+        <Group left={Number(config.runtime.yAxis.size)}>
+          <circle className='bump-circle' r={10} cx={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey]))))} cy={Number(yScale(d[series.dataKey]))} stroke='#CACACA' strokeWidth={1} fill='none' style={{ zIndex: 2 }} />
+          <text x={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey])))) - 4} y={Number(yScale(d[series.dataKey])) + 4} fill='#000000' fontSize={13} style={{ zIndex: 2 }}>
+            {d[series.dataKey]}
+          </text>
+        </Group>
+      )
     })
   })
 }

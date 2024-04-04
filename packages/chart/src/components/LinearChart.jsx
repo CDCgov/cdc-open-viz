@@ -23,7 +23,6 @@ import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './../hooks/useIntersectionObserver'
 import Regions from './Regions'
-import BumpChart from './BumpChart'
 
 // Hooks
 import useMinMax from '../hooks/useMinMax'
@@ -589,7 +588,7 @@ const LinearChart = props => {
               chartRef={svgRef}
             />
           )}
-          {(visualizationType === 'Line' || visualizationType === 'Combo') && (
+          {(visualizationType === 'Line' || visualizationType === 'Combo' || visualizationType === 'Bump Chart') && (
             <LineChart
               xScale={xScale}
               yScale={yScale}
@@ -604,15 +603,6 @@ const LinearChart = props => {
               tooltipData={tooltipData}
               showTooltip={showTooltip}
               chartRef={svgRef}
-            />
-          )}
-          {(visualizationType === 'Bump Chart') && (
-            <BumpChart
-            width={width}
-            height={height}
-            config={config}
-            xScale={xScale}
-            yScale={yScale}
             />
           )}
           {(visualizationType === 'Forecasting' || visualizationType === 'Combo') && (

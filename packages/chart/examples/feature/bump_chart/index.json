@@ -10,7 +10,7 @@
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
-  "lineDatapointStyle": "hover",
+  "lineDatapointStyle": "hidden",
   "lineDatapointColor": "Same as Line",
   "barHasBorder": "false",
   "isLollipopChart": false,
@@ -162,7 +162,288 @@
   },
   "brush": {
     "height": 25,
-    "data": [],
+    "data": [
+      {
+        "Series 1": "1",
+        "year": "2014"
+      },
+      {
+        "Series 1": "2",
+        "year": "2015"
+      },
+      {
+        "Series 1": "2",
+        "year": "2016"
+      },
+      {
+        "Series 1": "2",
+        "year": "2017"
+      },
+      {
+        "Series 1": "2",
+        "year": "2018"
+      },
+      {
+        "Series 1": "2",
+        "year": "2019"
+      },
+      {
+        "Series 1": "2",
+        "year": "2020"
+      },
+      {
+        "Series 2": "2",
+        "year": "2014"
+      },
+      {
+        "Series 2": "1",
+        "year": "2015"
+      },
+      {
+        "Series 2": "1",
+        "year": "2016"
+      },
+      {
+        "Series 2": "1",
+        "year": "2017"
+      },
+      {
+        "Series 2": "1",
+        "year": "2018"
+      },
+      {
+        "Series 2": "1",
+        "year": "2019"
+      },
+      {
+        "Series 2": "1",
+        "year": "2020"
+      },
+      {
+        "Series 3": "3",
+        "year": "2014"
+      },
+      {
+        "Series 3": "4",
+        "year": "2015"
+      },
+      {
+        "Series 3": "3",
+        "year": "2016"
+      },
+      {
+        "Series 3": "4",
+        "year": "2017"
+      },
+      {
+        "Series 3": "3",
+        "year": "2018"
+      },
+      {
+        "Series 3": "4",
+        "year": "2019"
+      },
+      {
+        "Series 3": "4",
+        "year": "2020"
+      },
+      {
+        "Series 4": "4",
+        "year": "2014"
+      },
+      {
+        "Series 4": "8",
+        "year": "2015"
+      },
+      {
+        "Series 4": "5",
+        "year": "2016"
+      },
+      {
+        "Series 4": "10",
+        "year": "2017"
+      },
+      {
+        "Series 4": "6",
+        "year": "2018"
+      },
+      {
+        "Series 4": "9",
+        "year": "2019"
+      },
+      {
+        "Series 4": "10",
+        "year": "2020"
+      },
+      {
+        "Series 5": "5",
+        "year": "2014"
+      },
+      {
+        "Series 5": "7",
+        "year": "2015"
+      },
+      {
+        "Series 5": "6",
+        "year": "2016"
+      },
+      {
+        "Series 5": "5",
+        "year": "2017"
+      },
+      {
+        "Series 5": "4",
+        "year": "2018"
+      },
+      {
+        "Series 5": "5",
+        "year": "2019"
+      },
+      {
+        "Series 5": "6",
+        "year": "2020"
+      },
+      {
+        "Series 6": "6",
+        "year": "2014"
+      },
+      {
+        "Series 6": "6",
+        "year": "2015"
+      },
+      {
+        "Series 6": "7",
+        "year": "2016"
+      },
+      {
+        "Series 6": "6",
+        "year": "2017"
+      },
+      {
+        "Series 6": "7",
+        "year": "2018"
+      },
+      {
+        "Series 6": "6",
+        "year": "2019"
+      },
+      {
+        "Series 6": "5",
+        "year": "2020"
+      },
+      {
+        "Series 7": "7",
+        "year": "2014"
+      },
+      {
+        "Series 7": "9",
+        "year": "2015"
+      },
+      {
+        "Series 7": "9",
+        "year": "2016"
+      },
+      {
+        "Series 7": "7",
+        "year": "2017"
+      },
+      {
+        "Series 7": "8",
+        "year": "2018"
+      },
+      {
+        "Series 7": "7",
+        "year": "2019"
+      },
+      {
+        "Series 7": "7",
+        "year": "2020"
+      },
+      {
+        "Series 8": "8",
+        "year": "2014"
+      },
+      {
+        "Series 8": "3",
+        "year": "2015"
+      },
+      {
+        "Series 8": "4",
+        "year": "2016"
+      },
+      {
+        "Series 8": "3",
+        "year": "2017"
+      },
+      {
+        "Series 8": "5",
+        "year": "2018"
+      },
+      {
+        "Series 8": "3",
+        "year": "2019"
+      },
+      {
+        "Series 8": "3",
+        "year": "2020"
+      },
+      {
+        "Series 9": "9",
+        "year": "2014"
+      },
+      {
+        "Series 9": "10",
+        "year": "2015"
+      },
+      {
+        "Series 9": "10",
+        "year": "2016"
+      },
+      {
+        "Series 9": "9",
+        "year": "2017"
+      },
+      {
+        "Series 9": "9",
+        "year": "2018"
+      },
+      {
+        "Series 9": "10",
+        "year": "2019"
+      },
+      {
+        "Series 9": "9",
+        "year": "2020"
+      },
+      {
+        "Series 10": "10",
+        "year": "2014"
+      },
+      {
+        "Series 10": "5",
+        "year": "2015"
+      },
+      {
+        "Series 10": "8",
+        "year": "2016"
+      },
+      {
+        "Series 10": "8",
+        "year": "2017"
+      },
+      {
+        "Series 10": "10",
+        "year": "2018"
+      },
+      {
+        "Series 10": "8",
+        "year": "2019"
+      },
+      {
+        "Series 10": "8",
+        "year": "2020"
+      }
+    ],
     "active": false
   },
   "exclusions": {
@@ -439,7 +720,8 @@
     {
       "Series 3": "4",
       "year": "2020"
-    },{
+    },
+    {
       "Series 4": "4",
       "year": "2014"
     },
@@ -466,7 +748,8 @@
     {
       "Series 4": "10",
       "year": "2020"
-    },{
+    },
+    {
       "Series 5": "5",
       "year": "2014"
     },
@@ -493,7 +776,8 @@
     {
       "Series 5": "6",
       "year": "2020"
-    },{
+    },
+    {
       "Series 6": "6",
       "year": "2014"
     },
@@ -520,7 +804,8 @@
     {
       "Series 6": "5",
       "year": "2020"
-    },{
+    },
+    {
       "Series 7": "7",
       "year": "2014"
     },
@@ -547,7 +832,8 @@
     {
       "Series 7": "7",
       "year": "2020"
-    },{
+    },
+    {
       "Series 8": "8",
       "year": "2014"
     },
@@ -602,7 +888,8 @@
     {
       "Series 9": "9",
       "year": "2020"
-    },{
+    },
+    {
       "Series 10": "10",
       "year": "2014"
     },

@@ -257,8 +257,6 @@ const LineChart = (props: LineChartProps) => {
                     </text>
                   )
                 })}
-
-              <LineChartBumpCircle config={config} xScale={xScale} yScale={yScale} />
             </Group>
           )
         })}
@@ -269,6 +267,7 @@ const LineChart = (props: LineChartProps) => {
           </Text>
         )}
       </Group>
+      {config.visualizationType === 'Bump Chart' && <LineChartBumpCircle config={config} xScale={xScale} yScale={yScale} />}
     </ErrorBoundary>
   )
 }
