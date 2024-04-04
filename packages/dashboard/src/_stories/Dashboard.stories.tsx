@@ -208,7 +208,7 @@ export const APIFiltersMap: Story = {
     const stratCategoryFilter = canvas.getByLabelText('View By', { selector: 'select' })
     await user.selectOptions(stratCategoryFilter, ['Some StratificationCategory 0'])
     const stratFilter = canvas.getByLabelText('Stratification', { selector: 'select' })
-    await user.selectOptions(stratFilter, ['some DataValueType 0'])
+    await user.selectOptions(stratFilter, ['Some Stratification 0'])
     await user.click(canvas.getByText('GO!'))
   }
 }
