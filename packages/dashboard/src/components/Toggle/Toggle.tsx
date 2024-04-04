@@ -7,23 +7,22 @@ import './toggle-style.css'
 import _ from 'lodash'
 
 type ToggleProps = {
+  active: number
   row: ConfigRow
-  rowIndex: number
   visualizations: Record<string, Visualization>
+  setToggled: (colIndex: number) => void
 }
-const Toggle: React.FC<ToggleProps> = ({ row, rowIndex, visualizations }) => {
-  const dispatch = useContext(DashboardDispatchContext)
-
+const Toggle: React.FC<ToggleProps> = ({ active, row, visualizations, setToggled }) => {
   const selectItem = (colIndex, e = null) => {
     if (e?.key && e.key !== 'Enter') return
-    dispatch({ type: 'TOGGLE_ROW', payload: { rowIndex, colIndex } })
+    setToggled(colIndex)
   }
   return (
     <div className='toggle-component'>
-      {row.map((col, colIndex) => {
+      {row.columns.map((col, colIndex) => {
         if (!col.widget) return null
         const type = visualizations[col.widget].type
-        const selected = col.hide !== undefined ? col.hide : colIndex === 0
+        const selected = colIndex === active
         return (
           <div role='radio' className={selected ? 'selected' : ''} key={colIndex} onClick={() => selectItem(colIndex)} onKeyUp={e => selectItem(colIndex, e)} aria-checked={selected} tabIndex={0} aria-label={`Toggle ${type}`}>
             {getIcon(visualizations[col.widget])} <span>{_.capitalize(type)}</span>

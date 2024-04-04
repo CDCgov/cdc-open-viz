@@ -288,7 +288,7 @@ export default function DataImport() {
   }, []) // eslint-disable-line
 
   // todo: code repetition in Widget.jsx?
-  const updateDescriptionProp = (visualizationKey, datasetKey, key, value) => {
+  const updateDescriptionProp = (datasetKey, key, value) => {
     if (config.type === 'dashboard') {
       let dataDescription = { ...config.datasets[datasetKey].dataDescription, [key]: value }
       let formattedData = transform.developerStandardize(config.datasets[datasetKey].data, dataDescription)
@@ -678,7 +678,7 @@ export default function DataImport() {
               </>
             )}
 
-            {showDataDesigner && <DataDesigner visualizationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} config={config} setConfig={setConfig} />}
+            {showDataDesigner && <DataDesigner visualizationKey={null} configureData={configureData} updateDescriptionProp={(key, value) => updateDescriptionProp(configureData.dataFileName, key, value)} config={config} setConfig={setConfig} />}
           </>
         )}
 
