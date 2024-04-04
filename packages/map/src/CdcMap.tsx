@@ -1653,9 +1653,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         {isEditor && <EditorPanel />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
-              <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
-            )}
             {/* prettier-ignore */}
             <Title
               title={title}
@@ -1750,6 +1747,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         <div aria-live='assertive' className='cdcdataviz-sr-only'>
           {accessibleStatus}
         </div>
+
+        {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
+          <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
+        )}
       </div>
     </ConfigContext.Provider>
   )
