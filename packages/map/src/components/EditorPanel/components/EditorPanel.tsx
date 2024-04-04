@@ -2648,16 +2648,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                 <label className='checkbox'>
                   <input
                     type='checkbox'
-                    checked={state.general.showDownloadButton}
-                    onChange={event => {
-                      handleEditorChanges('toggleDownloadButton', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label'>Show Download CSV Link</span>
-                </label>
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
                     checked={state.general.showFullGeoNameInCSV}
                     onChange={event => {
                       handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
@@ -2675,6 +2665,16 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   />
                   <span className='edit-label'>Enable Image Download</span>
                 </label>
+                {/* <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.general.showDownloadPdfButton}
+                        onChange={event => {
+                          handleEditorChanges('toggleDownloadPdfButton', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Enable Pdf Download</span>
+                    </label> */}
               </AccordionItemPanel>
             </AccordionItem>
           )}

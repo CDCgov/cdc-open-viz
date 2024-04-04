@@ -1185,6 +1185,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               )}
               {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
               {/* show pdf or image button */}
+              {/* Sankey */}
+              {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}</ParentSize>}
+              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} />}
             </div>
           )}
         </Layout.Responsive>
