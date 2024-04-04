@@ -43,18 +43,40 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     if (region.fromType === 'Previous Days') {
       const previousDays = Number(region.from) || 0
       const categoricalDomain = domain.map(d => formatDate(config.xAxis.dateParseFormat, new Date(d)))
-      const d = region.toType === 'Last Date' ? new Date(domain[domain.length - 1]) : new Date(region.to) // on categorical charts force leading zero 03/15/2016 vs 3/15/2016 for valid date format
+      const d = region.toType === 'Last Date' ? new Date(domain[domain.length - 1]).getTime() : new Date(region.to) // on categorical charts force leading zero 03/15/2016 vs 3/15/2016 for valid date format
       const to = config.xAxis.type === 'categorical' ? formatDate(config.xAxis.dateParseFormat, d) : formatDate(config.xAxis.dateParseFormat, d)
       const toDate = new Date(to)
+      from = new Date(toDate.setDate(toDate.getDate() - Number(previousDays)))
 
-      from = new Date(toDate.setDate(toDate.getDate() - previousDays))
+      if (xAxis.type === 'date') {
+        from = new Date(formatDate(xAxis.dateParseFormat, from)).getTime()
 
+        let closestDate = domain[0]
+        let minDiff = Math.abs(from - closestDate)
+
+        for (let i = 1; i < domain.length; i++) {
+          const diff = Math.abs(from - domain[i])
+          if (diff < minDiff) {
+            minDiff = diff
+            closestDate = domain[i]
+          }
+        }
+        from = closestDate
+      }
+
+      // Here the domain is in the xScale.dateParseFormat
       if (xAxis.type === 'categorical') {
-        const categoricalFormattedDate = formatDate(config.xAxis.dateParseFormat, from)
-        const isDate = date => date === categoricalFormattedDate
-        const index = categoricalDomain.findIndex(isDate)
-        const categoricalIndexValue = xScale.domain()[index]
-        from = config.xAxis.type === 'categorical' ? categoricalIndexValue : from
+        let closestDate = domain[0]
+        let minDiff = Math.abs(new Date(from).getTime() - new Date(closestDate).getTime())
+
+        for (let i = 1; i < domain.length; i++) {
+          const diff = Math.abs(new Date(from).getTime() - new Date(domain[i]).getTime())
+          if (diff < minDiff) {
+            minDiff = diff
+            closestDate = domain[i]
+          }
+        }
+        from = closestDate
       }
 
       from = xScale(from)

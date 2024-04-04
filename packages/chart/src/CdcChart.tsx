@@ -1149,7 +1149,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                   </>
                 )}
                 {/* Sankey */}
-                {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>}
+                {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}</ParentSize>}
                 {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} />}
               </div>
               {/* Link */}

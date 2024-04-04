@@ -446,20 +446,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           }
         })
         break
-      case 'toggleDownloadButton':
-        setState({
-          ...state,
-          general: {
-            ...state.general,
-            showDownloadButton: !state.general.showDownloadButton
-          },
-          table: {
-            // setting both bc DataTable new core needs it here
-            ...state.table,
-            download: !state.general.showDownloadButton
-          }
-        })
-        break
       case 'toggleShowFullGeoNameInCSV':
         setState({
           ...state,
@@ -2689,16 +2675,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                   />
                   <span className='edit-label'>Enable Image Download</span>
                 </label>
-                {/* <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.general.showDownloadPdfButton}
-                        onChange={event => {
-                          handleEditorChanges('toggleDownloadPdfButton', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>Enable Pdf Download</span>
-                    </label> */}
               </AccordionItemPanel>
             </AccordionItem>
           )}
