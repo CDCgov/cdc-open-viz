@@ -443,7 +443,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         if (series.type === 'Forecasting') {
           newConfig.runtime.forecastingSeriesKeys.push(series)
         }
-        if (series.type === 'Bar') {
+        if (series.type === 'Bar' || series.type === 'Combo') {
           newConfig.runtime.barSeriesKeys.push(series.dataKey)
         }
         if (series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg') {
