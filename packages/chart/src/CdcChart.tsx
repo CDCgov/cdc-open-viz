@@ -95,7 +95,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
 
-  const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
+  const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = !config.legend?.hide ? `legend` : config?.title ? `dataTableSection__${config.title.replace(/\s/g, '')}` : `dataTableSection`
 
@@ -1101,6 +1101,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Prevent render if loading
   let body = <Loading />
 
+  const getChartWrapperClasses = () => {
+    const classes = ['chart-container', 'p-relative']
+    if (config.legend.position === 'bottom') classes.push('bottom')
+    if (config.legend.hide) classes.push('legend-hidden')
+    if (lineDatapointClass) classes.push(lineDatapointClass)
+    if (!config.barHasBorder) classes.push('chart-bar--no-border')
+    if (isDebug) classes.push('debug')
+    classes.push(...contentClasses)
+    return classes
+  }
+
   if (!loading) {
     const tableLink = (
       <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
@@ -1122,10 +1133,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
               {/* Visualization */}
               {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
-              <div
-                style={{ marginBottom: computeMarginBottom(config, legend, currentViewport) }}
-                className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')} ${isDebug ? 'debug' : ''}`}
-              >
+
+              <div style={{ marginBottom: computeMarginBottom(config, legend, currentViewport) }} className={getChartWrapperClasses().join(' ')}>
                 {/* All charts except sparkline */}
                 {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
 
