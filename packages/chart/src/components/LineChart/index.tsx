@@ -10,6 +10,7 @@ import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
 import { filterCircles, createStyles } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
+import LineChartBumpCircle from './components/LineChart.BumpCircle'
 
 // types
 import { type ChartContext } from '../../types/ChartContext'
@@ -256,6 +257,8 @@ const LineChart = (props: LineChartProps) => {
                     </text>
                   )
                 })}
+
+              <LineChartBumpCircle config={config} xScale={xScale} yScale={yScale} />
             </Group>
           )
         })}
