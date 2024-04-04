@@ -424,6 +424,48 @@ const SeriesDropdownConfidenceInterval = props => {
   )
 }
 
+const SeriesInputWeight = props => {
+  const { series, index: i } = props
+  const { config, updateConfig } = useContext(ConfigContext)
+  const adjustableWeightSeriesTypes = ['Line', 'Combo', 'dashed-sm', 'dashed-md', 'dashed-lg']
+
+  if (!adjustableWeightSeriesTypes.includes(series.type)) return
+
+  const changeSeriesWeight = (i, value, min, max) => {
+    let series = [...config.series]
+    let seriesLabelsCopy = { ...config.runtime.seriesLabels }
+    series[i].weight = !value ? value : Math.max(Number(min), Math.min(Number(max), Number(value)))
+    seriesLabelsCopy[series[i].dataKey] = series[i].weight ? series[i].weight : series[i].dataKey
+
+    const newConfig = {
+      ...config,
+      series,
+      runtime: {
+        ...config.runtime,
+        seriesLabels: seriesLabelsCopy
+      }
+    }
+
+    updateConfig(newConfig)
+  }
+
+  return (
+    <>
+      <label htmlFor='series-weight'>Line Weight</label>
+      <input
+        type='number'
+        key={`series-weight-${i}`}
+        value={series.weight ? series.weight : ''}
+        min='1'
+        max='9'
+        onChange={event => {
+          changeSeriesWeight(i, event.target.value, event.target.min, event.target.max)
+        }}
+      />
+    </>
+  )
+}
+
 const SeriesInputName = props => {
   const { series, index: i } = props
   const { config, updateConfig } = useContext(ConfigContext)
@@ -431,7 +473,7 @@ const SeriesInputName = props => {
 
   if (!adjustableNameSeriesTypes.includes(series.type)) return
 
-  let changeSeriesName = (i, value) => {
+  const changeSeriesName = (i, value) => {
     let series = [...config.series]
     let seriesLabelsCopy = { ...config.runtime.seriesLabels }
     series[i].name = value
@@ -569,6 +611,7 @@ const SeriesItem = props => {
               {chartsWithOptions.includes(config.visualizationType) && (
                 <AccordionItemPanel>
                   <Series.Input.Name series={series} index={i} />
+                  <Series.Input.Weight series={series} index={i} />
                   <Series.Dropdown.SeriesType series={series} index={i} />
                   <Series.Dropdown.AxisPosition series={series} index={i} />
                   <Series.Dropdown.LineType series={series} index={i} />
@@ -604,7 +647,8 @@ const Series = {
     ForecastingColor: SeriesDropdownForecastColor
   },
   Input: {
-    Name: SeriesInputName
+    Name: SeriesInputName,
+    Weight: SeriesInputWeight
   },
   Checkbox: {
     DisplayInTooltip: SeriesDisplayInTooltip

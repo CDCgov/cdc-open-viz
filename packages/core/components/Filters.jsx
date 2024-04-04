@@ -238,7 +238,7 @@ const Filters = props => {
 
   const Filters = props => props.children
 
-  const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : theme]
+  const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme]
 
   // Exterior Section Wrapper
   Filters.Section = props => {

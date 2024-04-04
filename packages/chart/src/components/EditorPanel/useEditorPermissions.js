@@ -15,7 +15,7 @@ export const useEditorPermissions = () => {
     'Combo',
     'Deviation Bar',
     'Forecasting',
-    'Forest Plot',
+    // 'Forest Plot',
     'Line',
     'Paired Bar',
     'Pie',
@@ -127,6 +127,9 @@ export const useEditorPermissions = () => {
   }
 
   const visHasSelectableLegendValues = !['Box Plot', 'Forest Plot', 'Spark Line'].includes(visualizationType)
+  const visHasLegendAxisAlign = () => {
+    return visualizationType === 'Bar' && visualizationSubType === 'stacked' && config.legend.behavior === 'isolate'
+  }
 
   const visSupportsTooltipOpacity = () => {
     const disabledCharts = ['Spark Line', 'Sankey']
@@ -293,6 +296,19 @@ export const useEditorPermissions = () => {
     }
   }
 
+  const visSupportsPreliminaryData = () => {
+    // check if Line added in Combo
+    const lineExist = config?.series.some(item => ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg'].includes(item?.type))
+    if (visualizationType === 'Line') {
+      return true
+    }
+
+    if (visualizationType === 'Combo' && lineExist) {
+      return true
+    }
+    return false
+  }
+
   return {
     enabledChartTypes,
     headerColors,
@@ -303,6 +319,7 @@ export const useEditorPermissions = () => {
     visHasLabelOnData,
     visHasDataSuppression,
     visHasLegend,
+    visHasLegendAxisAlign,
     visHasBrushChart,
     visHasNumbersOnBars,
     visSupportsBarSpace,
@@ -320,6 +337,7 @@ export const useEditorPermissions = () => {
     visSupportsFootnotes,
     visSupportsLeftValueAxis,
     visSupportsNonSequentialPallete,
+    visSupportsPreliminaryData,
     visSupportsRankByValue,
     visSupportsRegions,
     visSupportsResponsiveTicks,

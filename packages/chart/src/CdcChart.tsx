@@ -58,6 +58,7 @@ import Title from '@cdc/core/components/ui/Title'
 import { ChartConfig } from './types/ChartConfig'
 import { Label } from './types/Label'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
+import SkipTo from '@cdc/core/components/elements/SkipTo'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDebug = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link, setSharedFilter, setSharedFilterValue, dashboardConfig }) {
   const transform = new DataTransform()
@@ -78,6 +79,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   type Config = typeof config
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
+  const legendRef = useRef(null)
 
   if (isDebug) console.log('Chart config, isEditor', config, isEditor)
 
@@ -93,7 +95,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
 
-  const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
+  const handleChartTabbing = !config.legend?.hide ? `legend` : config?.title ? `dataTableSection__${config.title.replace(/\s/g, '')}` : `dataTableSection`
 
   const reloadURLData = async () => {
     if (config.dataUrl) {
@@ -713,7 +715,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
     try {
-      const legend = document.getElementById('legend')
+      const legend = legendRef.current
       if (!legend) throw new Error('No legend available to set previous focus on.')
       legend.focus()
     } catch (e) {
@@ -1051,14 +1053,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       <>
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && (
-          <div className='cdc-chart-inner-container'>
+          <div className='cdc-chart-inner-container' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
             <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
+            <SkipTo skipId={handleChartTabbing} skipMessage='Skip Over Chart Container' />
 
-            <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
-              Skip Over Chart Container
-            </a>
             {/* Filters */}
-            {config.filters && !externalFilters && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
+            {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
             {/* Visualization */}
             {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
             <div
@@ -1071,6 +1071,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {/* Sparkline */}
               {config.visualizationType === 'Spark Line' && (
                 <>
+                  <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />
                   {config?.introText && (
                     <section className='introText' style={{ padding: '0px 0 35px' }}>
                       {parse(config.introText)}
@@ -1087,8 +1088,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 </>
               )}
               {/* Sankey */}
-              {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart width={parent.width} height={parent.height} />}</ParentSize>}
-              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend />}
+              {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}</ParentSize>}
+              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} />}
             </div>
             {/* Link */}
             {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
@@ -1135,7 +1136,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
-
   const contextValues = {
     capitalize,
     computeMarginBottom,

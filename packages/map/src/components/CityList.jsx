@@ -65,13 +65,14 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       <path
         className='marker'
         d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
-        title='Click for more information'
+        title='Select for more information'
         onClick={() => geoClickHandler(cityDisplayName, geoData)}
-        strokeWidth={2}
-        stroke={'black'}
         data-tooltip-id='tooltip'
         data-tooltip-html={toolTip}
         transform={`scale(${radius / 9})`}
+        stroke={state.general.geoBorderColor === 'sameAsBackground' ? '#ffffff' : '#000000'}
+        strokeWidth={'2px'}
+        tabIndex='-1'
         {...additionalProps}
       />
     )
@@ -117,13 +118,16 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
     const shapeProps = {
       onClick: () => geoClickHandler(cityDisplayName, geoData),
       size: state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius * 30,
-      title: 'Click for more information',
+      title: 'Select for more information',
       'data-tooltip-id': 'tooltip',
       'data-tooltip-html': toolTip,
+      stroke: state.general.geoBorderColor === 'sameAsBackground' ? '#ffffff' : '#000000',
+      strokeWidth: '2px',
+      tabIndex: -1,
       ...additionalProps
     }
 
-    const shapes = {
+    const cityStyleShapes = {
       circle: <GlyphCircle {...shapeProps} />,
       pin: pin,
       square: <GlyphSquare {...shapeProps} />,
@@ -143,19 +147,29 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
         return Object.keys(item).find(key => item[key] === city)
       })
 
-    if (cityStyle !== undefined) {
+    if (cityStyle !== undefined && cityStyle.shape) {
       if (!geoData?.[state.columns.longitude.name] && !geoData?.[state.columns.latitude.name] && city && supportedCities[city.toUpperCase()]) {
         let translate = `translate(${projection(supportedCities[city.toUpperCase()])})`
         return (
-          <g key={i} transform={translate} style={styles} className='geo-point'>
-            {shapes[cityStyle.shape.toLowerCase()]}
+          <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
+            {cityStyleShapes[cityStyle.shape.toLowerCase()]}
+          </g>
+        )
+      }
+
+      if (geoData?.[state.columns.longitude.name] && geoData?.[state.columns.latitude.name]) {
+        const coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
+        let translate = `translate(${projection(coords)})`
+        return (
+          <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
+            {cityStyleShapes[cityStyle.shape.toLowerCase()]}
           </g>
         )
       }
     }
     return (
-      <g key={i} transform={transform} style={styles} className='geo-point'>
-        {shapes[state.visual.cityStyle.toLowerCase()]}
+      <g key={i} transform={transform} style={styles} className='geo-point' tabIndex={-1}>
+        {cityStyleShapes[state.visual.cityStyle.toLowerCase()]}
       </g>
     )
   })

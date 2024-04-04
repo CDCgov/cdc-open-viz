@@ -96,7 +96,8 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
                 container
                 containerProps={{
                   'data-tooltip-html': handleTooltip(d),
-                  'data-tooltip-id': tooltip_id
+                  'data-tooltip-id': tooltip_id,
+                  tabIndex: -1
                 }}
               />
             </Group>
