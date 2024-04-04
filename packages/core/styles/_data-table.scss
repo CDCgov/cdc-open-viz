@@ -29,7 +29,7 @@ div.data-table-heading {
     position: relative;
   }
   @include breakpoint(xs) {
-    font-size: 0.7em;
+    font-size: $font-small + 0.2em;
   }
 }
 
@@ -157,7 +157,7 @@ table.data-table {
     }
 
     @include breakpoint(xs) {
-      font-size: 0.7em;
+      font-size: $font-small;
     }
   }
   tr {

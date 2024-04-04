@@ -177,10 +177,8 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                         return (
                           <>
                             {pd.label && (
-                              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <svg style={{ width: '50px' }} key={index} height={'23px'}>
-                                  {pd.style.includes('Dashed') ? <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} /> : <circle r={6} strokeWidth={2} stroke={'#000'} cx={22} cy={10} fill='transparent' />}
-                                </svg>
+                              <div key={index} className='legend-preliminary'>
+                                <svg>{pd.style.includes('Dashed') ? <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} /> : <circle r={6} strokeWidth={2} stroke={'#000'} cx={22} cy={10} fill='transparent' />}</svg>
                                 <span> {pd.label}</span>
                               </div>
                             )}
