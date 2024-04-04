@@ -169,7 +169,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
               </div>
 
               <>
-                {config?.preliminaryData?.some(pd => pd.label) && config.visualizationType === 'Line' && (
+                {config?.preliminaryData?.some(pd => pd.label) && ['Line', 'Combo'].includes(config.visualizationType) && (
                   <>
                     <hr></hr>
                     <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>

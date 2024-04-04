@@ -446,20 +446,6 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           }
         })
         break
-      case 'toggleDownloadButton':
-        setState({
-          ...state,
-          general: {
-            ...state.general,
-            showDownloadButton: !state.general.showDownloadButton
-          },
-          table: {
-            // setting both bc DataTable new core needs it here
-            ...state.table,
-            download: !state.general.showDownloadButton
-          }
-        })
-        break
       case 'toggleShowFullGeoNameInCSV':
         setState({
           ...state,
@@ -2667,29 +2653,72 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       handleEditorChanges('toggleDownloadButton', event.target.checked)
                     }}
                   />
-                  <span className='edit-label'>Show Download CSV Link</span>
-                </label>
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={state.general.showFullGeoNameInCSV}
-                    onChange={event => {
-                      handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label'>Include Full Geo Name in CSV Download</span>
-                </label>
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={state.general.showDownloadImgButton}
-                    onChange={event => {
-                      handleEditorChanges('toggleDownloadImgButton', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label'>Enable Image Download</span>
-                </label>
-                {/* <label className='checkbox'>
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={state.table.limitHeight}
+                      onChange={event => {
+                        handleEditorChanges('limitDataTableHeight', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Limit Table Height</span>
+                  </label>
+                  {state.table.limitHeight && <TextField value={table.height} updateField={updateField} section='table' fieldName='height' label='Data Table Height' placeholder='Height(px)' type='number' min='0' max='500' />}
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={state.table.expanded || false}
+                      onChange={event => {
+                        handleEditorChanges('expandDataTable', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Map loads with data table expanded</span>
+                  </label>
+                  {isDashboard && (
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.table.showDataTableLink}
+                        onChange={event => {
+                          handleEditorChanges('toggleDataTableLink', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Show Data Table Name & Link</span>
+                    </label>
+                  )}
+                  {isLoadedFromUrl && (
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.table.showDownloadUrl}
+                        onChange={event => {
+                          handleEditorChanges('toggleDataUrl', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Show URL to Automatically Updated Data</span>
+                    </label>
+                  )}
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={state.general.showFullGeoNameInCSV}
+                      onChange={event => {
+                        handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Include Full Geo Name in CSV Download</span>
+                  </label>
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={state.general.showDownloadImgButton}
+                      onChange={event => {
+                        handleEditorChanges('toggleDownloadImgButton', event.target.checked)
+                      }}
+                    />
+                    <span className='edit-label'>Enable Image Download</span>
+                  </label>
+                  {/* <label className='checkbox'>
                       <input
                         type='checkbox'
                         checked={state.general.showDownloadPdfButton}
