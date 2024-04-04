@@ -5,4 +5,5 @@ export type DataSet = {
   runtimeDataUrl: string
   dataFileSourceType: string
   formattedData: Object[]
+  preview?: boolean
 }
