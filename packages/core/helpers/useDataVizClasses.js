@@ -26,10 +26,6 @@ export default function useDataVizClasses(config, viewport = null) {
     contentClasses = contentClasses.filter(item => item !== 'cove-component__content')
   }
 
-  // if (config.type === 'data-bite') {
-  //   contentClasses = contentClasses.filter(item => item !== 'cove-component__content')
-  // }
-
   config.showTitle && contentClasses.push('component--has-title')
   config.title && config.visualizationType !== 'chart' && config.visualizationType !== 'Spark Line' && contentClasses.push('component--has-title')
   config.subtext && innerContainerClasses.push('component--has-subtext')

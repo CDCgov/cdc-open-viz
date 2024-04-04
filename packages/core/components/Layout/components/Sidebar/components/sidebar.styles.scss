@@ -18,18 +18,6 @@
   position: relative;
 }
 
-.configure {
-  .cdc-open-viz-module:not(.type-dashboard) {
-    //   &.isEditor .sidebar {
-    //     top: 56px;
-    //   }
-
-    //   &.isEditor .editor-panel__toggle {
-    //     top: 68px;
-    //   }
-  }
-}
-
 .cdc-open-viz-module {
   .waiting {
     padding-top: 0 !important;
