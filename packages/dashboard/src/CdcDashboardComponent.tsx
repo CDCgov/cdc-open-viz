@@ -686,7 +686,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
               //Checks shared filters against list to see if all visualizations are represented
               let applicableFilters: SharedFilter[] = []
-              config.dashboard.sharedFilters.forEach(sharedFilter => {
+              config.dashboard.sharedFilters?.forEach(sharedFilter => {
                 let allMatch = true
                 vizKeysUsingDataset.forEach(visualizationKey => {
                   if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
