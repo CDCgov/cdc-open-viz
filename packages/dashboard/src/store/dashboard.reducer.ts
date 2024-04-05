@@ -107,7 +107,25 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'TOGGLE_ROW': {
       const { rowIndex, colIndex } = action.payload
       const newRows = state.config.rows.map((row, index) => {
-        return index === rowIndex ? row.map((col, i) => ({ ...col, hide: i !== colIndex })) : row
+        if (index === rowIndex) {
+          const newColumns = row.columns.map((col, i) => ({ ...col, hide: i === colIndex }))
+          return { ...row, columns: newColumns }
+        }
+        return row
+      })
+      return { ...state, config: { ...state.config, rows: newRows } }
+    }
+    case 'UPDATE_VISUALIZATION': {
+      const { vizKey, configureData } = action.payload
+      return { ...state, config: { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: { ...state.config.visualizations[vizKey], ...configureData } } } }
+    }
+    case 'UPDATE_ROW': {
+      const { rowIndex, rowData } = action.payload
+      const newRows = state.config.rows.map((row, index) => {
+        if (index === rowIndex) {
+          return { ...row, ...rowData }
+        }
+        return row
       })
       return { ...state, config: { ...state.config, rows: newRows } }
     }

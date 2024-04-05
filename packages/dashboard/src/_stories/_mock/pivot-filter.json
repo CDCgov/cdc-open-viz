@@ -24,7 +24,6 @@
   ],
   "visualizations": {
     "table1707935263149": {
-      "newViz": true,
       "openModal": false,
       "uid": "table1707935263149",
       "type": "table",
@@ -115,7 +114,6 @@
     "showDownloadUrl": false,
     "showVertical": true
   },
-  "newViz": true,
   "datasets": {
     "valid-data-chart.csv": {
       "data": [
