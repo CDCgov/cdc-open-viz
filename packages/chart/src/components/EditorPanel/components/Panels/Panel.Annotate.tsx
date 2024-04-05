@@ -154,7 +154,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
               </Button>
             </div>
           ))}
-        <Button onClick={handleAddAnnotation}>Add Annotation</Button>
+        {config?.annotations?.length < 3 && <Button onClick={handleAddAnnotation}>Add Annotation</Button>}
       </AccordionItemPanel>
     </AccordionItem>
   )

@@ -1,4 +1,5 @@
 export default {
+  annotations: [],
   type: 'chart',
   debugSvg: false,
   chartMessage: {
