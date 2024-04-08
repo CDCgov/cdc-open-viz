@@ -738,7 +738,7 @@ const LinearChart = props => {
               <Line from={{ x: point.x, y: 0 }} to={{ x: point.x, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
             </Group>
           )}
-          <Annotations xScale={xScale} yScale={yScale} xMax={xMax} />
+          <Annotations xScale={xScale} yScale={yScale} xMax={xMax} svgRef={svgRef} />
         </svg>
         {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && !config.tooltips.singleSeries && (
           <>

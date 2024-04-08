@@ -66,7 +66,11 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         x: 0,
         y: 0
       },
-      selected: true
+      selected: true,
+      anchor: {
+        vertical: false,
+        horizontal: false
+      }
     }
 
     const annotations = Array.isArray(config.annotations) ? config.annotations : []
@@ -142,6 +146,36 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                   onClick={e => {
                     const updatedAnnotations = [...config?.annotations]
                     updatedAnnotations[index].show.desktop = e.target.checked
+                    updateConfig({
+                      ...config,
+                      annotations: updatedAnnotations
+                    })
+                  }}
+                />
+              </label>
+              <label>
+                Vertical Anchor
+                <input
+                  type='checkbox'
+                  checked={config?.annotations[index].anchor.vertical}
+                  onClick={e => {
+                    const updatedAnnotations = [...config?.annotations]
+                    updatedAnnotations[index].anchor.vertical = e.target.checked
+                    updateConfig({
+                      ...config,
+                      annotations: updatedAnnotations
+                    })
+                  }}
+                />
+              </label>
+              <label>
+                Horizontal Anchor
+                <input
+                  type='checkbox'
+                  checked={config?.annotations[index].anchor.horizontal}
+                  onClick={e => {
+                    const updatedAnnotations = [...config?.annotations]
+                    updatedAnnotations[index].anchor.horizontal = e.target.checked
                     updateConfig({
                       ...config,
                       annotations: updatedAnnotations
