@@ -17,6 +17,13 @@ export const formatConfigBeforeSave = configToStrip => {
         strippedConfig.visualizations[vizKey] = _.omit(strippedConfig.visualizations[vizKey], ['runtime', 'formattedData', 'data'])
       })
     }
+    if (strippedConfig.rows) {
+      strippedConfig.rows.forEach(row => {
+        if (row.dataKey) {
+          row = _.omit(row, ['data', 'formattedData'])
+        }
+      })
+    }
   } else {
     delete strippedConfig.runtime
     delete strippedConfig.formattedData

@@ -104,7 +104,7 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
                         <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                       </Tooltip.Target>
                       <Tooltip.Content>
-                        <p>The date needs to be in the original format of the data. Not the displayed format of the data.</p>
+                        <p>When using categorical (linear scale) match the data set value. When using date (linear / date time scale) match the x-axis value.</p>
                       </Tooltip.Content>
                     </Tooltip>
                   }

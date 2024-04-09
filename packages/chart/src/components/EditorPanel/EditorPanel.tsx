@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
 // @cdc/core
@@ -182,7 +182,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
                 Remove
               </button>
               <Select value={type} initial='Select' fieldName='type' label='Type' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
-              <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='ASSOCIATE TO SERIES' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={config.runtime?.seriesKeys} />
+              <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='ASSOCIATE TO SERIES' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={config.runtime.lineSeriesKeys ?? config.runtime?.seriesKeys} />
               <Select value={column} initial='Select' fieldName='column' label='COLUMN WITH CONFIGURATION VALUE' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
               <TextField value={value} fieldName='value' label='VALUE TO TRIGGER' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
               <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions()} />
@@ -193,7 +193,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
         })}
 
       <button type='button' onClick={addColumn} className='btn full-width'>
-        {config.visualizationType === 'Line' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Line/Bar'}
+        {config.visualizationType === 'Line' || config.visualizationType === 'Combo' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Line/Bar'}
       </button>
     </>
   )
@@ -243,6 +243,7 @@ const EditorPanel = () => {
     visHasSelectableLegendValues,
     visCanAnimate,
     visHasLegend,
+    visHasLegendAxisAlign,
     visHasBrushChart,
     visSupportsDateCategoryAxis,
     visSupportsValueAxisMin,
@@ -255,6 +256,7 @@ const EditorPanel = () => {
     visSupportsDateCategoryAxisPadding,
     visSupportsRegions,
     visSupportsFilters,
+    visSupportsPreliminaryData,
     visSupportsValueAxisGridLines,
     visSupportsValueAxisLine,
     visSupportsValueAxisTicks,
@@ -350,7 +352,7 @@ const EditorPanel = () => {
     if (updatedConfig.visualizationType === 'Combo') {
       updatedConfig.orientation = 'vertical'
     }
-    if (updatedConfig.xAxis.sortDates && !updatedConfig.xAxis.padding) {
+    if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 6
     }
   }
@@ -1146,7 +1148,7 @@ const EditorPanel = () => {
                     )}
                     {visSupportsRankByValue() && config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
                     {/* {visHasDataSuppression() && <DataSuppression config={config} updateConfig={updateConfig} data={data} />} */}
-                    {config.visualizationType === 'Line' && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
+                    {visSupportsPreliminaryData() && <PreliminaryData config={config} updateConfig={updateConfig} data={data} />}
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
@@ -1190,7 +1192,6 @@ const EditorPanel = () => {
                           <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                         )}
                         <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
-                        {config.visualizationType === 'Paired Bar' && <TextField value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                         <TextField
                           value={config.yAxis.size}
                           type='number'
@@ -1211,7 +1212,7 @@ const EditorPanel = () => {
                           }
                         />
                         {config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
-                        {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
+                        {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                         {config.isResponsiveTicks && config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && (
                           <TextField
                             value={config.xAxis.maxTickRotation}
@@ -1669,10 +1670,35 @@ const EditorPanel = () => {
                       <>
                         {config.visualizationType !== 'Forest Plot' && (
                           <>
-                            <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'continuous', 'date']} />
-                            {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && config.xAxis.type === 'date' && config.orientation !== 'horizontal' && (
-                              <CheckBox value={config.xAxis.sortDates} section='xAxis' fieldName='sortDates' label='Force Date Scale (Sort Dates)' updateField={updateField} />
-                            )}{' '}
+                            <label>
+                              <span className='edit-label'>
+                                Data Scaling Type
+                                <Tooltip style={{ textTransform: 'none', display: 'inline-block' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>Linear scales are employed for quantitative data, while time scales are used for time-series data.</Tooltip.Content>
+                                </Tooltip>
+                              </span>
+                              <select
+                                value={config.xAxis.type}
+                                onChange={e =>
+                                  updateConfig({
+                                    ...config,
+                                    xAxis: {
+                                      ...config.xAxis,
+                                      type: e.target.value
+                                    }
+                                  })
+                                }
+                              >
+                                <option value='categorical'>Categorical (Linear Scale)</option>
+                                <option value='date'>Date (Linear Scale)</option>
+                                <option value='date-time'>Date (Date Time Scale)</option>
+                                {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
+                              </select>
+                            </label>
+
                             {visSupportsDateCategoryAxisPadding() && (
                               <TextField
                                 value={config.xAxis.padding}
@@ -1805,7 +1831,7 @@ const EditorPanel = () => {
                           </>
                         )}
 
-                        {config.xAxis.type === 'date' && (
+                        {isDateScale(config.xAxis) && (
                           <>
                             <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                               Format how charts should parse and display your dates using{' '}
@@ -2629,6 +2655,8 @@ const EditorPanel = () => {
                       <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
                     )}
                     <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)} options={['highlight', 'isolate']} />
+                    {visHasLegendAxisAlign() && <CheckBox value={config.legend.axisAlign} fieldName='axisAlign' section='legend' label='Align to Axis on Isolate' updateField={updateField} />}
+
                     {config.legend.behavior === 'highlight' && config.tooltips.singleSeries && <CheckBox value={config.legend.highlightOnHover} section='legend' fieldName='highlightOnHover' label='HIGHLIGHT DATA SERIES ON HOVER' updateField={updateField} />}
 
                     {/* start: isolated values */}
@@ -2811,6 +2839,17 @@ const EditorPanel = () => {
                                   value={filter.label}
                                   onChange={e => {
                                     updateFilterProp('label', index, e.target.value)
+                                  }}
+                                />
+                              </label>
+
+                              <label>
+                                <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
+                                <input
+                                  type='text'
+                                  value={filter.setByQueryParameter}
+                                  onChange={e => {
+                                    updateFilterProp('setByQueryParameter', index, e.target.value)
                                   }}
                                 />
                               </label>

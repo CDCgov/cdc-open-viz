@@ -117,6 +117,75 @@ const EditorPanel = props => {
     specialClasses = legend.specialClasses || []
   }
 
+  const getCityStyleOptions = target => {
+    switch (target) {
+      case 'value': {
+        const values = ['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
+        const filteredValues = values.filter(val => String(state.visual.cityStyle).toLocaleLowerCase() !== val.toLocaleLowerCase())
+
+        return (
+          <>
+            <option value='' key={'Select Option'}>
+              - Select Option -
+            </option>
+            {filteredValues.map((val, i) => {
+              return (
+                <option key={i} value={val}>
+                  {val}
+                </option>
+              )
+            })}
+          </>
+        )
+      }
+    }
+  }
+
+  const editCityStyles = (target, index, fieldName, value) => {
+    switch (target) {
+      case 'add': {
+        const additionalCityStyles = state.visual.additionalCityStyles ? [...state.visual.additionalCityStyles] : []
+        additionalCityStyles.push({ label: '', column: '', value: '', shape: '' })
+        setState({
+          ...state,
+          visual: {
+            ...state.visual,
+            additionalCityStyles: additionalCityStyles
+          }
+        })
+        break
+      }
+      case 'remove': {
+        let additionalCityStyles = []
+        if (state.visual.additionalCityStyles) {
+          additionalCityStyles = [...state.visual.additionalCityStyles]
+        }
+
+        additionalCityStyles.splice(index, 1)
+        setState({
+          ...state,
+          visual: {
+            ...state.visual,
+            additionalCityStyles: additionalCityStyles
+          }
+        })
+        break
+      }
+      case 'update': {
+        let additionalCityStyles = []
+        additionalCityStyles = [...state.visual.additionalCityStyles]
+        additionalCityStyles[index][fieldName] = value
+        setState({
+          ...state,
+          visual: {
+            ...state.visual,
+            additionalCityStyles: additionalCityStyles
+          }
+        })
+      }
+    }
+  }
+
   const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', ...attributes }) => {
     const [value, setValue] = useState(stateValue)
 
@@ -376,20 +445,6 @@ const EditorPanel = props => {
           legend: {
             ...state.legend,
             separateZero: value
-          }
-        })
-        break
-      case 'toggleDownloadButton':
-        setState({
-          ...state,
-          general: {
-            ...state.general,
-            showDownloadButton: !state.general.showDownloadButton
-          },
-          table: {
-            // setting both bc DataTable new core needs it here
-            ...state.table,
-            download: !state.general.showDownloadButton
           }
         })
         break
@@ -1289,6 +1344,8 @@ const EditorPanel = props => {
             </select>
           </label>
 
+          <TextField value={state.filters[index].setByQueryParameter} section='filters' subsection={index} fieldName='setByQueryParameter' label='Default Value Set By Query String Parameter' updateField={updateField} />
+
           {filter.order === 'cust' && (
             <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, state.filters[index])}>
               <Droppable droppableId='filter_order'>
@@ -1928,7 +1985,7 @@ const EditorPanel = props => {
                     </label>
                   </fieldset>
                 )}
-                {(
+                {
                   <>
                     <label>Latitude Column</label>
                     <select
@@ -1949,7 +2006,7 @@ const EditorPanel = props => {
                       {columnsOptions}
                     </select>
                   </>
-                )}
+                }
 
                 {'navigation' !== state.general.type && (
                   <fieldset className='primary-fieldset edit-block'>
@@ -2637,16 +2694,6 @@ const EditorPanel = props => {
                   <label className='checkbox'>
                     <input
                       type='checkbox'
-                      checked={state.general.showDownloadButton}
-                      onChange={event => {
-                        handleEditorChanges('toggleDownloadButton', event.target.checked)
-                      }}
-                    />
-                    <span className='edit-label'>Show Download CSV Link</span>
-                  </label>
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
                       checked={state.general.showFullGeoNameInCSV}
                       onChange={event => {
                         handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
@@ -2849,12 +2896,10 @@ const EditorPanel = props => {
                     )
                   })}
                 </ul>
-                {state.visual.cityStyle === 'circle' && (
-                  <label>
-                    Geocode Settings
-                    <TextField type='number' value={state.visual.geoCodeCircleSize} section='visual' max='10' fieldName='geoCodeCircleSize' label='Geocode Circle Size' updateField={updateField} />
-                  </label>
-                )}
+                <label>
+                  Geocode Settings
+                  <TextField type='number' value={state.visual.geoCodeCircleSize} section='visual' max='10' fieldName='geoCodeCircleSize' label='Geocode Circle Size' updateField={updateField} />
+                </label>
 
                 {state.general.type === 'bubble' && (
                   <>
@@ -2899,19 +2944,109 @@ const EditorPanel = props => {
                   </label>
                 )}
                 {(state.general.geoType === 'us' || state.general.geoType === 'us-county' || state.general.geoType === 'world') && (
-                  <label>
-                    <span className='edit-label'>City Style</span>
-                    <select
-                      value={state.visual.cityStyle || false}
-                      onChange={event => {
-                        handleEditorChanges('handleCityStyle', event.target.value)
-                      }}
-                    >
-                      <option value='circle'>Circle</option>
-                      <option value='pin'>Pin</option>
-                    </select>
-                  </label>
+                  <>
+                    <label>
+                      <span className='edit-label'>Default City Style</span>
+                      <select
+                        value={state.visual.cityStyle || false}
+                        onChange={event => {
+                          handleEditorChanges('handleCityStyle', event.target.value)
+                        }}
+                      >
+                        <option value='circle'>Circle</option>
+                        <option value='pin'>Pin</option>
+                        <option value='square'>Square</option>
+                        <option value='triangle'>Triangle</option>
+                        <option value='diamond'>Diamond</option>
+                        <option value='star'>Star</option>
+                      </select>
+                    </label>
+                    <TextField
+                      value={state.visual.cityStyleLabel}
+                      section='visual'
+                      fieldName='cityStyleLabel'
+                      label='Label (Optional) '
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>When a label is provided, the default city style will appear in the legend.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  </>
                 )}
+                {/* <AdditionalCityStyles /> */}
+                <>
+                  {state.visual.additionalCityStyles.length > 0 &&
+                    state.visual.additionalCityStyles.map(({ label, column, value, shape }, i) => {
+                      return (
+                        <div className='edit-block' key={`additional-city-style-${i}`}>
+                          <button
+                            className='remove-column'
+                            onClick={e => {
+                              e.preventDefault()
+                              editCityStyles('remove', i, '', '')
+                            }}
+                          >
+                            Remove
+                          </button>
+                          <p>City Style {i + 1}</p>
+                          <label>
+                            <span className='edit-label column-heading'>Column with configuration value</span>
+                            <select
+                              value={column}
+                              onChange={e => {
+                                editCityStyles('update', i, 'column', e.target.value)
+                              }}
+                            >
+                              {columnsOptions}
+                            </select>
+                          </label>
+                          <label>
+                            <span className='edit-label column-heading'>Value to Trigger</span>
+                            <input
+                              type='text'
+                              value={value}
+                              onChange={e => {
+                                editCityStyles('update', i, 'value', e.target.value)
+                              }}
+                            ></input>
+                          </label>
+                          <label>
+                            <span className='edit-label column-heading'>Shape</span>
+                            <select
+                              value={shape}
+                              onChange={e => {
+                                editCityStyles('update', i, 'shape', e.target.value)
+                              }}
+                            >
+                              {getCityStyleOptions('value')}
+                            </select>
+                          </label>
+                          <label>
+                            <span className='edit-label column-heading'>Label</span>
+                            <input
+                              key={i}
+                              type='text'
+                              value={label}
+                              onChange={e => {
+                                editCityStyles('update', i, 'label', e.target.value)
+                              }}
+                            />
+                          </label>
+                        </div>
+                      )
+                    })}
+
+                  <button type='button' onClick={() => editCityStyles('add', 0, '', '')} className='btn full-width'>
+                    Add city style
+                  </button>
+                </>
                 <label htmlFor='opacity'>
                   <TextField type='number' min={0} max={100} value={state.tooltips.opacity ? state.tooltips.opacity : 100} section='tooltips' fieldName='opacity' label='Tooltip Opacity (%)' updateField={updateField} />
                 </label>
@@ -2961,6 +3096,7 @@ const EditorPanel = props => {
                 <button className={'btn full-width'} onClick={handleAddLayer}>
                   Add Map Layer
                 </button>
+                <p className='layer-purpose-details'>Context should be added to your visualization or associated page to describe the significance of layers that are added to maps.</p>
               </AccordionItemPanel>
             </AccordionItem>
             {state.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}

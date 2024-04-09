@@ -1,6 +1,7 @@
 import parse from 'html-react-parser'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendCircle from '@cdc/core/components/LegendCircle'
+import Button from '@cdc/core/components/elements/Button'
 
 import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
@@ -11,6 +12,7 @@ import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { Group } from '@visx/group'
+import { forwardRef } from 'react'
 
 interface LegendProps {
   config: ChartConfig
@@ -20,10 +22,11 @@ interface LegendProps {
   highlightReset: Function
   currentViewport: string
   formatLabels: (labels: Label[]) => Label[]
+  ref: React.Ref<() => void>
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
-const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels }) => {
+const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels }, ref) => {
   const { innerClasses, containerClasses } = useLegendClasses(config)
   const { runtime, orientation, legend } = config
   if (!legend) return null
@@ -66,7 +69,7 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
 
   return (
-    <aside style={legendClasses} id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
+    <aside ref={ref} style={legendClasses} id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
       {legend.label && <h3>{parse(legend.label)}</h3>}
       {legend.description && <p>{parse(legend.description)}</p>}
       <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
@@ -101,14 +104,17 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
                       className={className.join(' ')}
                       tabIndex={0}
                       key={`legend-quantile-${i}`}
-                      onKeyPress={e => {
+                      onKeyDown={e => {
                         if (e.key === 'Enter') {
+                          e.preventDefault()
                           highlight(label)
                         }
                       }}
-                      onClick={() => {
+                      onClick={e => {
+                        e.preventDefault()
                         highlight(label)
                       }}
+                      role='button'
                     >
                       {config.visualizationType === 'Line' && config.legend.lineMode ? (
                         <svg width={40} height={20}>
@@ -142,12 +148,14 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
                       className={className}
                       tabIndex={0}
                       key={`legend-quantile-${i}`}
-                      onKeyPress={e => {
+                      onKeyDown={e => {
                         if (e.key === 'Enter') {
+                          e.preventDefault()
                           highlight(bar.legendLabel)
                         }
                       }}
-                      onClick={() => {
+                      onClick={e => {
+                        e.preventDefault()
                         highlight(bar.legendLabel)
                       }}
                     >
@@ -158,15 +166,10 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
                     </LegendItem>
                   )
                 })}
-                {seriesHighlight.length > 0 && (
-                  <button className={`legend-reset ${config.theme}`} onClick={labels => highlightReset(labels)} tabIndex={0}>
-                    Reset
-                  </button>
-                )}
               </div>
 
               <>
-                {config?.preliminaryData?.some(pd => pd.label) && config.visualizationType === 'Line' && (
+                {config?.preliminaryData?.some(pd => pd.label) && ['Line', 'Combo'].includes(config.visualizationType) && (
                   <>
                     <hr></hr>
                     <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
@@ -174,11 +177,9 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
                         return (
                           <>
                             {pd.label && (
-                              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <svg style={{ width: '50px' }} key={index} height={'23px'}>
-                                  {pd.style.includes('Dashed') ? <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} /> : <circle r={6} strokeWidth={2} stroke={'#000'} cx={22} cy={10} fill='transparent' />}
-                                </svg>
-                                <span style={{}}> {pd.label}</span>
+                              <div key={index} className='legend-preliminary'>
+                                <svg>{pd.style.includes('Dashed') ? <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} /> : <circle r={6} strokeWidth={2} stroke={'#000'} cx={22} cy={10} fill='transparent' />}</svg>
+                                <span> {pd.label}</span>
                               </div>
                             )}
                           </>
@@ -192,8 +193,13 @@ const Legend: React.FC<LegendProps> = ({ config, colorScale, seriesHighlight, hi
           )
         }}
       </LegendOrdinal>
+      {seriesHighlight.length > 0 && (
+        <Button onClick={labels => highlightReset(labels)} style={{ marginTop: '1rem' }}>
+          Reset
+        </Button>
+      )}
     </aside>
   )
-}
+})
 
 export default Legend

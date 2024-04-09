@@ -44,11 +44,11 @@ const sampleData = {
       fileName: 'valid-forecast-data.csv',
       data: validForecastData
     },
-    {
-      text: 'Forest Plot Data',
-      fileName: 'valid-forest-plot-data.csv',
-      data: validForestPlotData
-    },
+    // {
+    //   text: 'Forest Plot Data',
+    //   fileName: 'valid-forest-plot-data.csv',
+    //   data: validForestPlotData
+    // },
     {
       text: 'Sankey Chart Data',
       fileName: 'valid-sankey-data.json',

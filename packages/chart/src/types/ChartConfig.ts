@@ -11,6 +11,7 @@ import { type Link } from './../components/Sankey/types'
 import { Legend } from '@cdc/core/types/Legend'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
+import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps'
 
 export type ChartColumns = Record<string, Column>
 
@@ -55,6 +56,7 @@ export type Legend = {
   additionalCategories: string[]
   // general legend onClick behavior
   behavior: 'highlight' | 'isolate' | string
+  axisAlign: boolean
   colorCode: string
   description: string
   // show or hide the legend
@@ -133,6 +135,7 @@ type AllChartsConfig = {
   orientation: 'vertical' | 'horizontal'
   palette: string
   pieType?: string
+  preliminaryData: PreliminaryDataItem[]
   primary?: DataFormat
   roundingStyle: string
   runtime: Runtime
@@ -159,7 +162,7 @@ type AllChartsConfig = {
   type: 'chart' | 'dashboard'
   useLogScale: boolean
   visual: Visual
-  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting'
+  visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey'
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis

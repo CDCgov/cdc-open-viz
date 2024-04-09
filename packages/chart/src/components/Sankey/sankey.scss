@@ -7,13 +7,13 @@
 
 .cdc-open-viz-module .sankey-chart {
   --font-size-small: 12px;
-  --font-size-medium: 16px;
+  --font-size-medium: 14px;
   --font-size-large: 18px;
   --font-size-xl: 24px;
 
   --storynode-font-size--small: 24px;
-  --storynode-font-size--medium: 32px;
-  --storynode-font-size--large: 40px;
+  --storynode-font-size--medium: 28px;
+  --storynode-font-size--large: 32px;
 
   --font-weight-normal: 400;
   --font-weight-bold: 700;
@@ -26,6 +26,7 @@
   }
 
   svg.sankey-chart__diagram {
+    position:relative;
     font-family: 'Roboto', sans-serif;
     height: auto;
     width: 100%;
@@ -103,10 +104,9 @@
   }
 
   //small
-  @media only screen and (max-width: 991px) {
+  @media only screen and (max-width: 799px) {
     .node-text {
       font-size: var(--font-size-small);
-      overflow-wrap: break-word;
     }
     .node-value--storynode {
       font-size: var(--storynode-font-size--small);
@@ -120,7 +120,7 @@
   }
 
   //x-small
-  @media only screen and (max-width: 650px) {
+  @media only screen and (max-width: 600px) {
     .popup {
       display: block; /* Show the popup on smaller screens */
     }
@@ -133,7 +133,7 @@
 /* Pop up */
 
 .popup {
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -142,7 +142,7 @@
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 80%;
-  z-index: 9999;
+  z-index: 999;
   display: none;
 }
 

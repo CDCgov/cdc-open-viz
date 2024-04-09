@@ -120,7 +120,6 @@ const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard,
       <CheckBox value={config.table.expanded} fieldName='expanded' label='Expanded by Default' section='table' updateField={updateField} />
       {isDashboard && config.type !== 'table' && <CheckBox value={config.table.showDataTableLink} fieldName='showDataTableLink' label='Show Data Table Name & Link' section='table' updateField={updateField} />}
       {isLoadedFromUrl && <CheckBox value={config.table.showDownloadUrl} fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' section='table' updateField={updateField} />}
-      <CheckBox value={config.table.download} fieldName='download' label='Show Download CSV Link' section='table' updateField={updateField} />
       {config.type !== 'table' && <CheckBox value={config.table.showDownloadImgButton} fieldName='showDownloadImgButton' label='Display Image Button' section='table' updateField={updateField} />}
       <label>
         <span className='edit-label column-heading'>Table Cell Min Width</span>

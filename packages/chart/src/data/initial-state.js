@@ -116,7 +116,7 @@ export default {
     tickColor: '#333',
     numTicks: '',
     labelOffset: 65,
-    axisPadding: 0,
+    axisPadding: 200,
     target: 0,
     maxTickRotation: 0
   },
@@ -141,6 +141,7 @@ export default {
   legend: {
     hide: false,
     behavior: 'isolate',
+    axisAlign: true,
     singleRow: true,
     colorCode: '',
     reverseLabelOrder: false,

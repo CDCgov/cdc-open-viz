@@ -1,9 +1,17 @@
 import { DataTableProps } from '../DataTable'
 import { DownIcon, UpIcon } from './Icons'
+import ScreenReaderText from '../../elements/ScreenReaderText'
 
 type MapHeaderProps = DataTableProps & {
   sortBy: { column; asc }
   setSortBy: Function
+}
+
+const ColumnHeadingText = ({ column, text, config }) => {
+  let notApplicableText = 'Not Applicable'
+  if (text === '__series__' && config.table.indexLabel) return `${config.table.indexLabel} `
+  if (text === '__series__' && !config.table.indexLabel) return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
+  return text
 }
 
 const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy }: MapHeaderProps) => {
@@ -27,7 +35,6 @@ const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy }: MapHeader
               key={`col-header-${column}__${index}`}
               id={column}
               tabIndex={0}
-              title={text}
               role='columnheader'
               scope='col'
               onClick={() => {
@@ -41,11 +48,9 @@ const MapHeader = ({ columns, config, indexTitle, sortBy, setSortBy }: MapHeader
               className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
               {...(sortBy.column === column ? (sortBy.asc ? { 'aria-sort': 'ascending' } : { 'aria-sort': 'descending' }) : null)}
             >
-              {text}
+              <ColumnHeadingText text={text} config={config} column={column} />
               {sortBy.column === column && <span className={'sort-icon'}>{!sortBy.asc ? <UpIcon /> : <DownIcon />}</span>}
-              <button>
-                <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} `} order</span>
-              </button>
+              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'} order`}</span>
             </th>
           )
         })}

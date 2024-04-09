@@ -31,9 +31,10 @@ const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, dele
   // just adds a new column but not set to any data yet
   const addAdditionalColumn = number => {
     const columnKey = `additionalColumn${number}`
+    const showInViz = config.type === 'table'
     const newColumn: Column = {
       label: 'New Column',
-      dataTable: false,
+      dataTable: showInViz,
       tooltips: false,
       prefix: '',
       suffix: '',

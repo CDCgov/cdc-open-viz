@@ -9,7 +9,7 @@ import { customSort } from './helpers/customSort'
 import ChartHeader from './components/ChartHeader'
 import BoxplotHeader from './components/BoxplotHeader'
 import MapHeader from './components/MapHeader'
-import SkipNav from './components/SkipNav'
+import SkipTo from '../elements/SkipTo'
 import ExpandCollapse from './components/ExpandCollapse'
 import mapCellMatrix from './helpers/mapCellMatrix'
 import Table from '../Table'
@@ -114,7 +114,7 @@ const DataTable = (props: DataTableProps) => {
           dataA = _runtimeData[a][sortBy.column]
           dataB = _runtimeData[b][sortBy.column]
         }
-        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date' && config.xAxis.sortDates) {
+        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
           dataA = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[a][config.xAxis.dataKey])
           dataB = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[b][config.xAxis.dataKey])
         }
@@ -181,10 +181,10 @@ const DataTable = (props: DataTableProps) => {
       <ErrorBoundary component='DataTable'>
         <MediaControls.Section classes={['download-links']}>
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />
-          {(config.table.download || config.general?.showDownloadButton) && <DownloadButton rawData={getDownloadData()} fileName={`${vizTitle || 'data-table'}.csv`} headerColor={headerColor} skipId={skipId} />}
+          {(config.table.download || config.general?.showDownloadButton) && <DownloadButton rawData={getDownloadData()} fileName={`${vizTitle || 'data-table'}.csv`} headerColor={headerColor} />}
         </MediaControls.Section>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
-          <SkipNav skipId={skipId} />
+          <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           <div className='table-container' style={limitHeight}>
             <Table
@@ -217,6 +217,9 @@ const DataTable = (props: DataTableProps) => {
             )}
           </div>
         </section>
+        <div id={skipId} className='cdcdataviz-sr-only'>
+          Skipped data table.
+        </div>
       </ErrorBoundary>
     )
   } else {
@@ -224,7 +227,7 @@ const DataTable = (props: DataTableProps) => {
     return (
       <ErrorBoundary component='DataTable'>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
-          <SkipNav skipId={skipId} />
+          <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           <div className='table-container' style={limitHeight}>
             <Table
@@ -238,6 +241,9 @@ const DataTable = (props: DataTableProps) => {
             />
           </div>
         </section>
+        <div id={skipId} className='cdcdataviz-sr-only'>
+          Skipped data table.
+        </div>
       </ErrorBoundary>
     )
   }

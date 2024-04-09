@@ -17,7 +17,8 @@ export const iconHash = {
   tools: <Icon display='tools' base />,
   'filtered-text': <Icon display='filtered-text' base />,
   'filter-dropdowns': <Icon display='filter-dropdowns' base />,
-  table: <Icon display='table' base />
+  table: <Icon display='table' base />,
+  Sankey: <Icon display='sankey' base />
 }
 
 export const getIcon = (visualization: Visualization) => {

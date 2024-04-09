@@ -23,7 +23,7 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
 }
 
 function filter(data, filters, condition) {
-  return data.filter(row => {
+  return data ? data.filter(row => {
     const found = filters.find(filter => {
       if (filter.pivot) return false
       const currentValue = row[filter.columnName]
@@ -35,14 +35,13 @@ function filter(data, filters, condition) {
       }
     })
     return !found
-  })
+  })  : []
 }
 
 function setFilterValuesAndActiveFilter(filters: SharedFilter[], filteredData: Object[], i: number) {
   filters.forEach(sharedFilter => {
     if (sharedFilter.pivot) {
       sharedFilter.values = _.uniq(filteredData.map(row => row[sharedFilter.columnName]))
-      if (!sharedFilter.active?.length) sharedFilter.active = sharedFilter.values
     } else if (sharedFilter.tier === i + 2 && !Array.isArray(sharedFilter.active)) {
       sharedFilter.values = _.uniq(filteredData.map(row => row[sharedFilter.columnName]))
       const valueAlreadySelected = sharedFilter.values.includes(sharedFilter.active)

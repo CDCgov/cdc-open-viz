@@ -4,6 +4,14 @@ import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
 
+const scaleTypes = {
+  TIME: 'time',
+  LOG: 'log',
+  POINT: 'point',
+  LINEAR: 'linear',
+  BAND: 'band'
+}
+
 type useScaleProps = {
   config: ChartConfig // standard chart config
   data: Object[] // standard data array
@@ -37,14 +45,6 @@ const useScales = (properties: useScaleProps) => {
   let xScaleNoPadding = null
   let xScaleBrush = null
 
-  const scaleTypes = {
-    TIME: 'time',
-    LOG: 'log',
-    POINT: 'point',
-    LINEAR: 'linear',
-    BAND: 'band'
-  }
-
   // handle  Horizontal bars
   if (isHorizontal) {
     xScale = composeXScale({ min: min * 1.03, ...properties })
@@ -56,14 +56,14 @@ const useScales = (properties: useScaleProps) => {
 
   // handle  Vertical bars
   if (!isHorizontal) {
-    xScaleBrush = composeScalePoint(xAxisDataKeysMapped, [0, xMax], .5)
+    xScaleBrush = composeScalePoint(xAxisDataKeysMapped, [0, xMax], 0.5)
     xScale = composeScaleBand(xAxisDataMapped, [0, xMax], 1 - config.barThickness)
     yScale = composeYScale(properties)
     seriesScale = composeScaleBand(seriesDomain, [0, xScale.bandwidth()], 0)
   }
 
   // handle Area chart
-  if (config.xAxis.type === 'date' && config.xAxis.sortDates) {
+  if (config.xAxis.type === 'date-time') {
     let xAxisMin = Math.min(...xAxisDataMapped)
     let xAxisMax = Math.max(...xAxisDataMapped)
     xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
@@ -73,8 +73,8 @@ const useScales = (properties: useScaleProps) => {
       range: [0, xMax]
     })
     xScaleBrush = xScale
-    xScale.type = scaleTypes.LINEAR
-    seriesScale = composeScaleBand(seriesDomain, [0, config.barThickness * (xMax)], 0)
+    xScale.type = scaleTypes.TIME
+    seriesScale = composeScaleBand(seriesDomain, [0, config.barThickness * xMax], 0)
   }
 
   // handle Deviation bar
@@ -249,8 +249,7 @@ const composeXScale = ({ min, max, xMax, config }) => {
     domain: [min, max],
     range: [0, xMax],
     nice: config.useLogScale,
-    zero: config.useLogScale,
-    type: config.useLogScale ? 'log' : 'linear'
+    zero: config.useLogScale
   })
 }
 
@@ -284,8 +283,7 @@ const composeScalePoint = (domain, range, padding = 0) => {
   return scalePoint({
     domain: domain,
     range: range,
-    padding: padding,
-    type: 'point'
+    padding: padding
   })
 }
 
@@ -293,7 +291,6 @@ const composeScaleBand = (domain, range, padding = 0) => {
   return scaleBand({
     domain: domain,
     range: range,
-    padding: padding,
-    type: 'band'
+    padding: padding
   })
 }
