@@ -27,7 +27,7 @@ const LegendItemHex = props => {
       return (
         <aside id='legend' className={legendClasses.aside.join(' ')} role='region' aria-label='Legend' tabIndex={0}>
           <section className={legendClasses.section.join(' ')} aria-label='Map Legend'>
-            {shapeGroup.legendTitle && <span className={legendClasses.title.join(' ')}>{parse(shapeGroup.legendTitle)}</span>}
+            {shapeGroup.legendTitle && <h3 className={legendClasses.title.join(' ')}>{parse(shapeGroup.legendTitle)}</h3>}
             {shapeGroup.legendDescription && <p className={legendClasses.description.join(' ')}>{parse(shapeGroup.legendDescription)}</p>}
 
             <ul className={legendClasses.ul.join(' ')} aria-label='Legend items' style={{ listStyle: 'none' }}>
