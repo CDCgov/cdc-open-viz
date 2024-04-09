@@ -47,17 +47,13 @@ const findNearestDatum = ({ data, xScale, yScale, config }, xPosition) => {
   }
 
   const invertedXValue = getXValueFromCoordinate(xPosition - Number(config.yAxis.size || 0))
-  console.log('inverted', invertedXValue)
   if (!invertedScaleValue) return { x: 0, y: 0 }
 
   const closestSeries = config.data.filter(d => d[config.xAxis.dataKey] === invertedXValue)
   if (closestSeries.length === 0) return { x: 0, y: 0 }
-  console.log('closest', closestSeries)
   const yValues = config.runtime.seriesLabelsAll?.map(key => closestSeries[0][key]) // Map each key to its corresponding value in data
   const x = invertedXValue
   const y = yValues
-  console.log('y', y)
-
   return { x, y }
 }
 
