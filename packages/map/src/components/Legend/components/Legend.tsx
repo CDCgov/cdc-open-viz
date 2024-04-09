@@ -173,7 +173,7 @@ const Legend = forwardRef((props, ref) => {
       <div className='legends'>
         <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0} ref={ref}>
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
-            {legend.title && <span className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</span>}
+            {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
             {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>}
             {legend.dynamicDescription === true &&
               runtimeFilters.map((filter, idx) => {
