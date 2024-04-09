@@ -28,10 +28,12 @@ div.data-table-heading {
     z-index: 2;
     position: relative;
   }
+  @include breakpoint(xs) {
+    font-size: $font-small + 0.2em;
+  }
 }
 
 table.horizontal {
-
   th,
   td {
     min-width: 200px;
@@ -103,18 +105,6 @@ table.data-table {
       background-size: 10px 5px;
     }
 
-    /* doesnt work
-    th.sort-asc,
-    td.sort-asc {
-      background-image: url(../assets/icon-caret-filled-up.svg);
-    }
-
-    th.sort-desc,
-    td.sort-desc {
-      background-image: url(../assets/icon-caret-filled-down.svg);
-    }
-    */
-
     // format the white triangle sort icon in data table headers
     .sort-icon {
       fill: white;
@@ -152,6 +142,7 @@ table.data-table {
 
   td {
     padding: 0.3em 0.7em;
+
     border-right: 1px solid rgba(0, 0, 0, 0.1);
   }
 
@@ -163,6 +154,10 @@ table.data-table {
     overflow: hidden;
     &:last-child {
       border-right: 0 !important;
+    }
+
+    @include breakpoint(xs) {
+      font-size: $font-small;
     }
   }
   tr {

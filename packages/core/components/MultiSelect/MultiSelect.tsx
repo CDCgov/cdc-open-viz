@@ -98,7 +98,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ section = null, subsection = 
           </Tooltip>
         )}
       </div>
-      <ul className={'dropdown-1' + (expanded ? '' : ' hide')}>
+      <ul className={'dropdown' + (expanded ? '' : ' hide')}>
         {options
           .filter(option => !selectedItems.find(item => item.value === option.value))
           .map(option => (

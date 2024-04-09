@@ -47,7 +47,7 @@ const config: StorybookConfig = {
         },
         rollupOptions: {
           output: {
-            chunkFileNames: `storybook-[hash].[format].js`
+            chunkFileNames: `storybook-[name]-[hash].[format].js`
           }
         }
       },
