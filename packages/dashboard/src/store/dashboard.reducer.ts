@@ -94,8 +94,8 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     }
     case 'SET_SHARED_FILTERS': {
       const newSharedFilters = action.payload
-      const newConfig = { ...state.config, sharedFilters: newSharedFilters }
-      return { ...state, config: newConfig }
+      const newDashboardConfig = { ...state.config.dashboard, sharedFilters: newSharedFilters }
+      return { ...state, config: { ...state.config, dashboard: newDashboardConfig } }
     }
     case 'INITIALIZE_MULTIDASHBOARDS': {
       const label = 'New Dashboard 1'

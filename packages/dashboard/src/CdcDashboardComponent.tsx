@@ -422,8 +422,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
   const updateDataFilters = (sharedFilters = undefined) => {
     const clonedState = _.cloneDeep(state)
-    const dashboardConfig = { ...clonedState.config.dashboard }
-    if (sharedFilters) dashboardConfig.sharedFilters = sharedFilters
+    if (sharedFilters) clonedState.config.dashboard.sharedFilters = sharedFilters
     const newFilteredData = getFilteredData(clonedState)
     dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
   }
