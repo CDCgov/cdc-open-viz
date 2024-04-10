@@ -274,15 +274,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       const dashboardConfig = dashboardConfigOverride || config.dashboard
       dispatch({ type: 'SET_DATA', payload: newData })
 
-      let newFilteredData = {}
-      getVizKeys(config).forEach(key => {
-        let dataKey = config.visualizations[key].dataKey
-
-        const applicableFilters = getApplicableFilters(_.cloneDeep(dashboardConfig), key)
-        if (applicableFilters) {
-          newFilteredData[key] = filterData(applicableFilters, newData[dataKey])
-        }
-      })
+      const newFilteredData = getFilteredData(state, {}, newData)
       const visualizations = Object.keys(config.visualizations).reduce((acc, vizKey) => {
         const dataKey = config.visualizations[vizKey].dataKey
         if (newData[dataKey]) {
@@ -307,7 +299,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   const setSharedFilter = (key, datum) => {
-    const { config: newConfig, filteredData: newFilteredData, data } = _.cloneDeep(state)
+    const { config: newConfig, filteredData } = _.cloneDeep(state)
 
     for (let i = 0; i < newConfig.dashboard.sharedFilters.length; i++) {
       const filter = newConfig.dashboard.sharedFilters[i]
@@ -319,16 +311,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       }
     }
 
-    getVizKeys(newConfig).forEach(visualizationKey => {
-      const applicableFilters = getApplicableFilters(newConfig.dashboard, visualizationKey)
-      if (applicableFilters) {
-        const visualization = newConfig.visualizations[visualizationKey]
-
-        const formattedData = visualization.dataDescription ? getFormattedData(data[visualization.dataKey] || visualization.data, visualization.dataDescription) : undefined
-
-        newFilteredData[visualizationKey] = filterData(applicableFilters, formattedData || data[visualization.dataKey])
-      }
-    })
+    const newFilteredData = getFilteredData({ ...state, config: newConfig }, filteredData)
 
     dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
     dispatch({ type: 'SET_SHARED_FILTERS', payload: newConfig.dashboard.sharedFilters })
@@ -438,21 +421,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   const updateDataFilters = (sharedFilters = undefined) => {
-    const config = _.cloneDeep(state.config)
-    const dashboardConfig = { ...config.dashboard }
+    const clonedState = _.cloneDeep(state)
+    const dashboardConfig = { ...clonedState.config.dashboard }
     if (sharedFilters) dashboardConfig.sharedFilters = sharedFilters
-    const newFilteredData = {}
-    getVizKeys(config).forEach(key => {
-      const applicableFilters = getApplicableFilters(dashboardConfig, key)
-      if (applicableFilters) {
-        const visualization = config.visualizations[key]
-        const _data = state.data[visualization.dataKey] || visualization.data
-        const formattedData = visualization.dataDescription ? getFormattedData(_data, visualization.dataDescription) : _data
-
-        newFilteredData[key] = filterData(applicableFilters, formattedData)
-      }
-    })
-
+    const newFilteredData = getFilteredData(clonedState)
     dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
   }
 
@@ -461,7 +433,6 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     const newSharedFilters = changeFilterActive(index, value)
     if (config.filterBehavior === FilterBehavior.Apply) {
       const autoLoadViz = getAutoLoadVisualization()
-      //if (!autoLoadViz) return // nothing left to do for regular filter behavior.
       const isAutoSelectFilter = !autoLoadViz?.hide.includes(index)
       const missingFilterSelections = config.dashboard.sharedFilters.some(f => !f.active)
       if (isAutoSelectFilter && !missingFilterSelections) {
