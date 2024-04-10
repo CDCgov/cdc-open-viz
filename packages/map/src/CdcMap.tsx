@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import * as d3 from 'd3'
 
 // IE11
@@ -136,6 +136,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
   const [dimensions, setDimensions] = useState()
   const legendRef = useRef(null)
+  const legendId = useId()
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
@@ -1621,7 +1622,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // 1) skip to legend
     if (general.showSidebar) {
-      tabbingID = 'legend'
+      tabbingID = legendId
     }
 
     // 2) skip to data table if it exists and not a navigation map
@@ -1693,7 +1694,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 )}
               </section>
 
-              {general.showSidebar && 'navigation' !== general.type && <Legend ref={legendRef} />}
+              {general.showSidebar && 'navigation' !== general.type && <Legend ref={legendRef} skipId={tabId} />}
             </div>
 
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}

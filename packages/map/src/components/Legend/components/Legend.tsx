@@ -14,7 +14,13 @@ import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from
 import { Group } from '@visx/group'
 import './index.scss'
 
+type LegendProps = {
+  skipId: string
+}
+
 const Legend = forwardRef((props, ref) => {
+  const { skipId } = props
+
   // prettier-ignore
   const {
     displayDataAsText,
@@ -171,7 +177,7 @@ const Legend = forwardRef((props, ref) => {
   return (
     <ErrorBoundary component='Sidebar'>
       <div className='legends'>
-        <aside id='legend' className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0} ref={ref}>
+        <aside id={skipId || 'legend'} className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0} ref={ref}>
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
             {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
             {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>}
