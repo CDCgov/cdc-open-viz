@@ -23,10 +23,11 @@ interface LegendProps {
   currentViewport: string
   formatLabels: (labels: Label[]) => Label[]
   ref: React.Ref<() => void>
+  skipId: string
 }
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
-const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels }, ref) => {
+const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels, skipId = 'legend' }, ref) => {
   const { innerClasses, containerClasses } = useLegendClasses(config)
   const { runtime, orientation, legend } = config
   if (!legend) return null
@@ -69,7 +70,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
 
   return (
-    <aside ref={ref} style={legendClasses} id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
+    <aside ref={ref} style={legendClasses} id={skipId || 'legend'} className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
       {legend.label && <h3>{parse(legend.label)}</h3>}
       {legend.description && <p>{parse(legend.description)}</p>}
       <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
