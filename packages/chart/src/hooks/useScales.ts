@@ -34,6 +34,8 @@ const useScales = (properties: useScaleProps) => {
   const getXAxisDataKeys = d => d[config.runtime.originalXAxis.dataKey]
   const xAxisDataKeysMapped = data.map(d => getXAxisDataKeys(d))
 
+  const xRange = config.xAxis.reverse ? [xMax, 0] : [0, xMax];
+
   const { visualizationType } = config
 
   //  define scales
@@ -56,8 +58,8 @@ const useScales = (properties: useScaleProps) => {
 
   // handle  Vertical bars
   if (!isHorizontal) {
-    xScaleBrush = composeScalePoint(xAxisDataKeysMapped, [0, xMax], 0.5)
-    xScale = composeScaleBand(xAxisDataMapped, [0, xMax], 1 - config.barThickness)
+    xScaleBrush = composeScalePoint(xAxisDataKeysMapped, xRange, 0.5)
+    xScale = composeScaleBand(xAxisDataMapped, xRange, 1 - config.barThickness)
     yScale = composeYScale(properties)
     seriesScale = composeScaleBand(seriesDomain, [0, xScale.bandwidth()], 0)
   }
@@ -70,7 +72,7 @@ const useScales = (properties: useScaleProps) => {
     xAxisMax += (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
     xScale = scaleTime({
       domain: [xAxisMin, xAxisMax],
-      range: [0, xMax]
+      range: xRange
     })
     xScaleBrush = xScale
     xScale.type = scaleTypes.TIME
@@ -86,7 +88,7 @@ const useScales = (properties: useScaleProps) => {
     })
     xScale = scaleLinear({
       domain: [min * leftOffset, Math.max(Number(config.xAxis.target), max)],
-      range: [0, xMax],
+      range: xRange,
       round: true,
       nice: true
     })
@@ -98,7 +100,7 @@ const useScales = (properties: useScaleProps) => {
     if (config.xAxis.type === 'continuous') {
       xScale = scaleLinear({
         domain: [0, Math.max.apply(null, xScale.domain())],
-        range: [0, xMax]
+        range: xRange
       })
       xScale.type = scaleTypes.LINEAR
     }
@@ -134,7 +136,7 @@ const useScales = (properties: useScaleProps) => {
     })
 
     xScale = scaleBand({
-      range: [0, xMax],
+      range: xRange,
       round: true,
       domain: config.boxplot.categories,
       padding: 0.4
@@ -247,7 +249,7 @@ const composeXScale = ({ min, max, xMax, config }) => {
   // Return the configured scale function
   return scaleFunc({
     domain: [min, max],
-    range: [0, xMax],
+    range: xRange,
     nice: config.useLogScale,
     zero: config.useLogScale
   })

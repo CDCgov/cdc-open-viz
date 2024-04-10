@@ -1916,6 +1916,14 @@ const EditorPanel = () => {
                         )}
 
                         <CheckBox
+                          value={config.xAxis.reverse}
+                          section='xAxis'
+                          fieldName='reverse'
+                          label='Reverse ticks'
+                          updateField={updateField}
+                        />
+
+                        <CheckBox
                           value={config.exclusions.active}
                           section='exclusions'
                           fieldName='active'
