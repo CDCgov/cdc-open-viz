@@ -28,9 +28,15 @@ const LineChartBumpCircle = props => {
           {d[series.dataKey] && (
             <>
               <circle r={10} cx={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey]))))} cy={Number(yScale(d[series.dataKey]))} stroke='#CACACA' strokeWidth={1} fill='#E5E4E2' />
-              <text x={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey])))) - 4} y={Number(yScale(d[series.dataKey])) + 4} fill='#000000' fontSize={12}>
+              {d[series.dataKey].toString().length === 2 ? (
+                <text x={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey])))) - 7} y={Number(yScale(d[series.dataKey])) + 4} fill='#000000' fontSize={12}>
                 {d[series.dataKey]}
               </text>
+              ) : (
+                <text x={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey])))) - 4} y={Number(yScale(d[series.dataKey])) + 4} fill='#000000' fontSize={12}>
+                  {d[series.dataKey]}
+              </text>
+              )}
             </>
             
           )}
