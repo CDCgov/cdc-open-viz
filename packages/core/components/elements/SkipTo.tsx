@@ -1,3 +1,5 @@
+import { useId } from 'react'
+
 type SkipToProps = {
   // id to skip to
   skipId: string
@@ -6,6 +8,7 @@ type SkipToProps = {
 }
 
 const SkipTo: React.FC<SkipToProps> = ({ skipId, skipMessage }) => {
+  const accessibleId = useId()
   const handleOnClick = () => {
     // Navigate to the specific part of the page
     const targetElement = document.getElementById(skipId)
@@ -24,7 +27,7 @@ const SkipTo: React.FC<SkipToProps> = ({ skipId, skipMessage }) => {
   return (
     <div
       tabIndex={0}
-      id='skip-nav'
+      id={`skip-nav--${accessibleId}`}
       className='cdcdataviz-sr-only-focusable'
       onClick={handleOnClick}
       onKeyDown={e => {
