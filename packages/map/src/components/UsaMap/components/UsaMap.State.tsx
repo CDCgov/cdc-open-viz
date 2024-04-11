@@ -261,33 +261,33 @@ const UsaMap = () => {
                   switch (item.operator) {
                     case '=':
                       if (geoData[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
-                        return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                        return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
                       }
                       break
                     case '≠':
                       if (geoData[item.key] !== item.value && Number(geoData[item.key]) !== Number(item.value)) {
-                        return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                        return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
                       }
                       break
                     case '<':
                       if (Number(geoData[item.key]) < Number(item.value)) {
-                        return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                        return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
                       }
                       break
                     case '>':
                       if (Number(geoData[item.key]) > Number(item.value)) {
-                        return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                        return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
                       }
                       break
                     case '<=':
                       if (Number(geoData[item.key]) <= Number(item.value)) {
-                        return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                        return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
                       }
                       break
                     case '>=':
                       if (item.operator === '>=') {
                         if (Number(geoData[item.key]) >= Number(item.value)) {
-                          return <HexIcon item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
+                          return <HexIcon textColor={textColor} item={item} index={itemIndex} centroid={centroid} iconSize={iconSize} />
                         }
                       }
                       break
@@ -311,7 +311,7 @@ const UsaMap = () => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
                 const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
-                const patternColor = getContrastColor('#000', currentFill)
+                const patternColor = patternData.color || getContrastColor('#000', currentFill)
 
                 return (
                   hasMatchingValues && (

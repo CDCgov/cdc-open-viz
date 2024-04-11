@@ -13,7 +13,6 @@ const SkipTo: React.FC<SkipToProps> = ({ skipId, skipMessage }) => {
       targetElement.scrollIntoView()
       targetElement.setAttribute('tabIndex', '-1')
       targetElement.focus()
-
       // Setup to remove tabIndex on blur to maintain document flow
       const blurListener = () => {
         targetElement.removeAttribute('tabIndex')
