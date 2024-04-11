@@ -7,6 +7,7 @@ export type Table = {
   caption?: string
   limitHeight?: boolean
   height?: number
+  freezeDataTableHeader?: boolean
   expanded?: boolean
   showDataTableLink?: boolean
   showDownloadUrl?: boolean

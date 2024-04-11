@@ -3,4 +3,7 @@
   @include breakpointClass(md) {
     margin: 5px 1em;
   }
+  .freeze-header {   
+    max-height:200px;
+  }
 }

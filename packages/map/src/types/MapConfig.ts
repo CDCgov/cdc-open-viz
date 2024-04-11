@@ -126,6 +126,7 @@ export type MapConfig = Visualization & {
     label: string
     expanded: boolean
     limitHeight: boolean
+    freezeDataTableHeader: boolean
     height: string
     caption: string
     showDownloadUrl: boolean

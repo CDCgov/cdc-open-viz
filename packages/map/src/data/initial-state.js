@@ -72,6 +72,7 @@ export default {
     label: 'Data Table',
     expanded: false,
     limitHeight: false,
+    freezeDataTableHeader: false,
     height: '',
     caption: '',
     showDownloadUrl: false,
