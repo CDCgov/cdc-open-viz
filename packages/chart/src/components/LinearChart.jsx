@@ -292,7 +292,22 @@ const LinearChart = props => {
                             </Text>
                           )}
 
-                          {orientation === 'vertical' && visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel && (
+                          {orientation === 'vertical' && visualizationType === 'Bump Chart' && !config.yAxis.hideLabel && (
+                            <Text
+                              display={config.useLogScale ? showTicks : 'block'}
+                              dx={config.useLogScale ? -6 : 0}
+                              x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
+                              y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                              angle={-Number(config.yAxis.tickRotation) || 0}
+                              verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
+                              textAnchor={config.runtime.horizontal ? 'start' : 'end'}
+                              fill={config.yAxis.tickLabelColor}
+                            >
+                              {config.runtime.seriesLabelsAll[tick.formattedValue - 1]}
+                            </Text>
+                          )}
+
+                          {orientation === 'vertical' && visualizationType !== 'Paired Bar' && visualizationType !== 'Bump Chart' && !config.yAxis.hideLabel && (
                             <Text
                               display={config.useLogScale ? showTicks : 'block'}
                               dx={config.useLogScale ? -6 : 0}
