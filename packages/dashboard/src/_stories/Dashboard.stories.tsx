@@ -73,12 +73,13 @@ export const PivotFilter: Story = {
 
 faker.seed(123)
 
-const countries = _.times(10, faker.location.country)
+const countries = _.times(5, faker.location.country)
 const categories = _.times(3, val => `category-${val + 1}`)
 
 const data = []
-countries.forEach(country => {
-  categories.forEach(category => {
+countries.forEach((country, i) => {
+  categories.forEach((category, j) => {
+    if ((i + j) % 3 === 0) return
     data.push({
       Country: country,
       'Sample Categories': category,
