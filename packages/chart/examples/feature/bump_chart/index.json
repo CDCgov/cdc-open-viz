@@ -34,7 +34,7 @@
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
-    "hideTicks": false,
+    "hideTicks": true,
     "size": 50,
     "gridLines": true,
     "enablePadding": false,
@@ -55,7 +55,7 @@
     "scalePadding": 10,
     "tickRotation": 0,
     "anchors": [],
-    "label": "Ranking",
+    "label": "",
     "rightSeries": "Diameter"
   },
   "boxplot": {
@@ -105,7 +105,7 @@
     "targetLabel": "Target",
     "hideAxis": false,
     "hideLabel": false,
-    "hideTicks": false,
+    "hideTicks": true,
     "size": 75,
     "tickRotation": "0",
     "min": "",
@@ -118,7 +118,7 @@
     "axisPadding": 0,
     "target": 0,
     "maxTickRotation": 0,
-    "label": "Year",
+    "label": "",
     "dataKey": "year",
     "tickWidthMax": 41,
     "dateParseFormat": "%Y",
@@ -148,7 +148,7 @@
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
-    "description": "",
+    "description": "* To highlight a data series in the chart, click on the corresponding name in the legend. To undo the highlight, select the reset button.",
     "dynamicLegend": false,
     "dynamicLegendDefaultText": "Show All",
     "dynamicLegendItemLimit": 5,
@@ -164,283 +164,283 @@
     "height": 25,
     "data": [
       {
-        "Series 1": "1",
+        "Brother Sister Younger Sibling": "1",
         "year": "2014"
       },
       {
-        "Series 1": "2",
+        "Brother Sister Younger Sibling": "2",
         "year": "2015"
       },
       {
-        "Series 1": "2",
+        "Brother Sister Younger Sibling": "2",
         "year": "2016"
       },
       {
-        "Series 1": "2",
+        "Brother Sister Younger Sibling": "2",
         "year": "2017"
       },
       {
-        "Series 1": "2",
+        "Brother Sister Younger Sibling": "2",
         "year": "2018"
       },
       {
-        "Series 1": "2",
+        "Brother Sister Younger Sibling": "2",
         "year": "2019"
       },
       {
-        "Series 1": "2",
+        "Brother Sister Younger Sibling": "2",
         "year": "2020"
       },
       {
-        "Series 2": "2",
+        "Belt Rope Neck Tied": "2",
         "year": "2014"
       },
       {
-        "Series 2": "1",
+        "Belt Rope Neck Tied": "1",
         "year": "2015"
       },
       {
-        "Series 2": "1",
+        "Belt Rope Neck Tied": "1",
         "year": "2016"
       },
       {
-        "Series 2": "1",
+        "Belt Rope Neck Tied": "1",
         "year": "2017"
       },
       {
-        "Series 2": "1",
+        "Belt Rope Neck Tied": "1",
         "year": "2018"
       },
       {
-        "Series 2": "1",
+        "Belt Rope Neck Tied": "1",
         "year": "2019"
       },
       {
-        "Series 2": "1",
+        "Belt Rope Neck Tied": "1",
         "year": "2020"
       },
       {
-        "Series 3": "3",
+        "Broken Girlfriend Broke Up": "3",
         "year": "2014"
       },
       {
-        "Series 3": "4",
+        "Broken Girlfriend Broke Up": "4",
         "year": "2015"
       },
       {
-        "Series 3": "3",
+        "Broken Girlfriend Broke Up": "3",
         "year": "2016"
       },
       {
-        "Series 3": "4",
+        "Broken Girlfriend Broke Up": "4",
         "year": "2017"
       },
       {
-        "Series 3": "3",
+        "Broken Girlfriend Broke Up": "3",
         "year": "2018"
       },
       {
-        "Series 3": "4",
+        "Broken Girlfriend Broke Up": "4",
         "year": "2019"
       },
       {
-        "Series 3": "4",
+        "Broken Girlfriend Broke Up": "4",
         "year": "2020"
       },
       {
-        "Series 4": "4",
+        "Bullied Bullying School Being": "4",
         "year": "2014"
       },
       {
-        "Series 4": "8",
+        "Bullied Bullying School Being": "8",
         "year": "2015"
       },
       {
-        "Series 4": "5",
+        "Bullied Bullying School Being": "5",
         "year": "2016"
       },
       {
-        "Series 4": "10",
+        "Bullied Bullying School Being": "10",
         "year": "2017"
       },
       {
-        "Series 4": "6",
+        "Bullied Bullying School Being": "6",
         "year": "2018"
       },
       {
-        "Series 4": "9",
+        "Bullied Bullying School Being": "9",
         "year": "2019"
       },
       {
-        "Series 4": "10",
+        "Bullied Bullying School Being": "10",
         "year": "2020"
       },
       {
-        "Series 5": "5",
+        "Depressed Depression Suffered Mother": "5",
         "year": "2014"
       },
       {
-        "Series 5": "7",
+        "Depressed Depression Suffered Mother": "7",
         "year": "2015"
       },
       {
-        "Series 5": "6",
+        "Depressed Depression Suffered Mother": "6",
         "year": "2016"
       },
       {
-        "Series 5": "5",
+        "Depressed Depression Suffered Mother": "5",
         "year": "2017"
       },
       {
-        "Series 5": "4",
+        "Depressed Depression Suffered Mother": "4",
         "year": "2018"
       },
       {
-        "Series 5": "5",
+        "Depressed Depression Suffered Mother": "5",
         "year": "2019"
       },
       {
-        "Series 5": "6",
+        "Depressed Depression Suffered Mother": "6",
         "year": "2020"
       },
       {
-        "Series 6": "6",
+        "Overdose Pills Attempted Overdosed": "6",
         "year": "2014"
       },
       {
-        "Series 6": "6",
+        "Overdose Pills Attempted Overdosed": "6",
         "year": "2015"
       },
       {
-        "Series 6": "7",
+        "Overdose Pills Attempted Overdosed": "7",
         "year": "2016"
       },
       {
-        "Series 6": "6",
+        "Overdose Pills Attempted Overdosed": "6",
         "year": "2017"
       },
       {
-        "Series 6": "7",
+        "Overdose Pills Attempted Overdosed": "7",
         "year": "2018"
       },
       {
-        "Series 6": "6",
+        "Overdose Pills Attempted Overdosed": "6",
         "year": "2019"
       },
       {
-        "Series 6": "5",
+        "Overdose Pills Attempted Overdosed": "5",
         "year": "2020"
       },
       {
-        "Series 7": "7",
+        "Depression Has History Of": "7",
         "year": "2014"
       },
       {
-        "Series 7": "9",
+        "Depression Has History Of": "9",
         "year": "2015"
       },
       {
-        "Series 7": "9",
+        "Depression Has History Of": "9",
         "year": "2016"
       },
       {
-        "Series 7": "7",
+        "Depression Has History Of": "7",
         "year": "2017"
       },
       {
-        "Series 7": "8",
+        "Depression Has History Of": "8",
         "year": "2018"
       },
       {
-        "Series 7": "7",
+        "Depression Has History Of": "7",
         "year": "2019"
       },
       {
-        "Series 7": "7",
+        "Depression Has History Of": "7",
         "year": "2020"
       },
       {
-        "Series 8": "8",
+        "Vehicle Car Parked Truck": "8",
         "year": "2014"
       },
       {
-        "Series 8": "3",
+        "Vehicle Car Parked Truck": "3",
         "year": "2015"
       },
       {
-        "Series 8": "4",
+        "Vehicle Car Parked Truck": "4",
         "year": "2016"
       },
       {
-        "Series 8": "3",
+        "Vehicle Car Parked Truck": "3",
         "year": "2017"
       },
       {
-        "Series 8": "5",
+        "Vehicle Car Parked Truck": "5",
         "year": "2018"
       },
       {
-        "Series 8": "3",
+        "Vehicle Car Parked Truck": "3",
         "year": "2019"
       },
       {
-        "Series 8": "3",
+        "Vehicle Car Parked Truck": "3",
         "year": "2020"
       },
       {
-        "Series 9": "9",
+        "Friends Friend Party House": "9",
         "year": "2014"
       },
       {
-        "Series 9": "10",
+        "Friends Friend Party House": "10",
         "year": "2015"
       },
       {
-        "Series 9": "10",
+        "Friends Friend Party House": "10",
         "year": "2016"
       },
       {
-        "Series 9": "9",
+        "Friends Friend Party House": "9",
         "year": "2017"
       },
       {
-        "Series 9": "9",
+        "Friends Friend Party House": "9",
         "year": "2018"
       },
       {
-        "Series 9": "10",
+        "Friends Friend Party House": "10",
         "year": "2019"
       },
       {
-        "Series 9": "9",
+        "Friends Friend Party House": "9",
         "year": "2020"
       },
       {
-        "Series 10": "10",
+        "Blood Skull Head Brain": "10",
         "year": "2014"
       },
       {
-        "Series 10": "5",
+        "Blood Skull Head Brain": "5",
         "year": "2015"
       },
       {
-        "Series 10": "8",
+        "Blood Skull Head Brain": "8",
         "year": "2016"
       },
       {
-        "Series 10": "8",
+        "Blood Skull Head Brain": "8",
         "year": "2017"
       },
       {
-        "Series 10": "10",
+        "Blood Skull Head Brain": "10",
         "year": "2018"
       },
       {
-        "Series 10": "8",
+        "Blood Skull Head Brain": "8",
         "year": "2019"
       },
       {
-        "Series 10": "8",
+        "Blood Skull Head Brain": "8",
         "year": "2020"
       }
     ],
@@ -480,66 +480,90 @@
   "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "Series 1",
+      "dataKey": "Brother Sister Younger Sibling",
       "type": "Bump Chart",
       "axis": "Left",
-      "tooltip": true
+      "tooltip": true,
+      "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Series 2",
+      "dataKey": "Belt Rope Neck Tied",
       "type": "Bump Chart",
       "axis": "Left",
-      "tooltip": true
+      "tooltip": true,
+      "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Series 3",
+      "dataKey": "Broken Girlfriend Broke Up",
       "type": "Bump Chart",
       "axis": "Left",
-      "tooltip": true
+      "tooltip": true,
+      "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Series 4",
+      "dataKey": "Bullied Bullying School Being",
       "type": "Bump Chart",
       "axis": "Left",
-      "tooltip": true
+      "tooltip": true,
+      "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Series 5",
+      "dataKey": "Depressed Depression Suffered Mother",
       "type": "Bump Chart",
       "axis": "Left",
-      "tooltip": true
+      "tooltip": true,
+      "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Series 6",
+      "dataKey": "Overdose Pills Attempted Overdosed",
       "type": "Bump Chart",
       "axis": "Left",
-      "tooltip": true
+      "tooltip": true,
+      "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Series 7",
+      "dataKey": "Depression Has History Of",
       "type": "Bump Chart",
       "axis": "Left",
-      "tooltip": true
+      "tooltip": true,
+      "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Series 8",
+      "dataKey": "Vehicle Car Parked Truck",
       "type": "Bump Chart",
       "axis": "Left",
-      "tooltip": true
+      "tooltip": true,
+      "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Series 9",
+      "dataKey": "Friends Friend Party House",
       "type": "Bump Chart",
       "axis": "Left",
-      "tooltip": true
+      "tooltip": true,
+      "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Series 10",
+      "dataKey": "Blood Skull Head Brain",
       "type": "Bump Chart",
       "axis": "Left",
-      "tooltip": true
+      "tooltip": true,
+      "lineType": "curveCardinal"
     }
   ],
+  "runtime": {
+    "seriesLabels": {
+      "1": "Brother Sister Younger Sibling",
+      "2": "Belt Rope Neck Tied",
+      "3": "Broken Girlfriend Broke Up",
+      "4": "Bullied Bullying School Being",
+      "5": "Depressed Depression Suffered Mother",
+      "6": "Overdose Pills Attempted Overdosed",
+      "7": "Depression Has History Of",
+      "8": "Vehicle Car Parked Truck",
+      "9": "Friends Friend Party House",
+      "10": "Blood Skull Head Brain"
+    }
+  },
   "tooltips": {
     "opacity": 90,
     "singleSeries": false,
@@ -638,283 +662,283 @@
   "dataCutoff": "0.5",
   "data": [
     {
-      "Series 1": "1",
+      "Brother Sister Younger Sibling": "1",
       "year": "2014"
     },
     {
-      "Series 1": "2",
+      "Brother Sister Younger Sibling": "2",
       "year": "2015"
     },
     {
-      "Series 1": "2",
+      "Brother Sister Younger Sibling": "2",
       "year": "2016"
     },
     {
-      "Series 1": "2",
+      "Brother Sister Younger Sibling": "2",
       "year": "2017"
     },
     {
-      "Series 1": "2",
+      "Brother Sister Younger Sibling": "2",
       "year": "2018"
     },
     {
-      "Series 1": "2",
+      "Brother Sister Younger Sibling": "2",
       "year": "2019"
     },
     {
-      "Series 1": "2",
+      "Brother Sister Younger Sibling": "2",
       "year": "2020"
     },
     {
-      "Series 2": "2",
+      "Belt Rope Neck Tied": "2",
       "year": "2014"
     },
     {
-      "Series 2": "1",
+      "Belt Rope Neck Tied": "1",
       "year": "2015"
     },
     {
-      "Series 2": "1",
+      "Belt Rope Neck Tied": "1",
       "year": "2016"
     },
     {
-      "Series 2": "1",
+      "Belt Rope Neck Tied": "1",
       "year": "2017"
     },
     {
-      "Series 2": "1",
+      "Belt Rope Neck Tied": "1",
       "year": "2018"
     },
     {
-      "Series 2": "1",
+      "Belt Rope Neck Tied": "1",
       "year": "2019"
     },
     {
-      "Series 2": "1",
+      "Belt Rope Neck Tied": "1",
       "year": "2020"
     },
     {
-      "Series 3": "3",
+      "Broken Girlfriend Broke Up": "3",
       "year": "2014"
     },
     {
-      "Series 3": "4",
+      "Broken Girlfriend Broke Up": "4",
       "year": "2015"
     },
     {
-      "Series 3": "3",
+      "Broken Girlfriend Broke Up": "3",
       "year": "2016"
     },
     {
-      "Series 3": "4",
+      "Broken Girlfriend Broke Up": "4",
       "year": "2017"
     },
     {
-      "Series 3": "3",
+      "Broken Girlfriend Broke Up": "3",
       "year": "2018"
     },
     {
-      "Series 3": "4",
+      "Broken Girlfriend Broke Up": "4",
       "year": "2019"
     },
     {
-      "Series 3": "4",
+      "Broken Girlfriend Broke Up": "4",
       "year": "2020"
     },
     {
-      "Series 4": "4",
+      "Bullied Bullying School Being": "4",
       "year": "2014"
     },
     {
-      "Series 4": "8",
+      "Bullied Bullying School Being": "8",
       "year": "2015"
     },
     {
-      "Series 4": "5",
+      "Bullied Bullying School Being": "5",
       "year": "2016"
     },
     {
-      "Series 4": "10",
+      "Bullied Bullying School Being": "10",
       "year": "2017"
     },
     {
-      "Series 4": "6",
+      "Bullied Bullying School Being": "6",
       "year": "2018"
     },
     {
-      "Series 4": "9",
+      "Bullied Bullying School Being": "9",
       "year": "2019"
     },
     {
-      "Series 4": "10",
+      "Bullied Bullying School Being": "10",
       "year": "2020"
     },
     {
-      "Series 5": "5",
+      "Depressed Depression Suffered Mother": "5",
       "year": "2014"
     },
     {
-      "Series 5": "7",
+      "Depressed Depression Suffered Mother": "7",
       "year": "2015"
     },
     {
-      "Series 5": "6",
+      "Depressed Depression Suffered Mother": "6",
       "year": "2016"
     },
     {
-      "Series 5": "5",
+      "Depressed Depression Suffered Mother": "5",
       "year": "2017"
     },
     {
-      "Series 5": "4",
+      "Depressed Depression Suffered Mother": "4",
       "year": "2018"
     },
     {
-      "Series 5": "5",
+      "Depressed Depression Suffered Mother": "5",
       "year": "2019"
     },
     {
-      "Series 5": "6",
+      "Depressed Depression Suffered Mother": "6",
       "year": "2020"
     },
     {
-      "Series 6": "6",
+      "Overdose Pills Attempted Overdosed": "6",
       "year": "2014"
     },
     {
-      "Series 6": "6",
+      "Overdose Pills Attempted Overdosed": "6",
       "year": "2015"
     },
     {
-      "Series 6": "7",
+      "Overdose Pills Attempted Overdosed": "7",
       "year": "2016"
     },
     {
-      "Series 6": "6",
+      "Overdose Pills Attempted Overdosed": "6",
       "year": "2017"
     },
     {
-      "Series 6": "7",
+      "Overdose Pills Attempted Overdosed": "7",
       "year": "2018"
     },
     {
-      "Series 6": "6",
+      "Overdose Pills Attempted Overdosed": "6",
       "year": "2019"
     },
     {
-      "Series 6": "5",
+      "Overdose Pills Attempted Overdosed": "5",
       "year": "2020"
     },
     {
-      "Series 7": "7",
+      "Depression Has History Of": "7",
       "year": "2014"
     },
     {
-      "Series 7": "9",
+      "Depression Has History Of": "9",
       "year": "2015"
     },
     {
-      "Series 7": "9",
+      "Depression Has History Of": "9",
       "year": "2016"
     },
     {
-      "Series 7": "7",
+      "Depression Has History Of": "7",
       "year": "2017"
     },
     {
-      "Series 7": "8",
+      "Depression Has History Of": "8",
       "year": "2018"
     },
     {
-      "Series 7": "7",
+      "Depression Has History Of": "7",
       "year": "2019"
     },
     {
-      "Series 7": "7",
+      "Depression Has History Of": "7",
       "year": "2020"
     },
     {
-      "Series 8": "8",
+      "Vehicle Car Parked Truck": "8",
       "year": "2014"
     },
     {
-      "Series 8": "3",
+      "Vehicle Car Parked Truck": "3",
       "year": "2015"
     },
     {
-      "Series 8": "4",
+      "Vehicle Car Parked Truck": "4",
       "year": "2016"
     },
     {
-      "Series 8": "3",
+      "Vehicle Car Parked Truck": "3",
       "year": "2017"
     },
     {
-      "Series 8": "5",
+      "Vehicle Car Parked Truck": "5",
       "year": "2018"
     },
     {
-      "Series 8": "3",
+      "Vehicle Car Parked Truck": "3",
       "year": "2019"
     },
     {
-      "Series 8": "3",
+      "Vehicle Car Parked Truck": "3",
       "year": "2020"
     },
     {
-      "Series 9": "9",
+      "Friends Friend Party House": "9",
       "year": "2014"
     },
     {
-      "Series 9": "10",
+      "Friends Friend Party House": "10",
       "year": "2015"
     },
     {
-      "Series 9": "10",
+      "Friends Friend Party House": "10",
       "year": "2016"
     },
     {
-      "Series 9": "9",
+      "Friends Friend Party House": "9",
       "year": "2017"
     },
     {
-      "Series 9": "9",
+      "Friends Friend Party House": "9",
       "year": "2018"
     },
     {
-      "Series 9": "10",
+      "Friends Friend Party House": "10",
       "year": "2019"
     },
     {
-      "Series 9": "9",
+      "Friends Friend Party House": "9",
       "year": "2020"
     },
     {
-      "Series 10": "10",
+      "Blood Skull Head Brain": "10",
       "year": "2014"
     },
     {
-      "Series 10": "5",
+      "Blood Skull Head Brain": "5",
       "year": "2015"
     },
     {
-      "Series 10": "8",
+      "Blood Skull Head Brain": "8",
       "year": "2016"
     },
     {
-      "Series 10": "8",
+      "Blood Skull Head Brain": "8",
       "year": "2017"
     },
     {
-      "Series 10": "10",
+      "Blood Skull Head Brain": "10",
       "year": "2018"
     },
     {
-      "Series 10": "8",
+      "Blood Skull Head Brain": "8",
       "year": "2019"
     },
     {
-      "Series 10": "8",
+      "Blood Skull Head Brain": "8",
       "year": "2020"
     }
   ],

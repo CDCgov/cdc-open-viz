@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Group } from '@visx/group'
 
 const LineChartBumpCircle = props => {
@@ -25,10 +25,16 @@ const LineChartBumpCircle = props => {
     return config.data.map((d, dataIndex) => {
       return (
         <Group left={Number(config.runtime.yAxis.size)}>
-          <circle className='bump-circle' r={10} cx={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey]))))} cy={Number(yScale(d[series.dataKey]))} stroke='#CACACA' strokeWidth={1} fill='none' style={{ zIndex: 2 }} />
-          <text x={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey])))) - 4} y={Number(yScale(d[series.dataKey])) + 4} fill='#000000' fontSize={13} style={{ zIndex: 2 }}>
-            {d[series.dataKey]}
-          </text>
+          {d[series.dataKey] && (
+            <>
+              <circle r={10} cx={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey]))))} cy={Number(yScale(d[series.dataKey]))} stroke='#CACACA' strokeWidth={1} fill='#E5E4E2' />
+              <text x={Number(checkBandScale(xScale(handleX(d[config.xAxis.dataKey])))) - 4} y={Number(yScale(d[series.dataKey])) + 4} fill='#000000' fontSize={12}>
+                {d[series.dataKey]}
+              </text>
+            </>
+            
+          )}
+          
         </Group>
       )
     })
