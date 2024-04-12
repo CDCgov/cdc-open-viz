@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -95,9 +95,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   if (config.table && (!config.table?.label || config.table?.label === '')) config.table.label = 'Data Table'
 
-  const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
-
-  const handleChartTabbing = !config.legend?.hide ? `legend` : config?.title ? `dataTableSection__${config.title.replace(/\s/g, '')}` : `dataTableSection`
+  const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
+  const legendId = useId()
+  const handleChartTabbing = !config.legend?.hide ? legendId : config?.title ? `dataTableSection__${config.title.replace(/\s/g, '')}` : `dataTableSection`
 
   const reloadURLData = async () => {
     if (config.dataUrl) {

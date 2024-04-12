@@ -624,9 +624,6 @@ const EditorPanel = () => {
     })
   }
 
-
-
-
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
     if (false === missingRequiredSections()) {
@@ -1050,7 +1047,6 @@ const EditorPanel = () => {
   return (
     <EditorPanelContext.Provider value={editorContextValues}>
       <ErrorBoundary component='EditorPanel'>
-
         <Layout.Sidebar displayPanel={displayPanel} isDashboard={isDashboard} title={'Configure Chart'} onBackClick={onBackClick}>
           <Accordion allowZeroExpanded={true}>
             <Panels.General name='General' />
@@ -1755,7 +1751,7 @@ const EditorPanel = () => {
                                   <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>Enter a data suffix (such as "%"), if applicable.</p>
+                                  <p>Enter a data suffix (such as "$"), if applicable.</p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }

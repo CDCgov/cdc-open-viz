@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import * as d3 from 'd3'
 import Layout from '@cdc/core/components/Layout'
 import Waiting from '@cdc/core/components/Waiting'
@@ -142,6 +142,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [requiredColumns, setRequiredColumns] = useState(null) // Simple state so we know if we need more information before parsing the map
 
   const legendRef = useRef(null)
+  const legendId = useId()
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
@@ -1651,7 +1652,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // 1) skip to legend
     if (general.showSidebar) {
-      tabbingID = 'legend'
+      tabbingID = legendId
     }
 
     // 2) skip to data table if it exists and not a navigation map
@@ -1729,7 +1730,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                   )}
                 </section>
 
-                {general.showSidebar && 'navigation' !== general.type && <Legend ref={legendRef} />}
+                {general.showSidebar && 'navigation' !== general.type && <Legend ref={legendRef} skipId={tabId} />}
               </div>
 
               {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
