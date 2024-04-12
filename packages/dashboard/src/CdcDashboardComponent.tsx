@@ -103,7 +103,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
   const transform = new DataTransform()
 
-  const setAutoLoadDefaultValue = (sharedFilterIndex: number, filterDropdowns: DropdownOptions) => {
+  const setAutoLoadDefaultValue = (sharedFilterIndex: number, filterDropdowns: DropdownOptions, dashboardConfigOverride) => {
     const autoLoadViz = getAutoLoadVisualization()
     if (!autoLoadViz) return // no autoLoading happening
     const notIncludedInAutoLoad = autoLoadViz.hide
@@ -111,20 +111,22 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       // we don't want to auto load it
       return
     } else {
-      const sharedFilter = state.config.dashboard.sharedFilters[sharedFilterIndex]
+      const sharedFilters = dashboardConfigOverride.sharedFilters
+      const sharedFilter = sharedFilters[sharedFilterIndex]
       if (sharedFilter.active) return // a value has already been selected.
-      const filterParents = state.config.dashboard.sharedFilters.filter(f => sharedFilter.parents?.includes(f.key))
-      const notAllParentFiltersSelected = filterParents.some(p => !p.active)
+      const filterParents = sharedFilters.filter(f => sharedFilter.parents?.includes(f.key))
+      const notAllParentFiltersSelected = filterParents.some(p => !p.active && !p.queuedActive)
       if (filterParents && notAllParentFiltersSelected) return
       const defaultFilterDropdown = filterDropdowns.find(({ value }) => value === sharedFilter.apiFilter!.defaultValue)
-      let defaultValue = defaultFilterDropdown?.value || filterDropdowns[0].value
-      changeFilterActive(sharedFilterIndex, defaultValue)
+      const defaultValue = defaultFilterDropdown?.value || filterDropdowns[0].value
+      sharedFilter.active = defaultValue
     }
   }
 
-  const loadAPIFilters = async () => {
-    if (state.config.dashboard.sharedFilters) {
-      const sharedAPIFilters = state.config.dashboard.sharedFilters.filter(f => f.apiFilter)
+  const loadAPIFilters = (dashboardConfigOverride = undefined) => {
+    const sharedFilters = (dashboardConfigOverride || state.config.dashboard).sharedFilters
+    if (sharedFilters) {
+      const sharedAPIFilters = sharedFilters.filter(f => f.apiFilter)
       const loadingFilterMemo: APIFilterDropdowns = sharedAPIFilters.reduce((acc, curr) => {
         const _key = getApiFilterKey(curr.apiFilter!)
         if (apiFilterDropdowns[_key] != null) return acc // don't overwrite fetched data.
@@ -136,58 +138,69 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       const getParentParams = (childFilter: SharedFilter): Record<'key' | 'value', string>[] | null => {
         const _parents = sharedAPIFilters.filter(parentFilter => childFilter.parents?.includes(parentFilter.key))
         if (!_parents.length) return null
-        return _parents.map(({ queryParameter, queuedActive }) => ({ key: queryParameter || '', value: queuedActive || '' }))
+        return _parents.map(({ queryParameter, active, queuedActive }) => ({ key: queryParameter || '', value: active || queuedActive || '' }))
       }
-      const getFilterValues = (data: Object | Array<Object>, apiFilter: APIFilter): DropdownOptions => {
-        const { textSelector, valueSelector, heirarchyLookup } = apiFilter
-        if (heirarchyLookup) {
-          const heirarchy = heirarchyLookup!.split('.')
-          const selector = heirarchy.shift() // pop first element
-          return getFilterValues(selector ? data[selector] : data, { ...apiFilter, heirarchyLookup: heirarchy.join('.') })
-        }
-        if (!Array.isArray(data)) throw new Error('the filter data has requires a heirarchy path to access the filter values, This should be in the format key.subkey.subsubkey')
+      const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): DropdownOptions => {
+        const { textSelector, valueSelector } = apiFilter
         return data.map(v => ({ text: v[textSelector], value: v[valueSelector] }))
       }
-      state.config.dashboard.sharedFilters.forEach(async (filter, index) => {
-        if (!filter.apiFilter) return
+      const toFetch = {}
+      sharedAPIFilters.forEach((filter, index) => {
         const baseEndpoint = filter.apiFilter.apiEndpoint
         const _key = getApiFilterKey(filter.apiFilter)
         const params = getParentParams(filter)
         const notAllParentsSelected = params?.some(({ value }) => value === '')
-        if (notAllParentsSelected) return // don't send request for dependent children filter options
-        if (apiFilterDropdowns[_key] && !params && filter.filterBy === 'Query String') return // don't reload filter unless it's a child
-        const endpoint = baseEndpoint + (params ? gatherQueryParams(params) : '')
 
-        fetch(endpoint)
-          .then(resp => resp.json())
-          .then(data => {
-            const apiFilter = filterLookup.get(_key) as APIFilter
-            const _filterValues = getFilterValues(data, apiFilter)
-            setAPIFilterDropdowns(dropdowns => ({ ...dropdowns, [_key]: _filterValues }))
-            setAutoLoadDefaultValue(index, _filterValues)
-          })
+        if (notAllParentsSelected) return // don't send request for dependent children filter options
+        if (apiFilterDropdowns[_key] && !params) return // don't reload filter unless it's a child
+        const topLevelDataAlreadyLoaded = apiFilterDropdowns[_key] && !filter.parents
+        if (topLevelDataAlreadyLoaded) return // don't reload top level filters
+
+        const endpoint = baseEndpoint + (params ? gatherQueryParams(params) : '')
+        toFetch[endpoint] = [_key, index]
       })
+      return Promise.all(
+        Object.keys(toFetch).map(
+          endpoint =>
+            new Promise<void>(resolve => {
+              fetch(endpoint)
+                .then(resp => resp.json())
+                .then(data => {
+                  const [_key, index] = toFetch[endpoint]
+                  if (!Array.isArray(data)) throw new Error('COVE only supports response data in the shape Array<Object>')
+                  const apiFilter = filterLookup.get(_key) as APIFilter
+                  const _filterValues = getFilterValues(data, apiFilter)
+                  setAPIFilterDropdowns(dropdowns => ({ ...dropdowns, [_key]: _filterValues }))
+                  setAutoLoadDefaultValue(index, _filterValues, dashboardConfigOverride)
+                })
+                .catch(console.error)
+                .finally(() => {
+                  resolve()
+                })
+            })
+        )
+      )
     }
   }
 
-  const reloadURLData = async () => {
-    const { config } = state
+  const reloadURLData = async (dashboardConfigOverride = undefined) => {
+    const config = _.cloneDeep(state.config)
     if (!config.datasets) return
     let newData = { ...state.data }
     let newDatasets = { ...config.datasets }
     let datasetsNeedsUpdate = false
     let datasetKeys = Object.keys(config.datasets)
     let newFileName = ''
-
+    const filters = (dashboardConfigOverride || config.dashboard)?.sharedFilters
     for (let i = 0; i < datasetKeys.length; i++) {
       const datasetKey = datasetKeys[i]
       const dataset = config.datasets[datasetKey]
-      const filters = config.dashboard?.sharedFilters
+
       if (dataset.dataUrl && filters) {
         const dataUrl = new URL(dataset.runtimeDataUrl || dataset.dataUrl, window.location.origin)
         let currentQSParams = Object.fromEntries(new URLSearchParams(dataUrl.search))
         let updatedQSParams = {}
-        let isUpdateNeeded = false
+        let isUpdateNeeded = !!dashboardConfigOverride
 
         filters.forEach(filter => {
           // filter.active is always a string when filter.type is 'urlfilter'
@@ -259,10 +272,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     }
 
     if (datasetsNeedsUpdate) {
+      const dashboardConfig = dashboardConfigOverride || config.dashboard
       dispatch({ type: 'SET_DATA', payload: newData })
 
       const newFilteredData = getFilteredData(state, {}, newData)
-
       const visualizations = Object.keys(config.visualizations).reduce((acc, vizKey) => {
         const dataKey = config.visualizations[vizKey].dataKey
         if (newData[dataKey]) {
@@ -272,7 +285,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       }, _.cloneDeep(config.visualizations))
 
       dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-      dispatch({ type: 'SET_CONFIG', payload: { ...config, datasets: newDatasets, visualizations } })
+      dispatch({ type: 'SET_CONFIG', payload: { dashboard: dashboardConfig, datasets: newDatasets, visualizations } })
     }
   }
 
@@ -287,8 +300,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   const setSharedFilter = (key, datum) => {
-    const { config } = state
-    let newConfig = { ...config }
+    const { config: newConfig, filteredData } = _.cloneDeep(state)
 
     for (let i = 0; i < newConfig.dashboard.sharedFilters.length; i++) {
       const filter = newConfig.dashboard.sharedFilters[i]
@@ -300,10 +312,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       }
     }
 
-    const newFilteredData = getFilteredData(state, _.cloneDeep(state.filteredData))
+    const newFilteredData = getFilteredData({ ...state, config: newConfig }, filteredData)
 
     dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-    dispatch({ type: 'SET_CONFIG', payload: newConfig })
+    dispatch({ type: 'SET_SHARED_FILTERS', payload: newConfig.dashboard.sharedFilters })
   }
 
   useEffect(() => {
@@ -312,19 +324,19 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       reloadURLData()
     }
     loadAPIFilters()
-  }, [JSON.stringify(state.config.dashboard ? state.config.dashboard.sharedFilters : undefined)])
+  }, [])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
-    const { config } = state
-    let updatedConfig = { ...config }
+    const config = _.cloneDeep(state.config)
+    const updatedConfig = _.pick(config, ['visualizations', 'multiDashboards'])
     updatedConfig.visualizations[visualizationKey] = newConfig
     updatedConfig.visualizations[visualizationKey].formattedData = config.visualizations[visualizationKey].formattedData
     if (config.multiDashboards) {
       const activeDashboard = config.activeDashboard
       const multiDashboards = [...config.multiDashboards]
       const label = multiDashboards[activeDashboard].label
-      const toSave = _.pick(updatedConfig, ['dashboard', 'visualizations', 'rows'])
-      multiDashboards[activeDashboard] = { ...toSave, label }
+      const toSave = { label, visualizations: updatedConfig.visualizations, ..._.pick(config, ['dashboard', 'rows']) }
+      multiDashboards[activeDashboard] = toSave
       updatedConfig.multiDashboards = multiDashboards
     }
 
@@ -336,13 +348,22 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   const applyFilters = () => {
-    let dashboardConfig = state.config.dashboard
-    const allFiltersSelected = !state.config.dashboard.sharedFilters.some(filter => !filter.active && !filter.queuedActive)
-    if (allFiltersSelected) {
+    const dashboardConfig = _.cloneDeep(state.config.dashboard)
+    const autoLoadViz = getAutoLoadVisualization()
+    const nonAutoLoadFilterIndexes = autoLoadViz?.hide || []
+    const allRequiredFiltersSelected = !dashboardConfig.sharedFilters.some((filter, filterIndex) => {
+      if (nonAutoLoadFilterIndexes.includes(filterIndex)) {
+        !filter.active && !filter.queuedActive
+      } else {
+        // autoload filters don't need to be selected to apply filters
+        return false
+      }
+    })
+    if (allRequiredFiltersSelected) {
       if (state.config.filterBehavior === FilterBehavior.Apply) {
         const queryParams = getQueryParams()
         let needsQueryUpdate = false
-        state.config.dashboard.sharedFilters.forEach((sharedFilter, index) => {
+        dashboardConfig.sharedFilters.forEach((sharedFilter, index) => {
           if (sharedFilter.queuedActive) {
             dashboardConfig.sharedFilters[index].active = sharedFilter.queuedActive
             delete dashboardConfig.sharedFilters[index].queuedActive
@@ -359,21 +380,28 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         }
       }
 
-      dispatch({ type: 'SET_CONFIG', payload: { ...state.config, dashboard: dashboardConfig } })
-      dispatch({ type: 'SET_FILTERED_DATA', payload: getFilteredData(state) })
-      reloadURLData()
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
+      updateDataFilters()
+      loadAPIFilters(dashboardConfig)
+        .then(() => {
+          reloadURLData(dashboardConfig)
+        })
+        .catch(e => {
+          console.error(e)
+        })
     } else {
       // TODO noftify of required fields
     }
   }
 
   const changeFilterActive = (index: number, value: string | string[]) => {
-    const { config } = state
-    let dashboardConfig = { ...config.dashboard }
-    let filterActive = dashboardConfig.sharedFilters[index]
+    const sharedFilters = _.cloneDeep(state.config.dashboard.sharedFilters)
+    const filterActive = sharedFilters[index]
+    const nonAutoLoadFilterIndexes = getAutoLoadVisualization()?.hide
+    const isAutoLoad = nonAutoLoadFilterIndexes && !nonAutoLoadFilterIndexes.includes(index)
 
-    if (config.filterBehavior !== FilterBehavior.Apply) {
-      dashboardConfig.sharedFilters[index].active = value
+    if (state.config.filterBehavior !== FilterBehavior.Apply || isAutoLoad) {
+      sharedFilters[index].active = value
 
       const queryParams = getQueryParams()
       if (filterActive.setByQueryParameter && queryParams[filterActive.setByQueryParameter] !== filterActive.active) {
@@ -382,28 +410,35 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       }
     } else {
       if (Array.isArray(value)) throw Error(`Cannot set active values on urlfilters. expected: ${JSON.stringify(value)} to be a single value.`)
-      dashboardConfig.sharedFilters[index].queuedActive = value
+      sharedFilters[index].queuedActive = value
     }
 
-    dispatch({ type: 'SET_CONFIG', payload: { ...config, dashboard: dashboardConfig } })
-    if (config.filterBehavior !== FilterBehavior.Apply) {
-      dispatch({ type: 'SET_FILTERED_DATA', payload: getFilteredData(state) })
+    dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFilters })
+    if (state.config.filterBehavior !== FilterBehavior.Apply) {
+      updateDataFilters(sharedFilters)
       reloadURLData()
     }
+    return sharedFilters
+  }
+
+  const updateDataFilters = (sharedFilters = undefined) => {
+    const clonedState = _.cloneDeep(state)
+    if (sharedFilters) clonedState.config.dashboard.sharedFilters = sharedFilters
+    const newFilteredData = getFilteredData(clonedState)
+    dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
   }
 
   const handleOnChange = (index: number, value: string | string[]) => {
-    const { config } = state
-    changeFilterActive(index, value)
+    const config = _.cloneDeep(state.config)
+    const newSharedFilters = changeFilterActive(index, value)
     if (config.filterBehavior === FilterBehavior.Apply) {
       const autoLoadViz = getAutoLoadVisualization()
-      if (!autoLoadViz) return // nothing left to do for regular filter behavior.
-      const isAutoSelectFilter = !autoLoadViz.hide.includes(index)
+      const isAutoSelectFilter = !autoLoadViz?.hide.includes(index)
       const missingFilterSelections = config.dashboard.sharedFilters.some(f => !f.active)
       if (isAutoSelectFilter && !missingFilterSelections) {
         // a dropdown has been selected that doesn't
         // require the Go Button
-        reloadURLData()
+        reloadURLData({ sharedFilters: newSharedFilters })
       } else {
         // A parent filter was selected, reset filters by:
         // set auto select filter dropdowns to null
@@ -425,11 +460,12 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
           if (_isAutoSelectFilter) filter.active = ''
           return filter
         })
-        const _newConfig = { ...config, dashboard: { ...config.dashboard, sharedFilters: newSharedFilters } }
+        const _newConfig = { dashboard: { ...config.dashboard, sharedFilters: newSharedFilters } }
         dispatch({ type: 'SET_CONFIG', payload: _newConfig })
         // setData to empty object because we no longer have a data state.
         dispatch({ type: 'SET_DATA', payload: {} })
         dispatch({ type: 'SET_FILTERED_DATA', payload: {} })
+        loadAPIFilters(_newConfig.dashboard)
       }
     }
   }

@@ -42,14 +42,21 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   const setRowLayout = (layout: number[], toggle = undefined) => {
     const newRows = _.cloneDeep(rows)
     newRows[rowIdx].toggle = toggle
-    const r = newRows[rowIdx].columns
+    const rowColumns = newRows[rowIdx].columns
+    const columnsWithWidgets = rowColumns.filter(c => c.widget)
 
-    const totalWidgets = r.filter(c => c.widget).length
+    const totalWidgets = columnsWithWidgets.length
     if (totalWidgets > layout.length) {
       // don't let them change to a smaller layout and lose viz config work
       return
     } else {
-      newRows[rowIdx].columns = layout.map((width, i) => (r[i] ? { ...r[i], width } : { width }))
+      // a 3 column becoming a 2 column with only a VizConfig in the second column will maintain order
+      // a 2 column becoming a 1 column with only a VizConfig in the second column will move the VizConfig to the first column
+      const mapRow = rowColumns.length > layout.length ? columnsWithWidgets : rowColumns
+      newRows[rowIdx].columns = layout.map((width, colIndex) => {
+        const col = mapRow[colIndex]
+        return col ? { ...col, width } : { width }
+      })
     }
 
     updateConfig({ ...config, rows: newRows })
