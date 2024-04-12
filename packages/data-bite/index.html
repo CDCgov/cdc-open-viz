@@ -6,15 +6,22 @@
     <style>
       body {
         margin: 0;
+        border-top: none !important;
+      }
+
+      .cdc-open-viz-module {
+        min-height: 100vh;
       }
     </style>
+    <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/contrib/libs/bootstrap/latest/css/bootstrap.min.css?_=39423" />
+    <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/4.0/assets/css/app.min.css?_=39423" />
   </head>
   <body>
     <!-- Original -->
-    <div class="react-container" data-config="/examples/sankey-example-data.json"></div>
+    <!-- <div class="react-container" data-config="/examples/sankey-example-data.json"></div> -->
 
     <!-- DATA PRESENTATION GALLERY: https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data_bites.html#examples -->
-    <!-- <div class="react-container" data-config="/examples/gallery/calculated-average.json"></div> -->
+    <div class="react-container" data-config="/examples/gallery/calculated-average.json"></div>
     <!-- <div class="react-container" data-config="/examples/gallery/calculated-with-pic.json"></div> -->
     <div class="react-container" data-config="/examples/gallery/max-value.json"></div>
     <!-- <div class="react-container" data-config="/examples/gallery/sum-of-data.json"></div> -->

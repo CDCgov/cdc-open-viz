@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback, useRef, useId } from 'react'
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 import * as d3 from 'd3-array'
+import Layout from '@cdc/core/components/Layout'
+import Button from '@cdc/core/components/elements/Button'
 
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
@@ -1008,6 +1010,63 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return formattedValue
   }
 
+  const Confirm = () => {
+    const confirmDone = e => {
+      if (e) {
+        e.preventDefault()
+      }
+
+      let newConfig = { ...config }
+      delete newConfig.newViz
+
+      updateConfig(newConfig)
+    }
+
+    const styles = {
+      position: 'relative',
+      height: '100vh',
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gridArea: 'content'
+    }
+
+    return (
+      <section className='waiting' style={styles}>
+        <section className='waiting-container'>
+          <h3>Finish Configuring</h3>
+          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
+          <Button className='btn' style={{ margin: '1em auto' }} disabled={missingRequiredSections()} onClick={e => confirmDone(e)}>
+            I'm Done
+          </Button>
+        </section>
+      </section>
+    )
+  }
+
+  const Error = () => {
+    const styles = {
+      position: 'absolute',
+      background: 'white',
+      zIndex: '999',
+      height: '100vh',
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gridArea: 'content'
+    }
+    return (
+      <section className='waiting' style={styles}>
+        <section className='waiting-container'>
+          <h3>Error With Configuration</h3>
+          <p>{config.runtime.editorErrorMessage}</p>
+        </section>
+      </section>
+    )
+  }
+
   // this is passed DOWN into the various components
   // then they do a lookup based on the bin number as index into here (TT)
   const applyLegendToRow = rowObj => {
@@ -1042,6 +1101,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Prevent render if loading
   let body = <Loading />
 
+  const getChartWrapperClasses = () => {
+    const classes = ['chart-container', 'p-relative']
+    if (config.legend.position === 'bottom') classes.push('bottom')
+    if (config.legend.hide) classes.push('legend-hidden')
+    if (lineDatapointClass) classes.push(lineDatapointClass)
+    if (!config.barHasBorder) classes.push('chart-bar--no-border')
+    if (isDebug) classes.push('debug')
+    classes.push(...contentClasses)
+    return classes
+  }
+
   if (!loading) {
     const tableLink = (
       <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
@@ -1051,79 +1121,85 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     body = (
       <>
         {isEditor && <EditorPanel />}
-        {!missingRequiredSections() && !config.newViz && (
-          <div className='cdc-chart-inner-container' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
-            <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
-            {/* Filters */}
-            {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
-            <SkipTo skipId={handleChartTabbing} skipMessage='Skip Over Chart Container' />
-            {/* Visualization */}
-            {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
-            <div
-              style={{ marginBottom: computeMarginBottom(config, legend, currentViewport) }}
-              className={`chart-container  p-relative ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')} ${isDebug ? 'debug' : ''}`}
-            >
-              {/* All charts except sparkline */}
-              {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
+        <Layout.Responsive isEditor={isEditor}>
+          {config.newViz && <Confirm />}
+          {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && <Error />}
+          {!missingRequiredSections() && !config.newViz && (
+            <div className='cdc-chart-inner-container cove-component__content' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
+              <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
 
-              {/* Sparkline */}
-              {config.visualizationType === 'Spark Line' && (
-                <>
-                  <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />
-                  {config?.introText && (
-                    <section className='introText' style={{ padding: '0px 0 35px' }}>
-                      {parse(config.introText)}
-                    </section>
-                  )}
-                  <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
-                    <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
-                  </div>
-                  {description && (
-                    <div className='subtext' style={{ padding: '35px 0 15px' }}>
-                      {parse(description)}
+              {/* Filters */}
+              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
+              <SkipTo skipId={handleChartTabbing} skipMessage='Skip Over Chart Container' />
+              {/* Visualization */}
+              {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
+
+              <div style={{ marginBottom: computeMarginBottom(config, legend, currentViewport) }} className={getChartWrapperClasses().join(' ')}>
+                {/* All charts except sparkline */}
+                {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
+
+                {/* Sparkline */}
+                {config.visualizationType === 'Spark Line' && (
+                  <>
+                    <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />
+                    {config?.introText && (
+                      <section className='introText' style={{ padding: '0px 0 35px' }}>
+                        {parse(config.introText)}
+                      </section>
+                    )}
+                    <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
+                      <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                     </div>
-                  )}
-                </>
+                    {description && (
+                      <div className='subtext' style={{ padding: '35px 0 15px' }}>
+                        {parse(description)}
+                      </div>
+                    )}
+                  </>
+                )}
+                {/* Sankey */}
+                {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}</ParentSize>}
+                {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} />}
+              </div>
+              {/* Link */}
+              {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
+
+              {/* Description */}
+              {description && config.visualizationType !== 'Spark Line' && <div className={'column ' + config.isResponsiveTicks ? 'subtext--responsive-ticks' : 'subtext'}>{parse(description)}</div>}
+
+              {/* buttons */}
+              <MediaControls.Section classes={['download-buttons']}>
+                {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+                {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+              </MediaControls.Section>
+
+              {/* Data Table */}
+              {((config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey') || (config.visualizationType === 'Sankey' && config.table.show)) && (
+                <DataTable
+                  config={config}
+                  rawData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
+                  runtimeData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : transform.applySuppression(filteredData || excludedData, config.suppressedData)}
+                  expandDataTable={config.table.expanded}
+                  columns={config.columns}
+                  displayDataAsText={displayDataAsText}
+                  displayGeoName={displayGeoName}
+                  applyLegendToRow={applyLegendToRow}
+                  tableTitle={config.table.label}
+                  indexTitle={config.table.indexLabel}
+                  vizTitle={title}
+                  viewport={currentViewport}
+                  tabbingId={handleChartTabbing}
+                  colorScale={colorScale}
+                />
               )}
+              {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
+              {/* show pdf or image button */}
               {/* Sankey */}
               {config.visualizationType === 'Sankey' && <ParentSize aria-hidden='true'>{parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}</ParentSize>}
-              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} skipId={handleChartTabbing} />}
+              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey' && <Legend ref={legendRef} />}
             </div>
-            {/* Link */}
-            {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
-
-            {/* Description */}
-            {description && config.visualizationType !== 'Spark Line' && <div className={'column ' + config.isResponsiveTicks ? 'subtext--responsive-ticks' : 'subtext'}>{parse(description)}</div>}
-
-            {/* buttons */}
-            <MediaControls.Section classes={['download-buttons']}>
-              {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
-              {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
-            </MediaControls.Section>
-
-            {/* Data Table */}
-            {((config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey') || (config.visualizationType === 'Sankey' && config.table.show)) && (
-              <DataTable
-                config={config}
-                rawData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
-                runtimeData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : transform.applySuppression(filteredData || excludedData, config.suppressedData)}
-                expandDataTable={config.table.expanded}
-                columns={config.columns}
-                displayDataAsText={displayDataAsText}
-                displayGeoName={displayGeoName}
-                applyLegendToRow={applyLegendToRow}
-                tableTitle={config.table.label}
-                indexTitle={config.table.indexLabel}
-                vizTitle={title}
-                viewport={currentViewport}
-                tabbingId={handleChartTabbing}
-                colorScale={colorScale}
-              />
-            )}
-            {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
-            {/* show pdf or image button */}
-          </div>
-        )}
+          )}
+        </Layout.Responsive>
       </>
     )
   }
@@ -1184,17 +1260,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     debugSvg: isDebug
   }
 
-  const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
-
-  config.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)
-  isEditor && classes.push('spacing-wrapper')
-  isEditor && classes.push('isEditor')
-
   return (
     <ConfigContext.Provider value={contextValues}>
-      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart} data-download-id={imageId}>
+      <Layout.VisualizationWrapper config={config} isEditor={isEditor} currentViewport={currentViewport} ref={outerContainerRef} imageId={imageId} showEditorPanel={config?.showEditorPanel}>
         {body}
-      </div>
+      </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
   )
 }

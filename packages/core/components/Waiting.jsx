@@ -1,8 +1,18 @@
 import React from 'react'
 import '../styles/waiting.scss'
 
+const styles = {
+  position: 'relative',
+  height: '100vh',
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gridArea: 'content'
+}
+
 export default ({ requiredColumns, className }) => (
-  <section className={className}>
+  <section className={className} style={styles}>
     <section className='waiting-container'>
       <h3>Configuration Required</h3>
       <p>

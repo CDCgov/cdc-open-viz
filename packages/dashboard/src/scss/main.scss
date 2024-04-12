@@ -10,6 +10,11 @@
     margin-top: 20%;
   }
 
+  > .cove-editor__content {
+    width: 100% !important;
+    left: 0px;
+  }
+
   .editor-heading {
     background-color: #ddd;
     border-bottom: #c7c7c7 1px solid;

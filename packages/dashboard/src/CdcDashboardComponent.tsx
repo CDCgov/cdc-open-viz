@@ -64,6 +64,7 @@ import VisualizationRow from './components/VisualizationRow'
 import { getVizConfig } from './helpers/getVizConfig'
 import { getApplicableFilters, getFilteredData } from './helpers/getFilteredData'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
+import Layout from '@cdc/core/components/Layout'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -636,122 +637,126 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       <>
         {isEditor && <Header />}
         <MultiTabs isEditor={isEditor && !isPreview} />
-        <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
-          <Title title={title} isDashboard={true} classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]} />
-          {/* Description */}
-          {description && <div className='subtext'>{parse(description)}</div>}
+        <Layout.Responsive isEditor={isEditor}>
+          <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
+            <Title title={title} isDashboard={true} classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]} />
+            {/* Description */}
+            {description && <div className='subtext'>{parse(description)}</div>}
 
-          {/* Filters */}
-          {config.dashboard.sharedFilters && Object.values(config.visualizations || {}).filter(viz => viz.visualizationType === 'filter-dropdowns').length === 0 && (
-            <>
-              <Filters filters={state.config.dashboard.sharedFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
-              <GoButton />
-            </>
-          )}
+            {/* Filters */}
+            {config.dashboard.sharedFilters && Object.values(config.visualizations || {}).filter(viz => viz.visualizationType === 'filter-dropdowns').length === 0 && (
+              <>
+                <Filters filters={state.config.dashboard.sharedFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} />
+                <GoButton />
+              </>
+            )}
 
-          {/* Visualizations */}
-          {config.rows &&
-            config.rows
-              .filter(row => row.columns.filter(col => col.widget).length !== 0)
-              .map((row, index) => {
-                if (row.multiVizColumn && (isPreview || !isEditor)) {
-                  const filteredData = getFilteredData(state)
-                  const data = filteredData[index] ?? row.formattedData
-                  const dataGroups = {}
-                  data.forEach(d => {
-                    const groupKey = d[row.multiVizColumn]
-                    if (!dataGroups[groupKey]) dataGroups[groupKey] = []
-                    dataGroups[groupKey].push(d)
-                  })
-                  return Object.keys(dataGroups).map(groupName => {
-                    const dataValue = dataGroups[groupName]
+            {/* Visualizations */}
+            {config.rows &&
+              config.rows
+                .filter(row => row.columns.filter(col => col.widget).length !== 0)
+                .map((row, index) => {
+                  if (row.multiVizColumn && (isPreview || !isEditor)) {
+                    const filteredData = getFilteredData(state)
+                    const data = filteredData[index] ?? row.formattedData
+                    const dataGroups = {}
+                    data.forEach(d => {
+                      const groupKey = d[row.multiVizColumn]
+                      if (!dataGroups[groupKey]) dataGroups[groupKey] = []
+                      dataGroups[groupKey].push(d)
+                    })
+                    return Object.keys(dataGroups).map(groupName => {
+                      const dataValue = dataGroups[groupName]
+                      return (
+                        <React.Fragment key={`row__${index}__${groupName}`}>
+                          <h1 className='h4'>{groupName}</h1>
+                          <VisualizationRow
+                            filteredDataOverride={dataValue}
+                            row={row}
+                            rowIndex={index}
+                            setSharedFilter={setSharedFilter}
+                            updateChildConfig={updateChildConfig}
+                            applyFilters={applyFilters}
+                            apiFilterDropdowns={apiFilterDropdowns}
+                            handleOnChange={handleOnChange}
+                            currentViewport={currentViewport}
+                          />
+                        </React.Fragment>
+                      )
+                    })
+                  } else {
                     return (
-                      <React.Fragment key={`row__${index}__${groupName}`}>
-                        <h1 className='h4'>{groupName}</h1>
-                        <VisualizationRow
-                          filteredDataOverride={dataValue}
-                          row={row}
-                          rowIndex={index}
-                          setSharedFilter={setSharedFilter}
-                          updateChildConfig={updateChildConfig}
-                          applyFilters={applyFilters}
-                          apiFilterDropdowns={apiFilterDropdowns}
-                          handleOnChange={handleOnChange}
-                          currentViewport={currentViewport}
-                        />
-                      </React.Fragment>
+                      <VisualizationRow key={`row__${index}`} row={row} rowIndex={index} setSharedFilter={setSharedFilter} updateChildConfig={updateChildConfig} applyFilters={applyFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} currentViewport={currentViewport} />
                     )
+                  }
+                })}
+
+            {/* Image or PDF Inserts */}
+            <section className='download-buttons'>
+              {config.table?.downloadImageButton && <MediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
+              {config.table?.downloadPdfButton && <MediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
+            </section>
+
+            {/* Data Table */}
+            {config.table?.show && config.data && (
+              <DataTable
+                config={config}
+                rawData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data}
+                runtimeData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data || []}
+                expandDataTable={config.table.expanded}
+                showDownloadButton={config.table.download}
+                tableTitle={config.dashboard.title || ''}
+                viewport={currentViewport}
+                tabbingId={config.dashboard.title || ''}
+                outerContainerRef={outerContainerRef}
+                imageRef={imageId}
+                isDebug={isDebug}
+                isEditor={isEditor}
+              />
+            )}
+            {config.table?.show &&
+              config.datasets &&
+              Object.keys(config.datasets).map(datasetKey => {
+                //For each dataset, find any shared filters that apply to all visualizations using the dataset
+
+                //Gets list of visuailzations using the dataset
+                const vizKeysUsingDataset: string[] = getVizKeys(config).filter(visualizationKey => {
+                  return config.visualizations[visualizationKey].dataKey === datasetKey
+                })
+
+                //Checks shared filters against list to see if all visualizations are represented
+                let applicableFilters: SharedFilter[] = []
+                config.dashboard.sharedFilters?.forEach(sharedFilter => {
+                  let allMatch = true
+                  vizKeysUsingDataset.forEach(visualizationKey => {
+                    if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
+                      allMatch = false
+                    }
                   })
-                } else {
-                  return <VisualizationRow key={`row__${index}`} row={row} rowIndex={index} setSharedFilter={setSharedFilter} updateChildConfig={updateChildConfig} applyFilters={applyFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} currentViewport={currentViewport} />
-                }
-              })}
-
-          {/* Image or PDF Inserts */}
-          <section className='download-buttons'>
-            {config.table?.downloadImageButton && <MediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
-            {config.table?.downloadPdfButton && <MediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
-          </section>
-
-          {/* Data Table */}
-          {config.table?.show && config.data && (
-            <DataTable
-              config={config}
-              rawData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data}
-              runtimeData={config.data?.[0]?.tableData ? config.data?.[0]?.tableData : config.data || []}
-              expandDataTable={config.table.expanded}
-              showDownloadButton={config.table.download}
-              tableTitle={config.dashboard.title || ''}
-              viewport={currentViewport}
-              tabbingId={config.dashboard.title || ''}
-              outerContainerRef={outerContainerRef}
-              imageRef={imageId}
-              isDebug={isDebug}
-              isEditor={isEditor}
-            />
-          )}
-          {config.table?.show &&
-            config.datasets &&
-            Object.keys(config.datasets).map(datasetKey => {
-              //For each dataset, find any shared filters that apply to all visualizations using the dataset
-
-              //Gets list of visuailzations using the dataset
-              const vizKeysUsingDataset: string[] = getVizKeys(config).filter(visualizationKey => {
-                return config.visualizations[visualizationKey].dataKey === datasetKey
-              })
-
-              //Checks shared filters against list to see if all visualizations are represented
-              let applicableFilters: SharedFilter[] = []
-              config.dashboard.sharedFilters?.forEach(sharedFilter => {
-                let allMatch = true
-                vizKeysUsingDataset.forEach(visualizationKey => {
-                  if (sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) === -1) {
-                    allMatch = false
+                  if (allMatch) {
+                    applicableFilters.push(sharedFilter)
                   }
                 })
-                if (allMatch) {
-                  applicableFilters.push(sharedFilter)
-                }
-              })
 
-              //Applys any applicable filters to the Table
-              const filteredTableData = applicableFilters.length > 0 ? filterData(applicableFilters, config.datasets[datasetKey].data) : undefined
-              return (
-                <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-                  <DataTable
-                    config={config as TableConfig}
-                    dataConfig={config.datasets[datasetKey]}
-                    rawData={config.datasets[datasetKey].data?.[0]?.tableData || config.datasets[datasetKey].data}
-                    runtimeData={config.datasets[datasetKey].data?.[0]?.tableData || filteredTableData || config.datasets[datasetKey].data || []}
-                    expandDataTable={config.table.expanded}
-                    tableTitle={datasetKey}
-                    viewport={currentViewport}
-                    tabbingId={datasetKey}
-                  />
-                </div>
-              )
-            })}
-        </div>
+                //Applys any applicable filters to the Table
+                const filteredTableData = applicableFilters.length > 0 ? filterData(applicableFilters, config.datasets[datasetKey].data) : undefined
+                return (
+                  <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
+                    <DataTable
+                      config={config as TableConfig}
+                      dataConfig={config.datasets[datasetKey]}
+                      rawData={config.datasets[datasetKey].data?.[0]?.tableData || config.datasets[datasetKey].data}
+                      runtimeData={config.datasets[datasetKey].data?.[0]?.tableData || filteredTableData || config.datasets[datasetKey].data || []}
+                      expandDataTable={config.table.expanded}
+                      tableTitle={datasetKey}
+                      viewport={currentViewport}
+                      tabbingId={datasetKey}
+                    />
+                  </div>
+                )
+              })}
+          </div>
+        </Layout.Responsive>
       </>
     )
   }
