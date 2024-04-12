@@ -27,27 +27,6 @@
     }
   }
 
-  // editor-panel
-  .editor-panel {
-    .cove-label + .cove-tooltip {
-      top: 1px;
-      margin-left: 0.5rem;
-      font-size: 0.75rem;
-    }
-
-    .cove-accordion__button .cove-tooltip {
-      display: inline-flex;
-      right: 1.5rem;
-      line-height: inherit;
-    }
-
-    .cove-list-group__item .cove-tooltip {
-      width: 100%;
-      display: block;
-      line-height: inherit;
-    }
-  }
-
   // begin actual tooltip styles
   .react-tooltip,
   .tooltip {
