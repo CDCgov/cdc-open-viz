@@ -39,7 +39,7 @@ const BarChartStackedHorizontal = () => {
       <>
         <BarStackHorizontal data={data} keys={barStackedSeriesKeys} height={yMax} y={d => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
           {barStacks =>
-            barStacks.map(barStack =>
+            barStacks.reverse().map(barStack =>
               updateBars(barStack.bars).map((bar, index) => {
                 const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                 const displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
