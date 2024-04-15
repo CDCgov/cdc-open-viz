@@ -64,6 +64,7 @@ const UsaMap = () => {
       state,
       supportedTerritories,
       titleCase,
+      tooltipId
     } = useContext<MapContext>(ConfigContext)
 
   let isFilterValueSupported = false
@@ -163,7 +164,20 @@ const UsaMap = () => {
 
       return (
         <>
-          <Shape key={label} label={label} style={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} territory={territory} territoryData={territoryData} tabIndex={-1} />
+          <Shape
+            key={label}
+            label={label}
+            style={styles}
+            text={styles.color}
+            strokeWidth={1.5}
+            textColor={textColor}
+            onClick={() => geoClickHandler(territory, territoryData)}
+            data-tooltip-id={`tooltip__${tooltipId}`}
+            data-tooltip-html={toolTip}
+            territory={territory}
+            territoryData={territoryData}
+            tabIndex={-1}
+          />
         </>
       )
     }
@@ -172,7 +186,7 @@ const UsaMap = () => {
   let pathGenerator = geoPath().projection(geoAlbersUsa().translate(translate))
 
   // Note: Layers are different than patterns
-  const { pathArray } = useMapLayers(state, '', pathGenerator)
+  const { pathArray } = useMapLayers(state, '', pathGenerator, tooltipId)
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
@@ -302,7 +316,7 @@ const UsaMap = () => {
 
         return (
           <g data-name={geoName} key={key} tabIndex={-1}>
-            <g className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip} tabIndex={-1}>
+            <g className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id={`tooltip__${tooltipId}`} data-tooltip-html={tooltip} tabIndex={-1}>
               {/* state path */}
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
 
@@ -358,6 +372,7 @@ const UsaMap = () => {
         setSharedFilterValue={setSharedFilterValue}
         state={state}
         titleCase={titleCase}
+        tooltipId={tooltipId}
       />
     )
 

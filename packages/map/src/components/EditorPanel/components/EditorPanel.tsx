@@ -53,6 +53,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
     setRuntimeFilters,
     setState,
     state,
+    tooltipId
   } = useContext<MapContext>(ConfigContext)
 
   const { general, columns, legend, table, tooltips } = state
@@ -76,7 +77,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
       handleAddLayer,
       handleRemoveLayer
     }
-  } = useMapLayers(state, setState, false, true)
+  } = useMapLayers(state, setState, false, tooltipId)
 
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = [...state.legend.categoryValuesOrder]
