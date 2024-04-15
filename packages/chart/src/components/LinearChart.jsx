@@ -208,6 +208,7 @@ const LinearChart = props => {
   }
 
   const padding = orientation === 'horizontal' ? Number(config.xAxis.padding) : Number(config.yAxis.size)
+  const fontSize = { small: 16, medium: 18, large: 20 }
 
   const handleNumTicks = () => {
     // On forest plots we need to return every "study" or y axis value.
@@ -224,6 +225,90 @@ const LinearChart = props => {
       x,
       y
     })
+  }
+
+  const generatePairedBarAxis = () => {
+    let axisMaxHeight = 40;
+
+    return <>
+      <AxisBottom top={yMax} left={Number(runtime.yAxis.size)} label={runtime.xAxis.label} tickFormat={isDateScale(runtime.xAxis) ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={runtime.xAxis.numTicks || undefined}>
+        {props => {
+          return (
+            <Group className='bottom-axis'>
+              {props.ticks.map((tick, i) => {
+                const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
+                const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
+
+                const textWidth = getTextWidth(tick.value, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25;
+
+                if(axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
+                console.log(axisMaxHeight);
+
+                return (
+                  <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                    {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
+                    {!runtime.yAxis.hideLabel && (
+                      <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
+                        {formatNumber(tick.value, 'left')}
+                      </Text>
+                    )}
+                  </Group>
+                )
+              })}
+              {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
+            </Group>
+          )
+        }}
+      </AxisBottom>
+      <AxisBottom
+        top={yMax}
+        left={Number(runtime.yAxis.size)}
+        label={runtime.xAxis.label}
+        tickFormat={isDateScale(runtime.xAxis) ? formatDate : runtime.xAxis.dataKey !== 'Year' ? formatNumber : tick => tick}
+        scale={g2xScale}
+        stroke='#333'
+        tickStroke='#333'
+        numTicks={runtime.xAxis.numTicks || undefined}
+      >
+        {props => {
+          return (
+            <>
+              <Group className='bottom-axis'>
+                {props.ticks.map((tick, i) => {
+                  const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
+                  const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
+
+                  const textWidth = getTextWidth(tick.value, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25;
+
+                  if(axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
+                  console.log(axisMaxHeight);
+
+                  return (
+                    <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                      {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
+                      {!runtime.yAxis.hideLabel && (
+                        <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
+                          {formatNumber(tick.value, 'left')}
+                        </Text>
+                      )}
+                    </Group>
+                  )
+                })}
+                {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
+              </Group>
+              <Group>
+                <Text x={xMax / 2} y={axisMaxHeight + 20} stroke='#333' textAnchor={'middle'} verticalAnchor='start'>
+                  {runtime.xAxis.label}
+                </Text>
+              </Group>
+              {svgRef.current ? svgRef.current.setAttribute('height', (height + axisMaxHeight + (runtime.xAxis.label ? 50 : 0)) + 'px') : ''}
+            </>
+          )
+        }}
+      </AxisBottom>
+    </>
   }
 
   return isNaN(width) ? (
@@ -382,7 +467,6 @@ const LinearChart = props => {
                 const ismultiLabel = props.ticks.some(tick => containsMultipleWords(tick.value))
 
                 // Calculate sumOfTickWidth here, before map function
-                const fontSize = { small: 16, medium: 18, large: 20 }
                 const defaultTickLength = 8
                 const tickWidthMax = Math.max(...props.ticks.map(tick => getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)))
                 // const marginTop = 20 // moved to top bc need for yMax calcs
@@ -424,8 +508,8 @@ const LinearChart = props => {
                     const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                     const tickLength = showTick === 'block' ? 16 : defaultTickLength
                     const to = { x: tick.to.x, y: tickLength }
-                    let textWidth = getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                    let limitedWidth = 100 / propsTicks.length
+                    const textWidth = getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                    const limitedWidth = 100 / propsTicks.length
                     //reset rotations by updating config
                     config.yAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
                     config.xAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'vertical' ? 0 : config.xAxis.tickRotation
@@ -477,72 +561,7 @@ const LinearChart = props => {
               }}
             </AxisBottom>
           )}
-          {visualizationType === 'Paired Bar' && (
-            <>
-              <AxisBottom top={yMax} left={Number(runtime.yAxis.size)} label={runtime.xAxis.label} tickFormat={isDateScale(runtime.xAxis) ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={runtime.xAxis.numTicks || undefined}>
-                {props => {
-                  return (
-                    <Group className='bottom-axis'>
-                      {props.ticks.map((tick, i) => {
-                        const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
-                        const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
-                        return (
-                          <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                            {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
-                            {!runtime.yAxis.hideLabel && (
-                              <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
-                                {formatNumber(tick.value, 'left')}
-                              </Text>
-                            )}
-                          </Group>
-                        )
-                      })}
-                      {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                    </Group>
-                  )
-                }}
-              </AxisBottom>
-              <AxisBottom
-                top={yMax}
-                left={Number(runtime.yAxis.size)}
-                label={runtime.xAxis.label}
-                tickFormat={isDateScale(runtime.xAxis) ? formatDate : runtime.xAxis.dataKey !== 'Year' ? formatNumber : tick => tick}
-                scale={g2xScale}
-                stroke='#333'
-                tickStroke='#333'
-                numTicks={runtime.xAxis.numTicks || undefined}
-              >
-                {props => {
-                  return (
-                    <>
-                      <Group className='bottom-axis'>
-                        {props.ticks.map((tick, i) => {
-                          const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
-                          const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
-                          return (
-                            <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                              {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
-                              {!runtime.yAxis.hideLabel && (
-                                <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
-                                  {formatNumber(tick.value, 'left')}
-                                </Text>
-                              )}
-                            </Group>
-                          )
-                        })}
-                        {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                      </Group>
-                      <Group>
-                        <Text x={xMax / 2} y={config.xAxis.labelOffset} stroke='#333' textAnchor={'middle'} verticalAnchor='start'>
-                          {runtime.xAxis.label}
-                        </Text>
-                      </Group>
-                    </>
-                  )
-                }}
-              </AxisBottom>
-            </>
-          )}
+          {visualizationType === 'Paired Bar' && generatePairedBarAxis()}
           {visualizationType === 'Deviation Bar' && config.series?.length === 1 && <DeviationBar animatedChart={animatedChart} xScale={xScale} yScale={yScale} width={xMax} height={yMax} />}
           {visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
           {visualizationType === 'Scatter Plot' && (
