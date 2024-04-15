@@ -80,7 +80,7 @@ export const BarChartHorizontal = () => {
                   let barHeight = config.barHeight
                   let numbericBarHeight = parseInt(!config.isLollipopChart ? barHeight : lollipopBarWidth)
                   if(isNaN(numbericBarHeight)){
-                    numbericBarHeight = 15;
+                    numbericBarHeight = 25;
                   }
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
                   const barXBase = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
