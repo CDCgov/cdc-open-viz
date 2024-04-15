@@ -143,6 +143,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const legendRef = useRef(null)
   const legendId = useId()
+  const tooltipId = useId()
 
   const { changeFilterActive, handleSorting } = useFilters({ config: state, setConfig: setState })
   let legendMemo = useRef(new Map())
@@ -1640,7 +1641,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     supportedTerritories,
     titleCase,
     type: general.type,
-    viewport: currentViewport
+    viewport: currentViewport,
+    tooltipId
   }
 
   if (!mapProps.data || !state.data) return <></>
@@ -1688,7 +1690,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
             <section className={`cove-component__content cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
               {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
-                <ReactTooltip id='tooltip' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
+                <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
               )}
               {/* prettier-ignore */}
               <Title
