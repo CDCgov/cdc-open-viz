@@ -3,7 +3,7 @@ import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
 
-export const BubbleList = ({ data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, runtimeData, displayGeoName }) => {
+export const BubbleList = ({ data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, runtimeData, displayGeoName, tooltipId }) => {
   const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
   const hasBubblesWithZeroOnMap = state.visual.showBubbleZeros ? 0 : 1
   // sort runtime data. Smaller bubbles should appear on top.
@@ -62,7 +62,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
               }}
               transform={transform}
               style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-              data-tooltip-id='tooltip'
+              data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={toolTip}
             />
 
@@ -90,7 +90,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 }}
                 transform={transform}
                 style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-                data-tooltip-id='tooltip'
+                data-tooltip-id={`tooltip__${tooltipId}`}
                 data-tooltip-html={toolTip}
               />
             )}
@@ -161,7 +161,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
               }}
               transform={transform}
               style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-              data-tooltip-id='tooltip'
+              data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={toolTip}
             />
             {state.visual.extraBubbleBorder && (
@@ -189,7 +189,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 }}
                 transform={transform}
                 style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-                data-tooltip-id='tooltip'
+                data-tooltip-id={`tooltip__${tooltipId}`}
                 data-tooltip-html={toolTip}
               />
             )}

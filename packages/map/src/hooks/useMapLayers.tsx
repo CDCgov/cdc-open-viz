@@ -16,7 +16,7 @@ import { MapConfig } from '../types/MapConfig'
  * 3) Clean (ie. mapshaper -clean) and edit the shape as needed and export the new layer as geoJSON
  * 4) Save the geoJSON somewhere external.
  */
-export default function useMapLayers(config: MapConfig, setConfig, pathGenerator) {
+export default function useMapLayers(config: MapConfig, setConfig, pathGenerator, tooltipId) {
   const [fetchedTopoJSON, setFetchedTopoJSON] = useState([])
   const geoId = useId()
 
@@ -158,7 +158,7 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
               key={geoId} data-id={geoId}
               stroke={config.map.layers[index].stroke ? config.map.layers[index].stroke : item.properties.stroke ? item.properties.stroke : 'transparent'}
               strokeWidth={config.map.layers[index].strokeWidth ? config.map.layers[index].strokeWidth : item.properties['stroke-width']}
-              data-tooltip-id='tooltip'
+              data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={config.map.layers[index].tooltip ? config.map.layers[index].tooltip : ''}
             />
           </Group>
