@@ -243,7 +243,6 @@ const LinearChart = props => {
                 const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25;
 
                 if(axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
-                console.log(axisMaxHeight);
 
                 return (
                   <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -283,7 +282,6 @@ const LinearChart = props => {
                   const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25;
 
                   if(axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
-                  console.log(axisMaxHeight);
 
                   return (
                     <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
