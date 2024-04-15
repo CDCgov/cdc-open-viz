@@ -126,6 +126,7 @@ const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard,
         <span className='edit-label column-heading'>Table Cell Min Width</span>
         <input type='number' value={config.table.cellMinWidth ? config.table.cellMinWidth : 0} onChange={e => updateField('table', null, 'cellMinWidth', e.target.value)} />
       </label>
+      <CheckBox section='table' fieldName='freezeDataTableHeader' value={config.table.freezeDataTableHeader} label='Freeze Data Table Header' updateField={updateField} />
     </>
   )
 }

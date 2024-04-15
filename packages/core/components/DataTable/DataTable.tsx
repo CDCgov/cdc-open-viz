@@ -186,7 +186,7 @@ const DataTable = (props: DataTableProps) => {
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <SkipNav skipId={skipId} />
           <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
-          <div className={`${config.table.freezeDataTableHeader && config.table.limitHeight === false? "freeze-header": ""}`} style={limitHeight}>
+          <div className={`${config.table.freezeDataTableHeader ?'freeze-header':''}`} style={limitHeight}>
             <Table
               wrapColumns={wrapColumns}
               childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData: _runtimeData }) : chartCellMatrix({ rows, ...props, runtimeData: _runtimeData, isVertical, sortBy, hasRowType })}
