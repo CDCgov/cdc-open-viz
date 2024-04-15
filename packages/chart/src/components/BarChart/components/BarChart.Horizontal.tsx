@@ -78,6 +78,10 @@ export const BarChartHorizontal = () => {
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   let barHeight = config.barHeight
+                  let numbericBarHeight = parseInt(!config.isLollipopChart ? barHeight : lollipopBarWidth)
+                  if(isNaN(numbericBarHeight)){
+                    numbericBarHeight = 15;
+                  }
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
                   const barXBase = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
@@ -172,7 +176,7 @@ export const BarChartHorizontal = () => {
                           borderStyle: 'solid',
                           borderWidth: `${borderWidth}px`,
                           width: barWidth,
-                          height: !config.isLollipopChart ? barHeight : lollipopBarWidth,
+                          height: numbericBarHeight,
                           x: barX,
                           y: barHeight * bar.index,
                           onMouseOver: () => onMouseOverBar(xAxisValue, bar.key),
