@@ -35,7 +35,7 @@ const Responsive = ({ children, isEditor }) => {
   )
 
   const onKeypress = key => {
-    if (key.code === 'Escape' && key.ctrlKey) setDisplayPanel(display => !display)
+    if (key.code === 'KeyV' && key.ctrlKey) setDisplayPanel(display => !display)
     const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
     if (viewportCommandKey) {
       let keyIndex = key.key
