@@ -37,7 +37,7 @@
     "hideTicks": true,
     "size": 50,
     "gridLines": true,
-    "enablePadding": false,
+    "enablePadding": true,
     "min": "0",
     "max": "2",
     "labelColor": "#333",
