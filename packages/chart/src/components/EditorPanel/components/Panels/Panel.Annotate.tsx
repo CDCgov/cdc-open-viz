@@ -101,12 +101,12 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
           config?.annotations.map((annotation, index) => (
             <div className='annotation-group'>
               <label>
-                Annotation:
-                <textarea rows={5} value={annotation.text} onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)} />
+                Annotation Title:
+                <input type='text' value={annotation.title} onChange={e => handleAnnotationUpdate(e.target.value, 'title', index)} />
               </label>
               <label>
-                Font Size
-                <input type='text' value={annotation.fontSize} onChange={e => handleAnnotationUpdate(e.target.value, 'fontSize', index)} />
+                Annotation Text:
+                <textarea rows={5} value={annotation.text} onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)} />
               </label>
               <label>
                 Mobile
@@ -176,6 +176,36 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                   onClick={e => {
                     const updatedAnnotations = [...config?.annotations]
                     updatedAnnotations[index].anchor.horizontal = e.target.checked
+                    updateConfig({
+                      ...config,
+                      annotations: updatedAnnotations
+                    })
+                  }}
+                />
+              </label>
+              <label>
+                Edit Subject
+                <input
+                  type='checkbox'
+                  checked={config?.annotations[index]?.edit?.subject}
+                  onClick={e => {
+                    const updatedAnnotations = [...config?.annotations]
+                    updatedAnnotations[index].edit.subject = e.target.checked
+                    updateConfig({
+                      ...config,
+                      annotations: updatedAnnotations
+                    })
+                  }}
+                />
+              </label>
+              <label>
+                Edit Label
+                <input
+                  type='checkbox'
+                  checked={config?.annotations[index]?.edit?.label}
+                  onClick={e => {
+                    const updatedAnnotations = [...config?.annotations]
+                    updatedAnnotations[index].edit.label = e.target.checked
                     updateConfig({
                       ...config,
                       annotations: updatedAnnotations

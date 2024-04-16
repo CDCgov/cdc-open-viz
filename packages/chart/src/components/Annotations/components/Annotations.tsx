@@ -18,8 +18,6 @@ const Annotations = ({ xScale, yScale, xMax }) => {
     setAnnotations(config.annotations)
   }, [])
 
-  console.log('annotations', annotations)
-
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
   const applyBandScaleOffset = (num: number) => num + Number(config.yAxis.size) + xScale.bandwidth() / 2
 
@@ -32,8 +30,8 @@ const Annotations = ({ xScale, yScale, xMax }) => {
             key={`annotation--${index}`}
             width={width}
             height={height}
-            x={annotation.x}
-            y={annotation.y}
+            x={annotation.x} // subject x
+            y={annotation.y} // subject y
             restrict={restrictedArea}
             onDragStart={() => {
               setDraggingItems(raise(annotations, index))
@@ -48,8 +46,8 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     dy={dy}
                     x={applyBandScaleOffset(annotation.x) || x}
                     y={annotation.y || y}
-                    canEditSubject={true}
-                    canEditLabel={true}
+                    canEditLabel={annotation.edit.label || false}
+                    canEditSubject={annotation.edit.subject || false}
                     onDragEnd={props => {
                       const updatedAnnotations = annotations.map((annotation, idx) => {
                         if (idx === index) {
@@ -58,7 +56,8 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                               data: config.data.map(data => data[config.xAxis.dataKey]),
                               xScale,
                               yScale,
-                              config
+                              config,
+                              xMax: xMax - config.yAxis.size / 2
                             },
                             props.x
                           )
@@ -97,7 +96,8 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                         fontWeight: 200
                       }}
                     >
-                      <p style={{ fontSize: '18px' }}>{annotation.text}</p>
+                      <h4>{annotation.title}</h4>
+                      <p>{annotation.text}</p>
                     </HtmlLabel>
                     <Connector />
                     <CircleSubject className='circle-subject' stroke={style.getPropertyValue('--primary')} />
