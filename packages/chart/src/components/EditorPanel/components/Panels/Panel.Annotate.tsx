@@ -63,13 +63,17 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         marker: 'black'
       },
       coordinates: {
-        x: 0,
+        x: 0 + Number(config.yAxis.size),
         y: 0
       },
       selected: true,
       anchor: {
         vertical: false,
         horizontal: false
+      },
+      edit: {
+        subject: true,
+        label: true
       }
     }
 
@@ -84,6 +88,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   const handleRemoveAnnotation = (annotationIndex: number) => {
     console.log(config.annotations)
     const updated = config.annotations.filter((_, index) => index !== annotationIndex)
+
     console.log('updated', updated)
     updateConfig({
       ...config,

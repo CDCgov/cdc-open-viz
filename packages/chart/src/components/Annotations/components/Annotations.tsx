@@ -6,17 +6,14 @@ import { Group } from '@visx/group'
 import { HtmlLabel, Label, Connector, CircleSubject, LineSubject, EditableAnnotation } from '@visx/annotation'
 import { findNearestDatum } from './findNearestDatum'
 import { updateOrdinalScale } from '@visx/scale/lib/scales/ordinal'
+import { update } from 'lodash'
 
 const Annotations = ({ xScale, yScale, xMax }) => {
   const [draggingItems, setDraggingItems] = useState([])
   const { config, dimensions, updateConfig } = useContext(ConfigContext)
   const [width, height] = dimensions
 
-  const [annotations, setAnnotations] = useState(config.annotatations || [])
-
-  useEffect(() => {
-    setAnnotations(config.annotations)
-  }, [])
+  const { annotations } = config
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
   const applyBandScaleOffset = (num: number) => num + Number(config.yAxis.size) + xScale.bandwidth() / 2
@@ -74,7 +71,10 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                         }
                         return annotation
                       })
-                      setAnnotations(updatedAnnotations)
+                      updateConfig({
+                        ...config,
+                        annotations: updatedAnnotations
+                      })
                     }}
                     onMouseMove={dragMove}
                     onMouseUp={dragEnd}
@@ -84,21 +84,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     onTouchEnd={dragEnd}
                     anchorPosition={'auto'}
                   >
-                    <HtmlLabel
-                      containerStyle={{
-                        background: 'white',
-                        border: `1px solid ${style.getPropertyValue('--primary')}`,
-                        borderRadius: 2,
-                        color: `${style.getPropertyValue('--primary')}`,
-                        fontSize: '0.55em',
-                        lineHeight: '1em',
-                        padding: '1rem',
-                        fontWeight: 200
-                      }}
-                    >
-                      <h4>{annotation.title}</h4>
-                      <p>{annotation.text}</p>
-                    </HtmlLabel>
+                    <Label className='annotation-box' title={annotation.title} subtitle={annotation.text} backgroundFill='#f5f5f5' />
                     <Connector />
                     <CircleSubject className='circle-subject' stroke={style.getPropertyValue('--primary')} />
                     {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + xScale.bandwidth() / 2} />}

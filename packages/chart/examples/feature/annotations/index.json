@@ -1,35 +1,4 @@
 {
-  "annotations": [
-    {
-      "text": "New Annotation",
-      "fontSize": 16,
-      "show": {
-        "desktop": true,
-        "tablet": true,
-        "mobile": true
-      },
-      "markerType": "arrow",
-      "connectorType": "line",
-      "colors": {
-        "label": "black",
-        "connector": "black",
-        "marker": "black"
-      },
-      "coordinates": {
-        "x": 0,
-        "y": 0
-      },
-      "edit": {
-        "subject": false,
-        "label": true
-      },
-      "selected": true,
-      "anchor": {
-        "vertical": false,
-        "horizontal": false
-      }
-    }
-  ],
   "type": "chart",
   "debugSvg": false,
   "chartMessage": {
