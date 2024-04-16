@@ -56,8 +56,6 @@ import _ from 'lodash'
 import EditorContext from '../../editor/src/ConfigContext'
 import { getApiFilterKey } from './helpers/getApiFilterKey'
 import Filters, { APIFilterDropdowns, DropdownOptions } from './components/Filters'
-import EditorWrapper from './components/EditorWrapper/EditorWrapper'
-import DataTableEditorPanel from '@cdc/core/components/DataTable/components/DataTableEditorPanel'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import VisualizationRow from './components/VisualizationRow'
@@ -604,9 +602,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             break
           case 'table':
             body = (
-              <EditorWrapper component={DataTableStandAlone} visualizationKey={visualizationKey} visualizationConfig={visualizationConfig} updateConfig={_updateConfig} type={'Table'} viewport={currentViewport}>
-                <DataTableEditorPanel key={visualizationKey} config={visualizationConfig} updateConfig={_updateConfig} />
-              </EditorWrapper>
+              <>
+                <Header visualizationKey={visualizationKey} subEditor='Table' />
+                <DataTableStandAlone visualizationKey={visualizationKey} config={visualizationConfig} isEditor={true} updateConfig={_updateConfig} />
+              </>
             )
             break
           default:
