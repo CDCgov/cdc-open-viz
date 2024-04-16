@@ -261,10 +261,12 @@ const composeYScale = ({ min, max, yMax, config, leftMax }) => {
   const scaleFunc = config.useLogScale ? scaleLog : scaleLinear
 
   if (config.visualizationType === 'Combo') max = leftMax
+
+  const yRange = config.visualizationType === 'Bump Chart' ?  [0,yMax] : [yMax,0]
   // Return the configured scale function
   return scaleFunc({
     domain: [min, max],
-    range: [yMax, 0],
+    range: yRange,
     nice: config.useLogScale,
     zero: config.useLogScale
   })
