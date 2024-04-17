@@ -1,44 +1,392 @@
 {
   "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
   "title": "Example Line Chart",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
   "theme": "theme-green",
+  "animate": false,
   "fontSize": "medium",
-  "height": "375",
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "showDownloadButton": false
+  },
   "padding": {
     "left": 5,
     "right": 5
   },
+  "suppressedData": [],
+  "preliminaryData": [],
   "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
     "size": "75",
     "gridLines": false,
-    "label": "Y-Axis Example Label",
-    "numTicks": "9"
+    "enablePadding": false,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "9",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "anchors": [],
+    "label": "Y-Axis Example Label"
   },
-  "barThickness": 0.35,
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
+    },
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "total": "Total",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": 0.035,
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 750
+  },
   "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "date-time",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
     "size": "77",
     "tickRotation": "25",
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 65,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": 0,
     "dataKey": "Date",
     "label": "X-Axis Example Label",
-    "type": "date",
     "dateParseFormat": "%m/%d/%Y",
-    "sortDates": true,
-    "dateDisplayFormat": "%m/%d/%Y"
+    "dateDisplayFormat": "%m/%d/%Y",
+    "tickWidthMax": 91,
+    "padding": 6
   },
   "table": {
     "label": "Data Table",
-    "expanded": true,
-    "download": true
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "indexLabel": "",
+    "download": false,
+    "showVertical": false,
+    "dateDisplayFormat": "",
+    "show": true
   },
+  "orientation": "vertical",
+  "color": "pinkpurple",
+  "columns": {},
   "legend": {
+    "hide": false,
     "behavior": "isolate",
-    "position": "right",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "seriesHighlight": [],
+    "position": "bottom",
     "label": "Type of Data"
   },
+  "brush": {
+    "height": 25,
+    "data": [
+      {
+        "Date": "1/15/2016",
+        "Data 1": "",
+        "Data 2": "1350",
+        "Data 3": "300",
+        "Data 4": "950",
+        "Data 5": "1200",
+        "Data 6": "3100"
+      },
+      {
+        "Date": "2/15/2016",
+        "Data 1": "40",
+        "Data 2": "900",
+        "Data 3": "240",
+        "Data 4": "60",
+        "Data 5": "1600",
+        "Data 6": "2000"
+      },
+      {
+        "Date": "3/15/2016",
+        "Data 1": "50",
+        "Data 2": "300",
+        "Data 3": "2900",
+        "Data 4": "100",
+        "Data 5": "2000",
+        "Data 6": "250"
+      },
+      {
+        "Date": "4/15/2016",
+        "Data 1": "",
+        "Data 2": "160",
+        "Data 3": "230",
+        "Data 4": "1800",
+        "Data 5": "160",
+        "Data 6": "220"
+      },
+      {
+        "Date": "5/15/2016",
+        "Data 1": "80",
+        "Data 2": "350",
+        "Data 3": "300",
+        "Data 4": "150",
+        "Data 5": "130",
+        "Data 6": "100"
+      },
+      {
+        "Date": "6/15/2016",
+        "Data 1": "90",
+        "Data 2": "220",
+        "Data 3": "320",
+        "Data 4": "100",
+        "Data 5": "220",
+        "Data 6": "300"
+      }
+    ],
+    "active": false
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
   "palette": "qualitative-bold",
+  "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
   "labels": false,
-  "dataFormat": {},
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
   "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "Data 1",
+      "type": "Line",
+      "tooltip": true,
+      "axis": "Left"
+    },
+    {
+      "dataKey": "Data 2",
+      "type": "Line",
+      "tooltip": true,
+      "axis": "Left"
+    },
+    {
+      "dataKey": "Data 3",
+      "type": "Line",
+      "tooltip": true,
+      "axis": "Left"
+    },
+    {
+      "dataKey": "Data 4",
+      "type": "Line",
+      "tooltip": true,
+      "axis": "Left"
+    },
+    {
+      "dataKey": "Data 5",
+      "type": "Line",
+      "tooltip": true,
+      "axis": "Left"
+    },
+    {
+      "dataKey": "Data 6",
+      "type": "Line",
+      "tooltip": true,
+      "axis": "Left"
+    }
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "height": "375",
   "data": [
     {
       "Date": "1/15/2016",
@@ -96,30 +444,6 @@
     }
   ],
   "visualizationType": "Line",
-  "series": [
-    {
-      "dataKey": "Data 1",
-      "type": "Line"
-    },
-    {
-      "dataKey": "Data 2",
-      "type": "Line"
-    },
-    {
-      "dataKey": "Data 3",
-      "type": "Line"
-    },
-    {
-      "dataKey": "Data 4",
-      "type": "Line"
-    },
-    {
-      "dataKey": "Data 5",
-      "type": "Line"
-    },
-    {
-      "dataKey": "Data 6",
-      "type": "Line"
-    }
-  ]
+  "validated": "4.24.3",
+  "dynamicMarginTop": 0
 }

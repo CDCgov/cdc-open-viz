@@ -1,6 +1,9 @@
 export default function createBarElement(props) {
   const { config, index, id, className, background, borderColor, borderWidth, width, height, x, y, onMouseOver, onMouseLeave, onClick, tooltipHtml, tooltipId, styleOverrides, seriesHighlight } = props
 
+  const adjustedWidth = Math.max(0, width);
+  const adjustedHeight = Math.max(0, height);
+
   const isHorizontal = config.orientation === 'horizontal'
   const isRounded = config.barStyle === 'rounded'
   const isStacked = config.visualizationSubType === 'stacked'
@@ -11,67 +14,67 @@ export default function createBarElement(props) {
   const stackCount = comboBarSeriesCount ? comboBarSeriesCount : isolateSeriesCount ? isolateSeriesCount : barSeriesCount
 
   let radius = config.roundingStyle === 'standard' ? 8 : config.roundingStyle === 'shallow' ? 5 : config.roundingStyle === 'finger' ? 15 : 0
-  if (radius > width / 2 || radius > height / 2) {
-    radius = Math.min(width / 2, height / 2)
+  if (radius > adjustedWidth / 2 || radius > adjustedHeight / 2) {
+    radius = Math.min(adjustedWidth / 2, adjustedHeight / 2)
   }
 
   const roundTop = () => {
-    return `M${x},${y + height}
+    return `M${x},${y + adjustedHeight}
       L${x},${y + radius}
       Q${x},${y} ${x + radius},${y}
-      L${x + width - radius},${y}
-      Q${x + width},${y} ${x + width},${y + radius}
-      L${x + width},${y + height}
-      L${x},${y + height}`
+      L${x + adjustedWidth - radius},${y}
+      Q${x + adjustedWidth},${y} ${x + adjustedWidth},${y + radius}
+      L${x + adjustedWidth},${y + adjustedHeight}
+      L${x},${y + adjustedHeight}`
   }
 
   const roundRight = () => {
-    return `M${x},${y + height}
+    return `M${x},${y + adjustedHeight}
       L${x},${y}
-      L${x + width - radius},${y}
-      Q${x + width},${y} ${x + width},${y + radius}
-      L${x + width},${y + height - radius}
-      Q${x + width},${y + height} ${x + width - radius},${y + height}
-      L${x},${y + height}`
+      L${x + adjustedWidth - radius},${y}
+      Q${x + adjustedWidth},${y} ${x + adjustedWidth},${y + radius}
+      L${x + adjustedWidth},${y + adjustedHeight - radius}
+      Q${x + adjustedWidth},${y + adjustedHeight} ${x + adjustedWidth - radius},${y + adjustedHeight}
+      L${x},${y + adjustedHeight}`
   }
 
   const roundBottom = () => {
-    return `M${x + radius},${y + height}
-      Q${x},${y + height} ${x},${y + height - radius}
+    return `M${x + radius},${y + adjustedHeight}
+      Q${x},${y + adjustedHeight} ${x},${y + adjustedHeight - radius}
       L${x},${y}
-      L${x + width},${y}
-      L${x + width},${y + height - radius}
-      Q${x + width},${y + height} ${x + width - radius},${y + height}
-      L${x + radius},${y + height}`
+      L${x + adjustedWidth},${y}
+      L${x + adjustedWidth},${y + adjustedHeight - radius}
+      Q${x + adjustedWidth},${y + adjustedHeight} ${x + adjustedWidth - radius},${y + adjustedHeight}
+      L${x + radius},${y + adjustedHeight}`
   }
 
   const roundLeft = () => {
-    return `M${x + radius},${y + height}
-      Q${x},${y + height} ${x},${y + height - radius}
+    return `M${x + radius},${y + adjustedHeight}
+      Q${x},${y + adjustedHeight} ${x},${y + adjustedHeight - radius}
       L${x},${y + radius}
       Q${x},${y} ${x + radius},${y}
-      L${x + width},${y}
-      L${x + width},${y + height}
-      L${x + radius},${y + height}`
+      L${x + adjustedWidth},${y}
+      L${x + adjustedWidth},${y + adjustedHeight}
+      L${x + radius},${y + adjustedHeight}`
   }
 
   const roundFull = () => {
-    return `M${x + radius},${y + height}
-      Q${x},${y + height} ${x},${y + height - radius}
+    return `M${x + radius},${y + adjustedHeight}
+      Q${x},${y + adjustedHeight} ${x},${y + adjustedHeight - radius}
       L${x},${y + radius}
       Q${x},${y} ${x + radius},${y}
-      L${x + width - radius},${y}
-      Q${x + width},${y} ${x + width},${y + radius}
-      L${x + width},${y + height - radius}
-      Q${x + width},${y + height} ${x + width - radius},${y + height}
-      L${x + radius},${y + height}`
+      L${x + adjustedWidth - radius},${y}
+      Q${x + adjustedWidth},${y} ${x + adjustedWidth},${y + radius}
+      L${x + adjustedWidth},${y + adjustedHeight - radius}
+      Q${x + adjustedWidth},${y + adjustedHeight} ${x + adjustedWidth - radius},${y + adjustedHeight}
+      L${x + radius},${y + adjustedHeight}`
   }
 
   const nonRounded = () => {
     return `M${x},${y}
-      L${x + width},${y}
-      L${x + width},${y + height}
-      L${x},${y + height}
+      L${x + adjustedWidth},${y}
+      L${x + adjustedWidth},${y + adjustedHeight}
+      L${x},${y + adjustedHeight}
       L${x},${y}`
   }
 

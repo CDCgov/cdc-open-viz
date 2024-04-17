@@ -16,12 +16,12 @@ type HexIconProps = {
 }
 
 const HexIcon: React.FC<HexIconProps> = props => {
-  const { item, index, centroid, iconSize, textColor, isTerritory } = props
+  const { item, index, centroid, iconSize, textColor = '#000', isTerritory } = props
   if (!centroid) return
 
   if (isTerritory) {
     return (
-      <Group style={{ transform: `translate(36%, 50%)`, fill: 'currentColor' }} key={`territory-hex--${index}`}>
+      <Group style={{ transform: `translate(36%, 50%)` }} key={`territory-hex--${index}`}>
         {item.shape === 'Arrow Down' && <AiOutlineArrowDown size={12} stroke='none' fontWeight={100} />}
         {item.shape === 'Arrow Up' && <AiOutlineArrowUp size={12} stroke='none' fontWeight={100} />}
         {item.shape === 'Arrow Right' && <AiOutlineArrowRight size={12} stroke='none' fontWeight={100} />}

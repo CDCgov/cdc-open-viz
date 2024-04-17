@@ -82,7 +82,7 @@
     color: #000;
     font-size: 1em;
     border: 0;
-    position: absolute;
+    position: fixed;
     z-index: 100;
     transition: 0.1s background;
     cursor: pointer;
@@ -110,17 +110,6 @@
   }
 
   .editor-panel {
-    background: #fff;
-    width: $editorWidth;
-    overflow-y: overlay;
-    position: absolute;
-    z-index: 7;
-    display: flex;
-    flex-direction: column;
-    left: 0;
-    top: 0;
-    bottom: 0;
-
     //TODO: Remove after COVE refactor
     &.cove {
       @import '@cdc/core/styles/v2/layout/tooltip.scss';

@@ -130,6 +130,9 @@
         word-wrap: break-word;
         white-space: pre-wrap;
         word-break: break-word;
+        @include breakpoint(xs) {
+          font-size: $font-small;
+        }
       }
     }
 
@@ -145,6 +148,9 @@
 
     h3 {
       font-size: 1.3rem;
+      @include breakpoint(xs) {
+        font-size: $font-small + 0.2em;
+      }
     }
 
     h3,
@@ -189,6 +195,20 @@
     button {
       width: auto;
       display: inline-block;
+    }
+  }
+
+  .legend-preliminary {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    @include breakpoint(xs) {
+      font-size: $font-small;
+    }
+
+    & > svg {
+      width: 50px;
+      height: 23px;
     }
   }
 
@@ -597,6 +617,11 @@
     vertical-align: middle;
     margin: 0.25em;
   }
+}
+
+.cdc-open-viz-module .cdc-chart-inner-container {
+  overflow: hidden;
+  background-color: var(--white);
 }
 
 .isEditor.type-sparkline .cdc-chart-inner-container {

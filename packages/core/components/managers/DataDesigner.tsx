@@ -5,18 +5,18 @@ import Card from '../elements/Card'
 
 import { DATA_TABLE_VERTICAL, DATA_TABLE_HORIZONTAL, DATA_TABLE_SINGLE_ROW, DATA_TABLE_MULTI_ROW } from '../../templates/dataDesignerTables'
 import '../../styles/v2/components/data-designer.scss'
+import { ConfigureData } from '../../types/ConfigureData'
 
 type DataDesignerProps = {
-  configureData?: any // todo: add description here when understood better
-  updateDescriptionProp?: (vizKey: string, dataKey: string, propName: string, value: any) => void // used to update data description fields
-  visualizationKey?: any // todo: add description here when understood better
-  dataKey?: string // appears to be the data file name, ie valid-data.csv
+  configureData?: ConfigureData
+  updateDescriptionProp: (propName: string, value: any) => void // used to update data description fields
+  visualizationKey: string
   config?: any // can be one of many different types of chart configs that aren't fully established yet
   setConfig?: (newConfig: any) => void
 }
 
 const DataDesigner = (props: DataDesignerProps) => {
-  const { configureData, updateDescriptionProp, visualizationKey, dataKey, config, setConfig } = props
+  const { configureData, updateDescriptionProp, config, setConfig } = props
   const hasDataOrientation = config?.visualizationType !== 'Forest Plot'
   const hasMultipleSeries = config?.visualizationType !== 'Forest Plot'
   const hasRowSelection = config?.visualizationType !== 'Forest Plot'
@@ -47,7 +47,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                 <button
                   className={'cove-data-designer__button' + (configureData.dataDescription && configureData.dataDescription.horizontal === false ? ' active' : '')}
                   onClick={() => {
-                    updateDescriptionProp(visualizationKey, dataKey, 'horizontal', false)
+                    updateDescriptionProp('horizontal', false)
                   }}
                 >
                   <Card>
@@ -63,7 +63,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                 <button
                   className={'cove-data-designer__button' + (configureData.dataDescription && configureData.dataDescription.horizontal === true ? ' active' : '')}
                   onClick={() => {
-                    updateDescriptionProp(visualizationKey, dataKey, 'horizontal', true)
+                    updateDescriptionProp('horizontal', true)
                   }}
                 >
                   <Card>
@@ -90,7 +90,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                   hoverStyle={{ backgroundColor: '#015daa' }}
                   className='mr-1'
                   onClick={() => {
-                    updateDescriptionProp(visualizationKey, dataKey, 'series', true)
+                    updateDescriptionProp('series', true)
                   }}
                   active={configureData.dataDescription.series === true}
                 >
@@ -100,7 +100,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                   style={{ backgroundColor: '#00345d' }}
                   hoverStyle={{ backgroundColor: '#015daa' }}
                   onClick={() => {
-                    updateDescriptionProp(visualizationKey, dataKey, 'series', false)
+                    updateDescriptionProp('series', false)
                   }}
                   active={configureData.dataDescription.series === false}
                 >
@@ -114,7 +114,7 @@ const DataDesigner = (props: DataDesignerProps) => {
               <div className='mb-1'>Which property in the dataset represents which series the row is describing?</div>
               <select
                 onChange={e => {
-                  updateDescriptionProp(visualizationKey, dataKey, 'seriesKey', e.target.value)
+                  updateDescriptionProp('seriesKey', e.target.value)
                 }}
                 defaultValue={configureData.dataDescription.seriesKey}
               >
@@ -136,7 +136,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                     <button
                       className={'cove-data-designer__button' + (configureData.dataDescription.singleRow === true ? ' active' : '')}
                       onClick={() => {
-                        updateDescriptionProp(visualizationKey, dataKey, 'singleRow', true)
+                        updateDescriptionProp('singleRow', true)
                       }}
                     >
                       <Card>
@@ -150,7 +150,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                     <button
                       className={'cove-data-designer__button' + (configureData.dataDescription.singleRow === false ? ' active' : '')}
                       onClick={() => {
-                        updateDescriptionProp(visualizationKey, dataKey, 'singleRow', false)
+                        updateDescriptionProp('singleRow', false)
                       }}
                     >
                       <Card>
@@ -168,7 +168,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                     <div className='mb-1'>Which property in the dataset represents which series the row is describing?</div>
                     <select
                       onChange={e => {
-                        updateDescriptionProp(visualizationKey, dataKey, 'seriesKey', e.target.value)
+                        updateDescriptionProp('seriesKey', e.target.value)
                       }}
                       defaultValue={configureData.dataDescription.seriesKey}
                     >
@@ -184,7 +184,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                     <div className='mb-1'>Which property in the dataset represents the values for the category/date axis or map geography?</div>
                     <select
                       onChange={e => {
-                        updateDescriptionProp(visualizationKey, dataKey, 'xKey', e.target.value)
+                        updateDescriptionProp('xKey', e.target.value)
                       }}
                       defaultValue={configureData.dataDescription.xKey}
                     >
@@ -207,7 +207,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                               onClick={() => {
                                 let newValueKeys = configureData.dataDescription.valueKeysTallSupport
                                 newValueKeys.splice(index, 1)
-                                updateDescriptionProp(visualizationKey, dataKey, 'valueKeysTallSupport', newValueKeys)
+                                updateDescriptionProp('valueKeysTallSupport', newValueKeys)
                               }}
                             >
                               X
@@ -219,7 +219,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                     <select
                       onChange={e => {
                         if (e.target.value && (!configureData.dataDescription.valueKeysTallSupport || configureData.dataDescription.valueKeysTallSupport.indexOf(e.target.value) === -1)) {
-                          updateDescriptionProp(visualizationKey, dataKey, 'valueKeysTallSupport', [...(configureData.dataDescription.valueKeysTallSupport || []), e.target.value])
+                          updateDescriptionProp('valueKeysTallSupport', [...(configureData.dataDescription.valueKeysTallSupport || []), e.target.value])
                         }
                       }}
                     >
@@ -244,7 +244,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                               onClick={() => {
                                 let newIgnoredKeys = configureData.dataDescription.ignoredKeys
                                 newIgnoredKeys.splice(index, 1)
-                                updateDescriptionProp(visualizationKey, dataKey, 'ignoredKeys', newIgnoredKeys)
+                                updateDescriptionProp('ignoredKeys', newIgnoredKeys)
                               }}
                             >
                               X
@@ -256,7 +256,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                     <select
                       onChange={e => {
                         if (e.target.value) {
-                          updateDescriptionProp(visualizationKey, dataKey, 'ignoredKeys', [...(configureData.dataDescription.ignoredKeys || []), e.target.value])
+                          updateDescriptionProp('ignoredKeys', [...(configureData.dataDescription.ignoredKeys || []), e.target.value])
                         }
                         e.target.value = ''
                       }}
