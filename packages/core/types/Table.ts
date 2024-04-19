@@ -18,4 +18,5 @@ export type Table = {
   downloadImageButton?: boolean
   downloadPdfButton?: boolean
   dateDisplayFormat?: string
+  fontSize: 'small' | 'medium' | 'large'
 }

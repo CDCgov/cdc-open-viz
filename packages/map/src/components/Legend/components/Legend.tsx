@@ -34,6 +34,8 @@ const Legend = forwardRef((props, ref) => {
   } = useContext(ConfigContext)
 
   const { legend } = state
+  const fontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? { fontSize: '11px' } : null
+  const fontSizeTitle = ['sm', 'xs', 'xxs'].includes(viewport) ? { fontSize: '15px' } : null
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -95,6 +97,7 @@ const Legend = forwardRef((props, ref) => {
       return (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions
         <li
+          style={fontSize}
           className={handleListItemClass().join(' ')}
           key={idx}
           title={`Legend item ${legendLabel} - Click to disable`}
@@ -110,7 +113,7 @@ const Legend = forwardRef((props, ref) => {
           role='button'
           tabIndex={0}
         >
-          <LegendCircle fill={entry.color} /> <span>{legendLabel}</span>
+          <LegendCircle viewport={viewport} fill={entry.color} /> <span>{legendLabel}</span>
         </li>
       )
     })
@@ -179,8 +182,16 @@ const Legend = forwardRef((props, ref) => {
       <div className='legends'>
         <aside id={skipId || 'legend'} className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0} ref={ref}>
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
-            {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
-            {legend.dynamicDescription === false && legend.description && <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>}
+            {legend.title && (
+              <h3 style={fontSizeTitle} className={legendClasses.title.join(' ') || ''}>
+                {parse(legend.title)}
+              </h3>
+            )}
+            {legend.dynamicDescription === false && legend.description && (
+              <p style={fontSize} className={legendClasses.description.join(' ') || ''}>
+                {parse(legend.description)}
+              </p>
+            )}
             {legend.dynamicDescription === true &&
               runtimeFilters.map((filter, idx) => {
                 const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`
@@ -190,7 +201,7 @@ const Legend = forwardRef((props, ref) => {
 
                 if (desc.length > 0) {
                   return (
-                    <p key={`dynamic-description-${lookupStr}`} className={`dynamic-legend-description-${lookupStr}`}>
+                    <p style={fontSize} key={`dynamic-description-${lookupStr}`} className={`dynamic-legend-description-${lookupStr}`}>
                       {desc}
                     </p>
                   )
@@ -224,7 +235,7 @@ const Legend = forwardRef((props, ref) => {
                               {cityStyleShapes[shape.toLowerCase()]}
                             </Group>
                           </svg>
-                          <p>{label}</p>
+                          <p style={fontSize}>{label}</p>
                         </div>
                       )
                   )}

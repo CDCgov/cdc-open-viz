@@ -148,14 +148,14 @@
 
     h3 {
       font-size: 1.3rem;
-      @include breakpoint(xs) {
-        font-size: $font-small + 0.2em;
-      }
     }
 
     h3,
     p {
       margin-bottom: 0.8em;
+      @include breakpoint(xs) {
+        font-size: $font-small + 0.2em;
+      }
     }
     & div.legend-item {
       margin-bottom: 0.5em !important;

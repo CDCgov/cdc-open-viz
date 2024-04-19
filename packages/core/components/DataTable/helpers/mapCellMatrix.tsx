@@ -7,7 +7,7 @@ type MapRowsProps = DataTableProps & {
   rows: string[]
 }
 
-const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, displayGeoName, formatLegendLocation, displayDataAsText, navigationHandler, setFilteredCountryCode }: MapRowsProps): ReactNode[][] => {
+const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, displayGeoName, formatLegendLocation, displayDataAsText, navigationHandler, setFilteredCountryCode, viewport }: MapRowsProps): ReactNode[][] => {
   return rows.map(row =>
     Object.keys(columns)
       .filter(column => columns[column].dataTable === true && columns[column].name)
@@ -31,7 +31,7 @@ const mapCellArray = ({ rows, columns, runtimeData, config, applyLegendToRow, di
           }
           cellValue = (
             <div className='col-12'>
-              <LegendCircle fill={legendColor[0]} />
+              <LegendCircle viewport={viewport} fill={legendColor[0]} />
               <CellAnchor markup={labelValue} row={rowObj} columns={columns} navigationHandler={navigationHandler} mapZoomHandler={mapZoomHandler} />
             </div>
           )
