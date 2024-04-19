@@ -1,0 +1,20 @@
+.cdc-open-viz-module .annotation__desktop-label {
+  display: none;
+}
+
+.cdc-open-viz-module {
+  .annotation__mobile-label-circle {
+    stroke: var(--primary);
+    stroke-width: 2;
+    stroke-dasharray: 5 5;
+  }
+}
+
+@container content (min-width: 700px) {
+  .cdc-open-viz-module .annotation__mobile-label {
+    display: none;
+  }
+  .cdc-open-viz-module .annotation__desktop-label {
+    display: block;
+  }
+}
