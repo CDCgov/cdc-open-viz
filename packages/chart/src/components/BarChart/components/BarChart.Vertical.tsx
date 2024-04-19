@@ -102,9 +102,9 @@ export const BarChartVertical = () => {
                   const supprssedBarY = bar.value >= 0 && isNumber(bar.value) ? yScale(scaleVal) - suppresedBarHeight : yScale(0)
                   const barY = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? supprssedBarY : barYBase
 
-                  let barGroupWidth = seriesScale.range()[1]
+                  let barGroupWidth = seriesScale.range()[1] - seriesScale.range()[0]
 
-                  let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
+                  let barWidth = config.isLollipopChart ? lollipopBarWidth : (config.barThickness * seriesScale.bandwidth());
                   let barX = bar.x + (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) - (config.xAxis.type === 'date-time' ? barGroupWidth / 2 : 0)
                   setBarWidth(barWidth)
                   setTotalBarsInGroup(barGroup.bars.length)
