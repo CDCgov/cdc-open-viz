@@ -1,13 +1,51 @@
 {
+  "annotations": [
+    {
+      "title": "New Annotation Title",
+      "text": "New Annotation Subtext",
+      "fontSize": 16,
+      "show": {
+        "desktop": true,
+        "tablet": true,
+        "mobile": true
+      },
+      "markerType": "arrow",
+      "connectorType": "line",
+      "colors": {
+        "label": "black",
+        "connector": "black",
+        "marker": "black"
+      },
+      "coordinates": {
+        "x": 75,
+        "y": 0
+      },
+      "selected": true,
+      "anchor": {
+        "vertical": false,
+        "horizontal": false
+      },
+      "edit": {
+        "subject": false,
+        "label": false
+      },
+      "xKey": 1455523200000,
+      "yKey": "40",
+      "x": 220.11744360902256,
+      "y": 223,
+      "dx": 0,
+      "dy": 0
+    }
+  ],
   "type": "chart",
   "debugSvg": false,
   "chartMessage": {
     "noData": "No Data Available"
   },
-  "title": "Example Line Chart",
+  "title": "Example Line Chart with Region",
   "showTitle": true,
   "showDownloadMediaButton": false,
-  "theme": "theme-green",
+  "theme": "theme-cyan",
   "animate": false,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
@@ -44,7 +82,7 @@
     "tickLabelColor": "#333",
     "tickColor": "#333",
     "rightHideAxis": true,
-    "rightAxisSize": 0,
+    "rightAxisSize": 50,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
     "rightAxisLabelColor": "#333",
@@ -116,24 +154,25 @@
     "tickColor": "#333",
     "numTicks": "",
     "labelOffset": 65,
-    "axisPadding": 200,
+    "axisPadding": 0,
     "target": 0,
     "maxTickRotation": 0,
     "dataKey": "Date",
     "label": "X-Axis Example Label",
     "dateParseFormat": "%m/%d/%Y",
     "dateDisplayFormat": "%m/%d/%Y",
-    "tickWidthMax": 91
+    "tickWidthMax": 91,
+    "padding": 6
   },
   "table": {
     "label": "Data Table",
-    "expanded": true,
+    "expanded": false,
     "limitHeight": false,
     "height": "",
     "caption": "",
     "showDownloadUrl": false,
     "showDataTableLink": true,
-    "indexLabel": "",
+    "indexLabel": "Data Group",
     "download": true,
     "showVertical": false,
     "dateDisplayFormat": "",
@@ -146,7 +185,7 @@
     "hide": false,
     "behavior": "isolate",
     "axisAlign": true,
-    "singleRow": true,
+    "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
     "description": "",
@@ -167,37 +206,37 @@
     "data": [
       {
         "Date": "1/15/2016",
-        "Data 1": "",
-        "Data 2": "1350",
+        "Data 1": "90",
+        "Data 2": "135",
         "Data 3": "300",
-        "Data 4": "950",
-        "Data 5": "1200",
-        "Data 6": "3100"
+        "Data 4": "95",
+        "Data 5": "120",
+        "Data 6": "310"
       },
       {
         "Date": "2/15/2016",
         "Data 1": "40",
-        "Data 2": "900",
+        "Data 2": "90",
         "Data 3": "240",
         "Data 4": "60",
-        "Data 5": "1600",
-        "Data 6": "2000"
+        "Data 5": "160",
+        "Data 6": "200"
       },
       {
         "Date": "3/15/2016",
         "Data 1": "50",
         "Data 2": "300",
-        "Data 3": "2900",
+        "Data 3": "290",
         "Data 4": "100",
-        "Data 5": "2000",
+        "Data 5": "200",
         "Data 6": "250"
       },
       {
         "Date": "4/15/2016",
-        "Data 1": "",
+        "Data 1": "120",
         "Data 2": "160",
         "Data 3": "230",
-        "Data 4": "1800",
+        "Data 4": "180",
         "Data 5": "160",
         "Data 6": "220"
       },
@@ -220,7 +259,9 @@
         "Data 6": "300"
       }
     ],
-    "active": false
+    "active": false,
+    "pattern_id": "brush_pattern",
+    "accent_color": "#ddd"
   },
   "exclusions": {
     "active": false,
@@ -255,8 +296,8 @@
   "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "Data 6",
-      "type": "Line",
+      "dataKey": "Data 1",
+      "type": "Bar",
       "tooltip": true,
       "axis": "Left"
     }
@@ -282,7 +323,7 @@
     },
     "estimateField": "",
     "estimateRadius": "",
-    "shape": "square",
+    "shape": "",
     "rowHeight": 20,
     "description": {
       "show": true,
@@ -295,8 +336,8 @@
       "location": 100
     },
     "radius": {
-      "min": 2,
-      "max": 10,
+      "min": 1,
+      "max": 8,
       "scalingColumn": ""
     },
     "regression": {
@@ -308,7 +349,11 @@
     "rightWidthOffset": 0,
     "showZeroLine": false,
     "leftLabel": "",
-    "rightLabel": ""
+    "rightLabel": "",
+    "hideDateCategoryCol": false,
+    "width": "auto",
+    "lowerCiField": "",
+    "upperCiField": ""
   },
   "area": {
     "isStacked": false
@@ -355,41 +400,42 @@
     },
     "data": []
   },
+  "showChartBrush": false,
   "height": "375",
   "data": [
     {
       "Date": "1/15/2016",
-      "Data 1": "foo",
-      "Data 2": "1350",
+      "Data 1": "90",
+      "Data 2": "135",
       "Data 3": "300",
-      "Data 4": "950",
-      "Data 5": "1200",
-      "Data 6": "3100"
+      "Data 4": "95",
+      "Data 5": "120",
+      "Data 6": "310"
     },
     {
       "Date": "2/15/2016",
       "Data 1": "40",
-      "Data 2": "900",
+      "Data 2": "90",
       "Data 3": "240",
       "Data 4": "60",
-      "Data 5": "1600",
-      "Data 6": "2000"
+      "Data 5": "160",
+      "Data 6": "200"
     },
     {
       "Date": "3/15/2016",
       "Data 1": "50",
       "Data 2": "300",
-      "Data 3": "2900",
+      "Data 3": "290",
       "Data 4": "100",
-      "Data 5": "2000",
+      "Data 5": "200",
       "Data 6": "250"
     },
     {
       "Date": "4/15/2016",
-      "Data 1": "",
+      "Data 1": "120",
       "Data 2": "160",
       "Data 3": "230",
-      "Data 4": "1800",
+      "Data 4": "180",
       "Data 5": "160",
       "Data 6": "220"
     },
@@ -413,6 +459,68 @@
     }
   ],
   "visualizationType": "Line",
+  "regions": [],
   "validated": "4.24.3",
-  "dynamicMarginTop": 0
+  "formattedData": [
+    {
+      "Date": "1/15/2016",
+      "Data 1": "90",
+      "Data 2": "135",
+      "Data 3": "300",
+      "Data 4": "95",
+      "Data 5": "120",
+      "Data 6": "310"
+    },
+    {
+      "Date": "2/15/2016",
+      "Data 1": "40",
+      "Data 2": "90",
+      "Data 3": "240",
+      "Data 4": "60",
+      "Data 5": "160",
+      "Data 6": "200"
+    },
+    {
+      "Date": "3/15/2016",
+      "Data 1": "50",
+      "Data 2": "300",
+      "Data 3": "290",
+      "Data 4": "100",
+      "Data 5": "200",
+      "Data 6": "250"
+    },
+    {
+      "Date": "4/15/2016",
+      "Data 1": "120",
+      "Data 2": "160",
+      "Data 3": "230",
+      "Data 4": "180",
+      "Data 5": "160",
+      "Data 6": "220"
+    },
+    {
+      "Date": "5/15/2016",
+      "Data 1": "80",
+      "Data 2": "350",
+      "Data 3": "300",
+      "Data 4": "150",
+      "Data 5": "130",
+      "Data 6": "100"
+    },
+    {
+      "Date": "6/15/2016",
+      "Data 1": "90",
+      "Data 2": "220",
+      "Data 3": "320",
+      "Data 4": "100",
+      "Data 5": "220",
+      "Data 6": "300"
+    }
+  ],
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "dynamicMarginTop": 0,
+  "version": "4.24.3"
 }

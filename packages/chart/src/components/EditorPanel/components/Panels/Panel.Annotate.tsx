@@ -48,7 +48,8 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
 
   const handleAddAnnotation = () => {
     const newAnnotation = {
-      text: 'New Annotation',
+      title: 'New Annotation Title',
+      text: 'New Annotation Subtext',
       fontSize: 16,
       show: {
         desktop: true,

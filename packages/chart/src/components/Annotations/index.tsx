@@ -1,3 +1,9 @@
-import Annotations from './components/Annotations'
+import AnnotationDraggable from './components/AnnotationDraggable'
+import AnnotationList from './components/AnnotationList'
 
-export default Annotations
+const Annotation = {
+  Draggable: AnnotationDraggable,
+  List: AnnotationList
+}
+
+export default Annotation

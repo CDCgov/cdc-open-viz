@@ -40,6 +40,7 @@ import { computeMarginBottom } from './helpers/computeMarginBottom'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
+import Annotation from './components/Annotations'
 
 // Helpers
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
@@ -1166,6 +1167,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
               {/* Description */}
               {description && config.visualizationType !== 'Spark Line' && <div className={'column ' + config.isResponsiveTicks ? 'subtext--responsive-ticks' : 'subtext'}>{parse(description)}</div>}
+
+              <Annotation.List />
 
               {/* buttons */}
               <MediaControls.Section classes={['download-buttons']}>

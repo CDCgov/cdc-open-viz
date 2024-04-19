@@ -32,7 +32,8 @@ import useScales from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
-import Annotations from './Annotations'
+import Annotation from './Annotations'
+
 // styles
 import ZoomBrush from './ZoomBrush'
 
@@ -738,7 +739,7 @@ const LinearChart = props => {
               <Line from={{ x: point.x, y: 0 }} to={{ x: point.x, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
             </Group>
           )}
-          <Annotations xScale={xScale} yScale={yScale} xMax={xMax} svgRef={svgRef} />
+          <Annotation.Draggable xScale={xScale} yScale={yScale} xMax={xMax} svgRef={svgRef} />
         </svg>
         {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && !config.tooltips.singleSeries && (
           <>

@@ -12,6 +12,42 @@ const invertedScaleValue = (value, xScale, data) => {
   return data[index]
 }
 
+const getXValueFromCoordinate = (x, isClick = false) => {
+  if (visualizationType === 'Pie') return
+  if (orientation === 'horizontal') return
+
+  // Check the type of x equal to point or if the type of xAxis is equal to continuous or date
+  if (config.xAxis.type === 'categorical' || (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')) {
+    let range = xScale.range()[1] - xScale.range()[0]
+    let eachBand = range / (xScale.domain().length + 1)
+
+    let numerator = x
+    const index = Math.floor((Number(numerator) - eachBand / 2) / eachBand)
+    return xScale.domain()[index] // fixes off by 1 error
+  }
+
+  if (config.xAxis.type === 'date') {
+    const xValue = x // Assuming x is the coordinate on the chart
+    const xTimestamp = convertXValueToTimestamp(x, 0, xMax, xScale.domain())
+
+    // Calculate the closest date to the x coordinate
+    let closestDate = null
+    let minDistance = Number.MAX_VALUE
+
+    xScale.domain().forEach(timestamp => {
+      const distance = Math.abs(xTimestamp - timestamp)
+      if (distance < minDistance) {
+        minDistance = distance
+        closestDate = timestamp
+      }
+    })
+
+    return closestDate
+  }
+
+  return x
+}
+
 const findNearestDatum = ({ data, xScale, yScale, config, xMax }, xPosition) => {
   const { xAxis, visualizationType, orientation } = config
 
@@ -75,6 +111,7 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax }, xPosition) => 
   }
 
   const xValue = getXValueFromCoordinate(xPosition - Number(config.yAxis.size || 0))
+
   let closestSeries = []
   if (!xValue) return { x: 0, y: 0 }
 
@@ -92,4 +129,4 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax }, xPosition) => 
   return { x, y }
 }
 
-export { findNearestDatum }
+export { findNearestDatum, getXValueFromCoordinate }
