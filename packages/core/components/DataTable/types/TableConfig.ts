@@ -24,4 +24,5 @@ export type TableConfig = {
   dataFormat?: Object
   runtime?: Runtime
   data: Object[]
+  fontSize: 'small' | 'medium' | 'large'
 }
