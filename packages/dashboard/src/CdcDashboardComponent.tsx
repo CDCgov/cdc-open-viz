@@ -502,7 +502,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     let subVisualizationEditing = false
 
     getVizKeys(state.config).forEach(visualizationKey => {
-      const rowNumber = vizRowColumnLocator[visualizationKey].row
+      const rowNumber = vizRowColumnLocator[visualizationKey]?.row
       const visualizationConfig = getVizConfig(visualizationKey, rowNumber, state.config, state.data, state.filteredData)
 
       const setsSharedFilter = state.config.dashboard.sharedFilters && state.config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0

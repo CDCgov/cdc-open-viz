@@ -7,7 +7,7 @@ const transform = new DataTransform()
 export const getVizConfig = (visualizationKey: string, rowNumber: number, config: MultiDashboardConfig, data: Object, filteredData?: Object) => {
   const visualizationConfig = _.cloneDeep(config.visualizations[visualizationKey])
   const rowData = config.rows[rowNumber]
-  if (rowData.dataKey) {
+  if (rowData?.dataKey) {
     // data configured on the row
     Object.assign(visualizationConfig, _.pick(rowData, ['dataKey', 'dataDescription', 'formattedData', 'data']))
   }
