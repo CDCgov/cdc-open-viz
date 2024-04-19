@@ -35,6 +35,7 @@ const mapUpdates = newConfig => {
   if (newConfig.type === 'map') {
     newConfig.table.download = true
     newConfig.general.showDownloadButton = true
+    newConfig.general.expandDataTable = newConfig.table.expanded
   }
 }
 
