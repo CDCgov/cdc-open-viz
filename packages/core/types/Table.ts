@@ -1,22 +1,22 @@
 export type Table = {
-  cellMinWidth?: number
-  label?: string
-  show?: boolean
-  showVertical?: boolean
-  indexLabel?: string
   caption?: string
-  limitHeight?: boolean
-  height?: number
-  expanded?: boolean
-  showDataTableLink?: boolean
-  showDownloadUrl?: boolean
+  cellMinWidth?: number
+  collapsible?: boolean
+  dateDisplayFormat?: string
   download?: boolean
-  customTableConfig?: boolean
-  excludeColumns?: string[]
-  showDownloadImgButton?: boolean
-  showDownloadPdfButton?: boolean
   downloadImageButton?: boolean
   downloadPdfButton?: boolean
-  dateDisplayFormat?: string
+  excludeColumns?: string[]
+  expanded?: boolean
   fontSize: 'small' | 'medium' | 'large'
+  height?: number
+  indexLabel?: string
+  label?: string
+  limitHeight?: boolean
+  show?: boolean
+  showDataTableLink?: boolean
+  showDownloadImgButton?: boolean
+  showDownloadPdfButton?: boolean
+  showDownloadUrl?: boolean
+  showVertical?: boolean
 }

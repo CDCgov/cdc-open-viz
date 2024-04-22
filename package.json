@@ -90,7 +90,7 @@
     ]
   },
   "scripts": {
-    "clean": "find . -name 'node_modules' -o -name 'dist' -type d -prune -exec rm -rf '{}' +",
+    "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "publish": "npx lerna publish",
     "storybook": "storybook dev -p 6006",
     "storybook-docs": "storybook dev --docs",
