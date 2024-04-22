@@ -141,7 +141,44 @@
   },
   "orientation": "vertical",
   "color": "pinkpurple",
-  "columns": {},
+  "columns": {
+    "additionalColumn1": {
+      "label": "Brother Sister Younger Sibling",
+      "dataTable": false,
+      "tooltips": true,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "series": "Brother Sister Younger Sibling",
+      "name": "Brother Sister Younger Sibling"
+    },
+    "additionalColumn2": {
+      "label": "Belt Rope Neck Tied",
+      "dataTable": false,
+      "tooltips": true,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "series": "Belt Rope Neck Tied",
+      "name": "Belt Rope Neck Tied"
+    },
+    "additionalColumn3": {
+      "label": "Broken Girlfriend Broke Up",
+      "dataTable": false,
+      "tooltips": true,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "series": "Broken Girlfriend Broke Up",
+      "name": "Broken Girlfriend Broke Up"
+    }
+  },
   "legend": {
     "hide": false,
     "behavior": "isolate",
