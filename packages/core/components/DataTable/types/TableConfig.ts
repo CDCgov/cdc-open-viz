@@ -7,25 +7,22 @@ import { BoxPlot } from '../../../types/BoxPlot'
 import { General } from '../../../types/General'
 import { Column } from '../../../types/Column'
 import { Legend } from '@cdc/core/types/Legend'
-import { FilterBehavior } from '../../../types/FilterBehavior'
 
 export type TableConfig = {
-  boxplot?: BoxPlot
-  columns?: Record<string, Column>
-  data: Object[]
-  dataFormat?: Object
-  filterBehavior: FilterBehavior
-  filters: Object[]
-  fontSize: 'small' | 'medium' | 'large'
-  general?: General
-  legend?: Legend
-  regions?: Region[]
-  runtime?: Runtime
-  runtimeSeriesLabels?: Object
-  series?: Series
-  table: Table
   type?: string
-  visualizationType: string
+  table: Table
   xAxis?: Axis
   yAxis?: Axis
+  boxplot?: BoxPlot
+  visualizationType: string
+  general?: General
+  columns?: Record<string, Column>
+  legend?: Legend
+  series?: Series
+  regions?: Region[]
+  runtimeSeriesLabels?: Object
+  dataFormat?: Object
+  runtime?: Runtime
+  data: Object[]
+  fontSize: 'small' | 'medium' | 'large'
 }

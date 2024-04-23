@@ -68,7 +68,7 @@ const pivotData = (data, pivotFilter: SharedFilter) => {
       const row = newData[index] || {}
       if (!inactive.includes(key)) row[key] = val[valueColumn]
       const toAdd = _.omit(val, [pivotColumn, valueColumn, ...inactive])
-      newData[index] = { ...toAdd, ...row }
+      newData[index] = { ...row, ...toAdd }
     })
   }
   return newData

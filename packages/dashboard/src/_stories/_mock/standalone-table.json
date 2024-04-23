@@ -17,8 +17,6 @@
       "newViz": true,
       "openModal": false,
       "uid": "table1707840146431",
-      "filters": [],
-      "filterBehavior": "Filter Change",
       "table": {
         "label": "Data Table",
         "show": true,
