@@ -28,8 +28,22 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
   const columns = Object.keys(config.originalFormattedData[0] || {})
   return (
     <>
-      <VizFilterEditor config={config} updateField={updateField} rawData={config.originalFormattedData} />
-      <ColumnsEditor config={config} updateField={updateField} deleteColumn={deleteColumn} />
+      <AccordionItem>
+        <AccordionItemHeading>
+          <AccordionItemButton>Filters</AccordionItemButton>
+        </AccordionItemHeading>
+        <AccordionItemPanel>
+          <VizFilterEditor config={config} updateField={updateField} rawData={config.originalFormattedData} />
+        </AccordionItemPanel>
+      </AccordionItem>
+      <AccordionItem>
+        <AccordionItemHeading>
+          <AccordionItemButton>Columns</AccordionItemButton>
+        </AccordionItemHeading>
+        <AccordionItemPanel>
+          <ColumnsEditor config={config} updateField={updateField} deleteColumn={deleteColumn} />
+        </AccordionItemPanel>
+      </AccordionItem>
       <AccordionItem>
         <AccordionItemHeading>
           <AccordionItemButton>Data Table</AccordionItemButton>

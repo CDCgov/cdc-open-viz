@@ -261,98 +261,93 @@ const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, dele
   }
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>Columns</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        {'navigation' !== config.type && (
-          <fieldset>
-            <label>
-              <span className='edit-label'>
-                Configurations
-                <Tooltip style={{ textTransform: 'none' }}>
-                  <Tooltip.Target>
-                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                  </Tooltip.Target>
-                  <Tooltip.Content>
-                    <p>You can specify additional columns to display in tooltips and / or the supporting data table.</p>
-                  </Tooltip.Content>
-                </Tooltip>
-              </span>
-            </label>
-            {additionalColumns.map((val, i) => (
-              <FieldSet key={val + i} controls={openControls} config={config} deleteColumn={deleteColumn} updateField={updateField} colKey={val} />
+    <>
+      {'navigation' !== config.type && (
+        <fieldset>
+          <label>
+            <span className='edit-label'>
+              Configurations
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>You can specify additional columns to display in tooltips and / or the supporting data table.</p>
+                </Tooltip.Content>
+              </Tooltip>
+            </span>
+          </label>
+          {additionalColumns.map((val, i) => (
+            <FieldSet key={val + i} controls={openControls} config={config} deleteColumn={deleteColumn} updateField={updateField} colKey={val} />
+          ))}
+          <button
+            className={'btn btn-primary'}
+            onClick={event => {
+              event.preventDefault()
+              addColumnConfig(additionalColumns.length + 1)
+            }}
+          >
+            Add Configuration
+          </button>
+        </fieldset>
+      )}
+      {'category' === config.legend?.type && (
+        <fieldset>
+          <label>
+            <span className='edit-label'>
+              Additional Category
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>You can provide additional categories to ensure they appear in the legend</p>
+                </Tooltip.Content>
+              </Tooltip>
+            </span>
+          </label>
+          {config.legend.additionalCategories &&
+            config.legend.additionalCategories.map((colKey, i) => (
+              <fieldset className='edit-block' key={colKey}>
+                <button
+                  className='remove-column'
+                  onClick={event => {
+                    event.preventDefault()
+                    const updatedAdditionaCategories = [...config.legend.additionalCategories]
+                    updatedAdditionaCategories.splice(i, 1)
+                    updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+                  }}
+                >
+                  Remove
+                </button>
+                <TextField
+                  value={colKey}
+                  label='Category'
+                  section='legend'
+                  subsection={null}
+                  fieldName='additionalCategories'
+                  updateField={(section, subsection, fieldName, value) => {
+                    const updatedAdditionaCategories = [...config.legend.additionalCategories]
+                    updatedAdditionaCategories[i] = value
+                    updateField(section, subsection, fieldName, updatedAdditionaCategories)
+                  }}
+                />
+              </fieldset>
             ))}
-            <button
-              className={'btn btn-primary'}
-              onClick={event => {
-                event.preventDefault()
-                addColumnConfig(additionalColumns.length + 1)
-              }}
-            >
-              Add Configuration
-            </button>
-          </fieldset>
-        )}
-        {'category' === config.legend?.type && (
-          <fieldset>
-            <label>
-              <span className='edit-label'>
-                Additional Category
-                <Tooltip style={{ textTransform: 'none' }}>
-                  <Tooltip.Target>
-                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                  </Tooltip.Target>
-                  <Tooltip.Content>
-                    <p>You can provide additional categories to ensure they appear in the legend</p>
-                  </Tooltip.Content>
-                </Tooltip>
-              </span>
-            </label>
-            {config.legend.additionalCategories &&
-              config.legend.additionalCategories.map((colKey, i) => (
-                <fieldset className='edit-block' key={colKey}>
-                  <button
-                    className='remove-column'
-                    onClick={event => {
-                      event.preventDefault()
-                      const updatedAdditionaCategories = [...config.legend.additionalCategories]
-                      updatedAdditionaCategories.splice(i, 1)
-                      updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
-                    }}
-                  >
-                    Remove
-                  </button>
-                  <TextField
-                    value={colKey}
-                    label='Category'
-                    section='legend'
-                    subsection={null}
-                    fieldName='additionalCategories'
-                    updateField={(section, subsection, fieldName, value) => {
-                      const updatedAdditionaCategories = [...config.legend.additionalCategories]
-                      updatedAdditionaCategories[i] = value
-                      updateField(section, subsection, fieldName, updatedAdditionaCategories)
-                    }}
-                  />
-                </fieldset>
-              ))}
-            <button
-              className={'btn btn-primary full-width'}
-              onClick={event => {
-                event.preventDefault()
-                const updatedAdditionaCategories = [...(config.legend.additionalCategories || [])]
-                updatedAdditionaCategories.push('')
-                updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
-              }}
-            >
-              Add Category
-            </button>
-          </fieldset>
-        )}
-      </AccordionItemPanel>
-    </AccordionItem>
+          <button
+            className={'btn btn-primary full-width'}
+            onClick={event => {
+              event.preventDefault()
+              const updatedAdditionaCategories = [...(config.legend.additionalCategories || [])]
+              updatedAdditionaCategories.push('')
+              updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+            }}
+          >
+            Add Category
+          </button>
+        </fieldset>
+      )}
+    </>
   )
 }
 

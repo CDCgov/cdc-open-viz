@@ -72,167 +72,162 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
   }
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>Filters</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
-        {config.filters && (
-          <>
-            <Select
-              value={config.filterBehavior}
-              fieldName='filterBehavior'
-              label='Filter Behavior'
-              updateField={updateField}
-              options={['Apply Button', 'Filter Change']}
-              tooltip={
-                <Tooltip style={{ textTransform: 'none' }}>
-                  <Tooltip.Target>
-                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                  </Tooltip.Target>
-                  <Tooltip.Content>
-                    <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
-                  </Tooltip.Content>
-                </Tooltip>
-              }
-            />
-            <br />
-          </>
-        )}
-        {config.filters && (
-          <ul className='filters-list'>
-            {/* Whether filters should apply onChange or Apply Button */}
+    <>
+      {config.filters && (
+        <>
+          <Select
+            value={config.filterBehavior}
+            fieldName='filterBehavior'
+            label='Filter Behavior'
+            updateField={updateField}
+            options={['Apply Button', 'Filter Change']}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+          />
+          <br />
+        </>
+      )}
+      {config.filters && (
+        <ul className='filters-list'>
+          {/* Whether filters should apply onChange or Apply Button */}
 
-            {config.filters.map((filter, index) => {
-              if (filter.type === 'url') return <></>
+          {config.filters.map((filter, index) => {
+            if (filter.type === 'url') return <></>
 
-              return (
-                <fieldset className='edit-block' key={index}>
-                  <button
-                    type='button'
-                    className='remove-column'
-                    onClick={() => {
-                      removeFilter(index)
+            return (
+              <fieldset className='edit-block' key={index}>
+                <button
+                  type='button'
+                  className='remove-column'
+                  onClick={() => {
+                    removeFilter(index)
+                  }}
+                >
+                  Remove
+                </button>
+                <label>
+                  <span className='edit-label column-heading'>Filter</span>
+                  <select
+                    value={filter.columnName}
+                    onChange={e => {
+                      handleNameChange(index, e.target.value)
                     }}
                   >
-                    Remove
-                  </button>
-                  <label>
-                    <span className='edit-label column-heading'>Filter</span>
-                    <select
-                      value={filter.columnName}
-                      onChange={e => {
-                        handleNameChange(index, e.target.value)
-                      }}
-                    >
-                      <option value=''>- Select Option -</option>
-                      {getFilters().map((dataKey, index) => (
-                        <option value={dataKey} key={index}>
-                          {dataKey}
+                    <option value=''>- Select Option -</option>
+                    {getFilters().map((dataKey, index) => (
+                      <option value={dataKey} key={index}>
+                        {dataKey}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  <span className='edit-showDropdown column-heading'>Show Filter Input</span>
+                  <input
+                    type='checkbox'
+                    checked={filter.showDropdown === undefined ? true : filter.showDropdown}
+                    onChange={e => {
+                      updateFilterProp('showDropdown', index, e.target.checked)
+                    }}
+                  />
+                </label>
+
+                <label>
+                  <span className='edit-label column-heading'>Filter Style</span>
+
+                  <select
+                    value={filter.filterStyle}
+                    onChange={e => {
+                      updateFilterProp('filterStyle', index, e.target.value)
+                    }}
+                  >
+                    {filterStyleOptions.map((item, index) => {
+                      return (
+                        <option key={`filter-style-${index}`} value={item}>
+                          {item}
                         </option>
-                      ))}
-                    </select>
-                  </label>
+                      )
+                    })}
+                  </select>
+                </label>
+                <label>
+                  <span className='edit-label column-heading'>Label</span>
+                  <input
+                    type='text'
+                    value={filter.label}
+                    onChange={e => {
+                      updateFilterProp('label', index, e.target.value)
+                    }}
+                  />
+                </label>
 
-                  <label>
-                    <span className='edit-showDropdown column-heading'>Show Filter Input</span>
-                    <input
-                      type='checkbox'
-                      checked={filter.showDropdown === undefined ? true : filter.showDropdown}
-                      onChange={e => {
-                        updateFilterProp('showDropdown', index, e.target.checked)
-                      }}
-                    />
-                  </label>
+                <label>
+                  <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
+                  <input
+                    type='text'
+                    value={filter.setByQueryParameter}
+                    onChange={e => {
+                      updateFilterProp('setByQueryParameter', index, e.target.value)
+                    }}
+                  />
+                </label>
 
-                  <label>
-                    <span className='edit-label column-heading'>Filter Style</span>
+                <label>
+                  <span className='edit-filterOrder column-heading'>Filter Order</span>
+                  <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
+                    {filterOrderOptions.map((option, index) => {
+                      return (
+                        <option value={option.value} key={`filter-${index}`}>
+                          {option.label}
+                        </option>
+                      )
+                    })}
+                  </select>
 
-                    <select
-                      value={filter.filterStyle}
-                      onChange={e => {
-                        updateFilterProp('filterStyle', index, e.target.value)
-                      }}
-                    >
-                      {filterStyleOptions.map((item, index) => {
-                        return (
-                          <option key={`filter-style-${index}`} value={item}>
-                            {item}
-                          </option>
-                        )
-                      })}
-                    </select>
-                  </label>
-                  <label>
-                    <span className='edit-label column-heading'>Label</span>
-                    <input
-                      type='text'
-                      value={filter.label}
-                      onChange={e => {
-                        updateFilterProp('label', index, e.target.value)
-                      }}
-                    />
-                  </label>
-
-                  <label>
-                    <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
-                    <input
-                      type='text'
-                      value={filter.setByQueryParameter}
-                      onChange={e => {
-                        updateFilterProp('setByQueryParameter', index, e.target.value)
-                      }}
-                    />
-                  </label>
-
-                  <label>
-                    <span className='edit-filterOrder column-heading'>Filter Order</span>
-                    <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
-                      {filterOrderOptions.map((option, index) => {
-                        return (
-                          <option value={option.value} key={`filter-${index}`}>
-                            {option.label}
-                          </option>
-                        )
-                      })}
-                    </select>
-
-                    {filter.order === 'cust' && (
-                      <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, config.filters[index])}>
-                        <Droppable droppableId='filter_order'>
-                          {provided => (
-                            <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-                              {config.filters[index]?.values.map((value, index) => {
-                                return (
-                                  <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
-                                    {(provided, snapshot) => (
-                                      <li>
-                                        <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={provided.draggableProps.style} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                          {value}
-                                        </div>
-                                      </li>
-                                    )}
-                                  </Draggable>
-                                )
-                              })}
-                              {provided.placeholder}
-                            </ul>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
-                    )}
-                  </label>
-                </fieldset>
-              )
-            })}
-          </ul>
-        )}
-        {!config.filters && <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
-        <button type='button' onClick={addNewFilter} className='btn btn-primary full-width'>
-          Add Filter
-        </button>
-      </AccordionItemPanel>
-    </AccordionItem>
+                  {filter.order === 'cust' && (
+                    <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, config.filters[index])}>
+                      <Droppable droppableId='filter_order'>
+                        {provided => (
+                          <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
+                            {config.filters[index]?.values.map((value, index) => {
+                              return (
+                                <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
+                                  {(provided, snapshot) => (
+                                    <li>
+                                      <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={provided.draggableProps.style} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                        {value}
+                                      </div>
+                                    </li>
+                                  )}
+                                </Draggable>
+                              )
+                            })}
+                            {provided.placeholder}
+                          </ul>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
+                  )}
+                </label>
+              </fieldset>
+            )
+          })}
+        </ul>
+      )}
+      {!config.filters && <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
+      <button type='button' onClick={addNewFilter} className='btn btn-primary full-width'>
+        Add Filter
+      </button>
+    </>
   )
 }
 
