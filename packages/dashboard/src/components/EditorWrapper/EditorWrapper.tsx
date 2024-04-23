@@ -37,9 +37,9 @@ const EditorWrapper: React.FC<React.PropsWithChildren<EditorProps>> = ({ childre
           <div aria-level={2} role='heading' className='heading-2'>
             Configure {type}
           </div>
-          <form>
+          <section>
             <Accordion allowZeroExpanded={true}>{children}</Accordion>
-          </form>
+          </section>
         </section>
         <div className='preview-wrapper'>
           <Component visualizationKey={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} configUrl={undefined} setEditing={undefined} hostname={undefined} viewport={viewport} />

@@ -370,6 +370,7 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                   value={filter.pivot}
                   onChange={e => {
                     updateFilterProp('pivot', e.target.value)
+                    updateFilterProp('showDropdown', true)
                   }}
                 >
                   <option value=''>- Select Option -</option>
@@ -392,16 +393,19 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                   }}
                 />
               </label>
-              <label>
-                <span className='edit-label column-heading'>Show Dropdown</span>
-                <input
-                  type='checkbox'
-                  defaultChecked={filter.showDropdown === true}
-                  onChange={e => {
-                    updateFilterProp('showDropdown', !filter.showDropdown)
-                  }}
-                />
-              </label>
+              {!filter.pivot && (
+                <label>
+                  <span className='edit-label column-heading'>Show Dropdown</span>
+                  <input
+                    type='checkbox'
+                    defaultChecked={filter.showDropdown === true}
+                    onChange={e => {
+                      updateFilterProp('showDropdown', !filter.showDropdown)
+                    }}
+                  />
+                </label>
+              )}
+
               <label>
                 <span className='edit-label column-heading'>Set By: </span>
                 <select value={filter.setBy} onChange={e => updateFilterProp('setBy', e.target.value)}>
