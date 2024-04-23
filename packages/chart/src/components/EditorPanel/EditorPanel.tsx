@@ -1662,7 +1662,7 @@ const EditorPanel = () => {
                               {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
                             </select>
                           </label>
-                           
+
                           <CheckBox value={config.xAxis.manual} section='xAxis' fieldName='manual' label='Manual Ticks' updateField={updateField} />
 
                           {visSupportsDateCategoryAxisPadding() && (
@@ -1753,7 +1753,7 @@ const EditorPanel = () => {
                                   <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>Enter a data suffix (such as "$"), if applicable.</p>
+                                  <p>Enter a data prefix (such as "$"), if applicable.</p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
@@ -1937,10 +1937,12 @@ const EditorPanel = () => {
                         </>
                       )}
 
-                      
-
-                      {visSupportsDateCategoryNumTicks() && config.xAxis.type !== 'date-time' && config.xAxis.manual && <TextField value={config.xAxis.manualStep} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='manualStep' label='Step count' className='number-narrow' updateField={updateField} />}
-                      {visSupportsDateCategoryNumTicks() && (config.xAxis.type === 'date-time' || !config.xAxis.manual) && <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />}
+                      {visSupportsDateCategoryNumTicks() && config.xAxis.type !== 'date-time' && config.xAxis.manual && (
+                        <TextField value={config.xAxis.manualStep} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='manualStep' label='Step count' className='number-narrow' updateField={updateField} />
+                      )}
+                      {visSupportsDateCategoryNumTicks() && (config.xAxis.type === 'date-time' || !config.xAxis.manual) && (
+                        <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
+                      )}
                       {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.size} type='number' min={0} section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
