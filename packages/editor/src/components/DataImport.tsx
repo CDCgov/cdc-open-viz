@@ -113,7 +113,8 @@ export default function DataImport() {
           responseBlob = response.data
 
           // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
-          if ((fileExtension === '.csv' && responseBlob.type === 'text/plain') || isSolrCsv(externalURL)) {
+          const csvTypes = ['text/csv', 'text/plain']
+          if ((fileExtension === '.csv' && csvTypes.includes(responseBlob.type)) || isSolrCsv(externalURL)) {
             responseBlob = responseBlob.slice(0, responseBlob.size, 'text/csv')
           } else if (responseBlob.type === 'application/json' || (fileExtension === '.json' && responseBlob.type === 'text/plain') || isSolrJson(externalURL)) {
             responseBlob = responseBlob.slice(0, responseBlob.size, 'application/json')
@@ -175,7 +176,7 @@ export default function DataImport() {
       }
 
       if (fileSourceType === 'url') {
-        return 'application/json'
+        return fileData.type
       }
     }
 
