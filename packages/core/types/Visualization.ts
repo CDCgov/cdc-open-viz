@@ -6,20 +6,16 @@ import { Table } from './Table'
 import { ConfidenceInterval } from './ConfidenceInterval'
 import { BaseVisualizationType } from './BaseVisualizationType'
 import { ConfigureData } from './ConfigureData'
-import { VizFilter } from './VizFilter'
-import { FilterBehavior } from './FilterBehavior'
 
 export type Visualization = ConfigureData & {
   autoLoad: boolean
-  columns: Record<string, Partial<Column>>
+  columns: Record<string, Column>
   confidenceKeys: ConfidenceInterval
   dataFileName: string
   dataFileSourceType: string
   dataFormat: any
   datasets: Record<string, any>
   editing: boolean
-  filterBehavior: FilterBehavior
-  filters: VizFilter[]
   general: any
   hide: any[]
   legend: Legend

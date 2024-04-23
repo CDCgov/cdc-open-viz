@@ -4,8 +4,6 @@ import { Visualization } from '@cdc/core/types/Visualization'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useMemo } from 'react'
 import ColumnsEditor from '../../EditorPanel/ColumnsEditor'
-import VizFilterEditor from '../../EditorPanel/VizFilterEditor'
-import _ from 'lodash'
 
 type DataTableEditorProps = {
   config: Visualization
@@ -15,7 +13,7 @@ type DataTableEditorProps = {
 const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateConfig }) => {
   const updateField = useMemo(() => updateFieldFactory(config, updateConfig), [JSON.stringify(config)])
   const deleteColumn = columnName => {
-    const newColumns = _.cloneDeep(config.columns)
+    const newColumns = config.columns
 
     delete newColumns[columnName]
 
@@ -25,25 +23,10 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
     })
   }
 
-  const columns = Object.keys(config.originalFormattedData[0] || {})
+  const columns = Object.keys(config.columns || {})
   return (
     <>
-      <AccordionItem>
-        <AccordionItemHeading>
-          <AccordionItemButton>Filters</AccordionItemButton>
-        </AccordionItemHeading>
-        <AccordionItemPanel>
-          <VizFilterEditor config={config} updateField={updateField} rawData={config.originalFormattedData} />
-        </AccordionItemPanel>
-      </AccordionItem>
-      <AccordionItem>
-        <AccordionItemHeading>
-          <AccordionItemButton>Columns</AccordionItemButton>
-        </AccordionItemHeading>
-        <AccordionItemPanel>
-          <ColumnsEditor config={config} updateField={updateField} deleteColumn={deleteColumn} />
-        </AccordionItemPanel>
-      </AccordionItem>
+      <ColumnsEditor config={config} updateField={updateField} deleteColumn={deleteColumn} />
       <AccordionItem>
         <AccordionItemHeading>
           <AccordionItemButton>Data Table</AccordionItemButton>

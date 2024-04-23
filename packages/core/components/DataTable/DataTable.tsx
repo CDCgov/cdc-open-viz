@@ -185,7 +185,7 @@ const DataTable = (props: DataTableProps) => {
         </MediaControls.Section>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
-          {config.table.collapsible !== false && <ExpandCollapse expanded={expanded} setExpanded={setExpanded} fontSize={config.fontSize} tableTitle={tableTitle} viewport={viewport} />}
+          <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} fontSize={config.fontSize} viewport={viewport} />
           <div className='table-container' style={limitHeight}>
             <Table
               viewport={viewport}

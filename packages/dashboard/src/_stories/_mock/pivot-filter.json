@@ -41,8 +41,6 @@
         "horizontal": false,
         "series": false
       },
-      "filters": [],
-      "filterBehavior": "Filter Change",
       "formattedData": [
         {
           "Race": "Hispanic or Latino",
