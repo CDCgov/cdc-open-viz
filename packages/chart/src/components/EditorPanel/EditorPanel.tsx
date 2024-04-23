@@ -9,6 +9,8 @@ import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
+import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
+import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 
@@ -28,10 +30,8 @@ import { type ChartContext } from '../../types/ChartContext'
 
 import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
-import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import EditorPanelContext from './EditorPanelContext'
 import _ from 'lodash'
-import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 
 const DataSuppression = memo(({ config, updateConfig, data }: any) => {
   const getColumnOptions = () => {
@@ -2242,7 +2242,16 @@ const EditorPanel = () => {
             <Panels.Regions name='Regions' />
 
             {/* Columns */}
-            {config.visualizationType !== 'Box Plot' && <ColumnsEditor config={config} updateField={updateField} deleteColumn={removeAdditionalColumn} />}
+            {config.visualizationType !== 'Box Plot' && (
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Columns</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <ColumnsEditor config={config} updateField={updateField} deleteColumn={removeAdditionalColumn} />{' '}
+                </AccordionItemPanel>
+              </AccordionItem>
+            )}
             {/* End Columns */}
             {visHasLegend() && (
               <AccordionItem>
@@ -2374,7 +2383,16 @@ const EditorPanel = () => {
                 </AccordionItemPanel>
               </AccordionItem>
             )}
-            {visSupportsFilters() && <VizFilterEditor config={config} updateField={updateField} rawData={rawData} />}
+            {visSupportsFilters() && (
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Filters</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <VizFilterEditor config={config} updateField={updateField} rawData={rawData} />
+                </AccordionItemPanel>
+              </AccordionItem>
+            )}
             <Panels.Visual name='Visual' />
             {/* Spark Line has no data table */}
             {config.visualizationType !== 'Spark Line' && (

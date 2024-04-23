@@ -7,7 +7,7 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
   const excludeColumns = Object.values(configColumns)
     .filter(column => column.dataTable === false)
     .map(column => column.name)
-  let tmpSeriesColumns
+  let tmpSeriesColumns: string[] = []
   if (config.visualizationType !== 'Pie') {
     tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey] : [] //, ...config.runtime.seriesLabelsAll
     if (config.series) {
@@ -32,11 +32,25 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
   })
 
   const columnOrderingHash = Object.values(configColumns).reduce((acc, column) => {
-    acc[column.name] = column.order || 0
+    // subtract 1 to switch from cardinal positioning to index
+    if (column.order !== undefined) {
+      acc[column.name] = column.order - 1
+    }
     return acc
   }, {})
 
-  tmpSeriesColumns.sort((a, b) => (columnOrderingHash[a] || 0) - (columnOrderingHash[b] || 0))
+  tmpSeriesColumns.forEach((columnName, index) => {
+    if (columnOrderingHash[columnName] === undefined) {
+      if (Object.values(columnOrderingHash).includes(index)) {
+        // add 1 to place unsorted columns behind sorted columns
+        columnOrderingHash[columnName] = index + 1
+      } else {
+        columnOrderingHash[columnName] = index
+      }
+    }
+  })
+
+  tmpSeriesColumns.sort((a, b) => columnOrderingHash[a] - columnOrderingHash[b])
 
   return tmpSeriesColumns.filter(columnName => !excludeColumns.includes(columnName))
 }
