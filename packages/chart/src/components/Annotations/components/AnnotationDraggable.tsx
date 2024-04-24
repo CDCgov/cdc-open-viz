@@ -4,8 +4,10 @@ import { Drag, raise } from '@visx/drag'
 import { Label, Connector, CircleSubject, LineSubject, EditableAnnotation } from '@visx/annotation'
 import { findNearestDatum } from './findNearestDatum'
 import { applyBandScaleOffset } from './helpers'
+import { scaleOrdinal } from '@visx/scale'
 
 import './AnnotationDraggable.styles.css'
+import useColorScale from '../../../hooks/useColorScale'
 
 const Annotations = ({ xScale, yScale, xMax }) => {
   const [draggingItems, setDraggingItems] = useState([])
@@ -13,6 +15,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
   const [width, height] = dimensions
   const prevDimensions = useRef(dimensions)
   const { annotations } = config
+  const { colorScale } = useColorScale()
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
 
@@ -150,7 +153,8 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                               xScale,
                               yScale,
                               config,
-                              xMax: xMax - config.yAxis.size / 2
+                              xMax: xMax - config.yAxis.size / 2,
+                              annotationSeriesKey: annotation.seriesKey
                             },
                             props.x
                           )
@@ -158,9 +162,9 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                           return {
                             ...annotation,
                             xKey: nearestDatum.x,
-                            yKey: nearestDatum.y[0],
+                            yKey: nearestDatum.y,
                             x: xScale(nearestDatum.x),
-                            y: yScale(nearestDatum.y[0]),
+                            y: yScale(nearestDatum.y),
                             dx: props.dx,
                             dy: props.dy
                           }
@@ -182,12 +186,19 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                   >
                     <Label className='annotation__desktop-label' title={annotation.title} subtitle={annotation.text} backgroundFill='#f5f5f5' />
                     <Connector />
-                    <circle fill='white' cx={Number(annotation.dx) + xScale(annotation.xKey) + xScale.bandwidth() / 2 + Number(config.yAxis.size)} cy={yScale(annotation.yKey) + Number(annotation.dy)} r={16} className='annotation__mobile-label annotation__mobile-label-circle' />
+                    <circle
+                      fill='white'
+                      cx={Number(annotation.dx) + xScale(annotation.xKey) + xScale.bandwidth() / 2 + Number(config.yAxis.size)}
+                      cy={yScale(annotation.yKey) + Number(annotation.dy)}
+                      r={16}
+                      className='annotation__mobile-label annotation__mobile-label-circle'
+                      stroke={colorScale(annotation.seriesKey)}
+                    />
                     <text x={Number(annotation.dx) + Number(xScale(annotation.xKey)) + xScale.bandwidth() / 2 + Number(config.yAxis.size) - 16 / 3} y={yScale(annotation.yKey) + Number(annotation.dy) + 5} className='annotation__mobile-label'>
                       {index + 1}
                     </text>
 
-                    <CircleSubject className='circle-subject' stroke={style.getPropertyValue('--primary')} />
+                    <CircleSubject className='circle-subject' stroke={colorScale(annotation.seriesKey)} />
                     {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + xScale.bandwidth() / 2} />}
                     {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />}
                   </EditableAnnotation>

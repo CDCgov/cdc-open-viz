@@ -33,7 +33,31 @@ type Annotation = {
 }
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
-  const { updateConfig, config } = useContext(ConfigContext)
+  const { updateConfig, config, unfilteredData } = useContext(ConfigContext)
+
+  const getColumns = (filter = true) => {
+    let columns = {}
+    unfilteredData.forEach(row => {
+      Object.keys(row).forEach(columnName => (columns[columnName] = true))
+    })
+
+    if (filter) {
+      Object.keys(columns).forEach(key => {
+        if (
+          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
+          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))
+          /*
+            TODO: Resolve errors when config keys exist, but have no value
+              Proposal:  (((confidenceUpper && confidenceLower) || confidenceUpper || confidenceLower) && Object.keys(config.confidenceKeys).includes(key))
+          */
+        ) {
+          delete columns[key]
+        }
+      })
+    }
+
+    return Object.keys(columns)
+  }
 
   const handleAnnotationUpdate = (value, property, index) => {
     const annotations = [...config?.annotations]
@@ -87,10 +111,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   const handleRemoveAnnotation = (annotationIndex: number) => {
-    console.log(config.annotations)
     const updated = config.annotations.filter((_, index) => index !== annotationIndex)
-
-    console.log('updated', updated)
     updateConfig({
       ...config,
       annotations: updated
@@ -218,6 +239,23 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     })
                   }}
                 />
+              </label>
+              <label>
+                Associated Series:
+                <select
+                  onChange={e => {
+                    const updatedAnnotations = [...config?.annotations]
+                    updatedAnnotations[index].seriesKey = e.target.value
+                    updateConfig({
+                      ...config,
+                      annotations: updatedAnnotations
+                    })
+                  }}
+                >
+                  {getColumns(false).map((column, columnIndex) => {
+                    return <option>{column}</option>
+                  })}
+                </select>
               </label>
               <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
                 Delete Annotation

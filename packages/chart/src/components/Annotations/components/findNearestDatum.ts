@@ -48,7 +48,7 @@ const getXValueFromCoordinate = (x, isClick = false) => {
   return x
 }
 
-const findNearestDatum = ({ data, xScale, yScale, config, xMax }, xPosition) => {
+const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeriesKey }, xPosition) => {
   const { xAxis, visualizationType, orientation } = config
 
   const parseDate = (dateString, showError = true) => {
@@ -123,9 +123,9 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax }, xPosition) => 
     closestSeries = config.data.filter(d => new Date(d[config.xAxis.dataKey]).getTime() === xValue)
   }
   if (closestSeries.length === 0) return { x: 0, y: 0 }
-  const yValues = config.runtime.seriesLabelsAll?.map(key => closestSeries[0][key]) // Map each key to its corresponding value in data
+  const y = closestSeries[0][annotationSeriesKey] // Map each key to its corresponding value in data
   const x = xValue
-  const y = yValues
+  console.log('y series', y)
   return { x, y }
 }
 

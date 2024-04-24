@@ -4,7 +4,6 @@
 
 .cdc-open-viz-module {
   .annotation__mobile-label-circle {
-    stroke: var(--primary);
     stroke-width: 2;
     stroke-dasharray: 5 5;
   }
