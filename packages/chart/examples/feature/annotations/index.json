@@ -26,15 +26,15 @@
         "horizontal": false
       },
       "edit": {
-        "subject": false,
-        "label": false
+        "subject": true,
+        "label": true
       },
-      "xKey": 1455523200000,
-      "yKey": "40",
-      "x": 220.11744360902256,
-      "y": 223,
-      "dx": 0,
-      "dy": 0
+      "xKey": 1458025200000,
+      "yKey": "50",
+      "x": 248.21533834586467,
+      "y": 195.125,
+      "dx": 93.37864661654135,
+      "dy": -31
     }
   ],
   "type": "chart",

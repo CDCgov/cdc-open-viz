@@ -10,7 +10,6 @@ export type TransformedData = {
 }
 
 type SharedChartContext = {
-  annotations: any
   animatedChart?: boolean
   // process top level chart aria label for each chart type
   handleChartAriaLabels: (config: any) => string

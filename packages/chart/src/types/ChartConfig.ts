@@ -12,6 +12,7 @@ import { Legend } from '@cdc/core/types/Legend'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
 import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps'
+import { type Annotation } from '@cdc/core/types/Annotation'
 
 export type ChartColumns = Record<string, Column>
 
@@ -82,6 +83,7 @@ type Visual = {
 }
 
 type AllChartsConfig = {
+  annotations: Annotation[]
   animate: boolean
   general: General
   barHasBorder: 'true' | 'false'

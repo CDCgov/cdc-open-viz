@@ -1,12 +1,9 @@
-import React, { useContext, useState, useRef, useEffect } from 'react'
+import { useContext, useState, useRef, useEffect } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import { Drag, raise } from '@visx/drag'
-import { Text } from '@visx/text'
-import { Group } from '@visx/group'
-import { HtmlLabel, Label, Connector, CircleSubject, LineSubject, EditableAnnotation } from '@visx/annotation'
+import { Label, Connector, CircleSubject, LineSubject, EditableAnnotation } from '@visx/annotation'
 import { findNearestDatum } from './findNearestDatum'
-import { updateOrdinalScale } from '@visx/scale/lib/scales/ordinal'
-import { update } from 'lodash'
+import { applyBandScaleOffset } from './helpers'
 
 import './AnnotationDraggable.styles.css'
 
@@ -18,7 +15,6 @@ const Annotations = ({ xScale, yScale, xMax }) => {
   const { annotations } = config
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
-  const applyBandScaleOffset = (num: number) => num + Number(config.yAxis.size) + xScale.bandwidth() / 2
 
   const convertXValueToTimestamp = (xValue, minX, maxX, domain) => {
     // Calculate the percentage position of xValue between minX and maxX
@@ -47,7 +43,6 @@ const Annotations = ({ xScale, yScale, xMax }) => {
     }
 
     if (config.xAxis.type === 'date') {
-      const xValue = x // Assuming x is the coordinate on the chart
       const xTimestamp = convertXValueToTimestamp(x, 0, xMax, xScale.domain())
 
       // Calculate the closest date to the x coordinate
@@ -68,54 +63,54 @@ const Annotations = ({ xScale, yScale, xMax }) => {
     return x
   }
 
-  useEffect(() => {
-    const handleResize = () => {
-      const [prevWidth, prevHeight] = prevDimensions.current
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     const [prevWidth, prevHeight] = prevDimensions.current
 
-      // Calculate the scaling factors for both axes
-      const xScaleFactor = width / prevWidth
-      const yScaleFactor = height / prevHeight
+  //     // Calculate the scaling factors for both axes
+  //     const xScaleFactor = width / prevWidth
+  //     const yScaleFactor = height / prevHeight
 
-      // Update the previous dimensions
-      prevDimensions.current = [width, height]
+  //     // Update the previous dimensions
+  //     prevDimensions.current = [width, height]
 
-      // Update the annotation positions
-      const updatedAnnotations = config.annotations.map((annotation, index) => {
-        // Calculate new x and y positions based on the scaling factors
-        const nearestDatum = findNearestDatum(
-          {
-            data: config.data.map(data => data[config.xAxis.dataKey]),
-            xScale,
-            yScale,
-            config,
-            xMax: xMax - config.yAxis.size / 2
-          },
-          annotation.x
-        )
+  //     // Update the annotation positions
+  //     const updatedAnnotations = config.annotations.map((annotation, index) => {
+  //       // Calculate new x and y positions based on the scaling factors
+  //       const nearestDatum = findNearestDatum(
+  //         {
+  //           data: config.data.map(data => data[config.xAxis.dataKey]),
+  //           xScale,
+  //           yScale,
+  //           config,
+  //           xMax: xMax - config.yAxis.size / 2
+  //         },
+  //         annotation.x
+  //       )
 
-        const x = annotation.x * xScaleFactor
+  //       const x = annotation.x * xScaleFactor
 
-        const y = annotation.y * yScaleFactor
+  //       const y = annotation.y * yScaleFactor
 
-        return {
-          ...annotation,
-          x: xScale(getXValueFromCoordinate(annotation.x)),
-          y: y
-        }
-      })
+  //       return {
+  //         ...annotation,
+  //         x: xScale(getXValueFromCoordinate(annotation.x)),
+  //         y: y
+  //       }
+  //     })
 
-      // Update the annotations in your config or state
-      // For example, if config is a state variable:
-      setTimeout(() => {
-        updateConfig({ ...config, annotations: updatedAnnotations })
-      }, 1000)
-    }
+  //     // Update the annotations in your config or state
+  //     // For example, if config is a state variable:
+  //     setTimeout(() => {
+  //       updateConfig({ ...config, annotations: updatedAnnotations })
+  //     }, 1000)
+  //   }
 
-    window.addEventListener('resize', handleResize)
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [width, height, config, xMax])
+  //   window.addEventListener('resize', handleResize)
+  //   return () => {
+  //     window.removeEventListener('resize', handleResize)
+  //   }
+  // }, [width, height, config, xMax])
 
   return (
     annotations &&
@@ -128,8 +123,6 @@ const Annotations = ({ xScale, yScale, xMax }) => {
             height={height}
             x={annotation.x} // subject x
             y={annotation.y} // subject y
-            dx={annotation.dx}
-            dy={annotation.dy}
             restrict={restrictedArea}
             onDragStart={() => {
               setDraggingItems(raise(annotations, index))
@@ -142,8 +135,10 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                   <EditableAnnotation
                     width={width}
                     height={height}
-                    x={applyBandScaleOffset(annotation.x) || x}
-                    y={annotation.y || y}
+                    dx={annotation.dx}
+                    dy={annotation.dy}
+                    x={applyBandScaleOffset(xScale(annotation.xKey), config, xScale) || 0}
+                    y={yScale(annotation.yKey) || y}
                     canEditLabel={annotation.edit.label || false}
                     canEditSubject={annotation.edit.subject || false}
                     onDragEnd={props => {
@@ -187,8 +182,8 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                   >
                     <Label className='annotation__desktop-label' title={annotation.title} subtitle={annotation.text} backgroundFill='#f5f5f5' />
                     <Connector />
-                    <circle fill='white' cx={x + dx + xScale.bandwidth() / 2 + Number(config.yAxis.size)} cy={y + dy} r={16} className='annotation__mobile-label annotation__mobile-label-circle' />
-                    <text x={Number(dx) + Number(x) + xScale.bandwidth() / 2 + Number(config.yAxis.size) - 16 / 3} y={y + dy + 5} className='annotation__mobile-label'>
+                    <circle fill='white' cx={Number(annotation.dx) + xScale(annotation.xKey) + xScale.bandwidth() / 2 + Number(config.yAxis.size)} cy={yScale(annotation.yKey) + Number(annotation.dy)} r={16} className='annotation__mobile-label annotation__mobile-label-circle' />
+                    <text x={Number(annotation.dx) + Number(xScale(annotation.xKey)) + xScale.bandwidth() / 2 + Number(config.yAxis.size) - 16 / 3} y={yScale(annotation.yKey) + Number(annotation.dy) + 5} className='annotation__mobile-label'>
                       {index + 1}
                     </text>
 
