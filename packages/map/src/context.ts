@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { MapConfig } from './MapConfig'
+import { MapConfig } from './types/MapConfig'
 
 type MapContext = {
   applyLegendToRow
@@ -42,6 +42,7 @@ type MapContext = {
   supportedCountries
   supportedTerritories
   titleCase
+  tooltipId: string
   viewport
 }
 
