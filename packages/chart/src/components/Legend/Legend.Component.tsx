@@ -28,7 +28,6 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
   const { innerClasses, containerClasses } = useLegendClasses(config)
   const { runtime, orientation, legend } = config
   if (!legend) return null
-  const fontSizes = { small: 16, medium: 18, large: 20 }
   const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
 
   const legendClasses = {
@@ -39,12 +38,11 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
-  const fontSize = ['sm', 'xs', 'xxs'].includes(currentViewport) ? { fontSize: '11px' } : { fontSize: fontSizes[config.fontSize] }
-  const fontSizeLabel = { fontSize: '1.3rem' }
+  const fontSize = ['sm', 'xs', 'xxs'].includes(currentViewport) ? { fontSize: '11px' } : null
 
   return (
     <aside ref={ref} style={legendClasses} id={skipId || 'legend'} className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
-      {legend.label && <h3 style={fontSizeLabel}>{parse(legend.label)}</h3>}
+      {legend.label && <h3>{parse(legend.label)}</h3>}
       {legend.description && <p style={fontSize}>{parse(legend.description)}</p>}
 
       <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
@@ -55,7 +53,6 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                 {formatLabels(labels as Label[]).map((label, i) => {
                   let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
                   let itemName = label.datum
-                  console.log(label)
 
                   // Filter excluded data keys from legend
                   if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {

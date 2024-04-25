@@ -35,7 +35,6 @@ const Legend = forwardRef((props, ref) => {
 
   const { legend } = state
   const fontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? { fontSize: '11px' } : null
-  const fontSizeTitle = ['sm', 'xs', 'xxs'].includes(viewport) ? { fontSize: '15px' } : null
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -181,11 +180,7 @@ const Legend = forwardRef((props, ref) => {
       <div className='legends'>
         <aside id={skipId || 'legend'} className={legendClasses.aside.join(' ') || ''} role='region' aria-label='Legend' tabIndex={0} ref={ref}>
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
-            {legend.title && (
-              <h3 style={fontSizeTitle} className={legendClasses.title.join(' ') || ''}>
-                {parse(legend.title)}
-              </h3>
-            )}
+            {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
             {legend.dynamicDescription === false && legend.description && (
               <p style={fontSize} className={legendClasses.description.join(' ') || ''}>
                 {parse(legend.description)}
