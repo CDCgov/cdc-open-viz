@@ -61,7 +61,6 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
 
   useEffect(() => {
     const runSetColumns = async () => {
-      if (config.filterBehavior === FilterBehavior.Apply) return
       let columns = {}
       let dataKeys = Object.keys(config.datasets)
 
