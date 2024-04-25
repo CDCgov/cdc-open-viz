@@ -110,7 +110,6 @@ const Legend = forwardRef((props, ref) => {
               toggleLegendActive(idx, legendLabel)
             }
           }}
-          role='button'
           tabIndex={0}
         >
           <LegendCircle viewport={viewport} fill={entry.color} /> <span>{legendLabel}</span>
