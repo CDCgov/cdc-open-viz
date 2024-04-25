@@ -56,7 +56,7 @@ const LineChartBumpCircle = props => {
               </text>
               )}
               {config.showTooltips && tooltipID && (
-                <ReactTooltip id={`bump-chart`} afterHide={() => clearClick()} variant='light' className='sankey-chart__tooltip'/>
+                <ReactTooltip id={`bump-chart`} afterHide={() => clearClick()} variant='light' className='bump-chart__tooltip'/>
               )}
             </>
           )}
