@@ -35,89 +35,15 @@ import { Anchor } from '@cdc/core/types/Axis'
 import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import EditorPanelContext from './EditorPanelContext'
 
-const DataSuppression = memo(({ config, updateConfig, data }: any) => {
+const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartConfig; updateConfig: Function; data: Record<string, any>[] }) => {
   const getColumnOptions = () => {
-    const keys = new Set()
+    const keys = new Set<string>()
     data.forEach(d => {
       Object.keys(d).forEach(key => {
         keys.add(key)
       })
     })
-    return [...keys]
-  }
-
-  const getIconOptions = () => {
-    return ['star']
-  }
-
-  let removeColumn = i => {
-    let suppressedData = []
-
-    if (config.suppressedData) {
-      suppressedData = [...config.suppressedData]
-    }
-
-    suppressedData.splice(i, 1)
-
-    updateConfig({ ...config, suppressedData })
-  }
-
-  let addColumn = () => {
-    let suppressedData = config.suppressedData ? [...config.suppressedData] : []
-    suppressedData.push({ label: '', column: '', value: '', icon: '' })
-    updateConfig({ ...config, suppressedData })
-  }
-
-  let update = (fieldName, value, i) => {
-    let suppressedData = []
-
-    if (config.suppressedData) {
-      suppressedData = [...config.suppressedData]
-    }
-
-    suppressedData[i][fieldName] = value
-    updateConfig({ ...config, suppressedData })
-  }
-
-  return (
-    <>
-      {config.suppressedData &&
-        config.suppressedData.map(({ label, column, value, icon }, i) => {
-          return (
-            <div key={`suppressed-${i}`} className='edit-block'>
-              <button
-                type='button'
-                className='remove-column'
-                onClick={event => {
-                  event.preventDefault()
-                  removeColumn(i)
-                }}
-              >
-                Remove
-              </button>
-              <Select value={column} initial='Select' fieldName='column' label='Column' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
-              <TextField value={value} fieldName='value' label='Value' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
-              <Select value={icon} initial='Select' fieldName='icon' label='Icon' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getIconOptions()} />
-              <TextField value={label} fieldName='label' label='Label' placeholder='suppressed' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
-            </div>
-          )
-        })}
-
-      <button type='button' onClick={addColumn} className='btn full-width'>
-        Add Suppression Class
-      </button>
-    </>
-  )
-})
-const PreliminaryData = memo(({ config, updateConfig, data }) => {
-  const getColumnOptions = () => {
-    const keys = new Set()
-    data.forEach(d => {
-      Object.keys(d).forEach(key => {
-        keys.add(key)
-      })
-    })
-    return [...keys]
+    return Array.from(keys)
   }
 
   const getTypeOptions = () => {
@@ -133,7 +59,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
       return ['Dashed Small', 'Dashed Medium', 'Dashed Large', 'Open Circles']
     }
     if (config.visualizationType === 'Bar') {
-      return ['star']
+      return ['Asterisk', 'Double Asterisks', 'Dagger', 'Double Daggers', 'Section Sign', 'Pilcrow', 'Hash']
     }
   }
 
@@ -150,8 +76,9 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
   }
 
   let addColumn = () => {
+    const defaultLabel = config.visualizationType === 'Bar' ? 'Suppressed' : ''
     let preliminaryData = config.preliminaryData ? [...config.preliminaryData] : []
-    preliminaryData.push({ type: '', label: '', column: '', value: '', style: '' })
+    preliminaryData.push({ type: '', seriesKey: '', label: defaultLabel, column: '', value: '', style: '', displayTooltip: true, displayLegend: true, displayTable: true, symbol: '' })
     updateConfig({ ...config, preliminaryData })
   }
 
@@ -169,7 +96,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
   return (
     <>
       {config.preliminaryData &&
-        config.preliminaryData.map(({ seriesKey, type, label, column, value, style }, i) => {
+        config.preliminaryData.map(({ seriesKey, type, label, column, value, style, displayTooltip, displayLegend, displayTable, symbol }, i) => {
           return (
             <div key={`preliminaryData-${i}`} className='edit-block'>
               <button
@@ -182,13 +109,62 @@ const PreliminaryData = memo(({ config, updateConfig, data }) => {
               >
                 Remove
               </button>
-              <Select value={type} initial='Select' fieldName='type' label='Type' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
-              <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='ASSOCIATE TO SERIES' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={config.runtime.lineSeriesKeys ?? config.runtime?.seriesKeys} />
-              <Select value={column} initial='Select' fieldName='column' label='COLUMN WITH CONFIGURATION VALUE' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
-              <TextField value={value} fieldName='value' label='VALUE TO TRIGGER' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
-              <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions()} />
+              {config.visualizationType === 'Bar' ? (
+                <>
+                  <Select value={type} initial='Select' fieldName='type' label='Type' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
+                  <Select
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>If no “Series Name” is selected, the symbol will be applied to "all" suppressed values indicated in the dataset.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={column}
+                    initial='Select'
+                    fieldName='column'
+                    label='Add Data Series'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                    options={config.runtime?.seriesKeys}
+                  />
+                  <TextField value={value} fieldName='value' label='Suppressed Data  Value' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                  <Select
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={symbol}
+                    initial='Select'
+                    fieldName='symbol'
+                    label='suppression symbol'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                    options={getStyleOptions()}
+                  />
+                  <TextField value={label ? label : 'Suppressed'} fieldName='label' label='Suppressed Data Label' placeholder='' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                  <CheckBox value={displayTooltip} fieldName='displayTooltip' label='Display on tooltips' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                  <CheckBox value={displayLegend} fieldName='displayLegend' label='Display on legend' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                  <CheckBox value={displayTable} fieldName='displayTable' label='Display on data table' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                </>
+              ) : (
+                <>
+                  <Select value={type} initial='Select' fieldName='type' label='Type' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
+                  <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='ASSOCIATE TO SERIES' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={config.runtime.lineSeriesKeys ?? config.runtime?.seriesKeys} />
+                  <Select value={column} initial='Select' fieldName='column' label='COLUMN WITH CONFIGURATION VALUE' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
+                  <TextField value={value} fieldName='value' label='VALUE TO TRIGGER' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                  <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions()} />
 
-              <TextField value={label} fieldName='label' label='Label' placeholder='' updateField={(section, subsection, fieldName, value) => update(fieldName, value, i)} />
+                  <TextField value={label} fieldName='label' label='Label' placeholder='' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                </>
+              )}
             </div>
           )
         })}
@@ -1662,7 +1638,7 @@ const EditorPanel = () => {
                               {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
                             </select>
                           </label>
-                           
+
                           <CheckBox value={config.xAxis.manual} section='xAxis' fieldName='manual' label='Manual Ticks' updateField={updateField} />
 
                           {visSupportsDateCategoryAxisPadding() && (
@@ -1937,10 +1913,12 @@ const EditorPanel = () => {
                         </>
                       )}
 
-                      
-
-                      {visSupportsDateCategoryNumTicks() && config.xAxis.type !== 'date-time' && config.xAxis.manual && <TextField value={config.xAxis.manualStep} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='manualStep' label='Step count' className='number-narrow' updateField={updateField} />}
-                      {visSupportsDateCategoryNumTicks() && (config.xAxis.type === 'date-time' || !config.xAxis.manual) && <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />}
+                      {visSupportsDateCategoryNumTicks() && config.xAxis.type !== 'date-time' && config.xAxis.manual && (
+                        <TextField value={config.xAxis.manualStep} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='manualStep' label='Step count' className='number-narrow' updateField={updateField} />
+                      )}
+                      {visSupportsDateCategoryNumTicks() && (config.xAxis.type === 'date-time' || !config.xAxis.manual) && (
+                        <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
+                      )}
                       {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.size} type='number' min={0} section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
@@ -1988,6 +1966,9 @@ const EditorPanel = () => {
                           {visSupportsDateCategoryAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
                           {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
                           {visSupportsDateCategoryAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
+                          <CheckBox value={config.xAxis.displayZero} section='xAxis' fieldName='displayZero' label='Display "0"' updateField={updateField} />
+                          <CheckBox value={config.xAxis.showSuppressedLine} section='xAxis' fieldName='showSuppressedLine' label='Display  suppressed data line' updateField={updateField} />
+                          <CheckBox value={config.xAxis.showSuppressedSymbol} section='xAxis' fieldName='showSuppressedSymbol' label='Display  suppressed data symbol' updateField={updateField} />
                         </>
                       )}
 
@@ -2599,6 +2580,23 @@ const EditorPanel = () => {
                     section='legend'
                     fieldName='hide'
                     label='Hide Legend'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                  <CheckBox
+                    value={config.legend.hide ? true : false}
+                    section='legend'
+                    fieldName='hideSuppressedLabels'
+                    label='Hide Suppressed Labels'
                     updateField={updateField}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
