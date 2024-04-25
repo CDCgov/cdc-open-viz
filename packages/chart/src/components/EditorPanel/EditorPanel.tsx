@@ -2018,6 +2018,7 @@ const EditorPanel = () => {
                           </>
                         ) : (
                           <>
+                            {visSupportsValueAxisGridLines() && <CheckBox value={config.xAxis.gridLines} section='xAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
                             {visSupportsDateCategoryAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
                             {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
                             {visSupportsDateCategoryAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}

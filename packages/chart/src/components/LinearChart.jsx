@@ -449,6 +449,7 @@ const LinearChart = props => {
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                          {runtime.xAxis.gridLines ? <Line key={`${tick.value}--hide-hideGridLines`} display={(config.useLogScale && showTicks).toString()} from={{ x: tick.from.x, y: tick.from.y - yMax }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
                           {!config.xAxis.hideTicks && <Line from={tick.from} to={orientation === 'horizontal' && config.useLogScale ? to : tick.to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' && config.useLogScale ? 1.3 : 1} />}
                           {!config.xAxis.hideLabel && (
                             <Text
