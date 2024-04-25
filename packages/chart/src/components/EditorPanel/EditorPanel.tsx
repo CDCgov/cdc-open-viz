@@ -1694,7 +1694,7 @@ const EditorPanel = () => {
                               >
                                 <option value='categorical'>Categorical (Linear Scale)</option>
                                 <option value='date'>Date (Linear Scale)</option>
-                                <option value='date-time'>Date (Date Time Scale)</option>
+                                {config.orientation !== 'horizontal' && <option value='date-time'>Date (Date Time Scale)</option>}
                                 {config.visualizationType === 'Scatter Plot' && <option value={'continuous'}>Continuous</option>}
                               </select>
                             </label>
