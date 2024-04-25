@@ -161,6 +161,7 @@ type AllChartsConfig = {
   twoColor: { palette: string }
   type: 'chart' | 'dashboard'
   useLogScale: boolean
+  uid: string | number
   visual: Visual
   visualizationType: 'Area Chart' | 'Bar' | 'Box Plot' | 'Deviation Bar' | 'Forest Plot' | 'Line' | 'Paired Bar' | 'Pie' | 'Scatter Plot' | 'Spark Line' | 'Combo' | 'Forecasting' | 'Sankey'
   visualizationSubType: string

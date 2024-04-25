@@ -166,24 +166,69 @@ export const useBarChart = () => {
   }
   const generateIconSize = barWidth => {
     if (barWidth < 4) {
-      return 1
+      return 3
     }
     if (barWidth < 5) {
-      return 4
+      return 5
     }
     if (barWidth < 10) {
       return 6
     }
     if (barWidth < 15) {
-      return 7
+      return 8
     }
     if (barWidth < 20) {
-      return 8
+      return 10
+    }
+    if (barWidth < 40) {
+      return 12
     }
     if (barWidth < 90) {
-      return 8
+      return 18
     }
     return 0
+  }
+
+  const suppressionIcons = {
+    Asterisk: '<span class="icon">&#42;</span>',
+    'Double Asterisks': '<span class="icon">&#42;&#42;</span>',
+    Dagger: '<span class="icon">&dagger;</span>',
+    'Double Daggers': '<span class="icon">&Dagger;</span>',
+    'Section Sign': '<span class="icon">&#167;</span>',
+    Pilcrow: '<span class="icon">&#182;</span>',
+    Hash: '<span class="icon">&#35;</span>'
+  }
+
+  const suppressionIconsUniCode = {
+    Asterisk: '<span class="icon">\u002A</span>',
+    'Double Asterisks': '<span class="icon">\u002A\u002A</span>',
+    Dagger: '<span class="icon">\u2020</span>',
+    'Double Daggers': '<span class="icon">\u2021\u2021</span>',
+    'Section Sign': '<span class="icon">\u00A7</span>',
+    Pilcrow: '<span class="icon">\u00B6</span>',
+    Hash: '<span class="icon">\u0023</span>'
+  }
+
+  const getIcon = bar => {
+    let newIcon = null
+    let iconName = null
+    let suppressedSymbol = config.xAxis.showSuppressedSymbol
+
+    config.preliminaryData.forEach(pd => {
+      if (shouldSuppress(bar) && suppressedSymbol && pd.symbol) {
+        newIcon = suppressionIcons[pd.symbol]
+        iconName = pd.symbol
+      }
+    })
+    return [newIcon, iconName]
+  }
+
+  const shouldSuppress = bar => {
+    return config.preliminaryData?.some(pd => {
+      const matchesColumn = pd.column ? pd.column === bar.key : true
+      const matchesValue = String(bar.value) === String(pd.value)
+      return matchesColumn && matchesValue && pd.symbol && pd.type === 'suppression'
+    })
   }
 
   const getAdditionalColumn = (series, xAxisDataValue) => {
@@ -231,6 +276,8 @@ export const useBarChart = () => {
     lollipopShapeSize,
     isLabelBelowBar,
     displayNumbersOnBar,
+    getIcon,
+    shouldSuppress,
     section,
     isRounded,
     isStacked,
@@ -249,6 +296,7 @@ export const useBarChart = () => {
     hoveredBar,
     setHoveredBar,
     onMouseOverBar,
-    onMouseLeaveBar
+    onMouseLeaveBar,
+    suppressionIcons
   }
 }

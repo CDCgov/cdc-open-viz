@@ -5,12 +5,14 @@ import Button from '@cdc/core/components/elements/Button'
 import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { handleLineType } from '../../helpers/handleLineType'
+import { useBarChart } from '../../hooks/useBarChart'
 import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { forwardRef } from 'react'
-
+import { FaAsterisk } from 'react-icons/fa6'
+import { symbol } from 'prop-types'
 interface LegendProps {
   config: ChartConfig
   colorScale: ColorScale
@@ -27,6 +29,8 @@ interface LegendProps {
 const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels, skipId = 'legend' }, ref) => {
   const { innerClasses, containerClasses } = useLegendClasses(config)
   const { runtime, orientation, legend } = config
+  const { suppressionIcons } = useBarChart()
+
   if (!legend) return null
   const fontSizes = { small: 16, medium: 18, large: 20 }
   const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
@@ -55,7 +59,6 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                 {formatLabels(labels as Label[]).map((label, i) => {
                   let className = ['legend-item', `legend-text--${label.text.replace(' ', '').toLowerCase()}`]
                   let itemName = label.datum
-                  console.log(label)
 
                   // Filter excluded data keys from legend
                   if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
@@ -157,6 +160,27 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                               <div key={index} className='legend-preliminary'>
                                 <svg>{pd.style.includes('Dashed') ? <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} /> : <circle r={6} strokeWidth={2} stroke={'#000'} cx={22} cy={10} fill='transparent' />}</svg>
                                 <span> {pd.label}</span>
+                              </div>
+                            )}
+                          </>
+                        )
+                      })}
+                    </div>
+                  </>
+                )}
+                {!config.legend.hideSuppressedLabels && config?.preliminaryData?.some(pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && pd?.symbol) && config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && (
+                  <>
+                    <hr></hr>
+                    <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
+                      {config?.preliminaryData?.map((pd, index) => {
+                        let h = {
+                          a: '\u00B6'
+                        }
+                        return (
+                          <>
+                            {pd.displayLegend && (
+                              <div key={index} className='legend-preliminary'>
+                                {h['a']}
                               </div>
                             )}
                           </>

@@ -6,12 +6,9 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
-import { FaStar } from 'react-icons/fa'
 import Regions from './../../Regions'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-
 import createBarElement from '@cdc/core/components/createBarElement'
-
 // third party
 import chroma from 'chroma-js'
 import BarChartContext, { type BarChartContextValues } from './context'
@@ -24,7 +21,6 @@ export const BarChartVertical = () => {
 
   // prettier-ignore
   const {
-    applyRadius,
     assignColorsToValues,
     barBorderWidth,
     generateIconSize,
@@ -35,7 +31,9 @@ export const BarChartVertical = () => {
     lollipopShapeSize,
     onMouseLeaveBar,
     onMouseOverBar,
-    section
+    section,
+    getIcon,
+    shouldSuppress
   } = useBarChart()
 
   // prettier-ignore
@@ -57,16 +55,46 @@ export const BarChartVertical = () => {
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
 
-  const getIcon = (bar, barWidth) => {
-    let icon = null
-    const iconSize = generateIconSize(barWidth)
-    config.suppressedData?.forEach(d => {
-      if (bar.key === d.column && String(bar.value) === String(d.value) && d.icon) {
-        icon = <FaStar color='#000' size={iconSize} />
-      }
-    })
-    return icon
+  // const getIcon = bar => {
+  //   let newIcon = null
+  //   let iconName = null
+  //   let suppressedSymbol = config.xAxis.showSuppressedSymbol
+  //   const icons = {
+  //     Asterisk: '<span class="icon">&#42;</span>',
+  //     'Double Asterisks': '<span class="icon">&#42;&#42;</span>',
+  //     Dagger: '<span class="icon">&dagger;</span>',
+  //     'Double Daggers': '<span class="icon">&Dagger;</span>',
+  //     'Section Sign': '<span class="icon">&#167;</span>',
+  //     Pilcrow: '<span class="icon">&#182;</span>',
+  //     Hash: '<span class="icon">&#35;</span>'
+  //   }
+  //   config.preliminaryData.forEach(pd => {
+  //     if (shouldSuppress(bar) && suppressedSymbol && pd.symbol) {
+  //       newIcon = icons[pd.symbol]
+  //       iconName = pd.symbol
+  //     }
+  //   })
+  //   return [newIcon, iconName]
+  // }
+
+  // const shouldSuppress = bar => {
+  //   return config.preliminaryData?.some(pd => {
+  //     const matchesColumn = pd.column ? pd.column === bar.key : true
+  //     const matchesValue = String(bar.value) === String(pd.value)
+  //     return matchesColumn && matchesValue && pd.symbol && pd.type === 'suppression'
+  //   })
+  // }
+
+  const suppressionIconsUniCode = {
+    Asterisk: '\u002A',
+    'Double Asterisks': '\u002A\u002A',
+    Dagger: '\u2020',
+    'Double Daggers': '\u2021\u2021',
+    'Section Sign': '\u00A7',
+    Pilcrow: '\u00B6',
+    Hash: '\u0023'
   }
+
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
@@ -92,7 +120,7 @@ export const BarChartVertical = () => {
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={barGroup.x0}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
-                  const suppresedBarHeight = 20
+                  const suppresedBarHeight = config.xAxis.showSuppressedLine ? 3 : 0
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
@@ -100,7 +128,7 @@ export const BarChartVertical = () => {
                   let barHeightBase = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let barYBase = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                   const supprssedBarY = bar.value >= 0 && isNumber(bar.value) ? yScale(scaleVal) - suppresedBarHeight : yScale(0)
-                  const barY = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? supprssedBarY : barYBase
+                  const barY = shouldSuppress(bar) ? supprssedBarY : barYBase
 
                   let barGroupWidth = seriesScale.range()[1]
 
@@ -115,10 +143,11 @@ export const BarChartVertical = () => {
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
                   // tooltips
+                  let suppressedTooltipValue = config.preliminaryData.map(pd => pd.label)[index]
 
                   const additionalColTooltip = getAdditionalColumn(bar.key, data[barGroup.index][config.runtime.originalXAxis.dataKey])
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
+                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${shouldSuppress(bar) ? suppressedTooltipValue : yAxisValue}`
 
                   const tooltip = `<ul>
                   <li class="tooltip-heading">${xAxisTooltip}</li>
@@ -138,10 +167,10 @@ export const BarChartVertical = () => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  const barValueLabel = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? '' : yAxisValue
-                  let barHeight = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? suppresedBarHeight : barHeightBase
-                  const displaylollipopShape = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? 'none' : 'block'
+                  const barValueLabel = shouldSuppress(bar) ? '' : yAxisValue
+                  let barHeight = shouldSuppress(bar) ? suppresedBarHeight : barHeightBase
 
+                  const displaylollipopShape = shouldSuppress(bar) ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
                     let _barColor = barColor
                     let _filteredOutColor = filteredOutColor || '#f2f2f2'
@@ -181,6 +210,11 @@ export const BarChartVertical = () => {
                     return _barColor
                   }
 
+                  const [suppressedIcon, iconName] = getIcon(bar)
+                  const iconY = /Asterisk/.test(iconName) ? 30 : 37
+                  const iconFont = /Asterisk/.test(iconName) ? 55 : 23
+                  const iconStyle = ` .icon { font-size: ${iconFont}px  }`
+
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
@@ -214,24 +248,11 @@ export const BarChartVertical = () => {
                             cursor: dashboardConfig ? 'pointer' : 'default'
                           }
                         })}
-                        <g
-                          transform={`translate(${barX},${yMax - suppresedBarHeight})`}
-                          onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
-                          onMouseLeave={onMouseLeaveBar}
-                          opacity={transparentBar ? 0.2 : 1}
-                          display={displayBar ? 'block' : 'none'}
-                          data-tooltip-html={tooltip}
-                          data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                          onClick={e => {
-                            e.preventDefault()
-                            if (setSharedFilter) {
-                              bar[config.xAxis.dataKey] = xAxisValue
-                              setSharedFilter(config.uid, bar)
-                            }
-                          }}
-                        >
-                          {getIcon(bar, barWidth)}
-                        </g>
+                        <foreignObject width='100' height='100' x={barX} y={barY - iconY}>
+                          <style>{iconStyle}</style>
+                          {/* <div dangerouslySetInnerHTML={{ __html: suppressedIcon }}></div> */}
+                          {suppressionIconsUniCode['Double As']}
+                        </foreignObject>
 
                         <Text // prettier-ignore
                           display={config.labels && displayBar ? 'block' : 'none'}
@@ -314,3 +335,25 @@ export const BarChartVertical = () => {
   )
 }
 export default BarChartVertical
+
+// <g
+//                         transform={`translate(${barX + 5},${yMax - 5 - generateIconSize(barWidth)})`}
+//                         onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
+//                         onMouseLeave={onMouseLeaveBar}
+//                         opacity={transparentBar ? 0.2 : 1}
+//                         display={displayBar ? 'block' : 'none'}
+//                         data-tooltip-html={tooltip}
+//                         data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+//                         onClick={e => {
+//                           e.preventDefault()
+//                           if (setSharedFilter) {
+//                             bar[config.xAxis.dataKey] = xAxisValue
+//                             setSharedFilter(config.uid, bar)
+//                           }
+//                         }}
+//                       >
+//                         <foreignObject width='100' height='100' x={bar.x} y={-12}>
+//                           {/* {getIcon(bar, barWidth)} */}
+//                           &#182;
+//                         </foreignObject>
+//                       </g>

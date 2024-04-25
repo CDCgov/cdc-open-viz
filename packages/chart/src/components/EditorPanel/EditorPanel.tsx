@@ -119,7 +119,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>If no “Series Name” is selected, the symbol will be applied to "all" suppressed values indicated in the dataset.</p>
+                          <p>If no “Data Series" is selected, the symbol will be applied to "all" suppressed values indicated in the dataset.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -138,7 +138,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression</p>
+                          <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -149,10 +149,71 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
                     updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                     options={getStyleOptions()}
                   />
-                  <TextField value={label ? label : 'Suppressed'} fieldName='label' label='Suppressed Data Label' placeholder='' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
-                  <CheckBox value={displayTooltip} fieldName='displayTooltip' label='Display on tooltips' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
-                  <CheckBox value={displayLegend} fieldName='displayLegend' label='Display on legend' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
-                  <CheckBox value={displayTable} fieldName='displayTable' label='Display on data table' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
+                  <TextField
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>This label will display in the tooltip and legend.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={label ? label : 'Suppressed'}
+                    fieldName='label'
+                    label='Suppressed Data Label'
+                    placeholder=''
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
+                  <CheckBox
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Enabling this tooltip will provide a clearer indication of 'suppressed' or 'zero data' values, whichever is applicable. Deselecting 'Display In Tooltip' indicates that you do not want to display 'suppressed' or 'zero data' values in tooltips when hovering over them.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={displayTooltip}
+                    fieldName='displayTooltip'
+                    label='Display on tooltips'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
+                  <CheckBox
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Deselecting "Display in Legend" indicates that you do not want to display suppressed data in the legend.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={displayLegend}
+                    fieldName='displayLegend'
+                    label='Display on legend'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
+                  <CheckBox
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Deselecting "Display In Data Table" indicates that you do not want to display suppressed data in the data table.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                    value={displayTable}
+                    fieldName='displayTable'
+                    label='Display on data table'
+                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                  />
                 </>
               ) : (
                 <>
@@ -1966,9 +2027,40 @@ const EditorPanel = () => {
                           {visSupportsDateCategoryAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
                           {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
                           {visSupportsDateCategoryAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
-                          <CheckBox value={config.xAxis.displayZero} section='xAxis' fieldName='displayZero' label='Display "0"' updateField={updateField} />
-                          <CheckBox value={config.xAxis.showSuppressedLine} section='xAxis' fieldName='showSuppressedLine' label='Display  suppressed data line' updateField={updateField} />
-                          <CheckBox value={config.xAxis.showSuppressedSymbol} section='xAxis' fieldName='showSuppressedSymbol' label='Display  suppressed data symbol' updateField={updateField} />
+                          <CheckBox
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Selecting this option will display a "thin line" slightly above the Date/Category Axis to indicate "suppressed data" where "suppressed data" values are indicated in the Data Series.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                            value={config.xAxis.showSuppressedLine}
+                            section='xAxis'
+                            fieldName='showSuppressedLine'
+                            label='Display  suppressed data line'
+                            updateField={updateField}
+                          />
+                          <CheckBox
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Selecting this option will display "suppressed data symbol" on the Date/Category Axis where suppressed data values are indicated in the Data Series, unless a different symbol was chosen from the data series (e.g., suppression symbol) menu.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                            value={config.xAxis.showSuppressedSymbol}
+                            section='xAxis'
+                            fieldName='showSuppressedSymbol'
+                            label='Display  suppressed data symbol'
+                            updateField={updateField}
+                          />
                         </>
                       )}
 
@@ -2593,7 +2685,7 @@ const EditorPanel = () => {
                     }
                   />
                   <CheckBox
-                    value={config.legend.hide ? true : false}
+                    value={config.legend.hideSuppressedLabels}
                     section='legend'
                     fieldName='hideSuppressedLabels'
                     label='Hide Suppressed Labels'
@@ -2604,7 +2696,7 @@ const EditorPanel = () => {
                           <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
-                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
+                          <p>Hiding suppressed labels will not override the 'Special Class' assigned to line chart indicating "suppressed" data in the Data Series Panel.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }

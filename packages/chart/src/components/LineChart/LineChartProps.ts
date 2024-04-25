@@ -23,6 +23,10 @@ export interface PreliminaryDataItem {
   value: string
   seriesKey: string
   label: string
+  symbol: string
+  displayTooltip: boolean
+  displayLegend: boolean
+  displayTable: boolean
 }
 
 export interface DataItem {

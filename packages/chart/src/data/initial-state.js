@@ -28,9 +28,7 @@ export default {
     left: 5,
     right: 5
   },
-  suppressedData: [],
   preliminaryData: [],
-
   yAxis: {
     hideAxis: false,
     displayNumbersOnBar: false,
@@ -118,7 +116,9 @@ export default {
     labelOffset: 65,
     axisPadding: 200,
     target: 0,
-    maxTickRotation: 0
+    maxTickRotation: 0,
+    showSuppressedSymbol: true,
+    showSuppressedLine: true
   },
   table: {
     label: 'Data Table',
@@ -154,6 +154,7 @@ export default {
     lineMode: false,
     verticalSorted: false,
     highlightOnHover: false,
+    hideSuppressedLabels: false,
     seriesHighlight: []
   },
   brush: {
