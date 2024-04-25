@@ -40,7 +40,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
 
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
   const fontSize = ['sm', 'xs', 'xxs'].includes(currentViewport) ? { fontSize: '11px' } : { fontSize: fontSizes[config.fontSize] }
-  const fontSizeLabel = ['sm', 'xs', 'xxs'].includes(currentViewport) ? { fontSize: '13px' } : { fontSize: fontSizes[config.fontSize] }
+  const fontSizeLabel = { fontSize: '1.3rem' }
 
   return (
     <aside ref={ref} style={legendClasses} id={skipId || 'legend'} className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
