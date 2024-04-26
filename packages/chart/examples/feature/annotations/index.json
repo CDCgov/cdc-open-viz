@@ -129,7 +129,7 @@
     "hasLine": false
   },
   "isLegendValue": false,
-  "barThickness": 0.35,
+  "barThickness": 0.035,
   "barHeight": 25,
   "barSpace": 15,
   "heights": {
@@ -139,7 +139,7 @@
   "xAxis": {
     "sortDates": false,
     "anchors": [],
-    "type": "date",
+    "type": "date-time",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,

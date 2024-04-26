@@ -132,6 +132,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
             }}
           >
             {({ dragStart, dragEnd, dragMove, isDragging, x, y, dx, dy }) => {
+              console.log('annotation', annotation)
               var style = getComputedStyle(document.body)
               return (
                 <>
@@ -140,7 +141,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     height={height}
                     dx={annotation.dx}
                     dy={annotation.dy}
-                    x={applyBandScaleOffset(xScale(annotation.xKey), config, xScale) || 0}
+                    x={config.xAxis.type !== 'date-time' ? applyBandScaleOffset(xScale(annotation.xKey), config, xScale) : annotation.xKey ? xScale(new Date(annotation.xKey)) + Number(config.yAxis.size) : 0}
                     y={yScale(annotation.yKey) || y}
                     canEditLabel={annotation.edit.label || false}
                     canEditSubject={annotation.edit.subject || false}
@@ -188,18 +189,18 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     <Connector />
                     <circle
                       fill='white'
-                      cx={Number(annotation.dx) + xScale(annotation.xKey) + xScale.bandwidth() / 2 + Number(config.yAxis.size)}
+                      cx={Number(annotation.dx) + xScale(annotation.xKey) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size)}
                       cy={yScale(annotation.yKey) + Number(annotation.dy)}
                       r={16}
                       className='annotation__mobile-label annotation__mobile-label-circle'
                       stroke={colorScale(annotation.seriesKey)}
                     />
-                    <text x={Number(annotation.dx) + Number(xScale(annotation.xKey)) + xScale.bandwidth() / 2 + Number(config.yAxis.size) - 16 / 3} y={yScale(annotation.yKey) + Number(annotation.dy) + 5} className='annotation__mobile-label'>
+                    <text x={Number(annotation.dx) + Number(xScale(annotation.xKey)) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) - 16 / 3} y={yScale(annotation.yKey) + Number(annotation.dy) + 5} className='annotation__mobile-label'>
                       {index + 1}
                     </text>
 
                     <CircleSubject className='circle-subject' stroke={colorScale(annotation.seriesKey)} />
-                    {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + xScale.bandwidth() / 2} />}
+                    {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)} />}
                     {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />}
                   </EditableAnnotation>
                 </>
