@@ -21,7 +21,6 @@
   "roundingStyle": "standard",
   "tipRounding": "top",
   "isResponsiveTicks": false,
-  "showTooltips": true,
   "general": {
     "showDownloadButton": false
   },
@@ -36,7 +35,7 @@
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": true,
-    "size": 50,
+    "size": "125",
     "gridLines": true,
     "enablePadding": true,
     "min": "0",
@@ -135,7 +134,7 @@
     "showDownloadUrl": false,
     "showDataTableLink": true,
     "indexLabel": "",
-    "download": false,
+    "download": true,
     "showVertical": true,
     "dateDisplayFormat": "",
     "show": true
@@ -146,6 +145,7 @@
   "legend": {
     "hide": false,
     "behavior": "isolate",
+    "axisAlign": true,
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
@@ -551,20 +551,6 @@
       "lineType": "curveCardinal"
     }
   ],
-  "runtime": {
-    "seriesLabels": {
-      "1": "Sibling",
-      "2": "Neck",
-      "3": "Girlfriend",
-      "4": "Bullying",
-      "5": "Mother",
-      "6": "Overdose",
-      "7": "Depression",
-      "8": "Vehicle",
-      "9": "Friends",
-      "10": "Head"
-    }
-  },
   "tooltips": {
     "opacity": 90,
     "singleSeries": false,
@@ -659,6 +645,7 @@
     },
     "data": []
   },
+  "showTooltips": true,
   "visualizationType": "Bump Chart",
   "dataCutoff": "0.5",
   "data": [
@@ -947,7 +934,7 @@
     {
       "key": "Neck",
       "year": "2014",
-      "rankChange": "0", 
+      "rankChange": "0",
       "additionalInfo1": "1/1/14",
       "additionalInfo2": "131"
     }
