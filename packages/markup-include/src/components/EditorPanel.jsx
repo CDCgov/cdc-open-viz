@@ -7,16 +7,15 @@ import ConfigContext from '../ConfigContext'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import InputText from '@cdc/core/components/inputs/InputText'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-
+import Layout from '@cdc/core/components/Layout'
 import '@cdc/core/styles/v2/components/editor.scss'
 
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = memo(props => {
-  const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(ConfigContext)
+  const { config, updateConfig, loading, data, setParentConfig, isDashboard, showConfigConfirm } = useContext(ConfigContext)
 
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [showConfigConfirm, setShowConfigConfirm] = useState(false)
 
   const updateField = updateFieldFactory(config, updateConfig, true)
 
@@ -43,6 +42,10 @@ const EditorPanel = memo(props => {
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
+    updateConfig({
+      ...config,
+      showEditorPanel: !displayPanel
+    })
 
     // if (isDashboard) {
     //   updateConfig({ ...config, editing: false })
@@ -146,20 +149,9 @@ const EditorPanel = memo(props => {
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <div className='cove-editor'>
-        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
-        {config.newViz && showConfigConfirm && <Confirm />}
-        <button className={`cove-editor--toggle` + (!displayPanel ? ` collapsed` : ``)} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
-        <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
-          <div className='cove-editor__panel-container'>
-            <h2 className='cove-editor__heading'>Configure Markup Include</h2>
-            <section className='cove-editor__content'>{editorContent}</section>
-          </div>
-        </section>
-        <div className='cove-editor__content'>
-          <div className='cove-editor__content-wrap'>{props.children}</div>
-        </div>
-      </div>
+      <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Markup Include'>
+        {editorContent}
+      </Layout.Sidebar>
     </ErrorBoundary>
   )
 })

@@ -4,6 +4,7 @@ import { filterData } from './filterData'
 import { generateValuesForFilter } from './generateValuesForFilter'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
+import { getVizRowColumnLocator } from './getVizRowColumnLocator'
 
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 
@@ -16,6 +17,8 @@ export const getUpdateConfig =
   (newConfig, dataOverride?: Object): [Config, Object] => {
     let newFilteredData = {}
     let visualizationKeys = getVizKeys(newConfig)
+
+    const vizRowColumnLocator = getVizRowColumnLocator(newConfig.rows)
 
     if (newConfig.dashboard.sharedFilters) {
       newConfig.dashboard.sharedFilters.forEach((filter, i) => {
@@ -52,6 +55,8 @@ export const getUpdateConfig =
       })
 
       visualizationKeys.forEach(visualizationKey => {
+        const row = vizRowColumnLocator[visualizationKey]
+        if (newConfig.rows[row]?.datakey) return // data configured on the row level
         const applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
 
         if (applicableFilters.length > 0) {
@@ -60,6 +65,16 @@ export const getUpdateConfig =
           const formattedData = getFormattedData(_newConfigDataSet?.data || visualization.data, visualization.dataDescription)
           const _data = formattedData || (dataOverride || state.data)[visualization.dataKey]
           newFilteredData[visualizationKey] = filterData(applicableFilters, _data)
+        }
+      })
+
+      newConfig.rows.forEach((row, rowIndex) => {
+        const applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(rowIndex) !== -1)
+
+        if (applicableFilters.length > 0) {
+          const formattedData = getFormattedData(row.data, row.dataDescription)
+          const _data = formattedData || (dataOverride || state.data)[rowIndex]
+          newFilteredData[rowIndex] = filterData(applicableFilters, _data)
         }
       })
     }

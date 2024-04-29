@@ -35,8 +35,7 @@ $red: #f74242;
   flex-flow: row;
   width: 100%;
   position: relative;
-  top: 0;
-  padding: 1em;
+  padding: 2em 1em 1em;
   border: 1px solid #c2c2c2;
   transition: border 300ms cubic-bezier(0.16, 1, 0.3, 1);
   background-color: #f2f2f2;
@@ -329,6 +328,14 @@ $red: #f74242;
 
 .builder-row {
   position: relative;
+
+  .btn-configure-row {
+    background: none;
+    display: block;
+    position: absolute;
+    right: 1em;
+    top: 0;
+  }
 
   .widget__content {
     padding: 0 2em;

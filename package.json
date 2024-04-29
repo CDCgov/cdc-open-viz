@@ -9,6 +9,7 @@
     "@babel/core": "^7.23.2",
     "@babel/preset-env": "^7.23.2",
     "@babel/preset-react": "^7.22.15",
+    "@faker-js/faker": "^8.4.1",
     "@rollup/plugin-dsv": "^3.0.2",
     "@storybook/addon-a11y": "^7.6.16",
     "@storybook/addon-docs": "^7.4.6",

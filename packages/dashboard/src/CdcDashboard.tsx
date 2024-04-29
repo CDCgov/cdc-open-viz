@@ -11,6 +11,7 @@ import { initialState } from './DashboardContext'
 import { getUpdateConfig } from './helpers/getUpdateConfig'
 import { InitialState } from './types/InitialState'
 import { DashboardConfig } from './types/DashboardConfig'
+import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 import _ from 'lodash'
 
 type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {
@@ -36,7 +37,8 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, confi
 
   const formatInitialState = (newConfig: MultiDashboardConfig | DashboardConfig, datasets: Record<string, Object[]>) => {
     const [config, filteredData] = getUpdateConfig(initialState)(newConfig, datasets)
-    return { ...initialState, config, filteredData, data: datasets }
+    const versionedConfig = coveUpdateWorker(config)
+    return { ...initialState, config: versionedConfig, filteredData, data: datasets }
   }
 
   const loadConfig = async (selectedConfig?: string) => {
@@ -62,7 +64,10 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, confi
     )
 
     getVizKeys(newConfig).forEach(vizKey => {
-      newConfig.visualizations[vizKey].formattedData = datasets[newConfig.visualizations[vizKey].dataKey]
+      const formattedData = datasets[newConfig.visualizations[vizKey].dataKey]
+      if (formattedData) {
+        newConfig.visualizations[vizKey].formattedData = formattedData
+      }
     })
 
     Object.keys(datasets).forEach(key => {
@@ -92,7 +97,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({ configUrl, confi
         newConfig.visualizations[vizKey] = { ...newConfig.visualizations[vizKey], ...newData }
       })
 
-      const blankFields = { data: [], dataUrl: '', dataFileName: '', dataFileSourceType: '', dataDescription: [], formattedData: [] }
+      const blankFields = { data: [], dataUrl: '', dataFileName: '', dataFileSourceType: '', dataDescription: {}, formattedData: [] }
       newConfig = { ...newConfig, ...blankFields }
 
       if (newConfig.dashboard.filters) {

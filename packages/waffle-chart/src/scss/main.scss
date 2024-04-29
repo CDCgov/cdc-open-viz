@@ -1,6 +1,6 @@
-@import '@cdc/core/styles/v2/components/input';
-@import '@cdc/core/styles/v2/main';
 @import '@cdc/core/styles/base';
+@import '@cdc/core/styles/heading-colors';
+@import '@cdc/core/styles/v2/themes/color-definitions';
 @import 'waffle-chart';
 
 .cdc-open-viz-module.type-waffle-chart {
@@ -13,5 +13,17 @@
     &::before {
       content: '\21BB';
     }
+  }
+
+  .cove-component__content:not(.component--has-background, .component--hideBackgroundColor) {
+    background-color: white;
+  }
+
+  &.is-editor .cove-component {
+    padding-left: 350px;
+  }
+
+  &.is-editor .cove-editor__content .cove-component {
+    padding-left: 0px;
   }
 }

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { MultiDashboardConfig } from '../../types/MultiDashboard'
 import { SharedFilter } from '../../types/SharedFilter'
 import { DashboardDispatchContext } from '../../DashboardContext'
@@ -11,6 +11,8 @@ import Icon from '@cdc/core/components/ui/Icon'
 import Button from '@cdc/core/components/elements/Button'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataTransform from '@cdc/core/helpers/DataTransform'
+import { getVizRowColumnLocator } from '../../helpers/getVizRowColumnLocator'
+import _ from 'lodash'
 
 type ModalProps = {
   config: MultiDashboardConfig
@@ -26,9 +28,39 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
   const [columns, setColumns] = useState<string[]>([])
   const transform = new DataTransform()
 
+  const vizRowColumnLocator = getVizRowColumnLocator(config.rows)
+
+  const [usedByNameLookup, usedByOptions] = useMemo(() => {
+    const nameLookup = {}
+    const vizOptions = Object.keys(config.visualizations)
+      .filter(vizKey => {
+        const notAdded = !filter.usedBy || filter.usedBy.indexOf(vizKey) === -1
+        const usesSharedFilter = config.visualizations[vizKey].usesSharedFilter
+        const row = vizRowColumnLocator[vizKey].row
+        const dataConfiguredOnRow = config.rows[row].dataKey
+        return filter.setBy !== vizKey && notAdded && !usesSharedFilter && !dataConfiguredOnRow
+      })
+      .map(vizKey => {
+        const viz = config.visualizations[vizKey]
+        const vizName = viz.general?.title || viz.title || vizKey
+        nameLookup[vizKey] = vizName
+        return vizKey
+      })
+    const rowOptions: number[] = []
+
+    config.rows.forEach((row, rowIndex) => {
+      if (!!row.multiVizColumn) {
+        nameLookup[rowIndex] = `Row ${rowIndex + 1}`
+        rowOptions.push(rowIndex)
+      }
+    })
+
+    const rowsNotSelected = rowOptions.filter(row => !filter.usedBy || filter.usedBy.indexOf(row.toString()) === -1)
+    return [nameLookup, [...vizOptions, ...rowsNotSelected]]
+  }, [config.visualizations, filter.usedBy, filter.setBy, vizRowColumnLocator])
+
   useEffect(() => {
     const runSetColumns = async () => {
-      if (config.filterBehavior === FilterBehavior.Apply) return
       let columns = {}
       let dataKeys = Object.keys(config.datasets)
 
@@ -71,18 +103,13 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
   }
 
   const updateFilterProp = (name, value) => {
-    // @TODO this should be refactored into a reducer function.
-    // it's unsafe to directly set objects w/o guardrails
-    let newFilter = { ...filter }
-
-    newFilter[name] = value
-
-    console.log('newFilter', newFilter)
+    const newFilter = { ..._.cloneDeep(filter), [name]: value }
 
     setFilter(newFilter)
   }
 
   const addFilterUsedBy = (filter, value) => {
+    if (value === '') return
     if (!filter.usedBy) filter.usedBy = []
     filter.usedBy.push(value)
     updateFilterProp('usedBy', filter.usedBy)
@@ -97,9 +124,10 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
   }
 
   const updateAPIFilter = (key: keyof APIFilter, value: string | boolean) => {
-    const _filter = filter.apiFilter || { apiEndpoint: '', valueSelector: '', textSelector: '' }
+    const filterClone = _.cloneDeep(filter)
+    const _filter = filterClone.apiFilter || { apiEndpoint: '', valueSelector: '', textSelector: '' }
     const newAPIFilter: APIFilter = { ..._filter, [key]: value }
-    setFilter({ ...filter, apiFilter: newAPIFilter })
+    setFilter({ ...filterClone, apiFilter: newAPIFilter })
   }
 
   return (
@@ -388,13 +416,13 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                 <span className='edit-label column-heading'>Used By: </span>
                 <ul>
                   {filter.usedBy &&
-                    filter.usedBy.map(vizKey => (
-                      <li key={`used-by-list-item-${vizKey}`}>
-                        <span>{config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}</span>{' '}
+                    filter.usedBy.map(opt => (
+                      <li key={`used-by-list-item-${opt}`}>
+                        <span>{usedByNameLookup[opt] || opt}</span>{' '}
                         <button
                           onClick={e => {
                             e.preventDefault()
-                            removeFilterUsedBy(filter, vizKey)
+                            removeFilterUsedBy(filter, opt)
                           }}
                         >
                           X
@@ -402,15 +430,13 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                       </li>
                     ))}
                 </ul>
-                <select onChange={e => addFilterUsedBy(filter, e.target.value)}>
+                <select value='' onChange={e => addFilterUsedBy(filter, e.target.value)}>
                   <option value=''>- Select Option -</option>
-                  {Object.keys(config.visualizations)
-                    .filter(vizKey => filter.setBy !== vizKey && (!filter.usedBy || filter.usedBy.indexOf(vizKey) === -1) && !config.visualizations[vizKey].usesSharedFilter)
-                    .map(vizKey => (
-                      <option value={vizKey} key={`used-by-select-item-${vizKey}`}>
-                        {config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}
-                      </option>
-                    ))}
+                  {usedByOptions.map(opt => (
+                    <option value={opt} key={`used-by-select-item-${opt}`}>
+                      {usedByNameLookup[opt] || opt}
+                    </option>
+                  ))}
                 </select>
               </label>
               <label>

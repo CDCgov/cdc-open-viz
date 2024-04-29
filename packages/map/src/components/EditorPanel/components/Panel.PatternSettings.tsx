@@ -3,6 +3,9 @@ import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, Acc
 import ConfigContext from '../../../context'
 import { type MapContext } from '../../../types/MapContext'
 import Button from '@cdc/core/components/elements/Button'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Icon from '@cdc/core/components/ui/Icon'
+import './Panel.PatternSettings-style.css'
 
 type PanelProps = {
   name: string
@@ -32,7 +35,7 @@ const PatternSettings = ({ name }: PanelProps) => {
   }
 
   /** Updates the map pattern at a given index */
-  const handleUpdateGeoPattern = (value: string, index: number, keyToUpdate: 'dataKey' | 'pattern' | 'dataValue' | 'size' | 'label') => {
+  const handleUpdateGeoPattern = (value: string, index: number, keyToUpdate: 'dataKey' | 'pattern' | 'dataValue' | 'size' | 'label' | 'color') => {
     const updatedPatterns = [...state.map.patterns]
     updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value }
 
@@ -120,6 +123,20 @@ const PatternSettings = ({ name }: PanelProps) => {
                           </option>
                         ))}
                       </select>
+                      <div className='pattern-input__color'>
+                        <label htmlFor='patternColor'>
+                          Pattern Color
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>{`If this setting is used, it is the reponsibility of the visualization author to verify the visualization colors meet WCAG 3:1 contrast ratios.`}</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                          <input type='text' value={pattern.color || ''} id='patternColor' name='patternColor' onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'color')} />
+                        </label>
+                      </div>
                       <Button onClick={e => handleRemovePattern(patternIndex)} className='btn btn--remove warn'>
                         Remove Pattern
                       </Button>

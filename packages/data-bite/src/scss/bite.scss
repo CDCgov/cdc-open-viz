@@ -1,12 +1,5 @@
 @import '../../../core/styles/variables';
 
-&.is-editor {
-  position: relative;
-  .cove-component__inner {
-    margin: 3em auto 0;
-    max-width: 35em;
-  }
-}
 &.theme-blue {
   .bite-value {
     color: $primary;
@@ -76,14 +69,27 @@
 // TODO after v2 refactor remove header reference colors
 // Use .font-color/.bg-color, etc. in color definitions or something similar
 // Remove box shadows if we're no longer using them
-.cove-component__inner {
+.sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) {
+  margin: 3em auto 0;
+  max-width: 35em;
+}
+
+.sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) {
+  background-color: white;
+}
+
+.cove-component__content {
   // Visual: Shadow
   &.shadow {
     box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
   }
 
+  .cove-component__inner {
+    padding: 1rem !important;
+  }
+
   // General: Bite Style > Graphic
-  .bite__style--graphic {
+  &.bite__style--graphic {
     .bite-content {
       flex: 1;
     }
@@ -135,7 +141,6 @@
       border-top-left-radius: 3px;
       border-top-right-radius: 3px;
     }
-
     .bite-content-container.component--hideBackgroundColor {
       background: transparent;
     }
@@ -231,7 +236,7 @@
 
     .cove-component__content {
       display: flex;
-      padding: 1em;
+      padding: 1em !important;
       justify-content: space-between;
 
       .bite-content {
