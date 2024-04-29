@@ -3,8 +3,6 @@ import { useContext, FC } from 'react'
 import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { type PanelProps } from './../PanelProps'
 import Button from '@cdc/core/components/elements/Button'
-import EditorPanel from '@cdc/map/src/components/EditorPanel'
-import EditorPanelContext from '../../EditorPanelContext'
 import ConfigContext from '../../../../ConfigContext.js'
 
 import './../panels.scss'
@@ -61,7 +59,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
 
   const handleAnnotationUpdate = (value, property, index) => {
     const annotations = [...config?.annotations]
-    console.log('ann', annotations)
     annotations[index][property] = value
 
     updateConfig({
@@ -136,51 +133,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                 <textarea rows={5} value={annotation.text} onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)} />
               </label>
               <label>
-                Mobile
-                <input
-                  type='checkbox'
-                  checked={config?.annotations[index].show.mobile}
-                  onClick={e => {
-                    const updatedAnnotations = [...config?.annotations]
-                    updatedAnnotations[index].show.mobile = e.target.checked
-                    updateConfig({
-                      ...config,
-                      annotations: updatedAnnotations
-                    })
-                  }}
-                />
-              </label>
-              <label>
-                Tablet
-                <input
-                  type='checkbox'
-                  checked={config?.annotations[index].show.tablet}
-                  onClick={e => {
-                    const updatedAnnotations = [...config?.annotations]
-                    updatedAnnotations[index].show.tablet = e.target.checked
-                    updateConfig({
-                      ...config,
-                      annotations: updatedAnnotations
-                    })
-                  }}
-                />
-              </label>
-              <label>
-                Desktop
-                <input
-                  type='checkbox'
-                  checked={config?.annotations[index].show.desktop}
-                  onClick={e => {
-                    const updatedAnnotations = [...config?.annotations]
-                    updatedAnnotations[index].show.desktop = e.target.checked
-                    updateConfig({
-                      ...config,
-                      annotations: updatedAnnotations
-                    })
-                  }}
-                />
-              </label>
-              <label>
                 Vertical Anchor
                 <input
                   type='checkbox'
@@ -210,6 +162,23 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                   }}
                 />
               </label>
+
+              <label>
+                Opacity
+                <input
+                  type='text'
+                  checked={config?.annotations[index].opacity}
+                  onClick={e => {
+                    const updatedAnnotations = [...config?.annotations]
+                    updatedAnnotations[index].opacity = e.target.value
+                    updateConfig({
+                      ...config,
+                      annotations: updatedAnnotations
+                    })
+                  }}
+                />
+              </label>
+
               <label>
                 Edit Subject
                 <input
@@ -253,6 +222,24 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                   }}
                 >
                   {getColumns(false).map((column, columnIndex) => {
+                    return <option>{column}</option>
+                  })}
+                </select>
+              </label>
+
+              <label>
+                Marker
+                <select
+                  onChange={e => {
+                    const updatedAnnotations = [...config?.annotations]
+                    updatedAnnotations[index].marker = e.target.value
+                    updateConfig({
+                      ...config,
+                      annotations: updatedAnnotations
+                    })
+                  }}
+                >
+                  {['circle', 'arrow'].map((column, columnIndex) => {
                     return <option>{column}</option>
                   })}
                 </select>

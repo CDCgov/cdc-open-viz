@@ -5,6 +5,8 @@ import { Label, Connector, CircleSubject, LineSubject, EditableAnnotation } from
 import { findNearestDatum } from './findNearestDatum'
 import { applyBandScaleOffset } from './helpers'
 import { scaleOrdinal } from '@visx/scale'
+import { MarkerArrow } from '@visx/marker'
+import { LinePath } from '@visx/shape'
 
 import './AnnotationDraggable.styles.css'
 import useColorScale from '../../../hooks/useColorScale'
@@ -132,7 +134,6 @@ const Annotations = ({ xScale, yScale, xMax }) => {
             }}
           >
             {({ dragStart, dragEnd, dragMove, isDragging, x, y, dx, dy }) => {
-              console.log('annotation', annotation)
               var style = getComputedStyle(document.body)
               return (
                 <>
@@ -185,7 +186,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     onTouchEnd={dragEnd}
                     anchorPosition={'auto'}
                   >
-                    <Label className='annotation__desktop-label' title={annotation.title} subtitle={annotation.text} backgroundFill='#f5f5f5' />
+                    <Label className='annotation__desktop-label' title={annotation.title} subtitle={annotation.text} backgroundFill='#f5f5f5' backgroundProps={{ opacity: annotation.opacity ? Number(annotation.opacity) / 100 : 1 }} />
                     <Connector />
                     <circle
                       fill='white'
@@ -199,7 +200,35 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                       {index + 1}
                     </text>
 
-                    <CircleSubject className='circle-subject' stroke={colorScale(annotation.seriesKey)} />
+                    {annotation.marker === 'arrow' && (
+                      <>
+                        <MarkerArrow
+                          markerWidth={10}
+                          markerHeight={10}
+                          id='marker-arrow-odd'
+                          refX={Number(annotation.dx) + xScale(annotation.xKey) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size)}
+                          refY={yScale(annotation.yKey) + Number(annotation.dy)}
+                          stroke='#333'
+                          size={22}
+                          strokeWidth={4}
+                          markerUnits='userSpaceOnUse'
+                        />
+                        <LinePath
+                          curve={'curveMonotoneX'}
+                          data={config.data}
+                          x={d => xScale(d[annotation.xKey]) ?? 0}
+                          y={d => yScale(d[annotation.yKey]) ?? 0}
+                          stroke='#333'
+                          strokeWidth={2}
+                          strokeOpacity={1}
+                          shapeRendering='geometricPrecision'
+                          markerMid='url(#marker-circle)'
+                          markerStart={'url(#marker-arrow)'}
+                          markerEnd={'url(#marker-arrow)'}
+                        />
+                      </>
+                    )}
+                    {annotation.marker === 'circle' && <CircleSubject className='circle-subject' stroke={colorScale(annotation.seriesKey)} />}
                     {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)} />}
                     {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />}
                   </EditableAnnotation>
