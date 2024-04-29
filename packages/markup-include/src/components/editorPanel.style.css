@@ -9,7 +9,7 @@
     border: 1px solid red;
     padding: 0px 10px;
   }
-  span.edit-label {
+  :is(span).edit-label {
     margin-bottom: 0.3em;
     display: block;
   }

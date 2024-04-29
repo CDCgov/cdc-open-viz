@@ -1,17 +1,15 @@
-import { useEffect, useCallback, useRef, useReducer } from 'react'
+import { useEffect, useCallback, useRef, useReducer, useState } from 'react'
 import _ from 'lodash'
-
 // external
-import { Markup, Interweave, MatcherInterface } from 'interweave'
+import { Markup } from 'interweave'
 import axios from 'axios'
 
 // cdc
-import { Config, Variable } from './types/Config'
+import { Config } from './types/Config'
 import { publish } from '@cdc/core/helpers/events'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import EditorPanel from './components/EditorPanel'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
+import EditorPanel from '../src/components/EditorPanel'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
@@ -20,14 +18,13 @@ import markupIncludeReducer from './store/mi.reducer'
 import Layout from '@cdc/core/components/Layout'
 // styles
 import './scss/main.scss'
-import './cdcMarkupInclude.style.css'
 
-interface CdcMarkupIncludeProps {
+type CdcMarkupIncludeProps = {
   config: Config
   configUrl: string
   isDashboard: boolean
   isEditor: boolean
-  setConfig: Function
+  setConfig: any
 }
 
 import Title from '@cdc/core/components/ui/Title'
@@ -44,9 +41,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
   const container = useRef(null)
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
-  const { data } = config
+  const { data, theme } = config
 
-  const { inlineHTML, markupVariables, showHeader, srcUrl, title, useInlineHTML } = config.contentEditor
+  const { inlineHTML, markupVariables, showHeader, srcUrl, title, useInlineHTML } = config.contentEditor || {}
 
   // Default Functions
   const updateConfig = newConfig => {
@@ -79,6 +76,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
     dispatch({ type: 'SET_LOADING', payload: false })
   }, [])
 
+  // Custom Functions
   useEffect(() => {
     if (markupError) {
       let errorCode = markupError
@@ -213,17 +211,13 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
   let content = <Loading />
 
-  let bodyClasses = ['markup-include']
-
-  const contentWrap = useRef(null)
-
   if (loading === false) {
     let body = (
       <Layout.Responsive isEditor={isEditor}>
         <div className={`cove-component__content ${contentClasses.join(' ')}`}>
-          <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
+          <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
           <div className={`${innerContainerClasses.join(' ')}`}>
-            <div ref={contentWrap} className={`cove-component__content-wrap${useInlineHTML ? '' : ' hide'}`}>
+            <div className={`cove-component__content-wrap${useInlineHTML ? '' : ' hide'}`}>
               <Markup content={convertVariablesInMarkup(inlineHTML)} />
             </div>
             <div className={`cove-component__content-wrap${useInlineHTML ? ' hide' : ''}`}>
@@ -263,7 +257,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
     const confirmDone = e => {
       e.preventDefault()
       let newConfig = { ...config }
-      delete newConfig.newViz
+      delete config.newViz
       updateConfig(newConfig)
     }
 
@@ -282,7 +276,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, showConfigConfirm }}>
+      <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard, showConfigConfirm }}>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
         {config.newViz && showConfigConfirm && <Confirm />}
         <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={container} showEditorPanel={config?.showEditorPanel}>

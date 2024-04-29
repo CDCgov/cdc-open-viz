@@ -3,7 +3,7 @@ import ExampleConfig_1 from './../data/markup-include-example.json'
 import CdcMarkupInclude from '../CdcMarkupInclude'
 
 const meta: Meta<typeof CdcMarkupInclude> = {
-  title: 'Components/Molecules/Markup Include',
+  title: 'Components/Pages/Markup Include',
   component: CdcMarkupInclude
 }
 

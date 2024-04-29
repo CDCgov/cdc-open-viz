@@ -24,7 +24,7 @@ import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
-import CdcMarkupInclude from '@cdc/markup-include'
+import CdcMarkupInclude from '../../markup-include/src/CdcMarkupInclude'
 import CdcFilteredText from '@cdc/filtered-text'
 
 import Grid from './components/Grid'
