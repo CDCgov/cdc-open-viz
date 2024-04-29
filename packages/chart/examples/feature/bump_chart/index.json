@@ -932,11 +932,424 @@
   ],
   "tooltipData": [
     {
+      "key": "Sibling",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "149"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "172"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "230"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "379"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "357"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "358"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "458"
+    },
+    {
       "key": "Neck",
-      "year": "2014",
-      "rankChange": "0",
-      "additionalInfo1": "1/1/14",
-      "additionalInfo2": "131"
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "131"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "316"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "437"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "621"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "526"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "555"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "527"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "101"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "155"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "219"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "260"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "294"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "262"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "242"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "95"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-4",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "90"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "3",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "144"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-5",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "165"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-4",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "213"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-3",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "151"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "112"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "89"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "-2",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "104"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "141"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "230"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "241"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "190"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "206"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "76"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "114"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "137"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "227"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "185"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "190"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "210"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "57"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "-2",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "89"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "125"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "2",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "181"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "168"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "172"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "206"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "55"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "5",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "171"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "209"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "304"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "-2",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "236"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "2",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "266"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "293"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "41"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "78"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "87"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "170"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "165"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "127"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "137"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "20"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "5",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "119"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "-3",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "134"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "171"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "-2",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "141"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "2",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "152"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "199"
     }
   ],
   "validated": "4.24.3",
