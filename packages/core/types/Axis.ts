@@ -19,6 +19,8 @@ export type Axis = {
   label?: string
   labelOffset?: number
   labelPlacement?: string
+  manual?: boolean
+  manualStep?: number
   max?: string
   maxTickRotation?: number
   min?: string

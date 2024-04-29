@@ -59,7 +59,7 @@ const generateMedia = (state, type, elementToCapture) => {
 
   switch (type) {
     case 'image':
-      html2canvas(baseSvg, {foreignObjectRendering: true, x: -1 * (window.pageXOffset + baseSvg.getBoundingClientRect().left), y: -1 * (window.pageYOffset + baseSvg.getBoundingClientRect().top)}).then(canvas => {
+      html2canvas(baseSvg).then(canvas => {
         saveImageAs(canvas.toDataURL(), filename + '.png')
       })
       return

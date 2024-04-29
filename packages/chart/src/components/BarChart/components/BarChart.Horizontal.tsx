@@ -78,6 +78,10 @@ export const BarChartHorizontal = () => {
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   let barHeight = config.barHeight
+                  let numbericBarHeight = parseInt(!config.isLollipopChart ? barHeight : lollipopBarWidth)
+                  if (isNaN(numbericBarHeight)) {
+                    numbericBarHeight = 25
+                  }
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
                   const barXBase = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
@@ -131,9 +135,9 @@ export const BarChartHorizontal = () => {
                   barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
-                  const isHighlightedBar = highlightedBarValues?.includes(yAxisValue)
-                  const highlightedBarColor = getHighlightedBarColorByValue(yAxisValue)
-                  const highlightedBar = getHighlightedBarByValue(yAxisValue)
+                  const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
+                  const highlightedBarColor = getHighlightedBarColorByValue(xAxisValue)
+                  const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
                   const displaylollipopShape = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? 'none' : 'block'
@@ -141,18 +145,7 @@ export const BarChartHorizontal = () => {
                   if (barColor && labelColor && textFits) {
                     labelColor = getContrastColor('#000', barColor)
                   }
-                  const getTop = () => {
-                    if (Number(barHeight) < 20) return -4
-                    if (Number(barHeight) < 25) return -1
-                    if (Number(barHeight) < 30) return 2
-                    if (Number(barHeight) < 35) return 4
-                    if (Number(barHeight) < 40) return 5
-                    if (Number(barHeight) < 50) return 9
-                    if (Number(barHeight) < 60) return 10
-                    else {
-                      return 12
-                    }
-                  }
+
                   const background = () => {
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
@@ -172,7 +165,7 @@ export const BarChartHorizontal = () => {
                           borderStyle: 'solid',
                           borderWidth: `${borderWidth}px`,
                           width: barWidth,
-                          height: !config.isLollipopChart ? barHeight : lollipopBarWidth,
+                          height: numbericBarHeight,
                           x: barX,
                           y: barHeight * bar.index,
                           onMouseOver: () => onMouseOverBar(xAxisValue, bar.key),

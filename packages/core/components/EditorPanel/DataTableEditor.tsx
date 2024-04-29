@@ -75,7 +75,23 @@ const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard,
           }
         />
       )}
-      <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />
+      <TextField
+        value={config.table.indexLabel}
+        section='table'
+        fieldName='indexLabel'
+        label='Index Column Header'
+        updateField={updateField}
+        tooltip={
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        }
+      />
       <TextField
         value={config.table.caption}
         updateField={updateField}

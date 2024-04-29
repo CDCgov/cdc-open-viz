@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer } from 'react'
+import React, { useCallback, useEffect, useReducer, useState } from 'react'
 
 // visx
 import { Circle, Bar } from '@visx/shape'
@@ -27,6 +27,7 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
+import Layout from '@cdc/core/components/Layout'
 
 type CdcWaffleChartProps = {
   configUrl?: string
@@ -37,23 +38,8 @@ type CdcWaffleChartProps = {
   setConfig?: () => void
 }
 
-const WaffleChart = ({ config, isEditor, link = '' }) => {
+const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateConfig }) => {
   const { title, theme, shape, nodeWidth, nodeSpacer, prefix, suffix, subtext, content, orientation, filters, dataColumn, dataFunction, dataConditionalColumn, dataConditionalOperator, dataConditionalComparate, customDenom, dataDenom, dataDenomColumn, dataDenomFunction, roundToPlace } = config
-
-  const handleWaffleChartAriaLabel = (state, testing = false): string => {
-    // eslint-disable-next-line no-console
-    if (testing) console.log(`handleWaffleChartAriaLabels Testing On:`, state)
-    try {
-      let ariaLabel = 'Waffle chart'
-      if (state.title) {
-        ariaLabel += ` with the title: ${state.title}`
-      }
-      return ariaLabel
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e.message)
-    }
-  }
 
   const gaugeColor = config.visual.colors[config.theme]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
@@ -279,58 +265,90 @@ const WaffleChart = ({ config, isEditor, link = '' }) => {
     range: [0, config.gauge.width]
   })
 
-  return (
-    <div className={innerContainerClasses.join(' ')}>
-      <>
-        <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
-        <div className={contentClasses.join(' ')}>
-          <div className='cove-component__content-wrap'>
-            {config.visualizationType === 'Gauge' && (
-              <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-                <div className='cove-gauge-chart__chart'>
-                  <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                    {prefix ? prefix : ' '}
-                    {config.showPercent ? dataPercentage : waffleNumerator}
-                    {suffix ? suffix + ' ' : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
-                  </div>
-                  <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
-                  <svg height={config.gauge.height} width={'100%'}>
-                    <Group>
-                      <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={config.gauge.width} height={config.gauge.height} fill='#fff' />
-                      <Bar x={0} y={0} width={xScale(waffleNumerator)} height={config.gauge.height} fill={gaugeColor} />
-                    </Group>
-                  </svg>
-                  <div className={'cove-waffle-chart__subtext subtext'}>{parse(subtext)}</div>
-                </div>
-              </div>
-            )}
-            {config.visualizationType !== 'Gauge' && (
-              <div className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-                <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
-                  <svg width={setRatio()} height={setRatio()}>
-                    <Group>{buildWaffle()}</Group>
-                  </svg>
-                </div>
-                {(dataPercentage || content) && (
-                  <div className='cove-waffle-chart__data'>
-                    {dataPercentage && (
-                      <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                        {prefix ? prefix : null}
-                        {dataPercentage}
-                        {suffix ? suffix : null}
-                      </div>
-                    )}
-                    <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
+  const Error = ({ config, updateConfig }) => {
+    return (
+      <section className='waiting'>
+        <section className='waiting-container'>
+          <h3>Error With Configuration</h3>
+          <p>{config.runtime.editorErrorMessage}</p>
+        </section>
+      </section>
+    )
+  }
 
-                    {subtext && <div className='cove-waffle-chart__subtext subtext'>{parse(subtext)}</div>}
-                  </div>
-                )}
+  const Confirm = ({ updateConfig, config }) => {
+    const confirmDone = e => {
+      e.preventDefault()
+      let newConfig = { ...config }
+      delete newConfig.newViz
+      updateConfig(newConfig)
+    }
+
+    return (
+      <section className='waiting'>
+        <section className='waiting-container'>
+          <h3>Finish Configuring</h3>
+          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
+          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
+            I'm Done
+          </button>
+        </section>
+      </section>
+    )
+  }
+
+  return (
+    <div className='cove-component__content'>
+      <Title title={title} config={config} classes={['chart-title', `${config.theme}`, 'mb-0']} />
+      <div className={contentClasses.join(' ')}>
+        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error updateConfig={updateConfig} config={config} />}
+        {config.newViz && showConfigConfirm && <Confirm updateConfig={updateConfig} config={config} />}
+        <div className='cove-component__content-wrap'>
+          {config.visualizationType === 'Gauge' && (
+            <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+              <div className='cove-gauge-chart__chart'>
+                <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                  {prefix ? prefix : ' '}
+                  {config.showPercent ? dataPercentage : waffleNumerator}
+                  {suffix ? suffix + ' ' : ' '} {config.valueDescription} {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+                </div>
+                <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
+                <svg height={config.gauge.height} width={'100%'}>
+                  <Group>
+                    <foreignObject style={{ border: '1px solid black' }} x={0} y={0} width={config.gauge.width} height={config.gauge.height} fill='#fff' />
+                    <Bar x={0} y={0} width={xScale(waffleNumerator)} height={config.gauge.height} fill={gaugeColor} />
+                  </Group>
+                </svg>
+                <div className={'cove-waffle-chart__subtext subtext'}>{parse(subtext)}</div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+          {config.visualizationType !== 'Gauge' && (
+            <div className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+              <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
+                <svg width={setRatio()} height={setRatio()}>
+                  <Group>{buildWaffle()}</Group>
+                </svg>
+              </div>
+              {(dataPercentage || content) && (
+                <div className='cove-waffle-chart__data'>
+                  {dataPercentage && (
+                    <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                      {prefix ? prefix : null}
+                      {dataPercentage}
+                      {suffix ? suffix : null}
+                    </div>
+                  )}
+                  <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
+
+                  {subtext && <div className='cove-waffle-chart__subtext subtext'>{parse(subtext)}</div>}
+                </div>
+              )}
+            </div>
+          )}
         </div>
-        {link && link}
-      </>
+      </div>
+      {link && link}
     </div>
   )
 }
@@ -339,6 +357,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   // Default States
   const [state, dispatch] = useReducer(chartReducer, { config: configObj ?? defaults, loading: true, preview: false, viewport: 'lg', coveLoadedHasRan: false, container: null })
   const { loading, config, viewport: currentViewport, coveLoadedHasRan, container } = state
+  const [showConfigConfirm, setShowConfigConfirm] = useState(false)
 
   // Default Functions
   const updateConfig = newConfig => {
@@ -417,31 +436,27 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   let content = <Loading />
 
   if (loading === false) {
-    let classNames = ['cove', 'cdc-open-viz-module', 'type-waffle-chart', currentViewport, config.theme, 'font-' + config.overallFontSize]
-
-    if (isEditor) {
-      classNames.push('is-editor')
-    }
-
-    let bodyClasses = ['cove-component', 'waffle-chart']
-
     let body = (
-      <div className={`${bodyClasses.join(' ')}`} ref={outerContainerRef}>
-        <WaffleChart config={config} isEditor={isEditor} />
-      </div>
+      <Layout.Responsive isEditor={isEditor}>
+        <WaffleChart config={config} isEditor={isEditor} showConfigConfirm={showConfigConfirm} updateConfig={updateConfig} />
+      </Layout.Responsive>
     )
 
     content = (
-      <div className={classNames.join(' ')}>
-        {isEditor && <EditorPanel>{body}</EditorPanel>}
+      <>
+        {isEditor && <EditorPanel showConfigConfirm={showConfigConfirm}>{body}</EditorPanel>}
         {!isEditor && body}
-      </div>
+      </>
     )
   }
 
   return (
     <ErrorBoundary component='WaffleChart'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>{content}</ConfigContext.Provider>
+      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>
+        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={outerContainerRef} showEditorPanel={config?.showEditorPanel}>
+          {content}
+        </Layout.VisualizationWrapper>
+      </ConfigContext.Provider>
     </ErrorBoundary>
   )
 }

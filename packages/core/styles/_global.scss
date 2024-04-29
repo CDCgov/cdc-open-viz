@@ -38,7 +38,11 @@ strong {
   border: 0 !important;
   display: flex;
 }
-
+.cdcdataviz-sr-only-focusable:focus {
+  width: fit-content;
+  margin-bottom: 0.5em;
+  margin-left: 1em;
+}
 .inline-icon {
   width: 1em !important;
   height: auto !important;
@@ -80,9 +84,9 @@ strong {
   }
   &.danger {
     background-color: $red;
-    padding: 0em 0.6em 0.0em;
+    padding: 0em 0.6em 0em;
     height: 1.6em;
-    font-size: 0.8   em;
+    font-size: 0.8 em;
     color: #fff;
     &:hover {
       background-color: darken($red, 5%);
@@ -193,4 +197,3 @@ section.footnotes {
 .margin-left-href {
   margin-left: 15px;
 }
-

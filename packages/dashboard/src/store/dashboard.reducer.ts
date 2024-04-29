@@ -41,7 +41,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       return { ...state, config, filteredData }
     }
     case 'SET_CONFIG': {
-      return { ...state, config: action.payload }
+      return { ...state, config: { ...state.config, ...action.payload } }
     }
     case 'SET_DATA': {
       return { ...state, data: action.payload }
@@ -92,6 +92,11 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       newMultiDashboards[saveSlot] = { ...toSave, label }
       return applyMultiDashboards(state, newMultiDashboards)
     }
+    case 'SET_SHARED_FILTERS': {
+      const newSharedFilters = action.payload
+      const newDashboardConfig = { ...state.config.dashboard, sharedFilters: newSharedFilters }
+      return { ...state, config: { ...state.config, dashboard: newDashboardConfig } }
+    }
     case 'INITIALIZE_MULTIDASHBOARDS': {
       const label = 'New Dashboard 1'
       const toSave = _.pick(state.config, ['dashboard', 'visualizations', 'rows'])
@@ -107,7 +112,25 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
     case 'TOGGLE_ROW': {
       const { rowIndex, colIndex } = action.payload
       const newRows = state.config.rows.map((row, index) => {
-        return index === rowIndex ? row.map((col, i) => ({ ...col, hide: i !== colIndex })) : row
+        if (index === rowIndex) {
+          const newColumns = row.columns.map((col, i) => ({ ...col, hide: i === colIndex }))
+          return { ...row, columns: newColumns }
+        }
+        return row
+      })
+      return { ...state, config: { ...state.config, rows: newRows } }
+    }
+    case 'UPDATE_VISUALIZATION': {
+      const { vizKey, configureData } = action.payload
+      return { ...state, config: { ...state.config, visualizations: { ...state.config.visualizations, [vizKey]: { ...state.config.visualizations[vizKey], ...configureData } } } }
+    }
+    case 'UPDATE_ROW': {
+      const { rowIndex, rowData } = action.payload
+      const newRows = state.config.rows.map((row, index) => {
+        if (index === rowIndex) {
+          return { ...row, ...rowData }
+        }
+        return row
       })
       return { ...state, config: { ...state.config, rows: newRows } }
     }
