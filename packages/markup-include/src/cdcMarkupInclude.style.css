@@ -1,0 +1,20 @@
+.cove.markup-include {
+  .cove-tooltip-variable {
+    position: relative;
+    display: inline;
+    background: var(--orange-tertiary);
+    .cove-tooltip-value {
+      display: none;
+      position: absolute;
+      background: var(--white);
+      border: 1px solid black;
+      padding: 10px;
+      width: 100vw;
+      max-width: 500px;
+      z-index: 9999;
+    }
+  }
+  .cove-tooltip-variable:hover > .cove-tooltip-value {
+    display: block;
+  }
+}

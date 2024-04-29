@@ -1,18 +1,52 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import ExampleConfig_1 from './../data/initial-state'
+import ExampleConfig_1 from './../data/markup-include-example.json'
 import CdcMarkupInclude from '../CdcMarkupInclude'
-import { Config } from '../types/Config'
 
 const meta: Meta<typeof CdcMarkupInclude> = {
-  title: 'Components/Templates/Markup Include',
+  title: 'Components/Molecules/Markup Include',
   component: CdcMarkupInclude
 }
 
 type Story = StoryObj<typeof CdcMarkupInclude>
 
-export const Initial_State: Story = {
+export const Primary: Story = {
   args: {
-    config: ExampleConfig_1 as unknown as Config
+    config: {
+      contentEditor: {
+        inlineHTML: '<h2>Inline HTML</h2> <div>{{state}</div> <div>{{rate}</div>',
+        markupVariables: [
+          {
+            variableName: '',
+            variableTag: '',
+            columnName: '',
+            conditions: [
+              {
+                columnName: '',
+                isOrIsNotEqualTo: 'is',
+                value: ''
+              }
+            ]
+          }
+        ],
+        showHeader: true,
+        srcUrl: '#example',
+        title: 'Markup Include',
+        useInlineHTML: true
+      },
+      data: ExampleConfig_1,
+      newViz: true,
+      theme: 'theme-blue',
+      type: 'markup-include',
+      runtime: null,
+      visual: {
+        border: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false,
+        borderColorTheme: false
+      }
+    },
+    isEditor: true
   }
 }
 
