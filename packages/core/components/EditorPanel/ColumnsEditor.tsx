@@ -56,6 +56,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
     })
     const configuredColumns = Object.values(config.columns).map(col => col.name)
     const cols = _.uniq(columns).filter(key => {
+      if (config.table.groupBy === key) return false
       if (configuredColumns.includes(key)) return false
       return true
     })

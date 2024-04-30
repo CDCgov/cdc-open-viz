@@ -9,6 +9,7 @@ export type Table = {
   excludeColumns?: string[]
   expanded?: boolean
   fontSize: 'small' | 'medium' | 'large'
+  groupBy?: string
   height?: number
   indexLabel?: string
   label?: string

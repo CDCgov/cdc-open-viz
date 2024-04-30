@@ -15,7 +15,9 @@ interface DataTableProps {
   columns: string[]
 }
 
-const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard, columns: dataColumns }) => {
+const PLACEHOLDER = '-Select-'
+
+const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDashboard, columns: dataColumns }) => {
   const isLoadedFromUrl = config.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
   const excludedColumns = useMemo(() => {
     return Object.keys(config.columns)
@@ -23,6 +25,21 @@ const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard,
       .filter(([key, dataTable]) => !dataTable)
       .map(([key]) => key)
   }, [config.columns])
+
+  const getGroupableColumns = () => {
+    const columns: string[] = config.data.flatMap(Object.keys)
+    const configuredColumns = Object.values(config.columns).map(col => col.name)
+    const cols = _.uniq(columns).filter(key => {
+      if (configuredColumns.includes(key)) return false
+      return true
+    })
+    return cols
+  }
+
+  const changeGroupBy = (value: string) => {
+    if (value === PLACEHOLDER) value = undefined
+    updateField('table', null, 'groupBy', value)
+  }
 
   const excludeColumns = (section, subSection, fieldName, excludedColNames: string[]) => {
     const newColumns = _.cloneDeep(config.columns)
@@ -156,8 +173,31 @@ const DataTable: React.FC<DataTableProps> = ({ config, updateField, isDashboard,
         <span className='edit-label column-heading'>Table Cell Min Width</span>
         <input type='number' value={config.table.cellMinWidth ? config.table.cellMinWidth : 0} onChange={e => updateField('table', null, 'cellMinWidth', e.target.value)} />
       </label>
+      <label>
+        <span className='edit-label column-heading'>
+          Group By{' '}
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Choose a column to use for grouping data rows. The selected column will not be shown in the data table. You will only be able to choose a column which does not have a column configuration.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        </span>
+        <select
+          value={config.table.groupBy}
+          onChange={event => {
+            changeGroupBy(event.target.value)
+          }}
+        >
+          {[PLACEHOLDER, ...getGroupableColumns()].map(option => (
+            <option key={option}>{option}</option>
+          ))}
+        </select>
+      </label>
     </>
   )
 }
 
-export default DataTable
+export default DataTableEditor

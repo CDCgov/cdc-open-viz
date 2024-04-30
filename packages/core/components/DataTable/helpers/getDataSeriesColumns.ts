@@ -39,6 +39,8 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
     return acc
   }, {})
 
+  tmpSeriesColumns = tmpSeriesColumns.filter(columnName => !excludeColumns.includes(columnName))
+
   tmpSeriesColumns.forEach((columnName, index) => {
     if (columnOrderingHash[columnName] === undefined) {
       if (Object.values(columnOrderingHash).includes(index)) {
@@ -52,5 +54,5 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
 
   tmpSeriesColumns.sort((a, b) => columnOrderingHash[a] - columnOrderingHash[b])
 
-  return tmpSeriesColumns.filter(columnName => !excludeColumns.includes(columnName))
+  return tmpSeriesColumns
 }
