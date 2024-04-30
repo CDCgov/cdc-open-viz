@@ -16,7 +16,7 @@ import Table from '../Table'
 import chartCellMatrix from './helpers/chartCellMatrix'
 import regionCellMatrix from './helpers/regionCellMatrix'
 import boxplotCellMatrix from './helpers/boxplotCellMatrix'
-import customColumns from './helpers/customColumns'
+import removeNullColumns from './helpers/removeNullColumns'
 import { TableConfig } from './types/TableConfig'
 import { Column } from '../../types/Column'
 
@@ -98,7 +98,7 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const _runtimeData = config.table.customTableConfig ? customColumns(rawData, config.table.excludeColumns) : runtimeData
+  const _runtimeData = removeNullColumns(rawData)
 
   const rawRows = Object.keys(_runtimeData).filter(column => column != 'columns')
   const rows = isVertical
