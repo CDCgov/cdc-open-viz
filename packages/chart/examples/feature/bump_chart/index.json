@@ -35,7 +35,7 @@
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": true,
-    "size": 50,
+    "size": "125",
     "gridLines": true,
     "enablePadding": true,
     "min": "0",
@@ -134,7 +134,7 @@
     "showDownloadUrl": false,
     "showDataTableLink": true,
     "indexLabel": "",
-    "download": false,
+    "download": true,
     "showVertical": true,
     "dateDisplayFormat": "",
     "show": true
@@ -145,6 +145,7 @@
   "legend": {
     "hide": false,
     "behavior": "isolate",
+    "axisAlign": true,
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
@@ -164,283 +165,283 @@
     "height": 25,
     "data": [
       {
-        "Brother Sister Younger Sibling": "1",
+        "Sibling": "1",
         "year": "2014"
       },
       {
-        "Brother Sister Younger Sibling": "2",
+        "Sibling": "2",
         "year": "2015"
       },
       {
-        "Brother Sister Younger Sibling": "2",
+        "Sibling": "2",
         "year": "2016"
       },
       {
-        "Brother Sister Younger Sibling": "2",
+        "Sibling": "2",
         "year": "2017"
       },
       {
-        "Brother Sister Younger Sibling": "2",
+        "Sibling": "2",
         "year": "2018"
       },
       {
-        "Brother Sister Younger Sibling": "2",
+        "Sibling": "2",
         "year": "2019"
       },
       {
-        "Brother Sister Younger Sibling": "2",
+        "Sibling": "2",
         "year": "2020"
       },
       {
-        "Belt Rope Neck Tied": "2",
+        "Neck": "2",
         "year": "2014"
       },
       {
-        "Belt Rope Neck Tied": "1",
+        "Neck": "1",
         "year": "2015"
       },
       {
-        "Belt Rope Neck Tied": "1",
+        "Neck": "1",
         "year": "2016"
       },
       {
-        "Belt Rope Neck Tied": "1",
+        "Neck": "1",
         "year": "2017"
       },
       {
-        "Belt Rope Neck Tied": "1",
+        "Neck": "1",
         "year": "2018"
       },
       {
-        "Belt Rope Neck Tied": "1",
+        "Neck": "1",
         "year": "2019"
       },
       {
-        "Belt Rope Neck Tied": "1",
+        "Neck": "1",
         "year": "2020"
       },
       {
-        "Broken Girlfriend Broke Up": "3",
+        "Girlfriend": "3",
         "year": "2014"
       },
       {
-        "Broken Girlfriend Broke Up": "4",
+        "Girlfriend": "4",
         "year": "2015"
       },
       {
-        "Broken Girlfriend Broke Up": "3",
+        "Girlfriend": "3",
         "year": "2016"
       },
       {
-        "Broken Girlfriend Broke Up": "4",
+        "Girlfriend": "4",
         "year": "2017"
       },
       {
-        "Broken Girlfriend Broke Up": "3",
+        "Girlfriend": "3",
         "year": "2018"
       },
       {
-        "Broken Girlfriend Broke Up": "4",
+        "Girlfriend": "4",
         "year": "2019"
       },
       {
-        "Broken Girlfriend Broke Up": "4",
+        "Girlfriend": "4",
         "year": "2020"
       },
       {
-        "Bullied Bullying School Being": "4",
+        "Bullying": "4",
         "year": "2014"
       },
       {
-        "Bullied Bullying School Being": "8",
+        "Bullying": "8",
         "year": "2015"
       },
       {
-        "Bullied Bullying School Being": "5",
+        "Bullying": "5",
         "year": "2016"
       },
       {
-        "Bullied Bullying School Being": "10",
+        "Bullying": "10",
         "year": "2017"
       },
       {
-        "Bullied Bullying School Being": "6",
+        "Bullying": "6",
         "year": "2018"
       },
       {
-        "Bullied Bullying School Being": "9",
+        "Bullying": "9",
         "year": "2019"
       },
       {
-        "Bullied Bullying School Being": "10",
+        "Bullying": "10",
         "year": "2020"
       },
       {
-        "Depressed Depression Suffered Mother": "5",
+        "Mother": "5",
         "year": "2014"
       },
       {
-        "Depressed Depression Suffered Mother": "7",
+        "Mother": "7",
         "year": "2015"
       },
       {
-        "Depressed Depression Suffered Mother": "6",
+        "Mother": "6",
         "year": "2016"
       },
       {
-        "Depressed Depression Suffered Mother": "5",
+        "Mother": "5",
         "year": "2017"
       },
       {
-        "Depressed Depression Suffered Mother": "4",
+        "Mother": "4",
         "year": "2018"
       },
       {
-        "Depressed Depression Suffered Mother": "5",
+        "Mother": "5",
         "year": "2019"
       },
       {
-        "Depressed Depression Suffered Mother": "6",
+        "Mother": "6",
         "year": "2020"
       },
       {
-        "Overdose Pills Attempted Overdosed": "6",
+        "Overdose": "6",
         "year": "2014"
       },
       {
-        "Overdose Pills Attempted Overdosed": "6",
+        "Overdose": "6",
         "year": "2015"
       },
       {
-        "Overdose Pills Attempted Overdosed": "7",
+        "Overdose": "7",
         "year": "2016"
       },
       {
-        "Overdose Pills Attempted Overdosed": "6",
+        "Overdose": "6",
         "year": "2017"
       },
       {
-        "Overdose Pills Attempted Overdosed": "7",
+        "Overdose": "7",
         "year": "2018"
       },
       {
-        "Overdose Pills Attempted Overdosed": "6",
+        "Overdose": "6",
         "year": "2019"
       },
       {
-        "Overdose Pills Attempted Overdosed": "5",
+        "Overdose": "5",
         "year": "2020"
       },
       {
-        "Depression Has History Of": "7",
+        "Depression": "7",
         "year": "2014"
       },
       {
-        "Depression Has History Of": "9",
+        "Depression": "9",
         "year": "2015"
       },
       {
-        "Depression Has History Of": "9",
+        "Depression": "9",
         "year": "2016"
       },
       {
-        "Depression Has History Of": "7",
+        "Depression": "7",
         "year": "2017"
       },
       {
-        "Depression Has History Of": "8",
+        "Depression": "8",
         "year": "2018"
       },
       {
-        "Depression Has History Of": "7",
+        "Depression": "7",
         "year": "2019"
       },
       {
-        "Depression Has History Of": "7",
+        "Depression": "7",
         "year": "2020"
       },
       {
-        "Vehicle Car Parked Truck": "8",
+        "Vehicle": "8",
         "year": "2014"
       },
       {
-        "Vehicle Car Parked Truck": "3",
+        "Vehicle": "3",
         "year": "2015"
       },
       {
-        "Vehicle Car Parked Truck": "4",
+        "Vehicle": "4",
         "year": "2016"
       },
       {
-        "Vehicle Car Parked Truck": "3",
+        "Vehicle": "3",
         "year": "2017"
       },
       {
-        "Vehicle Car Parked Truck": "5",
+        "Vehicle": "5",
         "year": "2018"
       },
       {
-        "Vehicle Car Parked Truck": "3",
+        "Vehicle": "3",
         "year": "2019"
       },
       {
-        "Vehicle Car Parked Truck": "3",
+        "Vehicle": "3",
         "year": "2020"
       },
       {
-        "Friends Friend Party House": "9",
+        "Friends": "9",
         "year": "2014"
       },
       {
-        "Friends Friend Party House": "10",
+        "Friends": "10",
         "year": "2015"
       },
       {
-        "Friends Friend Party House": "10",
+        "Friends": "10",
         "year": "2016"
       },
       {
-        "Friends Friend Party House": "9",
+        "Friends": "9",
         "year": "2017"
       },
       {
-        "Friends Friend Party House": "9",
+        "Friends": "9",
         "year": "2018"
       },
       {
-        "Friends Friend Party House": "10",
+        "Friends": "10",
         "year": "2019"
       },
       {
-        "Friends Friend Party House": "9",
+        "Friends": "9",
         "year": "2020"
       },
       {
-        "Blood Skull Head Brain": "10",
+        "Head": "10",
         "year": "2014"
       },
       {
-        "Blood Skull Head Brain": "5",
+        "Head": "5",
         "year": "2015"
       },
       {
-        "Blood Skull Head Brain": "8",
+        "Head": "8",
         "year": "2016"
       },
       {
-        "Blood Skull Head Brain": "8",
+        "Head": "8",
         "year": "2017"
       },
       {
-        "Blood Skull Head Brain": "10",
+        "Head": "10",
         "year": "2018"
       },
       {
-        "Blood Skull Head Brain": "8",
+        "Head": "8",
         "year": "2019"
       },
       {
-        "Blood Skull Head Brain": "8",
+        "Head": "8",
         "year": "2020"
       }
     ],
@@ -480,90 +481,76 @@
   "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "Brother Sister Younger Sibling",
+      "dataKey": "Sibling",
       "type": "Bump Chart",
       "axis": "Left",
       "tooltip": true,
       "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Belt Rope Neck Tied",
+      "dataKey": "Neck",
       "type": "Bump Chart",
       "axis": "Left",
       "tooltip": true,
       "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Broken Girlfriend Broke Up",
+      "dataKey": "Girlfriend",
       "type": "Bump Chart",
       "axis": "Left",
       "tooltip": true,
       "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Bullied Bullying School Being",
+      "dataKey": "Bullying",
       "type": "Bump Chart",
       "axis": "Left",
       "tooltip": true,
       "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Depressed Depression Suffered Mother",
+      "dataKey": "Mother",
       "type": "Bump Chart",
       "axis": "Left",
       "tooltip": true,
       "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Overdose Pills Attempted Overdosed",
+      "dataKey": "Overdose",
       "type": "Bump Chart",
       "axis": "Left",
       "tooltip": true,
       "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Depression Has History Of",
+      "dataKey": "Depression",
       "type": "Bump Chart",
       "axis": "Left",
       "tooltip": true,
       "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Vehicle Car Parked Truck",
+      "dataKey": "Vehicle",
       "type": "Bump Chart",
       "axis": "Left",
       "tooltip": true,
       "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Friends Friend Party House",
+      "dataKey": "Friends",
       "type": "Bump Chart",
       "axis": "Left",
       "tooltip": true,
       "lineType": "curveCardinal"
     },
     {
-      "dataKey": "Blood Skull Head Brain",
+      "dataKey": "Head",
       "type": "Bump Chart",
       "axis": "Left",
       "tooltip": true,
       "lineType": "curveCardinal"
     }
   ],
-  "runtime": {
-    "seriesLabels": {
-      "1": "Brother Sister Younger Sibling",
-      "2": "Belt Rope Neck Tied",
-      "3": "Broken Girlfriend Broke Up",
-      "4": "Bullied Bullying School Being",
-      "5": "Depressed Depression Suffered Mother",
-      "6": "Overdose Pills Attempted Overdosed",
-      "7": "Depression Has History Of",
-      "8": "Vehicle Car Parked Truck",
-      "9": "Friends Friend Party House",
-      "10": "Blood Skull Head Brain"
-    }
-  },
   "tooltips": {
     "opacity": 90,
     "singleSeries": false,
@@ -658,288 +645,711 @@
     },
     "data": []
   },
+  "showTooltips": true,
   "visualizationType": "Bump Chart",
   "dataCutoff": "0.5",
   "data": [
     {
-      "Brother Sister Younger Sibling": "1",
+      "Sibling": "1",
       "year": "2014"
     },
     {
-      "Brother Sister Younger Sibling": "2",
+      "Sibling": "2",
       "year": "2015"
     },
     {
-      "Brother Sister Younger Sibling": "2",
+      "Sibling": "2",
       "year": "2016"
     },
     {
-      "Brother Sister Younger Sibling": "2",
+      "Sibling": "2",
       "year": "2017"
     },
     {
-      "Brother Sister Younger Sibling": "2",
+      "Sibling": "2",
       "year": "2018"
     },
     {
-      "Brother Sister Younger Sibling": "2",
+      "Sibling": "2",
       "year": "2019"
     },
     {
-      "Brother Sister Younger Sibling": "2",
+      "Sibling": "2",
       "year": "2020"
     },
     {
-      "Belt Rope Neck Tied": "2",
+      "Neck": "2",
       "year": "2014"
     },
     {
-      "Belt Rope Neck Tied": "1",
+      "Neck": "1",
       "year": "2015"
     },
     {
-      "Belt Rope Neck Tied": "1",
+      "Neck": "1",
       "year": "2016"
     },
     {
-      "Belt Rope Neck Tied": "1",
+      "Neck": "1",
       "year": "2017"
     },
     {
-      "Belt Rope Neck Tied": "1",
+      "Neck": "1",
       "year": "2018"
     },
     {
-      "Belt Rope Neck Tied": "1",
+      "Neck": "1",
       "year": "2019"
     },
     {
-      "Belt Rope Neck Tied": "1",
+      "Neck": "1",
       "year": "2020"
     },
     {
-      "Broken Girlfriend Broke Up": "3",
+      "Girlfriend": "3",
       "year": "2014"
     },
     {
-      "Broken Girlfriend Broke Up": "4",
+      "Girlfriend": "4",
       "year": "2015"
     },
     {
-      "Broken Girlfriend Broke Up": "3",
+      "Girlfriend": "3",
       "year": "2016"
     },
     {
-      "Broken Girlfriend Broke Up": "4",
+      "Girlfriend": "4",
       "year": "2017"
     },
     {
-      "Broken Girlfriend Broke Up": "3",
+      "Girlfriend": "3",
       "year": "2018"
     },
     {
-      "Broken Girlfriend Broke Up": "4",
+      "Girlfriend": "4",
       "year": "2019"
     },
     {
-      "Broken Girlfriend Broke Up": "4",
+      "Girlfriend": "4",
       "year": "2020"
     },
     {
-      "Bullied Bullying School Being": "4",
+      "Bullying": "4",
       "year": "2014"
     },
     {
-      "Bullied Bullying School Being": "8",
+      "Bullying": "8",
       "year": "2015"
     },
     {
-      "Bullied Bullying School Being": "5",
+      "Bullying": "5",
       "year": "2016"
     },
     {
-      "Bullied Bullying School Being": "10",
+      "Bullying": "10",
       "year": "2017"
     },
     {
-      "Bullied Bullying School Being": "6",
+      "Bullying": "6",
       "year": "2018"
     },
     {
-      "Bullied Bullying School Being": "9",
+      "Bullying": "9",
       "year": "2019"
     },
     {
-      "Bullied Bullying School Being": "10",
+      "Bullying": "10",
       "year": "2020"
     },
     {
-      "Depressed Depression Suffered Mother": "5",
+      "Mother": "5",
       "year": "2014"
     },
     {
-      "Depressed Depression Suffered Mother": "7",
+      "Mother": "7",
       "year": "2015"
     },
     {
-      "Depressed Depression Suffered Mother": "6",
+      "Mother": "6",
       "year": "2016"
     },
     {
-      "Depressed Depression Suffered Mother": "5",
+      "Mother": "5",
       "year": "2017"
     },
     {
-      "Depressed Depression Suffered Mother": "4",
+      "Mother": "4",
       "year": "2018"
     },
     {
-      "Depressed Depression Suffered Mother": "5",
+      "Mother": "5",
       "year": "2019"
     },
     {
-      "Depressed Depression Suffered Mother": "6",
+      "Mother": "6",
       "year": "2020"
     },
     {
-      "Overdose Pills Attempted Overdosed": "6",
+      "Overdose": "6",
       "year": "2014"
     },
     {
-      "Overdose Pills Attempted Overdosed": "6",
+      "Overdose": "6",
       "year": "2015"
     },
     {
-      "Overdose Pills Attempted Overdosed": "7",
+      "Overdose": "7",
       "year": "2016"
     },
     {
-      "Overdose Pills Attempted Overdosed": "6",
+      "Overdose": "6",
       "year": "2017"
     },
     {
-      "Overdose Pills Attempted Overdosed": "7",
+      "Overdose": "7",
       "year": "2018"
     },
     {
-      "Overdose Pills Attempted Overdosed": "6",
+      "Overdose": "6",
       "year": "2019"
     },
     {
-      "Overdose Pills Attempted Overdosed": "5",
+      "Overdose": "5",
       "year": "2020"
     },
     {
-      "Depression Has History Of": "7",
+      "Depression": "7",
       "year": "2014"
     },
     {
-      "Depression Has History Of": "9",
+      "Depression": "9",
       "year": "2015"
     },
     {
-      "Depression Has History Of": "9",
+      "Depression": "9",
       "year": "2016"
     },
     {
-      "Depression Has History Of": "7",
+      "Depression": "7",
       "year": "2017"
     },
     {
-      "Depression Has History Of": "8",
+      "Depression": "8",
       "year": "2018"
     },
     {
-      "Depression Has History Of": "7",
+      "Depression": "7",
       "year": "2019"
     },
     {
-      "Depression Has History Of": "7",
+      "Depression": "7",
       "year": "2020"
     },
     {
-      "Vehicle Car Parked Truck": "8",
+      "Vehicle": "8",
       "year": "2014"
     },
     {
-      "Vehicle Car Parked Truck": "3",
+      "Vehicle": "3",
       "year": "2015"
     },
     {
-      "Vehicle Car Parked Truck": "4",
+      "Vehicle": "4",
       "year": "2016"
     },
     {
-      "Vehicle Car Parked Truck": "3",
+      "Vehicle": "3",
       "year": "2017"
     },
     {
-      "Vehicle Car Parked Truck": "5",
+      "Vehicle": "5",
       "year": "2018"
     },
     {
-      "Vehicle Car Parked Truck": "3",
+      "Vehicle": "3",
       "year": "2019"
     },
     {
-      "Vehicle Car Parked Truck": "3",
+      "Vehicle": "3",
       "year": "2020"
     },
     {
-      "Friends Friend Party House": "9",
+      "Friends": "9",
       "year": "2014"
     },
     {
-      "Friends Friend Party House": "10",
+      "Friends": "10",
       "year": "2015"
     },
     {
-      "Friends Friend Party House": "10",
+      "Friends": "10",
       "year": "2016"
     },
     {
-      "Friends Friend Party House": "9",
+      "Friends": "9",
       "year": "2017"
     },
     {
-      "Friends Friend Party House": "9",
+      "Friends": "9",
       "year": "2018"
     },
     {
-      "Friends Friend Party House": "10",
+      "Friends": "10",
       "year": "2019"
     },
     {
-      "Friends Friend Party House": "9",
+      "Friends": "9",
       "year": "2020"
     },
     {
-      "Blood Skull Head Brain": "10",
+      "Head": "10",
       "year": "2014"
     },
     {
-      "Blood Skull Head Brain": "5",
+      "Head": "5",
       "year": "2015"
     },
     {
-      "Blood Skull Head Brain": "8",
+      "Head": "8",
       "year": "2016"
     },
     {
-      "Blood Skull Head Brain": "8",
+      "Head": "8",
       "year": "2017"
     },
     {
-      "Blood Skull Head Brain": "10",
+      "Head": "10",
       "year": "2018"
     },
     {
-      "Blood Skull Head Brain": "8",
+      "Head": "8",
       "year": "2019"
     },
     {
-      "Blood Skull Head Brain": "8",
+      "Head": "8",
       "year": "2020"
+    }
+  ],
+  "tooltipData": [
+    {
+      "key": "Sibling",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "149"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "172"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "230"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "379"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "357"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "358"
+    },
+    {
+      "key": "Sibling",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "458"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "131"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "316"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "437"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "621"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "526"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "555"
+    },
+    {
+      "key": "Neck",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "527"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "101"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "155"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "219"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "260"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "294"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "262"
+    },
+    {
+      "key": "Girlfriend",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "242"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "95"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-4",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "90"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "3",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "144"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-5",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "165"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-4",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "213"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-3",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "151"
+    },
+    {
+      "key": "Bullying",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "112"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "89"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "-2",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "104"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "141"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "230"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "241"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "190"
+    },
+    {
+      "key": "Mother",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "206"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "76"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "114"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "137"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "227"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "185"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "190"
+    },
+    {
+      "key": "Overdose",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "210"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "57"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "-2",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "89"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "125"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "2",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "181"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "168"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "172"
+    },
+    {
+      "key": "Depression",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "206"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "55"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "5",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "171"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "209"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "304"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "-2",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "236"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "2",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "266"
+    },
+    {
+      "key": "Vehicle",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "293"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "41"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "78"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "87"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "170"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "165"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "-1",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "127"
+    },
+    {
+      "key": "Friends",
+      "additionalInfo1": "1",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "137"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "-",
+      "additionalInfo2": "1/1/14",
+      "additionalInfo3": "20"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "5",
+      "additionalInfo2": "1/1/15",
+      "additionalInfo3": "119"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "-3",
+      "additionalInfo2": "1/1/16",
+      "additionalInfo3": "134"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/17",
+      "additionalInfo3": "171"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "-2",
+      "additionalInfo2": "1/1/18",
+      "additionalInfo3": "141"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "2",
+      "additionalInfo2": "1/1/19",
+      "additionalInfo3": "152"
+    },
+    {
+      "key": "Head",
+      "additionalInfo1": "0",
+      "additionalInfo2": "1/1/20",
+      "additionalInfo3": "199"
     }
   ],
   "validated": "4.24.3",

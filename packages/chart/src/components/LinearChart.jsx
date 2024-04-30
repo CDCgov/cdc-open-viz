@@ -764,6 +764,8 @@ const LinearChart = props => {
         )}
 
         {visSupportsReactTooltip() && <ReactTooltip id={`cdc-open-viz-tooltip-${runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
+        {config.visualizationType === 'Bump Chart' && <ReactTooltip id={`bump-chart`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }} />}
+
         <div className='animation-trigger' ref={triggerRef} />
       </div>
     </ErrorBoundary>

@@ -49,6 +49,7 @@ export const useTooltip = props => {
    * @return {void} - The tooltip information is displayed
    */
   const handleTooltipMouseOver = (e, additionalChartData) => {
+    if (visualizationType === 'Bump Chart') return
     e.stopPropagation()
     const eventSvgCoords = localPoint(e)
     const { x, y } = eventSvgCoords
@@ -275,6 +276,7 @@ export const useTooltip = props => {
       // Get the closest x axis value from the pointer.
       // After getting the closest value, return the data entry with that x scale value.
       // Pass the config.visual uid (not uuid) along with that data entry to setSharedFilters
+      if (config.visualizationType === 'Bump Chart') return
       const eventSvgCoords = localPoint(e)
       const { x } = eventSvgCoords
       if (!x) throw new Error('COVE: no x value in handleTooltipClick.')
