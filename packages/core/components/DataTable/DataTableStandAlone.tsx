@@ -19,7 +19,7 @@ type StandAloneProps = {
 // consider moving this to a shared location
 const filterData = (filters, data) => {
   if (!filters) return data
-  let filteredData: any[] = []
+  const filteredData: any[] = []
 
   data.forEach(row => {
     let add = true
