@@ -1,16 +1,12 @@
 import React from 'react'
-import { Accordion } from 'react-accessible-accordion'
-import Header from '../Header'
-import { Visualization } from '@cdc/core/types/Visualization'
-import { ViewPort } from '@cdc/core/types/ViewPort'
+import { Visualization } from '../../types/Visualization'
+import { ViewPort } from '../../types/ViewPort'
 import './editor-wrapper.style.css'
 
 type StandAloneComponentProps = {
   visualizationKey: string
   config: Visualization
-  isEditor: boolean
   setConfig: Function
-  isDashboard: boolean
   configUrl: string
   setEditing: Function
   hostname: string
@@ -30,19 +26,16 @@ const EditorWrapper: React.FC<React.PropsWithChildren<EditorProps>> = ({ childre
   const [displayPanel, setDisplayPanel] = React.useState(true)
   return (
     <>
-      <Header visualizationKey={visualizationKey} subEditor={type} />
       <div className='editor-wrapper'>
         <button className={`editor-toggle ${displayPanel ? '' : 'collapsed'}`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel)} />
         <section className={`${displayPanel ? '' : 'hidden'} editor-panel cove`}>
           <div aria-level={2} role='heading' className='heading-2'>
             Configure {type}
           </div>
-          <form>
-            <Accordion allowZeroExpanded={true}>{children}</Accordion>
-          </form>
+          <form>{children}</form>
         </section>
         <div className='preview-wrapper'>
-          <Component visualizationKey={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} configUrl={undefined} setEditing={undefined} hostname={undefined} viewport={viewport} />
+          <Component visualizationKey={visualizationKey} config={visualizationConfig} setConfig={updateConfig} configUrl={undefined} setEditing={undefined} hostname={undefined} viewport={viewport} />
         </div>
       </div>
     </>
