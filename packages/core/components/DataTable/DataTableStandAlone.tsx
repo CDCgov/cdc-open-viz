@@ -11,8 +11,7 @@ type StandAloneProps = {
   config: Visualization
   viewport?: ViewPort
   isEditor?: boolean
-  updateConfig?: Function
-  setConfig: (Visualization) => void
+  updateConfig?: (Visualization) => void
 }
 
 // filterData is copied from ./packages/chart/src/helpers/filterData.ts
@@ -37,7 +36,7 @@ const filterData = (filters, data) => {
   return filteredData
 }
 
-const DataTableStandAlone: React.FC<StandAloneProps> = ({ visualizationKey, config, setConfig, viewport, isEditor, updateConfig }) => {
+const DataTableStandAlone: React.FC<StandAloneProps> = ({ visualizationKey, config, updateConfig, viewport, isEditor }) => {
   const [filteredData, setFilteredData] = useState<Record<string, any>[]>(filterData(config.filters, config.formattedData))
 
   useEffect(() => {
@@ -54,7 +53,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({ visualizationKey, conf
 
   return (
     <>
-      <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filterData={filterData} filteredData={filteredData} excludedData={config.formattedData} />
+      <Filters config={config} setConfig={updateConfig} setFilteredData={setFilteredData} filterData={filterData} filteredData={filteredData} excludedData={config.formattedData} />
       <DataTable expandDataTable={true} config={config} rawData={config.data} runtimeData={filteredData} tabbingId={visualizationKey} tableTitle={config.table.label} viewport={viewport || 'lg'} />
     </>
   )
