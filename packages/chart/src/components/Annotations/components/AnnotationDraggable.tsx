@@ -1,125 +1,50 @@
-import { useContext, useState, useRef, useEffect } from 'react'
+import { useContext, useState } from 'react'
 import ConfigContext from '../../../ConfigContext'
-import { Drag, raise } from '@visx/drag'
-import { Label, Connector, CircleSubject, LineSubject, EditableAnnotation } from '@visx/annotation'
+
+// helpers
 import { findNearestDatum } from './findNearestDatum'
 import { applyBandScaleOffset } from './helpers'
-import { scaleOrdinal } from '@visx/scale'
+import useColorScale from '../../../hooks/useColorScale'
+
+// visx
+import { Label, CircleSubject, LineSubject, EditableAnnotation } from '@visx/annotation'
+import { Drag, raise } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
+import * as allCurves from '@visx/curve'
 
+// styles
 import './AnnotationDraggable.styles.css'
-import useColorScale from '../../../hooks/useColorScale'
 
 const Annotations = ({ xScale, yScale, xMax }) => {
   const [draggingItems, setDraggingItems] = useState([])
   const { config, dimensions, updateConfig } = useContext(ConfigContext)
   const [width, height] = dimensions
-  const prevDimensions = useRef(dimensions)
   const { annotations } = config
   const { colorScale } = useColorScale()
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
 
-  const convertXValueToTimestamp = (xValue, minX, maxX, domain) => {
-    // Calculate the percentage position of xValue between minX and maxX
-    const percentage = (xValue - minX) / (maxX - minX)
+  const createPoints = annotation => {
+    const { x, y, dx, dy, xKey, yKey } = annotation
+    const bendFactor = 0.95 // Adjust the bend factor as needed
+    const controlX = x + dx * bendFactor
+    const controlY = y + dy * bendFactor
 
-    // Calculate the index in the domain array corresponding to the percentage position
-    const index = Math.round(percentage * (domain.length - 1))
+    const points = [
+      { x, y, xKey, yKey, xPos: xScale(xKey), yPos: yScale(yKey) },
+      // { x: controlX, y: controlY, xKey, yKey, xPos: xScale(xKey) + controlX - dx, yPos: yScale(yKey) + dy },
+      { x: x + dx, y: y + dy, xKey, yKey, xPos: xScale(xKey) + dx, yPos: yScale(yKey) + dy }
+    ]
 
-    // Return the timestamp from the domain array at the calculated index
-    return domain[index]
+    return points
   }
-
-  const getXValueFromCoordinate = (x, isClick = false) => {
-    const { visualizationType, orientation } = config
-    if (visualizationType === 'Pie') return
-    if (orientation === 'horizontal') return
-
-    // Check the type of x equal to point or if the type of xAxis is equal to continuous or date
-    if (config.xAxis.type === 'categorical' || (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')) {
-      let range = xScale.range()[1] - xScale.range()[0]
-      let eachBand = range / (xScale.domain().length + 1)
-
-      let numerator = x
-      const index = Math.floor((Number(numerator) - eachBand / 2) / eachBand)
-      return xScale.domain()[index] // fixes off by 1 error
-    }
-
-    if (config.xAxis.type === 'date') {
-      const xTimestamp = convertXValueToTimestamp(x, 0, xMax, xScale.domain())
-
-      // Calculate the closest date to the x coordinate
-      let closestDate = null
-      let minDistance = Number.MAX_VALUE
-
-      xScale.domain().forEach(timestamp => {
-        const distance = Math.abs(xTimestamp - timestamp)
-        if (distance < minDistance) {
-          minDistance = distance
-          closestDate = timestamp
-        }
-      })
-
-      return closestDate
-    }
-
-    return x
-  }
-
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     const [prevWidth, prevHeight] = prevDimensions.current
-
-  //     // Calculate the scaling factors for both axes
-  //     const xScaleFactor = width / prevWidth
-  //     const yScaleFactor = height / prevHeight
-
-  //     // Update the previous dimensions
-  //     prevDimensions.current = [width, height]
-
-  //     // Update the annotation positions
-  //     const updatedAnnotations = config.annotations.map((annotation, index) => {
-  //       // Calculate new x and y positions based on the scaling factors
-  //       const nearestDatum = findNearestDatum(
-  //         {
-  //           data: config.data.map(data => data[config.xAxis.dataKey]),
-  //           xScale,
-  //           yScale,
-  //           config,
-  //           xMax: xMax - config.yAxis.size / 2
-  //         },
-  //         annotation.x
-  //       )
-
-  //       const x = annotation.x * xScaleFactor
-
-  //       const y = annotation.y * yScaleFactor
-
-  //       return {
-  //         ...annotation,
-  //         x: xScale(getXValueFromCoordinate(annotation.x)),
-  //         y: y
-  //       }
-  //     })
-
-  //     // Update the annotations in your config or state
-  //     // For example, if config is a state variable:
-  //     setTimeout(() => {
-  //       updateConfig({ ...config, annotations: updatedAnnotations })
-  //     }, 1000)
-  //   }
-
-  //   window.addEventListener('resize', handleResize)
-  //   return () => {
-  //     window.removeEventListener('resize', handleResize)
-  //   }
-  // }, [width, height, config, xMax])
 
   return (
     annotations &&
     annotations.map((annotation, index) => {
+      const points = createPoints(annotation)
+
       return (
         <>
           <Drag
@@ -134,7 +59,6 @@ const Annotations = ({ xScale, yScale, xMax }) => {
             }}
           >
             {({ dragStart, dragEnd, dragMove, isDragging, x, y, dx, dy }) => {
-              var style = getComputedStyle(document.body)
               return (
                 <>
                   <EditableAnnotation
@@ -187,7 +111,24 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     anchorPosition={'auto'}
                   >
                     <Label className='annotation__desktop-label' title={annotation.title} subtitle={annotation.text} backgroundFill='#f5f5f5' backgroundProps={{ opacity: annotation.opacity ? Number(annotation.opacity) / 100 : 1 }} />
-                    <Connector />
+                    {console.log(annotation.lineType)}
+                    {/* Custom Connector */}
+                    {/* prettier-ignore */}
+                    <LinePath
+                      data={points}
+                      x={d => d.xPos + Number(config.yAxis.size) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)}
+                      y={d => d.yPos}
+                      stroke='black'
+                      strokeWidth={1}
+                      curve={allCurves[annotation.lineType]}
+                      markerStart={`url(#marker-start)`}
+                      />
+
+                    {/* MARKERS */}
+                    {annotation.marker === 'circle' && <CircleSubject className='circle-subject' stroke={colorScale(annotation.seriesKey)} />}
+                    {annotation.marker === 'arrow' && <MarkerArrow fill='black' id='marker-start' x={Number(xScale(annotation.xKey)) - 2} y={yScale(annotation.yKey)} stroke='#333' markerWidth={10} size={10} strokeWidth={1} orient='auto-start-reverse' />}
+
+                    {/* Mobile Labels */}
                     <circle
                       fill='white'
                       cx={Number(annotation.dx) + xScale(annotation.xKey) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size)}
@@ -196,39 +137,12 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                       className='annotation__mobile-label annotation__mobile-label-circle'
                       stroke={colorScale(annotation.seriesKey)}
                     />
+
                     <text x={Number(annotation.dx) + Number(xScale(annotation.xKey)) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) - 16 / 3} y={yScale(annotation.yKey) + Number(annotation.dy) + 5} className='annotation__mobile-label'>
                       {index + 1}
                     </text>
 
-                    {annotation.marker === 'arrow' && (
-                      <>
-                        <MarkerArrow
-                          markerWidth={10}
-                          markerHeight={10}
-                          id='marker-arrow-odd'
-                          refX={Number(annotation.dx) + xScale(annotation.xKey) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size)}
-                          refY={yScale(annotation.yKey) + Number(annotation.dy)}
-                          stroke='#333'
-                          size={22}
-                          strokeWidth={4}
-                          markerUnits='userSpaceOnUse'
-                        />
-                        <LinePath
-                          curve={'curveMonotoneX'}
-                          data={config.data}
-                          x={d => xScale(d[annotation.xKey]) ?? 0}
-                          y={d => yScale(d[annotation.yKey]) ?? 0}
-                          stroke='#333'
-                          strokeWidth={2}
-                          strokeOpacity={1}
-                          shapeRendering='geometricPrecision'
-                          markerMid='url(#marker-circle)'
-                          markerStart={'url(#marker-arrow)'}
-                          markerEnd={'url(#marker-arrow)'}
-                        />
-                      </>
-                    )}
-                    {annotation.marker === 'circle' && <CircleSubject className='circle-subject' stroke={colorScale(annotation.seriesKey)} />}
+                    {/* ANCHORS */}
                     {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)} />}
                     {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />}
                   </EditableAnnotation>

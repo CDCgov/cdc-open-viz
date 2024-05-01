@@ -141,7 +141,7 @@
   "xAxis": {
     "sortDates": false,
     "anchors": [],
-    "type": "date-time",
+    "type": "date",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
