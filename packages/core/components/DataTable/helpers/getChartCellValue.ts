@@ -11,7 +11,7 @@ const suppressionIcons = {
   Pilcrow: '\u00B6',
   Hash: '\u0023'
 }
-// functiion helps to check if cell value should be suppressed
+// function helps to check if cell value should be suppressed
 const shouldSuppress = (column, cellValue, preliminaryData) => {
   return preliminaryData?.some(pd => {
     const matchesColumn = pd.column ? pd.column === column : true
@@ -71,7 +71,7 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
       cellValue = config.dataFormat ? formatNumber(runtimeData[row][column], resolvedAxis, false, config) : runtimeData[row][column]
     }
   }
-
+  // suppress cell value
   config.preliminaryData.forEach(pd => {
     cellValue = shouldSuppress(column, labelValue, config.preliminaryData) ? suppressionIcons[pd?.symbol] : cellValue
   })

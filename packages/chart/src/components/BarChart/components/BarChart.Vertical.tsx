@@ -23,7 +23,6 @@ export const BarChartVertical = () => {
   const {
     assignColorsToValues,
     barBorderWidth,
-    generateIconSize,
     getAdditionalColumn,
     getHighlightedBarByValue,
     getHighlightedBarColorByValue,
@@ -54,46 +53,6 @@ export const BarChartVertical = () => {
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
-
-  // const getIcon = bar => {
-  //   let newIcon = null
-  //   let iconName = null
-  //   let suppressedSymbol = config.xAxis.showSuppressedSymbol
-  //   const icons = {
-  //     Asterisk: '<span class="icon">&#42;</span>',
-  //     'Double Asterisks': '<span class="icon">&#42;&#42;</span>',
-  //     Dagger: '<span class="icon">&dagger;</span>',
-  //     'Double Daggers': '<span class="icon">&Dagger;</span>',
-  //     'Section Sign': '<span class="icon">&#167;</span>',
-  //     Pilcrow: '<span class="icon">&#182;</span>',
-  //     Hash: '<span class="icon">&#35;</span>'
-  //   }
-  //   config.preliminaryData.forEach(pd => {
-  //     if (shouldSuppress(bar) && suppressedSymbol && pd.symbol) {
-  //       newIcon = icons[pd.symbol]
-  //       iconName = pd.symbol
-  //     }
-  //   })
-  //   return [newIcon, iconName]
-  // }
-
-  // const shouldSuppress = bar => {
-  //   return config.preliminaryData?.some(pd => {
-  //     const matchesColumn = pd.column ? pd.column === bar.key : true
-  //     const matchesValue = String(bar.value) === String(pd.value)
-  //     return matchesColumn && matchesValue && pd.symbol && pd.type === 'suppression'
-  //   })
-  // }
-
-  const suppressionIconsUniCode = {
-    Asterisk: '\u002A',
-    'Double Asterisks': '\u002A\u002A',
-    Dagger: '\u2020',
-    'Double Daggers': '\u2021\u2021',
-    'Section Sign': '\u00A7',
-    Pilcrow: '\u00B6',
-    Hash: '\u0023'
-  }
 
   return (
     config.visualizationSubType !== 'stacked' &&
@@ -211,9 +170,9 @@ export const BarChartVertical = () => {
                   }
 
                   const [suppressedIcon, iconName] = getIcon(bar)
-                  const iconY = /Asterisk/.test(iconName) ? 30 : 37
-                  const iconFont = /Asterisk/.test(iconName) ? 55 : 23
-                  const iconStyle = ` .icon { font-size: ${iconFont}px  }`
+                  const iconY = /^Asterisk$/.test(iconName) ? 25 : /^Double Asterisks$/.test(iconName) ? 10 : 35
+                  const iconFont = /^Asterisk$/.test(iconName) ? 25 : /^Double Asterisks$/.test(iconName) ? 20 : 20
+                  const iconAngle = /^Double Asterisks$/.test(iconName) ? 'rotate(88deg)' : ''
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -248,10 +207,8 @@ export const BarChartVertical = () => {
                             cursor: dashboardConfig ? 'pointer' : 'default'
                           }
                         })}
-                        <foreignObject width='100' height='100' x={barX} y={barY - iconY}>
-                          <style>{iconStyle}</style>
-                          {/* <div dangerouslySetInnerHTML={{ __html: suppressedIcon }}></div> */}
-                          {suppressionIconsUniCode['Double As']}
+                        <foreignObject width='66' height='60' x={barX} y={barY - iconY}>
+                          <div style={{ fontSize: `${iconFont}px`, transform: iconAngle }}>{suppressedIcon}</div>
                         </foreignObject>
 
                         <Text // prettier-ignore

@@ -11,8 +11,7 @@ import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { forwardRef } from 'react'
-import { FaAsterisk } from 'react-icons/fa6'
-import { symbol } from 'prop-types'
+
 interface LegendProps {
   config: ChartConfig
   colorScale: ColorScale
@@ -180,7 +179,8 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                           <>
                             {pd.displayLegend && (
                               <div key={index} className='legend-preliminary'>
-                                {h['a']}
+                                <span className={pd.symbol}>{suppressionIcons[pd.symbol]}</span>
+                                <p>{pd.label}</p>
                               </div>
                             )}
                           </>

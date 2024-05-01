@@ -197,13 +197,36 @@
       display: inline-block;
     }
   }
+  .div {
+    transform: rotate(90deg);
+  }
+
+  .div[class*='Asterisk'] {
+    transform: 0;
+  }
 
   .legend-preliminary {
     display: flex;
     flex-direction: row;
     align-items: center;
+    font-size: 1em;
     @include breakpoint(xs) {
       font-size: $font-small;
+    }
+    & > span {
+      font-size: 1.2em;
+      margin-bottom: 12px;
+      margin-right: 5px;
+    }
+    & > span[class*='Asterisk'] {
+      font-size: 1.8em;
+      margin-bottom: 0;
+    }
+    & > span[class*='Dagger'] {
+      margin-bottom: 15px;
+    }
+    & > span[class*='Sign'] {
+      margin-bottom: 18px;
     }
 
     & > svg {

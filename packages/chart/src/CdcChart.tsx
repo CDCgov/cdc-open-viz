@@ -749,7 +749,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   // function calculates the width of given text and its font-size
-  function getTextWidth(text, font) {
+  function getTextWidth(text: string, font: string): number | undefined {
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
     if (!context) {

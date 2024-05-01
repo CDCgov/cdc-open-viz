@@ -7,6 +7,7 @@ import { BoxPlot } from '../../../types/BoxPlot'
 import { General } from '../../../types/General'
 import { Column } from '../../../types/Column'
 import { Legend } from '@cdc/core/types/Legend'
+import { PreliminaryDataItem } from '@cdc/chart/src/components/LineChart/LineChartProps'
 
 export type TableConfig = {
   type?: string
@@ -25,4 +26,5 @@ export type TableConfig = {
   runtime?: Runtime
   data: Object[]
   fontSize: 'small' | 'medium' | 'large'
+  preliminaryData: PreliminaryDataItem[]
 }

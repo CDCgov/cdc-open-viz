@@ -35,21 +35,13 @@ export const BarChartHorizontal = () => {
     getAdditionalColumn,
     hoveredBar,
     onMouseLeaveBar,
-    onMouseOverBar
+    onMouseOverBar,
+    getIcon,
+    shouldSuppress
   } = useBarChart()
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
-  const getIcon = (bar, barWidth) => {
-    let icon = null
-    const iconSize = generateIconSize(barWidth)
-    config.suppressedData?.forEach(d => {
-      if (bar.key === d.column && String(bar.value) === String(d.value) && d.icon) {
-        icon = <FaStar color='#000' size={iconSize} />
-        // icon = <BarIcon color='#000' size={fontSize[config.fontSize] / 1.7} />
-      }
-    })
-    return icon
-  }
+
   return (
     config.visualizationSubType !== 'stacked' &&
     config.visualizationType === 'Bar' &&
@@ -79,27 +71,27 @@ export const BarChartHorizontal = () => {
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   let barHeight = config.barHeight
                   let numbericBarHeight = parseInt(!config.isLollipopChart ? barHeight : lollipopBarWidth)
-                  if(isNaN(numbericBarHeight)){
-                    numbericBarHeight = 25;
+                  if (isNaN(numbericBarHeight)) {
+                    numbericBarHeight = 25
                   }
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
                   const barXBase = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
-                  const suppresedBarWidth = 25
+                  const suppresedBarWidth = 5
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
-                  let barWidth = bar.value && config.suppressedData.some(({ column, value }) => bar.key === column && bar.value === value) ? suppresedBarWidth : barWidthHorizontal
+                  let barWidth = shouldSuppress(bar) ? suppresedBarWidth : barWidthHorizontal
 
                   const supprssedBarX = isPositiveBar ? xScale(0) : xScale(scaleVal) - suppresedBarWidth
-                  const barX = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? supprssedBarX : barXBase
+                  const barX = shouldSuppress(bar) ? supprssedBarX : barXBase
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
-                  const barValueLabel = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? '' : yAxisValue
+                  const barValueLabel = shouldSuppress(bar) ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
                   let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                  let textFits = textWidth < barWidthHorizontal - 5 // minus padding 5
+                  let textFits = Number(textWidth) < barWidthHorizontal - 5 // minus padding 5
 
                   // control text position
                   let textAnchor = textFits ? 'end' : 'start'
@@ -140,29 +132,22 @@ export const BarChartHorizontal = () => {
                   const highlightedBar = getHighlightedBarByValue(yAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  const displaylollipopShape = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? 'none' : 'block'
+                  const displaylollipopShape = shouldSuppress(bar) ? 'none' : 'block'
                   // update label color
                   if (barColor && labelColor && textFits) {
                     labelColor = getContrastColor('#000', barColor)
                   }
-                  const getTop = () => {
-                    if (Number(barHeight) < 20) return -4
-                    if (Number(barHeight) < 25) return -1
-                    if (Number(barHeight) < 30) return 2
-                    if (Number(barHeight) < 35) return 4
-                    if (Number(barHeight) < 40) return 5
-                    if (Number(barHeight) < 50) return 9
-                    if (Number(barHeight) < 60) return 10
-                    else {
-                      return 12
-                    }
-                  }
+
                   const background = () => {
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
+                  const [suppressedIcon, iconName] = getIcon(bar)
+                  const iconX = /Asterisk/.test(iconName) ? 9 : 20
+                  const iconFont = /Asterisk/.test(iconName) ? 23 : 15
+                  const iconAngle = /Asterisk/.test(iconName) ? '' : 'rotate(90deg)'
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -196,24 +181,9 @@ export const BarChartHorizontal = () => {
                             display: displayBar ? 'block' : 'none'
                           }
                         })}
-                        <g
-                          transform={`translate(${barX},${barHeight * bar.index})`}
-                          onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
-                          onMouseLeave={onMouseLeaveBar}
-                          opacity={transparentBar ? 0.2 : 1}
-                          display={displayBar ? 'block' : 'none'}
-                          data-tooltip-html={tooltip}
-                          data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                          onClick={e => {
-                            e.preventDefault()
-                            if (setSharedFilter) {
-                              bar[config.xAxis.dataKey] = yAxisValue
-                              setSharedFilter(config.uid, bar)
-                            }
-                          }}
-                        >
-                          {getIcon(bar, barWidth)}
-                        </g>
+                        <foreignObject width='20' height='20' x={barX + iconX} y={barHeight * bar.index}>
+                          <div style={{ fontSize: `${iconFont}px`, transform: iconAngle }}>{suppressedIcon}</div>
+                        </foreignObject>
 
                         {!config.isLollipopChart && displayNumbersOnBar && (
                           <Text // prettier-ignore
