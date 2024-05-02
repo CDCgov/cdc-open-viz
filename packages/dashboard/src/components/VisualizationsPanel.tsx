@@ -3,6 +3,7 @@ import type { Visualization } from '@cdc/core/types/Visualization'
 import Widget from './Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import { Table } from '@cdc/core/types/Table'
+import { Config as MarkupInclude } from '../../../markup-include/src/types/Config'
 
 const addVisualization = (type, subType) => {
   const modalWillOpen = type !== 'markup-include'
@@ -23,7 +24,7 @@ const addVisualization = (type, subType) => {
       newVisualizationConfig.general = {}
       newVisualizationConfig.general.geoType = subType
       break
-    case 'data-bite' || 'waffle-chart' || 'markup-include' || 'filtered-text':
+    case 'data-bite' || 'waffle-chart' || 'filtered-text':
       newVisualizationConfig.visualizationType = type
       break
     case 'table':
@@ -32,6 +33,27 @@ const addVisualization = (type, subType) => {
       newVisualizationConfig.columns = {}
       newVisualizationConfig.dataFormat = {}
       newVisualizationConfig.visualizationType = type
+      break
+    case 'markup-include':
+      newVisualizationConfig.contentEditor = {
+        inlineHTML: '<h2>Inline HTML</h2>',
+        markupVariables: [],
+        showHeader: true,
+        srcUrl: '#example',
+        title: 'Markup Include',
+        useInlineHTML: true
+      }
+      newVisualizationConfig.theme = 'theme-blue'
+      newVisualizationConfig.visual = {
+        border: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false,
+        borderColorTheme: false
+      }
+      newVisualizationConfig.showEditorPanel = true
+      newVisualizationConfig.visualizationType = type
+
       break
     default:
       newVisualizationConfig.visualizationType = type

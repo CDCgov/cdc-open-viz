@@ -1,4 +1,8 @@
-.cove.markup-include {
+.cdc-open-viz-module.markup-include {
+  height: 100vh;
+  .spacing-wrapper {
+    background-color: var(--lightGray) !important;
+  }
   .cove-tooltip-variable {
     position: relative;
     display: inline;
@@ -16,5 +20,18 @@
   }
   .cove-tooltip-variable:hover > .cove-tooltip-value {
     display: block;
+  }
+
+  /* .sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) { */
+  .sidebar + .markup-include-component.cove-component__content {
+    .markup-include-content-container {
+      margin: 3em auto 0;
+      max-width: 35em;
+      min-height: 300px;
+      height: fit-content;
+    }
+    .markup-include-content-container:not(.component--has-background) {
+      background-color: white;
+    }
   }
 }

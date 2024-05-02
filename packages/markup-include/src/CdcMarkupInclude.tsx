@@ -10,13 +10,15 @@ import { publish } from '@cdc/core/helpers/events'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorPanel from '../src/components/EditorPanel'
+import defaults from './data/initial-state'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import markupIncludeReducer from './store/mi.reducer'
+import markupIncludeReducer from './store/markupInclude.reducer'
 import Layout from '@cdc/core/components/Layout'
 // styles
+import './cdcMarkupInclude.style.css'
 import './scss/main.scss'
 
 type CdcMarkupIncludeProps = {
@@ -29,27 +31,27 @@ type CdcMarkupIncludeProps = {
 
 import Title from '@cdc/core/components/ui/Title'
 
-const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
+const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: configObj, isDashboard = true, isEditor = true, setConfig: setParentConfig }) => {
   const initialState = { config: configObj, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
 
   const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
-  const [showConfigConfirm, setShowConfigConfirm] = useState(false)
+  const [showConfigConfirm, setShowConfigConfirm] = useState(true)
 
   const { config, loading, urlMarkup, markupError, errorMessage, coveLoadedHasRan } = state
 
   // Custom States
-  const container = useRef(null)
+  const container = useRef()
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
-  const { data, theme } = config
+  const { contentEditor, data, theme } = config
 
-  const { inlineHTML, markupVariables, showHeader, srcUrl, title, useInlineHTML } = config.contentEditor || {}
+  const { inlineHTML, markupVariables, showHeader, srcUrl, title, useInlineHTML } = contentEditor
 
   // Default Functions
   const updateConfig = newConfig => {
-    Object.keys(configObj).forEach(key => {
+    Object.keys(defaults).forEach(key => {
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
-        newConfig[key] = { ...configObj[key], ...newConfig[key] }
+        newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
     })
 
@@ -214,15 +216,17 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
   if (loading === false) {
     let body = (
       <Layout.Responsive isEditor={isEditor}>
-        <div className={`cove-component__content ${contentClasses.join(' ')}`}>
-          <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
-          <div className={`${innerContainerClasses.join(' ')}`}>
-            <div className={`cove-component__content-wrap${useInlineHTML ? '' : ' hide'}`}>
-              <Markup content={convertVariablesInMarkup(inlineHTML)} />
-            </div>
-            <div className={`cove-component__content-wrap${useInlineHTML ? ' hide' : ''}`}>
-              {!markupError && urlMarkup && <Markup allowElements content={parseBodyMarkup(urlMarkup)} />}
-              {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+        <div className={`markup-include-component ${contentClasses.join(' ')}`}>
+          <div className='markup-include-content-container'>
+            <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
+            <div className={`${innerContainerClasses.join(' ')}`}>
+              <div className={`cove-component__content-wrap${useInlineHTML ? '' : ' hide'}`}>
+                <Markup content={convertVariablesInMarkup(inlineHTML)} />
+              </div>
+              <div className={`cove-component__content-wrap${useInlineHTML ? ' hide' : ''}`}>
+                {!markupError && urlMarkup && <Markup allowElements content={parseBodyMarkup(urlMarkup)} />}
+                {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+              </div>
             </div>
           </div>
         </div>

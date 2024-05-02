@@ -8,6 +8,7 @@ type ConfigCTX = {
   loading: boolean
   setParentConfig: Function
   updateConfig: Function
+  showEditorPanel?: boolean
 }
 
 const ConfigContext = createContext({} as unknown as ConfigCTX)

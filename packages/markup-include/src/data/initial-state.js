@@ -1,9 +1,28 @@
 export default {
-  title: 'Markup Include',
-  showHeader: false,
-  type: 'markup-include',
-  srcUrl: '#example',
+  contentEditor: {
+    inlineHTML: '<h2>Inline HTML</h2> <div>{{state}</div> <div>{{rate}</div>',
+    markupVariables: [
+      {
+        variableName: '',
+        variableTag: '',
+        columnName: '',
+        conditions: [
+          {
+            columnName: '',
+            isOrIsNotEqualTo: 'is',
+            value: ''
+          }
+        ]
+      }
+    ],
+    showHeader: true,
+    srcUrl: '#example',
+    title: 'Markup Include',
+    useInlineHTML: true
+  },
+  newViz: true,
   theme: 'theme-blue',
+  runtime: null,
   visual: {
     border: false,
     accent: false,

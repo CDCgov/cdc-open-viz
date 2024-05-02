@@ -4,13 +4,15 @@ import React, { forwardRef, useRef } from 'react'
 import { Config as DataBiteConfig } from '@cdc/data-bite/src/types/Config'
 import './visualizations.scss'
 import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
+import { Config as MarkupIncludeConfig } from '@cdc/markup-include/src/types/Config'
 
 type VisualizationWrapper = {
-  config: ChartConfig | DataBiteConfig | WaffleChartConfig
-  isEditor: boolean
+  children: React.ReactNode
+  config: ChartConfig | DataBiteConfig | WaffleChartConfig | MarkupIncludeConfig
   currentViewport: string
   imageId: string
-  children: React.ReactNode
+  isEditor: boolean
+  showEditorPanel: boolean
 }
 
 const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) => {

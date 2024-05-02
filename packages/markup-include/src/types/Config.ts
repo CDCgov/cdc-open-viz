@@ -27,11 +27,12 @@ export type Config = {
     title: string
     useInlineHTML: boolean
   }
-  data: Object[]
+  data?: Object[]
   newViz?: boolean
-  runtime: Runtime
+  runtime?: Runtime
   theme: any
   type: string
+  showEditorPanel?: boolean
   visual: {
     border: boolean
     accent: boolean

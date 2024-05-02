@@ -1,5 +1,5 @@
 import { Config } from '../types/Config'
-import MarkupIncludeActions from './mi.actions'
+import MarkupIncludeActions from './markupInclude.actions'
 
 export type MarkupIncludeState = {
   config?: Config

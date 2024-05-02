@@ -46,7 +46,8 @@ export const Primary: Story = {
         borderColorTheme: false
       }
     },
-    isEditor: true
+    isEditor: true,
+    showEditorPanel: true
   }
 }
 
