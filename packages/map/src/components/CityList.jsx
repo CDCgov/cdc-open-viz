@@ -97,8 +97,8 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
 
     const styles = {
       fill: legendColors[0],
-      opacity: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] !== setSharedFilterValue ? 0.5 : 1,
-      stroke: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] === setSharedFilterValue ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
+      opacity: setSharedFilterValue && isFilterValueSupported && data[city] && data[city][state.columns.geo.name] !== setSharedFilterValue ? 0.5 : 1,
+      stroke: setSharedFilterValue && isFilterValueSupported && data[city] && data[city][state.columns.geo.name] === setSharedFilterValue ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
       '&:hover': {
         fill: legendColors[1],
         outline: 0
