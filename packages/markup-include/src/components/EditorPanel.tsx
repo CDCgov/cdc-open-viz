@@ -304,7 +304,6 @@ type EditorPanelProps = { children }
 const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
   const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
   const { contentEditor, runtime, theme, visual, newViz } = config
-  // const { contentEditor, runtime, theme, visual, newViz } = config
   const { inlineHTML, showHeader, srcUrl, title, useInlineHTML } = contentEditor
   const [displayPanel, setDisplayPanel] = useState(true)
   const updateField = updateFieldFactory(config, updateConfig, true)
@@ -459,7 +458,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
                         <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                       </Tooltip.Target>
                       <Tooltip.Content>
-                        <p>Create variables to be placeholders for potential values</p>
+                        <p>{`To use created variables wrap the variable name in curly brackets, e.g. {{some_variable}}, and place the variable directly in your Inline HTML`}</p>
                       </Tooltip.Content>
                     </Tooltip>
                   </span>
