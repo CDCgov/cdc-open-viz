@@ -1,21 +1,5 @@
-// todo: improve base config to extend from
-
 import { Runtime } from '@cdc/core/types/Runtime'
-
-// todo: theme type is different from waffle chart so its been assigned to any for now.
-
-export type Condition = {
-  columnName: string
-  isOrIsNotEqualTo: string
-  value: string
-}
-
-export type Variable = {
-  columnName: string
-  conditions: Condition[]
-  name: string
-  tag: string
-}
+import { Variable } from './Variable'
 
 export type Config = {
   contentEditor: {

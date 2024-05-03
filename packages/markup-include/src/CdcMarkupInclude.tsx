@@ -216,8 +216,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
   if (loading === false) {
     let body = (
       <Layout.Responsive isEditor={isEditor}>
-        <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-          <div className='markup-include-content-container'>
+        <div className='markup-include-content-container'>
+          <div className={`markup-include-component ${contentClasses.join(' ')}`}>
             <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
             <div className={`${innerContainerClasses.join(' ')}`}>
               <div className={`cove-component__content-wrap${useInlineHTML ? '' : ' hide'}`}>
@@ -257,32 +257,10 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
     )
   }
 
-  const Confirm = () => {
-    const confirmDone = e => {
-      e.preventDefault()
-      let newConfig = { ...config }
-      delete config.newViz
-      updateConfig(newConfig)
-    }
-
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the markup.</p>
-          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
-            I'm Done
-          </button>
-        </section>
-      </section>
-    )
-  }
-
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard, showConfigConfirm }}>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
-        {config.newViz && showConfigConfirm && <Confirm />}
         <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={container} showEditorPanel={config?.showEditorPanel}>
           {content}
         </Layout.VisualizationWrapper>

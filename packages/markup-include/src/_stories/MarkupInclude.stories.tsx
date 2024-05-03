@@ -13,17 +13,17 @@ export const Primary: Story = {
   args: {
     config: {
       contentEditor: {
-        inlineHTML: '<h2>Inline HTML</h2> <div>{{state}</div> <div>{{rate}</div>',
+        inlineHTML: '<h2>Inline HTML</h2> <div>{{state}}</div> <div>{{rate}</div>',
         markupVariables: [
           {
-            variableName: '',
-            variableTag: '',
-            columnName: '',
+            name: 'state',
+            tag: '{{state}}',
+            columnName: 'STATE',
             conditions: [
               {
-                columnName: '',
+                columnName: 'rate',
                 isOrIsNotEqualTo: 'is',
-                value: ''
+                value: '130'
               }
             ]
           }
@@ -46,7 +46,7 @@ export const Primary: Story = {
         borderColorTheme: false
       }
     },
-    isEditor: true,
+    isEditor: false,
     showEditorPanel: true
   }
 }

@@ -1,17 +1,26 @@
 import React, { useState, useEffect, memo, useContext, useRef, useMemo, useReducer } from 'react'
+import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
+
+// Third Party
 import _ from 'lodash'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-
+// Context
+import { Condition } from '../types/Condition'
+import { Variable } from '../types/Variable'
 import ConfigContext from '../ConfigContext'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
+
+// Helpers
+import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
+
+// Components
+import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
 import InputText from '@cdc/core/components/inputs/InputText'
-import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import Layout from '@cdc/core/components/Layout'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 
-//styles
+// styles
 import '@cdc/core/styles/v2/components/editor.scss'
 import './editorPanel.style.css'
 
@@ -19,7 +28,7 @@ const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal',
 
 type CondtionsProps = {
   conditionControls: OpenControls
-  conditionLookup: Record<string, string[] | number[]> | []
+  conditionLookup: Record<string, string[] | number[]>
   conditionSettings: Condition
   number: number
   removeCondition: Function
@@ -27,7 +36,7 @@ type CondtionsProps = {
   updateConditionsList: Function
 }
 
-const Condition: React.FC<CondtionsProps> = ({ conditionControls, conditionLookup, conditionSettings, number, removeCondition, selectedColumn, updateConditionsList }) => {
+const Conditions: React.FC<CondtionsProps> = ({ conditionControls, conditionLookup, conditionSettings, number, removeCondition, selectedColumn, updateConditionsList }) => {
   const [openConditionControls, setOpenConditionControls] = conditionControls
   const showCondition = openConditionControls[number]
   const setShowCondition = (index, value) => {
@@ -40,7 +49,7 @@ const Condition: React.FC<CondtionsProps> = ({ conditionControls, conditionLooku
   const { columnName, isOrIsNotEqualTo, value } = conditionSettings
 
   const handleConditionChange = (selectionValue: string | number, conditionSetting: string) => {
-    const conditionSettingUpdate = { ..._.cloneDeep(conditionSettings) }
+    const conditionSettingUpdate = _.cloneDeep(conditionSettings)
     if (conditionSetting === 'columnName') {
       conditionSettingUpdate['value'] = ''
     }
@@ -60,7 +69,7 @@ const Condition: React.FC<CondtionsProps> = ({ conditionControls, conditionLooku
   ) : (
     <>
       <div className='d-flex justify-content-between'>
-        <button onClick={() => setOpenConditionControls({ ..._.cloneDeep(openConditionControls), [number]: false })}>
+        <button onClick={() => setOpenConditionControls({ ...openConditionControls, [number]: false })}>
           <Icon display='caretDown' />
         </button>
         <button className='btn btn-danger btn-sm mt-0 ml-2' onClick={() => removeCondition(number)}>
@@ -85,34 +94,20 @@ const Condition: React.FC<CondtionsProps> = ({ conditionControls, conditionLooku
             </select>
             <select className='ml-1' value={value} onChange={e => handleConditionChange(e.target.value, 'value')}>
               <option value=''>Select</option>
-              {columnName === ''
-                ? []
-                : conditionLookup[columnName].map(valueItem => {
-                    return (
-                      <option key={valueItem} value={valueItem}>
-                        {valueItem}
-                      </option>
-                    )
-                  })}
+
+              {conditionLookup[columnName]?.map(valueItem => {
+                return (
+                  <option key={valueItem} value={valueItem}>
+                    {valueItem}
+                  </option>
+                )
+              })}
             </select>
           </div>
         </label>
       </div>
     </>
   )
-}
-
-type Variable = {
-  columnName: string
-  conditions: Condition[]
-  name: string
-  tag: string
-}
-
-type Condition = {
-  columnName: string
-  isOrIsNotEqualTo: string
-  value: string
 }
 
 type VariableSectionProps = {
@@ -129,7 +124,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, con
   const [openVariableControls, setOpenVariableControls] = controls
   const show = openVariableControls[variableIndex]
   const setShow = (key, value) => {
-    setOpenVariableControls({ ..._.cloneDeep(openVariableControls), [key]: value })
+    setOpenVariableControls({ openVariableControls, [key]: value })
   }
 
   const openConditionControls = useState({})
@@ -151,10 +146,10 @@ const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, con
     setConditionsList([])
   }
 
-  const updateConditionsList = (conditionSettings: Condition, number: number) => {
+  const updateConditionsList = (conditionSettings: Condition, conditionNumber: number) => {
     const { columnName, isOrIsNotEqualTo, value } = conditionSettings
     const newConditionsList = [..._.cloneDeep(conditionsList)]
-    newConditionsList[number] = {
+    newConditionsList[conditionNumber] = {
       columnName: columnName,
       isOrIsNotEqualTo: isOrIsNotEqualTo,
       value: value
@@ -163,21 +158,22 @@ const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, con
   }
 
   const removeCondition = (conditionNumber: number) => {
-    const updatedConditionsList = [..._.cloneDeep(conditionsList)]
+    const updatedConditionsList = _.cloneDeep(conditionsList)
     updatedConditionsList.splice(conditionNumber, 1)
     setConditionsList(updatedConditionsList)
   }
 
   const handleAddConditionClick = () => {
-    const newConditionsList = [..._.cloneDeep(conditionsList)]
-    newConditionsList.push({
-      columnName: '',
-      isOrIsNotEqualTo: 'is',
-      value: ''
-    })
-    setConditionsList(newConditionsList)
+    setConditionsList([
+      ...conditionsList,
+      {
+        columnName: '',
+        isOrIsNotEqualTo: 'is',
+        value: ''
+      }
+    ])
     const [conditionControls, setConditionControls] = openConditionControls
-    setConditionControls({ ..._.cloneDeep(conditionControls), [conditionsList.length + 1]: true })
+    setConditionControls({ ...conditionControls, [conditionsList.length + 1]: true })
   }
 
   const handleVariableDoneClick = () => {
@@ -244,7 +240,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, con
             {conditionsList.map((condition, index) => {
               return (
                 <div className='condition-section mt-2'>
-                  <Condition
+                  <Conditions
                     key={variableName + '-condition-' + index}
                     conditionControls={openConditionControls}
                     conditionLookup={conditionLookup}
@@ -272,31 +268,31 @@ const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, con
   )
 }
 
-type CheckBoxProps = {
-  fieldName: string
-  label: string
-  section?: string
-  subsection?: string
-  tooltip?: string
-  updateField: Function
-  value: boolean
-}
+// type CheckBoxProps = {
+//   fieldName: string
+//   label: string
+//   section?: string
+//   subsection?: string
+//   tooltip?: string
+//   updateField: Function
+//   value: boolean
+// }
 
-const CheckBox: React.FC<CheckBoxProps> = memo(({ fieldName, label, subsection = null, tooltip, section = null, updateField, value, ...attributes }) => (
-  <label className='checkbox'>
-    <input
-      type='checkbox'
-      name={fieldName}
-      checked={value}
-      onChange={() => {
-        updateField(section, subsection, fieldName, !value)
-      }}
-      {...attributes}
-    />
-    <span className='edit-label column-heading'>{label}</span>
-    <span className='cove-icon'>{tooltip}</span>
-  </label>
-))
+// const InputCheckbox: React.FC<Checkbox> = memo(({ fieldName, label, subsection = null, tooltip, section = null, updateField, value, ...attributes }) => (
+//   <label className='checkbox'>
+//     <input
+//       type='checkbox'
+//       name={fieldName}
+//       checked={value}
+//       onChange={() => {
+//         updateField(section, subsection, fieldName, !value)
+//       }}
+//       {...attributes}
+//     />
+//     <span className='edit-label column-heading'>{label}</span>
+//     <span className='cove-icon'>{tooltip}</span>
+//   </label>
+// ))
 type OpenControls = [Record<string, boolean>, Function] // useState type
 
 type EditorPanelProps = { children }
@@ -333,38 +329,6 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
     })
   }
 
-  const Error = () => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
-  const Confirm = () => {
-    const confirmDone = e => {
-      e.preventDefault()
-      let newConfig = { ...config }
-      delete newConfig.newViz
-      updateConfig(newConfig)
-    }
-
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the markup.</p>
-          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
-            I'm Done
-          </button>
-        </section>
-      </section>
-    )
-  }
-
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
     delete strippedState.newViz
@@ -397,22 +361,20 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
   }
 
   const updateVariableArray = (newVariable: Variable, variableIndex: number) => {
-    const newVariableArray = [..._.cloneDeep(variableArray)]
+    const newVariableArray = _.cloneDeep(variableArray)
     newVariableArray[variableIndex] = newVariable
     setVariableArray(newVariableArray)
     updateField('contentEditor', null, 'markupVariables', newVariableArray)
-    config.contentEditor.markupVariables
     return
   }
 
   const deleteVariable = (variableIndex: number) => {
-    const newVariableArray = [..._.cloneDeep(variableArray)]
+    const newVariableArray = _.cloneDeep(variableArray)
     newVariableArray.splice(variableIndex, 1)
     setVariableArray(newVariableArray)
     updateField('contentEditor', null, 'markupVariables', newVariableArray)
-    config.contentEditor.markupVariables
 
-    const newControls = { ..._.cloneDeep(controls) }
+    const newControls = _.cloneDeep(controls)
     delete newControls[variableIndex]
     setControls(newControls)
   }
@@ -433,10 +395,10 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
         </AccordionItemHeading>
         <AccordionItemPanel>
           <span className='divider-heading'>Enter Markup</span>
-          <CheckBox value={useInlineHTML} section='contentEditor' fieldName='useInlineHTML' label='Use Inline HTML' updateField={updateField} />
+          <InputCheckbox inline value={useInlineHTML} section='contentEditor' fieldName='useInlineHTML' label='Use Inline HTML&nbsp;' updateField={updateField} />
           <div className='column-edit'>
             <div className={useInlineHTML ? 'hide' : ''}>
-              <InputText value={srcUrl || ''} section='contentEditor' fieldName='srcUrl' label='Source URL' placeholder='https://www.example.com/file.html' updateField={updateField} />
+              <InputText value={srcUrl || ''} section='contentEditor' fieldName='srcUrl' label='Source URL;' placeholder='https://www.example.com/file.html' updateField={updateField} />
             </div>
 
             <div className={useInlineHTML ? '' : 'hide'}>
@@ -501,11 +463,11 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
             </ul>
           </div>
           <div className='cove-accordion__panel-section checkbox-group'>
-            <CheckBox value={visual.border} section='visual' fieldName='border' label='Display Border' updateField={updateField} />
-            <CheckBox value={visual.borderColorTheme} section='visual' fieldName='borderColorTheme' label='Use Border Color Theme' updateField={updateField} />
-            <CheckBox value={visual.accent} section='visual' fieldName='accent' label='Use Accent Style' updateField={updateField} />
-            <CheckBox value={visual.background} section='visual' fieldName='background' label='Use Theme Background Color' updateField={updateField} />
-            <CheckBox value={visual.hideBackgroundColor} section='visual' fieldName='hideBackgroundColor' label='Hide Background Color' updateField={updateField} />
+            <InputCheckbox value={visual.border} section='visual' fieldName='border' label='Display Border&nbsp;' updateField={updateField} />
+            <InputCheckbox value={visual.borderColorTheme} section='visual' fieldName='borderColorTheme' label='Use Border Color Theme&nbsp;' updateField={updateField} />
+            <InputCheckbox value={visual.accent} section='visual' fieldName='accent' label='Use Accent Style&nbsp;' updateField={updateField} />
+            <InputCheckbox value={visual.background} section='visual' fieldName='background' label='Use Theme Background Color&nbsp;' updateField={updateField} />
+            <InputCheckbox value={visual.hideBackgroundColor} section='visual' fieldName='hideBackgroundColor' label='Hide Background Color&nbsp;' updateField={updateField} />
           </div>
         </AccordionItemPanel>
       </AccordionItem>

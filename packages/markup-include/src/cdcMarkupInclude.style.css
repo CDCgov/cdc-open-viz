@@ -1,5 +1,6 @@
 .cdc-open-viz-module.markup-include {
   height: 100vh;
+  background-color: var(--lightestGray);
   .spacing-wrapper {
     background-color: var(--lightGray) !important;
   }
@@ -22,15 +23,15 @@
     display: block;
   }
 
-  /* .sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) { */
-  .sidebar + .markup-include-component.cove-component__content {
-    .markup-include-content-container {
+  .markup-include-content-container {
+    height: 100vh;
+    .markup-include-component.cove-component__content {
       margin: 3em auto 0;
       max-width: 35em;
       min-height: 300px;
       height: fit-content;
     }
-    .markup-include-content-container:not(.component--has-background) {
+    .markup-include-component.cove-component__content:not(.component--hideBackgroundColor, .component--has-background) {
       background-color: white;
     }
   }

@@ -3,7 +3,6 @@ import type { Visualization } from '@cdc/core/types/Visualization'
 import Widget from './Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import { Table } from '@cdc/core/types/Table'
-import { Config as MarkupInclude } from '../../../markup-include/src/types/Config'
 
 const addVisualization = (type, subType) => {
   const modalWillOpen = type !== 'markup-include'
