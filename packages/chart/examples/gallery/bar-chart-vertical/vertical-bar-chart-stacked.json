@@ -33,13 +33,27 @@
       "type": "suppression",
       "seriesKey": "",
       "label": "Suppressed",
-      "column": "",
+      "column": "Data 3",
       "value": "40",
       "style": "",
       "displayTooltip": true,
       "displayLegend": true,
       "displayTable": true,
-      "symbol": "Hash"
+      "symbol": "Dagger",
+      "iconCode": "†"
+    },
+    {
+      "type": "suppression",
+      "seriesKey": "",
+      "label": "Suppressed",
+      "column": "Data 3",
+      "value": "55",
+      "style": "",
+      "displayTooltip": true,
+      "displayLegend": true,
+      "displayTable": true,
+      "symbol": "Section Sign",
+      "iconCode": "§"
     }
   ],
   "yAxis": {
@@ -611,7 +625,7 @@
     "showSuppressedLine": true,
     "dataKey": "Year",
     "label": "X-Axis Label Example",
-    "tickWidthMax": 21
+    "tickWidthMax": 41
   },
   "table": {
     "label": "Data Table",
@@ -627,7 +641,7 @@
     "dateDisplayFormat": "",
     "show": true
   },
-  "orientation": "horizontal",
+  "orientation": "vertical",
   "color": "pinkpurple",
   "columns": {},
   "legend": {
@@ -714,22 +728,16 @@
   "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "Data 1",
-      "type": "Bar",
-      "tooltip": true,
-      "axis": "Left"
-    },
-    {
-      "dataKey": "Data 2",
-      "type": "Bar",
-      "tooltip": true,
-      "axis": "Left"
-    },
-    {
       "dataKey": "Data 3",
       "type": "Bar",
       "tooltip": true,
       "axis": "Left"
+    },
+    {
+      "dataKey": "Data 1",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
     }
   ],
   "tooltips": {

@@ -148,14 +148,14 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
               </div>
 
               <>
-                {config?.preliminaryData?.some(pd => pd.label) && ['Line', 'Combo'].includes(config.visualizationType) && (
+                {config?.preliminaryData?.some(pd => pd.label && pd.type === 'effect' && pd.style) && ['Line', 'Combo'].includes(config.visualizationType) && (
                   <>
                     <hr></hr>
                     <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
                       {config?.preliminaryData?.map((pd, index) => {
                         return (
                           <>
-                            {pd.label && (
+                            {pd.label && pd.type === 'effect' && (
                               <div key={index} className='legend-preliminary'>
                                 <svg>{pd.style.includes('Dashed') ? <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} /> : <circle r={6} strokeWidth={2} stroke={'#000'} cx={22} cy={10} fill='transparent' />}</svg>
                                 <span> {pd.label}</span>
@@ -167,28 +167,33 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                     </div>
                   </>
                 )}
-                {!config.legend.hideSuppressedLabels && config?.preliminaryData?.some(pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && pd?.symbol) && config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && (
-                  <>
-                    <hr></hr>
-                    <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
-                      {config?.preliminaryData?.map((pd, index) => {
-                        let h = {
-                          a: '\u00B6'
-                        }
-                        return (
-                          <>
-                            {pd.displayLegend && (
-                              <div key={index} className='legend-preliminary'>
-                                <span className={pd.symbol}>{suppressionIcons[pd.symbol]}</span>
-                                <p>{pd.label}</p>
-                              </div>
-                            )}
-                          </>
-                        )
-                      })}
-                    </div>
-                  </>
-                )}
+                {!config.legend.hideSuppressedLabels &&
+                  config?.preliminaryData?.some(pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && pd?.symbol) &&
+                  ((config.visualizationType === 'Bar' && config.visualizationSubType === 'regular') || config.visualizationType === 'Line') && (
+                    <>
+                      <hr></hr>
+                      <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
+                        {config?.preliminaryData?.map((pd, index) => {
+                          return (
+                            <>
+                              {pd.displayLegend && pd.type === 'suppression' && (
+                                <div key={index} className='legend-preliminary'>
+                                  {pd.symbol && pd.symbol.includes('Dashed') && config.visualizationType !== 'Bar' && (
+                                    <svg>
+                                      <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.symbol)} />{' '}
+                                    </svg>
+                                  )}
+
+                                  <span className={pd.symbol}>{suppressionIcons[pd.symbol]}</span>
+                                  {pd.symbol && <p>{pd.label}</p>}
+                                </div>
+                              )}
+                            </>
+                          )
+                        })}
+                      </div>
+                    </>
+                  )}
               </>
             </>
           )

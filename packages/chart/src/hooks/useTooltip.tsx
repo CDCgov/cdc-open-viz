@@ -143,7 +143,15 @@ export const useTooltip = props => {
           ...getIncludedTooltipSeries()
             ?.filter(Boolean)
             ?.flatMap(seriesKey => {
-              const formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
+              let formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
+              config.preliminaryData?.forEach(pd => {
+                let val = resolvedScaleValues[0]?.[seriesKey]
+                if (pd.label && pd.type === 'suppression' && pd.displayTooltip) {
+                  if (val === pd.value && (!pd.column || seriesKey === pd.column)) {
+                    formattedValue = pd.label
+                  }
+                }
+              })
               return resolvedScaleValues?.[0]?.[seriesKey] ? [[seriesKey, formattedValue, getAxisPosition(seriesKey)]] : []
             })
         )

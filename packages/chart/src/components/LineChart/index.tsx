@@ -82,6 +82,7 @@ const LineChart = (props: LineChartProps) => {
                 const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
                 const labeltype = axis === 'Right' ? 'rightLabel' : 'label'
                 let label = config.runtime.yAxis[labeltype]
+
                 // if has muiltiple series dont show legend value on tooltip
                 if (!hasMultipleSeries) label = config.isLegendValue ? config.runtime.seriesLabels[seriesKey] : label
 
@@ -163,7 +164,7 @@ const LineChart = (props: LineChartProps) => {
                 )}
               </>
               {/* SPLIT LINE */}
-              {config?.preliminaryData?.some(d => d.value && d.column) ? (
+              {config?.preliminaryData?.some(pd => pd.value && pd.type) ? (
                 <SplitLinePath
                   curve={allCurves[seriesData[0].lineType]}
                   segments={(config.xAxis.type === 'date-time'
@@ -216,7 +217,17 @@ const LineChart = (props: LineChartProps) => {
 
               {/* circles for preliminaryData data */}
               {circleData.map((d, i) => {
-                return <circle key={i} cx={xPos(d)} cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey)))} r={6} strokeWidth={seriesData[0].weight || 2} stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'} fill='#fff' />
+                return (
+                  <circle
+                    key={i}
+                    cx={xPos(d)}
+                    cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey)))}
+                    r={6}
+                    strokeWidth={seriesData[0].weight || 2}
+                    stroke={colorScale ? colorScale(config.runtime.seriesLabels[seriesKey]) : '#000'}
+                    fill='#fff'
+                  />
+                )
               })}
 
               {/* ANIMATED LINE */}

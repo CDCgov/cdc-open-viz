@@ -10,6 +10,7 @@ import Regions from './../../Regions'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import createBarElement from '@cdc/core/components/createBarElement'
 // third party
+import ReactTooltip from 'react-tooltip'
 import chroma from 'chroma-js'
 import BarChartContext, { type BarChartContextValues } from './context'
 
@@ -106,7 +107,7 @@ export const BarChartVertical = () => {
 
                   const additionalColTooltip = getAdditionalColumn(bar.key, data[barGroup.index][config.runtime.originalXAxis.dataKey])
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${shouldSuppress(bar) ? suppressedTooltipValue : yAxisValue}`
+                  const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
 
                   const tooltip = `<ul>
                   <li class="tooltip-heading">${xAxisTooltip}</li>
@@ -160,6 +161,7 @@ export const BarChartVertical = () => {
                       if (isHighlightedBar) _barColor = 'transparent'
                       return _barColor
                     }
+                    console.log(config.preliminaryData)
 
                     // if this is a two tone lollipop slightly lighten the bar.
                     if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
@@ -207,9 +209,17 @@ export const BarChartVertical = () => {
                             cursor: dashboardConfig ? 'pointer' : 'default'
                           }
                         })}
-                        <foreignObject width='66' height='60' x={barX} y={barY - iconY}>
-                          <div style={{ fontSize: `${iconFont}px`, transform: iconAngle }}>{suppressedIcon}</div>
-                        </foreignObject>
+                        {config.preliminaryData.map((pd, index) => {
+                          const isSuppressed = Number(pd.value) === Number(bar.value) && (!pd.column || pd.column === bar.key)
+                          if (!isSuppressed) {
+                            return
+                          }
+                          return (
+                            <foreignObject key={index} style={{ overflow: 'hidden', display: displayBar ? 'block' : 'none' }} width={barWidth} height={33} x={barX} y={barY - iconY}>
+                              <div style={{ transform: iconAngle, zIndex: '-100' }}>{pd.iconCode}</div>
+                            </foreignObject>
+                          )
+                        })}
 
                         <Text // prettier-ignore
                           display={config.labels && displayBar ? 'block' : 'none'}

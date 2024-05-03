@@ -48,15 +48,28 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
 
   const getTypeOptions = () => {
     if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
-      return ['effect']
+      return ['effect', 'suppression']
     } else {
       return ['suppression']
     }
   }
+  const suppressionIcons = {
+    Asterisk: '\u002A',
+    'Double Asterisks': '\u002A\u002A',
+    Dagger: '\u2020',
+    'Double Daggers': '\u2021\u2021',
+    'Section Sign': '\u00A7',
+    Pilcrow: '\u00B6',
+    Hash: '\u0023'
+  }
 
-  const getStyleOptions = () => {
+  const getStyleOptions = type => {
     if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
-      return ['Dashed Small', 'Dashed Medium', 'Dashed Large', 'Open Circles']
+      if (type === 'suppression') {
+        return ['Dashed Small', 'Dashed Medium', 'Dashed Large']
+      } else {
+        return ['Dashed Small', 'Dashed Medium', 'Dashed Large', 'Open Circles']
+      }
     }
     if (config.visualizationType === 'Bar') {
       return ['Asterisk', 'Double Asterisks', 'Dagger', 'Double Daggers', 'Section Sign', 'Pilcrow', 'Hash']
@@ -77,8 +90,9 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
 
   let addColumn = () => {
     const defaultLabel = config.visualizationType === 'Bar' ? 'Suppressed' : ''
+    const defaultType = config.visualizationType === 'Line' ? 'effect' : ''
     let preliminaryData = config.preliminaryData ? [...config.preliminaryData] : []
-    preliminaryData.push({ type: '', seriesKey: '', label: defaultLabel, column: '', value: '', style: '', displayTooltip: true, displayLegend: true, displayTable: true, symbol: '' })
+    preliminaryData.push({ type: defaultType, seriesKey: '', label: defaultLabel, column: '', value: '', style: '', displayTooltip: true, displayLegend: true, displayTable: true, symbol: '', iconCode: '' })
     updateConfig({ ...config, preliminaryData })
   }
 
@@ -90,6 +104,9 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
     }
 
     preliminaryData[i][fieldName] = value
+    if (fieldName === 'symbol') {
+      preliminaryData[i]['iconCode'] = suppressionIcons[value]
+    }
     updateConfig({ ...config, preliminaryData })
   }
 
@@ -109,9 +126,9 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
               >
                 Remove
               </button>
-              {config.visualizationType === 'Bar' ? (
+              <Select value={type} initial={'Select'} fieldName='type' label='Type' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
+              {type === 'suppression' ? (
                 <>
-                  <Select value={type} initial='Select' fieldName='type' label='Type' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
                   <Select
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
@@ -147,7 +164,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
                     fieldName='symbol'
                     label='suppression symbol'
                     updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                    options={getStyleOptions()}
+                    options={getStyleOptions(type)}
                   />
                   <TextField
                     tooltip={
@@ -217,11 +234,10 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
                 </>
               ) : (
                 <>
-                  <Select value={type} initial='Select' fieldName='type' label='Type' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
                   <Select value={seriesKey} initial='Select' fieldName='seriesKey' label='ASSOCIATE TO SERIES' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={config.runtime.lineSeriesKeys ?? config.runtime?.seriesKeys} />
                   <Select value={column} initial='Select' fieldName='column' label='COLUMN WITH CONFIGURATION VALUE' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
                   <TextField value={value} fieldName='value' label='VALUE TO TRIGGER' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
-                  <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions()} />
+                  <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions(type)} />
 
                   <TextField value={label} fieldName='label' label='Label' placeholder='' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
                 </>
@@ -1935,7 +1951,7 @@ const EditorPanel = () => {
                         }
                         updateField={updateField}
                       />
-                      {/* {visHasBrushChart && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />} */}
+                      {visHasBrushChart && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
 
                       {config.exclusions.active && (
                         <>

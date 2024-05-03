@@ -18,7 +18,7 @@ export type LineChartProps = {
 
 export interface PreliminaryDataItem {
   style: string
-  type: string
+  type: 'effect' | 'suppression' | ''
   column: string
   value: string
   seriesKey: string
@@ -27,6 +27,7 @@ export interface PreliminaryDataItem {
   displayTooltip: boolean
   displayLegend: boolean
   displayTable: boolean
+  iconCode: string
 }
 
 export interface DataItem {
@@ -43,6 +44,7 @@ export interface StyleProps {
   handleLineType: Function
   lineType: string
   seriesKey: 'string'
+  strokeWidth: number
 }
 export interface Style {
   stroke: string
