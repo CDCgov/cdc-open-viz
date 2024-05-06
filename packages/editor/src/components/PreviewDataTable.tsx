@@ -96,8 +96,12 @@ const PreviewDataTable = () => {
   }
 
   useEffect(() => {
-    fetchAsyncData()
-  }, [config.datasets]) // eslint-disable-line
+    if (!config.data) {
+      fetchAsyncData()
+    } else {
+      setTableData(previewData)
+    }
+  }, [config.data]) // eslint-disable-line
 
   const tableColumns = useMemo(() => {
     if (!tableData) return []
