@@ -1,0 +1,10 @@
+{
+  "contentEditor": {
+    "inlineHTML": "<h2>Inline HTML</h2>",
+    "srcUrl": "#example",
+    "theme": "theme-blue",
+    "title": "Markup Include"
+  },
+  "data": [],
+  "type": "markup-include"
+}

@@ -216,7 +216,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
   if (loading === false) {
     let body = (
       <Layout.Responsive isEditor={isEditor}>
-        <div className='markup-include-content-container'>
+        <div className='markup-include-content-container cove-component__content'>
           <div className={`markup-include-component ${contentClasses.join(' ')}`}>
             <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
             <div className={`${innerContainerClasses.join(' ')}`}>

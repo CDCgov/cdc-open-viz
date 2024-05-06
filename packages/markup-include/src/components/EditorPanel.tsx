@@ -30,17 +30,19 @@ type CondtionsProps = {
   conditionControls: OpenControls
   conditionLookup: Record<string, string[] | number[]>
   conditionSettings: Condition
-  number: number
+  conditionIndex: number
   removeCondition: Function
   selectedColumn: string
   updateConditionsList: Function
 }
 
-const Conditions: React.FC<CondtionsProps> = ({ conditionControls, conditionLookup, conditionSettings, number, removeCondition, selectedColumn, updateConditionsList }) => {
+const Conditions: React.FC<CondtionsProps> = ({ conditionControls, conditionLookup, conditionSettings, conditionIndex, removeCondition, selectedColumn, updateConditionsList }) => {
   const [openConditionControls, setOpenConditionControls] = conditionControls
-  const showCondition = openConditionControls[number]
+  const showCondition = openConditionControls[conditionIndex]
   const setShowCondition = (index, value) => {
-    setOpenConditionControls({ ..._.cloneDeep(openConditionControls), [index]: value })
+    const newOpenConditionsControls = [...openConditionControls]
+    newOpenConditionsControls[index] = value
+    setOpenConditionControls(newOpenConditionsControls)
   }
 
   const columnNames = Object.keys(conditionLookup)
@@ -54,13 +56,13 @@ const Conditions: React.FC<CondtionsProps> = ({ conditionControls, conditionLook
       conditionSettingUpdate['value'] = ''
     }
     conditionSettingUpdate[conditionSetting] = selectionValue
-    updateConditionsList(conditionSettingUpdate, number)
+    updateConditionsList(conditionSettingUpdate, conditionIndex)
   }
 
   return !showCondition ? (
     <>
       <div className='mb-1'>
-        <button onClick={() => setShowCondition(number, true)}>
+        <button onClick={() => setShowCondition(conditionIndex, true)}>
           <Icon display='caretDown' />
         </button>
         <span> {value ? `${columnName} ${isOrIsNotEqualTo === 'is' ? 'is' : 'is not'} ${value}` : 'New Condition'}</span>
@@ -69,14 +71,20 @@ const Conditions: React.FC<CondtionsProps> = ({ conditionControls, conditionLook
   ) : (
     <>
       <div className='d-flex justify-content-between'>
-        <button onClick={() => setOpenConditionControls({ ...openConditionControls, [number]: false })}>
+        <button
+          onClick={() => {
+            const newOpenConditionsControls = [...openConditionControls]
+            newOpenConditionsControls[conditionIndex] = false
+            setOpenConditionControls(newOpenConditionsControls)
+          }}
+        >
           <Icon display='caretDown' />
         </button>
-        <button className='btn btn-danger btn-sm mt-0 ml-2' onClick={() => removeCondition(number)}>
+        <button className='btn btn-danger btn-sm mt-0 ml-2' onClick={() => removeCondition(conditionIndex)}>
           Remove
         </button>
       </div>
-      <div id={`condition_${number}`}>
+      <div id={`condition_${conditionIndex}`}>
         <label className='d-block'>
           <span>Condition : </span>
           <div className='pt-1'>
@@ -111,7 +119,6 @@ const Conditions: React.FC<CondtionsProps> = ({ conditionControls, conditionLook
 }
 
 type VariableSectionProps = {
-  allVariableNames: string[]
   controls: OpenControls
   data: Object[]
   deleteVariable: Function
@@ -120,14 +127,14 @@ type VariableSectionProps = {
   variableIndex: number
 }
 
-const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, controls, data, deleteVariable, updateVariableArray, variableConfig, variableIndex }) => {
+const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, deleteVariable, updateVariableArray, variableConfig, variableIndex }) => {
   const [openVariableControls, setOpenVariableControls] = controls
   const show = openVariableControls[variableIndex]
   const setShow = (key, value) => {
     setOpenVariableControls({ openVariableControls, [key]: value })
   }
 
-  const openConditionControls = useState({})
+  const openConditionControls = useState([])
 
   const columnNames = Object.keys(data[0])
   const [selectedColumn, setNewVariableColumnName] = useState(variableConfig.columnName)
@@ -146,10 +153,10 @@ const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, con
     setConditionsList([])
   }
 
-  const updateConditionsList = (conditionSettings: Condition, conditionNumber: number) => {
+  const updateConditionsList = (conditionSettings: Condition, conditionIndex: number) => {
     const { columnName, isOrIsNotEqualTo, value } = conditionSettings
-    const newConditionsList = [..._.cloneDeep(conditionsList)]
-    newConditionsList[conditionNumber] = {
+    const newConditionsList = _.cloneDeep(conditionsList)
+    newConditionsList[conditionIndex] = {
       columnName: columnName,
       isOrIsNotEqualTo: isOrIsNotEqualTo,
       value: value
@@ -157,9 +164,9 @@ const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, con
     setConditionsList(newConditionsList)
   }
 
-  const removeCondition = (conditionNumber: number) => {
+  const removeCondition = (conditionIndex: number) => {
     const updatedConditionsList = _.cloneDeep(conditionsList)
-    updatedConditionsList.splice(conditionNumber, 1)
+    updatedConditionsList.splice(conditionIndex, 1)
     setConditionsList(updatedConditionsList)
   }
 
@@ -172,8 +179,12 @@ const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, con
         value: ''
       }
     ])
+
     const [conditionControls, setConditionControls] = openConditionControls
-    setConditionControls({ ...conditionControls, [conditionsList.length + 1]: true })
+
+    const newConditionsControls = [...conditionControls]
+    newConditionsControls[conditionsList.length + 1] = true
+    setConditionControls(newConditionsControls)
   }
 
   const handleVariableDoneClick = () => {
@@ -235,7 +246,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, con
               </select>
             </label>
           </div>
-          <label className='d-block'>
+          <label className='d-block py-2'>
             <span className='edit-label column-heading'>Conditions:</span>
             {conditionsList.map((condition, index) => {
               return (
@@ -245,7 +256,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, con
                     conditionControls={openConditionControls}
                     conditionLookup={conditionLookup}
                     conditionSettings={condition}
-                    number={index}
+                    conditionIndex={index}
                     removeCondition={removeCondition}
                     selectedColumn={selectedColumn}
                     updateConditionsList={updateConditionsList}
@@ -268,39 +279,14 @@ const VariableSection: React.FC<VariableSectionProps> = ({ allVariableNames, con
   )
 }
 
-// type CheckBoxProps = {
-//   fieldName: string
-//   label: string
-//   section?: string
-//   subsection?: string
-//   tooltip?: string
-//   updateField: Function
-//   value: boolean
-// }
-
-// const InputCheckbox: React.FC<Checkbox> = memo(({ fieldName, label, subsection = null, tooltip, section = null, updateField, value, ...attributes }) => (
-//   <label className='checkbox'>
-//     <input
-//       type='checkbox'
-//       name={fieldName}
-//       checked={value}
-//       onChange={() => {
-//         updateField(section, subsection, fieldName, !value)
-//       }}
-//       {...attributes}
-//     />
-//     <span className='edit-label column-heading'>{label}</span>
-//     <span className='cove-icon'>{tooltip}</span>
-//   </label>
-// ))
-type OpenControls = [Record<string, boolean>, Function] // useState type
+type OpenControls = [[boolean], Function] // useState type
 
 type EditorPanelProps = { children }
 
 const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
   const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
   const { contentEditor, runtime, theme, visual, newViz } = config
-  const { inlineHTML, showHeader, srcUrl, title, useInlineHTML } = contentEditor
+  const { inlineHTML, markupVariables, showHeader, srcUrl, title, useInlineHTML } = contentEditor
   const [displayPanel, setDisplayPanel] = useState(true)
   const updateField = updateFieldFactory(config, updateConfig, true)
 
@@ -337,11 +323,10 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
     return strippedState
   }
 
-  const [variableArray, setVariableArray] = useState<Variable[]>([])
+  const [variableArray, setVariableArray] = useState<Variable[]>([...markupVariables])
   const [isCreatingVariable, setIsCreatingVariable] = useState(false)
 
   const textAreaInEditorContainer = useRef(null)
-  const variableNames = variableArray.map(variable => variable.name)
   const [controls, setControls] = openVariableControls
 
   const handleCreateNewVariableButtonClick = () => {
@@ -428,7 +413,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
                 {variableArray && variableArray.length > 0 && (
                   <div className='section-border'>
                     {variableArray?.map((variableObject, index) => {
-                      return <VariableSection key={`${variableObject.name}-${index}`} allVariableNames={variableNames} controls={openVariableControls} data={data} deleteVariable={deleteVariable} updateVariableArray={updateVariableArray} variableConfig={variableObject} variableIndex={index} />
+                      return <VariableSection key={`${variableObject.name}-${index}`} controls={openVariableControls} data={data} deleteVariable={deleteVariable} updateVariableArray={updateVariableArray} variableConfig={variableObject} variableIndex={index} />
                     })}
                   </div>
                 )}
