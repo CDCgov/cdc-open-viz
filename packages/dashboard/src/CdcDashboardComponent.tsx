@@ -317,12 +317,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   useEffect(() => {
+    if (state.tabSelected && state.tabSelected !== 'Dashboard Preview') return
     const { config } = state
     if (config.filterBehavior !== FilterBehavior.Apply) {
       reloadURLData()
     }
     loadAPIFilters()
-  }, [])
+  }, [state.tabSelected])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     const config = _.cloneDeep(state.config)
