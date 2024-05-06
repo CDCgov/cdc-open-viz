@@ -37,20 +37,7 @@ export const BarChartVertical = () => {
   } = useBarChart()
 
   // prettier-ignore
-  const {
-    colorScale,
-    config,
-    dashboardConfig,
-    formatDate,
-    formatNumber,
-    getXAxisData,
-    getYAxisData,
-    isNumber,
-    parseDate,
-    seriesHighlight,
-    setSharedFilter,
-    transformedData,
-  } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, dashboardConfig, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, getTextWidth } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
@@ -161,7 +148,6 @@ export const BarChartVertical = () => {
                       if (isHighlightedBar) _barColor = 'transparent'
                       return _barColor
                     }
-                    console.log(config.preliminaryData)
 
                     // if this is a two tone lollipop slightly lighten the bar.
                     if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
@@ -170,11 +156,18 @@ export const BarChartVertical = () => {
                     if (isHighlightedBar) _barColor = 'transparent'
                     return _barColor
                   }
+                  const getIconSize = synbol => {
+                    let size = 0
+                    if (synbol.includes('Asterisk')) {
+                      size = barWidth / 1.5
+                    } else {
+                      size = barWidth / 2
+                    }
+                    return size
+                  }
 
-                  const [suppressedIcon, iconName] = getIcon(bar)
-                  const iconY = /^Asterisk$/.test(iconName) ? 25 : /^Double Asterisks$/.test(iconName) ? 10 : 35
-                  const iconFont = /^Asterisk$/.test(iconName) ? 25 : /^Double Asterisks$/.test(iconName) ? 20 : 20
-                  const iconAngle = /^Double Asterisks$/.test(iconName) ? 'rotate(88deg)' : ''
+                  const iconAngle = symbol => (symbol === 'Double Asterisks' ? 90 : 0)
+                  const iconPadding = symbol => (symbol === 'Asterisk' ? '7px' : symbol === 'Double Asterisks' ? '-18px' : -suppresedBarHeight * 3)
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -211,13 +204,28 @@ export const BarChartVertical = () => {
                         })}
                         {config.preliminaryData.map((pd, index) => {
                           const isSuppressed = Number(pd.value) === Number(bar.value) && (!pd.column || pd.column === bar.key)
+                          const iconWidth = getTextWidth(pd.symbol, `normal ${20}px sans-serif`)
+                          const iconFits = 17 < barWidth
                           if (!isSuppressed) {
                             return
                           }
                           return (
-                            <foreignObject key={index} style={{ overflow: 'hidden', display: displayBar ? 'block' : 'none' }} width={barWidth} height={33} x={barX} y={barY - iconY}>
-                              <div style={{ transform: iconAngle, zIndex: '-100' }}>{pd.iconCode}</div>
-                            </foreignObject>
+                            <Text // prettier-ignore
+                              key={index}
+                              angle={Number(iconAngle(pd.symbol))}
+                              dy={iconPadding(pd.symbol)}
+                              dx={pd.symbol === 'Double Asterisks' ? -barWidth / 2 : 0}
+                              display={displayBar ? 'block' : 'none'}
+                              opacity={transparentBar ? 0.5 : 1}
+                              x={barX + barWidth / 2}
+                              y={barY}
+                              verticalAnchor='end'
+                              fill={labelColor}
+                              textAnchor='middle'
+                              fontSize={`${getIconSize(pd.symbol)}px`}
+                            >
+                              {pd.iconCode}
+                            </Text>
                           )
                         })}
 

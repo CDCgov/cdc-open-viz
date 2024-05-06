@@ -2,14 +2,6 @@ import { parseDate, formatDate } from '@cdc/core/helpers/cove/date'
 import { formatNumber } from '@cdc/core/helpers/cove/number'
 import { TableConfig } from '../types/TableConfig'
 
-// function helps to check if cell value should be suppressed
-const shouldSuppress = (column, cellValue, preliminaryData) => {
-  return preliminaryData?.some(pd => {
-    const matchesColumn = pd.column ? pd.column === column : true
-    const matchesValue = String(cellValue) === String(pd.value)
-    return matchesColumn && matchesValue && pd.symbol && pd.type === 'suppression'
-  })
-}
 // if its additional column, return formatting params
 const isAdditionalColumn = (column, config) => {
   let inthere = false
@@ -63,7 +55,10 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
   }
   // suppress cell value
   config.preliminaryData.forEach(pd => {
-    cellValue = shouldSuppress(column, labelValue, config.preliminaryData) ? pd?.iconCode : cellValue
+    const isSuppressed = Number(pd.value) === Number(labelValue) && (!pd.column || pd.column === column)
+    if (isSuppressed) {
+      cellValue = pd?.iconCode
+    }
   })
 
   return cellValue

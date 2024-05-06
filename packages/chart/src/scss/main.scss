@@ -210,28 +210,43 @@
     flex-direction: row;
     align-items: center;
     font-size: 1em;
+    vertical-align: middle;
+    margin-bottom: 0.5em;
+
     @include breakpoint(xs) {
       font-size: $font-small;
     }
     & > span {
+      display: flex;
+      justify-items: center;
+      align-items: center;
+    }
+    & > span {
       font-size: 1.2em;
-      margin-bottom: 12px;
-      margin-right: 5px;
+      margin-right: 8px;
+      max-height: 1px;
     }
     & > span[class*='Asterisk'] {
-      font-size: 1.8em;
-      margin-bottom: 0;
+      transform: scale(1.8);
+      margin-top: 18px;
     }
     & > span[class*='Dagger'] {
-      margin-bottom: 15px;
+      margin-top: 2px;
     }
     & > span[class*='Sign'] {
-      margin-bottom: 18px;
+      margin-top: 1px;
     }
 
     & > svg {
       width: 50px;
       height: 23px;
+    }
+
+    & > p.effect {
+      margin: 0;
+    }
+    & > p {
+      margin: 0;
     }
   }
 

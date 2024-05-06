@@ -31,29 +31,29 @@
   "preliminaryData": [
     {
       "type": "suppression",
-      "seriesKey": "",
-      "label": "Suppressed",
-      "column": "Data 3",
+      "seriesKey": "Data 1",
+      "label": "Suppressedkkd",
+      "column": "",
       "value": "40",
       "style": "",
       "displayTooltip": true,
       "displayLegend": true,
       "displayTable": true,
-      "symbol": "Dagger",
-      "iconCode": "†"
+      "symbol": "Double Asterisks",
+      "iconCode": "**"
     },
     {
       "type": "suppression",
       "seriesKey": "",
       "label": "Suppressed",
-      "column": "Data 3",
-      "value": "55",
+      "column": "Data 2",
+      "value": "20",
       "style": "",
       "displayTooltip": true,
       "displayLegend": true,
       "displayTable": true,
-      "symbol": "Section Sign",
-      "iconCode": "§"
+      "symbol": "Pilcrow",
+      "iconCode": "¶"
     }
   ],
   "yAxis": {
@@ -648,7 +648,7 @@
     "hide": false,
     "behavior": "isolate",
     "axisAlign": true,
-    "singleRow": true,
+    "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
     "description": "",
@@ -728,13 +728,13 @@
   "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "Data 3",
-      "type": "Bar",
-      "tooltip": true,
-      "axis": "Left"
+      "dataKey": "Data 1",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
     },
     {
-      "dataKey": "Data 1",
+      "dataKey": "Data 2",
       "type": "Line",
       "axis": "Left",
       "tooltip": true

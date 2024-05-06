@@ -158,7 +158,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                             {pd.label && pd.type === 'effect' && (
                               <div key={index} className='legend-preliminary'>
                                 <svg>{pd.style.includes('Dashed') ? <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} /> : <circle r={6} strokeWidth={2} stroke={'#000'} cx={22} cy={10} fill='transparent' />}</svg>
-                                <span> {pd.label}</span>
+                                <p> {pd.label}</p>
                               </div>
                             )}
                           </>
@@ -169,7 +169,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                 )}
                 {!config.legend.hideSuppressedLabels &&
                   config?.preliminaryData?.some(pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && pd?.symbol) &&
-                  ((config.visualizationType === 'Bar' && config.visualizationSubType === 'regular') || config.visualizationType === 'Line') && (
+                  ((config.visualizationType === 'Bar' && config.visualizationSubType === 'regular') || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && (
                     <>
                       <hr></hr>
                       <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
@@ -177,15 +177,14 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                           return (
                             <>
                               {pd.displayLegend && pd.type === 'suppression' && (
-                                <div key={index} className='legend-preliminary'>
+                                <div key={index} className={`legend-preliminary ${pd.symbol}`}>
                                   {pd.symbol && pd.symbol.includes('Dashed') && config.visualizationType !== 'Bar' && (
                                     <svg>
                                       <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.symbol)} />{' '}
                                     </svg>
                                   )}
-
-                                  <span className={pd.symbol}>{suppressionIcons[pd.symbol]}</span>
-                                  {pd.symbol && <p>{pd.label}</p>}
+                                  {!pd.symbol.includes('Dashed') && <span className={pd.symbol}>{suppressionIcons[pd.symbol]}</span>}
+                                  {pd.symbol && <p className={pd.type}>{pd.label}</p>}
                                 </div>
                               )}
                             </>

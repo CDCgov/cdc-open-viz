@@ -57,7 +57,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
     Asterisk: '\u002A',
     'Double Asterisks': '\u002A\u002A',
     Dagger: '\u2020',
-    'Double Daggers': '\u2021\u2021',
+    'Double Daggers': '\u2021',
     'Section Sign': '\u00A7',
     Pilcrow: '\u00B6',
     Hash: '\u0023'

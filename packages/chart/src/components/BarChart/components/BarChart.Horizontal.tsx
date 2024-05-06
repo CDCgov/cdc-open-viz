@@ -144,10 +144,18 @@ export const BarChartHorizontal = () => {
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
-                  const [suppressedIcon, iconName] = getIcon(bar)
-                  const iconX = /Asterisk/.test(iconName) ? 9 : 20
-                  const iconFont = /Asterisk/.test(iconName) ? 23 : 15
-                  const iconAngle = /Asterisk/.test(iconName) ? '' : 'rotate(90deg)'
+                  const getIconSize = synbol => {
+                    let size = ''
+                    if (synbol.includes('Asterisk')) {
+                      size = '30px'
+                    } else {
+                      size = '20px'
+                    }
+                    return size
+                  }
+
+                  const iconAngle = symbol => (symbol === 'Double Asterisks' ? 0 : 90)
+                  const iconPadding = symbol => (symbol === 'Asterisk' ? '3px' : symbol === 'Double Asterisks' ? '15px' : '12px')
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -181,9 +189,29 @@ export const BarChartHorizontal = () => {
                             display: displayBar ? 'block' : 'none'
                           }
                         })}
-                        <foreignObject width='20' height='20' x={barX + iconX} y={barHeight * bar.index}>
-                          <div style={{ fontSize: `${iconFont}px`, transform: iconAngle }}>{suppressedIcon}</div>
-                        </foreignObject>
+                        {config.preliminaryData.map((pd, index) => {
+                          const isSuppressed = Number(pd.value) === Number(bar.value) && (!pd.column || pd.column === bar.key)
+                          if (!isSuppressed) {
+                            return
+                          }
+                          return (
+                            <Text // prettier-ignore
+                              key={index}
+                              angle={iconAngle(pd.symbol)}
+                              display={displayBar ? 'block' : 'none'}
+                              opacity={transparentBar ? 0.5 : 1}
+                              x={barX}
+                              y={config.barHeight / 2 + config.barHeight * bar.index}
+                              fill={labelColor}
+                              dx={iconPadding(pd.symbol)}
+                              dy={pd.symbol === 'Double Asterisks' ? 10 : 0}
+                              verticalAnchor='end'
+                              textAnchor={'middle'}
+                            >
+                              {pd.iconCode}
+                            </Text>
+                          )
+                        })}
 
                         {!config.isLollipopChart && displayNumbersOnBar && (
                           <Text // prettier-ignore
