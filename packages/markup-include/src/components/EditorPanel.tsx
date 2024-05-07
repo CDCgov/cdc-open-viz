@@ -136,7 +136,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({ controls, data, delet
 
   const openConditionControls = useState([])
 
-  const columnNames = Object.keys(data[0])
+  const columnNames = Object.keys(data?.[0] || {})
   const [selectedColumn, setNewVariableColumnName] = useState(variableConfig.columnName)
   const [conditionsList, setConditionsList] = useState(variableConfig.conditions)
   const [variableName, setVariableName] = useState(variableConfig.name)
@@ -289,6 +289,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
   const { inlineHTML, markupVariables, showHeader, srcUrl, title, useInlineHTML } = contentEditor
   const [displayPanel, setDisplayPanel] = useState(true)
   const updateField = updateFieldFactory(config, updateConfig, true)
+  const hasData = data?.[0] !== undefined ?? false
 
   const openVariableControls = useState({})
 
@@ -404,12 +405,11 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
                       <Tooltip.Target>
                         <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                       </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>{`To use created variables wrap the variable name in curly brackets, e.g. {{some_variable}}, and place the variable directly in your Inline HTML`}</p>
-                      </Tooltip.Content>
+                      <Tooltip.Content>{`To use created variables wrap the variable name in curly brackets, e.g. {{some_variable}}, and place the variable directly in your Inline HTML`}</Tooltip.Content>
                     </Tooltip>
                   </span>
                 </label>
+                {hasData === false && <span className='need-data-source-prompt'>To use variables, add data source.</span>}
                 {variableArray && variableArray.length > 0 && (
                   <div className='section-border'>
                     {variableArray?.map((variableObject, index) => {
@@ -418,7 +418,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
                   </div>
                 )}
                 <div className='mb-1 d-flex'>
-                  <button className={'btn btn-primary'} onClick={handleCreateNewVariableButtonClick}>
+                  <button className={'btn btn-primary'} onClick={handleCreateNewVariableButtonClick} disabled={!hasData}>
                     Create New Variable
                   </button>
                 </div>

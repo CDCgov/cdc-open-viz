@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import ExampleConfig_1 from './../data/markup-include-example.json'
+import ExampleConfig_1 from '../data/markup-include-example.json'
 import CdcMarkupInclude from '../CdcMarkupInclude'
 
 const meta: Meta<typeof CdcMarkupInclude> = {

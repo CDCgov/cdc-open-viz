@@ -35,7 +35,6 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
   const initialState = { config: configObj || defaults, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
 
   const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
-  const [showConfigConfirm, setShowConfigConfirm] = useState(true)
 
   const { config, loading, urlMarkup, markupError, errorMessage, coveLoadedHasRan } = state
 
@@ -259,7 +258,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard, showConfigConfirm }}>
+      <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
         <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={container} showEditorPanel={config?.showEditorPanel}>
           {content}

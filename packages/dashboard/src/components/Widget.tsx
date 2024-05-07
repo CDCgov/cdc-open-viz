@@ -168,7 +168,7 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
 
   let isConfigurationReady = false
   const dataConfiguredForRow = !!rows[data?.rowIdx]?.dataKey
-  if (dataConfiguredForRow || type === 'filter-dropdowns') {
+  if (dataConfiguredForRow || ['filter-dropdowns', 'markup-include'].includes(type)) {
     isConfigurationReady = true
   } else {
     if (data?.formattedData) {
