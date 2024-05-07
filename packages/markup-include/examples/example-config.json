@@ -3,5 +3,9 @@
   "srcUrl": "#example",
   "title": "Markup Include",
   "theme": "theme-blue",
-  "data": []
+  "data": [],
+  "runtime": {
+    "editorErrorMessage": "Test"
+  },
+  "newViz": false
 }

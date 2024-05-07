@@ -12,6 +12,7 @@ import InputText from '@cdc/core/components/inputs/InputText'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
+import Layout from '@cdc/core/components/Layout'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 import WarningImage from '../images/warning.svg'
@@ -38,9 +39,8 @@ const CheckBox = memo(({ label, value, fieldName, section = null, subsection = n
 
 const EditorPanel = memo(props => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(ConfigContext)
-
+  const { showConfigConfirm } = props
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [showConfigConfirm, setShowConfigConfirm] = useState(false)
   const inputSelectStyle = condition => (condition ? { backgroundColor: '#ffd2d2', color: '#d8000c' } : {})
 
   const updateField = updateFieldFactory(config, updateConfig, true)
@@ -80,44 +80,16 @@ const EditorPanel = memo(props => {
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
+    updateConfig({
+      ...config,
+      showEditorPanel: !displayPanel
+    })
 
     // if (isDashboard) {
     //   updateConfig({ ...config, editing: false })
     // } else {
     //   setDisplayPanel(!displayPanel)
     // }
-  }
-
-  const Error = () => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
-  const Confirm = () => {
-    const confirmDone = e => {
-      e.preventDefault()
-      let newConfig = { ...config }
-      delete newConfig.newViz
-      updateConfig(newConfig)
-    }
-
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
-            I'm Done
-          </button>
-        </section>
-      </section>
-    )
   }
 
   const convertStateToConfig = () => {
@@ -427,20 +399,12 @@ const EditorPanel = memo(props => {
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <div className='cove-editor'>
-        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
-        {config.newViz && showConfigConfirm && <Confirm />}
-        <button className={`cove-editor--toggle` + (!displayPanel ? ` collapsed` : ``)} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
-        <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
-          <div className='cove-editor__panel-container'>
-            <h2 className='cove-editor__heading'>Configure Chart</h2>
-            <section className='cove-editor__content'>{editorContent}</section>
-          </div>
-        </section>
-        <div className='cove-editor__content'>
-          <div className='cove-editor__content-wrap'>{props.children}</div>
-        </div>
-      </div>
+      <>
+        <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Waffle Chart' showEditorPanel={displayPanel}>
+          {editorContent}
+        </Layout.Sidebar>
+        {props.children}
+      </>
     </ErrorBoundary>
   )
 })

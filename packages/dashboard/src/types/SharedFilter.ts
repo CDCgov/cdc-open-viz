@@ -7,7 +7,7 @@ export type SharedFilter = {
   setByQueryParameter?: string
   active?: string | string[]
   queuedActive?: string
-  usedBy?: string[]
+  usedBy?: (string | number)[] // if number used by whole row, else used by specific viz
   parents?: string[]
   pivot?: string
   setBy?: string

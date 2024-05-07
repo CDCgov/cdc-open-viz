@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import Row from './Row'
 
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
+import { ConfigRow } from '../types/ConfigRow'
 
 const Grid = () => {
   const { config } = useContext(DashboardContext)
@@ -10,9 +11,10 @@ const Grid = () => {
   const dispatch = useContext(DashboardDispatchContext)
   const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
   const addRow = () => {
+    const blankRow: Partial<ConfigRow> = { columns: [{ width: 12 }] }
     updateConfig({
       ...config,
-      rows: [...rows, [{ width: 12 }, { equalHeight: false }, {}, {}]],
+      rows: [...rows, blankRow],
       uuid: Date.now()
     })
   }

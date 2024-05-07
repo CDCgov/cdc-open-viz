@@ -239,16 +239,17 @@ const Filters = props => {
   const Filters = props => props.children
 
   const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme]
-
   // Exterior Section Wrapper
   Filters.Section = props => {
     return (
-      <section className={filterSectionClassList.join(' ')}>
-        <p className='filters-section__intro-text'>
-          {filterConstants.introText} {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
-        </p>
-        <div className='filters-section__wrapper'>{props.children}</div>
-      </section>
+      visualizationConfig?.filters && (
+        <section className={filterSectionClassList.join(' ')}>
+          <p className='filters-section__intro-text'>
+            {filters?.some(f => f.active) ? filterConstants.introText : ''} {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
+          </p>
+          <div className='filters-section__wrapper'>{props.children}</div>
+        </section>
+      )
     )
   }
 
