@@ -39,7 +39,7 @@ export const Primary: Story = {
   }
 }
 
-export const Example_1: Story = {
+export const No_Conditions: Story = {
   args: {
     config: {
       contentEditor: {
@@ -76,6 +76,7 @@ export const Example_1: Story = {
         useInlineHTML: true
       },
       data: ExampleConfig_1,
+      legend: {},
       newViz: true,
       theme: 'theme-blue',
       type: 'markup-include',
@@ -118,6 +119,7 @@ export const With_conditions: Story = {
         useInlineHTML: true
       },
       data: ExampleConfig_1,
+      legend: {},
       newViz: true,
       theme: 'theme-amber',
       type: 'markup-include',
@@ -131,6 +133,158 @@ export const With_conditions: Story = {
       }
     },
     isEditor: false,
+    showEditorPanel: true
+  }
+}
+
+export const Button_and_text: Story = {
+  args: {
+    config: {
+      contentEditor: {
+        inlineHTML: '<div>{{state}} does have a rate 130 compared to the over all rate of {{overall-rate}}</div>',
+        markupVariables: [],
+        showHeader: false,
+        srcUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Markup-Include-Button-and-Text.html',
+        title: '',
+        useInlineHTML: true
+      },
+      data: [
+        {
+          Race: 'Hispanic or Latino',
+          'Age-adjusted rate': '644.2'
+        },
+        {
+          Race: 'Non-Hispanic American Indian',
+          'Age-adjusted rate': '636.1'
+        },
+        {
+          Race: 'Non-Hispanic Black',
+          'Age-adjusted rate': '563.7'
+        },
+        {
+          Race: 'Non-Hispanic Asian or Pacific Islander',
+          'Age-adjusted rate': '202.5'
+        },
+        {
+          Race: 'Non-Hispanic White',
+          'Age-adjusted rate': '183.6'
+        }
+      ],
+      legend: {},
+      newViz: true,
+      theme: 'theme-amber',
+      type: 'markup-include',
+      runtime: null,
+      visual: {
+        border: false,
+        accent: true,
+        background: true,
+        hideBackgroundColor: false,
+        borderColorTheme: false
+      }
+    },
+    isEditor: true,
+    showEditorPanel: true
+  }
+}
+
+export const icon_no_text: Story = {
+  args: {
+    config: {
+      contentEditor: {
+        inlineHTML: '<div>{{state}} does have a rate 130 compared to the over all rate of {{overall-rate}}</div>',
+        markupVariables: [],
+        showHeader: false,
+        srcUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/SSI-Example-Markup-Include.html',
+        title: '',
+        useInlineHTML: true
+      },
+      data: [
+        {
+          Race: 'Hispanic or Latino',
+          'Age-adjusted rate': '644.2'
+        },
+        {
+          Race: 'Non-Hispanic American Indian',
+          'Age-adjusted rate': '636.1'
+        },
+        {
+          Race: 'Non-Hispanic Black',
+          'Age-adjusted rate': '563.7'
+        },
+        {
+          Race: 'Non-Hispanic Asian or Pacific Islander',
+          'Age-adjusted rate': '202.5'
+        },
+        {
+          Race: 'Non-Hispanic White',
+          'Age-adjusted rate': '183.6'
+        }
+      ],
+      legend: {},
+      newViz: true,
+      theme: 'theme-amber',
+      type: 'markup-include',
+      runtime: null,
+      visual: {
+        border: false,
+        accent: true,
+        background: true,
+        hideBackgroundColor: false,
+        borderColorTheme: false
+      }
+    },
+    isEditor: true,
+    showEditorPanel: true
+  }
+}
+export const image_with_text: Story = {
+  args: {
+    config: {
+      contentEditor: {
+        inlineHTML: '<div>{{state}} does have a rate 130 compared to the over all rate of {{overall-rate}}</div>',
+        markupVariables: [],
+        showHeader: false,
+        srcUrl: '/wcms/4.0/cdc-wp/data-presentation/examples/SSI-Image-With-Text.html',
+        title: '<strong>Markup Include</strong> - Image with Text',
+        useInlineHTML: true
+      },
+      data: [
+        {
+          Race: 'Hispanic or Latino',
+          'Age-adjusted rate': '644.2'
+        },
+        {
+          Race: 'Non-Hispanic American Indian',
+          'Age-adjusted rate': '636.1'
+        },
+        {
+          Race: 'Non-Hispanic Black',
+          'Age-adjusted rate': '563.7'
+        },
+        {
+          Race: 'Non-Hispanic Asian or Pacific Islander',
+          'Age-adjusted rate': '202.5'
+        },
+        {
+          Race: 'Non-Hispanic White',
+          'Age-adjusted rate': '183.6'
+        }
+      ],
+      legend: {},
+      newViz: true,
+      theme: 'theme-slate',
+      type: 'markup-include',
+      runtime: null,
+      visual: {
+        border: false,
+        accent: true,
+        background: true,
+        hideBackgroundColor: false,
+        borderColorTheme: false
+      }
+    },
+    isEditor: true,
     showEditorPanel: true
   }
 }
