@@ -44,7 +44,7 @@ export type DataTableProps = {
   showDownloadButton?: boolean
   tabbingId: string
   tableTitle: string
-  viewport: string
+  viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   vizTitle?: string
   // determines if columns should be wrapped in the table
   wrapColumns?: boolean
@@ -185,22 +185,25 @@ const DataTable = (props: DataTableProps) => {
         </MediaControls.Section>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
-          <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
+          <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} fontSize={config.fontSize} viewport={viewport} />
           <div className='table-container' style={limitHeight}>
             <Table
+              viewport={viewport}
               wrapColumns={wrapColumns}
-              childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData: _runtimeData }) : chartCellMatrix({ rows, ...props, runtimeData: _runtimeData, isVertical, sortBy, hasRowType })}
+              childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData: _runtimeData, viewport }) : chartCellMatrix({ rows, ...props, runtimeData: _runtimeData, isVertical, sortBy, hasRowType, viewport })}
               tableName={config.type}
               caption={caption}
               stickyHeader
               hasRowType={hasRowType}
               headContent={config.type === 'map' ? <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} /> : <ChartHeader data={_runtimeData} {...props} hasRowType={hasRowType} isVertical={isVertical} sortBy={sortBy} setSortBy={setSortBy} />}
               tableOptions={{ className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`, 'aria-live': 'assertive', 'aria-rowcount': config?.data?.length ? config.data.length : -1, hidden: !expanded }}
+              fontSize={config.fontSize}
             />
 
             {/* REGION Data Table */}
             {noRelativeRegions && config.regions && config.regions.length > 0 && config.visualizationType !== 'Box Plot' && (
               <Table
+                viewport={viewport}
                 wrapColumns={wrapColumns}
                 childrenMatrix={regionCellMatrix({ config })}
                 tableName={config.visualizationType}
@@ -213,6 +216,7 @@ const DataTable = (props: DataTableProps) => {
                   </tr>
                 }
                 tableOptions={{ className: 'region-table data-table' }}
+                fontSize={config.fontSize}
               />
             )}
           </div>
@@ -231,6 +235,7 @@ const DataTable = (props: DataTableProps) => {
           <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} />
           <div className='table-container' style={limitHeight}>
             <Table
+              viewport={viewport}
               wrapColumns={wrapColumns}
               childrenMatrix={boxplotCellMatrix({ rows: tableData, config })}
               tableName={config.visualizationType}
@@ -238,6 +243,7 @@ const DataTable = (props: DataTableProps) => {
               stickyHeader
               headContent={<BoxplotHeader categories={config.boxplot.categories} />}
               tableOptions={{ className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`, 'aria-live': 'assertive', 'aria-rowcount': 11, hidden: !expanded }}
+              fontSize={config.fontSize}
             />
           </div>
         </section>

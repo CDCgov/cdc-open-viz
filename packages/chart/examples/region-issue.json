@@ -1,0 +1,2065 @@
+{
+  "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "small",
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "showDownloadButton": false
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "suppressedData": [],
+  "preliminaryData": [],
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "55",
+    "gridLines": true,
+    "enablePadding": true,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": "",
+    "anchors": [],
+    "label": "Percent of Tests Positive"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
+    },
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "total": "Total",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": 0.35,
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": "350",
+    "horizontal": 750
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "date",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "110",
+    "tickRotation": "45",
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "12",
+    "labelOffset": 65,
+    "axisPadding": 0,
+    "target": 0,
+    "maxTickRotation": 0,
+    "dataKey": "",
+    "label": "Week Ending",
+    "dateParseFormat": "%Y-%m-%d",
+    "dateDisplayFormat": "%m/%d/%Y",
+    "tickWidthMax": 81,
+    "padding": 6
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "indexLabel": "Week Ending",
+    "download": false,
+    "showVertical": true,
+    "dateDisplayFormat": "",
+    "show": true
+  },
+  "orientation": "vertical",
+  "color": "pinkpurple",
+  "columns": {},
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "seriesHighlight": [],
+    "showLegendValuesTooltip": false,
+    "position": "bottom"
+  },
+  "brush": {
+    "height": 25,
+    "data": [
+      {
+        "week_end": "2022-10-01",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.9",
+        "Influenza": "2.0",
+        "RSV": "10.2"
+      },
+      {
+        "week_end": "2022-10-08",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.9",
+        "Influenza": "2.7",
+        "RSV": "12.5"
+      },
+      {
+        "week_end": "2022-10-15",
+        "**Numeric Value Property**": "",
+        "COVID-19": "7.1",
+        "Influenza": "3.5",
+        "RSV": "14.6"
+      },
+      {
+        "week_end": "2022-10-22",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.8",
+        "Influenza": "5.4",
+        "RSV": "16.5"
+      },
+      {
+        "week_end": "2022-10-29",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.9",
+        "Influenza": "8.4",
+        "RSV": "18.3"
+      },
+      {
+        "week_end": "2022-11-05",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.5",
+        "Influenza": "12.8",
+        "RSV": "19.1"
+      },
+      {
+        "week_end": "2022-11-12",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.8",
+        "Influenza": "14.9",
+        "RSV": "19.5"
+      },
+      {
+        "week_end": "2022-11-19",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.7",
+        "Influenza": "18.3",
+        "RSV": "16.7"
+      },
+      {
+        "week_end": "2022-11-26",
+        "**Numeric Value Property**": "",
+        "COVID-19": "7.6",
+        "Influenza": "25.8",
+        "RSV": "13.4"
+      },
+      {
+        "week_end": "2022-12-03",
+        "**Numeric Value Property**": "",
+        "COVID-19": "8.6",
+        "Influenza": "25.6",
+        "RSV": "10.5"
+      },
+      {
+        "week_end": "2022-12-10",
+        "**Numeric Value Property**": "",
+        "COVID-19": "8.7",
+        "Influenza": "26.3",
+        "RSV": "7.9"
+      },
+      {
+        "week_end": "2022-12-17",
+        "**Numeric Value Property**": "",
+        "COVID-19": "9.4",
+        "Influenza": "24.5",
+        "RSV": "6.7"
+      },
+      {
+        "week_end": "2022-12-24",
+        "**Numeric Value Property**": "",
+        "COVID-19": "9.8",
+        "Influenza": "20.8",
+        "RSV": "5.6"
+      },
+      {
+        "week_end": "2022-12-31",
+        "**Numeric Value Property**": "",
+        "COVID-19": "10.6",
+        "Influenza": "14.9",
+        "RSV": "5.1"
+      },
+      {
+        "week_end": "2023-01-07",
+        "**Numeric Value Property**": "",
+        "COVID-19": "10.3",
+        "Influenza": "8.6",
+        "RSV": "4.9"
+      },
+      {
+        "week_end": "2023-01-14",
+        "**Numeric Value Property**": "",
+        "COVID-19": "8.8",
+        "Influenza": "4.6",
+        "RSV": "4.0"
+      },
+      {
+        "week_end": "2023-01-21",
+        "**Numeric Value Property**": "",
+        "COVID-19": "8.5",
+        "Influenza": "2.9",
+        "RSV": "3.3"
+      },
+      {
+        "week_end": "2023-01-28",
+        "**Numeric Value Property**": "",
+        "COVID-19": "8.3",
+        "Influenza": "2.1",
+        "RSV": "2.5"
+      },
+      {
+        "week_end": "2023-02-04",
+        "**Numeric Value Property**": "",
+        "COVID-19": "8.0",
+        "Influenza": "1.7",
+        "RSV": "2.2"
+      },
+      {
+        "week_end": "2023-02-11",
+        "**Numeric Value Property**": "",
+        "COVID-19": "8.0",
+        "Influenza": "1.4",
+        "RSV": "1.8"
+      },
+      {
+        "week_end": "2023-02-18",
+        "**Numeric Value Property**": "",
+        "COVID-19": "8.1",
+        "Influenza": "1.1",
+        "RSV": "1.6"
+      },
+      {
+        "week_end": "2023-02-25",
+        "**Numeric Value Property**": "",
+        "COVID-19": "7.9",
+        "Influenza": "1.0",
+        "RSV": "1.4"
+      },
+      {
+        "week_end": "2023-03-04",
+        "**Numeric Value Property**": "",
+        "COVID-19": "7.4",
+        "Influenza": "0.9",
+        "RSV": "1.2"
+      },
+      {
+        "week_end": "2023-03-11",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.8",
+        "Influenza": "1.0",
+        "RSV": "1.1"
+      },
+      {
+        "week_end": "2023-03-18",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.8",
+        "Influenza": "0.9",
+        "RSV": "0.9"
+      },
+      {
+        "week_end": "2023-03-25",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.9",
+        "Influenza": "0.9",
+        "RSV": "0.8"
+      },
+      {
+        "week_end": "2023-04-01",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.5",
+        "Influenza": "1.0",
+        "RSV": "0.7"
+      },
+      {
+        "week_end": "2023-04-08",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.2",
+        "Influenza": "1.1",
+        "RSV": "0.6"
+      },
+      {
+        "week_end": "2023-04-15",
+        "**Numeric Value Property**": "",
+        "COVID-19": "5.7",
+        "Influenza": "1.0",
+        "RSV": "0.6"
+      },
+      {
+        "week_end": "2023-04-22",
+        "**Numeric Value Property**": "",
+        "COVID-19": "5.0",
+        "Influenza": "0.8",
+        "RSV": "0.5"
+      },
+      {
+        "week_end": "2023-04-29",
+        "**Numeric Value Property**": "",
+        "COVID-19": "4.9",
+        "Influenza": "1.0",
+        "RSV": "0.5"
+      },
+      {
+        "week_end": "2023-05-06",
+        "**Numeric Value Property**": "",
+        "COVID-19": "5.0",
+        "Influenza": "0.9",
+        "RSV": "0.5"
+      },
+      {
+        "week_end": "2023-05-13",
+        "**Numeric Value Property**": "",
+        "COVID-19": "4.8",
+        "Influenza": "1.0",
+        "RSV": "0.5"
+      },
+      {
+        "week_end": "2023-05-20",
+        "**Numeric Value Property**": "",
+        "COVID-19": "4.6",
+        "Influenza": "1.2",
+        "RSV": "0.5"
+      },
+      {
+        "week_end": "2023-05-27",
+        "**Numeric Value Property**": "",
+        "COVID-19": "4.6",
+        "Influenza": "1.2",
+        "RSV": "0.4"
+      },
+      {
+        "week_end": "2023-06-03",
+        "**Numeric Value Property**": "",
+        "COVID-19": "4.2",
+        "Influenza": "1.3",
+        "RSV": "0.5"
+      },
+      {
+        "week_end": "2023-06-10",
+        "**Numeric Value Property**": "",
+        "COVID-19": "4.1",
+        "Influenza": "1.1",
+        "RSV": "0.5"
+      },
+      {
+        "week_end": "2023-06-17",
+        "**Numeric Value Property**": "",
+        "COVID-19": "4.3",
+        "Influenza": "1.1",
+        "RSV": "0.5"
+      },
+      {
+        "week_end": "2023-06-24",
+        "**Numeric Value Property**": "",
+        "COVID-19": "4.4",
+        "Influenza": "0.9",
+        "RSV": "0.6"
+      },
+      {
+        "week_end": "2023-07-01",
+        "**Numeric Value Property**": "",
+        "COVID-19": "4.9",
+        "Influenza": "1.1",
+        "RSV": "0.6"
+      },
+      {
+        "week_end": "2023-07-08",
+        "**Numeric Value Property**": "",
+        "COVID-19": "5.9",
+        "Influenza": "1.2",
+        "RSV": "0.5"
+      },
+      {
+        "week_end": "2023-07-15",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.6",
+        "Influenza": "1.0",
+        "RSV": "0.6"
+      },
+      {
+        "week_end": "2023-07-22",
+        "**Numeric Value Property**": "",
+        "COVID-19": "7.5",
+        "Influenza": "1.0",
+        "RSV": "0.8"
+      },
+      {
+        "week_end": "2023-07-29",
+        "**Numeric Value Property**": "",
+        "COVID-19": "9.0",
+        "Influenza": "1.0",
+        "RSV": "0.8"
+      },
+      {
+        "week_end": "2023-08-05",
+        "**Numeric Value Property**": "",
+        "COVID-19": "10.6",
+        "Influenza": "1.1",
+        "RSV": "0.9"
+      },
+      {
+        "week_end": "2023-08-12",
+        "**Numeric Value Property**": "",
+        "COVID-19": "12.4",
+        "Influenza": "0.9",
+        "RSV": "0.8"
+      },
+      {
+        "week_end": "2023-08-19",
+        "**Numeric Value Property**": "",
+        "COVID-19": "13.4",
+        "Influenza": "0.9",
+        "RSV": "0.8"
+      },
+      {
+        "week_end": "2023-08-26",
+        "**Numeric Value Property**": "",
+        "COVID-19": "14.6",
+        "Influenza": "0.8",
+        "RSV": "1.2"
+      },
+      {
+        "week_end": "2023-09-02",
+        "**Numeric Value Property**": "",
+        "COVID-19": "14.1",
+        "Influenza": "0.7",
+        "RSV": "1.1"
+      },
+      {
+        "week_end": "2023-09-09",
+        "**Numeric Value Property**": "",
+        "COVID-19": "13.9",
+        "Influenza": "0.7",
+        "RSV": "1.3"
+      },
+      {
+        "week_end": "2023-09-16",
+        "**Numeric Value Property**": "",
+        "COVID-19": "12.7",
+        "Influenza": "0.8",
+        "RSV": "1.4"
+      },
+      {
+        "week_end": "2023-09-23",
+        "**Numeric Value Property**": "",
+        "COVID-19": "12.0",
+        "Influenza": "0.9",
+        "RSV": "2.1"
+      },
+      {
+        "week_end": "2023-09-30",
+        "**Numeric Value Property**": "",
+        "COVID-19": "10.9",
+        "Influenza": "0.9",
+        "RSV": "2.9"
+      },
+      {
+        "week_end": "2023-10-07",
+        "**Numeric Value Property**": "",
+        "COVID-19": "10.0",
+        "Influenza": "1.1",
+        "RSV": "3.7"
+      },
+      {
+        "week_end": "2023-10-14",
+        "**Numeric Value Property**": "",
+        "COVID-19": "9.1",
+        "Influenza": "1.3",
+        "RSV": "4.8"
+      },
+      {
+        "week_end": "2023-10-21",
+        "**Numeric Value Property**": "",
+        "COVID-19": "9.4",
+        "Influenza": "1.5",
+        "RSV": "6.0"
+      },
+      {
+        "week_end": "2023-10-28",
+        "**Numeric Value Property**": "",
+        "COVID-19": "9.6",
+        "Influenza": "1.8",
+        "RSV": "7.7"
+      },
+      {
+        "week_end": "2023-11-04",
+        "**Numeric Value Property**": "",
+        "COVID-19": "9.3",
+        "Influenza": "2.6",
+        "RSV": "9.2"
+      },
+      {
+        "week_end": "2023-11-11",
+        "**Numeric Value Property**": "",
+        "COVID-19": "10.0",
+        "Influenza": "4.0",
+        "RSV": "10.7"
+      },
+      {
+        "week_end": "2023-11-18",
+        "**Numeric Value Property**": "",
+        "COVID-19": "9.5",
+        "Influenza": "4.9",
+        "RSV": "11.9"
+      },
+      {
+        "week_end": "2023-11-25",
+        "**Numeric Value Property**": "",
+        "COVID-19": "11.2",
+        "Influenza": "6.0",
+        "RSV": "12.9"
+      },
+      {
+        "week_end": "2023-12-02",
+        "**Numeric Value Property**": "",
+        "COVID-19": "11.7",
+        "Influenza": "7.0",
+        "RSV": "12.0"
+      },
+      {
+        "week_end": "2023-12-09",
+        "**Numeric Value Property**": "",
+        "COVID-19": "11.6",
+        "Influenza": "8.5",
+        "RSV": "12.1"
+      },
+      {
+        "week_end": "2023-12-16",
+        "**Numeric Value Property**": "",
+        "COVID-19": "11.9",
+        "Influenza": "13.5",
+        "RSV": "12.2"
+      },
+      {
+        "week_end": "2023-12-23",
+        "**Numeric Value Property**": "",
+        "COVID-19": "12.4",
+        "Influenza": "17.4",
+        "RSV": "11.3"
+      },
+      {
+        "week_end": "2023-12-30",
+        "**Numeric Value Property**": "",
+        "COVID-19": "13.1",
+        "Influenza": "18.3",
+        "RSV": "10.5"
+      },
+      {
+        "week_end": "2024-01-06",
+        "**Numeric Value Property**": "",
+        "COVID-19": "12.9",
+        "Influenza": "13.8",
+        "RSV": "9.9"
+      },
+      {
+        "week_end": "2024-01-13",
+        "**Numeric Value Property**": "",
+        "COVID-19": "11.9",
+        "Influenza": "14.0",
+        "RSV": "8.4"
+      },
+      {
+        "week_end": "2024-01-20",
+        "**Numeric Value Property**": "",
+        "COVID-19": "10.9",
+        "Influenza": "15.0",
+        "RSV": "7.3"
+      },
+      {
+        "week_end": "2024-01-27",
+        "**Numeric Value Property**": "",
+        "COVID-19": "10.5",
+        "Influenza": "16.2",
+        "RSV": "6.1"
+      },
+      {
+        "week_end": "2024-02-03",
+        "**Numeric Value Property**": "",
+        "COVID-19": "10.0",
+        "Influenza": "16.5",
+        "RSV": "5.5"
+      },
+      {
+        "week_end": "2024-02-10",
+        "**Numeric Value Property**": "",
+        "COVID-19": "9.5",
+        "Influenza": "15.9",
+        "RSV": "5.0"
+      },
+      {
+        "week_end": "2024-02-17",
+        "**Numeric Value Property**": "",
+        "COVID-19": "8.3",
+        "Influenza": "15.6",
+        "RSV": "4.3"
+      },
+      {
+        "week_end": "2024-02-24",
+        "**Numeric Value Property**": "",
+        "COVID-19": "7.7",
+        "Influenza": "15.6",
+        "RSV": "3.7"
+      },
+      {
+        "week_end": "2024-03-02",
+        "**Numeric Value Property**": "",
+        "COVID-19": "6.7",
+        "Influenza": "15.0",
+        "RSV": "3.1"
+      },
+      {
+        "week_end": "2024-03-09",
+        "**Numeric Value Property**": "",
+        "COVID-19": "5.5",
+        "Influenza": "14.2",
+        "RSV": "2.8"
+      },
+      {
+        "week_end": "2024-03-16",
+        "**Numeric Value Property**": "",
+        "COVID-19": "4.6",
+        "Influenza": "12.0",
+        "RSV": "2.3"
+      },
+      {
+        "week_end": "2024-03-23",
+        "**Numeric Value Property**": "",
+        "COVID-19": "4.0",
+        "RSV": "1.9"
+      }
+    ],
+    "active": false,
+    "pattern_id": "brush_pattern",
+    "accent_color": "#ddd"
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "%",
+    "abbreviated": true,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false,
+    "roundTo": "1"
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": true,
+    "horizontalHoverLine": false
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "RSV",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 1,
+      "max": 8,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": "",
+    "hideDateCategoryCol": false,
+    "width": "auto",
+    "lowerCiField": "",
+    "upperCiField": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "data": [
+    {
+      "week_end": "2022-10-01",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.9"
+    },
+    {
+      "week_end": "2022-10-01",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "2.0"
+    },
+    {
+      "week_end": "2022-10-01",
+      "pathogen": "RSV",
+      "percent_test_positivity": "10.2"
+    },
+    {
+      "week_end": "2022-10-08",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.9"
+    },
+    {
+      "week_end": "2022-10-08",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "2.7"
+    },
+    {
+      "week_end": "2022-10-08",
+      "pathogen": "RSV",
+      "percent_test_positivity": "12.5"
+    },
+    {
+      "week_end": "2022-10-15",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "7.1"
+    },
+    {
+      "week_end": "2022-10-15",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "3.5"
+    },
+    {
+      "week_end": "2022-10-15",
+      "pathogen": "RSV",
+      "percent_test_positivity": "14.6"
+    },
+    {
+      "week_end": "2022-10-22",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.8"
+    },
+    {
+      "week_end": "2022-10-22",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "5.4"
+    },
+    {
+      "week_end": "2022-10-22",
+      "pathogen": "RSV",
+      "percent_test_positivity": "16.5"
+    },
+    {
+      "week_end": "2022-10-29",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.9"
+    },
+    {
+      "week_end": "2022-10-29",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "8.4"
+    },
+    {
+      "week_end": "2022-10-29",
+      "pathogen": "RSV",
+      "percent_test_positivity": "18.3"
+    },
+    {
+      "week_end": "2022-11-05",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.5"
+    },
+    {
+      "week_end": "2022-11-05",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "12.8"
+    },
+    {
+      "week_end": "2022-11-05",
+      "pathogen": "RSV",
+      "percent_test_positivity": "19.1"
+    },
+    {
+      "week_end": "2022-11-12",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.8"
+    },
+    {
+      "week_end": "2022-11-12",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "14.9"
+    },
+    {
+      "week_end": "2022-11-12",
+      "pathogen": "RSV",
+      "percent_test_positivity": "19.5"
+    },
+    {
+      "week_end": "2022-11-19",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.7"
+    },
+    {
+      "week_end": "2022-11-19",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "18.3"
+    },
+    {
+      "week_end": "2022-11-19",
+      "pathogen": "RSV",
+      "percent_test_positivity": "16.7"
+    },
+    {
+      "week_end": "2022-11-26",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "7.6"
+    },
+    {
+      "week_end": "2022-11-26",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "25.8"
+    },
+    {
+      "week_end": "2022-11-26",
+      "pathogen": "RSV",
+      "percent_test_positivity": "13.4"
+    },
+    {
+      "week_end": "2022-12-03",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "8.6"
+    },
+    {
+      "week_end": "2022-12-03",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "25.6"
+    },
+    {
+      "week_end": "2022-12-03",
+      "pathogen": "RSV",
+      "percent_test_positivity": "10.5"
+    },
+    {
+      "week_end": "2022-12-10",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "8.7"
+    },
+    {
+      "week_end": "2022-12-10",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "26.3"
+    },
+    {
+      "week_end": "2022-12-10",
+      "pathogen": "RSV",
+      "percent_test_positivity": "7.9"
+    },
+    {
+      "week_end": "2022-12-17",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "9.4"
+    },
+    {
+      "week_end": "2022-12-17",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "24.5"
+    },
+    {
+      "week_end": "2022-12-17",
+      "pathogen": "RSV",
+      "percent_test_positivity": "6.7"
+    },
+    {
+      "week_end": "2022-12-24",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "9.8"
+    },
+    {
+      "week_end": "2022-12-24",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "20.8"
+    },
+    {
+      "week_end": "2022-12-24",
+      "pathogen": "RSV",
+      "percent_test_positivity": "5.6"
+    },
+    {
+      "week_end": "2022-12-31",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "10.6"
+    },
+    {
+      "week_end": "2022-12-31",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "14.9"
+    },
+    {
+      "week_end": "2022-12-31",
+      "pathogen": "RSV",
+      "percent_test_positivity": "5.1"
+    },
+    {
+      "week_end": "2023-01-07",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "10.3"
+    },
+    {
+      "week_end": "2023-01-07",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "8.6"
+    },
+    {
+      "week_end": "2023-01-07",
+      "pathogen": "RSV",
+      "percent_test_positivity": "4.9"
+    },
+    {
+      "week_end": "2023-01-14",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "8.8"
+    },
+    {
+      "week_end": "2023-01-14",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "4.6"
+    },
+    {
+      "week_end": "2023-01-14",
+      "pathogen": "RSV",
+      "percent_test_positivity": "4.0"
+    },
+    {
+      "week_end": "2023-01-21",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "8.5"
+    },
+    {
+      "week_end": "2023-01-21",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "2.9"
+    },
+    {
+      "week_end": "2023-01-21",
+      "pathogen": "RSV",
+      "percent_test_positivity": "3.3"
+    },
+    {
+      "week_end": "2023-01-28",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "8.3"
+    },
+    {
+      "week_end": "2023-01-28",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "2.1"
+    },
+    {
+      "week_end": "2023-01-28",
+      "pathogen": "RSV",
+      "percent_test_positivity": "2.5"
+    },
+    {
+      "week_end": "2023-02-04",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "8.0"
+    },
+    {
+      "week_end": "2023-02-04",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.7"
+    },
+    {
+      "week_end": "2023-02-04",
+      "pathogen": "RSV",
+      "percent_test_positivity": "2.2"
+    },
+    {
+      "week_end": "2023-02-11",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "8.0"
+    },
+    {
+      "week_end": "2023-02-11",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.4"
+    },
+    {
+      "week_end": "2023-02-11",
+      "pathogen": "RSV",
+      "percent_test_positivity": "1.8"
+    },
+    {
+      "week_end": "2023-02-18",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "8.1"
+    },
+    {
+      "week_end": "2023-02-18",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.1"
+    },
+    {
+      "week_end": "2023-02-18",
+      "pathogen": "RSV",
+      "percent_test_positivity": "1.6"
+    },
+    {
+      "week_end": "2023-02-25",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "7.9"
+    },
+    {
+      "week_end": "2023-02-25",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.0"
+    },
+    {
+      "week_end": "2023-02-25",
+      "pathogen": "RSV",
+      "percent_test_positivity": "1.4"
+    },
+    {
+      "week_end": "2023-03-04",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "7.4"
+    },
+    {
+      "week_end": "2023-03-04",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.9"
+    },
+    {
+      "week_end": "2023-03-04",
+      "pathogen": "RSV",
+      "percent_test_positivity": "1.2"
+    },
+    {
+      "week_end": "2023-03-11",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.8"
+    },
+    {
+      "week_end": "2023-03-11",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.0"
+    },
+    {
+      "week_end": "2023-03-11",
+      "pathogen": "RSV",
+      "percent_test_positivity": "1.1"
+    },
+    {
+      "week_end": "2023-03-18",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.8"
+    },
+    {
+      "week_end": "2023-03-18",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.9"
+    },
+    {
+      "week_end": "2023-03-18",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.9"
+    },
+    {
+      "week_end": "2023-03-25",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.9"
+    },
+    {
+      "week_end": "2023-03-25",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.9"
+    },
+    {
+      "week_end": "2023-03-25",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.8"
+    },
+    {
+      "week_end": "2023-04-01",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.5"
+    },
+    {
+      "week_end": "2023-04-01",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.0"
+    },
+    {
+      "week_end": "2023-04-01",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.7"
+    },
+    {
+      "week_end": "2023-04-08",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.2"
+    },
+    {
+      "week_end": "2023-04-08",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.1"
+    },
+    {
+      "week_end": "2023-04-08",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.6"
+    },
+    {
+      "week_end": "2023-04-15",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "5.7"
+    },
+    {
+      "week_end": "2023-04-15",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.0"
+    },
+    {
+      "week_end": "2023-04-15",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.6"
+    },
+    {
+      "week_end": "2023-04-22",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "5.0"
+    },
+    {
+      "week_end": "2023-04-22",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.8"
+    },
+    {
+      "week_end": "2023-04-22",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.5"
+    },
+    {
+      "week_end": "2023-04-29",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "4.9"
+    },
+    {
+      "week_end": "2023-04-29",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.0"
+    },
+    {
+      "week_end": "2023-04-29",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.5"
+    },
+    {
+      "week_end": "2023-05-06",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "5.0"
+    },
+    {
+      "week_end": "2023-05-06",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.9"
+    },
+    {
+      "week_end": "2023-05-06",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.5"
+    },
+    {
+      "week_end": "2023-05-13",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "4.8"
+    },
+    {
+      "week_end": "2023-05-13",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.0"
+    },
+    {
+      "week_end": "2023-05-13",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.5"
+    },
+    {
+      "week_end": "2023-05-20",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "4.6"
+    },
+    {
+      "week_end": "2023-05-20",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.2"
+    },
+    {
+      "week_end": "2023-05-20",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.5"
+    },
+    {
+      "week_end": "2023-05-27",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "4.6"
+    },
+    {
+      "week_end": "2023-05-27",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.2"
+    },
+    {
+      "week_end": "2023-05-27",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.4"
+    },
+    {
+      "week_end": "2023-06-03",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "4.2"
+    },
+    {
+      "week_end": "2023-06-03",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.3"
+    },
+    {
+      "week_end": "2023-06-03",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.5"
+    },
+    {
+      "week_end": "2023-06-10",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "4.1"
+    },
+    {
+      "week_end": "2023-06-10",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.1"
+    },
+    {
+      "week_end": "2023-06-10",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.5"
+    },
+    {
+      "week_end": "2023-06-17",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "4.3"
+    },
+    {
+      "week_end": "2023-06-17",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.1"
+    },
+    {
+      "week_end": "2023-06-17",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.5"
+    },
+    {
+      "week_end": "2023-06-24",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "4.4"
+    },
+    {
+      "week_end": "2023-06-24",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.9"
+    },
+    {
+      "week_end": "2023-06-24",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.6"
+    },
+    {
+      "week_end": "2023-07-01",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "4.9"
+    },
+    {
+      "week_end": "2023-07-01",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.1"
+    },
+    {
+      "week_end": "2023-07-01",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.6"
+    },
+    {
+      "week_end": "2023-07-08",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "5.9"
+    },
+    {
+      "week_end": "2023-07-08",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.2"
+    },
+    {
+      "week_end": "2023-07-08",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.5"
+    },
+    {
+      "week_end": "2023-07-15",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.6"
+    },
+    {
+      "week_end": "2023-07-15",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.0"
+    },
+    {
+      "week_end": "2023-07-15",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.6"
+    },
+    {
+      "week_end": "2023-07-22",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "7.5"
+    },
+    {
+      "week_end": "2023-07-22",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.0"
+    },
+    {
+      "week_end": "2023-07-22",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.8"
+    },
+    {
+      "week_end": "2023-07-29",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "9.0"
+    },
+    {
+      "week_end": "2023-07-29",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.0"
+    },
+    {
+      "week_end": "2023-07-29",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.8"
+    },
+    {
+      "week_end": "2023-08-05",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "10.6"
+    },
+    {
+      "week_end": "2023-08-05",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.1"
+    },
+    {
+      "week_end": "2023-08-05",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.9"
+    },
+    {
+      "week_end": "2023-08-12",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "12.4"
+    },
+    {
+      "week_end": "2023-08-12",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.9"
+    },
+    {
+      "week_end": "2023-08-12",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.8"
+    },
+    {
+      "week_end": "2023-08-19",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "13.4"
+    },
+    {
+      "week_end": "2023-08-19",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.9"
+    },
+    {
+      "week_end": "2023-08-19",
+      "pathogen": "RSV",
+      "percent_test_positivity": "0.8"
+    },
+    {
+      "week_end": "2023-08-26",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "14.6"
+    },
+    {
+      "week_end": "2023-08-26",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.8"
+    },
+    {
+      "week_end": "2023-08-26",
+      "pathogen": "RSV",
+      "percent_test_positivity": "1.2"
+    },
+    {
+      "week_end": "2023-09-02",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "14.1"
+    },
+    {
+      "week_end": "2023-09-02",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.7"
+    },
+    {
+      "week_end": "2023-09-02",
+      "pathogen": "RSV",
+      "percent_test_positivity": "1.1"
+    },
+    {
+      "week_end": "2023-09-09",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "13.9"
+    },
+    {
+      "week_end": "2023-09-09",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.7"
+    },
+    {
+      "week_end": "2023-09-09",
+      "pathogen": "RSV",
+      "percent_test_positivity": "1.3"
+    },
+    {
+      "week_end": "2023-09-16",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "12.7"
+    },
+    {
+      "week_end": "2023-09-16",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.8"
+    },
+    {
+      "week_end": "2023-09-16",
+      "pathogen": "RSV",
+      "percent_test_positivity": "1.4"
+    },
+    {
+      "week_end": "2023-09-23",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "12.0"
+    },
+    {
+      "week_end": "2023-09-23",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.9"
+    },
+    {
+      "week_end": "2023-09-23",
+      "pathogen": "RSV",
+      "percent_test_positivity": "2.1"
+    },
+    {
+      "week_end": "2023-09-30",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "10.9"
+    },
+    {
+      "week_end": "2023-09-30",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "0.9"
+    },
+    {
+      "week_end": "2023-09-30",
+      "pathogen": "RSV",
+      "percent_test_positivity": "2.9"
+    },
+    {
+      "week_end": "2023-10-07",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "10.0"
+    },
+    {
+      "week_end": "2023-10-07",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.1"
+    },
+    {
+      "week_end": "2023-10-07",
+      "pathogen": "RSV",
+      "percent_test_positivity": "3.7"
+    },
+    {
+      "week_end": "2023-10-14",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "9.1"
+    },
+    {
+      "week_end": "2023-10-14",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.3"
+    },
+    {
+      "week_end": "2023-10-14",
+      "pathogen": "RSV",
+      "percent_test_positivity": "4.8"
+    },
+    {
+      "week_end": "2023-10-21",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "9.4"
+    },
+    {
+      "week_end": "2023-10-21",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.5"
+    },
+    {
+      "week_end": "2023-10-21",
+      "pathogen": "RSV",
+      "percent_test_positivity": "6.0"
+    },
+    {
+      "week_end": "2023-10-28",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "9.6"
+    },
+    {
+      "week_end": "2023-10-28",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "1.8"
+    },
+    {
+      "week_end": "2023-10-28",
+      "pathogen": "RSV",
+      "percent_test_positivity": "7.7"
+    },
+    {
+      "week_end": "2023-11-04",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "9.3"
+    },
+    {
+      "week_end": "2023-11-04",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "2.6"
+    },
+    {
+      "week_end": "2023-11-04",
+      "pathogen": "RSV",
+      "percent_test_positivity": "9.2"
+    },
+    {
+      "week_end": "2023-11-11",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "10.0"
+    },
+    {
+      "week_end": "2023-11-11",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "4.0"
+    },
+    {
+      "week_end": "2023-11-11",
+      "pathogen": "RSV",
+      "percent_test_positivity": "10.7"
+    },
+    {
+      "week_end": "2023-11-18",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "9.5"
+    },
+    {
+      "week_end": "2023-11-18",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "4.9"
+    },
+    {
+      "week_end": "2023-11-18",
+      "pathogen": "RSV",
+      "percent_test_positivity": "11.9"
+    },
+    {
+      "week_end": "2023-11-25",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "11.2"
+    },
+    {
+      "week_end": "2023-11-25",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "6.0"
+    },
+    {
+      "week_end": "2023-11-25",
+      "pathogen": "RSV",
+      "percent_test_positivity": "12.9"
+    },
+    {
+      "week_end": "2023-12-02",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "11.7"
+    },
+    {
+      "week_end": "2023-12-02",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "7.0"
+    },
+    {
+      "week_end": "2023-12-02",
+      "pathogen": "RSV",
+      "percent_test_positivity": "12.0"
+    },
+    {
+      "week_end": "2023-12-09",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "11.6"
+    },
+    {
+      "week_end": "2023-12-09",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "8.5"
+    },
+    {
+      "week_end": "2023-12-09",
+      "pathogen": "RSV",
+      "percent_test_positivity": "12.1"
+    },
+    {
+      "week_end": "2023-12-16",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "11.9"
+    },
+    {
+      "week_end": "2023-12-16",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "13.5"
+    },
+    {
+      "week_end": "2023-12-16",
+      "pathogen": "RSV",
+      "percent_test_positivity": "12.2"
+    },
+    {
+      "week_end": "2023-12-23",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "12.4"
+    },
+    {
+      "week_end": "2023-12-23",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "17.4"
+    },
+    {
+      "week_end": "2023-12-23",
+      "pathogen": "RSV",
+      "percent_test_positivity": "11.3"
+    },
+    {
+      "week_end": "2023-12-30",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "13.1"
+    },
+    {
+      "week_end": "2023-12-30",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "18.3"
+    },
+    {
+      "week_end": "2023-12-30",
+      "pathogen": "RSV",
+      "percent_test_positivity": "10.5"
+    },
+    {
+      "week_end": "2024-01-06",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "12.9"
+    },
+    {
+      "week_end": "2024-01-06",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "13.8"
+    },
+    {
+      "week_end": "2024-01-06",
+      "pathogen": "RSV",
+      "percent_test_positivity": "9.9"
+    },
+    {
+      "week_end": "2024-01-13",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "11.9"
+    },
+    {
+      "week_end": "2024-01-13",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "14.0"
+    },
+    {
+      "week_end": "2024-01-13",
+      "pathogen": "RSV",
+      "percent_test_positivity": "8.4"
+    },
+    {
+      "week_end": "2024-01-20",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "10.9"
+    },
+    {
+      "week_end": "2024-01-20",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "15.0"
+    },
+    {
+      "week_end": "2024-01-20",
+      "pathogen": "RSV",
+      "percent_test_positivity": "7.3"
+    },
+    {
+      "week_end": "2024-01-27",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "10.5"
+    },
+    {
+      "week_end": "2024-01-27",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "16.2"
+    },
+    {
+      "week_end": "2024-01-27",
+      "pathogen": "RSV",
+      "percent_test_positivity": "6.1"
+    },
+    {
+      "week_end": "2024-02-03",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "10.0"
+    },
+    {
+      "week_end": "2024-02-03",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "16.5"
+    },
+    {
+      "week_end": "2024-02-03",
+      "pathogen": "RSV",
+      "percent_test_positivity": "5.5"
+    },
+    {
+      "week_end": "2024-02-10",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "9.5"
+    },
+    {
+      "week_end": "2024-02-10",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "15.9"
+    },
+    {
+      "week_end": "2024-02-10",
+      "pathogen": "RSV",
+      "percent_test_positivity": "5.0"
+    },
+    {
+      "week_end": "2024-02-17",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "8.3"
+    },
+    {
+      "week_end": "2024-02-17",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "15.6"
+    },
+    {
+      "week_end": "2024-02-17",
+      "pathogen": "RSV",
+      "percent_test_positivity": "4.3"
+    },
+    {
+      "week_end": "2024-02-24",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "7.7"
+    },
+    {
+      "week_end": "2024-02-24",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "15.6"
+    },
+    {
+      "week_end": "2024-02-24",
+      "pathogen": "RSV",
+      "percent_test_positivity": "3.7"
+    },
+    {
+      "week_end": "2024-03-02",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "6.7"
+    },
+    {
+      "week_end": "2024-03-02",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "15.0"
+    },
+    {
+      "week_end": "2024-03-02",
+      "pathogen": "RSV",
+      "percent_test_positivity": "3.1"
+    },
+    {
+      "week_end": "2024-03-09",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "5.5"
+    },
+    {
+      "week_end": "2024-03-09",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "14.2"
+    },
+    {
+      "week_end": "2024-03-09",
+      "pathogen": "RSV",
+      "percent_test_positivity": "2.8"
+    },
+    {
+      "week_end": "2024-03-16",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "4.6"
+    },
+    {
+      "week_end": "2024-03-16",
+      "pathogen": "Influenza",
+      "percent_test_positivity": "12.0"
+    },
+    {
+      "week_end": "2024-03-16",
+      "pathogen": "RSV",
+      "percent_test_positivity": "2.3"
+    },
+    {
+      "week_end": "2024-03-23",
+      "pathogen": "COVID-19",
+      "percent_test_positivity": "4.0"
+    },
+    {
+      "week_end": "2024-03-23",
+      "pathogen": "RSV",
+      "percent_test_positivity": "1.9"
+    }
+  ],
+  "showChartBrush": false,
+  "datasets": {},
+  "visualizationType": "Line",
+  "customColors": [
+    "#f06f19",
+    "#0a58d6",
+    "#890664",
+    "#000000",
+    "#89bf13",
+    "#94036f",
+    "#87b6f9",
+    "#867a77",
+    "#000000"
+  ],
+  "dataFileName": "/wcms/vizdata/Respitory_Viruses/NREVSSWeeklyPercentPositive.json",
+  "dataFileSourceType": "url",
+  "dataDescription": {
+    "horizontal": false,
+    "series": true,
+    "singleRow": false,
+    "xKey": "week_end",
+    "valueKeys": [
+      "percent_test_positivity"
+    ],
+    "seriesKey": "pathogen"
+  },
+  "validated": "4.24.3",
+  "dynamicMarginTop": 0,
+  "filters": [],
+  "runtimeDataUrl": "https://wcms-wp.cdc.gov/wcms/vizdata/Respitory_Viruses/NREVSSWeeklyPercentPositive.json",
+  "description": "<div>Data presented through: <span class=\"date_max_2\"></span>; Data as of: <span class=\"date_min_2\"></span></div><a href=\"https://data.cdc.gov/Public-Health-Surveillance/2023-Respiratory-Virus-Response-Percent-of-Tests-P/seuz-s2cv\">Dataset on data.cdc.gov</a> | <a href=\"/wcms/vizdata/Respitory_Viruses/NREVSSWeeklyPercentPositive.json\">Link to Dataset</a>",
+  "regions": [
+    {
+      "from": "14",
+      "to": "2024-01-13",
+      "label": "",
+      "background": "#777777",
+      "toType": "Last Date",
+      "fromType": "Previous Days"
+    }
+  ]
+}

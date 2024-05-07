@@ -5,20 +5,17 @@ import { Series } from './Series'
 import { Table } from './Table'
 import { ConfidenceInterval } from './ConfidenceInterval'
 import { BaseVisualizationType } from './BaseVisualizationType'
+import { ConfigureData } from './ConfigureData'
 
-export type Visualization = {
+export type Visualization = ConfigureData & {
   autoLoad: boolean
   columns: Record<string, Column>
   confidenceKeys: ConfidenceInterval
-  data: any
-  dataDescription: Object
   dataFileName: string
   dataFileSourceType: string
   dataFormat: any
-  dataKey: string
   datasets: Record<string, any>
   editing: boolean
-  formattedData?: Object[] & Record<string, Object>
   general: any
   hide: any[]
   legend: Legend
@@ -31,7 +28,7 @@ export type Visualization = {
   table: Table
   title: string
   type: BaseVisualizationType
-  uid: string
+  uid: string // this is the actual key of the visualization object
   usesSharedFilter: any
   visualizationType: string
   visualizationSubType: string

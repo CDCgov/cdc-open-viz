@@ -365,7 +365,7 @@ canvas {
   width: 100%;
 }
 
-#canvas-tooltip {
+.county-map-canvas + .tooltip {
   position: fixed;
   background-color: white;
   pointer-events: none;

@@ -34,7 +34,8 @@ const WorldMap = props => {
     setState,
     state,
     supportedCountries,
-    titleCase
+    titleCase,
+    tooltipId
   } = useContext(ConfigContext)
 
   // TODO Refactor - state should be set together here to avoid rerenders
@@ -155,7 +156,20 @@ const WorldMap = props => {
         }
 
         return (
-          <Geo additionalData={additionalData} geoData={geoData} state={state} key={i + '-geo'} style={styles} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} tabIndex={-1} />
+          <Geo
+            additionalData={additionalData}
+            geoData={geoData}
+            state={state}
+            key={i + '-geo'}
+            style={styles}
+            path={path}
+            stroke={geoStrokeColor}
+            strokeWidth={strokeWidth}
+            onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            data-tooltip-id={`tooltip__${tooltipId}`}
+            data-tooltip-html={toolTip}
+            tabIndex={-1}
+          />
         )
       }
 
@@ -164,7 +178,7 @@ const WorldMap = props => {
     })
 
     // Cities
-    geosJsx.push(<CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} key='cities' projection={projection} state={state} titleCase={titleCase} />)
+    geosJsx.push(<CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} key='cities' projection={projection} state={state} titleCase={titleCase} tooltipId={tooltipId} />)
 
     // Bubbles
     if (state.general.type === 'bubble') {
@@ -178,6 +192,7 @@ const WorldMap = props => {
           applyLegendToRow={applyLegendToRow}
           applyTooltipsToGeo={applyTooltipsToGeo}
           displayGeoName={displayGeoName}
+          tooltipId={tooltipId}
           handleCircleClick={country => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData)}
         />
       )

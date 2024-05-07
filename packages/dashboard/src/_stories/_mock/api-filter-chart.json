@@ -4,9 +4,6 @@
     "sharedFilters": [
       {
         "key": "Location",
-        "usedBy": [
-          "chart1"
-        ],
         "type": "urlfilter",
         "apiFilter": {
           "apiEndpoint": "http://test.gov/api/poc/locations",
@@ -19,9 +16,6 @@
       },
       {
         "key": "Category",
-        "usedBy": [
-          "chart1"
-        ],
         "type": "urlfilter",
         "apiFilter": {
           "apiEndpoint": "http://test.gov/api/poc/topics",
@@ -34,9 +28,6 @@
       },
       {
         "key": "Indicator",
-        "usedBy": [
-          "chart1"
-        ],
         "type": "urlfilter",
         "apiFilter": {
           "apiEndpoint": "http://test.gov/api/poc/indicators",
@@ -50,15 +41,11 @@
       },
       {
         "key": "Year",
-        "usedBy": [
-          "chart1"
-        ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "http://test.gov/api/POC/Filters",
+          "apiEndpoint": "http://test.gov/api/POC/Filters/Year",
           "valueSelector": "Year",
-          "textSelector": "Year",
-          "heirarchyLookup": "Years"
+          "textSelector": "Year"
         },
         "queryParameter": "year",
         "showDropdown": true,
@@ -66,15 +53,11 @@
       },
       {
         "key": "View By",
-        "usedBy": [
-          "chart1"
-        ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "http://test.gov/api/POC/Filters",
-          "valueSelector": "StratificationCategoryId",
+          "apiEndpoint": "http://test.gov/api/POC/Filters/StratificationCategory",
+          "valueSelector": "StratificationCategory",
           "textSelector": "StratificationCategory",
-          "heirarchyLookup": "StratificationCategories",
           "defaultValue": "AGE"
         },
         "queryParameter": "stratificationcategoryid",
@@ -83,16 +66,11 @@
       },
       {
         "key": "Data Type",
-        "usedBy": [
-          "chart1"
-        ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "http://test.gov/api/POC/Filters",
-          "valueSelector": "DataValueTypeId",
-          "textSelector": "DataValueType",
-          "heirarchyLookup": "DataValueTypes"
-          
+          "apiEndpoint": "http://test.gov/api/POC/Filters/DataValueType",
+          "valueSelector": "DataValueType",
+          "textSelector": "DataValueType"
         },
         "queryParameter": "datavaluetypeid",
         "showDropdown": true,
@@ -130,7 +108,7 @@
     "filters": {
       "type": "filter-dropdowns",
       "visualizationType": "filter-dropdowns",
-      "hide": [ 3, 4, 5 ]
+      "hide": [3, 4, 5]
     },
     "header": {
       "type": "markup-include",
@@ -141,7 +119,7 @@
     "subfilters": {
       "type": "filter-dropdowns",
       "visualizationType": "filter-dropdowns",
-      "hide": [ 0, 1, 2 ],
+      "hide": [0, 1, 2],
       "autoLoad": true
     },
     "chart1": {
@@ -341,9 +319,7 @@
       },
       "validated": 4.23,
       "dynamicMarginTop": 0,
-      "regions": [
-        {}
-      ]
+      "regions": [{}]
     }
   },
   "type": "dashboard",
