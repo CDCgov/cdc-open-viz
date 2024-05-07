@@ -2,9 +2,7 @@ import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAl
 import React, { MouseEventHandler, useContext, useMemo } from 'react'
 import Toggle from './Toggle'
 import _ from 'lodash'
-import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
-import DataTransform from '@cdc/core/helpers/DataTransform'
 import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
@@ -160,7 +158,17 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                     <GoButton autoLoad={visualizationConfig.autoLoad} />
                   </React.Fragment>
                 )}
-                {visualizationConfig.type === 'table' && <DataTableStandAlone key={col.widget} visualizationKey={col.widget} config={visualizationConfig} viewport={currentViewport} />}
+                {visualizationConfig.type === 'table' && (
+                  <DataTableStandAlone
+                    key={col.widget}
+                    setConfig={newConfig => {
+                      updateChildConfig(col.widget, newConfig)
+                    }}
+                    visualizationKey={col.widget}
+                    config={visualizationConfig}
+                    viewport={currentViewport}
+                  />
+                )}
               </div>
             </React.Fragment>
           )
