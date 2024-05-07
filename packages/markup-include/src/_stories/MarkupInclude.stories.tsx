@@ -21,6 +21,7 @@ export const Primary: Story = {
         useInlineHTML: true
       },
       data: [],
+      legend: {},
       newViz: true,
       theme: 'theme-blue',
       type: 'markup-include',

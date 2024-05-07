@@ -12,6 +12,7 @@ export type Config = {
     useInlineHTML: boolean
   }
   data?: Object[]
+  legend: {}
   newViz?: boolean
   runtime?: Runtime
   theme: any

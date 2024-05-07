@@ -1,39 +1,23 @@
 export default {
-  type: 'data-bite',
+  contentEditor: {
+    inlineHTML: '<h2>Inline HTML</h2>',
+    markupVariables: [],
+    showHeader: true,
+    srcUrl: '#example',
+    title: 'Markup Include',
+    useInlineHTML: true
+  },
   data: [],
-  dataBite: '',
-  dataFunction: '',
-  dataColumn: '',
-  bitePosition: 'Left',
-  biteFontSize: 24,
-  fontSize: 'medium',
-  biteBody: '',
-  imageData: {
-    display: 'none',
-    url: '',
-    alt: '',
-    options: []
-  },
-  dataFormat: {
-    roundToPlace: 0,
-    commas: true,
-    prefix: '',
-    suffix: '%'
-  },
-  biteStyle: 'graphic',
-  filters: [],
-  subtext: '',
-  title: '',
+  legend: {},
+  newViz: true,
   theme: 'theme-blue',
-  shadow: false,
+  type: 'markup-include',
+  runtime: null,
   visual: {
     border: false,
     accent: false,
     background: false,
     hideBackgroundColor: false,
     borderColorTheme: false
-  },
-  general: {
-    isCompactStyle: false
   }
 }

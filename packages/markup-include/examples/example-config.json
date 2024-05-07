@@ -1,10 +1,23 @@
 {
   "contentEditor": {
     "inlineHTML": "<h2>Inline HTML</h2>",
+    "markupVariables": [],
+    "showHeader": true,
     "srcUrl": "#example",
-    "theme": "theme-blue",
-    "title": "Markup Include"
+    "title": "Markup Include",
+    "useInlineHTML": true
   },
   "data": [],
-  "type": "markup-include"
+  "legend": {},
+  "newViz": true,
+  "theme": "theme-blue",
+  "type": "markup-include",
+  "runtime": null,
+  "visual": {
+    "border": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false
+  }
 }
