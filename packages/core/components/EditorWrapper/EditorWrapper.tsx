@@ -2,6 +2,7 @@ import React from 'react'
 import { Visualization } from '../../types/Visualization'
 import { ViewPort } from '../../types/ViewPort'
 import './editor-wrapper.style.css'
+import { Accordion } from 'react-accessible-accordion'
 
 type StandAloneComponentProps = {
   visualizationKey: string
@@ -32,7 +33,9 @@ const EditorWrapper: React.FC<React.PropsWithChildren<EditorProps>> = ({ childre
           <div aria-level={2} role='heading' className='heading-2'>
             Configure {type}
           </div>
-          <form>{children}</form>
+          <section>
+            <Accordion allowZeroExpanded={true}>{children}</Accordion>
+          </section>
         </section>
         <div className='preview-wrapper'>
           <Component visualizationKey={visualizationKey} config={visualizationConfig} setConfig={updateConfig} configUrl={undefined} setEditing={undefined} hostname={undefined} viewport={viewport} />

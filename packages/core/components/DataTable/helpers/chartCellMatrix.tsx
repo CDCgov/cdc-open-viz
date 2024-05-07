@@ -15,7 +15,8 @@ type ChartRowsProps = DataTableProps & {
   hasRowType?: boolean
 }
 
-const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorScale, groupBy, hasRowType, viewport }: ChartRowsProps): CellMatrix | GroupCellMatrix => {
+const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorScale, hasRowType, viewport }: ChartRowsProps): CellMatrix | GroupCellMatrix => {
+  const groupBy = config.table?.groupBy
   const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
 
   const dataSeriesColumnsSorted = () => {
