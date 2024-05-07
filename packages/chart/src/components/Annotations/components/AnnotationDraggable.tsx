@@ -89,14 +89,15 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                             ...annotation,
                             xKey: nearestDatum.x,
                             yKey: nearestDatum.y,
-                            x: xScale(nearestDatum.x),
-                            y: yScale(nearestDatum.y),
+                            x: xScale(nearestDatum.x) || 0,
+                            y: yScale(nearestDatum.y) || 0,
                             dx: props.dx,
                             dy: props.dy
                           }
                         }
                         return annotation
                       })
+
                       updateConfig({
                         ...config,
                         annotations: updatedAnnotations
@@ -111,7 +112,6 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     anchorPosition={'auto'}
                   >
                     <Label className='annotation__desktop-label' title={annotation.title} subtitle={annotation.text} backgroundFill='#f5f5f5' backgroundProps={{ opacity: annotation.opacity ? Number(annotation.opacity) / 100 : 1 }} />
-                    {console.log(annotation.lineType)}
                     {/* Custom Connector */}
                     {/* prettier-ignore */}
                     <LinePath

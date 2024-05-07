@@ -85,10 +85,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         connector: 'black',
         marker: 'black'
       },
-      coordinates: {
-        x: 0 + Number(config.yAxis.size),
-        y: 0
-      },
       selected: true,
       anchor: {
         vertical: false,
@@ -97,7 +93,15 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       edit: {
         subject: true,
         label: true
-      }
+      },
+      seriesKey: config?.series?.[0]?.dataKey || '',
+      x: 0 + Number(config.xAxis.size),
+      y: 0,
+      xKey: config.xAxis.type === 'date' ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime() : '',
+      yKey: '',
+      dx: 0,
+      dy: 0,
+      opacity: '100'
     }
 
     const annotations = Array.isArray(config.annotations) ? config.annotations : []
