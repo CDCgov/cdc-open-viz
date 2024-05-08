@@ -429,7 +429,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ children }) => {
       </AccordionItem>
       <AccordionItem>
         <AccordionItemHeading>
-          <AccordionItemButton>General</AccordionItemButton>
+          <AccordionItemButton>Visual</AccordionItemButton>
         </AccordionItemHeading>
         <AccordionItemPanel>
           <div className='input-group'>

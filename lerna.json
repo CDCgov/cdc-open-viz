@@ -1,9 +1,15 @@
 {
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "npmClient": "yarn",
+<<<<<<< HEAD
   "version": "independent"
 <<<<<<< HEAD
 }
 =======
 }
 >>>>>>> e297701a (dev-7020 Reverted files)
+=======
+  "version": "independent",
+  "useWorkspaces": true
+}
+>>>>>>> f2327fd1 (dev-7020 Preview fixed before presentaion)

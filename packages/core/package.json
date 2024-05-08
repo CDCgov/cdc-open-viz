@@ -6,7 +6,8 @@
   "main": "dist/cdccore",
   "scripts": {
     "test": "vitest watch --reporter verbose --globals true",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "build" : ""
   },
   "repository": {
     "type": "git",

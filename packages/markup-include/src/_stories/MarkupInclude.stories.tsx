@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import ExampleConfig_1 from '../data/markup-include-example.json'
 import CdcMarkupInclude from '../CdcMarkupInclude'
 
 const meta: Meta<typeof CdcMarkupInclude> = {
@@ -75,7 +74,20 @@ export const No_Conditions: Story = {
         title: 'Current Rate by Location',
         useInlineHTML: true
       },
-      data: ExampleConfig_1,
+      data: [
+        {
+          STATE: 'Alabama',
+          Rate: '130',
+          Location: 'Vehicle',
+          URL: 'https://www.cdc.gov/'
+        },
+        {
+          STATE: 'Alaska',
+          Rate: '80',
+          Location: 'Home',
+          URL: 'https://www.cdc.gov/'
+        }
+      ],
       legend: {},
       newViz: true,
       theme: 'theme-blue',
@@ -118,7 +130,20 @@ export const With_conditions: Story = {
         title: '',
         useInlineHTML: true
       },
-      data: ExampleConfig_1,
+      data: [
+        {
+          STATE: 'Overall',
+          Rate: '80',
+          Location: 'Vehicle',
+          URL: 'https://www.cdc.gov/'
+        },
+        {
+          STATE: 'Alabama',
+          Rate: '130',
+          Location: 'Vehicle',
+          URL: 'https://www.cdc.gov/'
+        }
+      ],
       legend: {},
       newViz: true,
       theme: 'theme-amber',

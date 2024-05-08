@@ -3,7 +3,6 @@ import { Axis } from './Axis'
 import { Column } from './Column'
 import { Series } from './Series'
 import { Table } from './Table'
-import { Config as MarkupInclude } from '../../markup-include/src/types/Config'
 import { ConfidenceInterval } from './ConfidenceInterval'
 import { BaseVisualizationType } from './BaseVisualizationType'
 import { ConfigureData } from './ConfigureData'
@@ -14,7 +13,6 @@ export type Visualization = ConfigureData & {
   autoLoad: boolean
   columns: Record<string, Partial<Column>>
   confidenceKeys: ConfidenceInterval
-  contentEditor: {}
   dataFileName: string
   dataFileSourceType: string
   dataFormat: any
@@ -25,7 +23,6 @@ export type Visualization = ConfigureData & {
   general: any
   hide: any[]
   legend: Legend
-  markupInclude: MarkupInclude
   multiDashboards?: any[]
   newViz: boolean
   openModal: boolean
