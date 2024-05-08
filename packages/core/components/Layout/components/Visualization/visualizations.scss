@@ -22,8 +22,8 @@
   }
 
   .cove-editor__content,
-  .cove-component__content {
-    grid-area: content;
+  .cove-component__content,
+  .data-bite-content {
     position: relative;
     left: 0;
     width: 100% !important;
