@@ -16,6 +16,12 @@
 .cdc-open-viz-module.type-chart {
   @import 'DataTable';
 
+  &.isEditor {
+    .cove-component__content {
+      background: white !important;
+    }
+  }
+
   border-radius: 3px;
 
   .checkbox-group {
