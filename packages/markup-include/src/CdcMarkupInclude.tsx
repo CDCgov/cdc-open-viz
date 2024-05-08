@@ -165,7 +165,12 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
       const displayInfoMessage = '<p class="font-weight-bold">One or more of the following values will appear in the place of this variable placeholder:</p>'
 
-      const newReplacementForVariable = `<div class="cove-tooltip-variable">${variableTag}<div class="cove-tooltip-value">${displayInfoMessage} ${variableDisplay[0]}</div></div>`
+      // const newReplacementForVariable = `
+      // <div>
+      //   <div class="cove-tooltip-variable">${variableTag}<div class="cove-tooltip-value">${displayInfoMessage} ${variableDisplay[0]}</div></div>
+      //   <div class="cove-markup-include-variable-value">${variableDisplay[0]}</div>
+      // <div>`
+      const newReplacementForVariable = `<div><div class="cove-markup-include-variable-value">${variableDisplay[0]}</div><div>`
 
       return newReplacementForVariable
     })
