@@ -18,8 +18,12 @@ export default function useDataVizClasses(config, viewport = null) {
     if (title && showTitle) contentClasses.push('component--has-title')
   }
 
-  if (config.type === 'markup-include') {
+  if (config.type === 'markup-include' || config.type === 'data-bite') {
     contentClasses = contentClasses.filter(item => item !== 'cove-component__content')
+  }
+
+  if (config.type === 'data-bite') {
+    contentClasses.push('data-bite-content')
   }
 
   config.showTitle && contentClasses.push('component--has-title')

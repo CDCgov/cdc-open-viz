@@ -23,21 +23,19 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
 }
 
 function filter(data, filters, condition) {
-  return data
-    ? data.filter(row => {
-        const found = filters.find(filter => {
-          if (filter.pivot) return false
-          const currentValue = row[filter.columnName]
-          const selectedValue = filter.queuedActive || filter.active
-          const isNotTheSelectedValue = selectedValue && currentValue != selectedValue
-          const isFirstOccurrenceOfTier = filter.tier === condition
-          if (filter.type !== 'urlfilter' && isFirstOccurrenceOfTier && isNotTheSelectedValue) {
-            return true
-          }
-        })
-        return !found
-      })
-    : []
+  return data ? data.filter(row => {
+    const found = filters.find(filter => {
+      if (filter.pivot) return false
+      const currentValue = row[filter.columnName]
+      const selectedValue = filter.queuedActive || filter.active
+      const isNotTheSelectedValue = selectedValue && currentValue != selectedValue
+      const isFirstOccurrenceOfTier = filter.tier === condition
+      if (filter.type !== 'urlfilter' && isFirstOccurrenceOfTier && isNotTheSelectedValue) {
+        return true
+      }
+    })
+    return !found
+  })  : []
 }
 
 function setFilterValuesAndActiveFilter(filters: SharedFilter[], filteredData: Object[], i: number) {
@@ -84,7 +82,7 @@ export const filterData = (filters: SharedFilter[], _data: Object[]): Object[] =
 
     const filteredData = filter(_data, filters, i + 1)
 
-    setFilterValuesAndActiveFilter(_.cloneDeep(filters), filteredData, i)
+    setFilterValuesAndActiveFilter(filters, filteredData, i)
 
     if (lastIteration) {
       const pivotFilter = filters.find(filter => filter.pivot)
