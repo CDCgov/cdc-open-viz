@@ -1135,11 +1135,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             <div className={getChartWrapperClasses().join(' ')}>
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
-
-              <div style={{ marginBottom: computeMarginBottom(config, legend, currentViewport) }} className={getChartWrapperClasses().join(' ')}>
-                {/* All charts except sparkline */}
-                {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
-
                 {/* Sparkline */}
                 {config.visualizationType === 'Spark Line' && (
                   <>
