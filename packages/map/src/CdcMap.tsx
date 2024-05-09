@@ -1689,9 +1689,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
           {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
             <section className={`cove-component__content cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-              {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
-                <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
-              )}
               {/* prettier-ignore */}
               <Title
                 title={title}
@@ -1786,6 +1783,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           <div aria-live='assertive' className='cdcdataviz-sr-only'>
             {accessibleStatus}
           </div>
+
+          {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
+            <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
+          )}
         </Layout.Responsive>
       </Layout.VisualizationWrapper>
     </ConfigContext.Provider>
