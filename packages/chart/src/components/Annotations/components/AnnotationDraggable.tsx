@@ -1,9 +1,9 @@
-import { useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect, useRef } from 'react'
 import ConfigContext from '../../../ConfigContext'
 
 // helpers
 import { findNearestDatum } from './findNearestDatum'
-import { applyBandScaleOffset } from './helpers'
+import { applyBandScaleOffset, handleConnectionHorizontalType, handleConnectionVerticalType, createPoints } from './helpers'
 import useColorScale from '../../../hooks/useColorScale'
 
 // visx
@@ -22,49 +22,56 @@ const Annotations = ({ xScale, yScale, xMax }) => {
   const [width, height] = dimensions
   const { annotations } = config
   const { colorScale } = useColorScale()
-
-  useEffect(() => {
-    // force re-render
-    // setDraggingItems(annotations)
-  }, [annotations])
+  const prevDimensions = useRef(dimensions)
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
 
-  const createPoints = annotation => {
-    const { x, y, dx, dy, xKey, yKey } = annotation
-    const controlX = x + dx / 2
-    const controlY = y + dy
-    const padding = 5
+  useEffect(() => {
+    const handleResize = () => {
+      const [prevWidth, prevHeight] = prevDimensions.current
 
-    const points = [
-      { x, y, xKey, yKey, xPos: xScale(xKey) + (dx < 0 ? -padding : padding), yPos: yScale(yKey) + (dy < 0 ? -padding : padding) },
-      { x: controlX, y: controlY, xKey, yKey, xPos: controlX, yPos: controlY },
-      { x: x + dx, y: y + dy, xKey, yKey, xPos: xScale(xKey) + dx, yPos: yScale(yKey) + dy }
-    ]
+      // Calculate the scaling factors for both axes
+      const xScaleFactor = width / prevWidth
+      const yScaleFactor = height / prevHeight
 
-    return points
-  }
+      // Update the previous dimensions
+      prevDimensions.current = [width, height]
+
+      // Update the annotation positions
+      const updatedAnnotations = config.annotations.map((annotation, index) => {
+        // Calculate new x and y positions based on the scaling factors
+
+        console.log('here', annotation)
+        console.log('here', xScale(annotation.x))
+
+        const dx = annotation.x + annotation.dx < Number(config.xAxis.size) ? xScale(xScale.domain[0]) * xScaleFactor : annotation.dx * xScaleFactor
+
+        const dy = annotation.dy * yScaleFactor
+
+        return {
+          ...annotation,
+          dx: dx,
+          dy: dy
+        }
+      })
+
+      // Update the annotations in your config or state
+      // For example, if config is a state variable:
+      setTimeout(() => {
+        updateConfig({ ...config, annotations: updatedAnnotations })
+      }, 1000)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [width, height, config, xMax])
 
   return (
     annotations &&
     annotations.map((annotation, index) => {
-      const points = createPoints(annotation)
-
-      const handleConnectionHorizontalType = annotation => {
-        const { connectionLocation } = annotation
-        if (connectionLocation === 'right') return 'end'
-        if (connectionLocation === 'left') return 'start'
-        if (connectionLocation === 'bottom' || connectionLocation === 'top') return 'middle'
-        return null
-      }
-
-      const handleConnectionVerticalType = annotation => {
-        const { connectionLocation } = annotation
-        if (connectionLocation === 'top') return 'start'
-        if (connectionLocation === 'bottom') return 'end'
-        if (connectionLocation === 'right' || connectionLocation === 'left') return 'middle'
-        return null
-      }
+      const points = createPoints(annotation, xScale, yScale)
 
       return (
         <>
@@ -87,7 +94,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     height={height}
                     dx={annotation.dx}
                     dy={annotation.dy}
-                    x={config.xAxis.type !== 'date-time' ? applyBandScaleOffset(xScale(annotation.xKey), config, xScale) : annotation.xKey ? xScale(new Date(annotation.xKey)) + Number(config.yAxis.size) + 15 : 0}
+                    x={config.xAxis.type !== 'date-time' ? applyBandScaleOffset(xScale(annotation.xKey), config, xScale) : annotation.xKey ? xScale(new Date(annotation.xKey)) + Number(config.yAxis.size) : 0}
                     y={yScale(annotation.yKey) || y}
                     canEditLabel={annotation.edit.label || false}
                     canEditSubject={annotation.edit.subject || false}
@@ -119,10 +126,12 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                         return annotation
                       })
 
-                      updateConfig({
-                        ...config,
-                        annotations: updatedAnnotations
-                      })
+                      if (updatedAnnotations !== annotations) {
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }
                     }}
                     onMouseMove={dragMove}
                     onMouseUp={dragEnd}
@@ -136,7 +145,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                       <div
                         style={{
                           borderRadius: 5, // Optional: set border radius
-                          backgroundColor: `rgba(255, 255, 255, ${annotation?.opacity ? annotation?.opacity / 100 : 1})`,
+                          backgroundColor: `rgba(255, 255, 255, ${annotation?.opacity ? Number(annotation?.opacity) / 100 : 1})`,
                           padding: '10px'
                         }}
                         dangerouslySetInnerHTML={{ __html: annotation.text }}

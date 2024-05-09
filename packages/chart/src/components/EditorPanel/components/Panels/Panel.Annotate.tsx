@@ -75,7 +75,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       seriesKey: config?.series?.[0]?.dataKey || '',
       x: 0 + Number(config.xAxis.size),
       y: 0,
-      xKey: config.xAxis.type === 'date' ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime() : '',
+      xKey: config.xAxis.type === 'date' ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime() : config.xAxis.type === 'categorical' ? '1/15/2016' : '',
       yKey: '',
       dx: 0,
       dy: 0,
@@ -150,9 +150,9 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
 
                     <label>
                       Opacity
+                      <br />
                       <input
-                        type='text'
-                        checked={config?.annotations[index].opacity}
+                        type='range'
                         onClick={e => {
                           const updatedAnnotations = [...config?.annotations]
                           updatedAnnotations[index].opacity = e.target.value
