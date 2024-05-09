@@ -4,6 +4,7 @@ import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, Acc
 import { type PanelProps } from './../PanelProps'
 import Button from '@cdc/core/components/elements/Button'
 import ConfigContext from '../../../../ConfigContext.js'
+import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 import './../panels.scss'
 
@@ -206,6 +207,26 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                         {getColumns(false).map((column, columnIndex) => {
                           return <option>{column}</option>
                         })}
+                      </select>
+                    </label>
+
+                    <label>
+                      Line Type:
+                      <select
+                        onChange={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].lineType = e.target.value
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      >
+                        {Object.entries(approvedCurveTypes).map(([value, key]) => (
+                          <option key={key} value={key}>
+                            {value}
+                          </option>
+                        ))}
                       </select>
                     </label>
 

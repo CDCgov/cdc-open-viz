@@ -28,14 +28,14 @@ const Annotations = ({ xScale, yScale, xMax }) => {
 
   const createPoints = annotation => {
     const { x, y, dx, dy, xKey, yKey } = annotation
-    const bendFactor = 0.95 // Adjust the bend factor as needed
-    const controlX = x + dx * bendFactor
-    const controlY = y + dy * bendFactor
-    const padding = 10
+    const bendFactor = 0.59 // Adjust the bend factor as needed
+    const controlX = x + dx / 2
+    const controlY = y + dy
+    const padding = 5
 
     const points = [
-      { x, y, xKey, yKey, xPos: xScale(xKey), yPos: yScale(yKey) },
-      // { x: controlX, y: controlY, xKey, yKey, xPos: xScale(xKey) + controlX - dx, yPos: yScale(yKey) + dy },
+      { x, y, xKey, yKey, xPos: xScale(xKey) + (dx < 0 ? -padding : padding), yPos: yScale(yKey) + (dy < 0 ? -padding : padding) },
+      { x: controlX, y: controlY, xKey, yKey, xPos: controlX, yPos: controlY },
       { x: x + dx, y: y + dy, xKey, yKey, xPos: xScale(xKey) + dx, yPos: yScale(yKey) + dy }
     ]
 
