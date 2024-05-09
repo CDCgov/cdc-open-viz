@@ -1,35 +1,11 @@
 import React from 'react'
 import { useContext, FC } from 'react'
-import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
+import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { type PanelProps } from './../PanelProps'
 import Button from '@cdc/core/components/elements/Button'
 import ConfigContext from '../../../../ConfigContext.js'
-import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 import './../panels.scss'
-
-type Annotation = {
-  id: number
-  text: string
-  fontSize: number
-  show: {
-    mobile: boolean
-    tablet: boolean
-    desktop: boolean
-  }
-  markerType: 'arrow'
-  connectorType: 'line'
-  colors: {
-    label: string
-    connector: string
-    marker: string
-  }
-  coordinates: {
-    x: number
-    y: number
-  }
-  selected: boolean
-}
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
   const { updateConfig, config, unfilteredData } = useContext(ConfigContext)
@@ -70,8 +46,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
 
   const handleAddAnnotation = () => {
     const newAnnotation = {
-      title: 'New Annotation Title',
-      text: 'New Annotation Subtext',
+      text: 'New Annotation',
       fontSize: 16,
       show: {
         desktop: true,
@@ -101,7 +76,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       yKey: '',
       dx: 0,
       dy: 0,
-      opacity: '100'
+      opacity: 100
     }
 
     const annotations = Array.isArray(config.annotations) ? config.annotations : []
@@ -128,151 +103,136 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       <AccordionItemPanel>
         {config?.annotations &&
           config?.annotations.map((annotation, index) => (
-            <div className='annotation-group'>
-              <label>
-                Annotation Title:
-                <input type='text' value={annotation.title} onChange={e => handleAnnotationUpdate(e.target.value, 'title', index)} />
-              </label>
-              <label>
-                Annotation Text:
-                <textarea rows={5} value={annotation.text} onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)} />
-              </label>
-              <label>
-                Vertical Anchor
-                <input
-                  type='checkbox'
-                  checked={config?.annotations[index].anchor.vertical}
-                  onClick={e => {
-                    const updatedAnnotations = [...config?.annotations]
-                    updatedAnnotations[index].anchor.vertical = e.target.checked
-                    updateConfig({
-                      ...config,
-                      annotations: updatedAnnotations
-                    })
-                  }}
-                />
-              </label>
-              <label>
-                Horizontal Anchor
-                <input
-                  type='checkbox'
-                  checked={config?.annotations[index].anchor.horizontal}
-                  onClick={e => {
-                    const updatedAnnotations = [...config?.annotations]
-                    updatedAnnotations[index].anchor.horizontal = e.target.checked
-                    updateConfig({
-                      ...config,
-                      annotations: updatedAnnotations
-                    })
-                  }}
-                />
-              </label>
+            <Accordion allowZeroExpanded>
+              <AccordionItem className='series-item series-item--chart' key={`${index}`}>
+                <AccordionItemHeading className='series-item__title'>
+                  <AccordionItemButton>{annotation.text ? annotation.text.substring(0, 15) + '...' : `Annotation ${index + 1}`}</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <div className='annotation-group'>
+                    <label>
+                      Annotation Text:
+                      <textarea rows={5} value={annotation.text} onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)} />
+                    </label>
+                    {/* <label>
+                      Vertical Anchor
+                      <input
+                        type='checkbox'
+                        checked={config?.annotations[index].anchor.vertical}
+                        onClick={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].anchor.vertical = e.target.checked
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      />
+                    </label>
+                    <label>
+                      Horizontal Anchor
+                      <input
+                        type='checkbox'
+                        checked={config?.annotations[index].anchor.horizontal}
+                        onClick={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].anchor.horizontal = e.target.checked
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      />
+                    </label> */}
 
-              <label>
-                Opacity
-                <input
-                  type='text'
-                  checked={config?.annotations[index].opacity}
-                  onClick={e => {
-                    const updatedAnnotations = [...config?.annotations]
-                    updatedAnnotations[index].opacity = e.target.value
-                    updateConfig({
-                      ...config,
-                      annotations: updatedAnnotations
-                    })
-                  }}
-                />
-              </label>
+                    <label>
+                      Opacity
+                      <input
+                        type='text'
+                        checked={config?.annotations[index].opacity}
+                        onClick={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].opacity = e.target.value
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      />
+                    </label>
 
-              <label>
-                Edit Subject
-                <input
-                  type='checkbox'
-                  checked={config?.annotations[index]?.edit?.subject}
-                  onClick={e => {
-                    const updatedAnnotations = [...config?.annotations]
-                    updatedAnnotations[index].edit.subject = e.target.checked
-                    updateConfig({
-                      ...config,
-                      annotations: updatedAnnotations
-                    })
-                  }}
-                />
-              </label>
-              <label>
-                Edit Label
-                <input
-                  type='checkbox'
-                  checked={config?.annotations[index]?.edit?.label}
-                  onClick={e => {
-                    const updatedAnnotations = [...config?.annotations]
-                    updatedAnnotations[index].edit.label = e.target.checked
-                    updateConfig({
-                      ...config,
-                      annotations: updatedAnnotations
-                    })
-                  }}
-                />
-              </label>
-              <label>
-                Associated Series:
-                <select
-                  onChange={e => {
-                    const updatedAnnotations = [...config?.annotations]
-                    updatedAnnotations[index].seriesKey = e.target.value
-                    updateConfig({
-                      ...config,
-                      annotations: updatedAnnotations
-                    })
-                  }}
-                >
-                  {getColumns(false).map((column, columnIndex) => {
-                    return <option>{column}</option>
-                  })}
-                </select>
-              </label>
+                    <label>
+                      Edit Subject
+                      <input
+                        type='checkbox'
+                        checked={config?.annotations[index]?.edit?.subject}
+                        onClick={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].edit.subject = e.target.checked
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      />
+                    </label>
+                    <label>
+                      Edit Label
+                      <input
+                        type='checkbox'
+                        checked={config?.annotations[index]?.edit?.label}
+                        onClick={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].edit.label = e.target.checked
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      />
+                    </label>
+                    <label>
+                      Associated Series:
+                      <select
+                        onChange={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].seriesKey = e.target.value
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      >
+                        {getColumns(false).map((column, columnIndex) => {
+                          return <option>{column}</option>
+                        })}
+                      </select>
+                    </label>
 
-              <label>
-                Line Type:
-                <select
-                  onChange={e => {
-                    const updatedAnnotations = [...config?.annotations]
-                    updatedAnnotations[index].lineType = e.target.value
-                    updateConfig({
-                      ...config,
-                      annotations: updatedAnnotations
-                    })
-                  }}
-                >
-                  {Object.entries(approvedCurveTypes).map(([value, key]) => (
-                    <option key={key} value={key}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label>
-                Marker
-                <select
-                  onChange={e => {
-                    const updatedAnnotations = [...config?.annotations]
-                    updatedAnnotations[index].marker = e.target.value
-                    updateConfig({
-                      ...config,
-                      annotations: updatedAnnotations
-                    })
-                  }}
-                >
-                  {['circle', 'arrow'].map((column, columnIndex) => {
-                    return <option>{column}</option>
-                  })}
-                </select>
-              </label>
-              <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
-                Delete Annotation
-              </Button>
-            </div>
+                    <label>
+                      Marker
+                      <select
+                        onChange={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].marker = e.target.value
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      >
+                        {['circle', 'arrow'].map((column, columnIndex) => {
+                          return <option>{column}</option>
+                        })}
+                      </select>
+                    </label>
+                    <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
+                      Delete Annotation
+                    </Button>
+                  </div>
+                </AccordionItemPanel>
+              </AccordionItem>
+            </Accordion>
           ))}
         {config?.annotations?.length < 3 && <Button onClick={handleAddAnnotation}>Add Annotation</Button>}
       </AccordionItemPanel>

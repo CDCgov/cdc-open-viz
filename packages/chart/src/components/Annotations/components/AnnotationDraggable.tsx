@@ -7,7 +7,7 @@ import { applyBandScaleOffset } from './helpers'
 import useColorScale from '../../../hooks/useColorScale'
 
 // visx
-import { Label, CircleSubject, LineSubject, EditableAnnotation } from '@visx/annotation'
+import { HtmlLabel, CircleSubject, LineSubject, EditableAnnotation } from '@visx/annotation'
 import { Drag, raise } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
@@ -22,6 +22,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
   const [width, height] = dimensions
   const { annotations } = config
   const { colorScale } = useColorScale()
+  const labelPadding = 5
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
 
@@ -30,6 +31,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
     const bendFactor = 0.95 // Adjust the bend factor as needed
     const controlX = x + dx * bendFactor
     const controlY = y + dy * bendFactor
+    const padding = 10
 
     const points = [
       { x, y, xKey, yKey, xPos: xScale(xKey), yPos: yScale(yKey) },
@@ -66,7 +68,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     height={height}
                     dx={annotation.dx}
                     dy={annotation.dy}
-                    x={config.xAxis.type !== 'date-time' ? applyBandScaleOffset(xScale(annotation.xKey), config, xScale) : annotation.xKey ? xScale(new Date(annotation.xKey)) + Number(config.yAxis.size) : 0}
+                    x={config.xAxis.type !== 'date-time' ? applyBandScaleOffset(xScale(annotation.xKey), config, xScale) : annotation.xKey ? xScale(new Date(annotation.xKey)) + Number(config.yAxis.size) + 15 : 0}
                     y={yScale(annotation.yKey) || y}
                     canEditLabel={annotation.edit.label || false}
                     canEditSubject={annotation.edit.subject || false}
@@ -111,12 +113,22 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     onTouchEnd={dragEnd}
                     anchorPosition={'auto'}
                   >
-                    <Label className='annotation__desktop-label' title={annotation.title} subtitle={annotation.text} backgroundFill='#f5f5f5' backgroundProps={{ opacity: annotation.opacity ? Number(annotation.opacity) / 100 : 1 }} />
+                    <HtmlLabel className='annotation__desktop-label' anchorLineStroke={null}>
+                      <div
+                        style={{
+                          borderRadius: 5, // Optional: set border radius
+                          backgroundColor: `rgba(255, 255, 255, ${annotation?.opacity ? annotation?.opacity / 100 : 1})`,
+                          border: '1px solid gray',
+                          padding: '10px'
+                        }}
+                        dangerouslySetInnerHTML={{ __html: annotation.text }}
+                      />
+                    </HtmlLabel>
                     {/* Custom Connector */}
                     {/* prettier-ignore */}
                     <LinePath
                       data={points}
-                      x={d => d.xPos + Number(config.yAxis.size) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)}
+                      x={d => d.xPos + Number(config.yAxis.size) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) }
                       y={d => d.yPos}
                       stroke='black'
                       strokeWidth={1}
@@ -126,7 +138,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
 
                     {/* MARKERS */}
                     {annotation.marker === 'circle' && <CircleSubject className='circle-subject' stroke={colorScale(annotation.seriesKey)} />}
-                    {annotation.marker === 'arrow' && <MarkerArrow fill='black' id='marker-start' x={Number(xScale(annotation.xKey)) - 2} y={yScale(annotation.yKey)} stroke='#333' markerWidth={10} size={10} strokeWidth={1} orient='auto-start-reverse' />}
+                    {annotation.marker === 'arrow' && <MarkerArrow fill='black' id='marker-start' x={Number(xScale(annotation.xKey))} y={yScale(annotation.yKey)} stroke='#333' markerWidth={10} size={10} strokeWidth={1} orient='auto-start-reverse' />}
 
                     {/* Mobile Labels */}
                     <circle
