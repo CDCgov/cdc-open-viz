@@ -66,6 +66,8 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         vertical: false,
         horizontal: false
       },
+      connectionType: 'line',
+      marker: 'arrow',
       edit: {
         subject: true,
         label: true
@@ -225,6 +227,46 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                         {Object.entries(approvedCurveTypes).map(([value, key]) => (
                           <option key={key} value={key}>
                             {value}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label>
+                      Connection Type:
+                      <select
+                        onChange={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].connectionType = e.target.value
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      >
+                        {['curve', 'line', 'elbow'].map((side, index) => (
+                          <option key={side} value={side}>
+                            {side}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label>
+                      Connection Location:
+                      <select
+                        onChange={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].connectionLocation = e.target.value
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      >
+                        {['auto', 'left', 'top', 'bottom', 'right'].map((side, index) => (
+                          <option key={side} value={side}>
+                            {side}
                           </option>
                         ))}
                       </select>

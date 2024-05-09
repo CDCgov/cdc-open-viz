@@ -2,7 +2,7 @@
   "annotations": [
     {
       "title": "New Annotation Title",
-      "text": "New Annotation Subtext",
+      "text": "New Annotation",
       "fontSize": 16,
       "show": {
         "desktop": true,
@@ -26,17 +26,20 @@
         "horizontal": false
       },
       "edit": {
-        "subject": true,
-        "label": true
+        "subject": false,
+        "label": false
       },
       "xKey": 1458025200000,
       "yKey": "50",
-      "x": 277.69037597334665,
+      "x": 277.88736842105266,
       "y": 195.125,
-      "dx": -44.621353383458654,
-      "dy": -74,
+      "dx": -178.62135338345865,
+      "dy": -153,
       "seriesKey": "Data 1",
-      "opacity": "40"
+      "opacity": "40",
+      "connectionType": "curve",
+      "marker": "arrow",
+      "lineType": "curveBasis"
     }
   ],
   "type": "chart",
@@ -131,7 +134,7 @@
     "hasLine": false
   },
   "isLegendValue": false,
-  "barThickness": 0.035,
+  "barThickness": 0.35,
   "barHeight": 25,
   "barSpace": 15,
   "heights": {

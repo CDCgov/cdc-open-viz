@@ -147,7 +147,7 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeries
   }
 
   const xValue = getXValueFromCoordinate(xPosition - Number(config.yAxis.size || 0))
-  console.log('closest date', xValue)
+  console.log('closest value', xValue)
 
   let closestSeries = []
   if (!xValue) return { x: 0, y: 0 }
