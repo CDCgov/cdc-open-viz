@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <style>
       body {
-        /* max-width: 1000px; */
-        margin: 0 auto !important;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        margin: 0;
+        border-top: none !important;
       }
 
-      .react-container + .react-container {
-        margin-top: 3rem;
+      .cdc-map-outer-container {
+        min-height: 100vh;
       }
+
+      /* .react-container + .react-container {
+        margin-top: 3rem;
+      } */
     </style>
     <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/contrib/libs/bootstrap/latest/css/bootstrap.min.css?_=39423" />
     <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/4.0/assets/css/app.min.css?_=39423" />
@@ -26,7 +27,7 @@
       <main class="col-lg-9 order-lg-2" role="main" aria-label="Main Content Area">
         <div class="row">
           <div class="col-md-12"> -->
-    <div class="react-container" data-config="/examples/feature/sankey/sankey-example-data.json"></div>
+    <!-- <div class="react-container" data-config="/examples/feature/sankey/sankey-example-data.json"></div> -->
     <!-- </div>
         </div>
       </main>
@@ -45,8 +46,9 @@
   -->
 
     <!-- GENERIC CHART TYPES -->
+    <div class="react-container" data-config="/examples/test.json"></div>
     <!-- <div class="react-container" data-config="/examples/private/rvr.json"></div> -->
-    <div class="react-container" data-config="/examples/feature/filters/url-filter.json"></div>
+    <!-- <div class="react-container" data-config="/examples/feature/filters/url-filter.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/feature/bar/additional-column-tooltip.json"></div> -->
     <!-- <div class="react-container" data-config="https://cdc.gov/poxvirus/mpox/modules/data-viz/mpx-trends_1.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/feature/area/area-chart-date-city-temperature.json"></div> -->
@@ -56,7 +58,7 @@
     <!-- <div class="react-container" data-config="/examples/feature/forest-plot/forest-plot.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/feature/pie/planet-pie-example-config.json"></div> -->
     <!-- <div class="react-container" data-config=https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Line_Chart_Viz.json></div> -->
-    <!-- <div class="react-container" data-config=/examples/feature/regions/index.json></div> -->
+    <div class="react-container" data-config=/examples/feature/regions/index.json></div>
     <!-- <div class="react-container" data-config=https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Line_Chart_Regions_Viz.json></div> -->
     <!-- <div class="react-container" data-config=https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Line_Chart_Regions_Viz.json></div> -->
     <!-- <div class="react-container" data-config="/examples/feature/forecasting/forecasting.json"></div> -->
@@ -69,12 +71,12 @@
     <!-- <div class="react-container" data-config="/examples/feature/boxplot/boxplot.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/feature/combo/planet-combo-example-config.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/feature/combo/right-issues.json"></div> -->
-    <div class="react-container" data-config="/examples/feature/paired-bar/paired-bar-example.json"></div>
+    <!-- <div class="react-container" data-config="/examples/region-issue.json"></div> -->
 
     <!-- BAR -->
     <!-- <div class="react-container" data-config="/examples/feature/bar/planet-example-config.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/feature/bar/planet-chart-horizontal-example-config.json"></div> -->
-    <!-- <div class="react-container" data-config="/examples/feature/bar/example-bar-chart.json"></div> -->
+    <div class="react-container" data-config="/examples/feature/bar/example-bar-chart.json"></div>
     <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-chart-max-increase.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-chart.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-stacked-bar-chart.json"></div> -->
@@ -115,7 +117,7 @@
     <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/example-bar-chart-nonnumeric.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/sparkline.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/sparkline-chart-nonnumeric.json"></div> -->
-    <!-- <div class="react-container" data-config="/examples/feature/bar/lollipop.json"></div> -->
+    <div class="react-container" data-config="/examples/region-issue.json"></div>
     <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/stacked-vertical-bar-example-nonnumerics.json"></div> -->
 
     <!-- TESTS CUTOFF -->
@@ -133,7 +135,7 @@
 
     <!-- GENERIC CHART TYPES  -->
     <!-- <div class="react-container" data-config="/examples/gallery/paired-bar/paired-bar-chart.json"></div> -->
-    <!-- <div class="react-container" data-config="/examples/feature/line/line-chart.json"></div> -->
+    <div class="react-container" data-config="/examples/feature/line/line-chart.json"></div>
 
     <!-- HORIZONTAL BAR CHARTS -->
     <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-horizontal/horizontal-bar-chart-with-numbers-on-bar.json"></div> -->

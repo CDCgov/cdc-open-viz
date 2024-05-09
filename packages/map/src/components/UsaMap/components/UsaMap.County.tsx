@@ -127,7 +127,9 @@ const CountyMap = props => {
       handleMapAriaLabels,
       runtimeLegend,
       state,
-      runtimeFilters
+      runtimeFilters,
+      tooltipId,
+      isEditor
   } = useContext(ConfigContext)
 
   // CREATE STATE LINES
@@ -138,7 +140,7 @@ const CountyMap = props => {
 
   const pathGenerator = geoPath().projection(geoAlbersUsaTerritories())
 
-  const { featureArray } = useMapLayers(state, '', pathGenerator, false)
+  const { featureArray } = useMapLayers(state, '', pathGenerator, tooltipId)
 
   useEffect(() => {
     if (containerEl) {
@@ -322,7 +324,7 @@ const CountyMap = props => {
 
           tooltipRef.current.style.display = 'block'
           tooltipRef.current.style.top = e.clientY + 'px'
-          tooltipRef.current.style.left = e.clientX + 'px'
+          tooltipRef.current.style.left = isEditor ? Number(e.clientX - 350) + 'px' : e.clientX + 'px'
           tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), data[county.id])
           tooltipRef.current.setAttribute('data-index', countyIndex)
         } else {
@@ -520,8 +522,9 @@ const CountyMap = props => {
           tooltipRef.current.setAttribute('data-index', null)
         }}
         onClick={canvasClick}
+        className='county-map-canvas'
       ></canvas>
-      <div ref={tooltipRef} id='canvas-tooltip' className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})` }}></div>
+      <div ref={tooltipRef} id={`tooltip__${tooltipId}`} className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})` }}></div>
       <button className={`btn btn--reset`} onClick={onReset} ref={resetButton} tabIndex='0'>
         Reset Zoom
       </button>

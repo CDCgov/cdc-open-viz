@@ -21,7 +21,6 @@ const SankeySettings = () => {
     }
 
     storyNodes[i][fieldName] = value
-    console.log('story nodes', storyNodes[i])
     updateConfig({
       ...config,
       sankey: {

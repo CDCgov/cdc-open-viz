@@ -1,22 +1,21 @@
 import { memo, useContext } from 'react'
 
-import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
-import topoJSON from './../data/world-topo.json'
-import ZoomableGroup from '../../ZoomableGroup'
-import Geo from '../../Geo'
-import CityList from '../../CityList'
-import BubbleList from '../../BubbleList'
-import ConfigContext from '../../../context'
+import topoJSON from './data/world-topo.json'
+import ZoomableGroup from '../ZoomableGroup'
+import Geo from '../Geo'
+import CityList from '../CityList'
+import BubbleList from '../BubbleList'
+import ConfigContext from '../../context'
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
 let projection = geoMercator()
 
-const WorldMap = props => {
+const WorldMap = () => {
   // prettier-ignore
   const {
     applyLegendToRow,
@@ -34,7 +33,8 @@ const WorldMap = props => {
     setState,
     state,
     supportedCountries,
-    titleCase
+    titleCase,
+    tooltipId
   } = useContext(ConfigContext)
 
   // TODO Refactor - state should be set together here to avoid rerenders
@@ -126,7 +126,7 @@ const WorldMap = props => {
 
       const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
-      let styles = {
+      let styles: Record<string, string | Record<string, string>> = {
         fill: '#E6E6E6',
         cursor: 'default'
       }
@@ -155,7 +155,20 @@ const WorldMap = props => {
         }
 
         return (
-          <Geo additionalData={additionalData} geoData={geoData} state={state} key={i + '-geo'} style={styles} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} data-tooltip-id='tooltip' data-tooltip-html={toolTip} tabIndex={-1} />
+          <Geo
+            additionalData={additionalData}
+            geoData={geoData}
+            state={state}
+            key={i + '-geo'}
+            style={styles}
+            path={path}
+            stroke={geoStrokeColor}
+            strokeWidth={strokeWidth}
+            onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            data-tooltip-id={`tooltip__${tooltipId}`}
+            data-tooltip-html={toolTip}
+            tabIndex={-1}
+          />
         )
       }
 
@@ -164,7 +177,7 @@ const WorldMap = props => {
     })
 
     // Cities
-    geosJsx.push(<CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} key='cities' projection={projection} state={state} titleCase={titleCase} />)
+    geosJsx.push(<CityList applyLegendToRow={applyLegendToRow} applyTooltipsToGeo={applyTooltipsToGeo} data={data} displayGeoName={displayGeoName} geoClickHandler={geoClickHandler} key='cities' projection={projection} state={state} titleCase={titleCase} tooltipId={tooltipId} />)
 
     // Bubbles
     if (state.general.type === 'bubble') {
@@ -178,6 +191,7 @@ const WorldMap = props => {
           applyLegendToRow={applyLegendToRow}
           applyTooltipsToGeo={applyTooltipsToGeo}
           displayGeoName={displayGeoName}
+          tooltipId={tooltipId}
           handleCircleClick={country => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData)}
         />
       )

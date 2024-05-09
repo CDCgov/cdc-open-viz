@@ -127,6 +127,9 @@
         word-wrap: break-word;
         white-space: pre-wrap;
         word-break: break-word;
+        @include breakpoint(xs) {
+          font-size: $font-small;
+        }
       }
     }
 
@@ -147,6 +150,9 @@
     h3,
     p {
       margin-bottom: 0.8em;
+      @include breakpoint(xs) {
+        font-size: $font-small + 0.2em;
+      }
     }
     & div.legend-item {
       margin-bottom: 0.5em !important;
@@ -186,6 +192,20 @@
     button {
       width: auto;
       display: inline-block;
+    }
+  }
+
+  .legend-preliminary {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    @include breakpoint(xs) {
+      font-size: $font-small;
+    }
+
+    & > svg {
+      width: 50px;
+      height: 23px;
     }
   }
 
@@ -594,6 +614,11 @@
     vertical-align: middle;
     margin: 0.25em;
   }
+}
+
+.cdc-open-viz-module .is-editor .cdc-chart-inner-container {
+  overflow: hidden;
+  background-color: var(--white);
 }
 
 .isEditor.type-sparkline .cdc-chart-inner-container {
