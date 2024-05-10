@@ -26,48 +26,6 @@ const Annotations = ({ xScale, yScale, xMax }) => {
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
 
-  useEffect(() => {
-    const handleResize = () => {
-      const [prevWidth, prevHeight] = prevDimensions.current
-
-      // Calculate the scaling factors for both axes
-      const xScaleFactor = width / prevWidth
-      const yScaleFactor = height / prevHeight
-
-      // Update the previous dimensions
-      prevDimensions.current = [width, height]
-
-      // Update the annotation positions
-      const updatedAnnotations = config.annotations.map((annotation, index) => {
-        // Calculate new x and y positions based on the scaling factors
-
-        console.log('here', annotation)
-        console.log('here', xScale(annotation.x))
-
-        const dx = annotation.x + annotation.dx < Number(config.xAxis.size) ? xScale(xScale.domain[0]) * xScaleFactor : annotation.dx * xScaleFactor
-
-        const dy = annotation.dy * yScaleFactor
-
-        return {
-          ...annotation,
-          dx: dx,
-          dy: dy
-        }
-      })
-
-      // Update the annotations in your config or state
-      // For example, if config is a state variable:
-      setTimeout(() => {
-        updateConfig({ ...config, annotations: updatedAnnotations })
-      }, 1000)
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [width, height, config, xMax])
-
   return (
     annotations &&
     annotations.map((annotation, index) => {
@@ -90,7 +48,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
               return (
                 <>
                   <EditableAnnotation
-                    width={width}
+                    width={200}
                     height={height}
                     dx={annotation.dx}
                     dy={annotation.dy}
@@ -141,7 +99,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     onTouchEnd={dragEnd}
                     anchorPosition={'auto'}
                   >
-                    <HtmlLabel className='annotation__desktop-label' anchorLineStroke={null} horizontalAnchor={handleConnectionHorizontalType(annotation)} verticalAnchor={handleConnectionVerticalType(annotation)}>
+                    <HtmlLabel width={200} className='annotation__desktop-label' anchorLineStroke={null} horizontalAnchor={handleConnectionHorizontalType(annotation)} verticalAnchor={handleConnectionVerticalType(annotation)}>
                       <div
                         style={{
                           borderRadius: 5, // Optional: set border radius
