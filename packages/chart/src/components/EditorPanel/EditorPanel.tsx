@@ -220,7 +220,8 @@ const EditorPanel = () => {
     lineOptions,
     rawData,
     highlight,
-    highlightReset
+    highlightReset,
+    dimensions
   } = useContext<ChartContext>(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)

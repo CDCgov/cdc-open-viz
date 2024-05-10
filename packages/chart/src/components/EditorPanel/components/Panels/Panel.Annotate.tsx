@@ -9,7 +9,7 @@ import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import './../panels.scss'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
-  const { updateConfig, config, unfilteredData } = useContext(ConfigContext)
+  const { updateConfig, config, unfilteredData, dimensions } = useContext(ConfigContext)
 
   const getColumns = (filter = true) => {
     let columns = {}
@@ -38,6 +38,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   const handleAnnotationUpdate = (value, property, index) => {
     const annotations = [...config?.annotations]
     annotations[index][property] = value
+    annotations[index].savedDimensions = [dimensions[0] * 0.73, dimensions[1]]
 
     updateConfig({
       ...config,
@@ -79,7 +80,8 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       yKey: '',
       dx: 0,
       dy: 0,
-      opacity: 100
+      opacity: 100,
+      savedDimensions: [dimensions[0] * 0.73, dimensions[1]]
     }
 
     const annotations = Array.isArray(config.annotations) ? config.annotations : []
