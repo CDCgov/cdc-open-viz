@@ -26,6 +26,10 @@ export default function useDataVizClasses(config, viewport = null) {
     contentClasses.push('data-bite-content')
   }
 
+  if (config.type === 'filtered-text') {
+    contentClasses.push('filtered-text-container')
+  }
+
   config.showTitle && contentClasses.push('component--has-title')
   config.title && config.visualizationType !== 'chart' && config.visualizationType !== 'Spark Line' && contentClasses.push('component--has-title')
   config.subtext && innerContainerClasses.push('component--has-subtext')
