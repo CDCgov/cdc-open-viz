@@ -1,5 +1,6 @@
+@import '@cdc/core/styles/base';
+@import '@cdc/core/styles/v2/themes/_color-definitions';
 @import '@cdc/core/styles/v2/main';
-
 .cove-accordion__panel-section {
   overflow: auto;
 
@@ -7,5 +8,20 @@
     float: left;
     display: block;
     margin-right: 5px;
+  }
+}
+
+.cdc-open-viz-module.type-filtered-text {
+  .cove-component__content:not(.component--hideBackgroundColor, .component--has-background) {
+    background-color: white;
+  }
+  .cove-component__inner .cove-component__content-wrap:not(:empty) {
+    padding: 10px !important;
+  }
+  .filtered-text-inputs .input-group {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    margin-bottom: 5px;
   }
 }

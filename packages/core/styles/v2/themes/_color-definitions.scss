@@ -76,6 +76,7 @@ $theme: (
 .markup-include,
 .type-waffle-chart,
 .type-data-bite,
+.type-filtered-text,
 .cdc-open-viz-module.type-chart.type-sparkline,
 .cove {
   @each $theme-name, $theme-colors in $theme {
