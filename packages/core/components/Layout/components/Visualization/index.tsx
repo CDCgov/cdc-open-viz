@@ -4,7 +4,7 @@ import React, { forwardRef, useRef } from 'react'
 import { Config as DataBiteConfig } from '@cdc/data-bite/src/types/Config'
 import './visualizations.scss'
 import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
-import { Config as MarkupIncludeConfig } from '@cdc/markup-include/src/types/Config'
+import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 
 type VisualizationWrapper = {
   children: React.ReactNode

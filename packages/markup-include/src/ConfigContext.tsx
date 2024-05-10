@@ -1,8 +1,8 @@
 import { createContext } from 'react'
-import { Config } from './types/Config'
+import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 
 type ConfigCTX = {
-  config: Config
+  config: MarkupIncludeConfig
   data: Object[]
   isDashboard: boolean
   loading: boolean

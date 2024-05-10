@@ -576,7 +576,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             body = (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Markup Include' />
-                <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={_updateConfig} isDashboard={true} configUrl={undefined} />
+                <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} isPreview={isPreview} setConfig={_updateConfig} isDashboard={true} configUrl={undefined} />
               </>
             )
             break
@@ -685,7 +685,18 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                     })
                   } else {
                     return (
-                      <VisualizationRow key={`row__${index}`} row={row} rowIndex={index} setSharedFilter={setSharedFilter} updateChildConfig={updateChildConfig} applyFilters={applyFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} currentViewport={currentViewport} />
+                      <VisualizationRow
+                        key={`row__${index}`}
+                        isPreview={isPreview}
+                        row={row}
+                        rowIndex={index}
+                        setSharedFilter={setSharedFilter}
+                        updateChildConfig={updateChildConfig}
+                        applyFilters={applyFilters}
+                        apiFilterDropdowns={apiFilterDropdowns}
+                        handleOnChange={handleOnChange}
+                        currentViewport={currentViewport}
+                      />
                     )
                   }
                 })}
@@ -764,7 +775,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
   return (
     <GlobalContextProvider>
-      <DashboardContext.Provider value={{ ...state, setParentConfig: editorContext.setTempConfig, outerContainerRef, isDebug }}>
+      <DashboardContext.Provider value={{ ...state, setParentConfig: editorContext.setTempConfig, outerContainerRef, isDebug, isPreview }}>
         <DashboardDispatchContext.Provider value={dispatch}>
           <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
             {body}

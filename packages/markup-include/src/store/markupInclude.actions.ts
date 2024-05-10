@@ -1,8 +1,8 @@
-import type { Config } from '../types/Config'
+import type { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 
 type Action<T, P> = { type: T; payload: P }
 
-type SET_CONFIG = Action<'SET_CONFIG', Config>
+type SET_CONFIG = Action<'SET_CONFIG', MarkupIncludeConfig>
 type SET_LOADING = Action<'SET_LOADING', boolean>
 type SET_URL_MARKUP = Action<'SET_URL_MARKUP', string>
 type SET_MARKUP_ERROR = Action<'SET_MARKUP_ERROR', any>

@@ -5,7 +5,7 @@ import { Markup } from 'interweave'
 import axios from 'axios'
 
 // cdc
-import { Config } from './types/Config'
+import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { publish } from '@cdc/core/helpers/events'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
@@ -22,16 +22,17 @@ import './cdcMarkupInclude.style.css'
 import './scss/main.scss'
 
 type CdcMarkupIncludeProps = {
-  config: Config
+  config: MarkupIncludeConfig
   configUrl: string
   isDashboard: boolean
   isEditor: boolean
+  isPreview: boolean
   setConfig: any
 }
 
 import Title from '@cdc/core/components/ui/Title'
 
-const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: configObj, isDashboard = true, isEditor = true, setConfig: setParentConfig }) => {
+const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: configObj, isDashboard = true, isEditor = true, isPreview, setConfig: setParentConfig }) => {
   const initialState = { config: configObj || defaults, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
 
   const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
@@ -42,7 +43,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
   const container = useRef()
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
-  const { contentEditor, data, theme } = config
+  const { contentEditor, theme } = config
+  const data = configObj.formattedData
 
   const { inlineHTML, markupVariables, showHeader, srcUrl, title, useInlineHTML } = contentEditor
 
@@ -154,12 +156,14 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
       const variableValues: string[] = _.uniq(workingData.map(dataObject => dataObject[workingVariable.columnName]))
       const variableDisplay = []
 
+      const listConjunction = isPreview ? 'and' : 'or'
+
       const length = variableValues.length
       if (length === 2) {
-        variableValues.push(variableValues.join(' or '))
+        variableValues.push(variableValues.join(` ${listConjunction} `))
       }
       if (length > 2) {
-        variableValues[length - 1] = 'or ' + variableValues[length - 1]
+        variableValues[length - 1] = `${listConjunction} ${variableValues[length - 1]}`
       }
       variableDisplay.push(variableValues.join(', '))
 
