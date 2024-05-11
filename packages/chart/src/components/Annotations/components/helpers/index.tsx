@@ -1,18 +1,18 @@
 const applyBandScaleOffset = (num: number, config, xScale) => num + Number(config.yAxis.size) + xScale.bandwidth() / 2
-const handleConnectionHorizontalType = annotation => {
+const handleConnectionHorizontalType = (annotation, xScale, config) => {
   const { connectionLocation } = annotation
   if (connectionLocation === 'right') return 'end'
   if (connectionLocation === 'left') return 'start'
   if (connectionLocation === 'bottom' || connectionLocation === 'top') return 'middle'
-  return null
+  return xScale(annotation.xKey) + annotation.dx < config.yAxis.size ? 'middle' : null
 }
 
-const handleConnectionVerticalType = annotation => {
+const handleConnectionVerticalType = (annotation, xScale, config) => {
   const { connectionLocation } = annotation
   if (connectionLocation === 'top') return 'start'
   if (connectionLocation === 'bottom') return 'end'
   if (connectionLocation === 'right' || connectionLocation === 'left') return 'middle'
-  return null
+  return xScale(annotation.xKey) + annotation.dx < config.yAxis.size ? 'end' : null
 }
 
 const createPoints = (annotation, xScale, yScale) => {

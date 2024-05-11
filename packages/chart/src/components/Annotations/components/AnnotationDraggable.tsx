@@ -12,12 +12,12 @@ import { Drag, raise } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
 import * as allCurves from '@visx/curve'
+import { Annotation } from '@cdc/core/types/Annotation'
 
 // styles
 import './AnnotationDraggable.styles.css'
-import { a } from 'vitest/dist/suite-ghspeorC'
 
-const Annotations = ({ xScale, yScale, xMax }) => {
+const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   const [draggingItems, setDraggingItems] = useState([])
   const { config, dimensions, updateConfig } = useContext(ConfigContext)
   const [width, height] = dimensions
@@ -26,28 +26,9 @@ const Annotations = ({ xScale, yScale, xMax }) => {
   const prevDimensions = useRef(dimensions)
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
-  function invertScale(scale, value) {
-    const domain = scale.domain()
-    const range = scale.range()
-
-    // Find the index of the domain where the value falls
-    let index = 0
-    while (value > range[index + 1] && index < domain.length - 1) {
-      index++
-    }
-
-    // Calculate the interpolated value
-    const rangeDiff = range[index + 1] - range[index]
-    const domainDiff = domain[index + 1] - domain[index]
-    const ratio = (value - range[index]) / rangeDiff
-    const invertedValue = domain[index] + ratio * domainDiff
-
-    return invertedValue
-  }
 
   // Store the initial SVG dimensions and the initial relative position of the annotation
   // Store the initial SVG dimensions and the initial relative position of the annotation
-  const initialDimensions = useRef(dimensions)
   const initialRelativePositions = useRef(
     annotations.map(annotation => ({
       dx: annotation.dx / dimensions.width,
@@ -56,24 +37,36 @@ const Annotations = ({ xScale, yScale, xMax }) => {
   )
 
   useEffect(() => {
-    const threshold = 20
-    const widthChange = Math.abs(dimensions[0] - prevDimensions.current[0])
-    const heightChange = Math.abs(dimensions[1] - prevDimensions.current[1])
+    const threshold: number = 20
+    const widthChange: number = Math.abs(dimensions[0] - prevDimensions.current[0])
+    const heightChange: number = Math.abs(dimensions[1] - prevDimensions.current[1])
 
     // Only update if the dimensions have changed significantly
     if (widthChange > threshold || heightChange > threshold) {
-      const updatedAnnotations = annotations.map((annotation, index) => {
+      const updatedAnnotations: Annotation[] = annotations.map((annotation: Annotation, index: number) => {
         // Calculate new dx based on the initial relative position and the new dimensions
-        let newDx = prevDimensions.current[0] !== 0 ? (annotation.dx / prevDimensions.current[0]) * dimensions[0] : annotation.dx
+        let newDx: number
+
+        if (prevDimensions.current[0] !== 0) {
+          // If the previous width is not 0, scale the dx (label) value to the new width
+          const oldWidth: number = prevDimensions.current[0]
+          const newWidth: number = dimensions[0]
+          const oldDx: number = annotation.dx
+
+          newDx = (oldDx / oldWidth) * newWidth
+        } else {
+          // If the previous width is 0, use the current dx value
+          newDx = annotation.dx
+        }
 
         // If the initial relative dx position is less than config.yAxis.size, add a buffer to newDx
         if (initialRelativePositions.current[index].dx < config.yAxis.size) {
           // Calculate the buffer based on the new dimensions of the SVG
-          const annotationWidthBuffer = dimensions[0] * 0.1 // 10% of the SVG's width
-          newDx += config.yAxis.size + annotationWidthBuffer
+          const annotationWidthBuffer: number = dimensions[0] * 0.1 // 10% of the SVG's width
+          newDx += Number(config.yAxis.size) + annotationWidthBuffer + 200
         }
 
-        const newDy = prevDimensions.current[1] !== 0 ? (annotation.dy / prevDimensions.current[1]) * dimensions[1] : annotation.dy
+        const newDy: number = prevDimensions.current[1] !== 0 ? (annotation.dy / prevDimensions.current[1]) * dimensions[1] : annotation.dy
 
         return {
           ...annotation,
@@ -111,7 +104,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
             }}
           >
             {({ dragStart, dragEnd, dragMove, isDragging, x, y, dx, dy }) => {
-              console.log('annotation', annotation.dx)
+              console.log('MAAAATH', xScale(annotation.xKey) + annotation.dx < config.yAxis.size)
               return (
                 <>
                   <EditableAnnotation
@@ -166,7 +159,7 @@ const Annotations = ({ xScale, yScale, xMax }) => {
                     onTouchEnd={dragEnd}
                     anchorPosition={'auto'}
                   >
-                    <HtmlLabel width={200} className='annotation__desktop-label' anchorLineStroke={null} horizontalAnchor={handleConnectionHorizontalType(annotation)} verticalAnchor={handleConnectionVerticalType(annotation)}>
+                    <HtmlLabel width={200} className='annotation__desktop-label' showAnchorLine={false} horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)} verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}>
                       <div
                         style={{
                           borderRadius: 5, // Optional: set border radius
