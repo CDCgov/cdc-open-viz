@@ -414,7 +414,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFilters })
     if (state.config.filterBehavior !== FilterBehavior.Apply) {
       updateDataFilters(sharedFilters)
-      reloadURLData()
+      reloadURLData({ sharedFilters })
     }
     return sharedFilters
   }
