@@ -8,7 +8,7 @@ import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
-import { filterCircles, createStyles } from './helpers'
+import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 
 // types
@@ -63,6 +63,7 @@ const LineChart = (props: LineChartProps) => {
           const circleData = filterCircles(config.preliminaryData, rawData, seriesKey)
           // styles for preliminary Data  items
           let styles = createStyles({ preliminaryData: config.preliminaryData, data: tableData, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), strokeWidth: seriesData[0].weight || 2, handleLineType, lineType, seriesKey })
+          const suppressedSegments = createDataSegments(tableData, seriesKey, config.preliminaryData)
 
           let xPos = d => {
             return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
@@ -105,6 +106,7 @@ const LineChart = (props: LineChartProps) => {
                           mode='ALWAYS_SHOW_POINTS'
                           dataIndex={dataIndex}
                           circleData={circleData}
+                          tableData={tableData}
                           data={data}
                           d={d}
                           config={config}
@@ -124,6 +126,7 @@ const LineChart = (props: LineChartProps) => {
                       <LineChartCircle
                         mode='ISOLATED_POINTS'
                         dataIndex={dataIndex}
+                        tableData={tableData}
                         circleData={circleData}
                         data={data}
                         d={d}
@@ -146,6 +149,7 @@ const LineChart = (props: LineChartProps) => {
               <>
                 {lineDatapointStyle === 'hover' && (
                   <LineChartCircle
+                    tableData={tableData}
                     dataIndex={0}
                     mode='HOVER_POINTS'
                     circleData={circleData}
@@ -165,26 +169,38 @@ const LineChart = (props: LineChartProps) => {
               </>
               {/* SPLIT LINE */}
               {config?.preliminaryData?.some(pd => pd.value && pd.type) ? (
-                <SplitLinePath
-                  curve={allCurves[seriesData[0].lineType]}
-                  segments={(config.xAxis.type === 'date-time'
-                    ? data.sort((d1, d2) => {
-                        let x1 = getXAxisData(d1)
-                        let x2 = getXAxisData(d2)
-                        if (x1 < x2) return -1
-                        if (x2 < x1) return 1
-                        return 0
-                      })
-                    : data
-                  ).map(d => [d])}
-                  segmentation='x'
-                  x={d => xPos(d)}
-                  y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
-                  styles={styles}
-                  defined={(item, i) => {
-                    return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
-                  }}
-                />
+                <>
+                  <SplitLinePath
+                    curve={allCurves[seriesData[0].lineType]}
+                    segments={data.map(d => [d])}
+                    segmentation='x'
+                    x={d => xPos(d)}
+                    y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                    styles={styles}
+                    defined={(item, i) => {
+                      return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                    }}
+                  />
+
+                  {suppressedSegments.map((segment, index) => {
+                    return (
+                      <LinePath
+                        key={index}
+                        data={segment.data}
+                        x={d => xPos(d)}
+                        y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                        stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
+                        strokeWidth={seriesData[0].weight || 2}
+                        strokeOpacity={1}
+                        shapeRendering='geometricPrecision'
+                        strokeDasharray={handleLineType(segment.symbol)}
+                        defined={(item, i) => {
+                          return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                        }}
+                      />
+                    )
+                  })}
+                </>
               ) : (
                 <>
                   {/* STANDARD LINE */}

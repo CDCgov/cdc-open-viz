@@ -5,7 +5,6 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
-import { FaStar } from 'react-icons/fa'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 
 // third party
@@ -17,7 +16,7 @@ import createBarElement from '@cdc/core/components/createBarElement'
 
 export const BarChartHorizontal = () => {
   const { xScale, yScale, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getTextWidth, getYAxisData, getXAxisData } = useContext<ChartContext>(ConfigContext)
+  const { transformedData: data, tableData, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, setSharedFilter, isNumber, getTextWidth, getYAxisData, getXAxisData } = useContext<ChartContext>(ConfigContext)
   const {
     isHorizontal,
     barBorderWidth,
@@ -31,12 +30,10 @@ export const BarChartHorizontal = () => {
     lollipopShapeSize,
     getHighlightedBarColorByValue,
     getHighlightedBarByValue,
-    generateIconSize,
     getAdditionalColumn,
     hoveredBar,
     onMouseLeaveBar,
     onMouseOverBar,
-    getIcon,
     shouldSuppress
   } = useBarChart()
 
@@ -48,7 +45,7 @@ export const BarChartHorizontal = () => {
     config.orientation === 'horizontal' && (
       <Group>
         <BarGroup
-          data={data}
+          data={config.preliminaryData.some(pd => pd.value && pd.type === 'suppression') ? tableData : data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
           height={yMax}
           x0={d => d[config.runtime.originalXAxis.dataKey]}
@@ -75,14 +72,11 @@ export const BarChartHorizontal = () => {
                     numbericBarHeight = 25
                   }
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
-                  const barXBase = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
-                  const suppresedBarWidth = 5
+                  const suppresedBarWidth = config.xAxis.showSuppressedLine ? 4 : 0
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
                   let barWidth = shouldSuppress(bar) ? suppresedBarWidth : barWidthHorizontal
-
-                  const supprssedBarX = isPositiveBar ? xScale(0) : xScale(scaleVal) - suppresedBarWidth
-                  const barX = shouldSuppress(bar) ? supprssedBarX : barXBase
+                  const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
@@ -147,7 +141,7 @@ export const BarChartHorizontal = () => {
                   const getIconSize = synbol => {
                     let size = ''
                     if (synbol.includes('Asterisk')) {
-                      size = '30px'
+                      size = barHeight + 'px'
                     } else {
                       size = '20px'
                     }
@@ -155,7 +149,7 @@ export const BarChartHorizontal = () => {
                   }
 
                   const iconAngle = symbol => (symbol === 'Double Asterisks' ? 0 : 90)
-                  const iconPadding = symbol => (symbol === 'Asterisk' ? '3px' : symbol === 'Double Asterisks' ? '15px' : '12px')
+                  const iconPadding = symbol => (symbol === 'Asterisk' ? '3px' : symbol === 'Double Asterisks' ? barHeight / 1.4 + 'px' : '12px')
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -190,21 +184,22 @@ export const BarChartHorizontal = () => {
                           }
                         })}
                         {config.preliminaryData.map((pd, index) => {
-                          const isSuppressed = Number(pd.value) === Number(bar.value) && (!pd.column || pd.column === bar.key)
-                          if (!isSuppressed) {
+                          let isSuppressed = String(pd.value) === String(tableData[barGroup.index][bar.key]) && (!pd.column || pd.column === bar.key)
+                          if (!isSuppressed || barHeight < 10 || !config.xAxis.showSuppressedSymbol) {
                             return
                           }
                           return (
                             <Text // prettier-ignore
                               key={index}
+                              fontSize={getIconSize(pd.symbol)}
                               angle={iconAngle(pd.symbol)}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX}
                               y={config.barHeight / 2 + config.barHeight * bar.index}
-                              fill={labelColor}
+                              fill={'#000'}
                               dx={iconPadding(pd.symbol)}
-                              dy={pd.symbol === 'Double Asterisks' ? 10 : 0}
+                              dy={pd.symbol === 'Double Asterisks' ? barHeight / 2 : 0}
                               verticalAnchor='end'
                               textAnchor={'middle'}
                             >

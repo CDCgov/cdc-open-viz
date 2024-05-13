@@ -44,7 +44,6 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
   const fontSize = ['sm', 'xs', 'xxs'].includes(currentViewport) ? { fontSize: '11px' } : { fontSize: fontSizes[config.fontSize] }
   const fontSizeLabel = ['sm', 'xs', 'xxs'].includes(currentViewport) ? { fontSize: '13px' } : { fontSize: fontSizes[config.fontSize] }
-
   return (
     <aside ref={ref} style={legendClasses} id={skipId || 'legend'} className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
       {legend.label && <h3 style={fontSizeLabel}>{parse(legend.label)}</h3>}
@@ -155,9 +154,9 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                       {config?.preliminaryData?.map((pd, index) => {
                         return (
                           <>
-                            {pd.label && pd.type === 'effect' && (
+                            {pd.label && pd.type === 'effect' && pd.style && (
                               <div key={index} className='legend-preliminary'>
-                                <svg>{pd.style.includes('Dashed') ? <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.style)} /> : <circle r={6} strokeWidth={2} stroke={'#000'} cx={22} cy={10} fill='transparent' />}</svg>
+                                <span className={pd.symbol}>{pd.iconCode}</span>
                                 <p> {pd.label}</p>
                               </div>
                             )}
@@ -178,12 +177,9 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                             <>
                               {pd.displayLegend && pd.type === 'suppression' && (
                                 <div key={index} className={`legend-preliminary ${pd.symbol}`}>
-                                  {pd.symbol && pd.symbol.includes('Dashed') && config.visualizationType !== 'Bar' && (
-                                    <svg>
-                                      <Line from={{ x: 10, y: 10 }} to={{ x: 40, y: 10 }} stroke={'#000'} strokeWidth={2} strokeDasharray={handleLineType(pd.symbol)} />{' '}
-                                    </svg>
-                                  )}
-                                  {!pd.symbol.includes('Dashed') && <span className={pd.symbol}>{suppressionIcons[pd.symbol]}</span>}
+                                  <span style={{ wordBreak: 'keep-all' }} className={pd.symbol}>
+                                    {pd.iconCode}
+                                  </span>
                                   {pd.symbol && <p className={pd.type}>{pd.label}</p>}
                                 </div>
                               )}

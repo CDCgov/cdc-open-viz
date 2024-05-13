@@ -10,7 +10,7 @@ import Regions from './../../Regions'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import createBarElement from '@cdc/core/components/createBarElement'
 // third party
-import ReactTooltip from 'react-tooltip'
+
 import chroma from 'chroma-js'
 import BarChartContext, { type BarChartContextValues } from './context'
 
@@ -32,12 +32,11 @@ export const BarChartVertical = () => {
     onMouseLeaveBar,
     onMouseOverBar,
     section,
-    getIcon,
     shouldSuppress
   } = useBarChart()
 
   // prettier-ignore
-  const { colorScale, config, dashboardConfig, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, getTextWidth } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, dashboardConfig,tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, getTextWidth } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
   const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
@@ -48,7 +47,7 @@ export const BarChartVertical = () => {
     config.orientation === 'vertical' && (
       <Group>
         <BarGroup
-          data={data}
+          data={config.preliminaryData.some(pd => pd.value && pd.type === 'suppression') ? tableData : data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
           height={yMax}
           x0={d => {
@@ -74,8 +73,7 @@ export const BarChartVertical = () => {
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   let barHeightBase = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let barYBase = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
-                  const supprssedBarY = bar.value >= 0 && isNumber(bar.value) ? yScale(scaleVal) - suppresedBarHeight : yScale(0)
-                  const barY = shouldSuppress(bar) ? supprssedBarY : barYBase
+                  const barY = shouldSuppress(bar) ? yScale(scaleVal) - suppresedBarHeight : barYBase
 
                   let barGroupWidth = seriesScale.range()[1]
 
@@ -83,14 +81,12 @@ export const BarChartVertical = () => {
                   let barX = bar.x + (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) - (config.xAxis.type === 'date-time' ? barGroupWidth / 2 : 0)
                   setBarWidth(barWidth)
                   setTotalBarsInGroup(barGroup.bars.length)
-
-                  let yAxisValue = formatNumber(bar.value, 'left')
+                  let yAxisValue = formatNumber(/[a-zA-Z]/.test(String(bar.value)) ? '' : bar.value, 'left')
                   let xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
                   // tooltips
-                  let suppressedTooltipValue = config.preliminaryData.map(pd => pd.label)[index]
 
                   const additionalColTooltip = getAdditionalColumn(bar.key, data[barGroup.index][config.runtime.originalXAxis.dataKey])
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -159,15 +155,15 @@ export const BarChartVertical = () => {
                   const getIconSize = synbol => {
                     let size = 0
                     if (synbol.includes('Asterisk')) {
-                      size = barWidth / 1.5
+                      size = config.series.length > 1 ? barWidth : barWidth / 1.5
                     } else {
-                      size = barWidth / 2
+                      size = config.series.length > 1 ? barWidth : barWidth / 2
                     }
                     return size
                   }
 
                   const iconAngle = symbol => (symbol === 'Double Asterisks' ? 90 : 0)
-                  const iconPadding = symbol => (symbol === 'Asterisk' ? '7px' : symbol === 'Double Asterisks' ? '-18px' : -suppresedBarHeight * 3)
+                  const iconPadding = symbol => (symbol === 'Asterisk' ? '0' : symbol === 'Double Asterisks' ? -barWidth / 2 : -suppresedBarHeight * 3)
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -203,12 +199,12 @@ export const BarChartVertical = () => {
                           }
                         })}
                         {config.preliminaryData.map((pd, index) => {
-                          const isSuppressed = Number(pd.value) === Number(bar.value) && (!pd.column || pd.column === bar.key)
-                          const iconWidth = getTextWidth(pd.symbol, `normal ${20}px sans-serif`)
-                          const iconFits = 17 < barWidth
-                          if (!isSuppressed) {
+                          let isSuppressed = String(pd.value) === String(bar.value) && (!pd.column || pd.column === bar.key)
+
+                          if (!isSuppressed || barWidth < 10 || !config.xAxis.showSuppressedSymbol) {
                             return
                           }
+
                           return (
                             <Text // prettier-ignore
                               key={index}
@@ -310,25 +306,3 @@ export const BarChartVertical = () => {
   )
 }
 export default BarChartVertical
-
-// <g
-//                         transform={`translate(${barX + 5},${yMax - 5 - generateIconSize(barWidth)})`}
-//                         onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
-//                         onMouseLeave={onMouseLeaveBar}
-//                         opacity={transparentBar ? 0.2 : 1}
-//                         display={displayBar ? 'block' : 'none'}
-//                         data-tooltip-html={tooltip}
-//                         data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-//                         onClick={e => {
-//                           e.preventDefault()
-//                           if (setSharedFilter) {
-//                             bar[config.xAxis.dataKey] = xAxisValue
-//                             setSharedFilter(config.uid, bar)
-//                           }
-//                         }}
-//                       >
-//                         <foreignObject width='100' height='100' x={bar.x} y={-12}>
-//                           {/* {getIcon(bar, barWidth)} */}
-//                           &#182;
-//                         </foreignObject>
-//                       </g>

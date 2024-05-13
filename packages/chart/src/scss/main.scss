@@ -220,15 +220,16 @@
       display: flex;
       justify-items: center;
       align-items: center;
+      white-space: nowrap;
     }
     & > span {
-      font-size: 1.2em;
+      font-size: 1em;
       margin-right: 8px;
       max-height: 1px;
     }
     & > span[class*='Asterisk'] {
       transform: scale(1.8);
-      margin-top: 18px;
+      margin-top: 15px;
     }
     & > span[class*='Dagger'] {
       margin-top: 2px;

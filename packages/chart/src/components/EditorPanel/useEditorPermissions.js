@@ -305,7 +305,7 @@ export const useEditorPermissions = () => {
       return true
     }
 
-    if (visualizationType === 'Combo' && lineExist) {
+    if (visualizationType === 'Combo') {
       return true
     }
     return false

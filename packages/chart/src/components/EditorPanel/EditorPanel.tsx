@@ -60,7 +60,11 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
     'Double Daggers': '\u2021',
     'Section Sign': '\u00A7',
     Pilcrow: '\u00B6',
-    Hash: '\u0023'
+    Hash: '\u0023',
+    'Dashed Small': '\u002D \u002D \u002D',
+    'Dashed Medium': '\u2013 \u2013',
+    'Dashed Large': '\u2014 \u2013',
+    'Open Circles': '\u25EF'
   }
 
   const getStyleOptions = type => {
@@ -89,8 +93,8 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
   }
 
   let addColumn = () => {
-    const defaultLabel = config.visualizationType === 'Bar' ? 'Suppressed' : ''
-    const defaultType = config.visualizationType === 'Line' ? 'effect' : ''
+    const defaultLabel = 'Suppressed'
+    const defaultType = config.visualizationType === 'Line' ? 'effect' : 'suppression'
     let preliminaryData = config.preliminaryData ? [...config.preliminaryData] : []
     preliminaryData.push({ type: defaultType, seriesKey: '', label: defaultLabel, column: '', value: '', style: '', displayTooltip: true, displayLegend: true, displayTable: true, symbol: '', iconCode: '' })
     updateConfig({ ...config, preliminaryData })
@@ -104,7 +108,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
     }
 
     preliminaryData[i][fieldName] = value
-    if (fieldName === 'symbol') {
+    if (fieldName === 'symbol' || fieldName === 'style') {
       preliminaryData[i]['iconCode'] = suppressionIcons[value]
     }
     updateConfig({ ...config, preliminaryData })
@@ -126,7 +130,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
               >
                 Remove
               </button>
-              <Select value={type} initial={'Select'} fieldName='type' label='Type' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
+              <Select value={type} initial={config.visualizationType == 'Bar' ? '' : 'Select'} fieldName='type' label='Type' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
               {type === 'suppression' ? (
                 <>
                   <Select
@@ -2043,42 +2047,42 @@ const EditorPanel = () => {
                           {visSupportsDateCategoryAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
                           {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
                           {visSupportsDateCategoryAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
-                          <CheckBox
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>Selecting this option will display a "thin line" slightly above the Date/Category Axis to indicate "suppressed data" where "suppressed data" values are indicated in the Data Series.</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                            value={config.xAxis.showSuppressedLine}
-                            section='xAxis'
-                            fieldName='showSuppressedLine'
-                            label='Display  suppressed data line'
-                            updateField={updateField}
-                          />
-                          <CheckBox
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>Selecting this option will display "suppressed data symbol" on the Date/Category Axis where suppressed data values are indicated in the Data Series, unless a different symbol was chosen from the data series (e.g., suppression symbol) menu.</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                            value={config.xAxis.showSuppressedSymbol}
-                            section='xAxis'
-                            fieldName='showSuppressedSymbol'
-                            label='Display  suppressed data symbol'
-                            updateField={updateField}
-                          />
                         </>
                       )}
+                      <CheckBox
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Selecting this option will display a "thin line" slightly above the Date/Category Axis to indicate "suppressed data" where "suppressed data" values are indicated in the Data Series.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        value={config.xAxis.showSuppressedLine}
+                        section='xAxis'
+                        fieldName='showSuppressedLine'
+                        label='Display  suppressed data line'
+                        updateField={updateField}
+                      />
+                      <CheckBox
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Selecting this option will display "suppressed data symbol" on the Date/Category Axis where suppressed data values are indicated in the Data Series, unless a different symbol was chosen from the data series (e.g., suppression symbol) menu.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        value={config.xAxis.showSuppressedSymbol}
+                        section='xAxis'
+                        fieldName='showSuppressedSymbol'
+                        label='Display  suppressed data symbol'
+                        updateField={updateField}
+                      />
 
                       {config.series?.length === 1 && config.visualizationType === 'Bar' && (
                         <>

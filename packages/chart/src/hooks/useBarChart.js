@@ -165,30 +165,6 @@ export const useBarChart = () => {
     return match
   }
 
-  const suppressionIcons = {
-    Asterisk: '\u002A',
-    'Double Asterisks': '\u002A\u002A',
-    Dagger: '\u2020',
-    'Double Daggers': '\u2021',
-    'Section Sign': '\u00A7',
-    Pilcrow: '\u00B6',
-    Hash: '\u0023'
-  }
-
-  const getIcon = bar => {
-    let newIcon = null
-    let iconName = null
-    let suppressedSymbol = config.xAxis.showSuppressedSymbol
-
-    config.preliminaryData.forEach(pd => {
-      if (shouldSuppress(bar) && suppressedSymbol && pd.symbol) {
-        newIcon = suppressionIcons[pd.symbol]
-        iconName = pd.symbol
-      }
-    })
-    return [newIcon, iconName]
-  }
-
   const shouldSuppress = bar => {
     return config.preliminaryData?.some(pd => {
       const matchesColumn = pd.column ? pd.column === bar.key : true
@@ -241,7 +217,6 @@ export const useBarChart = () => {
     lollipopShapeSize,
     isLabelBelowBar,
     displayNumbersOnBar,
-    getIcon,
     shouldSuppress,
     section,
     isRounded,
@@ -261,7 +236,6 @@ export const useBarChart = () => {
     hoveredBar,
     setHoveredBar,
     onMouseOverBar,
-    onMouseLeaveBar,
-    suppressionIcons
+    onMouseLeaveBar
   }
 }

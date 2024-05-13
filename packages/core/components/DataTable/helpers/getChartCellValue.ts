@@ -53,11 +53,12 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
       cellValue = config.dataFormat ? formatNumber(runtimeData[row][column], resolvedAxis, false, config) : runtimeData[row][column]
     }
   }
+
   // suppress cell value
   config.preliminaryData.forEach(pd => {
-    const isSuppressed = Number(pd.value) === Number(labelValue) && (!pd.column || pd.column === column)
-    if (isSuppressed) {
-      cellValue = pd?.iconCode
+    const isSuppressed = String(pd.value) === String(labelValue) && (!pd.column || pd.column === column)
+    if (isSuppressed && pd.displayTable && pd.type === 'suppression') {
+      cellValue = pd.iconCode
     }
   })
 
