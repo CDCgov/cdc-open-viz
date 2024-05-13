@@ -43,4 +43,6 @@ export type Annotation = {
   dy: number
   // assigned series that the annotation should snap to
   seriesKey: string
+  // if the dragged item should be snapped to the nearest point
+  snapToNearestPoint: boolean
 }

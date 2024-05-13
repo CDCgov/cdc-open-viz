@@ -291,6 +291,23 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                         })}
                       </select>
                     </label>
+
+                    <label>
+                      Snap to Nearest Point
+                      <input
+                        type='checkbox'
+                        checked={config?.annotations[index]?.snapToNearestPoint}
+                        onClick={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].snapToNearestPoint = e.target.checked
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      />
+                    </label>
+
                     <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
                       Delete Annotation
                     </Button>
