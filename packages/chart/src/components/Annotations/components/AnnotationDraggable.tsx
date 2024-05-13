@@ -16,6 +16,7 @@ import { Annotation } from '@cdc/core/types/Annotation'
 
 // styles
 import './AnnotationDraggable.styles.css'
+import { a } from 'vitest/dist/suite-ghspeorC'
 
 const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   const [draggingItems, setDraggingItems] = useState([])
@@ -27,7 +28,6 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
 
-  // Store the initial SVG dimensions and the initial relative position of the annotation
   // Store the initial SVG dimensions and the initial relative position of the annotation
   const initialRelativePositions = useRef(
     annotations.map(annotation => ({
@@ -46,17 +46,21 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
       const updatedAnnotations: Annotation[] = annotations.map((annotation: Annotation, index: number) => {
         // Calculate new dx based on the initial relative position and the new dimensions
         let newDx: number
+        let newX: number
 
         if (prevDimensions.current[0] !== 0) {
           // If the previous width is not 0, scale the dx (label) value to the new width
           const oldWidth: number = prevDimensions.current[0]
           const newWidth: number = dimensions[0]
           const oldDx: number = annotation.dx
+          const oldX: number = annotation.x
 
           newDx = (oldDx / oldWidth) * newWidth
+          newX = (oldX / oldWidth) * newWidth
         } else {
           // If the previous width is 0, use the current dx value
           newDx = annotation.dx
+          newX = annotation.x
         }
 
         // If the initial relative dx position is less than config.yAxis.size, add a buffer to newDx
@@ -64,14 +68,18 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
           // Calculate the buffer based on the new dimensions of the SVG
           const annotationWidthBuffer: number = dimensions[0] * 0.1 // 10% of the SVG's width
           newDx += Number(config.yAxis.size) + annotationWidthBuffer + 200
+          newX += Number(config.yAxis.size) + annotationWidthBuffer + 200
         }
 
         const newDy: number = prevDimensions.current[1] !== 0 ? (annotation.dy / prevDimensions.current[1]) * dimensions[1] : annotation.dy
+        const newY: number = prevDimensions.current[1] !== 0 ? (annotation.y / prevDimensions.current[1]) * dimensions[1] : annotation.y
 
         return {
           ...annotation,
           dx: newDx,
-          dy: newDy
+          dy: newDy,
+          x: newX,
+          y: newY
         }
       })
 
@@ -84,6 +92,34 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
       prevDimensions.current = dimensions
     }
   }, [dimensions, annotations, updateConfig, config])
+
+  const handleMobileXPosition = annotation => {
+    if (annotation.snapToNearestPoint) {
+      return Number(annotation.dx) + xScale(annotation.xKey) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size)
+    }
+    return Number(annotation.x) + Number(annotation.dx)
+  }
+
+  const handleMobileYPosition = annotation => {
+    if (annotation.snapToNearestPoint) {
+      return yScale(annotation.yKey) + Number(annotation.dy)
+    }
+    return Number(annotation.dy) + Number(annotation.y) + config.xAxis.size
+  }
+
+  const handleTextX = annotation => {
+    if (annotation.snapToNearestPoint) {
+      return Number(annotation.dx) + Number(xScale(annotation.xKey)) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) - 16 / 3
+    }
+    return Number(annotation.dx) + Number(annotation.x) - 16 / 3
+  }
+
+  const handleTextY = annotation => {
+    if (annotation.snapToNearestPoint) {
+      return yScale(annotation.yKey) + Number(annotation.dy) + 5
+    }
+    return Number(annotation.y) + Number(annotation.dy) + 16 / 3
+  }
 
   return (
     annotations &&
@@ -104,16 +140,15 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
             }}
           >
             {({ dragStart, dragEnd, dragMove, isDragging, x, y, dx, dy }) => {
-              console.log('MAAAATH', xScale(annotation.xKey) + annotation.dx < config.yAxis.size)
               return (
                 <>
                   <EditableAnnotation
                     width={200}
                     height={height}
-                    dx={annotation.dx}
-                    dy={annotation.dy}
-                    x={config.xAxis.type !== 'date-time' ? applyBandScaleOffset(xScale(annotation.xKey), config, xScale) : annotation.xKey ? xScale(new Date(annotation.xKey)) + Number(config.yAxis.size) : 0}
-                    y={yScale(annotation.yKey) || y}
+                    dx={annotation.dx} // label position
+                    dy={annotation.dy} // label postion
+                    x={annotation.snapToNearestPoint ? (config.xAxis.type !== 'date-time' ? applyBandScaleOffset(xScale(annotation.xKey), config, xScale) : annotation.xKey ? xScale(new Date(annotation.xKey)) + Number(config.yAxis.size) : 0) : annotation.x}
+                    y={annotation.snapToNearestPoint ? yScale(annotation.yKey) : annotation.y}
                     canEditLabel={annotation.edit.label || false}
                     canEditSubject={annotation.edit.subject || false}
                     onDragEnd={props => {
@@ -135,8 +170,8 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                             ...annotation,
                             xKey: nearestDatum.x,
                             yKey: nearestDatum.y,
-                            x: xScale(nearestDatum.x) || 0,
-                            y: yScale(nearestDatum.y) || 0,
+                            x: annotation.snapToNearestPoint ? xScale(nearestDatum.x) : props.x,
+                            y: annotation.snapToNearestPoint ? yScale(nearestDatum.y) : props.y,
                             dx: props.dx,
                             dy: props.dy
                           }
@@ -180,19 +215,12 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
 
                     {/* MARKERS */}
                     {annotation.marker === 'circle' && <CircleSubject className='circle-subject' stroke={colorScale(annotation.seriesKey)} radius={8} />}
-                    {annotation.marker === 'arrow' && <MarkerArrow fill='black' id='marker-start' x={Number(xScale(annotation.xKey))} y={yScale(annotation.yKey)} stroke='#333' markerWidth={10} size={10} strokeWidth={1} orient='auto-start-reverse' />}
+                    {annotation.marker === 'arrow' && <MarkerArrow fill='black' id='marker-start' x={annotation.snapToNearestPoint ? Number(xScale(annotation.xKey)) : annotation.x} y={yScale(annotation.yKey)} stroke='#333' markerWidth={10} size={10} strokeWidth={1} orient='auto-start-reverse' />}
 
                     {/* Mobile Labels */}
-                    <circle
-                      fill='white'
-                      cx={Number(annotation.dx) + xScale(annotation.xKey) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size)}
-                      cy={yScale(annotation.yKey) + Number(annotation.dy)}
-                      r={16}
-                      className='annotation__mobile-label annotation__mobile-label-circle'
-                      stroke={colorScale(annotation.seriesKey)}
-                    />
+                    <circle fill='white' cx={handleMobileXPosition(annotation)} cy={handleMobileYPosition(annotation)} r={16} className='annotation__mobile-label annotation__mobile-label-circle' stroke={colorScale(annotation.seriesKey)} />
 
-                    <text x={Number(annotation.dx) + Number(xScale(annotation.xKey)) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) - 16 / 3} y={yScale(annotation.yKey) + Number(annotation.dy) + 5} className='annotation__mobile-label'>
+                    <text x={handleTextX(annotation)} y={handleTextY(annotation)} className='annotation__mobile-label'>
                       {index + 1}
                     </text>
 

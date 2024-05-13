@@ -12,8 +12,6 @@ export type Annotation = {
     tablet: boolean
     mobile: boolean
   }
-  // shap of marker/subject
-  markerType: 'arrow' | 'circle'
   connectorType: 'line'
   // visx curve type
   lineType: string
@@ -45,4 +43,10 @@ export type Annotation = {
   seriesKey: string
   // if the dragged item should be snapped to the nearest point
   snapToNearestPoint: boolean
+  // type of  connecting line from label to subject
+  connectionType: 'line' | 'curve' | 'elbow'
+  // marker type highlighting the subject
+  marker: 'arrow' | 'circle'
+  // should the item be snapped to the subject?
+  snapToSubject: boolean
 }
