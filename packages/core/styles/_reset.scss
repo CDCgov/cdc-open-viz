@@ -141,12 +141,6 @@
     top: -0.5em;
   }
 
-  header sup {
-    /* Allow line breaks using html in the header. */
-    top: initial;
-    line-height: initial;
-  }
-
   sub {
     /* Move the subscripted text down, but only
       half as far down as the superscript moved up */
