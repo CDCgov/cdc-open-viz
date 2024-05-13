@@ -1,0 +1,5 @@
+:is(ul) {
+  :is(li) {
+    list-style: none;
+  }
+}

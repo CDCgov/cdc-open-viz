@@ -1,3 +1,6 @@
+import Footnotes from '@cdc/core/types/Footnotes'
+import { Visualization } from '@cdc/core/types/Visualization'
+import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 import _ from 'lodash'
 
 export const formatConfigBeforeSave = configToStrip => {
@@ -24,6 +27,28 @@ export const formatConfigBeforeSave = configToStrip => {
         }
       })
     }
+
+    // strip any blank footnote visualizations
+    const footnoteIds: string[] = []
+
+    ;(strippedConfig as DashboardConfig).rows.forEach(row => {
+      if (row.footnotesId) {
+        const { dataKey, staticFootnotes } = strippedConfig.visualizations[row.footnotesId] as Footnotes
+        if (!dataKey && !staticFootnotes?.length) {
+          delete strippedConfig.visualizations[row.footnotesId]
+        } else {
+          footnoteIds.push(row.footnotesId)
+        }
+      }
+    })
+
+    Object.keys(strippedConfig.visualizations).forEach(vizKey => {
+      const viz: Visualization = strippedConfig.visualizations[vizKey]
+      if (viz.type === 'footnotes' && !footnoteIds.includes(vizKey)) {
+        // if footnote isn't being used by any rows, remove it
+        delete strippedConfig.visualizations[vizKey]
+      }
+    })
   } else {
     delete strippedConfig.runtime
     delete strippedConfig.formattedData

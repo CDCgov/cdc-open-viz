@@ -15,6 +15,9 @@ import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within } from '@storybook/testing-library'
 import ToggleExampleConfig from './_mock/toggle-example.json'
 import _ from 'lodash'
+import { footnotesSymbols } from '@cdc/core/components/Footnotes/footnoteSymbols'
+import FootnotesConfig from '@cdc/core/types/Footnotes'
+import { ConfigRow } from '../types/ConfigRow'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -89,8 +92,13 @@ countries.forEach((country, i) => {
   })
 })
 
+const footnoteData = countries.map((country, i) => {
+  return { Country: country, symbol: footnotesSymbols[i][0], text: faker.lorem.sentence() }
+})
+
 const multiVizData = {
-  'valid-world-data.json': { data }
+  'valid-world-data.json': { data },
+  'footnote-data.json': { data: footnoteData }
 }
 
 export const MultiVisualization: Story = {
@@ -103,6 +111,16 @@ export const MultiVisualization: Story = {
 export const MultiDashboard: Story = {
   args: {
     config: MultiDashboardConfig,
+    isEditor: false
+  }
+}
+
+const FNrows: ConfigRow[] = [{ ...MultiVizConfig.rows[0], footnotesId: 'footnote123' }]
+const footnoteConfig: Partial<FootnotesConfig> = { dataKey: 'footnote-data.json', dynamicFootnotes: { symbolColumn: 'symbol', textColumn: 'text' }, staticFootnotes: [{ symbol: '**', text: 'This is a static Footnote' }] }
+const FNViz = { ...MultiVizConfig.visualizations, footnote123: footnoteConfig }
+export const Footnotes: Story = {
+  args: {
+    config: { ...MultiVizConfig, datasets: multiVizData, rows: FNrows, visualizations: FNViz },
     isEditor: false
   }
 }

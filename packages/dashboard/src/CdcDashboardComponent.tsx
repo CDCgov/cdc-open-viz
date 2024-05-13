@@ -21,7 +21,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
 
 import CdcMap from '@cdc/map'
-import CdcChart from '@cdc/chart'
+import CdcChart from '../../chart/src/CdcChart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
@@ -62,6 +62,7 @@ import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import Layout from '@cdc/core/components/Layout'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -574,6 +575,14 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Table' />
                 <DataTableStandAlone visualizationKey={visualizationKey} config={visualizationConfig} isEditor={true} updateConfig={_updateConfig} />
+              </>
+            )
+            break
+          case 'footnotes':
+            body = (
+              <>
+                <Header visualizationKey={visualizationKey} subEditor='Footnotes' />
+                <FootnotesStandAlone visualizationKey={visualizationKey} config={{ ...visualizationConfig, datasets: state.config.datasets }} isEditor={true} updateConfig={_updateConfig} />
               </>
             )
             break

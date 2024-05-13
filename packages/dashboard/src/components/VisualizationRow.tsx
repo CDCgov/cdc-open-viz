@@ -15,6 +15,7 @@ import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 
 type VizRowProps = {
   filteredDataOverride?: Object[]
@@ -39,18 +40,34 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
     if (!vals.length) return true
     return vals.some(val => val === undefined)
   }, [rawData])
+
   const GoButton = ({ autoLoad }: { autoLoad?: boolean }) => {
     if (config.filterBehavior === FilterBehavior.Apply && !autoLoad) {
       return <button onClick={applyFilters}>GO!</button>
     }
     return null
   }
+
+  const footnotesConfig = useMemo(() => {
+    if (row.footnotesId) {
+      const footnoteConfig = getVizConfig(row.footnotesId, null, config, rawData, dashboardFilteredData)
+      if (row.multiVizColumn && filteredDataOverride) {
+        const vizCategory = filteredDataOverride[0][row.multiVizColumn]
+        const categoryFootnote = footnoteConfig.data.filter(d => d[row.multiVizColumn] === vizCategory)
+        footnoteConfig.data = categoryFootnote
+        footnoteConfig.formattedData = categoryFootnote
+      }
+      return footnoteConfig
+    }
+    return null
+  }, [config, row, rawData, dashboardFilteredData])
+
   return (
-    <div className={`dashboard-row ${row.equalHeight ? 'equal-height' : ''} ${row.toggle ? 'toggle' : ''}`} key={`row__${index}`}>
+    <div className={`row mb-5 ${row.equalHeight ? 'equal-height' : ''} ${row.toggle ? 'toggle' : ''}`} key={`row__${index}`}>
       {row.toggle && <Toggle row={row} visualizations={config.visualizations} active={show.indexOf(true)} setToggled={setToggled} />}
       {row.columns.map((col, colIndex) => {
         if (col.width) {
-          if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`dashboard-col dashboard-col-${col.width}`}></div>
+          if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col-${col.width}`}></div>
 
           const visualizationConfig = getVizConfig(col.widget, index, config, rawData, dashboardFilteredData)
           if (filteredDataOverride) {
@@ -72,7 +89,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
           return (
             <React.Fragment key={`vis__${index}__${colIndex}`}>
-              <div className={`dashboard-col dashboard-col-${col.width} ${!shouldShow ? 'hidden-toggle' : ''}`}>
+              <div className={`col-${col.width} ${!shouldShow ? 'd-none' : ''}`}>
                 {visualizationConfig.type === 'chart' && (
                   <CdcChart
                     key={col.widget}
@@ -170,12 +187,14 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                     viewport={currentViewport}
                   />
                 )}
+                {visualizationConfig.type === 'footnotes' && <FootnotesStandAlone key={col.widget} visualizationKey={col.widget} config={visualizationConfig} viewport={currentViewport} />}
               </div>
             </React.Fragment>
           )
         }
         return <React.Fragment key={`vis__${index}__${colIndex}`}></React.Fragment>
       })}
+      {row.footnotesId ? <FootnotesStandAlone isEditor={false} visualizationKey={row.footnotesId} config={footnotesConfig} viewport={currentViewport} /> : null}
     </div>
   )
 }
