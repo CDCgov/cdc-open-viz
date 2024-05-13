@@ -59,8 +59,9 @@ const generateMedia = (state, type, elementToCapture) => {
 
   switch (type) {
     case 'image':
-      html2canvas(baseSvg).then(canvas => {
-        saveImageAs(canvas.toDataURL(), filename + '.png')
+      html2canvas(baseSvg, {ignoreElements: el => el.className?.indexOf && el.className.search(/download-buttons|download-links|data-table-container/) !== -1}).then(canvas => {
+        document.body.appendChild(canvas);
+        //saveImageAs(canvas.toDataURL(), filename + '.png')
       })
       return
     case 'pdf':
