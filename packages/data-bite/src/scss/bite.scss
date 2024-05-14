@@ -69,16 +69,16 @@
 // TODO after v2 refactor remove header reference colors
 // Use .font-color/.bg-color, etc. in color definitions or something similar
 // Remove box shadows if we're no longer using them
-.sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) {
+.sidebar + .data-bite-content {
   margin: 3em auto 0;
   max-width: 35em;
 }
 
-.sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) {
-  background-color: white;
-}
+// .sidebar + .data-bite-content {
+//   background-color: white;
+// }
 
-.cove-component__content {
+.data-bite-content {
   // Visual: Shadow
   &.shadow {
     box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
@@ -116,14 +116,14 @@
   }
 
   // General: Compact View
-  &.bite--isCompactStyle .bite .cove-component__content .bite-content {
+  &.bite--isCompactStyle .bite .bite-content-container .bite-content {
     align-items: center;
     p.bite-text {
       margin-bottom: 0;
     }
   }
 
-  &.bite--isCompactStyle .bite .cove-component__content {
+  &.bite--isCompactStyle .bite .bite-content-container {
     align-items: center;
   }
 
@@ -234,7 +234,7 @@
       border-radius: 0.3em;
     }
 
-    .cove-component__content {
+    .bite-content-container {
       display: flex;
       padding: 1em !important;
       justify-content: space-between;
@@ -283,13 +283,13 @@
         width: 33%;
         margin-left: 1.5em;
       }
-      .cove-component__content {
+      .bite-content-container {
         flex-direction: row-reverse;
       }
     }
 
     &.bite-top {
-      .cove-component__content {
+      .bite-content-container {
         flex-direction: column;
 
         .bite-image {
@@ -308,7 +308,7 @@
     }
 
     &.bite-bottom {
-      .cove-component__content {
+      .bite-content-container {
         flex-direction: column;
 
         .bite-image {
@@ -327,7 +327,7 @@
     }
 
     &.bite-back {
-      .cove-component__content {
+      .bite-content-container {
         .bite-image {
           border-radius: 0 0 0.3em 0.3em;
           position: absolute;
@@ -339,14 +339,14 @@
     }
 
     // General: Compact View
-    &.bite--isCompactStyle .bite .cove-component__content .bite-content {
+    &.bite--isCompactStyle .bite .bite-content-container .bite-content {
       align-items: center;
       p.bite-text {
         margin-bottom: 0;
       }
     }
 
-    &.bite--isCompactStyle .bite .cove-component__content {
+    &.bite--isCompactStyle .bite .bite-content-container {
       align-items: center;
     }
 
@@ -356,7 +356,7 @@
   }
 }
 
-.cove-component__content {
+.bite-content-container {
   background: $lightestGray;
 
   &:not(.no-borders) {

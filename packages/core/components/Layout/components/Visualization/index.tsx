@@ -47,6 +47,13 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
       }
     }
 
+    if (config.type === 'filtered-text') {
+      classes.push('cdc-open-viz-module', 'type-filtered-text', currentViewport, config.theme, `font-${config.fontSize}`)
+      if (isEditor) {
+        classes.push('is-editor')
+      }
+    }
+
     if (config.type === 'markup-include') {
       classes.push('markup-include', 'cdc-open-viz-module')
     }

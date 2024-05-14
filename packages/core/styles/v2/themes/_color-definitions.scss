@@ -76,6 +76,7 @@ $theme: (
 .markup-include,
 .type-waffle-chart,
 .type-data-bite,
+.type-filtered-text,
 .cdc-open-viz-module.type-chart.type-sparkline,
 .cove {
   @each $theme-name, $theme-colors in $theme {
@@ -89,7 +90,8 @@ $theme: (
 
     &.theme-#{$theme-name} {
       /// area that appears underneath the title of the component.
-      .cove-component__content {
+      .cove-component__content,
+      .bite-content-container {
         /// when there are borders on a component
         &:not(.no-borders) {
           /// borders are the theme color
