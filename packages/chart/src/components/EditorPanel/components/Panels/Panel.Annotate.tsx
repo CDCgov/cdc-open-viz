@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useContext, FC } from 'react'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { type PanelProps } from './../PanelProps'
@@ -7,9 +7,20 @@ import ConfigContext from '../../../../ConfigContext.js'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 import './../panels.scss'
+import { s } from 'vitest/dist/reporters-1evA5lom'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
-  const { updateConfig, config, unfilteredData, dimensions } = useContext(ConfigContext)
+  const { updateConfig, config, unfilteredData, dimensions, svgRef } = useContext(ConfigContext)
+
+  const [svgDims, setSvgDims] = useState([0, 0])
+
+  useEffect(() => {
+    const svgSelection = document.querySelector('div.chart-container > div > svg')?.getBoundingClientRect()
+    const svgWidth = svgSelection?.width
+    const svgHeight = svgSelection?.height
+
+    setSvgDims([svgWidth, svgHeight])
+  }, [])
 
   const getColumns = (filter = true) => {
     let columns = {}
@@ -74,8 +85,8 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         label: true
       },
       seriesKey: config?.series?.[0]?.dataKey || '',
-      x: 0 + Number(config.xAxis.size),
-      y: 0,
+      x: Number(svgDims?.[0]) / 2,
+      y: Number(svgDims?.[1] / 2),
       xKey: config.xAxis.type === 'date' ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime() : config.xAxis.type === 'categorical' ? '1/15/2016' : '',
       yKey: '',
       dx: 0,

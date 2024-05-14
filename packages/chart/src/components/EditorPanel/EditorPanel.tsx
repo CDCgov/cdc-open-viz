@@ -109,6 +109,7 @@ const DataSuppression = memo(({ config, updateConfig, data }: any) => {
     </>
   )
 })
+
 const PreliminaryData = memo(({ config, updateConfig, data }) => {
   const getColumnOptions = () => {
     const keys = new Set()
