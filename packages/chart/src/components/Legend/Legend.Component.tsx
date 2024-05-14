@@ -167,7 +167,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                   </>
                 )}
                 {!config.legend.hideSuppressedLabels &&
-                  config?.preliminaryData?.some(pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && pd?.symbol) &&
+                  config?.preliminaryData?.some(pd => pd.label && pd.displayLegend && pd.type === 'suppression' && pd.value && (pd?.style || pd.symbol)) &&
                   ((config.visualizationType === 'Bar' && config.visualizationSubType === 'regular') || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && (
                     <>
                       <hr></hr>
@@ -178,9 +178,9 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                               {pd.displayLegend && pd.type === 'suppression' && (
                                 <div key={index} className={`legend-preliminary ${pd.symbol}`}>
                                   <span style={{ wordBreak: 'keep-all' }} className={pd.symbol}>
-                                    {pd.iconCode}
+                                    {pd.iconCode || pd.lineCode}
                                   </span>
-                                  {pd.symbol && <p className={pd.type}>{pd.label}</p>}
+                                  {(pd.symbol || pd.style) && <p className={pd.type}>{pd.label}</p>}
                                 </div>
                               )}
                             </>

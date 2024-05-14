@@ -193,7 +193,7 @@ const LineChart = (props: LineChartProps) => {
                         strokeWidth={seriesData[0].weight || 2}
                         strokeOpacity={1}
                         shapeRendering='geometricPrecision'
-                        strokeDasharray={handleLineType(segment.symbol)}
+                        strokeDasharray={handleLineType(segment.style)}
                         defined={(item, i) => {
                           return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
                         }}

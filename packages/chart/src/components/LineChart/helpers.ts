@@ -59,13 +59,13 @@ const isCalculable = value => !isNaN(parseFloat(value)) && isFinite(value)
 const handleFirstIndex = (data, seriesKey, preliminaryData) => {
   let result = {
     data: [],
-    symbol: ''
+    style: ''
   }
   let lastAddedIndex = -1
 
   data.forEach((item, index) => {
     preliminaryData.forEach(pd => {
-      if (index === 0 && pd.type == 'suppression' && pd.value === item[seriesKey] && (!pd.column || pd.column === seriesKey) && pd.symbol) {
+      if (index === 0 && pd.type == 'suppression' && pd.value === item[seriesKey] && (!pd.column || pd.column === seriesKey) && pd.style) {
         const modifiedItem = { ...item, [seriesKey]: 0 } // Modify first item
         result.data.push(modifiedItem)
         lastAddedIndex = index
@@ -79,7 +79,7 @@ const handleFirstIndex = (data, seriesKey, preliminaryData) => {
           result.data.push(data[nextIndex])
           lastAddedIndex = nextIndex
         }
-        result.symbol = pd.symbol
+        result.style = pd.style
       }
     })
   })
@@ -89,11 +89,11 @@ const handleFirstIndex = (data, seriesKey, preliminaryData) => {
 const handleLastIndex = (data, seriesKey, preliminaryData) => {
   let result = {
     data: [],
-    symbol: ''
+    style: ''
   }
   let lastAddedIndex = -1 // Tracks the last index added to the result
   preliminaryData.forEach(pd => {
-    if (data[data.length - 1][seriesKey] === pd.value && pd.symbol && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression') {
+    if (data[data.length - 1][seriesKey] === pd.value && pd.style && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression') {
       const lastIndex = data.length - 1
       let modifiedItem = { ...data[lastIndex], [seriesKey]: 0 }
       result.data.push(modifiedItem)
@@ -108,7 +108,7 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
         lastAddedIndex = prevIndex
       }
     }
-    result.symbol = pd.symbol
+    result.style = pd.style
   })
 
   return result
@@ -133,12 +133,12 @@ const findPreviousCalculableIndex = (data, startIndex, seriesKey) => {
 const handleMiddleIndices = (data, seriesKey, preliminaryData) => {
   let middleSegments = {
     data: [],
-    symbol: ''
+    style: ''
   }
 
   data.forEach((item, index) => {
     preliminaryData.forEach(pd => {
-      if (item[seriesKey] === pd.value && index !== 0 && index !== data.length - 1 && pd.symbol && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression') {
+      if (item[seriesKey] === pd.value && index !== 0 && index !== data.length - 1 && pd.style && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression') {
         let prevIndex = findPreviousCalculableIndex(data, index, seriesKey)
         let nextIndex = findNextCalculableIndex(data, index, seriesKey)
 
@@ -147,7 +147,7 @@ const handleMiddleIndices = (data, seriesKey, preliminaryData) => {
           middleSegments.data.push(data[nextIndex])
         }
       }
-      middleSegments.symbol = pd.symbol
+      middleSegments.style = pd.style
     })
   })
   return middleSegments

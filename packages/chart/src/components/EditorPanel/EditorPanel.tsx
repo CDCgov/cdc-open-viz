@@ -53,14 +53,24 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
       return ['suppression']
     }
   }
-  const suppressionIcons = {
+
+  const isCombo = config.visualizationType === 'Combo'
+  const lineExist = config.runtime.lineSeriesKeys?.length > 0
+  const barExist = config.runtime.barSeriesKeys?.length > 0
+  const exr = isCombo && lineExist ? true : false
+  const exrx = isCombo && barExist ? true : false
+
+  const symbolsCodes = {
     Asterisk: '\u002A',
     'Double Asterisks': '\u002A\u002A',
     Dagger: '\u2020',
     'Double Daggers': '\u2021',
     'Section Sign': '\u00A7',
     Pilcrow: '\u00B6',
-    Hash: '\u0023',
+    Hash: '\u0023'
+  }
+
+  const lineCodes = {
     'Dashed Small': '\u002D \u002D \u002D',
     'Dashed Medium': '\u2013 \u2013',
     'Dashed Large': '\u2014 \u2013',
@@ -68,14 +78,17 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
   }
 
   const getStyleOptions = type => {
-    if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
+    if (config.visualizationType === 'Line' || isCombo) {
       if (type === 'suppression') {
         return ['Dashed Small', 'Dashed Medium', 'Dashed Large']
       } else {
         return ['Dashed Small', 'Dashed Medium', 'Dashed Large', 'Open Circles']
       }
     }
-    if (config.visualizationType === 'Bar') {
+  }
+
+  const getSymbolOptions = () => {
+    if (config.visualizationType === 'Bar' || (isCombo && barExist)) {
       return ['Asterisk', 'Double Asterisks', 'Dagger', 'Double Daggers', 'Section Sign', 'Pilcrow', 'Hash']
     }
   }
@@ -108,8 +121,11 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
     }
 
     preliminaryData[i][fieldName] = value
-    if (fieldName === 'symbol' || fieldName === 'style') {
-      preliminaryData[i]['iconCode'] = suppressionIcons[value]
+    if (fieldName === 'symbol') {
+      preliminaryData[i]['iconCode'] = symbolsCodes[value]
+    }
+    if (fieldName === 'style') {
+      preliminaryData[i]['lineCode'] = lineCodes[value]
     }
     updateConfig({ ...config, preliminaryData })
   }
@@ -152,24 +168,48 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
                     options={config.runtime?.seriesKeys}
                   />
                   <TextField value={value} fieldName='value' label='Suppressed Data  Value' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
-                  <Select
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                    value={symbol}
-                    initial='Select'
-                    fieldName='symbol'
-                    label='suppression symbol'
-                    updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
-                    options={getStyleOptions(type)}
-                  />
+                  {(exr || config.visualizationType === 'Line') && (
+                    <Select
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                      value={style}
+                      initial='Select'
+                      fieldName='style'
+                      label={config.visualizationType === 'Combo' ? 'suppression line symbol' : 'suppression symbol'}
+                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                      options={getStyleOptions(type)}
+                    />
+                  )}
+
+                  {(exrx || config.visualizationType === 'Bar') && (
+                    <Select
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                      value={symbol}
+                      initial='Select'
+                      fieldName='symbol'
+                      label={config.visualizationType === 'Combo' ? 'suppression bar symbol' : 'suppression symbol'}
+                      updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
+                      options={getSymbolOptions()}
+                    />
+                  )}
+
                   <TextField
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>

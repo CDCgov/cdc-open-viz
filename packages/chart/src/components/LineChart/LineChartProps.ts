@@ -28,6 +28,7 @@ export interface PreliminaryDataItem {
   displayLegend: boolean
   displayTable: boolean
   iconCode: string
+  lineCode: string
 }
 
 export interface DataItem {
