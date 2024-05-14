@@ -154,7 +154,7 @@ export const BarChartVertical = () => {
                     if (dashboardConfig && dashboardConfig.dashboard.sharedFilters?.length !== 0) {
                       const { sharedFilters } = dashboardConfig.dashboard
 
-                      _barColor = sharedFilters?.map(_sharedFilter => {
+                      _barColor = sharedFilters.map(_sharedFilter => {
                         if (_sharedFilter.setBy === config.uid) {
                           // If the current filter is the reset filter item.
                           if (_sharedFilter.resetLabel === _sharedFilter.active) return colorScale(config.runtime.seriesLabels[bar.key])
@@ -166,8 +166,6 @@ export const BarChartVertical = () => {
                           return colorScale(config.runtime.seriesLabels[bar.key])
                         }
                       })[0]
-
-                      if (!sharedFilters) _barColor = barColor
 
                       if (isRegularLollipopColor) _barColor = barColor
                       if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
