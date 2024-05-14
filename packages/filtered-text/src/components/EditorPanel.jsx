@@ -12,6 +12,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
+import Layout from '@cdc/core/components/Layout'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 
@@ -233,7 +234,7 @@ const EditorPanel = memo(props => {
           </ul>
         </label>
 
-        <div className='cove-accordion__panel-section checkbox-group'>
+        <div className='cove-accordion__panel-section checkbox-group filtered-text-inputs'>
           <InputCheckbox inline size='small' value={config.visual.border} section='visual' fieldName='border' label='Display Border' updateField={updateField} />
           <InputCheckbox inline size='small' value={config.visual.borderColorTheme} section='visual' fieldName='borderColorTheme' label='Use theme border color' updateField={updateField} />
           <InputCheckbox size='small' value={config.visual.accent} section='visual' fieldName='accent' label='Use Accent Style' updateField={updateField} />
@@ -248,20 +249,13 @@ const EditorPanel = memo(props => {
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <div className='cove-editor'>
+      <>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
         {config.newViz && showConfigConfirm && <Confirm />}
-        <button className={`cove-editor--toggle` + (!displayPanel ? ` collapsed` : ``)} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
-        <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
-          <div className='cove-editor__panel-container'>
-            <h2 className='cove-editor__heading'>Configure Filtered Text</h2>
-            <section className='cove-editor__content'>{editorContent}</section>
-          </div>
-        </section>
-        <div className='cove-editor__content'>
-          <div className='cove-editor__content-wrap'>{props.children}</div>
-        </div>
-      </div>
+        <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Filtered Text'>
+          {editorContent}
+        </Layout.Sidebar>
+      </>
     </ErrorBoundary>
   )
 })
