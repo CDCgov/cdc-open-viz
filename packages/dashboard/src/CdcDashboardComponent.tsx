@@ -316,13 +316,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   useEffect(() => {
-    if (state.tabSelected && state.tabSelected !== 'Dashboard Preview') return
+    if (isEditor && !isPreview) return
     const { config } = state
     if (config.filterBehavior !== FilterBehavior.Apply) {
       reloadURLData()
     }
     loadAPIFilters()
-  }, [state.tabSelected])
+  }, [isEditor, isPreview])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     const config = _.cloneDeep(state.config)
@@ -414,7 +414,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFilters })
     if (state.config.filterBehavior !== FilterBehavior.Apply) {
       updateDataFilters(sharedFilters)
-      reloadURLData()
+      reloadURLData({ sharedFilters })
     }
     return sharedFilters
   }
