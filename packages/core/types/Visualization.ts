@@ -36,7 +36,6 @@ export type Visualization = ConfigureData & {
   type: BaseVisualizationType
   uid: string // this is the actual key of the visualization object
   usesSharedFilter: any
-  visual: {}
   visualizationSubType: string
   visualizationType: string
   xAxis: Axis

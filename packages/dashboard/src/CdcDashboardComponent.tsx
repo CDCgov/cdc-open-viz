@@ -24,7 +24,7 @@ import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
-import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
+import CdcMarkupInclude from '@cdc/markup-include/'
 import CdcFilteredText from '@cdc/filtered-text'
 
 import Grid from './components/Grid'
@@ -685,18 +685,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                     })
                   } else {
                     return (
-                      <VisualizationRow
-                        key={`row__${index}`}
-                        isPreview={isPreview}
-                        row={row}
-                        rowIndex={index}
-                        setSharedFilter={setSharedFilter}
-                        updateChildConfig={updateChildConfig}
-                        applyFilters={applyFilters}
-                        apiFilterDropdowns={apiFilterDropdowns}
-                        handleOnChange={handleOnChange}
-                        currentViewport={currentViewport}
-                      />
+                      <VisualizationRow key={`row__${index}`} row={row} rowIndex={index} setSharedFilter={setSharedFilter} updateChildConfig={updateChildConfig} applyFilters={applyFilters} apiFilterDropdowns={apiFilterDropdowns} handleOnChange={handleOnChange} currentViewport={currentViewport} />
                     )
                   }
                 })}
