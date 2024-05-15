@@ -17,47 +17,41 @@ type Story = StoryObj<typeof CdcMarkupInclude>
 export const Primary: Story = {
   args: {
     config: primary,
-    isEditor: false,
-    showEditorPanel: true
+    isEditor: false
   }
 }
 
 export const No_Conditions: Story = {
   args: {
     config: noConditions,
-    isEditor: false,
-    showEditorPanel: true
+    isEditor: false
   }
 }
 
 export const With_conditions: Story = {
   args: {
     config: withConditions,
-    isEditor: false,
-    showEditorPanel: true
+    isEditor: false
   }
 }
 
 export const Button_and_text: Story = {
   args: {
     config: buttonAndText,
-    isEditor: true,
-    showEditorPanel: true
+    isEditor: false
   }
 }
 
 export const icon_no_text: Story = {
   args: {
     config: iconNoText,
-    isEditor: true,
-    showEditorPanel: true
+    isEditor: false
   }
 }
 export const image_with_text: Story = {
   args: {
     config: imageWithText,
-    isEditor: true,
-    showEditorPanel: true
+    isEditor: false
   }
 }
 

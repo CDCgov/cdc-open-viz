@@ -1,12 +1,9 @@
 {
-  "contentEditor": {
-    "inlineHTML": "<div>{{state}} does have a rate 130 compared to the over all rate of {{overall-rate}}</div>",
-    "markupVariables": [],
-    "showHeader": false,
-    "srcUrl": "https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Markup-Include-Button-and-Text.html",
-    "title": "",
-    "useInlineHTML": true
-  },
+  "title": "",
+  "showHeader": false,
+  "type": "markup-include",
+  "srcUrl": "https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Markup-Include-Button-and-Text.html",
+  "theme": "theme-blue",
   "data": [
     {
       "Race": "Hispanic or Latino",
@@ -29,16 +26,6 @@
       "Age-adjusted rate": "183.6"
     }
   ],
-  "legend": {},
-  "newViz": true,
-  "theme": "theme-amber",
-  "type": "markup-include",
-  "runtime": null,
-  "visual": {
-    "border": false,
-    "accent": true,
-    "background": true,
-    "hideBackgroundColor": false,
-    "borderColorTheme": false
-  }
+  "dataFileName": "valid-data-chart.csv",
+  "dataFileSourceType": "file"
 }

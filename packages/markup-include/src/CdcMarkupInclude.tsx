@@ -45,7 +45,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
   const { contentEditor, theme } = config
   const data = configObj.data
 
-  const { inlineHTML, markupVariables, showHeader, srcUrl, title, useInlineHTML } = contentEditor
+  const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML } = contentEditor
 
   // Default Functions
   const updateConfig = newConfig => {
@@ -216,34 +216,25 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
   let content = <Loading />
 
   if (loading === false) {
-    let body = (
-      <Layout.Responsive isEditor={isEditor}>
-        <div className='markup-include-content-container cove-component__content'>
-          <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-            <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
-            <div className={`${innerContainerClasses.join(' ')}`}>
-              <div className={`cove-component__content-wrap${useInlineHTML ? '' : ' hide'}`}>
-                <Markup content={convertVariablesInMarkup(inlineHTML)} />
-              </div>
-              <div className={`cove-component__content-wrap${useInlineHTML ? ' hide' : ''}`}>
-                {!markupError && urlMarkup && <Markup allowElements content={parseBodyMarkup(urlMarkup)} />}
-                {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+    content = (
+      <>
+        {isEditor && <EditorPanel />}
+        <Layout.Responsive isEditor={isEditor}>
+          <div className='markup-include-content-container cove-component__content'>
+            <div className={`markup-include-component ${contentClasses.join(' ')}`}>
+              <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
+              <div className={`${innerContainerClasses.join(' ')}`}>
+                <div className={`cove-component__content-wrap${useInlineHTML ? '' : ' hide'}`}>
+                  <Markup content={convertVariablesInMarkup(inlineHTML)} />
+                </div>
+                <div className={`cove-component__content-wrap${useInlineHTML ? ' hide' : ''}`}>
+                  {!markupError && urlMarkup && <Markup allowElements content={parseBodyMarkup(urlMarkup)} />}
+                  {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </Layout.Responsive>
-    )
-
-    content = (
-      <>
-        {isEditor && (
-          <>
-            <EditorPanel />
-            {body}
-          </>
-        )}
-        {!isEditor && body}
+        </Layout.Responsive>
       </>
     )
   }
@@ -263,7 +254,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
     <ErrorBoundary component='CdcMarkupInclude'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={container} showEditorPanel={config?.showEditorPanel}>
+        <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
           {content}
         </Layout.VisualizationWrapper>
       </ConfigContext.Provider>
