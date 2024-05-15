@@ -238,6 +238,38 @@ const useScales = (properties: useScaleProps) => {
 
 export default useScales
 
+export const getTickValues = (xAxisDataMapped, xScale, num) => {
+  const xDomain = xScale.domain();
+
+  if(xScale.type === 'time'){
+    const xDomainMax = xAxisDataMapped[xAxisDataMapped.length - 1];
+    const xDomainMin = xAxisDataMapped[0];
+    const step = (xDomainMax - xDomainMin) / (num - 1);
+    const tickValues = [];
+    for(let i = xDomainMax; i >= xDomainMin; i -= step){
+      tickValues.push(i);
+    }
+    if(tickValues[tickValues.length - 1] !== xDomainMin){
+      tickValues.push(xDomainMin);
+    }
+    tickValues.reverse();
+    
+    return tickValues;
+  }
+
+  if(xDomain.length > 2){
+    const step = num || 1;
+    const tickValues = [];
+    for(let i = xDomain.length; i > 0; i -= step){
+      const adjustedIndex = Math.max(Math.round(i) - 1, 0);
+      tickValues.push(xDomain[adjustedIndex]);
+    }
+    tickValues.reverse();
+
+    return tickValues;
+  }
+}
+
 /// helper functions
 const composeXScale = ({ min, max, xMax, config }) => {
   // Adjust min value if using logarithmic scale

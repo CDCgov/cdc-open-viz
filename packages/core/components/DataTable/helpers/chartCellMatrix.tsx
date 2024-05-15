@@ -15,7 +15,8 @@ type ChartRowsProps = DataTableProps & {
   hasRowType?: boolean
 }
 
-const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorScale, groupBy, hasRowType }: ChartRowsProps): CellMatrix | GroupCellMatrix => {
+const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorScale, hasRowType, viewport }: ChartRowsProps): CellMatrix | GroupCellMatrix => {
+  const groupBy = config.table?.groupBy
   const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
 
   const dataSeriesColumnsSorted = () => {
@@ -79,7 +80,7 @@ const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorSc
         config.visualizationType !== 'Pie'
           ? [
               <>
-                {colorScale && colorScale(seriesName) && <LegendCircle fill={colorScale(seriesName)} />}
+                {colorScale && colorScale(seriesName) && <LegendCircle viewport={viewport} fill={colorScale(seriesName)} />}
                 {seriesName}
               </>
             ]

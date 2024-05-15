@@ -8,30 +8,57 @@ import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryString
 // Third Party
 import PropTypes from 'prop-types'
 
+export const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar']
+
+export const filterOrderOptions = [
+  {
+    label: 'Ascending Alphanumeric',
+    value: 'asc'
+  },
+  {
+    label: 'Descending Alphanumeric',
+    value: 'desc'
+  },
+  {
+    label: 'Custom',
+    value: 'cust'
+  }
+]
+
+export const handleSorting = singleFilter => {
+  const { order } = singleFilter
+
+  const sortAsc = (a, b) => {
+    return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
+  }
+
+  const sortDesc = (a, b) => {
+    return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+  }
+
+  if (!order || order === '') {
+    singleFilter.order = 'asc'
+  }
+
+  if (order === 'desc') {
+    singleFilter.values = singleFilter.values.sort(sortDesc)
+  }
+
+  if (order === 'asc') {
+    singleFilter.values = singleFilter.values.sort(sortAsc)
+  }
+  return singleFilter
+}
+
+const hasStandardFilterBehavior = ['chart', 'table']
+
 export const useFilters = props => {
   const [showApplyButton, setShowApplyButton] = useState(false)
 
   // Desconstructing: notice, adding more descriptive visualizationConfig name over config
   // visualizationConfig feels more robust for all vis types so that its not confused with config/state/etc.
   const { config: visualizationConfig, setConfig, filteredData, setFilteredData, excludedData, filterData } = props
-  const { type, filterBehavior, filters } = visualizationConfig
-
-  const filterStyleOptions = ['dropdown', 'pill', 'tab', 'tab bar']
-
-  const filterOrderOptions = [
-    {
-      label: 'Ascending Alphanumeric',
-      value: 'asc'
-    },
-    {
-      label: 'Descending Alphanumeric',
-      value: 'desc'
-    },
-    {
-      label: 'Custom',
-      value: 'cust'
-    }
-  ]
+  const { type } = visualizationConfig
 
   /**
    * Re-orders a filter based on two indices and updates the runtime filters array and filters state
@@ -51,7 +78,7 @@ export const useFilters = props => {
     const [movedItem] = updatedValues.splice(idx1, 1)
     updatedValues.splice(idx2, 0, movedItem)
 
-    const filtersCopy = visualizationConfig.type === 'chart' ? [...visualizationConfig.filters] : [...filteredData]
+    const filtersCopy = hasStandardFilterBehavior.includes(visualizationConfig.type) ? [...visualizationConfig.filters] : [...filteredData]
     const filterItem = { ...filtersCopy[filterIndex] }
 
     // Overwrite filterItem.values since thats what we map through in the editor panel
@@ -99,7 +126,7 @@ export const useFilters = props => {
     }
 
     // If we're on a chart and not using the apply button
-    if (visualizationConfig.type === 'chart' && visualizationConfig.filterBehavior === 'Filter Change') {
+    if (hasStandardFilterBehavior.includes(visualizationConfig.type) && visualizationConfig.filterBehavior === 'Filter Change') {
       setFilteredData(filterData(newFilters, excludedData))
     }
   }
@@ -127,7 +154,7 @@ export const useFilters = props => {
       setFilteredData(newFilters, excludedData)
     }
 
-    if (type === 'chart') {
+    if (hasStandardFilterBehavior.includes(visualizationConfig.type)) {
       setFilteredData(filterData(newFilters, excludedData))
     }
 
@@ -159,31 +186,6 @@ export const useFilters = props => {
     resetText: 'Reset All',
     introText: `Make a selection from the filters to change the visualization information.`,
     applyText: 'Select the apply button to update the visualization information.'
-  }
-
-  const handleSorting = singleFilter => {
-    const { order } = singleFilter
-
-    const sortAsc = (a, b) => {
-      return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
-    }
-
-    const sortDesc = (a, b) => {
-      return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
-    }
-
-    if (!order || order === '') {
-      singleFilter.order = 'asc'
-    }
-
-    if (order === 'desc') {
-      singleFilter.values = singleFilter.values.sort(sortDesc)
-    }
-
-    if (order === 'asc') {
-      singleFilter.values = singleFilter.values.sort(sortAsc)
-    }
-    return singleFilter
   }
 
   // prettier-ignore
@@ -239,16 +241,17 @@ const Filters = props => {
   const Filters = props => props.children
 
   const filterSectionClassList = ['filters-section', type === 'map' ? general.headerColor : visualizationConfig?.visualizationType === 'Spark Line' ? null : theme]
-
   // Exterior Section Wrapper
   Filters.Section = props => {
     return (
-      <section className={filterSectionClassList.join(' ')}>
-        <p className='filters-section__intro-text'>
-          {filterConstants.introText} {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
-        </p>
-        <div className='filters-section__wrapper'>{props.children}</div>
-      </section>
+      visualizationConfig?.filters && (
+        <section className={filterSectionClassList.join(' ')}>
+          <p className='filters-section__intro-text'>
+            {filters?.some(f => f.active) ? filterConstants.introText : ''} {visualizationConfig.filterBehavior === 'Apply Button' && filterConstants.applyText}
+          </p>
+          <div className='filters-section__wrapper'>{props.children}</div>
+        </section>
+      )
     )
   }
 

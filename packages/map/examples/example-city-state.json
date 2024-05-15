@@ -8,7 +8,7 @@
     "showSidebar": true,
     "showTitle": true,
     "showDownloadButton": true,
-    "expandDataTable": true,
+    "expandDataTable": false,
     "backgroundColor": "#f5f5f5",
     "geoBorderColor": "darkGray",
     "territoriesLabel": "Territories",
@@ -31,7 +31,8 @@
     "showDownloadImgButton": false,
     "showDownloadPdfButton": false,
     "territoriesAlwaysShow": false,
-    "geoLabelOverride": ""
+    "geoLabelOverride": "",
+    "convertFipsCodes": true
   },
   "type": "map",
   "color": "yelloworangered",
@@ -97,20 +98,29 @@
     "dynamicDescription": false,
     "descriptions": {},
     "singleRow": false,
-    "showSpecialClassesLast": false
+    "showSpecialClassesLast": false,
+    "verticalSorted": false
   },
-  "dataTable": {
-    "title": "Data Table",
-    "forceDisplay": true
-  },
+  "filters": [],
   "table": {
     "showDownloadUrl": false,
-    "showDataTableLink": true
+    "showDataTableLink": true,
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": ""
   },
   "tooltips": {
     "appearanceType": "hover",
     "linkLabel": "Learn More",
-    "capitalizeLabels": true
+    "capitalizeLabels": true,
+    "opacity": 90
   },
   "runtime": {
     "editorErrorMessage": []
@@ -121,17 +131,40 @@
     "maxBubbleSize": 20,
     "extraBubbleBorder": false,
     "showBubbleZeros": false,
-    "geoCodeCircleSize": 2
+    "geoCodeCircleSize": 2,
+    "cityStyleLabel": "",
+    "additionalCityStyles": []
   },
   "mapPosition": {
-    "coordinates": [
-      0,
-      30
-    ],
+    "coordinates": [0, 30],
     "zoom": 1
   },
   "map": {
-    "layers": []
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "dataTable": {
+    "title": "Data Table",
+    "forceDisplay": true
   },
   "sharing": {
     "enabled": false,
@@ -807,5 +840,6 @@
       "URL": "https://www.cdc.gov/"
     }
   ],
-  "filterStyle": "Filter Changes"
+  "filterStyle": "Filter Changes",
+  "version": "4.24.3"
 }

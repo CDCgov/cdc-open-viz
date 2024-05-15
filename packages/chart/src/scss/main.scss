@@ -149,13 +149,18 @@
     h3 {
       font-size: 1.3rem;
       @include breakpoint(xs) {
-        font-size: $font-small + 0.2em;
+        font-size: $font-small + 0.4em;
       }
     }
 
     h3,
     p {
       margin-bottom: 0.8em;
+    }
+    p {
+      @include breakpoint(xs) {
+        font-size: $font-small;
+      }
     }
     & div.legend-item {
       margin-bottom: 0.5em !important;
@@ -619,7 +624,7 @@
   }
 }
 
-.cdc-open-viz-module .cdc-chart-inner-container {
+.cdc-open-viz-module .is-editor .cdc-chart-inner-container {
   overflow: hidden;
   background-color: var(--white);
 }

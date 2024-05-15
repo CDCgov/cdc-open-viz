@@ -28,7 +28,7 @@ import Regions from './Regions'
 import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
-import useScales from '../hooks/useScales'
+import useScales, { getTickValues }  from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
@@ -377,6 +377,7 @@ const LinearChart = props => {
               stroke='#333'
               numTicks={countNumOfTicks('xAxis')}
               tickStroke='#333'
+              tickValues={config.xAxis.manual ? getTickValues(xAxisDataMapped, xScale, config.xAxis.type === 'date-time' ? countNumOfTicks('xAxis') : config.xAxis.manualStep) : undefined}
             >
               {props => {
                 const axisCenter = config.visualizationType !== 'Forest Plot' ? (props.axisToPoint.x - props.axisFromPoint.x) / 2 : dimensions[0] / 2

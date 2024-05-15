@@ -1,3 +1,3 @@
-import WorldMap from './components/WorldMap'
+import WorldMap from './WorldMap'
 
 export default WorldMap
