@@ -19,7 +19,6 @@ export const BarChartVertical = () => {
 
   const [barWidth, setBarWidth] = useState(0)
   const [totalBarsInGroup, setTotalBarsInGroup] = useState(0)
-
   // prettier-ignore
   const {
     assignColorsToValues,
@@ -39,15 +38,20 @@ export const BarChartVertical = () => {
   const { colorScale, config, dashboardConfig,tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, getTextWidth } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
-  const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
-
+  let data = transformedData
+  if (config.preliminaryData.some(pd => pd.value && pd.type === 'suppression')) {
+    data = tableData
+  }
+  if (config.brush.active && config.brush.data?.length) {
+    data = config.brush.data
+  }
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
     config.orientation === 'vertical' && (
       <Group>
         <BarGroup
-          data={config.preliminaryData.some(pd => pd.value && pd.type === 'suppression') ? tableData : data}
+          data={data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
           height={yMax}
           x0={d => {
@@ -155,15 +159,14 @@ export const BarChartVertical = () => {
                   const getIconSize = synbol => {
                     let size = 0
                     if (synbol.includes('Asterisk')) {
-                      size = config.series.length > 1 ? barWidth : barWidth / 1.5
+                      size = barWidth / 1.5
                     } else {
-                      size = config.series.length > 1 ? barWidth : barWidth / 2
+                      size = barWidth / 2.3
                     }
                     return size
                   }
 
-                  const iconAngle = symbol => (symbol === 'Double Asterisks' ? 90 : 0)
-                  const iconPadding = symbol => (symbol === 'Asterisk' ? '0' : symbol === 'Double Asterisks' ? -barWidth / 2 : -suppresedBarHeight * 3)
+                  const iconPadding = symbol => (symbol === 'Asterisk' ? '0' : symbol === 'Double Asterisks' ? 2 : -suppresedBarHeight * 3)
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -208,9 +211,7 @@ export const BarChartVertical = () => {
                           return (
                             <Text // prettier-ignore
                               key={index}
-                              angle={Number(iconAngle(pd.symbol))}
                               dy={iconPadding(pd.symbol)}
-                              dx={pd.symbol === 'Double Asterisks' ? -barWidth / 2 : 0}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX + barWidth / 2}

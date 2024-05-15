@@ -38,6 +38,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
     marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${isBottomOrSmallViewport ? config.dynamicMarginTop + 15 : 0}px`
   }
+  console.log(config.preliminaryData)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
@@ -172,20 +173,47 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                     <>
                       <hr></hr>
                       <div className={config.legend.singleRow && isBottomOrSmallViewport ? 'legend-container__inner bottom single-row' : ''}>
-                        {config?.preliminaryData?.map((pd, index) => {
-                          return (
-                            <>
-                              {pd.displayLegend && pd.type === 'suppression' && (
-                                <div key={index} className={`legend-preliminary ${pd.symbol}`}>
-                                  <span style={{ wordBreak: 'keep-all' }} className={pd.symbol}>
-                                    {pd.iconCode || pd.lineCode}
-                                  </span>
-                                  {(pd.symbol || pd.style) && <p className={pd.type}>{pd.label}</p>}
-                                </div>
-                              )}
-                            </>
-                          )
-                        })}
+                        {config?.preliminaryData?.map(
+                          (pd, index) =>
+                            pd.displayLegend &&
+                            pd.type === 'suppression' && (
+                              <>
+                                {config.visualizationType === 'Bar' && (
+                                  <>
+                                    <div key={index + 'Bar'} className={`legend-preliminary ${pd.symbol}`}>
+                                      <span className={pd.symbol}>{pd.iconCode}</span>
+                                      <p className={pd.type}>{pd.label}</p>
+                                    </div>
+                                  </>
+                                )}
+                                {config.visualizationType === 'Line' && (
+                                  <>
+                                    <div key={index + 'Line'} className={`legend-preliminary `}>
+                                      <span>{pd.lineCode}</span>
+                                      <p className={pd.type}>{pd.label}</p>
+                                    </div>
+                                  </>
+                                )}
+                                {config.visualizationType === 'Combo' && (
+                                  <>
+                                    {pd.symbol && pd.iconCode && (
+                                      <div key={index + 'Combo'} className={`legend-preliminary ${pd.symbol}`}>
+                                        <span className={pd.symbol}>{pd.iconCode}</span>
+                                        <p className={pd.type}>{pd.label}</p>
+                                      </div>
+                                    )}
+
+                                    {pd.style && pd.lineCode && (
+                                      <div key={index + 'Combo'} className='legend-preliminary'>
+                                        <span>{pd.lineCode}</span>
+                                        <p>{pd.label}</p>
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </>
+                            )
+                        )}
                       </div>
                     </>
                   )}

@@ -14,10 +14,11 @@ interface Props {
   yMax: number
 }
 const ZoomBrush: FC<Props> = props => {
-  const { transformedData: data, config, parseDate, formatDate, updateConfig } = useContext(ConfigContext)
+  const { tableData, config, parseDate, formatDate, updateConfig } = useContext(ConfigContext)
   const { fontSize } = useBarChart()
 
-  const [filteredData, setFilteredData] = useState([...data])
+  const [filteredData, setFilteredData] = useState([...tableData])
+  const [brushKey, setBrushKey] = useState(0)
   const brushRef = useRef(null)
   const radius = 15
 
@@ -48,7 +49,7 @@ const ZoomBrush: FC<Props> = props => {
 
     const dataKey = config.xAxis?.dataKey
 
-    const filteredData = data.filter(item => xValues.includes(item[dataKey]))
+    const filteredData = tableData.filter(item => xValues.includes(item[dataKey]))
 
     const endValue = xValues
       .slice()
@@ -82,8 +83,12 @@ const ZoomBrush: FC<Props> = props => {
   //reset filters  if brush is off
   useEffect(() => {
     if (!config.brush.active) {
-      setFilteredData(data)
+      setFilteredData(tableData)
     }
+  }, [config.brush.active])
+
+  useEffect(() => {
+    setBrushKey(prevKey => prevKey + 1)
   }, [config.brush.active])
 
   const calculateTop = (): number => {
@@ -127,6 +132,7 @@ const ZoomBrush: FC<Props> = props => {
     <Group display={config.brush.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
       <rect fill='#eee' width={props.xMax} height={config.brush.height} rx={radius} />
       <Brush
+        key={brushKey}
         renderBrushHandle={props => <BrushHandle textProps={textProps} fontSize={fontSize[config.fontSize]} {...props} isBrushing={brushRef.current?.state.isBrushing} />}
         innerRef={brushRef}
         useWindowMoveEvents={true}

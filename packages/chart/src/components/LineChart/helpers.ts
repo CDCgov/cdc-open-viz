@@ -41,17 +41,15 @@ export const createStyles = (props: StyleProps): Style[] => {
 export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: DataItem[], seriesKey: string): DataItem[] => {
   // Filter and map preliminaryData to get circlesFiltered
   const circlesFiltered = preliminaryData.filter(item => item.style === 'Open Circles' && item.type === 'effect').map(item => ({ column: item.column, value: item.value, seriesKey: item.seriesKey }))
-
   let filteredData: DataItem[] = []
-
   // Process data to find matching items
   data.forEach(item => {
-    if (circlesFiltered.some(d => item[d.column] === d.value && d.seriesKey === seriesKey)) {
-      // Add current item
-      filteredData.push(item)
-    }
+    circlesFiltered.forEach(fc => {
+      if (item[fc.column] === fc.value && fc.seriesKey === seriesKey) {
+        filteredData.push(item)
+      }
+    })
   })
-
   return filteredData
 }
 
@@ -107,62 +105,48 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
         result.data.push(data[prevIndex])
         lastAddedIndex = prevIndex
       }
+      result.style = pd.style
     }
-    result.style = pd.style
   })
 
   return result
 }
 
-const findNextCalculableIndex = (data, startIndex, seriesKey) => {
-  let nextIndex = startIndex + 1
-  while (nextIndex < data.length && !isCalculable(data[nextIndex][seriesKey])) {
-    nextIndex++
-  }
-  return nextIndex < data.length ? nextIndex : -1
-}
-
-const findPreviousCalculableIndex = (data, startIndex, seriesKey) => {
-  let prevIndex = startIndex - 1
-  while (prevIndex >= 0 && !isCalculable(data[prevIndex][seriesKey])) {
-    prevIndex--
-  }
-  return prevIndex >= 0 ? prevIndex : -1
-}
-
 const handleMiddleIndices = (data, seriesKey, preliminaryData) => {
-  let middleSegments = {
+  let result = {
     data: [],
     style: ''
   }
-
   data.forEach((item, index) => {
     preliminaryData.forEach(pd => {
-      if (item[seriesKey] === pd.value && index !== 0 && index !== data.length - 1 && pd.style && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression') {
-        let prevIndex = findPreviousCalculableIndex(data, index, seriesKey)
-        let nextIndex = findNextCalculableIndex(data, index, seriesKey)
-
-        if (prevIndex !== -1 && nextIndex !== -1) {
-          middleSegments.data.push(data[prevIndex])
-          middleSegments.data.push(data[nextIndex])
+      if (item[seriesKey] === pd.value) {
+        // Find the previous calculable point
+        let prevIndex = index - 1
+        if (prevIndex >= 0 && data[prevIndex][seriesKey] !== pd.value) {
+          result.data.push(data[prevIndex])
         }
+
+        // Find the next calculable point
+        let nextIndex = index + 1
+        if (nextIndex < data.length && data[nextIndex][seriesKey] !== pd.value) {
+          result.data.push(data[nextIndex])
+        }
+        result.style = pd.style
       }
-      middleSegments.style = pd.style
     })
   })
-  return middleSegments
+
+  return result
 }
 
 // create segments (array of arrays) for building suppressed Lines
 export const createDataSegments = (data, seriesKey, preliminaryData) => {
   // Process the first index if necessary
   let firstSegment = handleFirstIndex(data, seriesKey, preliminaryData)
-
   // Process the last index if necessary
   let lastSegment = handleLastIndex(data, seriesKey, preliminaryData)
   // Process the middle segment
   let middleSegments = handleMiddleIndices(data, seriesKey, preliminaryData)
-
   // Combine all segments into a single array
-  return [firstSegment, middleSegments, lastSegment]
+  return [firstSegment, middleSegments, lastSegment].filter(segment => segment.data.length > 0)
 }

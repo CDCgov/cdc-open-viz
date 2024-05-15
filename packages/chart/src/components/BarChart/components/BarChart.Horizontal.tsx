@@ -148,8 +148,7 @@ export const BarChartHorizontal = () => {
                     return size
                   }
 
-                  const iconAngle = symbol => (symbol === 'Double Asterisks' ? 0 : 90)
-                  const iconPadding = symbol => (symbol === 'Asterisk' ? '3px' : symbol === 'Double Asterisks' ? barHeight / 1.4 + 'px' : '12px')
+                  const iconPadding = symbol => (symbol === 'Asterisk' ? '3px' : symbol === 'Double Asterisks' ? '4px' : '12px')
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -192,14 +191,13 @@ export const BarChartHorizontal = () => {
                             <Text // prettier-ignore
                               key={index}
                               fontSize={getIconSize(pd.symbol)}
-                              angle={iconAngle(pd.symbol)}
+                              angle={90}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX}
                               y={config.barHeight / 2 + config.barHeight * bar.index}
                               fill={'#000'}
                               dx={iconPadding(pd.symbol)}
-                              dy={pd.symbol === 'Double Asterisks' ? barHeight / 2 : 0}
                               verticalAnchor='end'
                               textAnchor={'middle'}
                             >

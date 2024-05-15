@@ -91,6 +91,7 @@ type AllChartsConfig = {
   barThickness: number
   boxplot: BoxPlot
   brush: {
+    data: object[]
     active: boolean
     height: number
   }

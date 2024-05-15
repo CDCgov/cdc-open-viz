@@ -149,19 +149,13 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   if (config.visualizationType === 'Line') {
     const isMinValid = config.useLogScale ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
-    // update minValue for Suppression points
-
+    // update minValue for (0) Suppression points
     const suppressedMinValue = tableData?.some((d, index) => {
-      let res = false
-      config.preliminaryData.forEach(pd => {
-        if (pd.type === 'suppression' && d[pd.column] === pd.value && (index === 0 || index === data.length - 1) && pd.symbol) {
-          res = true
-        }
-        if (pd.type === 'suppression' && pd.column === '' && Object.values(d).includes(pd.value) && pd.symbol) {
-          res = true
-        }
+      return config.preliminaryData.some(pd => {
+        if (pd.type !== 'suppression' || !pd.style) return false
+        const valueMatch = pd.column ? d[pd.column] === pd.value : Object.values(d).includes(pd.value)
+        return valueMatch && (index === 0 || index === data.length - 1)
       })
-      return res
     })
     min = enteredMinValue && isMinValid ? enteredMinValue : suppressedMinValue ? 0 : minValue
   }
