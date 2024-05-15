@@ -180,6 +180,7 @@
   },
   "brush": {
     "height": 25,
+    "active": true,
     "data": [
       {
         "Date": "1/15/2016",
@@ -253,8 +254,7 @@
         "Data 4": "150",
         "Monthly-Goal": "140"
       }
-    ],
-    "active": true
+    ]
   },
   "exclusions": {
     "active": false,
@@ -512,7 +512,7 @@
       "Monthly-Goal": "140"
     }
   ],
-  "visualizationType": "Line",
+  "visualizationType": "Bar",
   "filters": [],
   "validated": 4.23,
   "dynamicMarginTop": 0,

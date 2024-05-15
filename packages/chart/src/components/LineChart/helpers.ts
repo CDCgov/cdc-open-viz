@@ -4,10 +4,10 @@ export const createStyles = (props: StyleProps): Style[] => {
   const { preliminaryData, data, stroke, strokeWidth, handleLineType, lineType, seriesKey } = props
 
   const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(pd => pd.seriesKey && pd.column && pd.value && pd.style)
-  const validSuppressedData: PreliminaryDataItem[] = preliminaryData.filter(pd => pd.type === 'suppression' && pd.value && pd.symbol)
+  const validSuppressedData: PreliminaryDataItem[] = preliminaryData.filter(pd => pd.type === 'suppression' && pd.value && pd.style)
   const getMatchingPd = (point: DataItem): PreliminaryDataItem => validPreliminaryData.find(pd => pd.seriesKey === seriesKey && point[pd.column] === pd.value && pd.type === 'effect' && pd.style !== 'Open Circles')
   const getMatchingSp = (point: DataItem): PreliminaryDataItem => validSuppressedData.find(pd => point[seriesKey] === pd.value && (!pd.column || pd.column === seriesKey))
-  let styles: Style[] = []
+  const styles: Style[] = []
   const createStyle = (lineStyle): Style => ({
     stroke: stroke,
     strokeWidth: strokeWidth,
@@ -15,19 +15,19 @@ export const createStyles = (props: StyleProps): Style[] => {
   })
 
   data.forEach((d, index) => {
-    let matchingPd: PreliminaryDataItem = getMatchingPd(d)
-    let matchingSp: PreliminaryDataItem = getMatchingSp(d)
+    const matchingPd: PreliminaryDataItem = getMatchingPd(d)
+    const matchingSp: PreliminaryDataItem = getMatchingSp(d)
 
-    let style: Style = matchingPd ? createStyle(handleLineType(matchingPd.style)) : createStyle(handleLineType(lineType))
-    let styleX: Style = matchingSp ? createStyle(handleLineType(matchingSp.symbol)) : createStyle(handleLineType(lineType))
+    const style: Style = matchingPd ? createStyle(handleLineType(matchingPd.style)) : createStyle(handleLineType(lineType))
+    const styleX: Style = matchingSp ? createStyle(handleLineType(matchingSp.style)) : createStyle(handleLineType(lineType))
     if (matchingPd) {
       styles.push(style)
     } else {
       styles.push(styleX)
     }
     // If matchingSP exists, update the previous style if there is a previous element
-    if (matchingSp && index > 0 && matchingSp.symbol) {
-      styles[index - 1] = createStyle(handleLineType(matchingSp.symbol))
+    if (matchingSp && index > 0 && matchingSp.style) {
+      styles[index - 1] = createStyle(handleLineType(matchingSp.style))
     }
 
     // If matchingPd exists, update the previous style if there is a previous element
@@ -41,7 +41,7 @@ export const createStyles = (props: StyleProps): Style[] => {
 export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: DataItem[], seriesKey: string): DataItem[] => {
   // Filter and map preliminaryData to get circlesFiltered
   const circlesFiltered = preliminaryData.filter(item => item.style === 'Open Circles' && item.type === 'effect').map(item => ({ column: item.column, value: item.value, seriesKey: item.seriesKey }))
-  let filteredData: DataItem[] = []
+  const filteredData: DataItem[] = []
   // Process data to find matching items
   data.forEach(item => {
     circlesFiltered.forEach(fc => {
@@ -55,7 +55,7 @@ export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: Data
 
 const isCalculable = value => !isNaN(parseFloat(value)) && isFinite(value)
 const handleFirstIndex = (data, seriesKey, preliminaryData) => {
-  let result = {
+  const result = {
     data: [],
     style: ''
   }
@@ -85,7 +85,7 @@ const handleFirstIndex = (data, seriesKey, preliminaryData) => {
 }
 
 const handleLastIndex = (data, seriesKey, preliminaryData) => {
-  let result = {
+  const result = {
     data: [],
     style: ''
   }
@@ -93,7 +93,7 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
   preliminaryData.forEach(pd => {
     if (data[data.length - 1][seriesKey] === pd.value && pd.style && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression') {
       const lastIndex = data.length - 1
-      let modifiedItem = { ...data[lastIndex], [seriesKey]: 0 }
+      const modifiedItem = { ...data[lastIndex], [seriesKey]: 0 }
       result.data.push(modifiedItem)
 
       // Find previous calculable item
@@ -113,7 +113,7 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
 }
 
 const handleMiddleIndices = (data, seriesKey, preliminaryData) => {
-  let result = {
+  const result = {
     data: [],
     style: ''
   }
@@ -121,13 +121,13 @@ const handleMiddleIndices = (data, seriesKey, preliminaryData) => {
     preliminaryData.forEach(pd => {
       if (item[seriesKey] === pd.value) {
         // Find the previous calculable point
-        let prevIndex = index - 1
+        const prevIndex = index - 1
         if (prevIndex >= 0 && data[prevIndex][seriesKey] !== pd.value) {
           result.data.push(data[prevIndex])
         }
 
         // Find the next calculable point
-        let nextIndex = index + 1
+        const nextIndex = index + 1
         if (nextIndex < data.length && data[nextIndex][seriesKey] !== pd.value) {
           result.data.push(data[nextIndex])
         }
@@ -142,11 +142,11 @@ const handleMiddleIndices = (data, seriesKey, preliminaryData) => {
 // create segments (array of arrays) for building suppressed Lines
 export const createDataSegments = (data, seriesKey, preliminaryData) => {
   // Process the first index if necessary
-  let firstSegment = handleFirstIndex(data, seriesKey, preliminaryData)
+  const firstSegment = handleFirstIndex(data, seriesKey, preliminaryData)
   // Process the last index if necessary
-  let lastSegment = handleLastIndex(data, seriesKey, preliminaryData)
+  const lastSegment = handleLastIndex(data, seriesKey, preliminaryData)
   // Process the middle segment
-  let middleSegments = handleMiddleIndices(data, seriesKey, preliminaryData)
+  const middleSegments = handleMiddleIndices(data, seriesKey, preliminaryData)
   // Combine all segments into a single array
   return [firstSegment, middleSegments, lastSegment].filter(segment => segment.data.length > 0)
 }
