@@ -144,14 +144,10 @@ export const useTooltip = props => {
             ?.filter(Boolean)
             ?.flatMap(seriesKey => {
               let formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
-              config.preliminaryData?.forEach(pd => {
-                let val = resolvedScaleValues[0]?.[seriesKey]
-                if (pd.label && pd.type === 'suppression' && pd.displayTooltip) {
-                  if (val === pd.value && (!pd.column || seriesKey === pd.column)) {
-                    formattedValue = pd.label
-                  }
-                }
-              })
+              const suppressed = config.preliminaryData?.find(pd => pd.label && pd.type === 'suppression' && pd.displayTooltip && resolvedScaleValues[0]?.[seriesKey] === pd.value && (!pd.column || seriesKey === pd.column))
+              if (suppressed) {
+                formattedValue = suppressed.label
+              }
               return resolvedScaleValues?.[0]?.[seriesKey] ? [[seriesKey, formattedValue, getAxisPosition(seriesKey)]] : []
             })
         )

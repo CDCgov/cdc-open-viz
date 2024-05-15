@@ -56,7 +56,11 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
 
   // suppress cell value
   config.preliminaryData.forEach(pd => {
-    if (String(pd.value) === String(labelValue) && (!pd.column || pd.column === column) && pd.displayTable && pd.type === 'suppression') {
+    // check entered suppression value against cell value
+    const isValueMatch = String(pd.value) === String(labelValue)
+    // check entered suppression column against table key
+    const isColumnMatch = !pd.column || pd.column === column
+    if (isValueMatch && isColumnMatch && pd.displayTable && pd.type === 'suppression') {
       switch (config.visualizationType) {
         case 'Combo':
           cellValue = config.runtime.barSeriesKeys.includes(column) ? pd.iconCode : config.runtime.lineSeriesKeys.includes(column) ? pd.lineCode : ''

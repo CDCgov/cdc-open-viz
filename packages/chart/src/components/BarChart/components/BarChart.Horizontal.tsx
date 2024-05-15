@@ -139,11 +139,9 @@ export const BarChartHorizontal = () => {
                     return barColor
                   }
                   const getIconSize = synbol => {
-                    let size = ''
+                    let size = '20px'
                     if (synbol.includes('Asterisk')) {
                       size = barHeight + 'px'
-                    } else {
-                      size = '20px'
                     }
                     return size
                   }
@@ -183,7 +181,11 @@ export const BarChartHorizontal = () => {
                           }
                         })}
                         {config.preliminaryData.map((pd, index) => {
-                          let isSuppressed = String(pd.value) === String(tableData[barGroup.index][bar.key]) && (!pd.column || pd.column === bar.key)
+                          // check if user selected column
+                          const selectedSuppressionColumn = !pd.column || pd.column === bar.key
+                          // compare entered suppressed value with data value
+                          const isValueMatch = String(pd.value) === String(tableData[barGroup.index][bar.key])
+                          const isSuppressed = isValueMatch && selectedSuppressionColumn
                           if (!isSuppressed || barHeight < 10 || !config.xAxis.showSuppressedSymbol) {
                             return
                           }

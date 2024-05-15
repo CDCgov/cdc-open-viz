@@ -33,15 +33,9 @@ import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
 import _ from 'lodash'
 
-const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartConfig; updateConfig: Function; data: Record<string, any>[] }) => {
+const PreliminaryData = ({ config, updateConfig, data }: { config: ChartConfig; updateConfig: Function; data: Record<string, any>[] }) => {
   const getColumnOptions = () => {
-    const keys = new Set<string>()
-    data.forEach(d => {
-      Object.keys(d).forEach(key => {
-        keys.add(key)
-      })
-    })
-    return Array.from(keys)
+    return _.uniq(_.flatMap(data, _.keys))
   }
 
   const getTypeOptions = () => {
@@ -293,7 +287,7 @@ const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartCon
       </button>
     </>
   )
-})
+}
 
 const EditorPanel = () => {
   const {
