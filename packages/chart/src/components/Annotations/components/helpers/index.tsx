@@ -16,10 +16,10 @@ const handleConnectionVerticalType = (annotation, xScale, config) => {
 }
 
 const createPoints = (annotation, xScale, yScale) => {
-  const { x, y, dx, dy, xKey, yKey } = annotation
+  const { x, y, dx, dy, xKey, yKey, snapToNearest } = annotation
   const controlX = x + dx / 2
   const controlY = y + dy
-  const padding = 5
+  const padding = 0
 
   const points = [
     { x, y, xKey, yKey, xPos: xScale(xKey) + (dx < 0 ? -padding : padding), yPos: yScale(yKey) + (dy < 0 ? -padding : padding) },

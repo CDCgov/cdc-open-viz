@@ -7,7 +7,7 @@ import { applyBandScaleOffset, handleConnectionHorizontalType, handleConnectionV
 import useColorScale from '../../../hooks/useColorScale'
 
 // visx
-import { HtmlLabel, CircleSubject, LineSubject, EditableAnnotation, Connector } from '@visx/annotation'
+import { HtmlLabel, CircleSubject, LineSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
 import { Drag, raise } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
@@ -20,11 +20,12 @@ import { a } from 'vitest/dist/suite-ghspeorC'
 
 const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   const [draggingItems, setDraggingItems] = useState([])
-  const { config, dimensions, updateConfig } = useContext(ConfigContext)
+  const { config, dimensions, updateConfig, isEditor } = useContext(ConfigContext)
   const [width, height] = dimensions
   const { annotations } = config
   const { colorScale } = useColorScale()
   const prevDimensions = useRef(dimensions)
+  const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
 
@@ -37,7 +38,8 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   )
 
   useEffect(() => {
-    const threshold: number = 20
+    if (config.annotations.length < 1) return
+    const threshold: number = 0.25
     const widthChange: number = Math.abs(dimensions[0] - prevDimensions.current[0])
     const heightChange: number = Math.abs(dimensions[1] - prevDimensions.current[1])
 
@@ -64,7 +66,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
         }
 
         // If the initial relative dx position is less than config.yAxis.size, add a buffer to newDx
-        if (initialRelativePositions.current[index].dx < config.yAxis.size) {
+        if (initialRelativePositions.current[index]?.dx < config.yAxis.size) {
           // Calculate the buffer based on the new dimensions of the SVG
           const annotationWidthBuffer: number = dimensions[0] * 0.1 // 10% of the SVG's width
           newDx += Number(config.yAxis.size) + annotationWidthBuffer + 200
@@ -104,7 +106,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
     if (annotation.snapToNearestPoint) {
       return yScale(annotation.yKey) + Number(annotation.dy)
     }
-    return Number(annotation.dy) + Number(annotation.y) + config.xAxis.size
+    return Number(annotation.dy) + Number(annotation.y)
   }
 
   const handleTextX = annotation => {
@@ -126,6 +128,8 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
     annotations.map((annotation, index) => {
       const points = createPoints(annotation, xScale, yScale)
 
+      const categoricalOffsetCheck = +(config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)
+
       return (
         <>
           <Drag
@@ -142,7 +146,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
             {({ dragStart, dragEnd, dragMove, isDragging, x, y, dx, dy }) => {
               return (
                 <>
-                  <EditableAnnotation
+                  <AnnotationComponent
                     width={200}
                     height={height}
                     dx={annotation.dx} // label position
@@ -170,8 +174,8 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                             ...annotation,
                             xKey: nearestDatum.x,
                             yKey: nearestDatum.y,
-                            x: annotation.snapToNearestPoint ? xScale(nearestDatum.x) : props.x,
-                            y: annotation.snapToNearestPoint ? yScale(nearestDatum.y) : props.y,
+                            x: annotation.snapToNearestPoint && nearestDatum.x ? xScale(nearestDatum.x) : props.x ? props.x : 0,
+                            y: annotation.snapToNearestPoint && nearestDatum.y ? yScale(nearestDatum.y) : props.y ? props.y : 0,
                             dx: props.dx,
                             dy: props.dy
                           }
@@ -209,9 +213,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
 
                     {annotation.connectionType === 'elbow' && <Connector type='elbow' pathProps={{ markerStart: 'url(#marker-start)' }} />}
 
-                    {annotation.connectionType === 'curve' && (
-                      <LinePath data={points} x={d => d.xPos + Number(config.yAxis.size) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)} y={d => d.yPos} stroke='black' strokeWidth={1} curve={allCurves[annotation.lineType]} markerStart={`url(#marker-start)`} />
-                    )}
+                    {annotation.connectionType === 'curve' && <LinePath data={points} x={d => d.xPos + Number(config.yAxis.size) + categoricalOffsetCheck} y={d => d.yPos} stroke='black' strokeWidth={1} curve={allCurves[annotation.lineType]} markerStart={`url(#marker-start)`} />}
 
                     {/* MARKERS */}
                     {annotation.marker === 'circle' && <CircleSubject className='circle-subject' stroke={colorScale(annotation.seriesKey)} radius={8} />}
@@ -225,9 +227,9 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                     </text>
 
                     {/* ANCHORS */}
-                    {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)} />}
+                    {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + categoricalOffsetCheck} />}
                     {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />}
-                  </EditableAnnotation>
+                  </AnnotationComponent>
                 </>
               )
             }}

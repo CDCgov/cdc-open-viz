@@ -12,16 +12,6 @@ import { s } from 'vitest/dist/reporters-1evA5lom'
 const PanelAnnotate: React.FC<PanelProps> = props => {
   const { updateConfig, config, unfilteredData, dimensions, svgRef } = useContext(ConfigContext)
 
-  const [svgDims, setSvgDims] = useState([0, 0])
-
-  useEffect(() => {
-    const svgSelection = document.querySelector('div.chart-container > div > svg')?.getBoundingClientRect()
-    const svgWidth = svgSelection?.width
-    const svgHeight = svgSelection?.height
-
-    setSvgDims([svgWidth, svgHeight])
-  }, [])
-
   const getColumns = (filter = true) => {
     let columns = {}
     unfilteredData.forEach(row => {
@@ -58,8 +48,12 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   const handleAddAnnotation = () => {
+    const svgContainer = document.querySelector('.chart-container > div > svg')?.getBoundingClientRect()
+    const newSvgDims = [svgContainer.width, svgContainer.height]
+
     const newAnnotation = {
       text: 'New Annotation',
+      snapToNearestPoint: false,
       fontSize: 16,
       show: {
         desktop: true,
@@ -84,9 +78,9 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         subject: true,
         label: true
       },
-      seriesKey: config?.series?.[0]?.dataKey || '',
-      x: Number(svgDims?.[0]) / 2,
-      y: Number(svgDims?.[1] / 2),
+      seriesKey: '',
+      x: Number(newSvgDims?.[0]) / 2,
+      y: Number(newSvgDims?.[1] / 2),
       xKey: config.xAxis.type === 'date' ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime() : config.xAxis.type === 'categorical' ? '1/15/2016' : '',
       yKey: '',
       dx: 0,
@@ -219,29 +213,12 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                           })
                         }}
                       >
+                        <option key='none' value='none'>
+                          None
+                        </option>
                         {getColumns(false).map((column, columnIndex) => {
                           return <option>{column}</option>
                         })}
-                      </select>
-                    </label>
-
-                    <label>
-                      Line Type:
-                      <select
-                        onChange={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].lineType = e.target.value
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      >
-                        {Object.entries(approvedCurveTypes).map(([value, key]) => (
-                          <option key={key} value={key}>
-                            {value}
-                          </option>
-                        ))}
                       </select>
                     </label>
 
@@ -257,13 +234,35 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                           })
                         }}
                       >
-                        {['curve', 'line', 'elbow'].map((side, index) => (
+                        {['curve', 'line', 'elbow', 'none'].map((side, index) => (
                           <option key={side} value={side}>
                             {side}
                           </option>
                         ))}
                       </select>
                     </label>
+
+                    {annotation.connectionType === 'curve' && (
+                      <label>
+                        Line Type:
+                        <select
+                          onChange={e => {
+                            const updatedAnnotations = [...config?.annotations]
+                            updatedAnnotations[index].lineType = e.target.value
+                            updateConfig({
+                              ...config,
+                              annotations: updatedAnnotations
+                            })
+                          }}
+                        >
+                          {Object.entries(approvedCurveTypes).map(([value, key]) => (
+                            <option key={key} value={key}>
+                              {value}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
 
                     <label>
                       Connection Location:

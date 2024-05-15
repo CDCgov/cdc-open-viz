@@ -40,8 +40,6 @@ const AreaChart = props => {
                 }
               })
 
-              console.log('series data', seriesData)
-
               let curveType = allCurves[s.lineType]
               let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
               let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1

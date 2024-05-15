@@ -96,9 +96,6 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeries
 
       // Calculate the percentage position of xValue between minX and maxX
       const invertedValue = new Date(xScale.invert(x))
-
-      console.log('in', invertedValue.getTime())
-
       const ticks = config.data.map(d => new Date(d[config.xAxis.dataKey]).getTime())
       let minDistance = Infinity
       let closestDate = null
@@ -147,24 +144,25 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeries
   }
 
   const xValue = getXValueFromCoordinate(xPosition - Number(config.yAxis.size || 0))
-  console.log('closest value', xValue)
 
   let closestSeries = []
+
+  console.log('xValue', xValue)
   if (!xValue) return { x: 0, y: 0 }
 
   if (xAxis.type === 'categorical') {
     closestSeries = config.data.filter(d => d[config.xAxis.dataKey] === xValue)
   }
 
+  console.log('closest', closestSeries)
+
   if (xAxis.type === 'date' || xAxis.type === 'date-time') {
     closestSeries = config.data.filter(d => new Date(d[config.xAxis.dataKey]).getTime() === xValue)
     // config.data.filter(d => console.log(new Date(d[config.xAxis.dataKey]).getTime()))
-    console.log('closestSeries', closestSeries)
   }
-  if (closestSeries.length === 0) return { x: 0, y: 0 }
+
   const y = closestSeries[0][annotationSeriesKey] // Map each key to its corresponding value in data
   const x = xValue
-  console.log({ x, y })
   return { x, y }
 }
 
