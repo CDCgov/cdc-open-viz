@@ -576,7 +576,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             body = (
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Markup Include' />
-                <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} isPreview={isPreview} setConfig={_updateConfig} isDashboard={true} configUrl={undefined} />
+                <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={_updateConfig} isDashboard={true} configUrl={undefined} />
               </>
             )
             break
@@ -764,7 +764,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
 
   return (
     <GlobalContextProvider>
-      <DashboardContext.Provider value={{ ...state, setParentConfig: editorContext.setTempConfig, outerContainerRef, isDebug, isPreview }}>
+      <DashboardContext.Provider value={{ ...state, setParentConfig: editorContext.setTempConfig, outerContainerRef, isDebug }}>
         <DashboardDispatchContext.Provider value={dispatch}>
           <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
             {body}

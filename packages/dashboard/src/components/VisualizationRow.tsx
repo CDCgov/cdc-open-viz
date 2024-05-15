@@ -27,7 +27,7 @@ type VizRowProps = {
   currentViewport: ViewPort
 }
 
-const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, rowIndex: index, isPreview, setSharedFilter, updateChildConfig, applyFilters, apiFilterDropdowns, handleOnChange, currentViewport }) => {
+const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, rowIndex: index, setSharedFilter, updateChildConfig, applyFilters, apiFilterDropdowns, handleOnChange, currentViewport }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [show, setShow] = React.useState(row.columns.map((col, i) => i === 0))
   const setToggled = (colIndex: number) => {
@@ -135,7 +135,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                     configUrl={undefined}
                     isDashboard={true}
                     isEditor={false}
-                    isPreview={isPreview}
                     setConfig={newConfig => {
                       updateChildConfig(col.widget, newConfig)
                     }}

@@ -26,13 +26,12 @@ type CdcMarkupIncludeProps = {
   configUrl: string
   isDashboard: boolean
   isEditor: boolean
-  isPreview: boolean
   setConfig: any
 }
 
 import Title from '@cdc/core/components/ui/Title'
 
-const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: configObj, isDashboard = true, isEditor = true, isPreview, setConfig: setParentConfig }) => {
+const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: configObj, isDashboard = true, isEditor = true, setConfig: setParentConfig }) => {
   const initialState = { config: configObj || defaults, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
 
   const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
@@ -44,7 +43,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
   const { contentEditor, theme } = config
-  const data = configObj.formattedData
+  const data = configObj.data
 
   const { inlineHTML, markupVariables, showHeader, srcUrl, title, useInlineHTML } = contentEditor
 
@@ -153,10 +152,10 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
       if (workingVariable === undefined) return [variableTag]
       const workingData = workingVariable && workingVariable.conditions.length === 0 ? data : filterOutConditions(data, [...workingVariable.conditions])
 
-      const variableValues: string[] = _.uniq(workingData.map(dataObject => dataObject[workingVariable.columnName]))
+      const variableValues: string[] = _.uniq(workingData?.map(dataObject => dataObject[workingVariable.columnName]))
       const variableDisplay = []
 
-      const listConjunction = isPreview ? 'and' : 'or'
+      const listConjunction = !isEditor ? 'and' : 'or'
 
       const length = variableValues.length
       if (length === 2) {
