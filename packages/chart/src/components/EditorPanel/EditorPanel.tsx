@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable } from '@hello-pangea/dnd'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import Layout from '@cdc/core/components/Layout'
@@ -8,18 +8,17 @@ import Layout from '@cdc/core/components/Layout'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
-import InputToggle from '@cdc/core/components/inputs/InputToggle'
+import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
+import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
+import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 
 // chart components
 import Panels from './components/Panels'
-import Series from './components/Panel.Series.jsx'
 
 // cdc additional
-import { useColorPalette } from '../../hooks/useColorPalette'
 import { useEditorPermissions } from './useEditorPermissions'
-import { useFilters } from '@cdc/core/components/Filters'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
@@ -27,13 +26,12 @@ import useRightAxis from '../../hooks/useRightAxis'
 import WarningImage from '../../images/warning.svg'
 import useMinMax from '../../hooks/useMinMax'
 
-import { type ChartConfig } from '../../types/ChartConfig'
 import { type ChartContext } from '../../types/ChartContext'
 
 import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
-import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import EditorPanelContext from './EditorPanelContext'
+import _ from 'lodash'
 
 const PreliminaryData = memo(({ config, updateConfig, data }: { config: ChartConfig; updateConfig: Function; data: Record<string, any>[] }) => {
   const getColumnOptions = () => {
@@ -321,9 +319,6 @@ const EditorPanel = () => {
   } = useContext<ChartContext>(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
-
-  const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
-
   const properties = { data, config }
   const { leftMax, rightMax } = useMinMax(properties)
 
@@ -372,9 +367,6 @@ const EditorPanel = () => {
     visSupportsDateCategoryHeight,
     visHasDataSuppression
   } = useEditorPermissions()
-
-  // argument acts as props
-  const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config, setConfig: updateConfig, filteredData: data, setFilteredData })
 
   // when the visualization type changes we
   // have to update the individual series type & axis details
@@ -486,13 +478,18 @@ const EditorPanel = () => {
       return
     }
 
-    if (section === 'columns' && subsection !== '' && fieldName !== '') {
+    const truthy = val => {
+      if (val === 0) return true // indexes can be used as keys
+      return !!val
+    }
+
+    if (section === 'columns' && truthy(subsection) && truthy(fieldName)) {
       updateConfig({
         ...config,
-        [section]: {
-          ...config[section],
+        columns: {
+          ...config.columns,
           [subsection]: {
-            ...config[section][subsection],
+            ...config.columns[subsection],
             [fieldName]: newValue
           }
         }
@@ -500,6 +497,8 @@ const EditorPanel = () => {
       return
     }
     if (null === section && null === subsection) {
+      // special case that allows for updating the config object directly
+      if (!truthy(fieldName)) console.error('fieldName is required')
       let updatedConfig = { ...config, [fieldName]: newValue }
       enforceRestrictions(updatedConfig)
       updateConfig(updatedConfig)
@@ -510,13 +509,13 @@ const EditorPanel = () => {
 
     let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
 
-    if (null !== subsection) {
+    if (truthy(subsection)) {
       if (isArray) {
         sectionValue = [...config[section]]
         sectionValue[subsection] = { ...sectionValue[subsection], [fieldName]: newValue }
       } else if (typeof newValue === 'string') {
         sectionValue[subsection] = newValue
-      } else {
+      } else if (truthy(fieldName)) {
         sectionValue = { ...config[section], [subsection]: { ...config[section][subsection], [fieldName]: newValue } }
       }
     }
@@ -554,30 +553,6 @@ const EditorPanel = () => {
     })
   }
 
-  const removeFilter = index => {
-    let filters = [...config.filters]
-
-    filters.splice(index, 1)
-
-    updateConfig({ ...config, filters })
-  }
-
-  const updateFilterProp = (name, index, value) => {
-    let filters = [...config.filters]
-
-    filters[index][name] = value
-
-    updateConfig({ ...config, filters })
-  }
-
-  const addNewFilter = () => {
-    let filters = config.filters ? [...config.filters] : []
-
-    filters.push({ values: [] })
-
-    updateConfig({ ...config, filters })
-  }
-
   const addNewSeries = seriesKey => {
     let newSeries = config.series ? [...config.series] : []
     let forecastingStages = Array.from(new Set(data.map(item => item[seriesKey])))
@@ -600,37 +575,6 @@ const EditorPanel = () => {
     const sorted = data.sort((a, b) => a[series] - b[series])
     const newData = e === 'asc' ? sorted : sorted.reverse()
     updateConfig({ ...config }, newData)
-  }
-
-  const removeSeries = seriesKey => {
-    let series = [...config.series]
-    let seriesIndex = -1
-
-    for (let i = 0; i < series.length; i++) {
-      if (series[i].dataKey === seriesKey) {
-        seriesIndex = i
-        break
-      }
-    }
-
-    if (seriesIndex !== -1) {
-      series.splice(seriesIndex, 1)
-
-      let newConfig = { ...config, series }
-
-      if (series.length === 0) {
-        delete newConfig.series
-      }
-
-      updateConfig(newConfig)
-    }
-
-    if (config.visualizationType === 'Paired Bar') {
-      updateConfig({
-        ...config,
-        series: []
-      })
-    }
   }
 
   const addNewExclusion = exclusionKey => {
@@ -664,16 +608,6 @@ const EditorPanel = () => {
 
       updateConfig(newExclusionsPayload)
     }
-  }
-
-  const getFilters = () => {
-    let columns = {}
-
-    unfilteredData.forEach(row => {
-      Object.keys(row).forEach(columnName => (columns[columnName] = true))
-    })
-
-    return Object.keys(columns)
   }
 
   const getColumns = (filter = true) => {
@@ -999,40 +933,8 @@ const EditorPanel = () => {
     })
   }
 
-  // prevents adding duplicates
-  const additionalColumns = Object.keys(config.columns).filter(value => {
-    const defaultCols = [config.xAxis.dataKey] // ['geo', 'navigate', 'primary', 'latitude', 'longitude']
-
-    if (true === defaultCols.includes(value)) {
-      return false
-    }
-    return true
-  })
-
-  // just adds a new column but not set to any data yet
-  const addAdditionalColumn = number => {
-    const columnKey = `additionalColumn${number}`
-
-    updateConfig({
-      ...config,
-      columns: {
-        ...config.columns,
-        [columnKey]: {
-          label: 'New Column',
-          dataTable: false,
-          tooltips: false,
-          prefix: '',
-          suffix: '',
-          forestPlot: false,
-          startingPoint: '0',
-          forestPlotAlignRight: false
-        }
-      }
-    })
-  }
-
   const removeAdditionalColumn = columnName => {
-    const newColumns = config.columns
+    const newColumns = _.cloneDeep(config.columns)
 
     delete newColumns[columnName]
 
@@ -1850,7 +1752,7 @@ const EditorPanel = () => {
                                   <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
                                 </Tooltip.Target>
                                 <Tooltip.Content>
-                                  <p>Enter a data suffix (such as "$"), if applicable.</p>
+                                  <p>Enter a data prefix (such as "$"), if applicable.</p>
                                 </Tooltip.Content>
                               </Tooltip>
                             }
@@ -2469,6 +2371,7 @@ const EditorPanel = () => {
               </AccordionItem>
             )}
             <Panels.Regions name='Regions' />
+
             {/* Columns */}
             {config.visualizationType !== 'Box Plot' && (
               <AccordionItem>
@@ -2476,235 +2379,7 @@ const EditorPanel = () => {
                   <AccordionItemButton>Columns</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {'navigation' !== config.type && (
-                    <fieldset className='primary-fieldset edit-block'>
-                      <label>
-                        <span className='edit-label'>
-                          Additional Columns
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>You can specify additional columns to display in tooltips and / or the supporting data table.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </span>
-                      </label>
-                      {additionalColumns.map(val => (
-                        <fieldset className='edit-block' key={val}>
-                          <button
-                            className='remove-column'
-                            onClick={event => {
-                              event.preventDefault()
-                              removeAdditionalColumn(val)
-                            }}
-                          >
-                            Remove
-                          </button>
-                          <label>
-                            <span className='edit-label column-heading'>Column</span>
-                            <select
-                              value={config.columns[val] ? config.columns[val].name : getColumns()[0]}
-                              onChange={event => {
-                                editColumn(val, 'name', event.target.value)
-                              }}
-                            >
-                              {getColumns().map(option => (
-                                <option>{option}</option>
-                              ))}
-                            </select>
-                          </label>
-                          <label>
-                            <span className='edit-label column-heading'>Associate to Series</span>
-                            <select
-                              value={config.columns[val] ? config.columns[val].series : ''}
-                              onChange={event => {
-                                editColumn(val, 'series', event.target.value)
-                              }}
-                            >
-                              <option value=''>Select series</option>
-                              {config.series.map(series => (
-                                <option>{series.dataKey}</option>
-                              ))}
-                            </select>
-                          </label>
-                          <TextField value={config.columns[val].label} section='columns' subsection={val} fieldName='label' label='Label' updateField={updateField} />
-                          <ul className='column-edit'>
-                            <li className='three-col'>
-                              <TextField value={config.columns[val].prefix} section='columns' subsection={val} fieldName='prefix' label='Prefix' updateField={updateField} />
-                              <TextField value={config.columns[val].suffix} section='columns' subsection={val} fieldName='suffix' label='Suffix' updateField={updateField} />
-                              <TextField type='number' value={config.columns[val].roundToPlace} section='columns' subsection={val} fieldName='roundToPlace' label='Round' updateField={updateField} />
-                            </li>
-                            <li>
-                              <label className='checkbox'>
-                                <input
-                                  type='checkbox'
-                                  checked={config.columns[val].commas}
-                                  onChange={event => {
-                                    editColumn(val, 'commas', event.target.checked)
-                                  }}
-                                />
-                                <span className='edit-label'>Add Commas to Numbers</span>
-                              </label>
-                            </li>
-                            <li>
-                              {config.table.showVertical && (
-                                <label className='checkbox'>
-                                  <input
-                                    type='checkbox'
-                                    checked={config.columns[val].dataTable}
-                                    onChange={event => {
-                                      editColumn(val, 'dataTable', event.target.checked)
-                                    }}
-                                  />
-                                  <span className='edit-label'>Show in Data Table</span>
-                                </label>
-                              )}
-                            </li>
-                            {config.visualizationType === 'Pie' && (
-                              <li>
-                                <label className='checkbox'>
-                                  <input
-                                    type='checkbox'
-                                    checked={config.columns[val].showInViz}
-                                    onChange={event => {
-                                      editColumn(val, 'showInViz', event.target.checked)
-                                    }}
-                                  />
-                                  <span className='edit-label'>Show in Visualization</span>
-                                </label>
-                              </li>
-                            )}
-
-                            {/* disable for now */}
-
-                            <li>
-                              <label className='checkbox'>
-                                <input
-                                  type='checkbox'
-                                  checked={config.columns[val].tooltips || false}
-                                  onChange={event => {
-                                    updateSeriesTooltip(val, event.target.checked)
-                                  }}
-                                />
-                                <span className='edit-label'>Show in tooltip</span>
-                              </label>
-                            </li>
-
-                            {config.visualizationType === 'Forest Plot' && (
-                              <>
-                                <li>
-                                  <label className='checkbox'>
-                                    <input
-                                      type='checkbox'
-                                      checked={config.columns[val].forestPlot || false}
-                                      onChange={event => {
-                                        editColumn(val, 'forestPlot', event.target.checked)
-                                      }}
-                                    />
-                                    <span className='edit-label'>Show in Forest Plot</span>
-                                  </label>
-                                </li>
-                                <li>
-                                  <label className='checkbox'>
-                                    <input
-                                      type='checkbox'
-                                      checked={config.columns[val].forestPlotAlignRight || false}
-                                      onChange={event => {
-                                        editColumn(val, 'forestPlotAlignRight', event.target.checked)
-                                      }}
-                                    />
-                                    <span className='edit-label'>Align Right</span>
-                                  </label>
-                                </li>
-
-                                {!config.columns[val].forestPlotAlignRight && (
-                                  <li>
-                                    <label className='text'>
-                                      <span className='edit-label'>Forest Plot Starting Point</span>
-                                      <input
-                                        type='number'
-                                        value={config.columns[val].forestPlotStartingPoint || 0}
-                                        onChange={event => {
-                                          editColumn(val, 'forestPlotStartingPoint', event.target.value)
-                                        }}
-                                      />
-                                    </label>
-                                  </li>
-                                )}
-                              </>
-                            )}
-                          </ul>
-                        </fieldset>
-                      ))}
-                      <button
-                        className={'btn full-width'}
-                        onClick={event => {
-                          event.preventDefault()
-                          addAdditionalColumn(additionalColumns.length + 1)
-                        }}
-                      >
-                        Add Column
-                      </button>
-                    </fieldset>
-                  )}
-                  {'category' === config.legend.type && (
-                    <fieldset className='primary-fieldset edit-block'>
-                      <label>
-                        <span className='edit-label'>
-                          Additional Category
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>You can provide additional categories to ensure they appear in the legend</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </span>
-                      </label>
-                      {config.legend.additionalCategories &&
-                        config.legend.additionalCategories.map((val, i) => (
-                          <fieldset className='edit-block' key={val}>
-                            <button
-                              className='remove-column'
-                              onClick={event => {
-                                event.preventDefault()
-                                const updatedAdditionaCategories = [...config.legend.additionalCategories]
-                                updatedAdditionaCategories.splice(i, 1)
-                                updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
-                              }}
-                            >
-                              Remove
-                            </button>
-                            <TextField
-                              value={val}
-                              label='Category'
-                              section='legend'
-                              subsection={null}
-                              fieldName='additionalCategories'
-                              updateField={(section, subsection, fieldName, value) => {
-                                const updatedAdditionaCategories = [...config.legend.additionalCategories]
-                                updatedAdditionaCategories[i] = value
-                                updateField(section, subsection, fieldName, updatedAdditionaCategories)
-                              }}
-                            />
-                          </fieldset>
-                        ))}
-                      <button
-                        className={'btn full-width'}
-                        onClick={event => {
-                          event.preventDefault()
-                          const updatedAdditionaCategories = [...(config.legend.additionalCategories || [])]
-                          updatedAdditionaCategories.push('')
-                          updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
-                        }}
-                      >
-                        Add Category
-                      </button>
-                    </fieldset>
-                  )}
+                  <ColumnsEditor config={config} updateField={updateField} deleteColumn={removeAdditionalColumn} />{' '}
                 </AccordionItemPanel>
               </AccordionItem>
             )}
@@ -2862,161 +2537,7 @@ const EditorPanel = () => {
                   <AccordionItemButton>Filters</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {config.filters && (
-                    <>
-                      {/* prettier-ignore */}
-                      <Select
-                        value={config.filterBehavior}
-                        fieldName='filterBehavior'
-                        label='Filter Behavior'
-                        updateField={updateField}
-                        options={['Apply Button', 'Filter Change']}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>The Apply Button option changes the visualization when the user clicks "apply". The Filter Change option immediately changes the visualization when the selection is changed.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        />
-                      <br />
-                    </>
-                  )}
-                  {config.filters && (
-                    <ul className='filters-list'>
-                      {/* Whether filters should apply onChange or Apply Button */}
-
-                      {config.filters.map((filter, index) => {
-                        if (filter.type === 'url') return <></>
-
-                        return (
-                          <fieldset className='edit-block' key={index}>
-                            <button
-                              type='button'
-                              className='remove-column'
-                              onClick={() => {
-                                removeFilter(index)
-                              }}
-                            >
-                              Remove
-                            </button>
-                            <label>
-                              <span className='edit-label column-heading'>Filter</span>
-                              <select
-                                value={filter.columnName}
-                                onChange={e => {
-                                  updateFilterProp('columnName', index, e.target.value)
-                                }}
-                              >
-                                <option value=''>- Select Option -</option>
-                                {getFilters().map((dataKey, index) => (
-                                  <option value={dataKey} key={index}>
-                                    {dataKey}
-                                  </option>
-                                ))}
-                              </select>
-                            </label>
-
-                            <label>
-                              <span className='edit-showDropdown column-heading'>Show Filter Input</span>
-                              <input
-                                type='checkbox'
-                                checked={filter.showDropdown === undefined ? true : filter.showDropdown}
-                                onChange={e => {
-                                  updateFilterProp('showDropdown', index, e.target.checked)
-                                }}
-                              />
-                            </label>
-
-                            <label>
-                              <span className='edit-label column-heading'>Filter Style</span>
-
-                              <select
-                                value={filter.filterStyle}
-                                onChange={e => {
-                                  updateFilterProp('filterStyle', index, e.target.value)
-                                }}
-                              >
-                                {filterStyleOptions.map((item, index) => {
-                                  return (
-                                    <option key={`filter-style-${index}`} value={item}>
-                                      {item}
-                                    </option>
-                                  )
-                                })}
-                              </select>
-                            </label>
-                            <label>
-                              <span className='edit-label column-heading'>Label</span>
-                              <input
-                                type='text'
-                                value={filter.label}
-                                onChange={e => {
-                                  updateFilterProp('label', index, e.target.value)
-                                }}
-                              />
-                            </label>
-
-                            <label>
-                              <span className='edit-label column-heading'>Default Value Set By Query String Parameter</span>
-                              <input
-                                type='text'
-                                value={filter.setByQueryParameter}
-                                onChange={e => {
-                                  updateFilterProp('setByQueryParameter', index, e.target.value)
-                                }}
-                              />
-                            </label>
-
-                            <label>
-                              <span className='edit-filterOrder column-heading'>Filter Order</span>
-                              <select value={filter.order ? filter.order : 'asc'} onChange={e => updateFilterProp('order', index, e.target.value)}>
-                                {filterOrderOptions.map((option, index) => {
-                                  return (
-                                    <option value={option.value} key={`filter-${index}`}>
-                                      {option.label}
-                                    </option>
-                                  )
-                                })}
-                              </select>
-
-                              {filter.order === 'cust' && (
-                                <DragDropContext onDragEnd={({ source, destination }) => handleFilterOrder(source.index, destination.index, index, config.filters[index])}>
-                                  <Droppable droppableId='filter_order'>
-                                    {provided => (
-                                      <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
-                                        {config.filters[index]?.values.map((value, index) => {
-                                          return (
-                                            <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
-                                              {(provided, snapshot) => (
-                                                <li>
-                                                  <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                    {value}
-                                                  </div>
-                                                </li>
-                                              )}
-                                            </Draggable>
-                                          )
-                                        })}
-                                        {provided.placeholder}
-                                      </ul>
-                                    )}
-                                  </Droppable>
-                                </DragDropContext>
-                              )}
-                            </label>
-                          </fieldset>
-                        )
-                      })}
-                    </ul>
-                  )}
-                  {!config.filters && <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
-                  <button type='button' onClick={addNewFilter} className='btn full-width'>
-                    Add Filter
-                  </button>
+                  <VizFilterEditor config={config} updateField={updateField} rawData={rawData} />
                 </AccordionItemPanel>
               </AccordionItem>
             )}

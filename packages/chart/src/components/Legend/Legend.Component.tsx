@@ -31,23 +31,21 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
   const { suppressionIcons } = useBarChart()
 
   if (!legend) return null
-  const fontSizes = { small: 16, medium: 18, large: 20 }
   const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
     marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${isBottomOrSmallViewport ? config.dynamicMarginTop + 15 : 0}px`
   }
-  console.log(config.preliminaryData)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
-  const fontSize = ['sm', 'xs', 'xxs'].includes(currentViewport) ? { fontSize: '11px' } : { fontSize: fontSizes[config.fontSize] }
-  const fontSizeLabel = ['sm', 'xs', 'xxs'].includes(currentViewport) ? { fontSize: '13px' } : { fontSize: fontSizes[config.fontSize] }
+  const fontSize = ['sm', 'xs', 'xxs'].includes(currentViewport) ? { fontSize: '11px' } : null
+
   return (
     <aside ref={ref} style={legendClasses} id={skipId || 'legend'} className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
-      {legend.label && <h3 style={fontSizeLabel}>{parse(legend.label)}</h3>}
+      {legend.label && <h3>{parse(legend.label)}</h3>}
       {legend.description && <p style={fontSize}>{parse(legend.description)}</p>}
 
       <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>

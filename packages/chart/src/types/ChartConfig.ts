@@ -12,6 +12,7 @@ import { Legend } from '@cdc/core/types/Legend'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
 import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps'
+import { VizFilter } from '@cdc/core/types/VizFilter'
 
 export type ChartColumns = Record<string, Column>
 
@@ -37,18 +38,6 @@ type Exclusions = {
   active: boolean
   dateStart: string
   dateEnd: string
-}
-
-type Filter = {
-  active: string
-  type: 'url'
-  columnName: string
-  showDropdown: boolean
-  filterStyle: string
-  label: string
-  order: 'asc' | 'desc' | 'cust'
-  values: string[]
-  queryParameter: string
 }
 
 export type Legend = {
@@ -110,7 +99,7 @@ type AllChartsConfig = {
   description: string
   dynamicMarginTop: number
   exclusions: Exclusions
-  filters: Filter[]
+  filters: VizFilter[]
   filterBehavior: FilterBehavior
   fontSize: 'small' | 'medium' | 'large'
   footnotes: string

@@ -121,9 +121,9 @@ export const BarChartHorizontal = () => {
                   barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
                   const isTwoToneLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'two-tone'
-                  const isHighlightedBar = highlightedBarValues?.includes(yAxisValue)
-                  const highlightedBarColor = getHighlightedBarColorByValue(yAxisValue)
-                  const highlightedBar = getHighlightedBarByValue(yAxisValue)
+                  const isHighlightedBar = highlightedBarValues?.includes(xAxisValue)
+                  const highlightedBarColor = getHighlightedBarColorByValue(xAxisValue)
+                  const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
                   const displaylollipopShape = shouldSuppress(bar) ? 'none' : 'block'
