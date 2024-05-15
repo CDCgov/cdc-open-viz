@@ -1,16 +1,44 @@
 {
-  "title": "",
-  "showHeader": false,
-  "type": "markup-include",
-  "srcUrl": "https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/SSI-Example-Markup-Include.html",
-  "theme": "theme-blue",
+  "contentEditor": {
+    "inlineHTML": "<div>{{state}} does have a rate 130 compared to the over all rate of {{overall-rate}}</div>",
+    "markupVariables": [],
+    "showHeader": false,
+    "srcUrl": "https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/SSI-Example-Markup-Include.html",
+    "title": "",
+    "useInlineHTML": true
+  },
   "data": [
-    { "Race": "Hispanic or Latino", "Age-adjusted rate": "644.2" },
-    { "Race": "Non-Hispanic American Indian", "Age-adjusted rate": "636.1" },
-    { "Race": "Non-Hispanic Black", "Age-adjusted rate": "563.7" },
-    { "Race": "Non-Hispanic Asian or Pacific Islander", "Age-adjusted rate": "202.5" },
-    { "Race": "Non-Hispanic White", "Age-adjusted rate": "183.6" }
+    {
+      "Race": "Hispanic or Latino",
+      "Age-adjusted rate": "644.2"
+    },
+    {
+      "Race": "Non-Hispanic American Indian",
+      "Age-adjusted rate": "636.1"
+    },
+    {
+      "Race": "Non-Hispanic Black",
+      "Age-adjusted rate": "563.7"
+    },
+    {
+      "Race": "Non-Hispanic Asian or Pacific Islander",
+      "Age-adjusted rate": "202.5"
+    },
+    {
+      "Race": "Non-Hispanic White",
+      "Age-adjusted rate": "183.6"
+    }
   ],
-  "dataFileName": "valid-data-chart.csv",
-  "dataFileSourceType": "file"
+  "legend": {},
+  "newViz": true,
+  "theme": "theme-amber",
+  "type": "markup-include",
+  "runtime": null,
+  "visual": {
+    "border": false,
+    "accent": true,
+    "background": true,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false
+  }
 }

@@ -1,5 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CdcMarkupInclude from '../CdcMarkupInclude'
+import primary from './_mock/primary.json'
+import noConditions from './_mock/no-conditions.json'
+import withConditions from './_mock/with-conditions.json'
+import buttonAndText from './_mock/button-and-text.json'
+import iconNoText from './_mock/icon-no-text.json'
+import imageWithText from './_mock/image-with-text.json'
 
 const meta: Meta<typeof CdcMarkupInclude> = {
   title: 'Components/Pages/Markup Include',
@@ -10,29 +16,7 @@ type Story = StoryObj<typeof CdcMarkupInclude>
 
 export const Primary: Story = {
   args: {
-    config: {
-      contentEditor: {
-        inlineHTML: '<h2>Inline HTML</h2>',
-        markupVariables: [],
-        showHeader: true,
-        srcUrl: '#example',
-        title: 'Markup Include',
-        useInlineHTML: true
-      },
-      data: [],
-      legend: {},
-      newViz: true,
-      theme: 'theme-blue',
-      type: 'markup-include',
-      runtime: null,
-      visual: {
-        border: false,
-        accent: false,
-        background: false,
-        hideBackgroundColor: false,
-        borderColorTheme: false
-      }
-    },
+    config: primary,
     isEditor: false,
     showEditorPanel: true
   }
@@ -40,67 +24,7 @@ export const Primary: Story = {
 
 export const No_Conditions: Story = {
   args: {
-    config: {
-      contentEditor: {
-        inlineHTML: '<div>In the state of {{state}}, the overall rate was {{rate}} for {{location}}</div> <div>For more information visit {{url}}{{state}}/{{location}}</div>',
-        markupVariables: [
-          {
-            name: 'state',
-            tag: '{{state}}',
-            columnName: 'STATE',
-            conditions: []
-          },
-          {
-            name: 'rate',
-            tag: '{{rate}}',
-            columnName: 'Rate',
-            conditions: []
-          },
-          {
-            name: 'location',
-            tag: '{{location}}',
-            columnName: 'Location',
-            conditions: []
-          },
-          {
-            name: 'url',
-            tag: '{{url}}',
-            columnName: 'URL',
-            conditions: []
-          }
-        ],
-        showHeader: true,
-        srcUrl: '#example',
-        title: 'Current Rate by Location',
-        useInlineHTML: true
-      },
-      data: [
-        {
-          STATE: 'Alabama',
-          Rate: '130',
-          Location: 'Vehicle',
-          URL: 'https://www.cdc.gov/'
-        },
-        {
-          STATE: 'Alaska',
-          Rate: '80',
-          Location: 'Home',
-          URL: 'https://www.cdc.gov/'
-        }
-      ],
-      legend: {},
-      newViz: true,
-      theme: 'theme-blue',
-      type: 'markup-include',
-      runtime: null,
-      visual: {
-        border: false,
-        accent: false,
-        background: false,
-        hideBackgroundColor: false,
-        borderColorTheme: false
-      }
-    },
+    config: noConditions,
     isEditor: false,
     showEditorPanel: true
   }
@@ -108,55 +32,7 @@ export const No_Conditions: Story = {
 
 export const With_conditions: Story = {
   args: {
-    config: {
-      contentEditor: {
-        inlineHTML: '<div>{{state}} does have a rate 130 compared to the over all rate of {{overall-rate}}</div>',
-        markupVariables: [
-          {
-            name: 'state',
-            tag: '{{state}}',
-            columnName: 'STATE',
-            conditions: [{ columnName: 'Rate', isOrIsNotEqualTo: 'is', value: '130' }]
-          },
-          {
-            name: 'overall-rate',
-            tag: '{{overall-rate}}',
-            columnName: 'Rate',
-            conditions: [{ columnName: 'STATE', isOrIsNotEqualTo: 'is', value: 'Overall' }]
-          }
-        ],
-        showHeader: true,
-        srcUrl: '#example',
-        title: '',
-        useInlineHTML: true
-      },
-      data: [
-        {
-          STATE: 'Overall',
-          Rate: '80',
-          Location: 'Vehicle',
-          URL: 'https://www.cdc.gov/'
-        },
-        {
-          STATE: 'Alabama',
-          Rate: '130',
-          Location: 'Vehicle',
-          URL: 'https://www.cdc.gov/'
-        }
-      ],
-      legend: {},
-      newViz: true,
-      theme: 'theme-amber',
-      type: 'markup-include',
-      runtime: null,
-      visual: {
-        border: false,
-        accent: true,
-        background: true,
-        hideBackgroundColor: false,
-        borderColorTheme: false
-      }
-    },
+    config: withConditions,
     isEditor: false,
     showEditorPanel: true
   }
@@ -164,50 +40,7 @@ export const With_conditions: Story = {
 
 export const Button_and_text: Story = {
   args: {
-    config: {
-      contentEditor: {
-        inlineHTML: '<div>{{state}} does have a rate 130 compared to the over all rate of {{overall-rate}}</div>',
-        markupVariables: [],
-        showHeader: false,
-        srcUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Markup-Include-Button-and-Text.html',
-        title: '',
-        useInlineHTML: true
-      },
-      data: [
-        {
-          Race: 'Hispanic or Latino',
-          'Age-adjusted rate': '644.2'
-        },
-        {
-          Race: 'Non-Hispanic American Indian',
-          'Age-adjusted rate': '636.1'
-        },
-        {
-          Race: 'Non-Hispanic Black',
-          'Age-adjusted rate': '563.7'
-        },
-        {
-          Race: 'Non-Hispanic Asian or Pacific Islander',
-          'Age-adjusted rate': '202.5'
-        },
-        {
-          Race: 'Non-Hispanic White',
-          'Age-adjusted rate': '183.6'
-        }
-      ],
-      legend: {},
-      newViz: true,
-      theme: 'theme-amber',
-      type: 'markup-include',
-      runtime: null,
-      visual: {
-        border: false,
-        accent: true,
-        background: true,
-        hideBackgroundColor: false,
-        borderColorTheme: false
-      }
-    },
+    config: buttonAndText,
     isEditor: true,
     showEditorPanel: true
   }
@@ -215,100 +48,14 @@ export const Button_and_text: Story = {
 
 export const icon_no_text: Story = {
   args: {
-    config: {
-      contentEditor: {
-        inlineHTML: '<div>{{state}} does have a rate 130 compared to the over all rate of {{overall-rate}}</div>',
-        markupVariables: [],
-        showHeader: false,
-        srcUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/SSI-Example-Markup-Include.html',
-        title: '',
-        useInlineHTML: true
-      },
-      data: [
-        {
-          Race: 'Hispanic or Latino',
-          'Age-adjusted rate': '644.2'
-        },
-        {
-          Race: 'Non-Hispanic American Indian',
-          'Age-adjusted rate': '636.1'
-        },
-        {
-          Race: 'Non-Hispanic Black',
-          'Age-adjusted rate': '563.7'
-        },
-        {
-          Race: 'Non-Hispanic Asian or Pacific Islander',
-          'Age-adjusted rate': '202.5'
-        },
-        {
-          Race: 'Non-Hispanic White',
-          'Age-adjusted rate': '183.6'
-        }
-      ],
-      legend: {},
-      newViz: true,
-      theme: 'theme-amber',
-      type: 'markup-include',
-      runtime: null,
-      visual: {
-        border: false,
-        accent: true,
-        background: true,
-        hideBackgroundColor: false,
-        borderColorTheme: false
-      }
-    },
+    config: iconNoText,
     isEditor: true,
     showEditorPanel: true
   }
 }
 export const image_with_text: Story = {
   args: {
-    config: {
-      contentEditor: {
-        inlineHTML: '<div>{{state}} does have a rate 130 compared to the over all rate of {{overall-rate}}</div>',
-        markupVariables: [],
-        showHeader: false,
-        srcUrl: '/wcms/4.0/cdc-wp/data-presentation/examples/SSI-Image-With-Text.html',
-        title: '<strong>Markup Include</strong> - Image with Text',
-        useInlineHTML: true
-      },
-      data: [
-        {
-          Race: 'Hispanic or Latino',
-          'Age-adjusted rate': '644.2'
-        },
-        {
-          Race: 'Non-Hispanic American Indian',
-          'Age-adjusted rate': '636.1'
-        },
-        {
-          Race: 'Non-Hispanic Black',
-          'Age-adjusted rate': '563.7'
-        },
-        {
-          Race: 'Non-Hispanic Asian or Pacific Islander',
-          'Age-adjusted rate': '202.5'
-        },
-        {
-          Race: 'Non-Hispanic White',
-          'Age-adjusted rate': '183.6'
-        }
-      ],
-      legend: {},
-      newViz: true,
-      theme: 'theme-slate',
-      type: 'markup-include',
-      runtime: null,
-      visual: {
-        border: false,
-        accent: true,
-        background: true,
-        hideBackgroundColor: false,
-        borderColorTheme: false
-      }
-    },
+    config: imageWithText,
     isEditor: true,
     showEditorPanel: true
   }
