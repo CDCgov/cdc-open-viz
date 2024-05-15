@@ -121,18 +121,23 @@ const LineChartCircle = (props: LineChartCircleProps) => {
   if (mode === 'ISOLATED_POINTS') {
     const drawIsolatedPoints = (currentIndex, seriesKey) => {
       const currentPoint = data[currentIndex]
-      const previousPoint = data[currentIndex - 1]
-      const nextPoint = data[currentIndex + 1]
+      const previousPoint = currentIndex > 0 ? data[currentIndex - 1] : null
+      const nextPoint = currentIndex < data.length - 1 ? data[currentIndex + 1] : null
       let res = false
 
-      if (currentIndex === 0 && !nextPoint[seriesKey]) {
+      // Handle the first point in the array
+      if (currentIndex === 0 && nextPoint && !nextPoint[seriesKey]) {
         res = true
       }
-      if (currentIndex === data.length - 1 && !previousPoint[seriesKey]) {
+      // Handle the last point in the array
+      if (currentIndex === data.length - 1 && previousPoint && !previousPoint[seriesKey]) {
         res = true
       }
-      if (currentIndex !== 0 && currentPoint[seriesKey] && !previousPoint[seriesKey] && !nextPoint[seriesKey]) {
-        res = true
+      // Handle points in the middle
+      if (currentIndex > 0 && currentIndex < data.length - 1) {
+        if (currentPoint && currentPoint[seriesKey] && (!previousPoint || !previousPoint[seriesKey]) && (!nextPoint || !nextPoint[seriesKey])) {
+          res = true
+        }
       }
 
       return res
@@ -141,7 +146,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
     if (mode) {
       if (drawIsolatedPoints(dataIndex, seriesKey)) {
         return (
-          <circle cx={getXPos(d[config.xAxis.dataKey])} cy={filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered.dataKey])} r={5.3} strokeWidth={2} stroke={colorScale(config.runtime.seriesLabels[seriesKey])} fill={colorScale(config.runtime.seriesLabels[seriesKey])} />
+          <circle cx={getXPos(d[config.xAxis?.dataKey])} cy={filtered.axis === 'Right' ? yScaleRight(d[filtered.dataKey]) : yScale(d[filtered?.dataKey])} r={5.3} strokeWidth={2} stroke={colorScale(config.runtime.seriesLabels[seriesKey])} fill={colorScale(config.runtime?.seriesLabels[seriesKey])} />
         )
       }
     }

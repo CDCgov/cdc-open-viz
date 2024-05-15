@@ -13,11 +13,11 @@
   "lineDatapointStyle": "hover",
   "lineDatapointColor": "Same as Line",
   "barHasBorder": "false",
-  "isLollipopChart": true,
+  "isLollipopChart": false,
   "lollipopShape": "circle",
   "lollipopColorStyle": "two-tone",
   "visualizationSubType": "regular",
-  "barStyle": "lollipop",
+  "barStyle": "flat",
   "roundingStyle": "standard",
   "tipRounding": "top",
   "isResponsiveTicks": false,
@@ -34,13 +34,14 @@
       "seriesKey": "",
       "label": "Suppressed",
       "column": "",
-      "value": "110",
-      "style": "",
+      "value": "SUB",
+      "style": "Dashed Medium",
       "displayTooltip": true,
       "displayLegend": true,
       "displayTable": true,
       "symbol": "Dagger",
-      "iconCode": "†"
+      "iconCode": "†",
+      "lineCode": "– –"
     }
   ],
   "yAxis": {
@@ -182,7 +183,7 @@
     "data": [
       {
         "Date": "1/15/2016",
-        "Data 1": "1000",
+        "Data 1": "$1,000",
         "Data 2": "110",
         "Data 3": "100",
         "Data 4": "90",
@@ -253,7 +254,7 @@
         "Monthly-Goal": "140"
       }
     ],
-    "active": false
+    "active": true
   },
   "exclusions": {
     "active": false,
@@ -265,7 +266,7 @@
     "palette": "monochrome-1",
     "isPaletteReversed": false
   },
-  "labels": true,
+  "labels": false,
   "dataFormat": {
     "commas": false,
     "prefix": "",
@@ -290,6 +291,12 @@
     {
       "dataKey": "Data 2",
       "type": "Bar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Data 3",
+      "type": "Line",
       "axis": "Left",
       "tooltip": true
     }
@@ -460,14 +467,54 @@
       "Date": "9/15/2016",
       "Data 1": "120",
       "Data 2": "130",
-      "Data 3": "120",
+      "Data 3": "SUB",
+      "Data 4": "150",
+      "Monthly-Goal": "140"
+    },
+    {
+      "Date": "9/17/2016",
+      "Data 1": "120",
+      "Data 2": "130",
+      "Data 3": "SUB",
+      "Data 4": "150",
+      "Monthly-Goal": "140"
+    },
+    {
+      "Date": "9/18/2016",
+      "Data 1": "120",
+      "Data 2": "130",
+      "Data 3": "SUB",
+      "Data 4": "150",
+      "Monthly-Goal": "140"
+    },
+    {
+      "Date": "9/19/2016",
+      "Data 1": "120",
+      "Data 2": "130",
+      "Data 3": "SUB",
+      "Data 4": "150",
+      "Monthly-Goal": "140"
+    },
+    {
+      "Date": "9/20/2016",
+      "Data 1": "120",
+      "Data 2": "130",
+      "Data 3": "SUB",
+      "Data 4": "150",
+      "Monthly-Goal": "140"
+    },
+    {
+      "Date": "10/02/2016",
+      "Data 1": "120",
+      "Data 2": "130",
+      "Data 3": "333",
       "Data 4": "150",
       "Monthly-Goal": "140"
     }
   ],
-  "visualizationType": "Bar",
+  "visualizationType": "Line",
   "filters": [],
   "validated": 4.23,
   "dynamicMarginTop": 0,
-  "version": "4.24.3"
+  "version": "4.24.4"
 }

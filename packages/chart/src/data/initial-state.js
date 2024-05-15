@@ -159,7 +159,6 @@ export default {
   },
   brush: {
     height: 25,
-    data: [],
     active: false
   },
   exclusions: {

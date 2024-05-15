@@ -35,15 +35,14 @@ export const BarChartVertical = () => {
   } = useBarChart()
 
   // prettier-ignore
-  const { colorScale, config, dashboardConfig,tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, getTextWidth } = useContext<ChartContext>(ConfigContext)
-
+  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData,  brushConfig, } = useContext<ChartContext>(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   let data = transformedData
   if (config.preliminaryData.some(pd => pd.value && pd.type === 'suppression')) {
     data = tableData
   }
-  if (config.brush.active && config.brush.data?.length) {
-    data = config.brush.data
+  if (brushConfig.data.length) {
+    data = brushConfig.data
   }
   return (
     config.visualizationSubType !== 'stacked' &&

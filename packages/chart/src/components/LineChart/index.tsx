@@ -31,28 +31,19 @@ const LineChart = (props: LineChartProps) => {
   } = props
 
   // prettier-ignore
-  const {
-    colorScale,
-    config,
-    formatNumber,
-    handleLineType,
-    isNumber,
-    parseDate,
-    seriesHighlight,
-    tableData,
-    transformedData: data,
-    updateConfig,
-    rawData
-  } = useContext<ChartContext>(ConfigContext)
-  const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
+  const { colorScale, config, formatNumber, handleLineType, isNumber, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig } = useContext<ChartContext>(ConfigContext)
+  const { yScaleRight } = useRightAxis({ config, yMax, data: transformedData, updateConfig })
   if (!handleTooltipMouseOver) return
 
   const DEBUG = false
   const { lineDatapointStyle, showLineSeriesLabels, legend } = config
-
+  let data = transformedData
+  if (brushConfig.data.length) {
+    data = brushConfig.data
+  }
   return (
     <ErrorBoundary component='LineChart'>
-      <Group left={config.runtime.yAxis.size}>
+      <Group left={Number(config.runtime.yAxis.size)}>
         {' '}
         {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {

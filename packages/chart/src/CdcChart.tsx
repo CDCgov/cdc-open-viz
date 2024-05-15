@@ -78,6 +78,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState<any[]>([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [brushConfig, setBrushConfig] = useState({
+    data: [],
+    isActive: false,
+    isBrushing: false
+  })
   type Config = typeof config
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
@@ -1202,7 +1207,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
+
   const contextValues = {
+    brushConfig,
+    setBrushConfig,
     capitalize,
     computeMarginBottom,
     getXAxisData,
