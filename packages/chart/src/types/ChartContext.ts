@@ -1,6 +1,7 @@
 import { type ChartConfig } from './ChartConfig'
 import { PickD3Scale } from '@visx/scale'
 import { type SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
+import { type Annotation } from '@cdc/core/types/Annotation'
 
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
@@ -46,7 +47,7 @@ type LineChartContext = SharedChartContext & {
 export type ChartContext =
   | LineChartContext
   | (SharedChartContext & {
-      annotations: any
+      annotations: Annotation[]
       dimensions: [screenWidth: number, screenHeight: number]
       formatDate?: Function
       formatTooltipsDate: Function

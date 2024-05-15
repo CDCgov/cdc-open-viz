@@ -4,6 +4,5 @@ export const approvedCurveTypes = {
   Natural: 'curveNatural',
   'Monotone X': 'curveMonotoneX',
   Step: 'curveStep',
-  'Curve Basis': 'curveBasis',
-  'Curve Basis Open': 'curveBasisOpen'
+  'Curve Basis': 'curveBasis'
 }

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { useContext, FC } from 'react'
+import React from 'react'
+import { useContext } from 'react'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { type PanelProps } from './../PanelProps'
 import Button from '@cdc/core/components/elements/Button'
@@ -10,7 +10,7 @@ import './../panels.scss'
 import { s } from 'vitest/dist/reporters-1evA5lom'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
-  const { updateConfig, config, unfilteredData, dimensions, svgRef } = useContext(ConfigContext)
+  const { updateConfig, config, unfilteredData, dimensions } = useContext(ConfigContext)
 
   const getColumns = (filter = true) => {
     let columns = {}

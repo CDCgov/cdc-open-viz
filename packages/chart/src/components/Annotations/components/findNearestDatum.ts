@@ -1,16 +1,4 @@
-import { timeParse, timeFormat } from 'd3-time-format'
-import { formatDate } from '@cdc/core/helpers/cove/date'
-
-const invertedScaleValue = (value, xScale, data) => {
-  const range = xScale.range()
-  const domain = xScale.domain()
-  const percent = (value - range[0]) / (range[1] - range[0])
-  const index = Math.floor((domain.length - 1) * percent)
-  if (index >= domain.length) {
-    return data[domain.length - 1]
-  }
-  return data[index]
-}
+import { timeParse } from 'd3-time-format'
 
 const getXValueFromCoordinate = (x, isClick = false) => {
   if (visualizationType === 'Pie') return
@@ -91,9 +79,6 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeries
     if (orientation === 'horizontal') return
 
     if (config.xAxis.type === 'date-time') {
-      // Get the domain of the xScale (should be an array of two dates)
-      const [minX, maxX] = xScale.domain()
-
       // Calculate the percentage position of xValue between minX and maxX
       const invertedValue = new Date(xScale.invert(x))
       const ticks = config.data.map(d => new Date(d[config.xAxis.dataKey]).getTime())
@@ -147,18 +132,14 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeries
 
   let closestSeries = []
 
-  console.log('xValue', xValue)
   if (!xValue) return { x: 0, y: 0 }
 
   if (xAxis.type === 'categorical') {
     closestSeries = config.data.filter(d => d[config.xAxis.dataKey] === xValue)
   }
 
-  console.log('closest', closestSeries)
-
   if (xAxis.type === 'date' || xAxis.type === 'date-time') {
     closestSeries = config.data.filter(d => new Date(d[config.xAxis.dataKey]).getTime() === xValue)
-    // config.data.filter(d => console.log(new Date(d[config.xAxis.dataKey]).getTime()))
   }
 
   const y = closestSeries[0][annotationSeriesKey] // Map each key to its corresponding value in data

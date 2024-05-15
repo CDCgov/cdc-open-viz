@@ -1,27 +1,15 @@
 export type Annotation = {
   // background opacity of annotation
   opacity: number
+  // HTML text string to display in annotation
   text: string
-  fontSize: number
+  // can the user edit/drag the annotation
   edit: {
     subject: boolean
     label: boolean
   }
-  show: {
-    desktop: boolean
-    tablet: boolean
-    mobile: boolean
-  }
-  connectorType: 'line'
-  // visx curve type
+  // if the connectionType is curve - allow choosing a visx curve type
   lineType: string
-  // color adustments if needed?
-  colors: {
-    connector: string
-    label: string
-    marker: string
-  }
-  selected: boolean
   // anchor points for lines
   anchor: {
     horizontal: boolean
