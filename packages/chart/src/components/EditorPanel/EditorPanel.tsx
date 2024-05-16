@@ -35,6 +35,12 @@ import EditorPanelContext from './EditorPanelContext'
 import _ from 'lodash'
 
 const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: ChartConfig; updateConfig: Function; data: Record<string, any>[] }) => {
+  const isCombo = config.visualizationType === 'Combo'
+  const lineSeriesExists = config.runtime.lineSeriesKeys?.length > 0
+  const barSeriesExists = config.runtime.barSeriesKeys?.length > 0
+  const hasComboLineSeries = isCombo && lineSeriesExists
+  const hasComboBarSeries = isCombo && barSeriesExists
+
   const getColumnOptions = () => {
     return _.uniq(_.flatMap(data, _.keys))
   }
@@ -46,12 +52,6 @@ const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: Cha
       return ['suppression']
     }
   }
-
-  const isCombo = config.visualizationType === 'Combo'
-  const lineExist = config.runtime.lineSeriesKeys?.length > 0
-  const barExist = config.runtime.barSeriesKeys?.length > 0
-  const exr = isCombo && lineExist ? true : false
-  const exrx = isCombo && barExist ? true : false
 
   const symbolCodes = {
     Asterisk: '\u002A',
@@ -72,17 +72,18 @@ const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: Cha
 
   const getStyleOptions = type => {
     if (config.visualizationType === 'Line' || isCombo) {
+      const options = Object.keys(lineCodes)
       if (type === 'suppression') {
-        return ['Dashed Small', 'Dashed Medium', 'Dashed Large']
+        return options.slice(0, -1)
       } else {
-        return ['Dashed Small', 'Dashed Medium', 'Dashed Large', 'Open Circles']
+        return options
       }
     }
   }
 
   const getSymbolOptions = () => {
-    if (config.visualizationType === 'Bar' || (isCombo && barExist)) {
-      return ['Asterisk', 'Double Asterisks', 'Dagger', 'Double Daggers', 'Section Sign', 'Pilcrow', 'Hash']
+    if (config.visualizationType === 'Bar' || (isCombo && barSeriesExists)) {
+      return Object.keys(symbolCodes)
     }
   }
 
@@ -174,7 +175,7 @@ const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: Cha
                     options={config.runtime?.seriesKeys}
                   />
                   <TextField value={value} fieldName='value' label='Suppressed Data  Value' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
-                  {(exr || config.visualizationType === 'Line') && (
+                  {(hasComboLineSeries || config.visualizationType === 'Line') && (
                     <Select
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
@@ -195,7 +196,7 @@ const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: Cha
                     />
                   )}
 
-                  {(exrx || config.visualizationType === 'Bar') && (
+                  {(hasComboBarSeries || config.visualizationType === 'Bar') && (
                     <Select
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
@@ -288,7 +289,6 @@ const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: Cha
                   <Select value={column} initial='Select' fieldName='column' label='COLUMN WITH CONFIGURATION VALUE' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getColumnOptions()} />
                   <TextField value={value} fieldName='value' label='VALUE TO TRIGGER' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
                   <Select value={style} initial='Select' fieldName='style' label='Style' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getStyleOptions(type)} />
-
                   <TextField value={label} fieldName='label' label='Label' placeholder='' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} />
                 </>
               )}
