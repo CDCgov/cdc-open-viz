@@ -1675,8 +1675,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // this only shows in Dashboard config mode and only if Show Table is also set
   const tableLink = (
-    <a href={`#data-table-${state.general.dataKey}`} className='margin-left-href'>
-      {state.general.dataKey} (Go to Table)
+    <a href={`#data-table-${state.dataKey}`} className='margin-left-href'>
+      {state.dataKey} (Go to Table)
     </a>
   )
 
@@ -1704,7 +1704,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
               {/* prettier-ignore */}
-              {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
+              {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} getUniqueValues={getUniqueValues} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
 
               <div
                 role='region'
