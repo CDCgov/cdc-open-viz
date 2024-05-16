@@ -23,6 +23,7 @@ type SharedChartContext = {
   getTextWidth?: () => string | number
   brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
   setBrushConfig: Function
+  clean: Function
 }
 
 // Line Chart Specific Context
