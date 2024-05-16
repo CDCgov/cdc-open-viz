@@ -27,13 +27,14 @@ import WarningImage from '../../images/warning.svg'
 import useMinMax from '../../hooks/useMinMax'
 
 import { type ChartContext } from '../../types/ChartContext'
+import { type ChartConfig } from '../../types/ChartConfig'
 
 import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
 import _ from 'lodash'
 
-const PreliminaryData = ({ config, updateConfig, data }: { config: ChartConfig; updateConfig: Function; data: Record<string, any>[] }) => {
+const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: ChartConfig; updateConfig: Function; data: Record<string, any>[] }) => {
   const getColumnOptions = () => {
     return _.uniq(_.flatMap(data, _.keys))
   }
@@ -52,7 +53,7 @@ const PreliminaryData = ({ config, updateConfig, data }: { config: ChartConfig; 
   const exr = isCombo && lineExist ? true : false
   const exrx = isCombo && barExist ? true : false
 
-  const symbolsCodes = {
+  const symbolCodes = {
     Asterisk: '\u002A',
     'Double Asterisks': '\u002A\u002A',
     Dagger: '\u2020',
@@ -98,10 +99,23 @@ const PreliminaryData = ({ config, updateConfig, data }: { config: ChartConfig; 
   }
 
   let addColumn = () => {
-    const defaultLabel = 'Suppressed'
     const defaultType = config.visualizationType === 'Line' ? 'effect' : 'suppression'
     let preliminaryData = config.preliminaryData ? [...config.preliminaryData] : []
-    preliminaryData.push({ type: defaultType, seriesKey: '', label: defaultLabel, column: '', value: '', style: '', displayTooltip: true, displayLegend: true, displayTable: true, symbol: '', iconCode: '' })
+    const defaultValues = {
+      type: defaultType,
+      seriesKey: '',
+      label: 'Suppressed',
+      column: '',
+      value: '',
+      style: '',
+      displayTooltip: true,
+      displayLegend: true,
+      displayTable: true,
+      symbol: '',
+      iconCode: '',
+      lineCode: ''
+    }
+    preliminaryData.push(defaultValues)
     updateConfig({ ...config, preliminaryData })
   }
 
@@ -114,7 +128,7 @@ const PreliminaryData = ({ config, updateConfig, data }: { config: ChartConfig; 
 
     preliminaryData[i][fieldName] = value
     if (fieldName === 'symbol') {
-      preliminaryData[i]['iconCode'] = symbolsCodes[value]
+      preliminaryData[i]['iconCode'] = symbolCodes[value]
     }
     if (fieldName === 'style') {
       preliminaryData[i]['lineCode'] = lineCodes[value]

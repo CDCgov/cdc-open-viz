@@ -27,7 +27,7 @@ export interface PreliminaryDataItem {
   seriesKey: string
   style: string
   symbol: string
-  type: 'effect' | 'suppression' | ''
+  type: 'effect' | 'suppression'
   value: string
 }
 
