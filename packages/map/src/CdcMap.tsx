@@ -1704,7 +1704,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               {general.introText && <section className='introText'>{parse(general.introText)}</section>}
 
               {/* prettier-ignore */}
-              {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
+              {state?.filters?.length > 0 && <Filters config={state} setConfig={setState} getUniqueValues={getUniqueValues} filteredData={runtimeFilters} setFilteredData={setRuntimeFilters} dimensions={dimensions} />}
 
               <div
                 role='region'
