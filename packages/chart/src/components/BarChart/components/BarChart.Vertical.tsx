@@ -1,18 +1,23 @@
 import React, { useContext, useState } from 'react'
+// Local contexts
 import ConfigContext from '../../../ConfigContext'
-import { type ChartContext } from '../../../types/ChartContext'
+import BarChartContext, { type BarChartContextValues } from './context'
+// Local hooks
 import { useBarChart } from '../../../hooks/useBarChart'
+import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
+// VisX library imports
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
-import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
-import Regions from './../../Regions'
+// Local components
+import Regions from '../../Regions'
+// CDC core components and helpers
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import createBarElement from '@cdc/core/components/createBarElement'
-// third party
-
+// Third party libraries
 import chroma from 'chroma-js'
-import BarChartContext, { type BarChartContextValues } from './context'
+// Types
+import { type ChartContext } from '../../../types/ChartContext'
 
 export const BarChartVertical = () => {
   const { xScale, yScale, xMax, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
