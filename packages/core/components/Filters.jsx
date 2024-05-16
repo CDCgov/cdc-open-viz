@@ -57,8 +57,8 @@ export const useFilters = props => {
 
   // Desconstructing: notice, adding more descriptive visualizationConfig name over config
   // visualizationConfig feels more robust for all vis types so that its not confused with config/state/etc.
-  const { config: visualizationConfig, setConfig, filteredData, setFilteredData, excludedData, filterData } = props
-  const { type } = visualizationConfig
+  const { config: visualizationConfig, setConfig, filteredData, setFilteredData, excludedData, filterData, getUniqueValues } = props
+  const { type, data } = visualizationConfig
 
   /**
    * Re-orders a filter based on two indices and updates the runtime filters array and filters state
@@ -166,11 +166,26 @@ export const useFilters = props => {
     e.preventDefault()
 
     // reset to first item in values array.
-    newFilters.map(filter => {
-      filter = handleSorting(filter)
-      filter.active = filter.values[0]
-      return filter
+    let needsQueryUpdate = false
+    const queryParams = getQueryParams()
+    newFilters.forEach((filter, i) => {
+      if(!filter.values || filter.values.length === 0){
+        filter.values = getUniqueValues(data, filter.columnName)
+      }
+      newFilters[i].active = handleSorting(filter).values[0]
+
+
+      if (filter.setByQueryParameter && queryParams[filter.setByQueryParameter] !== filter.active) {
+        queryParams[filter.setByQueryParameter] = filter.active
+        needsQueryUpdate = true
+      }
     })
+
+    if (needsQueryUpdate) {
+      updateQueryString(queryParams)
+    }
+
+    setConfig({ ...visualizationConfig, filters: newFilters })
 
     if (type === 'map') {
       setFilteredData(newFilters, excludedData)
@@ -178,7 +193,6 @@ export const useFilters = props => {
       setFilteredData(filterData(newFilters, excludedData))
     }
 
-    setConfig({ ...visualizationConfig, filters: newFilters })
   }
 
   const filterConstants = {
@@ -204,8 +218,8 @@ export const useFilters = props => {
 }
 
 const Filters = props => {
-  const { config: visualizationConfig, filteredData, dimensions } = props
-  const { filters, type, general, theme, filterBehavior } = visualizationConfig
+  const { config: visualizationConfig, filteredData, dimensions, getUniqueValues } = props
+  const { filters, type, general, theme, filterBehavior, data } = visualizationConfig
   const [mobileFilterStyle, setMobileFilterStyle] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState('')
   const id = useId()
