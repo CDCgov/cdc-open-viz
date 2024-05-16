@@ -1257,7 +1257,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setSharedFilter,
     setSharedFilterValue,
     dashboardConfig,
-    debugSvg: isDebug
+    debugSvg: isDebug,
+    clean
   }
 
   return (

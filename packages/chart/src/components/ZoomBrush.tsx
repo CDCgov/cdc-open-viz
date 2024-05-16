@@ -14,7 +14,7 @@ interface Props {
   yMax: number
 }
 const ZoomBrush: FC<Props> = props => {
-  const { tableData, config, parseDate, formatDate, updateConfig, brushConfig, setBrushConfig } = useContext(ConfigContext)
+  const { tableData, config, parseDate, formatDate, setBrushConfig } = useContext(ConfigContext)
   const { fontSize } = useBarChart()
   const [brushKey, setBrushKey] = useState(0)
   const brushRef = useRef(null)
@@ -102,7 +102,6 @@ const ZoomBrush: FC<Props> = props => {
         }
       })
   }, [config.filters])
-  console.log(brushConfig.data)
 
   const calculateTop = (): number => {
     const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0

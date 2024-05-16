@@ -112,41 +112,61 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
   return result
 }
 
-const handleMiddleIndices = (data, seriesKey, preliminaryData) => {
+function handleMiddleIndices(data, seriesKey, dataKey, preliminaryData) {
   const result = {
     data: [],
     style: ''
   }
-  data.forEach((item, index) => {
-    preliminaryData.forEach(pd => {
-      if (item[seriesKey] === pd.value) {
-        // Find the previous calculable point
-        const prevIndex = index - 1
-        if (prevIndex >= 0 && data[prevIndex][seriesKey] !== pd.value) {
-          result.data.push(data[prevIndex])
+
+  preliminaryData.forEach(pd => {
+    const targetValue = pd.value
+    const style = pd.style
+
+    result.style = style
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i][seriesKey] === targetValue) {
+        // Skip if the target value is at the first or last index
+        if (i === 0 || i === data.length - 1) {
+          continue
         }
 
-        // Find the next calculable point
-        const nextIndex = index + 1
-        if (nextIndex < data.length && data[nextIndex][seriesKey] !== pd.value) {
-          result.data.push(data[nextIndex])
+        // Add previous object if it is calculable
+        if (i > 0 && isCalculable(data[i - 1][seriesKey])) {
+          result.data.push(data[i - 1])
         }
-        result.style = pd.style
+
+        // Find the next calculable object
+        let nextObject = null
+        for (let j = i + 1; j < data.length; j++) {
+          if (data[j][seriesKey] !== targetValue && isCalculable(data[j][seriesKey])) {
+            nextObject = data[j]
+            break
+          }
+        }
+
+        // Add next calculable object if found
+        if (nextObject) {
+          result.data.push(nextObject)
+        }
       }
-    })
+    }
   })
+
+  // Remove any duplicates
+  result.data = result.data.filter((item, index, self) => index === self.findIndex(t => t[dataKey] === item[dataKey] && t[seriesKey] === item[seriesKey]))
 
   return result
 }
 
 // create segments (array of arrays) for building suppressed Lines
-export const createDataSegments = (data, seriesKey, preliminaryData) => {
+export const createDataSegments = (data, seriesKey, preliminaryData, dataKey) => {
   // Process the first index if necessary
   const firstSegment = handleFirstIndex(data, seriesKey, preliminaryData)
   // Process the last index if necessary
   const lastSegment = handleLastIndex(data, seriesKey, preliminaryData)
   // Process the middle segment
-  const middleSegments = handleMiddleIndices(data, seriesKey, preliminaryData)
+  const middleSegments = handleMiddleIndices(data, seriesKey, dataKey, preliminaryData)
   // Combine all segments into a single array
   return [firstSegment, middleSegments, lastSegment].filter(segment => segment.data.length > 0)
 }

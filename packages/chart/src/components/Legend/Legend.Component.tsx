@@ -12,15 +12,15 @@ import { ChartConfig } from '../../types/ChartConfig'
 import { ColorScale } from '../../types/ChartContext'
 import { forwardRef } from 'react'
 
-interface LegendProps {
-  config: ChartConfig
+export interface LegendProps {
   colorScale: ColorScale
-  seriesHighlight: string[]
-  highlight: Function
-  highlightReset: Function
+  config: ChartConfig
   currentViewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   formatLabels: (labels: Label[]) => Label[]
+  highlight: Function
+  highlightReset: Function
   ref: React.Ref<() => void>
+  seriesHighlight: string[]
   skipId: string
 }
 
@@ -28,7 +28,6 @@ interface LegendProps {
 const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels, skipId = 'legend' }, ref) => {
   const { innerClasses, containerClasses } = useLegendClasses(config)
   const { runtime, orientation, legend } = config
-  const { suppressionIcons } = useBarChart()
 
   if (!legend) return null
   const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
@@ -155,7 +154,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                           <>
                             {pd.label && pd.type === 'effect' && pd.style && (
                               <div key={index} className='legend-preliminary'>
-                                <span className={pd.symbol}>{pd.iconCode}</span>
+                                <span className={pd.symbol}>{pd.lineCode}</span>
                                 <p> {pd.label}</p>
                               </div>
                             )}

@@ -17,18 +17,18 @@ export type LineChartProps = {
 }
 
 export interface PreliminaryDataItem {
-  style: string
-  type: 'effect' | 'suppression' | ''
   column: string
-  value: string
-  seriesKey: string
-  label: string
-  symbol: string
-  displayTooltip: boolean
   displayLegend: boolean
   displayTable: boolean
+  displayTooltip: boolean
   iconCode: string
+  label: string
   lineCode: string
+  seriesKey: string
+  style: string
+  symbol: string
+  type: 'effect' | 'suppression' | ''
+  value: string
 }
 
 export interface DataItem {
@@ -39,12 +39,12 @@ export interface Config {
   preliminaryData: PreliminaryDataItem[] | []
 }
 export interface StyleProps {
-  preliminaryData: PreliminaryDataItem[]
   data: DataItem[]
-  stroke: string
   handleLineType: Function
   lineType: string
+  preliminaryData: PreliminaryDataItem[]
   seriesKey: 'string'
+  stroke: string
   strokeWidth: number
 }
 export interface Style {

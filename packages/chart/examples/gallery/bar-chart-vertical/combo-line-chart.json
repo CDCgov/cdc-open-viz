@@ -35,13 +35,13 @@
       "label": "Suppressed",
       "column": "",
       "value": "SUB",
-      "style": "Dashed Medium",
+      "style": "Dashed Small",
       "displayTooltip": true,
       "displayLegend": true,
       "displayTable": true,
-      "symbol": "Dagger",
-      "iconCode": "†",
-      "lineCode": "– –"
+      "symbol": "Pilcrow",
+      "iconCode": "¶",
+      "lineCode": "- - -"
     }
   ],
   "yAxis": {
@@ -290,12 +290,6 @@
   "series": [
     {
       "dataKey": "Data 2",
-      "type": "Bar",
-      "axis": "Left",
-      "tooltip": true
-    },
-    {
-      "dataKey": "Data 3",
       "type": "Line",
       "axis": "Left",
       "tooltip": true
@@ -401,47 +395,47 @@
   "data": [
     {
       "Date": "1/15/2016",
-      "Data 1": "$1,000",
-      "Data 2": "110",
+      "Data 1": "1223",
+      "Data 2": "12",
       "Data 3": "100",
       "Data 4": "90",
       "Monthly-Goal": "100"
     },
     {
       "Date": "2/15/2016",
-      "Data 1": "100",
-      "Data 2": "110",
-      "Data 3": "100",
+      "Data 1": "SUB",
+      "Data 2": "SUB",
+      "Data 3": "140",
       "Data 4": "100",
       "Monthly-Goal": "100"
     },
     {
       "Date": "3/15/2016",
-      "Data 1": "80",
-      "Data 2": "90",
-      "Data 3": "100",
+      "Data 1": "333",
+      "Data 2": "122",
+      "Data 3": "SUB",
       "Data 4": "120",
       "Monthly-Goal": "110"
     },
     {
       "Date": "4/15/2016",
-      "Data 1": "80",
-      "Data 2": "90",
+      "Data 1": "199",
+      "Data 2": "444",
       "Data 3": "110",
       "Data 4": "120",
       "Monthly-Goal": "110"
     },
     {
       "Date": "5/15/2016",
-      "Data 1": "70",
-      "Data 2": "90",
+      "Data 1": "SUB",
+      "Data 2": "432",
       "Data 3": "110",
       "Data 4": "130",
       "Monthly-Goal": "120"
     },
     {
       "Date": "6/15/2016",
-      "Data 1": "100",
+      "Data 1": "SUB",
       "Data 2": "120",
       "Data 3": "120",
       "Data 4": "130",
@@ -449,7 +443,7 @@
     },
     {
       "Date": "7/15/2016",
-      "Data 1": "110",
+      "Data 1": "SUB",
       "Data 2": "140",
       "Data 3": "120",
       "Data 4": "130",
@@ -457,8 +451,8 @@
     },
     {
       "Date": "8/15/2016",
-      "Data 1": "110",
-      "Data 2": "130",
+      "Data 1": "888",
+      "Data 2": "444",
       "Data 3": "120",
       "Data 4": "140",
       "Monthly-Goal": "130"
@@ -466,15 +460,15 @@
     {
       "Date": "9/15/2016",
       "Data 1": "120",
-      "Data 2": "130",
-      "Data 3": "SUB",
+      "Data 2": "123",
+      "Data 3": "44",
       "Data 4": "150",
       "Monthly-Goal": "140"
     },
     {
       "Date": "9/17/2016",
       "Data 1": "120",
-      "Data 2": "130",
+      "Data 2": "900",
       "Data 3": "SUB",
       "Data 4": "150",
       "Monthly-Goal": "140"
@@ -482,7 +476,7 @@
     {
       "Date": "9/18/2016",
       "Data 1": "120",
-      "Data 2": "130",
+      "Data 2": "555",
       "Data 3": "SUB",
       "Data 4": "150",
       "Monthly-Goal": "140"
@@ -490,7 +484,7 @@
     {
       "Date": "9/19/2016",
       "Data 1": "120",
-      "Data 2": "130",
+      "Data 2": "544",
       "Data 3": "SUB",
       "Data 4": "150",
       "Monthly-Goal": "140"
@@ -498,15 +492,15 @@
     {
       "Date": "9/20/2016",
       "Data 1": "120",
-      "Data 2": "130",
+      "Data 2": "122",
       "Data 3": "SUB",
-      "Data 4": "150",
+      "Data 4": "SUB",
       "Monthly-Goal": "140"
     },
     {
       "Date": "10/02/2016",
       "Data 1": "120",
-      "Data 2": "130",
+      "Data 2": "444",
       "Data 3": "333",
       "Data 4": "150",
       "Monthly-Goal": "140"
