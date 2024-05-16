@@ -1,33 +1,28 @@
-import React from 'react'
-import { useContext } from 'react'
-import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
-import { type PanelProps } from './../PanelProps'
-import Button from '@cdc/core/components/elements/Button'
+import React, { useContext } from 'react'
 import ConfigContext from '../../../../ConfigContext.js'
-import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
+// CDC Core
+import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
+import Accordion from '@cdc/core/components/ui/Accordion'
+import Button from '@cdc/core/components/elements/Button'
+
+// types
+import { type PanelProps } from './../PanelProps'
+// styles
 import './../panels.scss'
-import { s } from 'vitest/dist/reporters-1evA5lom'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
   const { updateConfig, config, unfilteredData, dimensions } = useContext(ConfigContext)
 
   const getColumns = (filter = true) => {
-    let columns = {}
+    const columns = {}
     unfilteredData.forEach(row => {
       Object.keys(row).forEach(columnName => (columns[columnName] = true))
     })
 
     if (filter) {
       Object.keys(columns).forEach(key => {
-        if (
-          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
-          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))
-          /*
-            TODO: Resolve errors when config keys exist, but have no value
-              Proposal:  (((confidenceUpper && confidenceLower) || confidenceUpper || confidenceLower) && Object.keys(config.confidenceKeys).includes(key))
-          */
-        ) {
+        if ((config.series && config.series.filter(series => series.dataKey === key).length > 0) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))) {
           delete columns[key]
         }
       })
@@ -106,25 +101,18 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   return (
-    <AccordionItem>
-      <AccordionItemHeading>
-        <AccordionItemButton>{props.name}</AccordionItemButton>
-      </AccordionItemHeading>
-      <AccordionItemPanel>
+    <Accordion>
+      <Accordion.Section title={props.name}>
         {config?.annotations &&
           config?.annotations.map((annotation, index) => (
-            <Accordion allowZeroExpanded>
-              <AccordionItem className='series-item series-item--chart' key={`${index}`}>
-                <AccordionItemHeading className='series-item__title'>
-                  <AccordionItemButton>{annotation.text ? annotation.text.substring(0, 15) + '...' : `Annotation ${index + 1}`}</AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <div className='annotation-group'>
-                    <label>
-                      Annotation Text:
-                      <textarea rows={5} value={annotation.text} onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)} />
-                    </label>
-                    {/* <label>
+            <Accordion>
+              <Accordion.Section title={annotation.text ? annotation.text.substring(0, 15) + '...' : `Annotation ${index + 1}`}>
+                <div className='annotation-group'>
+                  <label>
+                    Annotation Text:
+                    <textarea rows={5} value={annotation.text} onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)} />
+                  </label>
+                  {/* <label>
                       Vertical Anchor
                       <input
                         type='checkbox'
@@ -155,180 +143,179 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       />
                     </label> */}
 
-                    <label>
-                      Opacity
-                      <br />
-                      <input
-                        type='range'
-                        onClick={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].opacity = e.target.value
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      />
-                    </label>
+                  <label>
+                    Opacity
+                    <br />
+                    <input
+                      type='range'
+                      onClick={e => {
+                        const updatedAnnotations = [...config?.annotations]
+                        updatedAnnotations[index].opacity = e.target.value
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    />
+                  </label>
 
-                    <label>
-                      Edit Subject
-                      <input
-                        type='checkbox'
-                        checked={config?.annotations[index]?.edit?.subject}
-                        onClick={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].edit.subject = e.target.checked
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      />
-                    </label>
-                    <label>
-                      Edit Label
-                      <input
-                        type='checkbox'
-                        checked={config?.annotations[index]?.edit?.label}
-                        onClick={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].edit.label = e.target.checked
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      />
-                    </label>
-                    <label>
-                      Associated Series:
-                      <select
-                        onChange={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].seriesKey = e.target.value
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      >
-                        <option key='none' value='none'>
-                          None
+                  <label>
+                    Edit Subject
+                    <input
+                      type='checkbox'
+                      checked={config?.annotations[index]?.edit?.subject}
+                      onClick={e => {
+                        const updatedAnnotations = [...config?.annotations]
+                        updatedAnnotations[index].edit.subject = e.target.checked
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    />
+                  </label>
+                  <label>
+                    Edit Label
+                    <input
+                      type='checkbox'
+                      checked={config?.annotations[index]?.edit?.label}
+                      onClick={e => {
+                        const updatedAnnotations = [...config?.annotations]
+                        updatedAnnotations[index].edit.label = e.target.checked
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    />
+                  </label>
+                  <label>
+                    Associated Series:
+                    <select
+                      onChange={e => {
+                        const updatedAnnotations = [...config?.annotations]
+                        updatedAnnotations[index].seriesKey = e.target.value
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    >
+                      <option key='none' value='none'>
+                        None
+                      </option>
+                      {getColumns(false).map((column, columnIndex) => {
+                        return <option>{column}</option>
+                      })}
+                    </select>
+                  </label>
+
+                  <label>
+                    Connection Type:
+                    <select
+                      onChange={e => {
+                        const updatedAnnotations = [...config?.annotations]
+                        updatedAnnotations[index].connectionType = e.target.value
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    >
+                      {['curve', 'line', 'elbow', 'none'].map((side, index) => (
+                        <option key={side} value={side}>
+                          {side}
                         </option>
-                        {getColumns(false).map((column, columnIndex) => {
-                          return <option>{column}</option>
-                        })}
-                      </select>
-                    </label>
+                      ))}
+                    </select>
+                  </label>
 
+                  {annotation.connectionType === 'curve' && (
                     <label>
-                      Connection Type:
+                      Line Type:
                       <select
                         onChange={e => {
                           const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].connectionType = e.target.value
+                          updatedAnnotations[index].lineType = e.target.value
                           updateConfig({
                             ...config,
                             annotations: updatedAnnotations
                           })
                         }}
                       >
-                        {['curve', 'line', 'elbow', 'none'].map((side, index) => (
-                          <option key={side} value={side}>
-                            {side}
+                        {Object.entries(approvedCurveTypes).map(([value, key]) => (
+                          <option key={key} value={key}>
+                            {value}
                           </option>
                         ))}
                       </select>
                     </label>
+                  )}
 
-                    {annotation.connectionType === 'curve' && (
-                      <label>
-                        Line Type:
-                        <select
-                          onChange={e => {
-                            const updatedAnnotations = [...config?.annotations]
-                            updatedAnnotations[index].lineType = e.target.value
-                            updateConfig({
-                              ...config,
-                              annotations: updatedAnnotations
-                            })
-                          }}
-                        >
-                          {Object.entries(approvedCurveTypes).map(([value, key]) => (
-                            <option key={key} value={key}>
-                              {value}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    )}
+                  <label>
+                    Connection Location:
+                    <select
+                      onChange={e => {
+                        const updatedAnnotations = [...config?.annotations]
+                        updatedAnnotations[index].connectionLocation = e.target.value
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    >
+                      {['auto', 'left', 'top', 'bottom', 'right'].map((side, index) => (
+                        <option key={side} value={side}>
+                          {side}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
 
-                    <label>
-                      Connection Location:
-                      <select
-                        onChange={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].connectionLocation = e.target.value
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      >
-                        {['auto', 'left', 'top', 'bottom', 'right'].map((side, index) => (
-                          <option key={side} value={side}>
-                            {side}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
+                  <label>
+                    Marker
+                    <select
+                      onChange={e => {
+                        const updatedAnnotations = [...config?.annotations]
+                        updatedAnnotations[index].marker = e.target.value
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    >
+                      {['circle', 'arrow'].map((column, columnIndex) => {
+                        return <option>{column}</option>
+                      })}
+                    </select>
+                  </label>
 
-                    <label>
-                      Marker
-                      <select
-                        onChange={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].marker = e.target.value
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      >
-                        {['circle', 'arrow'].map((column, columnIndex) => {
-                          return <option>{column}</option>
-                        })}
-                      </select>
-                    </label>
+                  <label>
+                    Snap to Nearest Point
+                    <input
+                      type='checkbox'
+                      checked={config?.annotations[index]?.snapToNearestPoint}
+                      onClick={e => {
+                        const updatedAnnotations = [...config?.annotations]
+                        updatedAnnotations[index].snapToNearestPoint = e.target.checked
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    />
+                  </label>
 
-                    <label>
-                      Snap to Nearest Point
-                      <input
-                        type='checkbox'
-                        checked={config?.annotations[index]?.snapToNearestPoint}
-                        onClick={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].snapToNearestPoint = e.target.checked
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      />
-                    </label>
-
-                    <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
-                      Delete Annotation
-                    </Button>
-                  </div>
-                </AccordionItemPanel>
-              </AccordionItem>
+                  <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
+                    Delete Annotation
+                  </Button>
+                </div>
+              </Accordion.Section>
             </Accordion>
           ))}
         {config?.annotations?.length < 3 && <Button onClick={handleAddAnnotation}>Add Annotation</Button>}
-      </AccordionItemPanel>
-    </AccordionItem>
+      </Accordion.Section>
+    </Accordion>
   )
 }
 

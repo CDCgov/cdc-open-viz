@@ -39,18 +39,6 @@ const getXValueFromCoordinate = (x, isClick = false) => {
 const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeriesKey }, xPosition) => {
   const { xAxis, visualizationType, orientation } = config
 
-  const parseDate = (dateString, showError = true) => {
-    let date = timeParse(config.xAxis.dateParseFormat)(dateString)
-    if (!date) {
-      if (showError) {
-        config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
-      }
-      return new Date()
-    } else {
-      return date
-    }
-  }
-
   const convertXValueToTimestamp = (xValue, minX, maxX, domain, xScale) => {
     let ticks = []
     if (config.xAxis.type === 'date-time') {
@@ -98,8 +86,8 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeries
 
     // Check the type of x equal to point or if the type of xAxis is equal to continuous or date
     if (config.xAxis.type === 'categorical' || (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')) {
-      let range = xScale.range()[1] - xScale.range()[0]
-      let eachBand = range / (xScale.domain().length + 1)
+      const range = xScale.range()[1] - xScale.range()[0]
+      const eachBand = range / (xScale.domain().length + 1)
 
       let numerator = x
       const index = Math.floor((Number(numerator) - eachBand / 2) / eachBand)

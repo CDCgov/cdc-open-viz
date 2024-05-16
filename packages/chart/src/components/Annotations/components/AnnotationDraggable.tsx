@@ -16,7 +16,6 @@ import { Annotation } from '@cdc/core/types/Annotation'
 
 // styles
 import './AnnotationDraggable.styles.css'
-import { a } from 'vitest/dist/suite-ghspeorC'
 
 const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   const [draggingItems, setDraggingItems] = useState([])
