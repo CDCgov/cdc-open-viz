@@ -1112,7 +1112,23 @@ const EditorPanel = () => {
                     </>
                   )}
                   <span className='divider-heading'>Number Formatting</span>
-                  <CheckBox value={config.dataFormat.commas} section='dataFormat' fieldName='commas' label='Add commas' updateField={updateField} />
+                  <CheckBox
+                    value={config.dataFormat.commas}
+                    section='dataFormat'
+                    fieldName='commas'
+                    label='Add commas'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>{`Selecting this option will add commas to the left value axis, tooltip hover, and data table.`}</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <CheckBox
                     value={config.dataFormat.abbreviated}
                     section='dataFormat'
