@@ -24,6 +24,7 @@ type SharedChartContext = {
   brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
   setBrushConfig: Function
   clean: Function
+  capitalize: (value: string) => string
 }
 
 // Line Chart Specific Context

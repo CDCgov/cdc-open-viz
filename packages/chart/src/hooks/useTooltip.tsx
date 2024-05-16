@@ -6,16 +6,14 @@ import { type ChartContext } from '../types/ChartContext'
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-const transform = new DataTransform()
 
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 export const useTooltip = props => {
-  const { tableData, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)
+  const { tableData: data, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, showTooltip, hideTooltip } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
-  const data = transform.applySuppression(tableData, config.suppressedData)
   /**
    * Provides the tooltip information based on the tooltip data array and svg cursor coordinates
    * @function getTooltipInformation

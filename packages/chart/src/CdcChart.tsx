@@ -1178,7 +1178,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                 <DataTable
                   config={config}
                   rawData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
-                  runtimeData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : transform.applySuppression(filteredData || excludedData, config.suppressedData)}
+                  runtimeData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : filteredData || excludedData}
                   expandDataTable={config.table.expanded}
                   columns={config.columns}
                   displayDataAsText={displayDataAsText}

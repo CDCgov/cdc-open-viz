@@ -46,11 +46,7 @@ const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: Cha
   }
 
   const getTypeOptions = () => {
-    if (config.visualizationType === 'Line' || config.visualizationType === 'Combo') {
-      return ['effect', 'suppression']
-    } else {
-      return ['suppression']
-    }
+    return config.visualizationType === 'Line' || hasComboLineSeries ? ['effect', 'suppression'] : ['suppression']
   }
 
   const symbolCodes = {
@@ -82,7 +78,7 @@ const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: Cha
   }
 
   const getSymbolOptions = () => {
-    if (config.visualizationType === 'Bar' || (isCombo && barSeriesExists)) {
+    if (config.visualizationType === 'Bar' || hasComboBarSeries) {
       return Object.keys(symbolCodes)
     }
   }
@@ -140,7 +136,7 @@ const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: Cha
   return (
     <>
       {config.preliminaryData &&
-        config.preliminaryData.map(({ seriesKey, type, label, column, value, style, displayTooltip, displayLegend, displayTable, symbol }, i) => {
+        config.preliminaryData.map(({ column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value }, i) => {
           return (
             <div key={`preliminaryData-${i}`} className='edit-block'>
               <button
