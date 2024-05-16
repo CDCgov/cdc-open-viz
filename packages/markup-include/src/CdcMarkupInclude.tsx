@@ -43,9 +43,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
   const { contentEditor, theme } = config
-  const data = configObj.data
+  const data = configObj?.data
 
-  const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML } = contentEditor
+  const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML } = contentEditor || {}
 
   // Default Functions
   const updateConfig = newConfig => {
