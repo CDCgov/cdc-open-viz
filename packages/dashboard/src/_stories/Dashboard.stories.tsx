@@ -7,6 +7,7 @@ import ExampleConfig_2 from './_mock/dashboard-2.json'
 import ExampleConfig_3 from './_mock/dashboard_no_filter.json'
 import Dashboard_Filter from './_mock/dashboard-filter.json'
 import MultiVizConfig from './_mock/multi-viz.json'
+import MultiDashboardConfig from './_mock/multi-dashboards.json'
 import Dashboard from '../CdcDashboard'
 import StandaloneTable from './_mock/standalone-table.json'
 import PivotFitlerConfig from './_mock/pivot-filter.json'
@@ -95,6 +96,13 @@ const multiVizData = {
 export const MultiVisualization: Story = {
   args: {
     config: { ...MultiVizConfig, datasets: multiVizData },
+    isEditor: false
+  }
+}
+
+export const MultiDashboard: Story = {
+  args: {
+    config: MultiDashboardConfig,
     isEditor: false
   }
 }
