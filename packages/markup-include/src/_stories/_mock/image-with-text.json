@@ -1,9 +1,25 @@
 {
-  "title": "<strong>Markup Include</strong> - Image with Text",
-  "showHeader": false,
-  "type": "markup-include",
-  "srcUrl": "/wcms/4.0/cdc-wp/data-presentation/examples/SSI-Image-With-Text.html",
-  "theme": "theme-slate",
+  "contentEditor": {
+    "inlineHTML": "<div>{{race}} did not have an age adjusted rate of 644.2.</div>",
+    "markupVariables": [
+      {
+        "name": "race",
+        "tag": "{{race}}",
+        "columnName": "Race",
+        "conditions": [
+          {
+            "columnName": "Age-adjusted rate",
+            "isOrIsNotEqualTo": "isNot",
+            "value": "644.2"
+          }
+        ]
+      }
+    ],
+    "showHeader": false,
+    "srcUrl": "/wcms/4.0/cdc-wp/data-presentation/examples/SSI-Image-With-Text.html",
+    "title": "<strong>Markup Include</strong> - Image with Text",
+    "useInlineHTML": true
+  },
   "data": [
     {
       "Race": "Hispanic or Latino",
@@ -26,6 +42,18 @@
       "Age-adjusted rate": "183.6"
     }
   ],
-  "dataFileName": "valid-data-chart.csv",
-  "dataFileSourceType": "file"
+  "legend": {},
+  "newViz": true,
+  "theme": "theme-slate",
+  "type": "markup-include",
+  "runtime": null,
+  "visual": {
+    "border": false,
+    "accent": true,
+    "background": true,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false
+  },
+  "isEditor": true,
+  "showEditorPanel": true
 }
