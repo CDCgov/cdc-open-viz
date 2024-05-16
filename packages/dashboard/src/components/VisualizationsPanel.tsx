@@ -67,7 +67,7 @@ const VisualizationsPanel = ({ loadConfig, config }) => (
       <Widget addVisualization={() => addVisualization('table', '')} type='table' />
     </div>
     <span className='subheading-3'>Advanced</span>
-    <AdvancedEditor loadConfig={loadConfig} state={config} convertStateToConfig={undefined} />
+    <AdvancedEditor loadConfig={loadConfig} state={config} convertStateToConfig={() => undefined} />
   </div>
 )
 

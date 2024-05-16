@@ -1,12 +1,9 @@
 import type { DashboardConfig as Config } from '../types/DashboardConfig'
 import { type Action } from '@cdc/core/types/Action'
 import { Tab } from '../types/Tab'
-<<<<<<< HEAD
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
 import { ConfigRow } from '../types/ConfigRow'
-=======
 import { SharedFilter } from '../types/SharedFilter'
->>>>>>> 35436844 (fixed api dropdowns)
 
 type SET_CONFIG = Action<'SET_CONFIG', Partial<Config>>
 type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [Config, Object?]>
@@ -23,12 +20,9 @@ type ADD_NEW_DASHBOARD = Action<'ADD_NEW_DASHBOARD', undefined>
 type SAVE_CURRENT_CHANGES = Action<'SAVE_CURRENT_CHANGES', undefined>
 type SWITCH_CONFIG = Action<'SWITCH_CONFIG', number>
 type TOGGLE_ROW = Action<'TOGGLE_ROW', { rowIndex: number; colIndex: number }>
-<<<<<<< HEAD
 type UPDATE_VISUALIZATION = Action<'UPDATE_VISUALIZATION', { vizKey: string; configureData: Partial<ConfigureData> }>
 type UPDATE_ROW = Action<'UPDATE_ROW', { rowIndex: number; rowData: Partial<ConfigRow> }>
-=======
 type SET_SHARED_FILTERS = Action<'SET_SHARED_FILTERS', SharedFilter[]>
->>>>>>> 35436844 (fixed api dropdowns)
 
 type DashboardActions =
   | ADD_NEW_DASHBOARD
