@@ -1,14 +1,12 @@
 import { useContext } from 'react'
+// Local imports
 import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
-
-// third party
-import { localPoint } from '@visx/event'
-import { bisector } from 'd3-array'
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
-
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
+// Third-party library imports
+import { localPoint } from '@visx/event'
+import { bisector } from 'd3-array'
 
 export const useTooltip = props => {
   const { tableData: data, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)

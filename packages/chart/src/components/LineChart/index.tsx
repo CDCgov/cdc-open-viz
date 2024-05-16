@@ -1,17 +1,23 @@
 import React, { useContext } from 'react'
 
+// VisX library imports
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
 import { LinePath, Bar, SplitLinePath } from '@visx/shape'
 import { Text } from '@visx/text'
 
+// CDC core components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+
+// Local context and hooks
 import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
+
+// Local helpers and components
 import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 
-// types
+// Types
 import { type ChartContext } from '../../types/ChartContext'
 import { type LineChartProps } from './LineChartProps'
 
