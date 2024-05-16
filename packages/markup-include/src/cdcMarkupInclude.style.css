@@ -1,7 +1,4 @@
-/* .cdc-open-viz-module.markup-include.isEditor { */
 .cdc-open-viz-module.markup-include {
-  height: 100vh;
-  background-color: var(--lightestGray);
   .spacing-wrapper {
     background-color: var(--lightGray) !important;
   }
@@ -10,12 +7,8 @@
   }
 
   .markup-include-content-container.cove-component__content {
-    height: 100vh;
     .markup-include-component.cove-component__content {
-      margin: 3em auto 0;
       max-width: 35em;
-      /* min-height: 300px; */
-      height: fit-content;
     }
     .markup-include-component.cove-component__content:not(.component--hideBackgroundColor, .component--has-background) {
       background-color: white;

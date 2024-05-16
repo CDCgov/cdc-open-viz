@@ -1,4 +1,6 @@
+import _ from 'lodash'
 import { Condition } from '../types/Condition'
+import Icon from '@cdc/core/components/ui/Icon'
 
 type OpenControls = [boolean[], Function] // useState type
 
