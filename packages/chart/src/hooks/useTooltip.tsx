@@ -141,9 +141,9 @@ export const useTooltip = props => {
       if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot') {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
-            ?.filter(Boolean)
+            ?.filter(seriesKey => config.series?.find(item => item.dataKey === seriesKey && item?.tooltip) || config.xAxis?.dataKey == seriesKey)
             ?.flatMap(seriesKey => {
-              const formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
+              let formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
               return resolvedScaleValues?.[0]?.[seriesKey] ? [[seriesKey, formattedValue, getAxisPosition(seriesKey)]] : []
             })
         )
