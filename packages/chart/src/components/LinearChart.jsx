@@ -28,7 +28,7 @@ import Regions from './Regions'
 import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
-import useScales, { getTickValues }  from '../hooks/useScales'
+import useScales, { getTickValues } from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
@@ -246,7 +246,7 @@ const LinearChart = props => {
           <Bar width={width} height={height} fill={'transparent'}></Bar> {/* Highlighted regions */}
           {/* Y axis */}
           {!['Spark Line', 'Forest Plot'].includes(visualizationType) && (
-            <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.yAxis?.label || runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
+            <AxisLeft scale={yScale} tickLength={config.useLogScale ? 6 : 8} left={Number(runtime.yAxis.size) - config.yAxis.axisPadding} label={runtime.yAxis.label || runtime.yAxis.label} stroke='#333' tickFormat={(tick, i) => handleLeftTickFormatting(tick, i)} numTicks={handleNumTicks()}>
               {props => {
                 const axisCenter = config.orientation === 'horizontal' ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
                 const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
@@ -369,7 +369,7 @@ const LinearChart = props => {
             <AxisBottom
               top={runtime.horizontal && config.visualizationType !== 'Forest Plot' ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : config.visualizationType === 'Forest Plot' ? yMax + Number(config.xAxis.axisPadding) : yMax}
               left={config.visualizationType !== 'Forest Plot' ? Number(runtime.yAxis.size) : 0}
-              label={runtime.xAxis.label}
+              label={config[section].label}
               tickFormat={handleBottomTickFormatting}
               scale={xScale}
               stroke='#333'
