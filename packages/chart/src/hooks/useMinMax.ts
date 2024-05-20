@@ -11,11 +11,13 @@ type UseMinMaxProps = {
   existPositiveValue: boolean
   /** data - standard data array */
   data: Object[]
+  /** Table data -data array Filtered & Excluded */
+  tableData: Object[]
   /** isAllLine: if all series are line type including dashed lines */
   isAllLine: boolean
 }
 
-const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAllLine }: UseMinMaxProps) => {
+const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAllLine, tableData }: UseMinMaxProps) => {
   let min = 0
   let max = 0
 
@@ -147,7 +149,15 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   if (config.visualizationType === 'Line') {
     const isMinValid = config.useLogScale ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
-    min = enteredMinValue && isMinValid ? enteredMinValue : minValue
+    // update minValue for (0) Suppression points
+    const suppressedMinValue = tableData?.some((d, index) => {
+      return config.preliminaryData.some(pd => {
+        if (pd.type !== 'suppression' || !pd.style) return false
+        const valueMatch = pd.column ? d[pd.column] === pd.value : Object.values(d).includes(pd.value)
+        return valueMatch && (index === 0 || index === data.length - 1)
+      })
+    })
+    min = enteredMinValue && isMinValid ? enteredMinValue : suppressedMinValue ? 0 : minValue
   }
   //If data value max wasn't provided, calculate it
   if (max === Number.MIN_VALUE) {

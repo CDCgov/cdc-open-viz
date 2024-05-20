@@ -203,17 +203,49 @@
     }
   }
 
+  .div[class*='Asterisk'] {
+    transform: 0;
+  }
+
   .legend-preliminary {
     display: flex;
     flex-direction: row;
     align-items: center;
+    font-size: 1em;
+    vertical-align: middle;
+    margin-bottom: 0.5em;
+
     @include breakpoint(xs) {
       font-size: $font-small;
+    }
+    & > span {
+      display: flex;
+      justify-items: center;
+      align-items: center;
+      white-space: nowrap;
+      font-size: 1em;
+      margin-right: 8px;
+      max-height: 1px;
+    }
+
+    & > span[class*='Asterisk'] {
+      transform: scale(1.8);
+      margin-top: 15px;
+    }
+    & > span[class*='Dagger'] {
+      margin-top: 2px;
+    }
+    & > span[class*='Sign'] {
+      margin-top: 1px;
     }
 
     & > svg {
       width: 50px;
       height: 23px;
+    }
+
+    & > p {
+      margin: 0;
     }
   }
 
