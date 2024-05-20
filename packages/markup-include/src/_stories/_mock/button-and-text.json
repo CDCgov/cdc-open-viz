@@ -1,0 +1,69 @@
+{
+  "contentEditor": {
+    "inlineHTML": "<div>The age adjusted rate for {{race}} was 644.2, compared to Non-Hispanic American Indian, which was {{ageAdjustedRate}}.</div>",
+    "markupVariables": [
+      {
+        "name": "race",
+        "tag": "{{race}}",
+        "columnName": "Race",
+        "conditions": [
+          {
+            "columnName": "Age-adjusted rate",
+            "isOrIsNotEqualTo": "is",
+            "value": "644.2"
+          }
+        ]
+      },
+      {
+        "name": "ageAdjustedRate",
+        "tag": "{{ageAdjustedRate}}",
+        "columnName": "Age-adjusted rate",
+        "conditions": [
+          {
+            "columnName": "Race",
+            "isOrIsNotEqualTo": "is",
+            "value": "Non-Hispanic American Indian"
+          }
+        ]
+      }
+    ],
+    "showHeader": false,
+    "srcUrl": "https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Markup-Include-Button-and-Text.html",
+    "title": "",
+    "useInlineHTML": false
+  },
+  "data": [
+    {
+      "Race": "Hispanic or Latino",
+      "Age-adjusted rate": "644.2"
+    },
+    {
+      "Race": "Non-Hispanic American Indian",
+      "Age-adjusted rate": "636.1"
+    },
+    {
+      "Race": "Non-Hispanic Black",
+      "Age-adjusted rate": "563.7"
+    },
+    {
+      "Race": "Non-Hispanic Asian or Pacific Islander",
+      "Age-adjusted rate": "202.5"
+    },
+    {
+      "Race": "Non-Hispanic White",
+      "Age-adjusted rate": "183.6"
+    }
+  ],
+  "legend": {},
+  "newViz": true,
+  "theme": "theme-amber",
+  "type": "markup-include",
+  "runtime": null,
+  "visual": {
+    "border": false,
+    "accent": true,
+    "background": true,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false
+  }
+}

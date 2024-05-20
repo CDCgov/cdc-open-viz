@@ -7,7 +7,7 @@ import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
-import CdcMarkupInclude from '@cdc/markup-include'
+import CdcMarkupInclude from '../../../markup-include/src/CdcMarkupInclude'
 import CdcFilteredText from '@cdc/filtered-text'
 import Filters, { APIFilterDropdowns } from './Filters'
 import { FilterBehavior } from './Header/Header'
@@ -132,12 +132,12 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                   <CdcMarkupInclude
                     key={col.widget}
                     config={visualizationConfig}
+                    configUrl={undefined}
+                    isDashboard={true}
                     isEditor={false}
                     setConfig={newConfig => {
                       updateChildConfig(col.widget, newConfig)
                     }}
-                    isDashboard={true}
-                    configUrl={undefined}
                   />
                 )}
                 {visualizationConfig.type === 'filtered-text' && (

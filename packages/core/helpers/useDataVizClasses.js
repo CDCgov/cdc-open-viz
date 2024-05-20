@@ -18,10 +18,6 @@ export default function useDataVizClasses(config, viewport = null) {
     if (title && showTitle) contentClasses.push('component--has-title')
   }
 
-  if (config.type === 'markup-include') {
-    contentClasses = contentClasses.filter(item => item !== 'cove-component__content')
-  }
-
   config.showTitle && contentClasses.push('component--has-title')
   config.title && config.visualizationType !== 'chart' && config.visualizationType !== 'Spark Line' && contentClasses.push('component--has-title')
   config.subtext && innerContainerClasses.push('component--has-subtext')

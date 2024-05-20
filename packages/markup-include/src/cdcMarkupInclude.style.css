@@ -1,0 +1,42 @@
+.cdc-open-viz-module.markup-include {
+  .spacing-wrapper {
+    background-color: var(--lightGray) !important;
+  }
+  .cove-tooltip-variable {
+    display: none;
+  }
+
+  .markup-include-content-container.cove-component__content {
+    .markup-include-component.cove-component__content {
+      max-width: 35em;
+    }
+    .markup-include-component.cove-component__content:not(.component--hideBackgroundColor, .component--has-background) {
+      background-color: white;
+    }
+  }
+}
+
+.cdc-open-viz-module.markup-include.isEditor {
+  .cove-tooltip-variable {
+    position: relative;
+    display: inline;
+    background: var(--orange-tertiary);
+    .cove-tooltip-value {
+      display: none;
+      position: absolute;
+      background: var(--white);
+      border: 1px solid black;
+      font-size: 16px;
+      padding: 10px;
+      width: 100vw;
+      max-width: 500px;
+      z-index: 9999;
+    }
+    &:hover > .cove-tooltip-value {
+      display: block;
+    }
+  }
+  .cove-markup-include-variable-value {
+    display: none !important;
+  }
+}
