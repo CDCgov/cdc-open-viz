@@ -1,7 +1,7 @@
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import _ from 'lodash'
 import Footnotes, { Footnote } from '../../types/Footnotes'
-import { footnotesSymbols } from '../Footnotes/footnoteSymbols'
+import { footnotesSymbols } from '../../helpers/footnoteSymbols'
 import InputSelect from '../inputs/InputSelect'
 import { TextField } from './Inputs'
 interface FootnotesEditorProps {

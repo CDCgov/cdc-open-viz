@@ -15,7 +15,7 @@ import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within } from '@storybook/testing-library'
 import ToggleExampleConfig from './_mock/toggle-example.json'
 import _ from 'lodash'
-import { footnotesSymbols } from '@cdc/core/components/Footnotes/footnoteSymbols'
+import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
 import FootnotesConfig from '@cdc/core/types/Footnotes'
 import { ConfigRow } from '../types/ConfigRow'
 

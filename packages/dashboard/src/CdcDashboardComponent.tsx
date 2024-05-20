@@ -21,7 +21,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
 
 import CdcMap from '@cdc/map'
-import CdcChart from '../../chart/src/CdcChart'
+import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
