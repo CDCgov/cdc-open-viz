@@ -1,0 +1,17 @@
+.cdc-open-viz-module.markup-include {
+  .editor-panel .condition-section :is(label) {
+    font-size: 1em;
+  }
+  :is(span).edit-label {
+    margin-bottom: 0.3em;
+    display: block;
+  }
+  .react-tooltip {
+    position: absolute;
+    width: 250px;
+  }
+  .need-data-source-prompt {
+    color: var(--gray);
+    font-size: 0.8rem;
+  }
+}

@@ -1,7 +1,8 @@
 import { Runtime } from '@cdc/core/types/Runtime'
-import { Variable } from './Variable'
+import { Variable } from '@cdc/markup-include/src/types/Variable'
+import { Visualization } from './Visualization'
 
-export type Config = {
+export type MarkupIncludeConfig = Visualization & {
   contentEditor: {
     // Changing the base config object creates an infinite loop, nesting it is a workaround
     inlineHTML: string
@@ -12,12 +13,9 @@ export type Config = {
     useInlineHTML: boolean
   }
   data?: Object[]
-  legend: {}
+  formattedData: {}
   newViz?: boolean
   runtime?: Runtime
-  theme: any
-  type: string
-  showEditorPanel?: boolean
   visual: {
     border: boolean
     accent: boolean

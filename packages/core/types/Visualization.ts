@@ -26,15 +26,17 @@ export type Visualization = ConfigureData & {
   multiDashboards?: any[]
   newViz: boolean
   openModal: boolean
-  originalFormattedData: any
   orientation: 'vertical' | 'horizontal'
+  originalFormattedData: any
   series: Series
+  showEditorPanel: boolean
   table: Table
+  theme: string
   title: string
   type: BaseVisualizationType
   uid: string // this is the actual key of the visualization object
   usesSharedFilter: any
-  visualizationType: string
   visualizationSubType: string
+  visualizationType: string
   xAxis: Axis
 }

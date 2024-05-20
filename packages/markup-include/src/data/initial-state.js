@@ -1,9 +1,18 @@
 export default {
-  title: 'Markup Include',
-  showHeader: false,
-  type: 'markup-include',
-  srcUrl: '#example',
+  contentEditor: {
+    inlineHTML: '<h2>Inline HTML</h2>',
+    markupVariables: [],
+    showHeader: true,
+    srcUrl: '#example',
+    title: 'Markup Include',
+    useInlineHTML: false
+  },
+  data: [],
+  legend: {},
+  newViz: true,
   theme: 'theme-blue',
+  type: 'markup-include',
+  runtime: null,
   visual: {
     border: false,
     accent: false,
