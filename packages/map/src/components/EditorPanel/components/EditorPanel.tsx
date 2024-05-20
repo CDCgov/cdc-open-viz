@@ -6,7 +6,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
 // import ReactTags from 'react-tag-autocomplete'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import Panels from './Panels.tsx'
+import Panels from './Panels'
 import Layout from '@cdc/core/components/Layout'
 
 // Data
@@ -3055,6 +3055,7 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
             </AccordionItemPanel>
           </AccordionItem>
           {state.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
+          <Panels.Annotate name='Text Annotations' />
         </Accordion>
         <AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>
