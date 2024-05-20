@@ -137,7 +137,7 @@ export const useTooltip = props => {
       if (visualizationType !== 'Pie' && visualizationType !== 'Forest Plot') {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
-            ?.filter(Boolean)
+            ?.filter(seriesKey => config.series?.find(item => item.dataKey === seriesKey && item?.tooltip) || config.xAxis?.dataKey == seriesKey)
             ?.flatMap(seriesKey => {
               let formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
               const suppressed = config.preliminaryData?.find(pd => pd.label && pd.type === 'suppression' && pd.displayTooltip && resolvedScaleValues[0]?.[seriesKey] === pd.value && (!pd.column || seriesKey === pd.column))
