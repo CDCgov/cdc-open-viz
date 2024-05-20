@@ -7,6 +7,7 @@ import { BoxPlot } from '../../../types/BoxPlot'
 import { General } from '../../../types/General'
 import { Column } from '../../../types/Column'
 import { Legend } from '@cdc/core/types/Legend'
+import { PreliminaryDataItem } from '@cdc/chart/src/components/LineChart/LineChartProps'
 import { FilterBehavior } from '../../../types/FilterBehavior'
 
 export type TableConfig = {
@@ -28,4 +29,5 @@ export type TableConfig = {
   visualizationType: string
   xAxis?: Axis
   yAxis?: Axis
+  preliminaryData: PreliminaryDataItem[]
 }
