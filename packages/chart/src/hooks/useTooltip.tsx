@@ -1,17 +1,21 @@
 import { useContext } from 'react'
-// Local imports
 import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
-import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
-import { isDateScale } from '@cdc/core/helpers/cove/date'
-// Third-party library imports
+
+// third party
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+const transform = new DataTransform()
+
+import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 
 export const useTooltip = props => {
-  const { tableData: data, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)
+  const { tableData, config, formatNumber, capitalize, formatDate, formatTooltipsDate, parseDate, setSharedFilter } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, showTooltip, hideTooltip } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
+  const data = transform.applySuppression(tableData, config.suppressedData)
   /**
    * Provides the tooltip information based on the tooltip data array and svg cursor coordinates
    * @function getTooltipInformation
@@ -140,10 +144,6 @@ export const useTooltip = props => {
             ?.filter(seriesKey => config.series?.find(item => item.dataKey === seriesKey && item?.tooltip) || config.xAxis?.dataKey == seriesKey)
             ?.flatMap(seriesKey => {
               let formattedValue = seriesKey === config.xAxis.dataKey ? resolvedScaleValues[0]?.[seriesKey] : formatNumber(resolvedScaleValues[0]?.[seriesKey], getAxisPosition(seriesKey))
-              const suppressed = config.preliminaryData?.find(pd => pd.label && pd.type === 'suppression' && pd.displayTooltip && resolvedScaleValues[0]?.[seriesKey] === pd.value && (!pd.column || seriesKey === pd.column))
-              if (suppressed) {
-                formattedValue = suppressed.label
-              }
               return resolvedScaleValues?.[0]?.[seriesKey] ? [[seriesKey, formattedValue, getAxisPosition(seriesKey)]] : []
             })
         )

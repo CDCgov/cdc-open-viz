@@ -301,11 +301,8 @@ export const useEditorPermissions = () => {
     if (visualizationType === 'Line') {
       return true
     }
-    if (visualizationType === 'Bar' && visualizationSubType === 'regular') {
-      return true
-    }
 
-    if (visualizationType === 'Combo') {
+    if (visualizationType === 'Combo' && lineExist) {
       return true
     }
     return false

@@ -78,11 +78,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState<any[]>([])
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
-  const [brushConfig, setBrushConfig] = useState({
-    data: [],
-    isActive: false,
-    isBrushing: false
-  })
   type Config = typeof config
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
@@ -754,7 +749,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   // function calculates the width of given text and its font-size
-  function getTextWidth(text: string, font: string): number | undefined {
+  function getTextWidth(text, font) {
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
     if (!context) {
@@ -1132,11 +1127,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           {!missingRequiredSections() && !config.newViz && (
             <div className='cdc-chart-inner-container cove-component__content' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
               <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
+
               {/* Filters */}
               {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
               <SkipTo skipId={handleChartTabbing} skipMessage='Skip Over Chart Container' />
               {/* Visualization */}
               {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
+
               <div style={{ marginBottom: computeMarginBottom(config, legend, currentViewport) }} className={getChartWrapperClasses().join(' ')}>
                 {/* All charts except sparkline */}
                 {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
@@ -1166,19 +1163,22 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               </div>
               {/* Link */}
               {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
+
               {/* Description */}
               {description && config.visualizationType !== 'Spark Line' && <div className={'column ' + config.isResponsiveTicks ? 'subtext--responsive-ticks' : 'subtext'}>{parse(description)}</div>}
+
               {/* buttons */}
               <MediaControls.Section classes={['download-buttons']}>
                 {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
                 {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
               </MediaControls.Section>
+
               {/* Data Table */}
               {((config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Sankey') || (config.visualizationType === 'Sankey' && config.table.show)) && (
                 <DataTable
                   config={config}
                   rawData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : config.table.customTableConfig ? filterData(config.filters, config.data) : config.data}
-                  runtimeData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : filteredData || excludedData}
+                  runtimeData={config.visualizationType === 'Sankey' ? config?.data?.[0]?.tableData : transform.applySuppression(filteredData || excludedData, config.suppressedData)}
                   expandDataTable={config.table.expanded}
                   columns={config.columns}
                   displayDataAsText={displayDataAsText}
@@ -1207,10 +1207,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
-
   const contextValues = {
-    brushConfig,
-    setBrushConfig,
     capitalize,
     computeMarginBottom,
     getXAxisData,
@@ -1257,8 +1254,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setSharedFilter,
     setSharedFilterValue,
     dashboardConfig,
-    debugSvg: isDebug,
-    clean
+    debugSvg: isDebug
   }
 
   return (
