@@ -168,7 +168,7 @@ export const useBarChart = () => {
   const shouldSuppress = bar => {
     return config.preliminaryData?.some(pd => {
       const matchesColumn = pd.column ? pd.column === bar.key : true
-      const matchesValue = String(bar.value) === String(pd.value)
+      const matchesValue = String(bar.value) === String(pd.value) && pd.value !== ''
       return matchesColumn && matchesValue && pd.symbol && pd.type === 'suppression'
     })
   }

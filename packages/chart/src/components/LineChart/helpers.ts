@@ -1,5 +1,5 @@
 import { type PreliminaryDataItem, DataItem, StyleProps, Style } from './LineChartProps'
-
+import _ from 'lodash'
 export const createStyles = (props: StyleProps): Style[] => {
   const { preliminaryData, data, stroke, strokeWidth, handleLineType, lineType, seriesKey } = props
 
@@ -59,28 +59,39 @@ const handleFirstIndex = (data, seriesKey, preliminaryData) => {
     data: [],
     style: ''
   }
-  let lastAddedIndex = -1
 
-  data.forEach((item, index) => {
-    preliminaryData.forEach(pd => {
-      if (index === 0 && pd.type == 'suppression' && pd.value === item[seriesKey] && (!pd.column || pd.column === seriesKey) && pd.style) {
-        const modifiedItem = { ...item, [seriesKey]: 0 } // Modify first item
-        result.data.push(modifiedItem)
-        lastAddedIndex = index
+  // If data is empty, return the empty result
+  if (!data.length) return result
 
-        // Find next calculable item
-        let nextIndex = index + 1
-        while (nextIndex < data.length && !isCalculable(data[nextIndex][seriesKey])) {
-          nextIndex++
-        }
-        if (nextIndex < data.length && lastAddedIndex !== nextIndex) {
-          result.data.push(data[nextIndex])
-          lastAddedIndex = nextIndex
-        }
-        result.style = pd.style
-      }
-    })
-  })
+  const firstIndexDataItem = data[0]
+
+  // Function to check if a data item matches the suppression criteria
+  const isSuppressed = pd => {
+    return pd.type == 'suppression' && pd.value === firstIndexDataItem[seriesKey] && (!pd.column || pd.column === seriesKey)
+  }
+
+  // Find applicable suppression data for the first item
+  const suppressionData = preliminaryData.find(isSuppressed)
+
+  if (suppressionData && suppressionData.style) {
+    // Modify first item and add to result
+    const modifiedItem = { ...firstIndexDataItem, [seriesKey]: 0 }
+    result.data.push(modifiedItem)
+    result.style = suppressionData.style
+
+    // Find the next calculable item index
+    let nextIndex = 1
+    while (nextIndex < data.length && !isCalculable(data[nextIndex][seriesKey])) {
+      nextIndex++
+    }
+    if (nextIndex < data.length) {
+      result.data.push(data[nextIndex])
+    }
+  } else {
+    // If no suppression, just add the first item
+    result.data.push(firstIndexDataItem)
+  }
+
   return result
 }
 
@@ -118,43 +129,37 @@ function handleMiddleIndices(data, seriesKey, dataKey, preliminaryData) {
     style: ''
   }
 
+  const isValidMiddleIndex = index => index > 0 && index < data.length - 1
+
   preliminaryData.forEach(pd => {
     const targetValue = pd.value
-    const style = pd.style
+    result.style = pd.style
 
-    result.style = style
-
-    for (let i = 0; i < data.length; i++) {
-      if (data[i][seriesKey] === targetValue) {
-        // Skip if the target value is at the first or last index
-        if (i === 0 || i === data.length - 1) {
-          continue
-        }
-
-        // Add previous object if it is calculable
-        if (i > 0 && isCalculable(data[i - 1][seriesKey])) {
-          result.data.push(data[i - 1])
-        }
-
-        // Find the next calculable object
-        let nextObject = null
-        for (let j = i + 1; j < data.length; j++) {
-          if (data[j][seriesKey] !== targetValue && isCalculable(data[j][seriesKey])) {
-            nextObject = data[j]
-            break
-          }
-        }
-
-        // Add next calculable object if found
-        if (nextObject) {
-          result.data.push(nextObject)
-        }
+    // Find all indices
+    const matchingIndices = data.reduce((indices, item, index) => {
+      if (item[seriesKey] === targetValue && isValidMiddleIndex(index)) {
+        indices.push(index)
       }
-    }
+      return indices
+    }, [])
+
+    // Process each valid index
+    matchingIndices.forEach(i => {
+      // Add previous object if calculable
+      if (isCalculable(data[i - 1][seriesKey])) {
+        result.data.push(data[i - 1])
+      }
+
+      // Find and add the next calculable object
+      const nextIndex = data.slice(i + 1).findIndex(item => item[seriesKey] !== targetValue && isCalculable(item[seriesKey]))
+      if (nextIndex !== -1) {
+        result.data.push(data[i + 1 + nextIndex])
+      }
+    })
   })
 
-  // Remove any duplicates
-  result.data = result.data.filter((item, index, self) => index === self.findIndex(t => t[dataKey] === item[dataKey] && t[seriesKey] === item[seriesKey]))
+  // Deduplicate entries
+  result.data = _.uniqWith(result.data, (a, b) => a[dataKey] === b[dataKey] && a[seriesKey] === b[seriesKey])
 
   return result
 }

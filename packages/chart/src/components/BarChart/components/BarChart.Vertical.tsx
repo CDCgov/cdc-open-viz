@@ -208,7 +208,7 @@ export const BarChartVertical = () => {
                           // check if user selected column
                           const selectedSuppressionColumn = !pd.column || pd.column === bar.key
                           // compare entered suppressed value with data value
-                          const isValueMatch = String(pd.value) === String(bar.value)
+                          const isValueMatch = String(pd.value) === String(bar.value) && pd.value !== ''
                           let isSuppressed = isValueMatch && selectedSuppressionColumn
 
                           if (!isSuppressed || barWidth < 10 || !config.xAxis.showSuppressedSymbol) {

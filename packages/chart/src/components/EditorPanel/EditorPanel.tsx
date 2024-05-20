@@ -33,8 +33,15 @@ import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
 import _ from 'lodash'
+import { adjustedSymbols as symbolCodes } from '@cdc/core/helpers/footnoteSymbols'
 
-const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: ChartConfig; updateConfig: Function; data: Record<string, any>[] }) => {
+interface PreliminaryProps {
+  config: ChartConfig
+  updateConfig: Function
+  data: Record<string, any>[]
+}
+
+const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, data }) => {
   const isCombo = config.visualizationType === 'Combo'
   const lineSeriesExists = config.runtime.lineSeriesKeys?.length > 0
   const barSeriesExists = config.runtime.barSeriesKeys?.length > 0
@@ -47,16 +54,6 @@ const PreliminaryData: React.FC = ({ config, updateConfig, data }: { config: Cha
 
   const getTypeOptions = () => {
     return config.visualizationType === 'Line' || hasComboLineSeries ? ['effect', 'suppression'] : ['suppression']
-  }
-
-  const symbolCodes = {
-    Asterisk: '\u002A',
-    'Double Asterisks': '\u002A\u002A',
-    Dagger: '\u2020',
-    'Double Daggers': '\u2021',
-    'Section Sign': '\u00A7',
-    Pilcrow: '\u00B6',
-    Hash: '\u0023'
   }
 
   const lineCodes = {
