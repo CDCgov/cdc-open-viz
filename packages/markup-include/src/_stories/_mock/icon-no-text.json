@@ -18,7 +18,7 @@
     "showHeader": false,
     "srcUrl": "https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/SSI-Example-Markup-Include.html",
     "title": "",
-    "useInlineHTML": true
+    "useInlineHTML": false
   },
   "data": [
     {

@@ -215,7 +215,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: 
 
   let content = <Loading />
 
-  const markup = urlMarkup ? parseBodyMarkup(urlMarkup) : convertVariablesInMarkup(inlineHTML)
+  const markup = useInlineHTML ? convertVariablesInMarkup(inlineHTML) : parseBodyMarkup(urlMarkup)
 
   if (loading === false) {
     content = (

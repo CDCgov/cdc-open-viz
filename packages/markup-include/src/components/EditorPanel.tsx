@@ -117,47 +117,47 @@ const EditorPanel: React.FC = () => {
         <span className='divider-heading'>Enter Markup</span>
         <InputCheckbox inline value={useInlineHTML} section='contentEditor' fieldName='useInlineHTML' label='Use Inline HTML&nbsp;' updateField={updateField} />
         <div className='column-edit'>
-          <div className={useInlineHTML ? 'hide' : ''}>
-            <InputText value={srcUrl || ''} section='contentEditor' fieldName='srcUrl' label='Source URL;' placeholder='https://www.example.com/file.html' updateField={updateField} />
-          </div>
+          {useInlineHTML ? (
+            <>
+              {/* HTML Textbox */}
+              <div ref={textAreaInEditorContainer}>
+                <InputText value={inlineHTML} section='contentEditor' fieldName='inlineHTML' label='HTML' placeholder='Add HTML here' type='textarea' rows={10} updateField={updateField} />
 
-          <div className={useInlineHTML ? '' : 'hide'}>
-            {/* HTML Textbox */}
-            <div ref={textAreaInEditorContainer}>
-              <InputText value={inlineHTML} section='contentEditor' fieldName='inlineHTML' label='HTML' placeholder='Add HTML here' type='textarea' rows={10} updateField={updateField} />
-
-              <hr className='accordion__divider' />
-            </div>
-            {/* Create New Variable*/}
-
-            {/* Variable Options List */}
-            <fieldset>
-              <label>
-                <span className='edit-label'>
-                  Variables
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>{`To use created variables wrap the variable name in curly brackets, e.g. {{some_variable}}, and place the variable directly in your Inline HTML`}</Tooltip.Content>
-                  </Tooltip>
-                </span>
-              </label>
-              {hasData === false && <span className='need-data-source-prompt'>To use variables, add data source.</span>}
-              {variableArray && variableArray.length > 0 && (
-                <div className='section-border'>
-                  {variableArray?.map((variableObject, index) => {
-                    return <VariableSection key={`${variableObject.name}-${index}`} controls={openVariableControls} data={data} deleteVariable={deleteVariable} updateVariableArray={updateVariableArray} variableConfig={variableObject} variableIndex={index} />
-                  })}
-                </div>
-              )}
-              <div className='mb-1 d-flex'>
-                <button className={'btn btn-primary'} onClick={handleCreateNewVariableButtonClick} disabled={!hasData}>
-                  Create New Variable
-                </button>
+                <hr className='accordion__divider' />
               </div>
-            </fieldset>
-          </div>
+              {/* Create New Variable*/}
+
+              {/* Variable Options List */}
+              <fieldset>
+                <label>
+                  <span className='edit-label'>
+                    Variables
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>{`To use created variables wrap the variable name in curly brackets, e.g. {{some_variable}}, and place the variable directly in your Inline HTML`}</Tooltip.Content>
+                    </Tooltip>
+                  </span>
+                </label>
+                {hasData === false && <span className='need-data-source-prompt'>To use variables, add data source.</span>}
+                {variableArray && variableArray.length > 0 && (
+                  <div className='section-border'>
+                    {variableArray?.map((variableObject, index) => {
+                      return <VariableSection key={`${variableObject.name}-${index}`} controls={openVariableControls} data={data} deleteVariable={deleteVariable} updateVariableArray={updateVariableArray} variableConfig={variableObject} variableIndex={index} />
+                    })}
+                  </div>
+                )}
+                <div className='mb-1 d-flex'>
+                  <button className={'btn btn-primary'} onClick={handleCreateNewVariableButtonClick} disabled={!hasData}>
+                    Create New Variable
+                  </button>
+                </div>
+              </fieldset>
+            </>
+          ) : (
+            <InputText value={srcUrl || ''} section='contentEditor' fieldName='srcUrl' label='Source URL;' placeholder='https://www.example.com/file.html' updateField={updateField} />
+          )}
         </div>
       </Accordion.Section>
       <Accordion.Section title='Visual'>

@@ -30,7 +30,7 @@
     "showHeader": false,
     "srcUrl": "https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Markup-Include-Button-and-Text.html",
     "title": "",
-    "useInlineHTML": true
+    "useInlineHTML": false
   },
   "data": [
     {
