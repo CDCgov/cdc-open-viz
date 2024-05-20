@@ -164,13 +164,26 @@ export const useBarChart = () => {
     if (!match?.color) return false
     return match
   }
-
-  const shouldSuppress = bar => {
-    return config.preliminaryData?.some(pd => {
-      const matchesColumn = pd.column ? pd.column === bar.key : true
-      const matchesValue = String(bar.value) === String(pd.value) && pd.value !== ''
-      return matchesColumn && matchesValue && pd.symbol && pd.type === 'suppression'
-    })
+  const generateIconSize = barWidth => {
+    if (barWidth < 4) {
+      return 1
+    }
+    if (barWidth < 5) {
+      return 4
+    }
+    if (barWidth < 10) {
+      return 6
+    }
+    if (barWidth < 15) {
+      return 7
+    }
+    if (barWidth < 20) {
+      return 8
+    }
+    if (barWidth < 90) {
+      return 8
+    }
+    return 0
   }
 
   const getAdditionalColumn = (series, xAxisDataValue) => {
@@ -211,13 +224,13 @@ export const useBarChart = () => {
   }
 
   return {
+    generateIconSize,
     isHorizontal,
     barBorderWidth,
     lollipopBarWidth,
     lollipopShapeSize,
     isLabelBelowBar,
     displayNumbersOnBar,
-    shouldSuppress,
     section,
     isRounded,
     isStacked,

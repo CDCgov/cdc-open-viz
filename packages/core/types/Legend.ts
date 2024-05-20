@@ -7,7 +7,6 @@ export type Legend = {
   description: string
   // show or hide the legend
   hide: boolean
-  hideSuppressedLabels: boolean
   highlightOnHover: boolean
   label: string
   lineMode: boolean

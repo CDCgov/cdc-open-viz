@@ -144,7 +144,7 @@ const PanelGeneral: FC<PanelProps> = props => {
                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>Consider adding footnotes when displaying 'suppressed,' 'no data,' and 'zero values' to ensure accurate interpretation of the data.</p>
+                  <p>Footnotes</p>
                 </Tooltip.Content>
               </Tooltip>
             }

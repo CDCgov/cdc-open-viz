@@ -37,7 +37,7 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
-  const { transformedData: data, tableData, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth, brushConfig } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth } = useContext(ConfigContext)
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
 
@@ -80,9 +80,9 @@ const LinearChart = props => {
   // getters & functions
   const getXAxisData = d => (isDateScale(config.runtime.xAxis) ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const xAxisDataMapped = config.brush.active && brushConfig.data?.length ? brushConfig.data.map(d => getXAxisData(d)) : data.map(d => getXAxisData(d))
+  const xAxisDataMapped = config.brush.active && config.brush.data?.length ? config.brush.data.map(d => getXAxisData(d)) : data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
-  const properties = { data, tableData, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
+  const properties = { data, config, minValue, maxValue, isAllLine, existPositiveValue, xAxisDataMapped, xMax, yMax }
   const { min, max, leftMax, rightMax } = useMinMax(properties)
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleBrush } = useScales({ ...properties, min, max, leftMax, rightMax, dimensions })
@@ -741,8 +741,7 @@ const LinearChart = props => {
         </svg>
         {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && !config.tooltips.singleSeries && (
           <>
-            <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important;`}</style>
-            <style>{`.tooltip {max-width:300px} !important; word-wrap: break-word; `}</style>
+            <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100}) !important`}</style>
             <TooltipWithBounds key={Math.random()} className={'tooltip cdc-open-viz-module'} left={tooltipLeft} top={tooltipTop}>
               <ul>{typeof tooltipData === 'object' && Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}</ul>
             </TooltipWithBounds>

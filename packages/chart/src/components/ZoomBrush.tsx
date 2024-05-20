@@ -14,9 +14,10 @@ interface Props {
   yMax: number
 }
 const ZoomBrush: FC<Props> = props => {
-  const { tableData, config, parseDate, formatDate, setBrushConfig } = useContext(ConfigContext)
+  const { transformedData: data, config, parseDate, formatDate, updateConfig } = useContext(ConfigContext)
   const { fontSize } = useBarChart()
-  const [brushKey, setBrushKey] = useState(0)
+
+  const [filteredData, setFilteredData] = useState([...data])
   const brushRef = useRef(null)
   const radius = 15
 
@@ -33,7 +34,7 @@ const ZoomBrush: FC<Props> = props => {
   }
 
   const style = {
-    fill: '#AFA6A5 ',
+    fill: '#ddd',
     stroke: 'blue',
     fillOpacity: 0.8,
     strokeOpacity: 0,
@@ -41,12 +42,13 @@ const ZoomBrush: FC<Props> = props => {
   }
 
   const onBrushChange = event => {
-    if (!event || !event.xValues) return
+    if (!event) return
+
     const { xValues } = event
 
     const dataKey = config.xAxis?.dataKey
 
-    const brushedData = tableData.filter(item => xValues.includes(item[dataKey]))
+    const filteredData = data.filter(item => xValues.includes(item[dataKey]))
 
     const endValue = xValues
       .slice()
@@ -64,44 +66,25 @@ const ZoomBrush: FC<Props> = props => {
       startValue: formatIfDate(startValue)
     }))
 
-    setBrushConfig(prev => {
-      return {
-        ...prev,
-        isBrushing: brushRef.current?.state.isBrushing,
-        data: brushedData
-      }
-    })
+    setFilteredData(filteredData)
   }
 
   useEffect(() => {
+    updateConfig({
+      ...config,
+      brush: {
+        ...config.brush,
+        data: filteredData
+      }
+    })
+  }, [filteredData])
+
+  //reset filters  if brush is off
+  useEffect(() => {
     if (!config.brush.active) {
-      setBrushKey(prevKey => prevKey + 1)
-      setBrushConfig({
-        data: [],
-        isActive: false,
-        isBrushing: false
-      })
+      setFilteredData(data)
     }
   }, [config.brush.active])
-
-  useEffect(() => {
-    if (config.filters?.some(filter => filter.active)) {
-      setBrushKey(prevKey => prevKey + 1)
-      setBrushConfig(prev => {
-        return {
-          ...prev,
-          data: tableData
-        }
-      })
-    }
-    return () =>
-      setBrushConfig(prev => {
-        return {
-          ...prev,
-          data: []
-        }
-      })
-  }, [config.filters])
 
   const calculateTop = (): number => {
     const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
@@ -140,12 +123,10 @@ const ZoomBrush: FC<Props> = props => {
   if (!['Line', 'Bar', 'Area Chart', 'Combo'].includes(config.visualizationType)) {
     return
   }
-
   return (
     <Group display={config.brush.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
-      <rect fill='#F7F7F7  ' width={props.xMax} height={config.brush.height} rx={radius} />
+      <rect fill='#eee' width={props.xMax} height={config.brush.height} rx={radius} />
       <Brush
-        key={brushKey}
         renderBrushHandle={props => <BrushHandle textProps={textProps} fontSize={fontSize[config.fontSize]} {...props} isBrushing={brushRef.current?.state.isBrushing} />}
         innerRef={brushRef}
         useWindowMoveEvents={true}
@@ -180,7 +161,7 @@ const BrushHandle = props => {
       <Text pointerEvents='visiblePainted' dominantBaseline='hanging' x={0} verticalAnchor='start' textAnchor={textAnchor} fontSize={props.fontSize / 1.4} dy={10} y={15}>
         {isLeft ? textProps.startValue : textProps.endValue}
       </Text>
-      <path cursor='ew-resize' d='M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12' fill={!isBrushing ? '#000' : '#297EF1'} strokeWidth='1' transform={transform}></path>
+      <path cursor='ew-resize' d='M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12' fill={!isBrushing ? '#666' : '#297EF1'} strokeWidth='1' transform={transform}></path>
     </Group>
   )
 }

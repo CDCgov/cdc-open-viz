@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import SuppressedConfig from './_mock/bar-chart-suppressed.json'
 
 import Chart from '../CdcChart'
 
@@ -183,13 +182,6 @@ export const Lollipop: Story = {
       validated: 4.23,
       dynamicMarginTop: 0
     }
-  }
-}
-
-export const Suppression: Story = {
-  args: {
-    config: SuppressedConfig,
-    isEditor: false
   }
 }
 

@@ -134,27 +134,27 @@ export class DataTransform {
           let standardized: string[] = []
 
           data.forEach(row => {
-            let uniqueKey = row[description.xKey]
+            let uniqueKey = row[description.xKey];
             Object.keys(row).forEach(key => {
-              if (key !== description.xKey && key !== description.seriesKey && description.valueKeysTallSupport.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)) {
-                uniqueKey += '|' + row[key]
+              if(key !== description.xKey && key !== description.seriesKey && description.valueKeysTallSupport.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)){
+                uniqueKey += "|" + row[key];
               }
             })
 
-            if (!standardizedMapped[uniqueKey]) {
-              standardizedMapped[uniqueKey] = { [description.xKey]: row[description.xKey] }
+            if(!standardizedMapped[uniqueKey]){
+              standardizedMapped[uniqueKey] = {[description.xKey]: row[description.xKey]}
             }
             Object.keys(row).forEach(key => {
-              if (key !== description.xKey && key !== description.seriesKey && description.valueKeysTallSupport.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)) {
-                standardizedMapped[uniqueKey][key] = row[key]
+              if(key !== description.xKey && key !== description.seriesKey && description.valueKeysTallSupport.indexOf(key) === -1 && (!description.ignoredKeys || description.ignoredKeys.indexOf(key) === -1)){
+                standardizedMapped[uniqueKey][key] = row[key];
               }
             })
             description.valueKeysTallSupport.forEach(valueKey => {
-              standardizedMapped[uniqueKey][row[description.seriesKey] + '-' + valueKey] = row[valueKey]
+              standardizedMapped[uniqueKey][row[description.seriesKey] + '-' + valueKey] = row[valueKey];
             })
           })
 
-          standardized = Object.keys(standardizedMapped).map(key => standardizedMapped[key])
+          standardized = Object.keys(standardizedMapped).map(key => standardizedMapped[key]);
 
           return standardized
         } else if (description.valueKeys !== undefined) {
@@ -289,6 +289,29 @@ export class DataTransform {
     })
     if (testing) console.log('## cleanedData =', cleanedupData)
     return cleanedupData
+  }
+
+  applySuppression = (data, suppressedData) => {
+    if (!suppressedData || suppressedData.length === 0) return data
+
+    // Create a new array to store the result without modifying the original data
+    const result = data.map(item => {
+      // Create a new object to store the updated item without modifying the original item
+      const newItem = { ...item }
+
+      // For each suppressedData item
+      for (let i = 0; i < suppressedData.length; i++) {
+        // If the object contains the column and its value matches the suppressed one
+        if (newItem[suppressedData[i].column] && newItem[suppressedData[i].column] === suppressedData[i].value) {
+          // Replace the value with the label in the new object
+          newItem[suppressedData[i].column] = suppressedData[i].label
+        }
+      }
+
+      return newItem
+    })
+
+    return result
   }
 
   // clean out %, $, commas from numbers when needing to do sorting!
