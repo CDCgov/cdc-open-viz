@@ -40,7 +40,7 @@ export const createStyles = (props: StyleProps): Style[] => {
 
 export const filterCircles = (preliminaryData: PreliminaryDataItem[], data: DataItem[], seriesKey: string): DataItem[] => {
   // Filter and map preliminaryData to get circlesFiltered
-  const circlesFiltered = preliminaryData.filter(item => item.style === 'Open Circles' && item.type === 'effect').map(item => ({ column: item.column, value: item.value, seriesKey: item.seriesKey }))
+  const circlesFiltered = preliminaryData?.filter(item => item.style === 'Open Circles' && item.type === 'effect').map(item => ({ column: item.column, value: item.value, seriesKey: item.seriesKey }))
   const filteredData: DataItem[] = []
   // Process data to find matching items
   data.forEach(item => {
@@ -101,7 +101,7 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
     style: ''
   }
   let lastAddedIndex = -1 // Tracks the last index added to the result
-  preliminaryData.forEach(pd => {
+  preliminaryData?.forEach(pd => {
     if (data[data.length - 1][seriesKey] === pd.value && pd.style && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression') {
       const lastIndex = data.length - 1
       const modifiedItem = { ...data[lastIndex], [seriesKey]: 0 }
@@ -131,7 +131,7 @@ function handleMiddleIndices(data, seriesKey, dataKey, preliminaryData) {
 
   const isValidMiddleIndex = index => index > 0 && index < data.length - 1
 
-  preliminaryData.forEach(pd => {
+  preliminaryData?.forEach(pd => {
     const targetValue = pd.value
     result.style = pd.style
 

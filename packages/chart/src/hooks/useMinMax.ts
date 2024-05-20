@@ -151,7 +151,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
     const isMinValid = config.useLogScale ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
     // update minValue for (0) Suppression points
     const suppressedMinValue = tableData?.some((d, index) => {
-      return config.preliminaryData.some(pd => {
+      return config.preliminaryData?.some(pd => {
         if (pd.type !== 'suppression' || !pd.style) return false
         const valueMatch = pd.column ? d[pd.column] === pd.value : Object.values(d).includes(pd.value)
         return valueMatch && (index === 0 || index === data.length - 1)

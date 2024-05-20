@@ -133,7 +133,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   return (
     <>
       {config.preliminaryData &&
-        config.preliminaryData.map(({ column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value }, i) => {
+        config.preliminaryData?.map(({ column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value }, i) => {
           return (
             <div key={`preliminaryData-${i}`} className='edit-block'>
               <button

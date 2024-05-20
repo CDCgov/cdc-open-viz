@@ -52,7 +52,7 @@ export const BarChartHorizontal = () => {
     config.orientation === 'horizontal' && (
       <Group>
         <BarGroup
-          data={config.preliminaryData.some(pd => pd.value && pd.type === 'suppression') ? tableData : data}
+          data={config.preliminaryData?.some(pd => pd.value && pd.type === 'suppression') ? tableData : data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
           height={yMax}
           x0={d => d[config.runtime.originalXAxis.dataKey]}
@@ -187,7 +187,7 @@ export const BarChartHorizontal = () => {
                             display: displayBar ? 'block' : 'none'
                           }
                         })}
-                        {config.preliminaryData.map((pd, index) => {
+                        {config.preliminaryData?.map((pd, index) => {
                           // check if user selected column
                           const selectedSuppressionColumn = !pd.column || pd.column === bar.key
                           // compare entered suppressed value with data value

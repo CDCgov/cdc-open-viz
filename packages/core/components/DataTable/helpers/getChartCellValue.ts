@@ -55,7 +55,7 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
   }
 
   // suppress cell value
-  config.preliminaryData.forEach(pd => {
+  config.preliminaryData?.forEach(pd => {
     // check entered suppression value against cell value
     const isValueMatch = String(pd.value) === String(labelValue)
     // check entered suppression column against table key

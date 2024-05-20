@@ -60,7 +60,7 @@ const LineChart = (props: LineChartProps) => {
           const seriesData = config.series.filter(item => item.dataKey === seriesKey)
           const seriesAxis = seriesData[0].axis ? seriesData[0].axis : 'left'
           let displayArea = legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
-          const circleData = filterCircles(config.preliminaryData, tableD, seriesKey)
+          const circleData = filterCircles(config?.preliminaryData, tableD, seriesKey)
           // styles for preliminary Data  items
           let styles = createStyles({ preliminaryData: config.preliminaryData, data: tableD, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), strokeWidth: seriesData[0].weight || 2, handleLineType, lineType, seriesKey })
           const suppressedSegments = createDataSegments(tableData, seriesKey, config.preliminaryData, config.xAxis.dataKey)
