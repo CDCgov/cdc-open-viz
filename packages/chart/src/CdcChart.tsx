@@ -36,7 +36,6 @@ import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
 import { generateColorsArray } from './helpers/generateColorsArray'
-import { computeMarginBottom } from './helpers/computeMarginBottom'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -1132,15 +1131,15 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           {!missingRequiredSections() && !config.newViz && (
             <div className='cdc-chart-inner-container cove-component__content' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
               <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
+
               {/* Filters */}
               {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && <Filters config={config} setConfig={setConfig} setFilteredData={setFilteredData} filteredData={filteredData} excludedData={excludedData} filterData={filterData} dimensions={dimensions} />}
               <SkipTo skipId={handleChartTabbing} skipMessage='Skip Over Chart Container' />
               {/* Visualization */}
               {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
-              <div style={{ marginBottom: computeMarginBottom(config, legend, currentViewport) }} className={getChartWrapperClasses().join(' ')}>
+              <div className={getChartWrapperClasses().join(' ')}>
                 {/* All charts except sparkline */}
                 {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
-
                 {/* Sparkline */}
                 {config.visualizationType === 'Spark Line' && (
                   <>
@@ -1212,7 +1211,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     brushConfig,
     setBrushConfig,
     capitalize,
-    computeMarginBottom,
     getXAxisData,
     getYAxisData,
     config,
