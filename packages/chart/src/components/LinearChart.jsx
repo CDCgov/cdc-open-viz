@@ -120,7 +120,10 @@ const LinearChart = props => {
   }
 
   const countNumOfTicks = axis => {
-    const { numTicks } = runtime[axis]
+    let { numTicks } = runtime[axis]
+    if(runtime[axis].viewportNumTicks && runtime[axis].viewportNumTicks[currentViewport]){
+      numTicks = runtime[axis].viewportNumTicks[currentViewport];
+    }
     let tickCount = undefined
 
     if (axis === 'yAxis') {
@@ -214,6 +217,14 @@ const LinearChart = props => {
     // On forest plots we need to return every "study" or y axis value.
     if (config.visualizationType === 'Forest Plot') return config.data.length
     return countNumOfTicks('yAxis')
+  }
+
+  const getManualStep = () => {
+    let manualStep = config.xAxis.manualStep
+    if(config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[currentViewport]){
+      manualStep = config.xAxis.viewportStepCount[currentViewport];
+    }
+    return manualStep;
   }
 
   const onMouseMove = event => {
@@ -458,7 +469,7 @@ const LinearChart = props => {
               stroke='#333'
               numTicks={countNumOfTicks('xAxis')}
               tickStroke='#333'
-              tickValues={config.xAxis.manual ? getTickValues(xAxisDataMapped, xScale, config.xAxis.type === 'date-time' ? countNumOfTicks('xAxis') : config.xAxis.manualStep) : undefined}
+              tickValues={config.xAxis.manual ? getTickValues(xAxisDataMapped, xScale, config.xAxis.type === 'date-time' ? countNumOfTicks('xAxis') : getManualStep()) : undefined}
             >
               {props => {
                 const axisCenter = config.visualizationType !== 'Forest Plot' ? (props.axisToPoint.x - props.axisFromPoint.x) / 2 : dimensions[0] / 2

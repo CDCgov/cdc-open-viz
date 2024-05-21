@@ -13,6 +13,7 @@ import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import { viewports } from '@cdc/core/helpers/getViewport'
 
 // chart components
 import Panels from './components/Panels'
@@ -529,6 +530,7 @@ const EditorPanel = () => {
   }
 
   const [displayPanel, setDisplayPanel] = useState(true)
+  const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
 
   if (loading) {
     return null
@@ -1015,6 +1017,14 @@ const EditorPanel = () => {
     if (newValue === 'highlight' && config.legend.seriesHighlight?.length) {
       updatedConfig.legend.seriesHighlight.length = 0
     }
+
+    updateConfig(updatedConfig)
+  }
+
+  const updateViewportOverrides = (property, viewport, numTicks) => {
+    const propertyObject = {...config.xAxis[property]}
+    propertyObject[viewport] = numTicks
+    const updatedConfig = {...config, xAxis: {...config.xAxis, [property]: propertyObject}}
 
     updateConfig(updatedConfig)
   }
@@ -1954,10 +1964,34 @@ const EditorPanel = () => {
                       )}
 
                       {visSupportsDateCategoryNumTicks() && config.xAxis.type !== 'date-time' && config.xAxis.manual && (
-                        <TextField value={config.xAxis.manualStep} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='manualStep' label='Step count' className='number-narrow' updateField={updateField} />
+                        <>
+                          <TextField value={config.xAxis.manualStep} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='manualStep' label='Step count' className='number-narrow' updateField={updateField} />
+                          <div className="viewport-overrides">
+                            <label>
+                              <button onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)} className="edit-label">Step Count: viewport overrides <span style={{transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})`}}>&gt;</span></button>
+                            </label>
+                            {displayViewportOverrides && <div className="edit-block">
+                              {Object.keys(viewports).map(viewport => (
+                                <TextField key={`viewport-step-count-input-${viewport}`} value={config.xAxis.viewportStepCount ? config.xAxis.viewportStepCount[viewport] : undefined} placeholder='Auto' type='number' label={viewport} className='number-narrow' updateField={(section, fieldName, label, val) => updateViewportOverrides('viewportStepCount', viewport, val)} />
+                              ))}
+                            </div>}
+                          </div>
+                        </>
                       )}
                       {visSupportsDateCategoryNumTicks() && (config.xAxis.type === 'date-time' || !config.xAxis.manual) && (
-                        <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
+                        <>
+                          <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
+                          <div className="viewport-overrides">
+                            <label>
+                              <button onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)} className="edit-label">Number of ticks: viewport overrides <span style={{transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})`}}>&gt;</span></button>
+                            </label>
+                            {displayViewportOverrides && <div className="edit-block">
+                              {Object.keys(viewports).map(viewport => (
+                                <TextField key={`viewport-num-ticks-input-${viewport}`} value={config.xAxis.viewportNumTicks ? config.xAxis.viewportNumTicks[viewport] : undefined} placeholder='Auto' type='number' label={viewport} className='number-narrow' updateField={(section, fieldName, label, val) => updateViewportOverrides('viewportNumTicks', viewport, val)} />
+                              ))}
+                            </div>}
+                          </div>
+                        </>
                       )}
                       {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.padding} type='number' min={0} section='xAxis' fieldName='padding' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
 
