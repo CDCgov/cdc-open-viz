@@ -7,13 +7,14 @@ import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
-import CdcMarkupInclude from '../../../markup-include/src/CdcMarkupInclude'
+import CdcMarkupInclude from '@cdc/markup-include'
 import CdcFilteredText from '@cdc/filtered-text'
 import Filters, { APIFilterDropdowns } from './Filters'
 import { FilterBehavior } from './Header/Header'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { getVizConfig } from '../helpers/getVizConfig'
+import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 
 type VizRowProps = {
   filteredDataOverride?: Object[]
@@ -161,11 +162,11 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                 {visualizationConfig.type === 'table' && (
                   <DataTableStandAlone
                     key={col.widget}
-                    setConfig={newConfig => {
+                    updateConfig={newConfig => {
                       updateChildConfig(col.widget, newConfig)
                     }}
                     visualizationKey={col.widget}
-                    config={visualizationConfig}
+                    config={visualizationConfig as TableConfig}
                     viewport={currentViewport}
                   />
                 )}

@@ -7,9 +7,6 @@
   }
 
   .markup-include-content-container.cove-component__content {
-    .markup-include-component.cove-component__content {
-      max-width: 35em;
-    }
     .markup-include-component.cove-component__content:not(.component--hideBackgroundColor, .component--has-background) {
       background-color: white;
     }
