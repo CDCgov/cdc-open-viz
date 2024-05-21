@@ -8,6 +8,7 @@ import { BaseVisualizationType } from './BaseVisualizationType'
 import { ConfigureData } from './ConfigureData'
 import { VizFilter } from './VizFilter'
 import { FilterBehavior } from './FilterBehavior'
+import { General } from './General'
 
 export type Visualization = ConfigureData & {
   autoLoad: boolean
@@ -20,7 +21,7 @@ export type Visualization = ConfigureData & {
   editing: boolean
   filterBehavior: FilterBehavior
   filters: VizFilter[]
-  general: any
+  general: General
   hide: any[]
   legend: Legend
   multiDashboards?: any[]
