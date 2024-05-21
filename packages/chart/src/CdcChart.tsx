@@ -244,8 +244,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
 
-    newConfig.series.map(series => {
-      if (!series.tooltip) series.tooltip = true
+    newConfig.series.forEach(series => {
+      if (series.tooltip === undefined || series.tooltip === null) {
+        series.tooltip = true
+      }
       if (!series.axis) series.axis = 'Left'
     })
 
