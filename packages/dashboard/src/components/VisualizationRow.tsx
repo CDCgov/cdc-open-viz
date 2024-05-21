@@ -13,7 +13,7 @@ import Filters, { APIFilterDropdowns } from './Filters'
 import { FilterBehavior } from './Header/Header'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
-import { getVizConfig } from '../helpers/getVizConfig'
+import { getFootnotesVizConfig, getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 
@@ -50,11 +50,11 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
 
   const footnotesConfig = useMemo(() => {
     if (row.footnotesId) {
-      const footnoteConfig = getVizConfig(row.footnotesId, null, config, rawData, dashboardFilteredData)
+      const footnoteConfig = getFootnotesVizConfig(row.footnotesId, index, config)
       if (row.multiVizColumn && filteredDataOverride) {
         const vizCategory = filteredDataOverride[0][row.multiVizColumn]
-        const categoryFootnote = footnoteConfig.data.filter(d => d[row.multiVizColumn] === vizCategory)
-        footnoteConfig.data = categoryFootnote
+        // the multiViz filtering filtering is applied after the dashboard filters
+        const categoryFootnote = footnoteConfig.formattedData.filter(d => d[row.multiVizColumn] === vizCategory)
         footnoteConfig.formattedData = categoryFootnote
       }
       return footnoteConfig
