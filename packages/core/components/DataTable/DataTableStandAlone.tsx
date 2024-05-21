@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { ViewPort } from '../../types/ViewPort'
-import { Visualization } from '../../types/Visualization'
 import EditorWrapper from '../EditorWrapper/EditorWrapper'
 import DataTable from './DataTable'
 import DataTableEditorPanel from './components/DataTableEditorPanel'
 import Filters from '../Filters'
+import { TableConfig } from './types/TableConfig'
 
 type StandAloneProps = {
   visualizationKey: string
-  config: Visualization
+  config: TableConfig
   viewport?: ViewPort
   isEditor?: boolean
   updateConfig?: (Visualization) => void

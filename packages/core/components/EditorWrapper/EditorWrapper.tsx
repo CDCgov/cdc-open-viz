@@ -6,8 +6,8 @@ import { Accordion } from 'react-accessible-accordion'
 
 type StandAloneComponentProps = {
   visualizationKey: string
-  config: Visualization
-  setConfig: Function
+  config
+  updateConfig: (Visualization) => void
   configUrl: string
   setEditing: Function
   hostname: string
@@ -19,7 +19,7 @@ type EditorProps = {
   type: string
   visualizationKey: string
   visualizationConfig: Visualization
-  updateConfig: Function
+  updateConfig: (Visualization) => void
   viewport?: ViewPort
 }
 
@@ -38,7 +38,7 @@ const EditorWrapper: React.FC<React.PropsWithChildren<EditorProps>> = ({ childre
           </section>
         </section>
         <div className='preview-wrapper'>
-          <Component visualizationKey={visualizationKey} config={visualizationConfig} setConfig={updateConfig} configUrl={undefined} setEditing={undefined} hostname={undefined} viewport={viewport} />
+          <Component visualizationKey={visualizationKey} config={visualizationConfig} updateConfig={updateConfig} configUrl={undefined} setEditing={undefined} hostname={undefined} viewport={viewport} />
         </div>
       </div>
     </>
