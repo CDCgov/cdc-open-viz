@@ -154,18 +154,20 @@ export const BarChartVertical = () => {
                     if (dashboardConfig && dashboardConfig.dashboard.sharedFilters?.length !== 0) {
                       const { sharedFilters } = dashboardConfig.dashboard
 
-                      _barColor = sharedFilters.map(_sharedFilter => {
-                        if (_sharedFilter.setBy === config.uid) {
-                          // If the current filter is the reset filter item.
-                          if (_sharedFilter.resetLabel === _sharedFilter.active) return colorScale(config.runtime.seriesLabels[bar.key])
-                          // If the current filter is the bars
-                          if (_sharedFilter.active === transformedData[barGroup.index][config.xAxis.dataKey]) return colorScale(config.runtime.seriesLabels[bar.key])
-                          return _filteredOutColor
-                        } else {
-                          // If the setBy isn't the config.uid return the original barColor
-                          return colorScale(config.runtime.seriesLabels[bar.key])
-                        }
-                      })[0]
+                      _barColor = sharedFilters
+                        ? sharedFilters.map(_sharedFilter => {
+                            if (_sharedFilter.setBy === config.uid) {
+                              // If the current filter is the reset filter item.
+                              if (_sharedFilter.resetLabel === _sharedFilter.active) return colorScale(config.runtime.seriesLabels[bar.key])
+                              // If the current filter is the bars
+                              if (_sharedFilter.active === transformedData[barGroup.index][config.xAxis.dataKey]) return colorScale(config.runtime.seriesLabels[bar.key])
+                              return _filteredOutColor
+                            } else {
+                              // If the setBy isn't the config.uid return the original barColor
+                              return colorScale(config.runtime.seriesLabels[bar.key])
+                            }
+                          })[0]
+                        : colorScale(config.runtime.seriesLabels[bar.key])
 
                       if (isRegularLollipopColor) _barColor = barColor
                       if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
