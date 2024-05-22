@@ -42,7 +42,7 @@ const PanelAnnotate: React.FC = props => {
   }
 
   const handleAddAnnotation = () => {
-    const svgContainer = document.querySelector('.map-container > section > svg')?.getBoundingClientRect()
+    const svgContainer = document.querySelector('.map-container > section > svg, .map-container > section > canvas')?.getBoundingClientRect()
     const newSvgDims = [svgContainer.width, svgContainer.height]
 
     const newAnnotation = {
