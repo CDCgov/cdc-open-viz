@@ -13,8 +13,20 @@
   flex-direction: column-reverse;
 }
 
+.cdc-open-viz-module.type-dashboard {
+  .cdc-open-viz-module.type-chart.isEditor {
+    .cdc-chart-inner-container {
+      background: white;
+    }
+  }
+}
+
 .cdc-open-viz-module.type-chart {
   @import 'DataTable';
+
+  &.isEditor .cdc-chart-inner-container {
+    background: white;
+  }
 
   border-radius: 3px;
 
@@ -75,8 +87,10 @@
     margin-bottom: 20px;
   }
 
+  .subtext,
+  .subtext--responsive-ticks,
   .section-subtext {
-    padding: 15px;
+    padding: 0 1rem;
   }
 
   .legend-container {
@@ -685,8 +699,10 @@
     padding: 1em;
   }
 
-  .subtext {
+  .subtext,
+  .subtext--responsive-ticks {
     margin-top: 0px;
+    padding: 0 1rem;
   }
 
   .isEditor {
