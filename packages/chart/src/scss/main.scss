@@ -13,8 +13,20 @@
   flex-direction: column-reverse;
 }
 
+.cdc-open-viz-module.type-dashboard {
+  .cdc-open-viz-module.type-chart.isEditor {
+    .cdc-chart-inner-container {
+      background: white;
+    }
+  }
+}
+
 .cdc-open-viz-module.type-chart {
   @import 'DataTable';
+
+  &.isEditor .cdc-chart-inner-container {
+    background: white;
+  }
 
   border-radius: 3px;
 
@@ -75,11 +87,10 @@
     margin-bottom: 20px;
   }
 
+  .subtext,
+  .subtext--responsive-ticks,
   .section-subtext {
-    padding: 15px;
-  }
-  .subtext--responsive-ticks {
-    margin-top: 3em;
+    padding: 0 1rem;
   }
 
   .legend-container {
@@ -149,13 +160,18 @@
     h3 {
       font-size: 1.3rem;
       @include breakpoint(xs) {
-        font-size: $font-small + 0.2em;
+        font-size: $font-small + 0.4em;
       }
     }
 
     h3,
     p {
       margin-bottom: 0.8em;
+    }
+    p {
+      @include breakpoint(xs) {
+        font-size: $font-small;
+      }
     }
     & div.legend-item {
       margin-bottom: 0.5em !important;
@@ -198,17 +214,49 @@
     }
   }
 
+  .div[class*='Asterisk'] {
+    transform: 0;
+  }
+
   .legend-preliminary {
     display: flex;
     flex-direction: row;
     align-items: center;
+    font-size: 1em;
+    vertical-align: middle;
+    margin-bottom: 0.5em;
+
     @include breakpoint(xs) {
       font-size: $font-small;
+    }
+    & > span {
+      display: flex;
+      justify-items: center;
+      align-items: center;
+      white-space: nowrap;
+      font-size: 1em;
+      margin-right: 8px;
+      max-height: 1px;
+    }
+
+    & > span[class*='Asterisk'] {
+      transform: scale(1.8);
+      margin-top: 15px;
+    }
+    & > span[class*='Dagger'] {
+      margin-top: 2px;
+    }
+    & > span[class*='Sign'] {
+      margin-top: 1px;
     }
 
     & > svg {
       width: 50px;
       height: 23px;
+    }
+
+    & > p {
+      margin: 0;
     }
   }
 
@@ -619,6 +667,11 @@
   }
 }
 
+.cdc-open-viz-module .is-editor .cdc-chart-inner-container {
+  overflow: hidden;
+  background-color: var(--white);
+}
+
 .isEditor.type-sparkline .cdc-chart-inner-container {
   margin: 3em auto 0;
   max-width: 60%;
@@ -646,8 +699,10 @@
     padding: 1em;
   }
 
-  .subtext {
+  .subtext,
+  .subtext--responsive-ticks {
     margin-top: 0px;
+    padding: 0 1rem;
   }
 
   .isEditor {

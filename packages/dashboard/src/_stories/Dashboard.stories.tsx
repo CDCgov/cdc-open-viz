@@ -7,6 +7,7 @@ import ExampleConfig_2 from './_mock/dashboard-2.json'
 import ExampleConfig_3 from './_mock/dashboard_no_filter.json'
 import Dashboard_Filter from './_mock/dashboard-filter.json'
 import MultiVizConfig from './_mock/multi-viz.json'
+import MultiDashboardConfig from './_mock/multi-dashboards.json'
 import Dashboard from '../CdcDashboard'
 import StandaloneTable from './_mock/standalone-table.json'
 import PivotFitlerConfig from './_mock/pivot-filter.json'
@@ -73,12 +74,13 @@ export const PivotFilter: Story = {
 
 faker.seed(123)
 
-const countries = _.times(10, faker.location.country)
+const countries = _.times(5, faker.location.country)
 const categories = _.times(3, val => `category-${val + 1}`)
 
 const data = []
-countries.forEach(country => {
-  categories.forEach(category => {
+countries.forEach((country, i) => {
+  categories.forEach((category, j) => {
+    if ((i + j) % 3 === 0) return
     data.push({
       Country: country,
       'Sample Categories': category,
@@ -94,6 +96,13 @@ const multiVizData = {
 export const MultiVisualization: Story = {
   args: {
     config: { ...MultiVizConfig, datasets: multiVizData },
+    isEditor: false
+  }
+}
+
+export const MultiDashboard: Story = {
+  args: {
+    config: MultiDashboardConfig,
     isEditor: false
   }
 }
@@ -124,35 +133,18 @@ const fetchMock = {
         body: [{ IndicatorID: 'indicatorID', Indicator: 'Some Indicator' }]
       }
     },
-    {
-      matcher: {
-        name: 'filters',
-        url: 'path:/api/POC/Filters'
-      },
-      response: {
-        status: 200,
-        body: {
-          Years: [{ Year: 1999 }],
-          DataValueTypes: [{ DataValueType: 'Some Data Value Type', DataValueTypeId: 'dataValueTypeId' }],
-          StratificationCategories: [{ StratificationCategoryId: 'stratCategoryId', StratificationCategory: 'Some Strat Category' }]
+    ...['Year', 'DataValueType', 'StratificationCategory', 'Stratification'].map(filter => {
+      return {
+        matcher: {
+          name: 'filters' + filter,
+          url: 'path:/api/POC/Filters/' + filter
+        },
+        response: {
+          status: 200,
+          body: _.times(5, i => ({ [filter]: `Some ${filter} ${i}` }))
         }
       }
-    },
-    {
-      matcher: {
-        name: 'stratifications',
-        url: 'path:/api/POC/stratifications'
-      },
-      response: {
-        status: 200,
-        body: [
-          {
-            StratificationId: 'stratId',
-            Stratification: 'Some Strat'
-          }
-        ]
-      }
-    },
+    }),
     {
       matcher: {
         name: 'locations',
@@ -221,11 +213,11 @@ export const APIFiltersMap: Story = {
     const indicatorsFilter = canvas.getByLabelText('Indicator', { selector: 'select' })
     await user.selectOptions(indicatorsFilter, ['indicatorID'])
     const yearsFilter = canvas.getByLabelText('Year', { selector: 'select' })
-    await user.selectOptions(yearsFilter, ['1999'])
+    await user.selectOptions(yearsFilter, ['Some Year 0'])
     const stratCategoryFilter = canvas.getByLabelText('View By', { selector: 'select' })
-    await user.selectOptions(stratCategoryFilter, ['stratCategoryId'])
+    await user.selectOptions(stratCategoryFilter, ['Some StratificationCategory 0'])
     const stratFilter = canvas.getByLabelText('Stratification', { selector: 'select' })
-    await user.selectOptions(stratFilter, ['stratId'])
+    await user.selectOptions(stratFilter, ['Some Stratification 0'])
     await user.click(canvas.getByText('GO!'))
   }
 }
@@ -251,8 +243,9 @@ export const APIFiltersChart: Story = {
     const indicatorsFilter = canvas.getByLabelText('Indicator', { selector: 'select' })
     await user.selectOptions(indicatorsFilter, ['indicatorID'])
     await user.click(canvas.getByText('GO!'))
+    await sleep(1000)
     const yearFilter = canvas.getByLabelText('Year', { selector: 'select' })
-    await user.selectOptions(yearFilter, ['1999'])
+    await user.selectOptions(yearFilter, ['Some Year 1'])
   }
 }
 

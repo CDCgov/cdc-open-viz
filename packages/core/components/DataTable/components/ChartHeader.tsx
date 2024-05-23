@@ -4,9 +4,10 @@ import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import { DownIcon, UpIcon } from './Icons'
 import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
 
-type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; groupBy?; hasRowType? }
+type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType? }
 
-const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, groupBy, hasRowType }: ChartHeaderProps) => {
+const ChartHeader = ({ data, isVertical, config, setSortBy, sortBy, hasRowType }: ChartHeaderProps) => {
+  const groupBy = config.table?.groupBy
   if (!data) return
   let dataSeriesColumns = getDataSeriesColumns(config, isVertical, data)
   if (groupBy) {

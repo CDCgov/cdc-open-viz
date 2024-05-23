@@ -1,0 +1,156 @@
+.cove-editor__grid-caret--bottom {
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: -20px;
+      width: 14px;
+      height: 14px;
+      border-color: #949da4;
+      border-style: solid;
+      border-width: 0;
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 1;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -20px;
+      border-top-width: 2px;
+      border-right-width: 2px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -20px;
+      border-top-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+  }
+}
+
+.cove-editor__grid-caret--top {
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -20px;
+      width: 14px;
+      height: 14px;
+      border-color: #949da4;
+      border-style: solid;
+      border-width: 0;
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 1;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -20px;
+      border-right-width: 2px;
+      border-bottom-width: 2px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -20px;
+      border-bottom-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+  }
+}
+
+.cove-editor__content-wrap--x {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  min-width: 35rem;
+  max-width: 50%;
+  min-height: 100vh;
+  margin-right: auto;
+  margin-left: auto;
+  transition: max-width $editorAnimationTimer cubic-bezier(0.16, 1, 0.3, 1);
+
+  @at-root {
+    .cove-dashboard #{&} {
+      min-height: calc(100vh - 3rem);
+    }
+
+    .cove-tabs #{&} {
+      // min-height: calc(100vh - #{$wizardTabsHeight});
+    }
+
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      width: 1px;
+      height: 100%;
+      top: 0;
+      display: block;
+      position: absolute;
+      background-image: repeating-linear-gradient(0deg, #949da4, #949da4 18px, transparent 18px, transparent 26px);
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 1;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -1px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -1px;
+    }
+  }
+}
+
+.cove-editor__content-wrap--y {
+  position: relative;
+  width: 100%;
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 50%;
+      width: 100vw;
+      height: 1px;
+      background-image: repeating-linear-gradient(90deg, #949da4, #949da4 18px, transparent 18px, transparent 26px);
+      transform: translateX(-50%);
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 1;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      top: -1px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      bottom: -1px;
+    }
+  }
+}

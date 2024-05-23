@@ -1,16 +1,12 @@
 export default function useDataVizClasses(config, viewport = null) {
   const { legend } = config
   let lineDatapointClass = ''
-  let barBorderClass = ''
 
   if (config.lineDatapointStyle === 'hover') {
     lineDatapointClass = ' chart-line--hover'
   }
   if (config.lineDatapointStyle === 'always show') {
     lineDatapointClass = ' chart-line--always'
-  }
-  if (config.barHasBorder === 'false') {
-    barBorderClass = ' chart-bar--no-border'
   }
 
   let innerContainerClasses = ['cove-component__inner']
@@ -69,5 +65,5 @@ export default function useDataVizClasses(config, viewport = null) {
     div: [legend?.position === 'bottom' && legend?.singleRow ? 'shape-container single-row' : 'shape-container']
   }
 
-  return { innerContainerClasses, contentClasses, barBorderClass, lineDatapointClass, sparkLineStyles, legendClasses }
+  return { innerContainerClasses, contentClasses, lineDatapointClass, sparkLineStyles, legendClasses }
 }

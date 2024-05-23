@@ -1,0 +1,78 @@
+{
+  "dashboard": {
+    "theme": "theme-blue"
+  },
+  "rows": [
+    [
+      {
+        "width": 12,
+        "widget": "markup-include1709307330120"
+      },
+      {},
+      {}
+    ]
+  ],
+  "visualizations": {
+    "markup-include1709307330120": {
+      "inlineHTML": "",
+      "markupSource": "inline",
+      "showHeader": false,
+      "srcUrl": "#example",
+      "theme": "theme-blue",
+      "title": "Markup Include",
+      "type": "markup-include",
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      },
+      "openModal": false,
+      "uid": "markup-include1709307330120",
+      "visualizationType": "markup-include",
+      "editing": false,
+      "data": {},
+      "validated": 4.23
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": false,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "datasets": {
+    "valid-data-chart.csv": {
+      "data": [
+        {
+          "Race": "Hispanic or Latino",
+          "Age-adjusted rate": "644.2"
+        },
+        {
+          "Race": "Non-Hispanic American Indian",
+          "Age-adjusted rate": "636.1"
+        },
+        {
+          "Race": "Non-Hispanic Black",
+          "Age-adjusted rate": "563.7"
+        },
+        {
+          "Race": "Non-Hispanic Asian or Pacific Islander",
+          "Age-adjusted rate": "202.5"
+        },
+        {
+          "Race": "Non-Hispanic White",
+          "Age-adjusted rate": "183.6"
+        }
+      ],
+      "dataFileSize": 184,
+      "dataFileName": "valid-data-chart.csv",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  },
+  "type": "dashboard",
+  "runtime": {}
+}

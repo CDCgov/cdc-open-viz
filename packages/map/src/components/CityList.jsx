@@ -5,7 +5,7 @@ import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
 import { GlyphStar, GlyphTriangle, GlyphDiamond, GlyphSquare, GlyphCircle } from '@visx/glyph'
 
-const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, projection, titleCase, setSharedFilterValue, isFilterValueSupported }) => {
+const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, projection, titleCase, setSharedFilterValue, isFilterValueSupported, tooltipId }) => {
   const [citiesData, setCitiesData] = useState({})
 
   useEffect(() => {
@@ -67,7 +67,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
         d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
         title='Select for more information'
         onClick={() => geoClickHandler(cityDisplayName, geoData)}
-        data-tooltip-id='tooltip'
+        data-tooltip-id={`tooltip__${tooltipId}`}
         data-tooltip-html={toolTip}
         transform={`scale(${radius / 9})`}
         stroke={state.general.geoBorderColor === 'sameAsBackground' ? '#ffffff' : '#000000'}
@@ -97,8 +97,8 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
 
     const styles = {
       fill: legendColors[0],
-      opacity: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] !== setSharedFilterValue ? 0.5 : 1,
-      stroke: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] === setSharedFilterValue ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
+      opacity: setSharedFilterValue && isFilterValueSupported && data[city] && data[city][state.columns.geo.name] !== setSharedFilterValue ? 0.5 : 1,
+      stroke: setSharedFilterValue && isFilterValueSupported && data[city] && data[city][state.columns.geo.name] === setSharedFilterValue ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
       '&:hover': {
         fill: legendColors[1],
         outline: 0
@@ -119,7 +119,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       onClick: () => geoClickHandler(cityDisplayName, geoData),
       size: state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius * 30,
       title: 'Select for more information',
-      'data-tooltip-id': 'tooltip',
+      'data-tooltip-id': `tooltip__${tooltipId}`,
       'data-tooltip-html': toolTip,
       stroke: state.general.geoBorderColor === 'sameAsBackground' ? '#ffffff' : '#000000',
       strokeWidth: '2px',

@@ -46,6 +46,7 @@ export const Primary: Story = {
         label: 'Data Table',
         show: true
       },
+      columns: {},
       visualizationType: 'Pie'
     },
     isDashboard: true

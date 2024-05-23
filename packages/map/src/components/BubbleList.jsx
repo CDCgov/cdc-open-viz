@@ -1,10 +1,13 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
+import ConfigContext from './../../src/context'
 
 export const BubbleList = ({ data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, runtimeData, displayGeoName }) => {
   const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
+  const { tooltipId } = useContext(ConfigContext)
+
   const hasBubblesWithZeroOnMap = state.visual.showBubbleZeros ? 0 : 1
   // sort runtime data. Smaller bubbles should appear on top.
   const sortedRuntimeData = Object.values(runtimeData).sort((a, b) => (a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1))
@@ -62,7 +65,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
               }}
               transform={transform}
               style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-              data-tooltip-id='tooltip'
+              data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={toolTip}
             />
 
@@ -90,7 +93,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 }}
                 transform={transform}
                 style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-                data-tooltip-id='tooltip'
+                data-tooltip-id={`tooltip__${tooltipId}`}
                 data-tooltip-html={toolTip}
               />
             )}
@@ -161,7 +164,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
               }}
               transform={transform}
               style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-              data-tooltip-id='tooltip'
+              data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={toolTip}
             />
             {state.visual.extraBubbleBorder && (
@@ -189,7 +192,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 }}
                 transform={transform}
                 style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
-                data-tooltip-id='tooltip'
+                data-tooltip-id={`tooltip__${tooltipId}`}
                 data-tooltip-html={toolTip}
               />
             )}
