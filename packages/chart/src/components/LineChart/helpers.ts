@@ -129,7 +129,7 @@ function handleMiddleIndices(data, seriesKey, dataKey, preliminaryData) {
 
     // Find all indices
     const matchingIndices = data.reduce((indices, item, index) => {
-      if (item[seriesKey] === targetValue && isValidMiddleIndex(index)) {
+      if (item[seriesKey] === targetValue && isValidMiddleIndex(index) && (!pd.column || pd.column === seriesKey)) {
         indices.push(index)
       }
       return indices
