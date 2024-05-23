@@ -210,14 +210,11 @@ export const useBarChart = () => {
     if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') setSeriesHighlight([])
   }
 
-  const composeSuppressionBars = ({ bar, barGroup }) => {
+  const composeSuppressionBars = ({ bar }) => {
     const suppresedBarHeight = config.xAxis.showSuppressedLine ? 3 : 0
     const ASTERISK = 'Asterisk'
     const getIconPadding = symbol => (String(symbol).includes(ASTERISK) ? -5 : -suppresedBarHeight * 3)
     const getVerticalAnchor = symbol => {
-      if (isHorizontal) {
-        return String(symbol).includes(ASTERISK) ? 'middle' : 'end'
-      }
       return String(symbol).includes(ASTERISK) ? 'middle' : 'end'
     }
     const getIconSize = (symbol, barWidth) => {
