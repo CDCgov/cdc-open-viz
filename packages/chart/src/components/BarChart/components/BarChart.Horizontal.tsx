@@ -41,7 +41,7 @@ export const BarChartHorizontal = () => {
     hoveredBar,
     onMouseLeaveBar,
     onMouseOverBar,
-    shouldSuppress
+    composeSuppressionBars
   } = useBarChart()
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
@@ -68,6 +68,7 @@ export const BarChartHorizontal = () => {
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} top={barGroup.y}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
+                  const { suppresedBarHeight: suppresedBarWidth, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
 
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
@@ -80,15 +81,15 @@ export const BarChartHorizontal = () => {
                   }
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
-                  const suppresedBarWidth = config.xAxis.showSuppressedLine ? 4 : 0
+                  // const suppresedBarWidth = config.xAxis.showSuppressedLine ? 4 : 0
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
-                  let barWidth = shouldSuppress(bar) ? suppresedBarWidth : barWidthHorizontal
+                  let barWidth = isSuppressed ? suppresedBarWidth : barWidthHorizontal
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
-                  const barValueLabel = shouldSuppress(bar) ? '' : yAxisValue
+                  const barValueLabel = isSuppressed ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
                   let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
@@ -133,7 +134,7 @@ export const BarChartHorizontal = () => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  const displaylollipopShape = shouldSuppress(bar) ? 'none' : 'block'
+                  const displaylollipopShape = isSuppressed ? 'none' : 'block'
                   // update label color
                   if (barColor && labelColor && textFits) {
                     labelColor = getContrastColor('#000', barColor)
@@ -144,13 +145,6 @@ export const BarChartHorizontal = () => {
                     if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
                     if (isHighlightedBar) return 'transparent'
                     return barColor
-                  }
-                  const getIconSize = synbol => {
-                    let size = '20px'
-                    if (synbol.includes('Asterisk')) {
-                      size = barHeight + 'px'
-                    }
-                    return size
                   }
 
                   const iconPadding = symbol => (symbol === 'Asterisk' ? '3px' : symbol === 'Double Asterisks' ? '4px' : '12px')
@@ -199,7 +193,7 @@ export const BarChartHorizontal = () => {
                           return (
                             <Text // prettier-ignore
                               key={index}
-                              fontSize={getIconSize(pd.symbol)}
+                              fontSize={getIconSize(pd.symbol, barHeight)}
                               angle={90}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
@@ -207,7 +201,7 @@ export const BarChartHorizontal = () => {
                               y={config.barHeight / 2 + config.barHeight * bar.index}
                               fill={'#000'}
                               dx={iconPadding(pd.symbol)}
-                              verticalAnchor='end'
+                              verticalAnchor={getVerticalAnchor(pd.symbol)}
                               textAnchor={'middle'}
                             >
                               {pd.iconCode}

@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 const symbols = [
-  ['*', 'Astrerisk'],
+  ['*', 'Asterisk'],
   ['†', 'Dagger'],
   ['§', 'Section Symbol'],
   ['¶', 'Paragraph Symbol']
