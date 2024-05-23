@@ -25,19 +25,7 @@ export const BarChartVertical = () => {
   const [barWidth, setBarWidth] = useState(0)
   const [totalBarsInGroup, setTotalBarsInGroup] = useState(0)
   // prettier-ignore
-  const {
-    assignColorsToValues,
-    barBorderWidth,
-    getAdditionalColumn,
-    getHighlightedBarByValue,
-    getHighlightedBarColorByValue,
-    lollipopBarWidth,
-    lollipopShapeSize,
-    onMouseLeaveBar,
-    onMouseOverBar,
-    section,
-    shouldSuppress
-  } = useBarChart()
+  const { assignColorsToValues, barBorderWidth, getAdditionalColumn, getHighlightedBarByValue, getHighlightedBarColorByValue, lollipopBarWidth, lollipopShapeSize, onMouseLeaveBar, onMouseOverBar, section, composeSuppressionBars, shouldSuppress } = useBarChart()
 
   // prettier-ignore
   const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData,  brushConfig, } = useContext<ChartContext>(ConfigContext)
@@ -53,6 +41,55 @@ export const BarChartVertical = () => {
   if (brushConfig.data.length) {
     data = brushConfig.data
   }
+
+  interface Config {
+    useLogScale: boolean
+  }
+
+  // Assuming yScale is a function that takes a number and returns a number.
+
+  class BarConditions {
+    private scaleVal: number
+    private suppressedBarHeight: number
+    private noDataBarHeight: number
+    private yScale: Function
+    private barYBase: number
+    private barHeightBase: number
+
+    constructor(config: Config, yScale: Function, barYBase: number, barHeightBase: number) {
+      this.scaleVal = config.useLogScale ? 0.1 : 0
+      this.suppressedBarHeight = 4
+      this.noDataBarHeight = 4
+      this.yScale = yScale
+      this.barYBase = barYBase
+      this.barHeightBase = barHeightBase
+    }
+
+    public suppressedY(): number {
+      return this.yScale(this.scaleVal) - this.suppressedBarHeight
+    }
+
+    public noDataY(): number {
+      return this.yScale(this.scaleVal) - this.noDataBarHeight
+    }
+
+    public defaultY(): number {
+      return this.barYBase
+    }
+
+    public suppressedHeight(): number {
+      return this.suppressedBarHeight
+    }
+
+    public noDataHeight(): number {
+      return this.noDataBarHeight
+    }
+
+    public defaultHeight(): number {
+      return this.barHeightBase
+    }
+  }
+
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
@@ -84,21 +121,36 @@ export const BarChartVertical = () => {
                       showNoDataBars = true
                       noDataBarheight = 15
                     }
-                    return [showNoDataBars, noDataBarheight]
+                    return { showNoDataBars, noDataBarheight }
                   }
-                  const [showNoDataBars, noDataBarheight] = composeNoDataBars(bar)
+                  const { showNoDataBars, noDataBarheight } = composeNoDataBars(bar)
+                  const { suppresedBarHeight, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar, barGroup })
                   const scaleVal = config.useLogScale ? 0.1 : 0
-                  const suppresedBarHeight = config.xAxis.showSuppressedLine ? 3 : 0
+
+                  const yConditions = {
+                    scaleVal: config.useLogScale ? 0.1 : 0,
+                    suppresedBarHeight: 4,
+                    noDataBarheight: 4,
+                    suppressed: () => yScale(yConditions.scaleVal) - yConditions.suppresedBarHeight,
+                    noData: () => yScale(yConditions.scaleVal) - yConditions.noDataBarheight,
+                    default: () => barYBase
+                  }
+                  const heightConditions = {
+                    suppresedBarHeight: 4,
+                    noDataBarheight: 4,
+                    suppressed: () => yConditions.suppresedBarHeight,
+                    noData: () => yConditions.noDataBarheight,
+                    default: () => barHeightBase
+                  }
+
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   const displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                  const barHeightBase = showNoDataBars ? noDataBarheight : Math.abs(yScale(bar.value) - yScale(scaleVal))
-                  console.log(bar.value)
+                  const barHeightBase = Math.abs(yScale(bar.value) - yScale(scaleVal))
 
                   const barYBase = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
-                  const barY = shouldSuppress(bar) ? yScale(scaleVal) - suppresedBarHeight : showNoDataBars ? yScale(scaleVal) - Number(noDataBarheight) : barYBase
-
+                  const barY = isSuppressed ? yConditions.suppressed() : showNoDataBars ? yConditions.noData() : yConditions.default()
                   let barGroupWidth = seriesScale.range()[1]
 
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
@@ -111,6 +163,7 @@ export const BarChartVertical = () => {
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
                   // tooltips
+                  const barConditions = new BarConditions(config, yScale, barYBase, barHeightBase)
 
                   const additionalColTooltip = getAdditionalColumn(bar.key, data[barGroup.index][config.runtime.originalXAxis.dataKey])
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -134,10 +187,10 @@ export const BarChartVertical = () => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  const barValueLabel = shouldSuppress(bar) ? '' : showNoDataBars ? 'N/A' : yAxisValue
-                  const barHeight = shouldSuppress(bar) ? suppresedBarHeight : barHeightBase
+                  const barValueLabel = isSuppressed ? '' : yAxisValue
+                  const barHeight = isSuppressed ? heightConditions.suppressed() : noDataBarheight ? heightConditions.noData() : heightConditions.default()
 
-                  const displaylollipopShape = shouldSuppress(bar) ? 'none' : 'block'
+                  const displaylollipopShape = isSuppressed ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
                     let _barColor = barColor
                     let _filteredOutColor = filteredOutColor || '#f2f2f2'
@@ -178,12 +231,6 @@ export const BarChartVertical = () => {
                     if (isHighlightedBar) _barColor = 'transparent'
                     return _barColor
                   }
-                  // suppression icons
-                  const getIconSize = synbol => {
-                    return synbol.includes('Asterisk') ? barWidth / 1.5 : barWidth / 2.3
-                  }
-
-                  const iconPadding = symbol => (symbol === 'Asterisk' ? '0' : symbol === 'Double Asterisks' ? 2 : -suppresedBarHeight * 3)
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -232,15 +279,15 @@ export const BarChartVertical = () => {
                           return (
                             <Text // prettier-ignore
                               key={index}
-                              dy={iconPadding(pd.symbol)}
+                              dy={getIconPadding(pd.symbol)}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX + barWidth / 2}
                               y={barY}
-                              verticalAnchor='end'
+                              verticalAnchor={getVerticalAnchor(pd.symbol)}
                               fill={labelColor}
                               textAnchor='middle'
-                              fontSize={`${getIconSize(pd.symbol)}px`}
+                              fontSize={`${getIconSize(pd.symbol, barWidth)}px`}
                             >
                               {pd.iconCode}
                             </Text>
