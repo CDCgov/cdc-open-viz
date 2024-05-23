@@ -3,11 +3,10 @@ import _ from 'lodash'
 export const createStyles = (props: StyleProps): Style[] => {
   const { preliminaryData, data, stroke, strokeWidth, handleLineType, lineType, seriesKey } = props
 
-  const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(pd => pd.seriesKey && pd.column && pd.value && pd.style)
-  const validSuppressedData: PreliminaryDataItem[] = preliminaryData.filter(pd => pd.type === 'suppression' && pd.value && pd.style)
+  const validPreliminaryData: PreliminaryDataItem[] = preliminaryData.filter(pd => pd.seriesKey && pd.column && pd.value && pd.type && pd.style && pd.type === 'effect')
   const getMatchingPd = (point: DataItem): PreliminaryDataItem => validPreliminaryData.find(pd => pd.seriesKey === seriesKey && point[pd.column] === pd.value && pd.type === 'effect' && pd.style !== 'Open Circles')
-  const getMatchingSp = (point: DataItem): PreliminaryDataItem => validSuppressedData.find(pd => point[seriesKey] === pd.value && (!pd.column || pd.column === seriesKey))
-  const styles: Style[] = []
+
+  let styles: Style[] = []
   const createStyle = (lineStyle): Style => ({
     stroke: stroke,
     strokeWidth: strokeWidth,
@@ -15,20 +14,10 @@ export const createStyles = (props: StyleProps): Style[] => {
   })
 
   data.forEach((d, index) => {
-    const matchingPd: PreliminaryDataItem = getMatchingPd(d)
-    const matchingSp: PreliminaryDataItem = getMatchingSp(d)
+    let matchingPd: PreliminaryDataItem = getMatchingPd(d)
+    let style: Style = matchingPd ? createStyle(handleLineType(matchingPd.style)) : createStyle(handleLineType(lineType))
 
-    const style: Style = matchingPd ? createStyle(handleLineType(matchingPd.style)) : createStyle(handleLineType(lineType))
-    const styleX: Style = matchingSp ? createStyle(handleLineType(matchingSp.style)) : createStyle(handleLineType(lineType))
-    if (matchingPd) {
-      styles.push(style)
-    } else {
-      styles.push(styleX)
-    }
-    // If matchingSP exists, update the previous style if there is a previous element
-    if (matchingSp && index > 0 && matchingSp.style) {
-      styles[index - 1] = createStyle(handleLineType(matchingSp.style))
-    }
+    styles.push(style)
 
     // If matchingPd exists, update the previous style if there is a previous element
     if (matchingPd && index > 0) {
@@ -67,6 +56,7 @@ const handleFirstIndex = (data, seriesKey, preliminaryData) => {
 
   // Function to check if a data item matches the suppression criteria
   const isSuppressed = pd => {
+    if (pd.type === 'effect') return
     return pd.type == 'suppression' && pd.value === firstIndexDataItem[seriesKey] && (!pd.column || pd.column === seriesKey)
   }
 
@@ -102,6 +92,7 @@ const handleLastIndex = (data, seriesKey, preliminaryData) => {
   }
   let lastAddedIndex = -1 // Tracks the last index added to the result
   preliminaryData?.forEach(pd => {
+    if (pd.type === 'effect') return
     if (data[data.length - 1][seriesKey] === pd.value && pd.style && (!pd.column || pd.column === seriesKey) && pd.type == 'suppression') {
       const lastIndex = data.length - 1
       const modifiedItem = { ...data[lastIndex], [seriesKey]: 0 }
@@ -132,6 +123,7 @@ function handleMiddleIndices(data, seriesKey, dataKey, preliminaryData) {
   const isValidMiddleIndex = index => index > 0 && index < data.length - 1
 
   preliminaryData?.forEach(pd => {
+    if (pd.type === 'effect') return
     const targetValue = pd.value
     result.style = pd.style
 
@@ -173,5 +165,5 @@ export const createDataSegments = (data, seriesKey, preliminaryData, dataKey) =>
   // Process the middle segment
   const middleSegments = handleMiddleIndices(data, seriesKey, dataKey, preliminaryData)
   // Combine all segments into a single array
-  return [firstSegment, middleSegments, lastSegment].filter(segment => segment.data.length > 0)
+  return [firstSegment, middleSegments, lastSegment].filter(segment => segment.data.length > 0 && segment.style !== '')
 }

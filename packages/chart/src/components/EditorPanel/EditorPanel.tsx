@@ -1914,7 +1914,7 @@ const EditorPanel = () => {
                         }
                         updateField={updateField}
                       />
-                      {visHasBrushChart && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
+                      {/* {visHasBrushChart && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />} */}
 
                       {config.exclusions.active && (
                         <>
