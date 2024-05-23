@@ -82,6 +82,12 @@
     margin-top: 3em;
   }
 
+  .type-pie {
+    svg {
+      width: auto !important;
+    }
+  }
+
   .legend-container {
     background: #fff;
     width: 100%;
