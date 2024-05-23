@@ -77,15 +77,27 @@ export const BarChartVertical = () => {
             return barGroups.map((barGroup, index) => (
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={barGroup.x0}>
                 {barGroup.bars.map((bar, index) => {
+                  const composeNoDataBars = bar => {
+                    let showNoDataBars = false
+                    let noDataBarheight = 0
+                    if (!bar.value) {
+                      showNoDataBars = true
+                      noDataBarheight = 15
+                    }
+                    return [showNoDataBars, noDataBarheight]
+                  }
+                  const [showNoDataBars, noDataBarheight] = composeNoDataBars(bar)
                   const scaleVal = config.useLogScale ? 0.1 : 0
                   const suppresedBarHeight = config.xAxis.showSuppressedLine ? 3 : 0
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   const displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                  const barHeightBase = Math.abs(yScale(bar.value) - yScale(scaleVal))
+                  const barHeightBase = showNoDataBars ? noDataBarheight : Math.abs(yScale(bar.value) - yScale(scaleVal))
+                  console.log(bar.value)
+
                   const barYBase = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
-                  const barY = shouldSuppress(bar) ? yScale(scaleVal) - suppresedBarHeight : barYBase
+                  const barY = shouldSuppress(bar) ? yScale(scaleVal) - suppresedBarHeight : showNoDataBars ? yScale(scaleVal) - Number(noDataBarheight) : barYBase
 
                   let barGroupWidth = seriesScale.range()[1]
 
@@ -122,7 +134,7 @@ export const BarChartVertical = () => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  const barValueLabel = shouldSuppress(bar) ? '' : yAxisValue
+                  const barValueLabel = shouldSuppress(bar) ? '' : showNoDataBars ? 'N/A' : yAxisValue
                   const barHeight = shouldSuppress(bar) ? suppresedBarHeight : barHeightBase
 
                   const displaylollipopShape = shouldSuppress(bar) ? 'none' : 'block'
