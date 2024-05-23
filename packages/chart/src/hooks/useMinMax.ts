@@ -1,4 +1,5 @@
 import { ChartConfig } from '../types/ChartConfig'
+import _ from 'lodash'
 
 type UseMinMaxProps = {
   /** config - standard chart config */
@@ -150,11 +151,19 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   if (config.visualizationType === 'Line') {
     const isMinValid = config.useLogScale ? enteredMinValue >= 0 && enteredMinValue < minValue : enteredMinValue < minValue
     // update minValue for (0) Suppression points
-    const suppressedMinValue = tableData?.some((d, index) => {
+    const suppressedMinValue = tableData?.some((dataItem, index) => {
       return config.preliminaryData?.some(pd => {
         if (pd.type !== 'suppression' || !pd.style) return false
-        const valueMatch = pd.column ? d[pd.column] === pd.value : Object.values(d).includes(pd.value)
-        return valueMatch && (index === 0 || index === data.length - 1)
+
+        // Filter data item based on current series keys and check if pd.value is present
+        const relevantData = _.pick(dataItem, config.runtime?.seriesKeys)
+        const isValuePresent = _.values(relevantData).includes(pd.value)
+
+        // Check for value match condition
+        const valueMatch = pd.column ? dataItem[pd.column] === pd.value : isValuePresent
+
+        // Return true if the value matches and it's either the first or the last item
+        return valueMatch && (index === 0 || index === tableData.length - 1)
       })
     })
     min = enteredMinValue && isMinValid ? enteredMinValue : suppressedMinValue ? 0 : minValue
