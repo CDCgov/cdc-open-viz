@@ -1,27 +1,28 @@
 import { useEffect, useCallback, useRef, useReducer, useState } from 'react'
-
+import _ from 'lodash'
 // external
 import { Markup } from 'interweave'
 import axios from 'axios'
 
 // cdc
-import { Config } from './types/Config'
+import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { publish } from '@cdc/core/helpers/events'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import EditorPanel from '../src/components/EditorPanel'
 import defaults from './data/initial-state'
-import EditorPanel from './components/EditorPanel'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import markupIncludeReducer from './store/mi.reducer'
+import markupIncludeReducer from './store/markupInclude.reducer'
 import Layout from '@cdc/core/components/Layout'
 // styles
+import './cdcMarkupInclude.style.css'
 import './scss/main.scss'
 
 type CdcMarkupIncludeProps = {
-  config: Config
+  config: MarkupIncludeConfig
   configUrl: string
   isDashboard: boolean
   isEditor: boolean
@@ -30,21 +31,21 @@ type CdcMarkupIncludeProps = {
 
 import Title from '@cdc/core/components/ui/Title'
 
-const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
-  const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
-  const initialState = { config: configObj ?? defaults, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
+const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({ configUrl, config: configObj, isDashboard = true, isEditor = true, setConfig: setParentConfig }) => {
+  const initialState = { config: configObj, loading: true, urlMarkup: '', markupError: null, errorMessage: null, coveLoadedHasRan: false }
 
   const [state, dispatch] = useReducer(markupIncludeReducer, initialState)
-  const [showConfigConfirm, setShowConfigConfirm] = useState(false)
 
   const { config, loading, urlMarkup, markupError, errorMessage, coveLoadedHasRan } = state
 
   // Custom States
   const container = useRef()
 
-  const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
+  const { innerContainerClasses, contentClasses } = useDataVizClasses(config || {})
+  const { contentEditor, theme } = config || {}
+  const data = configObj?.data
 
-  let { title } = config
+  const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML } = contentEditor || {}
 
   // Default Functions
   const updateConfig = newConfig => {
@@ -73,7 +74,7 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
     response.data = responseData
     const processedConfig = { ...(await coveUpdateWorker(response)) }
 
-    updateConfig({ ...defaults, ...processedConfig })
+    updateConfig({ ...configObj, ...processedConfig })
     dispatch({ type: 'SET_LOADING', payload: false })
   }, [])
 
@@ -81,10 +82,10 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
   useEffect(() => {
     if (markupError) {
       let errorCode = markupError
-      let message = 'There was a problem retrieving the content from ' + config.srcUrl + '. '
+      let message = 'There was a problem retrieving the content from ' + srcUrl + '. '
       let protocolCheck = /https?:\/\//g
 
-      if (errorCode === 404 && !config.srcUrl.match(protocolCheck)) {
+      if (errorCode === 404 && !srcUrl.match(protocolCheck)) {
         errorCode = 'proto' //Capture 404 caused by missing protocols and adjust message
       }
 
@@ -104,15 +105,15 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
   const loadConfigMarkupData = useCallback(async () => {
     dispatch({ type: 'SET_MARKUP_ERROR', payload: null })
 
-    if (config.srcUrl) {
-      if (config.srcUrl === '#example') {
+    if (srcUrl) {
+      if (srcUrl === '#example') {
         let payload =
           '<!doctype html><html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"> <meta http-equiv="X-UA-Compatible" content="ie=edge"> <title>Document</title> </head> <body> <h1>Header</h1> <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p> <br> <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen. </p><br><p>She packed her seven versalia, put her initial into the belt and made herself on the way. When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane. Pityful a rethoric question ran over her cheek.</p></body></html>'
 
         dispatch({ type: 'SET_URL_MARKUP', payload })
       } else {
         try {
-          await axios.get(config.srcUrl).then(res => {
+          await axios.get(srcUrl).then(res => {
             if (res.data) {
               dispatch({ type: 'SET_URL_MARKUP', payload: res.data })
             }
@@ -132,7 +133,47 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
     } else {
       dispatch({ type: 'SET_URL_MARKUP', payload: '' })
     }
-  }, [config.srcUrl])
+  }, [srcUrl])
+
+  const filterOutConditions = (workingData, conditionList) => {
+    const { columnName, isOrIsNotEqualTo, value } = conditionList[0]
+
+    const newWorkingData = isOrIsNotEqualTo === 'is' ? workingData.filter(dataObject => dataObject[columnName] === value) : workingData.filter(dataObject => dataObject[columnName] !== value)
+
+    conditionList.shift()
+    return conditionList.length === 0 ? newWorkingData : filterOutConditions(newWorkingData, conditionList)
+  }
+
+  const convertVariablesInMarkup = inlineMarkup => {
+    if (_.isEmpty(markupVariables)) return inlineMarkup
+    const variableRegexPattern = /{{(.*?)}}/g
+    const convertedInlineMarkup = inlineMarkup.replace(variableRegexPattern, variableTag => {
+      const workingVariable = markupVariables.filter(variable => variable.tag === variableTag)[0]
+      if (workingVariable === undefined) return [variableTag]
+      const workingData = workingVariable && workingVariable.conditions.length === 0 ? data : filterOutConditions(data, [...workingVariable.conditions])
+
+      const variableValues: string[] = _.uniq(workingData?.map(dataObject => dataObject[workingVariable.columnName]))
+      const variableDisplay = []
+
+      const listConjunction = !isEditor ? 'and' : 'or'
+
+      const length = variableValues.length
+      if (length === 2) {
+        variableValues.push(variableValues.join(` ${listConjunction} `))
+      }
+      if (length > 2) {
+        variableValues[length - 1] = `${listConjunction} ${variableValues[length - 1]}`
+      }
+      variableDisplay.push(variableValues.join(', '))
+
+      const displayInfoMessage = '<span class="font-weight-bold display-Info-message">One or more of the following values will appear in the place of this variable placeholder:</span>'
+
+      const newReplacementForVariable = `<span class="cove-tooltip-variable">${variableTag}<span class="cove-tooltip-value">${displayInfoMessage}<br/>${variableDisplay[0]}</span></span><span class="cove-markup-include-variable-value">${variableDisplay[0].trim()}</span>`
+
+      return newReplacementForVariable
+    })
+    return convertedInlineMarkup
+  }
 
   const parseBodyMarkup = markup => {
     let parse
@@ -174,30 +215,25 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
 
   let content = <Loading />
 
-  if (loading === false) {
-    let body = (
-      <Layout.Responsive isEditor={isEditor}>
-        <div className={`cove-component__content ${contentClasses.join(' ')}`}>
-          <Title title={title} isDashboard={isDashboard} classes={[`${config.theme}`, 'mb-0']} />
-          <div className={`${innerContainerClasses.join(' ')}`}>
-            <div className='cove-component__content-wrap'>
-              {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
-              {markupError && config.srcUrl && <div className='warning'>{errorMessage}</div>}
-            </div>
-          </div>
-        </div>
-      </Layout.Responsive>
-    )
+  const markup = useInlineHTML ? convertVariablesInMarkup(inlineHTML) : parseBodyMarkup(urlMarkup)
 
+  if (loading === false) {
     content = (
       <>
-        {isEditor && (
-          <>
-            <EditorPanel />
-            {body}
-          </>
-        )}
-        {!isEditor && body}
+        {isEditor && <EditorPanel />}
+        <Layout.Responsive isEditor={isEditor}>
+          <div className='markup-include-content-container cove-component__content no-borders'>
+            <div className={`markup-include-component ${contentClasses.join(' ')}`}>
+              <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
+              <div className={`${innerContainerClasses.join(' ')}`}>
+                <div className='cove-component__content-wrap'>
+                  {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
+                  {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+                </div>
+              </div>
+            </div>
+          </div>
+        </Layout.Responsive>
       </>
     )
   }
@@ -207,28 +243,7 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
       <section className='waiting'>
         <section className='waiting-container'>
           <h3>Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
-  const Confirm = () => {
-    const confirmDone = e => {
-      e.preventDefault()
-      let newConfig = { ...config }
-      delete newConfig.newViz
-      updateConfig(newConfig)
-    }
-
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the markup.</p>
-          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
-            I'm Done
-          </button>
+          <p>{config?.runtime.editorErrorMessage}</p>
         </section>
       </section>
     )
@@ -236,10 +251,9 @@ const CdcMarkupInclude = (props: CdcMarkupIncludeProps) => {
 
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, showConfigConfirm }}>
-        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
-        {config.newViz && showConfigConfirm && <Confirm />}
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} ref={container} showEditorPanel={config?.showEditorPanel}>
+      <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
+        {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
+        <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
           {content}
         </Layout.VisualizationWrapper>
       </ConfigContext.Provider>

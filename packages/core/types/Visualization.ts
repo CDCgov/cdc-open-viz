@@ -8,6 +8,7 @@ import { BaseVisualizationType } from './BaseVisualizationType'
 import { ConfigureData } from './ConfigureData'
 import { VizFilter } from './VizFilter'
 import { FilterBehavior } from './FilterBehavior'
+import { General } from './General'
 
 export type Visualization = ConfigureData & {
   autoLoad: boolean
@@ -20,21 +21,23 @@ export type Visualization = ConfigureData & {
   editing: boolean
   filterBehavior: FilterBehavior
   filters: VizFilter[]
-  general: any
+  general: General
   hide: any[]
   legend: Legend
   multiDashboards?: any[]
   newViz: boolean
   openModal: boolean
-  originalFormattedData: any
   orientation: 'vertical' | 'horizontal'
+  originalFormattedData: any
   series: Series
+  showEditorPanel: boolean
   table: Table
+  theme: string
   title: string
   type: BaseVisualizationType
   uid: string // this is the actual key of the visualization object
   usesSharedFilter: any
-  visualizationType: string
   visualizationSubType: string
+  visualizationType: string
   xAxis: Axis
 }

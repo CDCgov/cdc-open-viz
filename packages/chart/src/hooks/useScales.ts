@@ -72,7 +72,7 @@ const useScales = (properties: useScaleProps) => {
       domain: [xAxisMin, xAxisMax],
       range: [0, xMax]
     })
-    xScaleBrush = xScale
+
     xScale.type = scaleTypes.TIME
     seriesScale = composeScaleBand(seriesDomain, [0, config.barThickness * xMax], 0)
   }
@@ -239,34 +239,34 @@ const useScales = (properties: useScaleProps) => {
 export default useScales
 
 export const getTickValues = (xAxisDataMapped, xScale, num) => {
-  const xDomain = xScale.domain();
+  const xDomain = xScale.domain()
 
-  if(xScale.type === 'time'){
-    const xDomainMax = xAxisDataMapped[xAxisDataMapped.length - 1];
-    const xDomainMin = xAxisDataMapped[0];
-    const step = (xDomainMax - xDomainMin) / (num - 1);
-    const tickValues = [];
-    for(let i = xDomainMax; i >= xDomainMin; i -= step){
-      tickValues.push(i);
+  if (xScale.type === 'time') {
+    const xDomainMax = xAxisDataMapped[xAxisDataMapped.length - 1]
+    const xDomainMin = xAxisDataMapped[0]
+    const step = (xDomainMax - xDomainMin) / (num - 1)
+    const tickValues = []
+    for (let i = xDomainMax; i >= xDomainMin; i -= step) {
+      tickValues.push(i)
     }
-    if(tickValues[tickValues.length - 1] !== xDomainMin){
-      tickValues.push(xDomainMin);
+    if (tickValues[tickValues.length - 1] !== xDomainMin) {
+      tickValues.push(xDomainMin)
     }
-    tickValues.reverse();
-    
-    return tickValues;
+    tickValues.reverse()
+
+    return tickValues
   }
 
-  if(xDomain.length > 2){
-    const step = num || 1;
-    const tickValues = [];
-    for(let i = xDomain.length; i > 0; i -= step){
-      const adjustedIndex = Math.max(Math.round(i) - 1, 0);
-      tickValues.push(xDomain[adjustedIndex]);
+  if (xDomain.length > 2) {
+    const step = num || 1
+    const tickValues = []
+    for (let i = xDomain.length; i > 0; i -= step) {
+      const adjustedIndex = Math.max(Math.round(i) - 1, 0)
+      tickValues.push(xDomain[adjustedIndex])
     }
-    tickValues.reverse();
+    tickValues.reverse()
 
-    return tickValues;
+    return tickValues
   }
 }
 

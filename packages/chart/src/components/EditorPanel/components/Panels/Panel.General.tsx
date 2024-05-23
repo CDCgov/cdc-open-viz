@@ -49,7 +49,24 @@ const PanelGeneral: FC<PanelProps> = props => {
         {visHasNumbersOnBars() ? (
           <CheckBox value={config.yAxis.displayNumbersOnBar} section='yAxis' fieldName='displayNumbersOnBar' label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
         ) : (
-          visHasLabelOnData() && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
+          visHasLabelOnData() && (
+            <CheckBox
+              value={config.labels}
+              fieldName='labels'
+              label='Display label on data'
+              updateField={updateField}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>Selecting this option will not hide the display of "zero value", "suppressed data", or "no data" indicators on the chart (if applicable).</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+          )
         )}
         {visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
 
@@ -144,7 +161,7 @@ const PanelGeneral: FC<PanelProps> = props => {
                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>Footnotes</p>
+                  <p>Consider adding footnotes when displaying 'suppressed,' 'no data,' and 'zero values' to ensure accurate interpretation of the data.</p>
                 </Tooltip.Content>
               </Tooltip>
             }
