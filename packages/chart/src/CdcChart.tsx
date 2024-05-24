@@ -1219,7 +1219,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     clean,
     colorPalettes,
     colorScale,
-    computeMarginBottom,
     config,
     currentViewport,
     dashboardConfig,
