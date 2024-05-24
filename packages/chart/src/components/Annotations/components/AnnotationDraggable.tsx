@@ -126,7 +126,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   return (
     annotations &&
     annotations.map((annotation, index) => {
-      const points = createPoints(annotation, xScale, yScale)
+      const points = createPoints(annotation, xScale, yScale, config)
 
       const categoricalOffsetCheck = +(config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)
 

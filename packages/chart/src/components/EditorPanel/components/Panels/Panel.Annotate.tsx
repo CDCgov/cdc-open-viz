@@ -222,6 +222,9 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                         })
                       }}
                     >
+                      <option key='select' value='select'>
+                        Select
+                      </option>
                       {['curve', 'line', 'elbow', 'none'].map((side, index) => (
                         <option key={side} value={side}>
                           {side}
