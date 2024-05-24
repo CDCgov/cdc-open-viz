@@ -154,7 +154,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                     x={annotation.snapToNearestPoint ? (config.xAxis.type !== 'date-time' ? applyBandScaleOffset(xScale(annotation.xKey), config, xScale) : annotation.xKey ? xScale(new Date(annotation.xKey)) + Number(config.yAxis.size) : 0) : annotation.x}
                     y={annotation.snapToNearestPoint ? yScale(annotation.yKey) : annotation.y}
                     canEditLabel={annotation.edit.label || false}
-                    canEditSubject={annotation.edit.subject || false}
+                    canEditSubject={(annotation.edit.subject && annotation.connectionType !== 'none') || false}
                     onDragEnd={props => {
                       const updatedAnnotations = annotations.map((annotation, idx) => {
                         if (idx === index) {

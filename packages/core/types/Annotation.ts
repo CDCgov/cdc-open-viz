@@ -32,7 +32,7 @@ export type Annotation = {
   // if the dragged item should be snapped to the nearest point
   snapToNearestPoint: boolean
   // type of  connecting line from label to subject
-  connectionType: 'line' | 'curve' | 'elbow'
+  connectionType: 'line' | 'curve' | 'elbow' | 'none'
   // marker type highlighting the subject
   marker: 'arrow' | 'circle'
   // should the item be snapped to the subject?
