@@ -136,6 +136,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
         config.preliminaryData?.map(({ column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value }, i) => {
           return (
             <div key={`preliminaryData-${i}`} className='edit-block'>
+              <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
               <button
                 type='button'
                 className='remove-column'
@@ -146,6 +147,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
               >
                 Remove
               </button>
+
               <Select value={type} initial={config.visualizationType == 'Bar' ? '' : 'Select'} fieldName='type' label='Type' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
               {type === 'suppression' ? (
                 <>
@@ -176,14 +178,14 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression.</p>
+                            <p>The recommended approach for presenting data is to include a footnote indicating any data suppression.</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
                       value={style}
                       initial='Select'
                       fieldName='style'
-                      label={config.visualizationType === 'Combo' ? 'suppression line symbol' : 'suppression symbol'}
+                      label={'suppression line style'}
                       updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                       options={getStyleOptions(type)}
                     />
