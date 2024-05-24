@@ -19,7 +19,7 @@ import './AnnotationDraggable.styles.css'
 
 const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   const [draggingItems, setDraggingItems] = useState([])
-  const { config, dimensions, updateConfig, isEditor } = useContext(ConfigContext)
+  const { config, dimensions, updateConfig, isEditor, currentViewport } = useContext(ConfigContext)
   const [width, height] = dimensions
   const { annotations } = config
   const { colorScale } = useColorScale()
@@ -37,10 +37,15 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   )
 
   useEffect(() => {
+    // Here it seems "dimensions" is calculated wrong or a different dimension is used.
+    // Use the true svgRef for width and height calculations.
+    const trueDimensions = [svgRef.current.getBoundingClientRect().width, svgRef.current.getBoundingClientRect().height]
+    const [width, height] = trueDimensions
+
     if (config.annotations.length < 1) return
-    const threshold: number = 0.25
-    const widthChange: number = Math.abs(dimensions[0] - prevDimensions.current[0])
-    const heightChange: number = Math.abs(dimensions[1] - prevDimensions.current[1])
+    const threshold: number = 0.5
+    const widthChange: number = Math.abs(width - prevDimensions.current[0])
+    const heightChange: number = Math.abs(height - prevDimensions.current[1])
 
     // Only update if the dimensions have changed significantly
     if (widthChange > threshold || heightChange > threshold) {
@@ -52,7 +57,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
         if (prevDimensions.current[0] !== 0) {
           // If the previous width is not 0, scale the dx (label) value to the new width
           const oldWidth: number = prevDimensions.current[0]
-          const newWidth: number = dimensions[0]
+          const newWidth: number = width
           const oldDx: number = annotation.dx
           const oldX: number = annotation.x
 
@@ -67,20 +72,16 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
         // If the initial relative dx position is less than config.yAxis.size, add a buffer to newDx
         if (initialRelativePositions.current[index]?.dx < config.yAxis.size) {
           // Calculate the buffer based on the new dimensions of the SVG
-          const annotationWidthBuffer: number = dimensions[0] * 0.1 // 10% of the SVG's width
+          const annotationWidthBuffer: number = width * 0.1 // 10% of the SVG's width
           newDx += Number(config.yAxis.size) + annotationWidthBuffer + 200
           newX += Number(config.yAxis.size) + annotationWidthBuffer + 200
         }
-
-        const newDy: number = prevDimensions.current[1] !== 0 ? (annotation.dy / prevDimensions.current[1]) * dimensions[1] : annotation.dy
-        const newY: number = prevDimensions.current[1] !== 0 ? (annotation.y / prevDimensions.current[1]) * dimensions[1] : annotation.y
-
         return {
           ...annotation,
           dx: newDx,
-          dy: newDy,
+          dy: annotation.dy,
           x: newX,
-          y: newY
+          y: annotation.y
         }
       })
 
@@ -90,9 +91,9 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
       })
 
       // Update the previous dimensions to the current dimensions
-      prevDimensions.current = dimensions
+      prevDimensions.current = trueDimensions
     }
-  }, [dimensions, annotations, updateConfig, config])
+  }, [dimensions, annotations, updateConfig, config, currentViewport, svgRef])
 
   const handleMobileXPosition = annotation => {
     if (annotation.snapToNearestPoint) {

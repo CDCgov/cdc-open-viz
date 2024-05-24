@@ -27,12 +27,12 @@
         "label": true
       },
       "seriesKey": "Data 1",
-      "x": 150.7454887218045,
-      "y": 223,
-      "xKey": 1455523200000,
-      "yKey": "40",
-      "dx": -64.05048929710738,
-      "dy": -57,
+      "x": 479.7385564587383,
+      "y": 150.7603673712623,
+      "xKey": 1463295600000,
+      "yKey": "80",
+      "dx": -74.07624475751632,
+      "dy": -70.50825533704912,
       "opacity": 100,
       "savedDimensions": [
         660.65,
@@ -69,7 +69,6 @@
     "left": 5,
     "right": 5
   },
-  "suppressedData": [],
   "preliminaryData": [],
   "yAxis": {
     "hideAxis": false,
@@ -160,6 +159,8 @@
     "axisPadding": 0,
     "target": 0,
     "maxTickRotation": 0,
+    "showSuppressedSymbol": true,
+    "showSuppressedLine": true,
     "dataKey": "Date",
     "label": "X-Axis Example Label",
     "dateParseFormat": "%m/%d/%Y",
@@ -200,12 +201,14 @@
     "lineMode": false,
     "verticalSorted": false,
     "highlightOnHover": false,
+    "hideSuppressedLabels": false,
     "seriesHighlight": [],
     "position": "right",
     "label": "Type of Data"
   },
   "brush": {
     "height": 25,
+    "active": false,
     "data": [
       {
         "Date": "1/15/2016",
@@ -262,7 +265,6 @@
         "Data 6": "300"
       }
     ],
-    "active": false,
     "pattern_id": "brush_pattern",
     "accent_color": "#ddd"
   },
@@ -403,6 +405,7 @@
     },
     "data": []
   },
+  "suppressedData": [],
   "showChartBrush": false,
   "height": "375",
   "data": [
@@ -525,5 +528,5 @@
     "series": false
   },
   "dynamicMarginTop": 0,
-  "version": "4.24.3"
+  "version": "4.24.4"
 }
