@@ -301,7 +301,7 @@ const LinearChart = props => {
                   {runtime.xAxis.label}
                 </Text>
               </Group>
-              {svgRef.current ? svgRef.current.setAttribute('height', (height + axisMaxHeight + (runtime.xAxis.label ? 50 : 0)) + 'px') : ''}
+              {svgRef.current ? svgRef.current.setAttribute('height', (Number(height) + Number(axisMaxHeight) + (runtime.xAxis.label ? 50 : 0)) + 'px') : ''}
             </>
           )
         }}
@@ -554,7 +554,7 @@ const LinearChart = props => {
                   </Text>
                 </Group>
 
-                if(svgRef.current) svgRef.current.setAttribute('height',(height + axisMaxHeight + (runtime.xAxis.label ? 50 : 0)) + 'px')
+                if(svgRef.current) svgRef.current.setAttribute('height',(Number(height) + Number(axisMaxHeight) + (runtime.xAxis.label ? 50 : 0)) + 'px')
 
                 return axisContents
               }}
