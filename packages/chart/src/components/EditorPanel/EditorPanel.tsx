@@ -292,7 +292,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
         })}
 
       <button type='button' onClick={addColumn} className='btn full-width'>
-        {config.visualizationType === 'Line' || config.visualizationType === 'Combo' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Line/Bar'}
+        {config.visualizationType === 'Line' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Bar/Line'}
       </button>
     </>
   )
