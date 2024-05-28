@@ -136,6 +136,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
         config.preliminaryData?.map(({ column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value }, i) => {
           return (
             <div key={`preliminaryData-${i}`} className='edit-block'>
+              <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
               <button
                 type='button'
                 className='remove-column'
@@ -146,6 +147,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
               >
                 Remove
               </button>
+
               <Select value={type} initial={config.visualizationType == 'Bar' ? '' : 'Select'} fieldName='type' label='Type' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
               {type === 'suppression' ? (
                 <>
@@ -176,14 +178,14 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression.</p>
+                            <p>The recommended approach for presenting data is to include a footnote indicating any data suppression.</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
                       value={style}
                       initial='Select'
                       fieldName='style'
-                      label={config.visualizationType === 'Combo' ? 'suppression line symbol' : 'suppression symbol'}
+                      label={'suppression line style'}
                       updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                       options={getStyleOptions(type)}
                     />
@@ -290,7 +292,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
         })}
 
       <button type='button' onClick={addColumn} className='btn full-width'>
-        {config.visualizationType === 'Line' || config.visualizationType === 'Combo' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Line/Bar'}
+        {config.visualizationType === 'Line' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Bar/Line'}
       </button>
     </>
   )
@@ -2008,6 +2010,40 @@ const EditorPanel = () => {
                           {visSupportsDateCategoryAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
                         </>
                       )}
+                      <CheckBox
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p> Selecting this option will display "N/A" on the Date/Category Axis as an indication of missing or undefined data values.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        value={config.xAxis.shoMissingDataLabel}
+                        section='xAxis'
+                        fieldName='shoMissingDataLabel'
+                        label='Use "N/A" to Indicate No Data'
+                        updateField={updateField}
+                      />
+                      <CheckBox
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Selecting this option will display a "thin line" slightly above the Date/Category Axis as an additional indication of missing or undefined data values.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        value={config.xAxis.showMissingDataLine}
+                        section='xAxis'
+                        fieldName='showMissingDataLine'
+                        label='Display "Missing Data" Line'
+                        updateField={updateField}
+                      />
                       <CheckBox
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>

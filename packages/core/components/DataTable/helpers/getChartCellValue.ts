@@ -74,5 +74,6 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
       }
     }
   })
-  return cellValue
+  const shoMissingDataCellValue = config.xAxis.shoMissingDataLabel && !labelValue
+  return shoMissingDataCellValue ? 'N/A' : cellValue
 }

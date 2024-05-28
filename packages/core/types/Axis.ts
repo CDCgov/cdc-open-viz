@@ -39,6 +39,8 @@ export type Axis = {
   showTargetLabel?: boolean
   showSuppressedLine: boolean
   showSuppressedSymbol: boolean
+  showMissingDataLine: boolean
+  shoMissingDataLabel: boolean
   size?: number
   target?: number
   targetLabel?: string

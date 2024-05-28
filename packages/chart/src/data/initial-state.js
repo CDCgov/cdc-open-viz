@@ -118,7 +118,9 @@ export default {
     target: 0,
     maxTickRotation: 0,
     showSuppressedSymbol: true,
-    showSuppressedLine: true
+    showSuppressedLine: true,
+    shoMissingDataLabel: true,
+    showMissingDataLine: true
   },
   table: {
     label: 'Data Table',

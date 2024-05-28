@@ -28,7 +28,22 @@
     "left": 5,
     "right": 5
   },
-  "preliminaryData": [],
+  "preliminaryData": [
+    {
+      "type": "suppression",
+      "seriesKey": "",
+      "label": "Suppressed",
+      "column": "",
+      "value": "110",
+      "style": "",
+      "displayTooltip": true,
+      "displayLegend": true,
+      "displayTable": true,
+      "symbol": "Section Symbol",
+      "iconCode": "§",
+      "lineCode": ""
+    }
+  ],
   "yAxis": {
     "hideAxis": false,
     "displayNumbersOnBar": false,
@@ -118,6 +133,8 @@
     "maxTickRotation": 0,
     "showSuppressedSymbol": true,
     "showSuppressedLine": true,
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
     "dataKey": "Date",
     "label": "X-Axis Example Label",
     "dateParseFormat": "%d/%m/%Y",
