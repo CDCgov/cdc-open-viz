@@ -78,6 +78,21 @@ const useScales = (properties: useScaleProps) => {
     seriesScale = composeScaleBand(seriesDomain, [0, config.barThickness * xMax], 0)
   }
 
+  // // handle Bump chart
+  // if (config.visualizationType === 'Bump Chart') {
+  //   let xAxisMin = Math.min(...xAxisDataMapped)
+  //   let xAxisMax = Math.max(...xAxisDataMapped)
+  //   xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
+  //   xAxisMax += (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
+  //   xScale = scaleTime({
+  //     domain: [xAxisMin, xAxisMax],
+  //     range: [-50, xMax-50]
+  //   })
+  //   xScaleBrush = xScale
+  //   xScale.type = scaleTypes.TIME
+  //   seriesScale = composeScaleBand(seriesDomain, [0, config.barThickness * xMax], 0)
+  // }
+
   // handle Deviation bar
   if (config.visualizationType === 'Deviation Bar') {
     const leftOffset = config.isLollipopChart ? 1.05 : 1.03
@@ -262,7 +277,7 @@ const composeYScale = ({ min, max, yMax, config, leftMax }) => {
 
   if (config.visualizationType === 'Combo') max = leftMax
 
-  const yRange = config.visualizationType === 'Bump Chart' ?  [0,yMax] : [yMax,0]
+  const yRange = config.visualizationType === 'Bump Chart' ?  [20,yMax] : [yMax,0]
   const domainSet = config.visualizationType === 'Bump Chart' ?  [1, max] : [min, max]
   // Return the configured scale function
   return scaleFunc({
