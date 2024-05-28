@@ -324,6 +324,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     loadAPIFilters()
   }, [isEditor, isPreview])
 
+  useEffect(() => {
+    updateDataFilters()
+  }, [state.config?.activeDashboard])
+
   const updateChildConfig = (visualizationKey, newConfig) => {
     const config = _.cloneDeep(state.config)
     const updatedConfig = _.pick(config, ['visualizations', 'multiDashboards'])
