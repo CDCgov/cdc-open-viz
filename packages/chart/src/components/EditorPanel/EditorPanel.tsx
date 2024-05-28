@@ -242,7 +242,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                     }
                     value={displayTooltip}
                     fieldName='displayTooltip'
-                    label='Display on tooltips'
+                    label='Display in tooltips'
                     updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                   />
                   <CheckBox
@@ -258,7 +258,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                     }
                     value={displayLegend}
                     fieldName='displayLegend'
-                    label='Display on legend'
+                    label='Display in legend'
                     updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                   />
                   <CheckBox
@@ -274,7 +274,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                     }
                     value={displayTable}
                     fieldName='displayTable'
-                    label='Display on data table'
+                    label='Display in table'
                     updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                   />
                 </>
