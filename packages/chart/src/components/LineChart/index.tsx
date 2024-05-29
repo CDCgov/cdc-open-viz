@@ -1,17 +1,23 @@
 import React, { useContext } from 'react'
 
+// VisX library imports
 import * as allCurves from '@visx/curve'
 import { Group } from '@visx/group'
 import { LinePath, Bar, SplitLinePath } from '@visx/shape'
 import { Text } from '@visx/text'
 
+// CDC core components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+
+// Local context and hooks
 import ConfigContext from '../../ConfigContext'
 import useRightAxis from '../../hooks/useRightAxis'
-import { filterCircles, createStyles } from './helpers'
+
+// Local helpers and components
+import { filterCircles, createStyles, createDataSegments } from './helpers'
 import LineChartCircle from './components/LineChart.Circle'
 
-// types
+// Types
 import { type ChartContext } from '../../types/ChartContext'
 import { type LineChartProps } from './LineChartProps'
 
@@ -31,28 +37,22 @@ const LineChart = (props: LineChartProps) => {
   } = props
 
   // prettier-ignore
-  const {
-    colorScale,
-    config,
-    formatNumber,
-    handleLineType,
-    isNumber,
-    parseDate,
-    seriesHighlight,
-    tableData,
-    transformedData: data,
-    updateConfig,
-    rawData
-  } = useContext<ChartContext>(ConfigContext)
-  const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
+  const { colorScale, config, formatNumber, handleLineType, isNumber, parseDate, seriesHighlight, tableData, transformedData, updateConfig, brushConfig,clean  } = useContext<ChartContext>(ConfigContext)
+  const { yScaleRight } = useRightAxis({ config, yMax, data: transformedData, updateConfig })
   if (!handleTooltipMouseOver) return
 
   const DEBUG = false
   const { lineDatapointStyle, showLineSeriesLabels, legend } = config
-
+  let data = transformedData
+  let tableD = tableData
+  // if brush on use brush data and clean
+  if (brushConfig.data.length) {
+    data = clean(brushConfig.data)
+    tableD = clean(brushConfig.data)
+  }
   return (
     <ErrorBoundary component='LineChart'>
-      <Group left={config.runtime.yAxis.size}>
+      <Group left={Number(config.runtime.yAxis.size)}>
         {' '}
         {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {
@@ -60,9 +60,10 @@ const LineChart = (props: LineChartProps) => {
           const seriesData = config.series.filter(item => item.dataKey === seriesKey)
           const seriesAxis = seriesData[0].axis ? seriesData[0].axis : 'left'
           let displayArea = legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1
-          const circleData = filterCircles(config.preliminaryData, rawData, seriesKey)
+          const circleData = filterCircles(config?.preliminaryData, tableD, seriesKey)
           // styles for preliminary Data  items
-          let styles = createStyles({ preliminaryData: config.preliminaryData, data: tableData, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), strokeWidth: seriesData[0].weight || 2, handleLineType, lineType, seriesKey })
+          let styles = createStyles({ preliminaryData: config.preliminaryData, data: tableD, stroke: colorScale(config.runtime.seriesLabels[seriesKey]), strokeWidth: seriesData[0].weight || 2, handleLineType, lineType, seriesKey })
+          const suppressedSegments = createDataSegments(tableData, seriesKey, config.preliminaryData, config.xAxis.dataKey)
 
           let xPos = d => {
             return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
@@ -82,6 +83,7 @@ const LineChart = (props: LineChartProps) => {
                 const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
                 const labeltype = axis === 'Right' ? 'rightLabel' : 'label'
                 let label = config.runtime.yAxis[labeltype]
+
                 // if has muiltiple series dont show legend value on tooltip
                 if (!hasMultipleSeries) label = config.isLegendValue ? config.runtime.seriesLabels[seriesKey] : label
 
@@ -104,6 +106,7 @@ const LineChart = (props: LineChartProps) => {
                           mode='ALWAYS_SHOW_POINTS'
                           dataIndex={dataIndex}
                           circleData={circleData}
+                          tableData={tableData}
                           data={data}
                           d={d}
                           config={config}
@@ -123,6 +126,7 @@ const LineChart = (props: LineChartProps) => {
                       <LineChartCircle
                         mode='ISOLATED_POINTS'
                         dataIndex={dataIndex}
+                        tableData={tableData}
                         circleData={circleData}
                         data={data}
                         d={d}
@@ -145,6 +149,7 @@ const LineChart = (props: LineChartProps) => {
               <>
                 {lineDatapointStyle === 'hover' && (
                   <LineChartCircle
+                    tableData={tableData}
                     dataIndex={0}
                     mode='HOVER_POINTS'
                     circleData={circleData}
@@ -163,27 +168,39 @@ const LineChart = (props: LineChartProps) => {
                 )}
               </>
               {/* SPLIT LINE */}
-              {config?.preliminaryData?.some(d => d.value && d.column) ? (
-                <SplitLinePath
-                  curve={allCurves[seriesData[0].lineType]}
-                  segments={(config.xAxis.type === 'date-time'
-                    ? data.sort((d1, d2) => {
-                        let x1 = getXAxisData(d1)
-                        let x2 = getXAxisData(d2)
-                        if (x1 < x2) return -1
-                        if (x2 < x1) return 1
-                        return 0
-                      })
-                    : data
-                  ).map(d => [d])}
-                  segmentation='x'
-                  x={d => xPos(d)}
-                  y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
-                  styles={styles}
-                  defined={(item, i) => {
-                    return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
-                  }}
-                />
+              {config?.preliminaryData?.some(pd => pd.value && pd.type) ? (
+                <>
+                  <SplitLinePath
+                    curve={allCurves[seriesData[0].lineType]}
+                    segments={data.map(d => [d])}
+                    segmentation='x'
+                    x={d => xPos(d)}
+                    y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                    styles={styles}
+                    defined={(item, i) => {
+                      return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                    }}
+                  />
+
+                  {suppressedSegments.map((segment, index) => {
+                    return (
+                      <LinePath
+                        key={index}
+                        data={segment.data}
+                        x={d => xPos(d)}
+                        y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(Number(getYAxisData(d, seriesKey))))}
+                        stroke={colorScale(config.runtime.seriesLabels[seriesKey])}
+                        strokeWidth={seriesData[0].weight || 2}
+                        strokeOpacity={1}
+                        shapeRendering='geometricPrecision'
+                        strokeDasharray={handleLineType(segment.style)}
+                        defined={(item, i) => {
+                          return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                        }}
+                      />
+                    )
+                  })}
+                </>
               ) : (
                 <>
                   {/* STANDARD LINE */}

@@ -14,6 +14,7 @@ import { FilterBehavior } from './Header/Header'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { getVizConfig } from '../helpers/getVizConfig'
+import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 
 type VizRowProps = {
   filteredDataOverride?: Object[]
@@ -132,12 +133,12 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                   <CdcMarkupInclude
                     key={col.widget}
                     config={visualizationConfig}
+                    configUrl={undefined}
+                    isDashboard={true}
                     isEditor={false}
                     setConfig={newConfig => {
                       updateChildConfig(col.widget, newConfig)
                     }}
-                    isDashboard={true}
-                    configUrl={undefined}
                   />
                 )}
                 {visualizationConfig.type === 'filtered-text' && (
@@ -161,11 +162,11 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                 {visualizationConfig.type === 'table' && (
                   <DataTableStandAlone
                     key={col.widget}
-                    setConfig={newConfig => {
+                    updateConfig={newConfig => {
                       updateChildConfig(col.widget, newConfig)
                     }}
                     visualizationKey={col.widget}
-                    config={visualizationConfig}
+                    config={visualizationConfig as TableConfig}
                     viewport={currentViewport}
                   />
                 )}

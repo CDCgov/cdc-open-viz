@@ -13,13 +13,14 @@ import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
 import * as allCurves from '@visx/curve'
 import { Annotation } from '@cdc/core/types/Annotation'
+import { Group } from '@visx/group'
 
 // styles
 import './AnnotationDraggable.styles.css'
 
 const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   const [draggingItems, setDraggingItems] = useState([])
-  const { config, dimensions, updateConfig, isEditor } = useContext(ConfigContext)
+  const { config, dimensions, updateConfig, isEditor, currentViewport } = useContext(ConfigContext)
   const [width, height] = dimensions
   const { annotations } = config
   const { colorScale } = useColorScale()
@@ -37,10 +38,15 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   )
 
   useEffect(() => {
+    // Here it seems "dimensions" is calculated wrong or a different dimension is used.
+    // Use the true svgRef for width and height calculations.
+    const trueDimensions = [svgRef.current.getBoundingClientRect().width, svgRef.current.getBoundingClientRect().height]
+    const [width, height] = trueDimensions
+
     if (config.annotations.length < 1) return
-    const threshold: number = 0.25
-    const widthChange: number = Math.abs(dimensions[0] - prevDimensions.current[0])
-    const heightChange: number = Math.abs(dimensions[1] - prevDimensions.current[1])
+    const threshold: number = 0.5
+    const widthChange: number = Math.abs(width - prevDimensions.current[0])
+    const heightChange: number = Math.abs(height - prevDimensions.current[1])
 
     // Only update if the dimensions have changed significantly
     if (widthChange > threshold || heightChange > threshold) {
@@ -52,7 +58,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
         if (prevDimensions.current[0] !== 0) {
           // If the previous width is not 0, scale the dx (label) value to the new width
           const oldWidth: number = prevDimensions.current[0]
-          const newWidth: number = dimensions[0]
+          const newWidth: number = width
           const oldDx: number = annotation.dx
           const oldX: number = annotation.x
 
@@ -67,20 +73,16 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
         // If the initial relative dx position is less than config.yAxis.size, add a buffer to newDx
         if (initialRelativePositions.current[index]?.dx < config.yAxis.size) {
           // Calculate the buffer based on the new dimensions of the SVG
-          const annotationWidthBuffer: number = dimensions[0] * 0.1 // 10% of the SVG's width
+          const annotationWidthBuffer: number = width * 0.1 // 10% of the SVG's width
           newDx += Number(config.yAxis.size) + annotationWidthBuffer + 200
           newX += Number(config.yAxis.size) + annotationWidthBuffer + 200
         }
-
-        const newDy: number = prevDimensions.current[1] !== 0 ? (annotation.dy / prevDimensions.current[1]) * dimensions[1] : annotation.dy
-        const newY: number = prevDimensions.current[1] !== 0 ? (annotation.y / prevDimensions.current[1]) * dimensions[1] : annotation.y
-
         return {
           ...annotation,
           dx: newDx,
-          dy: newDy,
+          dy: annotation.dy,
           x: newX,
-          y: newY
+          y: annotation.y
         }
       })
 
@@ -90,9 +92,9 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
       })
 
       // Update the previous dimensions to the current dimensions
-      prevDimensions.current = dimensions
+      prevDimensions.current = trueDimensions
     }
-  }, [dimensions, annotations, updateConfig, config])
+  }, [dimensions, annotations, updateConfig, config, currentViewport, svgRef])
 
   const handleMobileXPosition = annotation => {
     if (annotation.snapToNearestPoint) {
@@ -125,7 +127,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
   return (
     annotations &&
     annotations.map((annotation, index) => {
-      const points = createPoints(annotation, xScale, yScale)
+      const points = createPoints(annotation, xScale, yScale, config)
 
       const categoricalOffsetCheck = +(config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0)
 
@@ -153,7 +155,7 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                     x={annotation.snapToNearestPoint ? (config.xAxis.type !== 'date-time' ? applyBandScaleOffset(xScale(annotation.xKey), config, xScale) : annotation.xKey ? xScale(new Date(annotation.xKey)) + Number(config.yAxis.size) : 0) : annotation.x}
                     y={annotation.snapToNearestPoint ? yScale(annotation.yKey) : annotation.y}
                     canEditLabel={annotation.edit.label || false}
-                    canEditSubject={annotation.edit.subject || false}
+                    canEditSubject={(annotation.edit.subject && annotation.connectionType !== 'none') || false}
                     onDragEnd={props => {
                       const updatedAnnotations = annotations.map((annotation, idx) => {
                         if (idx === index) {
@@ -207,24 +209,38 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                         dangerouslySetInnerHTML={{ __html: annotation.text }}
                       />
                     </HtmlLabel>
-
                     {annotation.connectionType === 'line' && <Connector type='line' pathProps={{ markerStart: 'url(#marker-start)' }} />}
-
                     {annotation.connectionType === 'elbow' && <Connector type='elbow' pathProps={{ markerStart: 'url(#marker-start)' }} />}
-
-                    {annotation.connectionType === 'curve' && <LinePath data={points} x={d => d.xPos + Number(config.yAxis.size) + categoricalOffsetCheck} y={d => d.yPos} stroke='black' strokeWidth={1} curve={allCurves[annotation.lineType]} markerStart={`url(#marker-start)`} />}
-
+                    {annotation.connectionType === 'curve' && false && <LinePath data={points} x={d => d.xPos + Number(config.yAxis.size) + categoricalOffsetCheck} y={d => d.yPos} stroke='black' strokeWidth={1} curve={allCurves[annotation.lineType]} markerStart={`url(#marker-start)`} />}
                     {/* MARKERS */}
                     {annotation.marker === 'circle' && <CircleSubject className='circle-subject' stroke={colorScale(annotation.seriesKey)} radius={8} />}
-                    {annotation.marker === 'arrow' && <MarkerArrow fill='black' id='marker-start' x={annotation.snapToNearestPoint ? Number(xScale(annotation.xKey)) : annotation.x} y={yScale(annotation.yKey)} stroke='#333' markerWidth={10} size={10} strokeWidth={1} orient='auto-start-reverse' />}
-
+                    {annotation.marker === 'arrow' && (
+                      <MarkerArrow fill='black' id='marker-start' x={annotation.snapToNearestPoint ? Number(xScale(annotation.xKey)) : annotation.x} y={yScale(annotation.yKey)} stroke='#333' markerWidth={10} size={10} strokeWidth={1} orient='auto-start-reverse' markerUnits='userSpaceOnUse' />
+                    )}
+                    {annotation.connectionType === 'curve' && (
+                      <>
+                        {/* <marker id='small-arrow' markerWidth='6' markerHeight='6' refX={0} refY={3} orient='auto-start-reverse'>
+                          <path d='M0,6 L9,3 L0,0 z' fill='black' />
+                        </marker> */}
+                        <LinePath
+                          // M - Moves the pen to the starting point
+                          // Q - Draws a quadratic Bézier curve from the current position to the end point.
+                          // Control Point - ${annotation.x + annotation.dx / 2}, ${annotation.y + annotation.dy / 2 - 21}
+                          // End Point - ${annotation.x + annotation.dx},${annotation.y + annotation.dy}
+                          d={`M ${annotation.x},${annotation.y}
+                             Q ${annotation.x + annotation.dx / 2}, ${annotation.y + annotation.dy / 2 + Number(annotation?.bezier) || 0} ${annotation.x + annotation.dx},${annotation.y + annotation.dy}`}
+                          stroke='black'
+                          strokeWidth='2'
+                          fill='none'
+                          marker-start='url(#marker-start)'
+                        />
+                      </>
+                    )}
                     {/* Mobile Labels */}
                     <circle fill='white' cx={handleMobileXPosition(annotation)} cy={handleMobileYPosition(annotation)} r={16} className='annotation__mobile-label annotation__mobile-label-circle' stroke={colorScale(annotation.seriesKey)} />
-
                     <text x={handleTextX(annotation)} y={handleTextY(annotation)} className='annotation__mobile-label'>
                       {index + 1}
                     </text>
-
                     {/* ANCHORS */}
                     {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + categoricalOffsetCheck} />}
                     {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />}

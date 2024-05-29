@@ -15,16 +15,31 @@ const handleConnectionVerticalType = (annotation, xScale, config) => {
   return xScale(annotation.xKey) + annotation.dx < config.yAxis.size ? 'end' : null
 }
 
-const createPoints = (annotation, xScale, yScale) => {
+const createPoints = (annotation, xScale, yScale, config) => {
+  const draggableCircleDiameter = 16
   const { x, y, dx, dy, xKey, yKey, snapToNearest } = annotation
   const controlX = x + dx / 2
   const controlY = y + dy
   const padding = 0
 
+  const checkSnapToNearestX = () => {
+    if (snapToNearest) {
+      return xScale(xKey)
+    }
+    return x - config.yAxis.size - draggableCircleDiameter
+  }
+
+  const checkSnapToNearestY = () => {
+    if (snapToNearest) {
+      return yScale(yKey)
+    }
+    return y
+  }
+
   const points = [
-    { x, y, xKey, yKey, xPos: xScale(xKey) + (dx < 0 ? -padding : padding), yPos: yScale(yKey) + (dy < 0 ? -padding : padding) },
-    { x: controlX, y: controlY, xKey, yKey, xPos: controlX, yPos: controlY },
-    { x: x + dx, y: y + dy, xKey, yKey, xPos: xScale(xKey) + dx, yPos: yScale(yKey) + dy }
+    { xPos: checkSnapToNearestX() + (dx < 0 ? -padding : padding), yPos: checkSnapToNearestY() + (dy < 0 ? -padding : padding) },
+    { xPos: controlX, yPos: controlY },
+    { xPos: checkSnapToNearestX() + dx - draggableCircleDiameter, yPos: checkSnapToNearestY() + dy }
   ]
 
   return points

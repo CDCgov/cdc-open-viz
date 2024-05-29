@@ -189,26 +189,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       }}
                     />
                   </label>
-                  <label>
-                    Associated Series:
-                    <select
-                      onChange={e => {
-                        const updatedAnnotations = [...config?.annotations]
-                        updatedAnnotations[index].seriesKey = e.target.value
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    >
-                      <option key='none' value='none'>
-                        None
-                      </option>
-                      {getColumns(false).map((column, columnIndex) => {
-                        return <option>{column}</option>
-                      })}
-                    </select>
-                  </label>
 
                   <label>
                     Connection Type:
@@ -222,6 +202,9 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                         })
                       }}
                     >
+                      <option key='select' value='select'>
+                        Select
+                      </option>
                       {['curve', 'line', 'elbow', 'none'].map((side, index) => (
                         <option key={side} value={side}>
                           {side}
@@ -231,25 +214,45 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                   </label>
 
                   {annotation.connectionType === 'curve' && (
-                    <label>
-                      Line Type:
-                      <select
-                        onChange={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].lineType = e.target.value
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      >
-                        {Object.entries(approvedCurveTypes).map(([value, key]) => (
-                          <option key={key} value={key}>
-                            {value}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
+                    <>
+                      {/* <label>
+                        Line Type:
+                        <select
+                          onChange={e => {
+                            const updatedAnnotations = [...config?.annotations]
+                            updatedAnnotations[index].lineType = e.target.value
+                            updateConfig({
+                              ...config,
+                              annotations: updatedAnnotations
+                            })
+                          }}
+                        >
+                          {Object.entries(approvedCurveTypes).map(([value, key]) => (
+                            <option key={key} value={key}>
+                              {value}
+                            </option>
+                          ))}
+                        </select>
+                      </label> */}
+                      <label>
+                        Curve Bezier
+                        {/* create a range input */}
+                        <input
+                          type='range'
+                          min='-20'
+                          max='20'
+                          value={config?.annotations[index]?.bezier}
+                          onChange={e => {
+                            const updatedAnnotations = [...config?.annotations]
+                            updatedAnnotations[index].bezier = e.target.value
+                            updateConfig({
+                              ...config,
+                              annotations: updatedAnnotations
+                            })
+                          }}
+                        />
+                      </label>
+                    </>
                   )}
 
                   <label>
@@ -305,6 +308,29 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       }}
                     />
                   </label>
+
+                  {annotation.snapToNearestPoint && (
+                    <label>
+                      Associated Series:
+                      <select
+                        onChange={e => {
+                          const updatedAnnotations = [...config?.annotations]
+                          updatedAnnotations[index].seriesKey = e.target.value
+                          updateConfig({
+                            ...config,
+                            annotations: updatedAnnotations
+                          })
+                        }}
+                      >
+                        <option key='none' value='none'>
+                          None
+                        </option>
+                        {getColumns(false).map((column, columnIndex) => {
+                          return <option>{column}</option>
+                        })}
+                      </select>
+                    </label>
+                  )}
 
                   <Button className='warn btn-warn btn btn-remove delete' onClick={() => handleRemoveAnnotation(index)}>
                     Delete Annotation
