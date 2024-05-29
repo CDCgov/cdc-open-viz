@@ -133,18 +133,35 @@ const fetchMock = {
         body: [{ IndicatorID: 'indicatorID', Indicator: 'Some Indicator' }]
       }
     },
-    ...['Year', 'DataValueType', 'StratificationCategory', 'Stratification'].map(filter => {
-      return {
-        matcher: {
-          name: 'filters' + filter,
-          url: 'path:/api/POC/Filters/' + filter
-        },
-        response: {
-          status: 200,
-          body: _.times(5, i => ({ [filter]: `Some ${filter} ${i}` }))
+    {
+      matcher: {
+        name: 'filters',
+        url: 'path:/api/POC/Filters'
+      },
+      response: {
+        status: 200,
+        body: {
+          Years: [{ Year: 1999 }],
+          DataValueTypes: [{ DataValueType: 'Some Data Value Type', DataValueTypeId: 'dataValueTypeId' }],
+          StratificationCategories: [{ StratificationCategoryId: 'stratCategoryId', StratificationCategory: 'Some Strat Category' }]
         }
       }
-    }),
+    },
+    {
+      matcher: {
+        name: 'stratifications',
+        url: 'path:/api/POC/stratifications'
+      },
+      response: {
+        status: 200,
+        body: [
+          {
+            StratificationId: 'stratId',
+            Stratification: 'Some Strat'
+          }
+        ]
+      }
+    },
     {
       matcher: {
         name: 'locations',
@@ -213,11 +230,11 @@ export const APIFiltersMap: Story = {
     const indicatorsFilter = canvas.getByLabelText('Indicator', { selector: 'select' })
     await user.selectOptions(indicatorsFilter, ['indicatorID'])
     const yearsFilter = canvas.getByLabelText('Year', { selector: 'select' })
-    await user.selectOptions(yearsFilter, ['Some Year 0'])
+    await user.selectOptions(yearsFilter, ['1999'])
     const stratCategoryFilter = canvas.getByLabelText('View By', { selector: 'select' })
-    await user.selectOptions(stratCategoryFilter, ['Some StratificationCategory 0'])
+    await user.selectOptions(stratCategoryFilter, ['stratCategoryId'])
     const stratFilter = canvas.getByLabelText('Stratification', { selector: 'select' })
-    await user.selectOptions(stratFilter, ['Some Stratification 0'])
+    await user.selectOptions(stratFilter, ['stratId'])
     await user.click(canvas.getByText('GO!'))
   }
 }
@@ -243,9 +260,8 @@ export const APIFiltersChart: Story = {
     const indicatorsFilter = canvas.getByLabelText('Indicator', { selector: 'select' })
     await user.selectOptions(indicatorsFilter, ['indicatorID'])
     await user.click(canvas.getByText('GO!'))
-    await sleep(1000)
     const yearFilter = canvas.getByLabelText('Year', { selector: 'select' })
-    await user.selectOptions(yearFilter, ['Some Year 1'])
+    await user.selectOptions(yearFilter, ['1999'])
   }
 }
 
