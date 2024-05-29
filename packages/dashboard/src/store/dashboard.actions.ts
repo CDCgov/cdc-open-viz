@@ -3,9 +3,8 @@ import { type Action } from '@cdc/core/types/Action'
 import { Tab } from '../types/Tab'
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
 import { ConfigRow } from '../types/ConfigRow'
-import { SharedFilter } from '../types/SharedFilter'
 
-type SET_CONFIG = Action<'SET_CONFIG', Partial<Config>>
+type SET_CONFIG = Action<'SET_CONFIG', Config>
 type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [Config, Object?]>
 type SET_DATA = Action<'SET_DATA', Object>
 type SET_LOADING = Action<'SET_LOADING', boolean>
@@ -22,7 +21,6 @@ type SWITCH_CONFIG = Action<'SWITCH_CONFIG', number>
 type TOGGLE_ROW = Action<'TOGGLE_ROW', { rowIndex: number; colIndex: number }>
 type UPDATE_VISUALIZATION = Action<'UPDATE_VISUALIZATION', { vizKey: string; configureData: Partial<ConfigureData> }>
 type UPDATE_ROW = Action<'UPDATE_ROW', { rowIndex: number; rowData: Partial<ConfigRow> }>
-type SET_SHARED_FILTERS = Action<'SET_SHARED_FILTERS', SharedFilter[]>
 
 type DashboardActions =
   | ADD_NEW_DASHBOARD
@@ -36,7 +34,6 @@ type DashboardActions =
   | SET_LOADING
   | SET_PREVIEW
   | SET_FILTERED_DATA
-  | SET_SHARED_FILTERS
   | SET_TAB_SELECTED
   | SWITCH_CONFIG
   | INITIALIZE_MULTIDASHBOARDS
