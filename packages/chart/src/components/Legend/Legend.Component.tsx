@@ -5,7 +5,6 @@ import Button from '@cdc/core/components/elements/Button'
 import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { handleLineType } from '../../helpers/handleLineType'
-import { useBarChart } from '../../hooks/useBarChart'
 import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
@@ -27,7 +26,7 @@ export interface LegendProps {
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHighlight, highlight, highlightReset, currentViewport, formatLabels, skipId = 'legend' }, ref) => {
   const { innerClasses, containerClasses } = useLegendClasses(config)
-  const { runtime, orientation, legend } = config
+  const { runtime, legend } = config
 
   if (!legend) return null
   const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
@@ -40,12 +39,11 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
   let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
-  const fontSize = ['sm', 'xs', 'xxs'].includes(currentViewport) ? { fontSize: '11px' } : null
 
   return (
     <aside ref={ref} style={legendClasses} id={skipId || 'legend'} className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
       {legend.label && <h3>{parse(legend.label)}</h3>}
-      {legend.description && <p style={fontSize}>{parse(legend.description)}</p>}
+      {legend.description && <p>{parse(legend.description)}</p>}
 
       <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
         {labels => {
@@ -103,7 +101,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
                         )}
                       </div>
 
-                      <LegendLabel style={fontSize} align='left' margin='0 0 0 4px'>
+                      <LegendLabel align='left' margin='0 0 0 4px'>
                         {label.text}
                       </LegendLabel>
                     </LegendItem>
