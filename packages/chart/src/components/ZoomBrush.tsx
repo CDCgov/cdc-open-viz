@@ -16,6 +16,7 @@ interface Props {
 const ZoomBrush: FC<Props> = props => {
   const { tableData, config, parseDate, formatDate, setBrushConfig } = useContext(ConfigContext)
   const { fontSize } = useBarChart()
+  const [dateCount, setDateCount] = useState(0)
   const [brushKey, setBrushKey] = useState(0)
   const brushRef = useRef(null)
   const radius = 15
@@ -31,7 +32,6 @@ const ZoomBrush: FC<Props> = props => {
     start: { x: 0 },
     end: { x: props.xMax }
   }
-
   const style = {
     fill: '#AFA6A5 ',
     stroke: 'blue',
@@ -42,7 +42,9 @@ const ZoomBrush: FC<Props> = props => {
 
   const onBrushChange = event => {
     if (!event || !event.xValues) return
+
     const { xValues } = event
+    setDateCount(xValues.length)
 
     const dataKey = config.xAxis?.dataKey
 
@@ -72,7 +74,7 @@ const ZoomBrush: FC<Props> = props => {
       }
     })
   }
-
+  // reset brush if brush is off.
   useEffect(() => {
     if (!config.brush.active) {
       setBrushKey(prevKey => prevKey + 1)
@@ -84,8 +86,11 @@ const ZoomBrush: FC<Props> = props => {
     }
   }, [config.brush.active])
 
+  // reset brush if filters or exclusions are ON each time
   useEffect(() => {
-    if (config.filters?.some(filter => filter.active)) {
+    const isFiltersActive = config.filters?.some(filter => filter.active)
+    const isExclusionsActive = config.exclusions?.active
+    if (isFiltersActive || isExclusionsActive) {
       setBrushKey(prevKey => prevKey + 1)
       setBrushConfig(prev => {
         return {
@@ -101,7 +106,7 @@ const ZoomBrush: FC<Props> = props => {
           data: []
         }
       })
-  }, [config.filters])
+  }, [config.filters, config.exclusions.active])
 
   const calculateTop = (): number => {
     const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
@@ -146,7 +151,8 @@ const ZoomBrush: FC<Props> = props => {
       <rect fill='#F7F7F7  ' width={props.xMax} height={config.brush.height} rx={radius} />
       <Brush
         key={brushKey}
-        renderBrushHandle={props => <BrushHandle textProps={textProps} fontSize={fontSize[config.fontSize]} {...props} isBrushing={brushRef.current?.state.isBrushing} />}
+        disableDraggingOverlay={true}
+        renderBrushHandle={props => <BrushHandle dateCount={dateCount} textProps={textProps} fontSize={fontSize[config.fontSize]} {...props} isBrushing={brushRef.current?.state.isBrushing} />}
         innerRef={brushRef}
         useWindowMoveEvents={true}
         selectedBoxStyle={style}
@@ -165,7 +171,7 @@ const ZoomBrush: FC<Props> = props => {
 }
 
 const BrushHandle = props => {
-  const { x, isBrushActive, isBrushing, className, textProps } = props
+  const { x, isBrushActive, isBrushing, className, textProps, dateCount } = props
   const pathWidth = 8
   if (!isBrushActive) {
     return null
@@ -177,7 +183,7 @@ const BrushHandle = props => {
 
   return (
     <Group left={x + pathWidth / 2} top={-2}>
-      <Text pointerEvents='visiblePainted' dominantBaseline='hanging' x={0} verticalAnchor='start' textAnchor={textAnchor} fontSize={props.fontSize / 1.4} dy={10} y={15}>
+      <Text display={dateCount <= 2 ? 'none' : 'block'} pointerEvents='visiblePainted' dominantBaseline='hanging' x={isLeft ? 55 : -50} y={30} verticalAnchor='start' textAnchor={textAnchor} fontSize={props.fontSize / 1.4}>
         {isLeft ? textProps.startValue : textProps.endValue}
       </Text>
       <path cursor='ew-resize' d='M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12' fill={!isBrushing ? '#000' : '#297EF1'} strokeWidth='1' transform={transform}></path>
