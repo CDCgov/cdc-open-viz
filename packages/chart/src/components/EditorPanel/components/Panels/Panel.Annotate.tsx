@@ -235,7 +235,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                         </select>
                       </label> */}
                       <label>
-                        Curve Bezier
+                        Curve Control
                         {/* create a range input */}
                         <input
                           type='range'
