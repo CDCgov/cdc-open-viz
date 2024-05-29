@@ -53,7 +53,9 @@ export default {
     axisPadding: 0,
     scalePadding: 10,
     tickRotation: 0,
-    anchors: []
+    anchors: [],
+    shoMissingDataLabel: true,
+    showMissingDataLine: true
   },
   boxplot: {
     plots: [],

@@ -212,8 +212,9 @@ export const useBarChart = () => {
 
   const composeSuppressionBars = ({ bar }) => {
     const suppresedBarHeight = config.xAxis.showSuppressedLine ? 3 : 0
+    let t = suppresedBarHeight ? suppresedBarHeight : 3
     const ASTERISK = 'Asterisk'
-    const getIconPadding = symbol => (String(symbol).includes(ASTERISK) ? -5 : -suppresedBarHeight * 3)
+    const getIconPadding = symbol => (String(symbol).includes(ASTERISK) ? -5 : -t * 3)
     const getVerticalAnchor = symbol => {
       return String(symbol).includes(ASTERISK) ? 'middle' : 'end'
     }
@@ -236,7 +237,7 @@ export const useBarChart = () => {
         return isValueMatch && selectedSuppressionColumn
       })
 
-      return isSuppressed && config.xAxis.showSuppressedSymbol
+      return isSuppressed
     }
 
     return {

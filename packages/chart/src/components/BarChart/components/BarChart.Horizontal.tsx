@@ -70,6 +70,16 @@ export const BarChartHorizontal = () => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
                   const { suppresedBarHeight: suppresedBarWidth, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
 
+                  const conditions = {
+                    barWidth: 4,
+                    shoMissingDataLabel: config.xAxis.shoMissingDataLabel && !bar.value,
+                    showMissingDataLine: config.xAxis.showMissingDataLine && !bar.value,
+                    defaultWidth: Math.abs(xScale(bar.value) - xScale(scaleVal)),
+                    composeBarWidth: () => (isSuppressed ? conditions.barWidth : conditions.showMissingDataLine ? conditions.barWidth : conditions.defaultWidth),
+                    composeBarLabel: () => (isSuppressed ? '' : yAxisValue),
+                    composeMissingDataLabel: () => (conditions.shoMissingDataLabel ? 'N/A' : '')
+                  }
+
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
@@ -83,24 +93,28 @@ export const BarChartHorizontal = () => {
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   // const suppresedBarWidth = config.xAxis.showSuppressedLine ? 4 : 0
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
-                  let barWidth = isSuppressed ? suppresedBarWidth : barWidthHorizontal
+                  let barWidth = conditions.composeBarWidth()
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
-                  const barValueLabel = isSuppressed ? '' : yAxisValue
+                  const barLabel = conditions.composeBarLabel()
 
                   // check if bar text/value string fits into  each bars.
+                  const missingDataLabel = conditions.composeMissingDataLabel()
+                  let missingDataFontSize = barWidth / 2
+                  let missingDataLabelWidth = getTextWidth(missingDataLabel, `normal ${missingDataFontSize}px sans-serif`)
+                  const textFitstobar = Number(missingDataLabelWidth) < Number(barWidth)
                   let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                  let textFits = Number(textWidth) < barWidthHorizontal - 5 // minus padding 5
+                  let textFits = Number(textWidth) < barWidthHorizontal - 5
 
                   // control text position
                   let textAnchor = textFits ? 'end' : 'start'
                   let textAnchorLollipop = 'start'
                   let textPadding = textFits ? -5 : 5
                   let textPaddingLollipop = 10
-                  // if bars are negative we change positions of text
+                  //if bars are negative we change positions of text
                   if (barPosition === 'below') {
                     textAnchor = textFits ? 'start' : 'end'
                     textPadding = textFits ? 5 : -5
@@ -209,6 +223,17 @@ export const BarChartHorizontal = () => {
                           )
                         })}
 
+                        <Text // prettier-ignore
+                          x={bar.y}
+                          y={config.barHeight / 2 + config.barHeight * bar.index}
+                          fill={labelColor}
+                          dx={10}
+                          verticalAnchor='middle'
+                          textAnchor={'start'}
+                        >
+                          {missingDataLabel}
+                        </Text>
+
                         {!config.isLollipopChart && displayNumbersOnBar && (
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
@@ -219,7 +244,7 @@ export const BarChartHorizontal = () => {
                             verticalAnchor='middle'
                             textAnchor={textAnchor}
                           >
-                            {barValueLabel}
+                            {barLabel}
                           </Text>
                         )}
                         {config.isLollipopChart && displayNumbersOnBar && (
@@ -233,7 +258,7 @@ export const BarChartHorizontal = () => {
                             verticalAnchor='middle'
                             fontWeight={'normal'}
                           >
-                            {barValueLabel}
+                            {barLabel}
                           </Text>
                         )}
                         {isLabelBelowBar && !config.yAxis.hideLabel && (

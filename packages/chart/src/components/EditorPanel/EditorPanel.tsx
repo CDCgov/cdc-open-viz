@@ -2024,7 +2024,7 @@ const EditorPanel = () => {
                         value={config.xAxis.shoMissingDataLabel}
                         section='xAxis'
                         fieldName='shoMissingDataLabel'
-                        label='Use "N/A" to Indicate No Data'
+                        label='Indicate Missing Data with "N/A'
                         updateField={updateField}
                       />
                       <CheckBox

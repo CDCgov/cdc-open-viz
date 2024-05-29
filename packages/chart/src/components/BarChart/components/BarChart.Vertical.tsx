@@ -28,7 +28,7 @@ export const BarChartVertical = () => {
   const { assignColorsToValues, barBorderWidth, getAdditionalColumn, getHighlightedBarByValue, getHighlightedBarColorByValue, lollipopBarWidth, lollipopShapeSize, onMouseLeaveBar, onMouseOverBar, section, composeSuppressionBars,  fontSize } = useBarChart()
 
   // prettier-ignore
-  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData,  brushConfig, } = useContext<ChartContext>(ConfigContext)
+  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData, brushConfig, getTextWidth } = useContext<ChartContext>(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
   let data = transformedData
   // check if user add suppression
@@ -74,13 +74,14 @@ export const BarChartVertical = () => {
                     shoMissingDataLabel: config.xAxis.shoMissingDataLabel && !bar.value,
                     showMissingDataLine: config.xAxis.showMissingDataLine && !bar.value,
                     barHeight: 4, // height for suppressed & missingdata bars
-                    suppressedY: () => yScale(conditions.scaleVal) - conditions.barHeight,
+                    suppressedY: () => yScale(conditions.scaleVal) - suppresedBarHeight,
                     missingDataY: () => yScale(conditions.scaleVal) - conditions.barHeight,
                     defaultY: bar => (bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)),
                     defaultHeight: () => Math.abs(yScale(bar.value) - yScale(scaleVal)),
                     composeBarY: bar => (isSuppressed ? conditions.suppressedY() : conditions.showMissingDataLine ? conditions.missingDataY() : conditions.defaultY(bar)),
-                    composeBarHeight: () => (isSuppressed ? conditions.barHeight : conditions.showMissingDataLine ? conditions.barHeight : conditions.defaultHeight()),
-                    composeLabel: () => (isSuppressed ? '' : conditions.shoMissingDataLabel ? 'N/A' : yAxisValue)
+                    composeBarHeight: () => (isSuppressed ? suppresedBarHeight : conditions.showMissingDataLine ? conditions.barHeight : conditions.defaultHeight()),
+                    composeLabel: () => (isSuppressed ? '' : yAxisValue),
+                    composeMissingDataLabel: () => (conditions.shoMissingDataLabel ? 'N/A' : '')
                   }
 
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
@@ -126,6 +127,10 @@ export const BarChartVertical = () => {
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
                   const barLabel = conditions.composeLabel()
                   const barHeight = conditions.composeBarHeight()
+                  const missingDataLabel = conditions.composeMissingDataLabel()
+                  let missingDataFontSize = barWidth / 2
+                  let textWidth = getTextWidth(missingDataLabel, `normal ${missingDataFontSize}px sans-serif`)
+                  const textFitstobar = textWidth < barWidth
 
                   const displaylollipopShape = isSuppressed ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
@@ -167,11 +172,6 @@ export const BarChartVertical = () => {
                     // if we're highlighting a bar make it invisible since it gets a border
                     if (isHighlightedBar) _barColor = 'transparent'
                     return _barColor
-                  }
-                  const composeFont = (): number => {
-                    barLabel === 'N/A' ? 'small' : config.fontSize
-
-                    return 1222
                   }
 
                   return (
@@ -241,11 +241,21 @@ export const BarChartVertical = () => {
                           opacity={transparentBar ? 0.5 : 1}
                           x={barX + barWidth / 2}
                           y={barY - 5}
-                          fontSize={barLabel === 'N/A' ? fontSize['small'] : fontSize[config.fontSize]}
                           fill={labelColor}
                           textAnchor='middle'
                         >
                           {barLabel}
+                        </Text>
+                        <Text // prettier-ignore
+                          display={textFitstobar ? 'block' : 'none'}
+                          opacity={transparentBar ? 0.5 : 1}
+                          x={barX + barWidth / 2}
+                          y={barY - 5}
+                          fontSize={missingDataFontSize}
+                          fill={labelColor}
+                          textAnchor='middle'
+                        >
+                          {missingDataLabel}
                         </Text>
 
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
