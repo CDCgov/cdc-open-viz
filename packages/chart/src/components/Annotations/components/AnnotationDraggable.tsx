@@ -13,6 +13,7 @@ import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
 import * as allCurves from '@visx/curve'
 import { Annotation } from '@cdc/core/types/Annotation'
+import { Group } from '@visx/group'
 
 // styles
 import './AnnotationDraggable.styles.css'
@@ -208,24 +209,38 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                         dangerouslySetInnerHTML={{ __html: annotation.text }}
                       />
                     </HtmlLabel>
-
                     {annotation.connectionType === 'line' && <Connector type='line' pathProps={{ markerStart: 'url(#marker-start)' }} />}
-
                     {annotation.connectionType === 'elbow' && <Connector type='elbow' pathProps={{ markerStart: 'url(#marker-start)' }} />}
-
-                    {annotation.connectionType === 'curve' && <LinePath data={points} x={d => d.xPos + Number(config.yAxis.size) + categoricalOffsetCheck} y={d => d.yPos} stroke='black' strokeWidth={1} curve={allCurves[annotation.lineType]} markerStart={`url(#marker-start)`} />}
-
+                    {annotation.connectionType === 'curve' && false && <LinePath data={points} x={d => d.xPos + Number(config.yAxis.size) + categoricalOffsetCheck} y={d => d.yPos} stroke='black' strokeWidth={1} curve={allCurves[annotation.lineType]} markerStart={`url(#marker-start)`} />}
                     {/* MARKERS */}
                     {annotation.marker === 'circle' && <CircleSubject className='circle-subject' stroke={colorScale(annotation.seriesKey)} radius={8} />}
-                    {annotation.marker === 'arrow' && <MarkerArrow fill='black' id='marker-start' x={annotation.snapToNearestPoint ? Number(xScale(annotation.xKey)) : annotation.x} y={yScale(annotation.yKey)} stroke='#333' markerWidth={10} size={10} strokeWidth={1} orient='auto-start-reverse' />}
-
+                    {annotation.marker === 'arrow' && (
+                      <MarkerArrow fill='black' id='marker-start' x={annotation.snapToNearestPoint ? Number(xScale(annotation.xKey)) : annotation.x} y={yScale(annotation.yKey)} stroke='#333' markerWidth={10} size={10} strokeWidth={1} orient='auto-start-reverse' markerUnits='userSpaceOnUse' />
+                    )}
+                    {annotation.connectionType === 'curve' && (
+                      <>
+                        {/* <marker id='small-arrow' markerWidth='6' markerHeight='6' refX={0} refY={3} orient='auto-start-reverse'>
+                          <path d='M0,6 L9,3 L0,0 z' fill='black' />
+                        </marker> */}
+                        <LinePath
+                          // M - Moves the pen to the starting point
+                          // Q - Draws a quadratic Bézier curve from the current position to the end point.
+                          // Control Point - ${annotation.x + annotation.dx / 2}, ${annotation.y + annotation.dy / 2 - 21}
+                          // End Point - ${annotation.x + annotation.dx},${annotation.y + annotation.dy}
+                          d={`M ${annotation.x},${annotation.y}
+                             Q ${annotation.x + annotation.dx / 2}, ${annotation.y + annotation.dy / 2 + Number(annotation?.bezier) || 0} ${annotation.x + annotation.dx},${annotation.y + annotation.dy}`}
+                          stroke='black'
+                          strokeWidth='2'
+                          fill='none'
+                          marker-start='url(#marker-start)'
+                        />
+                      </>
+                    )}
                     {/* Mobile Labels */}
                     <circle fill='white' cx={handleMobileXPosition(annotation)} cy={handleMobileYPosition(annotation)} r={16} className='annotation__mobile-label annotation__mobile-label-circle' stroke={colorScale(annotation.seriesKey)} />
-
                     <text x={handleTextX(annotation)} y={handleTextY(annotation)} className='annotation__mobile-label'>
                       {index + 1}
                     </text>
-
                     {/* ANCHORS */}
                     {annotation.anchor.horizontal && <LineSubject orientation={'horizontal'} stroke={'gray'} min={config.yAxis.size} max={xMax + Number(config.yAxis.size) + categoricalOffsetCheck} />}
                     {annotation.anchor.vertical && <LineSubject orientation={'vertical'} stroke={'gray'} min={config.heights.vertical - config.xAxis.size} max={0} />}

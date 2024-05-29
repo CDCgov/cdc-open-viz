@@ -214,25 +214,45 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                   </label>
 
                   {annotation.connectionType === 'curve' && (
-                    <label>
-                      Line Type:
-                      <select
-                        onChange={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].lineType = e.target.value
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      >
-                        {Object.entries(approvedCurveTypes).map(([value, key]) => (
-                          <option key={key} value={key}>
-                            {value}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
+                    <>
+                      {/* <label>
+                        Line Type:
+                        <select
+                          onChange={e => {
+                            const updatedAnnotations = [...config?.annotations]
+                            updatedAnnotations[index].lineType = e.target.value
+                            updateConfig({
+                              ...config,
+                              annotations: updatedAnnotations
+                            })
+                          }}
+                        >
+                          {Object.entries(approvedCurveTypes).map(([value, key]) => (
+                            <option key={key} value={key}>
+                              {value}
+                            </option>
+                          ))}
+                        </select>
+                      </label> */}
+                      <label>
+                        Curve Bezier
+                        {/* create a range input */}
+                        <input
+                          type='range'
+                          min='-20'
+                          max='20'
+                          value={config?.annotations[index]?.bezier}
+                          onChange={e => {
+                            const updatedAnnotations = [...config?.annotations]
+                            updatedAnnotations[index].bezier = e.target.value
+                            updateConfig({
+                              ...config,
+                              annotations: updatedAnnotations
+                            })
+                          }}
+                        />
+                      </label>
+                    </>
                   )}
 
                   <label>
