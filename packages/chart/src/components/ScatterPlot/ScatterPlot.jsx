@@ -8,11 +8,16 @@ const ScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
   // TODO: copied from line chart should probably be a constant somewhere.
   let circleRadii = 4.5
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
+  // tooltips for additional columns
+  let additionalColumns = Object.entries(config.columns)
+    .filter(([_, value]) => value.tooltips)
+    .map(([_, value]) => [value.label || value.name, value.name])
 
   const handleTooltip = (item, s) => `<div>
     ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[s] || ''}<br/>` : ''}
     ${config.xAxis.label}: ${formatNumber(item[config.xAxis.dataKey], 'bottom')} <br/>
-    ${config.yAxis.label}: ${formatNumber(item[s], 'left')}
+    ${config.yAxis.label}: ${formatNumber(item[s], 'left')}<br/>
+   ${additionalColumns.map(([label, name]) => `${label} : ${formatNumber(item[name], 'left')}<br/>`).join('')}
 </div>`
 
   return (
