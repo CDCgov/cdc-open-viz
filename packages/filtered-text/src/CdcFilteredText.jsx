@@ -22,12 +22,21 @@ import parse from 'html-react-parser'
 // styles
 import './scss/main.scss'
 
-const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
+const CdcFilteredText = ({ dashboardConfig, config: configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
+  const getAllData = () => {
+    let data = []
+    if (dashboardConfig) {
+      Object.entries(dashboardConfig?.datasets)?.forEach(([dataSetName, dataSet]) => data.push(...dataSet.data))
+    } else {
+      data = configObj?.data || []
+    }
+    return data
+  }
   const transform = new DataTransform()
   // Default States
   const [config, setConfig] = useState(defaults)
   const [loading, setLoading] = useState(true)
-  const [stateData, setStateData] = useState(config.data || [])
+  const [stateData, setStateData] = useState(getAllData())
   const [excludedData, setExcludedData] = useState()
   let { title, filters } = config
   const fontSize = config.fontSize === 'small' ? '16px' : config.fontSize === 'medium' ? '22px' : '27px'
@@ -37,7 +46,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
   // Default Functions
 
   const loadConfig = async () => {
-    let response = configObj || (await (await fetch(configUrl)).json())
+    let response = dashboardConfig || configObj || (await (await fetch(configUrl)).json())
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {}
 
@@ -54,6 +63,10 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
     if (data) {
       setStateData(data)
       setExcludedData(data)
+    }
+
+    if (dashboardConfig) {
+      setStateData(getAllData())
     }
 
     let newConfig = { ...config, ...response }
@@ -81,11 +94,14 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
   const filterByTextColumn = () => {
     let filteredData = []
 
-    if (filters.length) {
-      filters.map(filter => {
-        if (filter.columnName && filter.columnValue) {
-          return (filteredData = stateData.filter(function (e) {
-            return e[filter.columnName] === filter.columnValue
+    if (filters.length || dashboardConfig.dashboard?.sharedFilters?.length) {
+      const filtersToUse = dashboardConfig.dashboard?.sharedFilters || filters
+      filtersToUse.map(filter => {
+        let selected = filter.columnValue ? filter.columnValue : filter.active
+        let columnName = filter.columnName
+        if (filter.columnName && selected) {
+          return (filteredData = stateData.filter(data => {
+            return data[filter.columnName] === selected
           }))
         } else {
           return null
@@ -109,10 +125,10 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
   useEffect(() => {
     if (configObj && !configObj.dataUrl) {
       updateConfig({ ...defaults, ...configObj })
-      setStateData(configObj.data)
+      setStateData(getAllData())
       setExcludedData(configObj.data)
     }
-  }, [configObj?.data]) // eslint-disable-line
+  }, [configObj?.data, dashboardConfig]) // eslint-disable-line
 
   let content = <Loading />
 

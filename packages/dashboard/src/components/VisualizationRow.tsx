@@ -145,6 +145,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                   <CdcFilteredText
                     key={col.widget}
                     config={visualizationConfig}
+                    dashboardConfig={config}
                     isEditor={false}
                     setConfig={newConfig => {
                       updateChildConfig(col.widget, newConfig)
