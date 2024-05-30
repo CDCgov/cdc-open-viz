@@ -82,7 +82,8 @@ export default function DeviationBar({ height, xScale }) {
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth)
-      barRefs.current.forEach(bar => {
+      barRefs.current?.forEach(bar => {
+        if (!bar || !bar.style) return
         bar.style.transition = 'none'
         bar.style.transform = 'translate(0) scale(1)'
       })
@@ -104,7 +105,8 @@ export default function DeviationBar({ height, xScale }) {
   }, [entry?.isIntersecting, config.animate]) // eslint-disable-line
 
   useEffect(() => {
-    barRefs.current.forEach((bar, i) => {
+    barRefs.current?.forEach((bar, i) => {
+      if (!bar || !bar.style) return
       if (config.animate) {
         const normalizedTarget = (target / maxVal) * 100
         bar.style.opacity = '0'

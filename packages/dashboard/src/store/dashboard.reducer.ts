@@ -1,19 +1,26 @@
 import _ from 'lodash'
 import { getUpdateConfig } from '../helpers/getUpdateConfig'
-import { MultiDashboardConfig } from '../types/MultiDashboard'
+import { MultiDashboard, MultiDashboardConfig } from '../types/MultiDashboard'
 import DashboardActions from './dashboard.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import { Tab } from '../types/Tab'
+import { DashboardConfig } from '../types/DashboardConfig'
+import { ConfigRow } from '../types/ConfigRow'
 
-const createBlankDashboard = () => ({
-  dashboard: {
-    theme: 'theme-blue'
-  },
-  rows: [[{ width: 12 }, {}, {}]],
+type BlankMultiConfig = {
+  dashboard: Partial<DashboardConfig>
+  rows: Partial<ConfigRow>[]
+  visualizations: Record<string, Object>
+  table: Object
+}
+
+const createBlankDashboard: () => BlankMultiConfig = () => ({
+  dashboard: {},
+  rows: [{ columns: [{ width: 12 }] }],
   visualizations: {},
   table: {
     label: 'Data Table',
-    show: true,
+    show: false,
     showDownloadUrl: false,
     showVertical: true
   }

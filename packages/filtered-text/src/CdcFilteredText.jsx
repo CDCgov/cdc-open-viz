@@ -14,7 +14,6 @@ import EditorPanel from './components/EditorPanel'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import Layout from '@cdc/core/components/Layout'
 
 // external
 import parse from 'html-react-parser'
@@ -32,7 +31,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
   let { title, filters } = config
   const fontSize = config.fontSize === 'small' ? '16px' : config.fontSize === 'medium' ? '22px' : '27px'
 
-  const { contentClasses, innerContainerClasses } = useDataVizClasses(config)
+  const { contentClasses } = useDataVizClasses(config)
 
   // Default Functions
 
@@ -119,29 +118,27 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
   if (loading === false) {
     let body = (
       <>
-        <div className={`cove-component__content ${contentClasses.join(' ')}`}>
-          <Title classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
-          <div className={`${innerContainerClasses.join(' ')}`}>
-            <div className='cove-component__content-wrap'>
-              {filterByTextColumn()
-                .slice(0, 1)
-                .map((el, i) => (
-                  <p style={{ fontSize }} key={i}>
-                    {' '}
-                    {parse(el[config.textColumn] || '')}{' '}
-                  </p>
-                ))}
-            </div>
+        <Title classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
+        <div className={contentClasses.join(' ')}>
+          <div className='cove-component__content-wrap'>
+            {filterByTextColumn()
+              .slice(0, 1)
+              .map((el, i) => (
+                <p style={{ fontSize }} key={i}>
+                  {' '}
+                  {parse(el[config.textColumn] || '')}{' '}
+                </p>
+              ))}
           </div>
         </div>
       </>
     )
 
     content = (
-      <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
-        {isEditor && <EditorPanel />}
-        <Layout.Responsive isEditor={isEditor}>{body}</Layout.Responsive>
-      </Layout.VisualizationWrapper>
+      <div className={`cove ${config.theme} `}>
+        {isEditor && <EditorPanel>{body}</EditorPanel>}
+        {!isEditor && body}
+      </div>
     )
   }
   const values = {

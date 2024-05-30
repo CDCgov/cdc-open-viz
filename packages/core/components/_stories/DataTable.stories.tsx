@@ -51,13 +51,12 @@ export const CityState: Story = {
 
 export const Grouped: Story = {
   args: {
-    config: Example_1,
+    config: { ...Example_1, table: { ...Example_1.table, groupBy: 'TimeZone' } },
     dataConfig: Example_1.datasets[datasetKey],
     rawData: Example_1.datasets[datasetKey].data,
     runtimeData: Example_1.datasets[datasetKey].data,
     expandDataTable: true,
     tableTitle: 'COVE DataTable',
-    groupBy: 'TimeZone',
     viewport: 'lg',
     tabbingId: datasetKey
   }

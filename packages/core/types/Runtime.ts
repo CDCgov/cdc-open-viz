@@ -28,4 +28,5 @@ export type Runtime = {
   editorErrorMessage: string
   lineSeriesKeys: any[]
   horizontal: boolean
+  uniqueId: number | string
 }
