@@ -1,4 +1,4 @@
-@import '@cdc/core/styles/v2/main';
+@import '@cdc/core/styles/base';
 
 .cove-accordion__panel-section {
   overflow: auto;
@@ -7,5 +7,16 @@
     float: left;
     display: block;
     margin-right: 5px;
+  }
+}
+
+.cdc-open-viz-module.type-filtered-text {
+  .cove-accordion__panel-section .cove-input__checkbox--small {
+    // float: initial;
+    // display: initial;
+    float: none;
+  }
+  .cove-component__content.body:not(:empty) {
+    padding: 1rem !important ;
   }
 }
