@@ -16,7 +16,6 @@ interface Props {
 const ZoomBrush: FC<Props> = props => {
   const { tableData, config, parseDate, formatDate, setBrushConfig, getTextWidth } = useContext(ConfigContext)
   const { fontSize } = useBarChart()
-  const [dateCount, setDateCount] = useState(0)
   const [brushKey, setBrushKey] = useState(0)
   const brushRef = useRef(null)
   const radius = 15
@@ -46,7 +45,6 @@ const ZoomBrush: FC<Props> = props => {
     if (!event || !event.xValues) return
 
     const { xValues } = event
-    setDateCount(xValues.length)
 
     const dataKey = config.xAxis?.dataKey
 
@@ -154,7 +152,7 @@ const ZoomBrush: FC<Props> = props => {
       <Brush
         key={brushKey}
         disableDraggingOverlay={true}
-        renderBrushHandle={props => <BrushHandle getTextWidth={getTextWidth} pixelDistance={textProps.endPosition - textProps.startPosition} dateCount={dateCount} textProps={textProps} fontSize={fontSize[config.fontSize]} {...props} isBrushing={brushRef.current?.state.isBrushing} />}
+        renderBrushHandle={props => <BrushHandle getTextWidth={getTextWidth} pixelDistance={textProps.endPosition - textProps.startPosition} textProps={textProps} fontSize={fontSize[config.fontSize]} {...props} isBrushing={brushRef.current?.state.isBrushing} />}
         innerRef={brushRef}
         useWindowMoveEvents={true}
         selectedBoxStyle={style}
@@ -173,7 +171,7 @@ const ZoomBrush: FC<Props> = props => {
 }
 
 const BrushHandle = props => {
-  const { x, isBrushActive, isBrushing, className, textProps, dateCount, pixelDistance, getTextWidth,fontSize } = props
+  const { x, isBrushActive, isBrushing, className, textProps, pixelDistance, getTextWidth, fontSize } = props
   const pathWidth = 8
   if (!isBrushActive) {
     return null
@@ -182,14 +180,12 @@ const BrushHandle = props => {
   const isLeft = className.includes('left')
   const transform = isLeft ? 'scale(-1, 1)' : 'translate(0,0)'
   const textAnchor = isLeft ? 'end' : 'start'
+  let textWidth = getTextWidth(textProps.startValue, `normal ${props.fontSize / 1.4}px sans-serif`)
+  const displayLabels = textWidth * 2 > pixelDistance
 
-  let textWidth = getTextWidth(textProps.startValue, `normal ${props.fontSize / 1.4}px sans-serif`) * 2
-  console.log(textWidth, 'textWidth')
-  console.log(pixelDistance, 'pixelDistance')
-  const shouldDisplayLabels = textWidth * 2 > pixelDistance
   return (
     <Group left={x + pathWidth / 2} top={-2}>
-      <Text display={shouldDisplayLabels ? 'block' : 'none'} pointerEvents='visiblePainted' dominantBaseline='hanging' x={isLeft ? 55 : -50} y={30} verticalAnchor='start' textAnchor={textAnchor} fontSize={fontSize /2.3}>
+      <Text pointerEvents='visiblePainted' dominantBaseline='hanging' x={isLeft ? 55 : -50} y={30} verticalAnchor='start' textAnchor={textAnchor} fontSize={fontSize / 1.4}>
         {isLeft ? textProps.startValue : textProps.endValue}
       </Text>
       <path cursor='ew-resize' d='M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12' fill={!isBrushing ? '#000' : '#297EF1'} strokeWidth='1' transform={transform}></path>
