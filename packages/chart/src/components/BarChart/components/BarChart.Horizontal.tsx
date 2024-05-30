@@ -68,14 +68,14 @@ export const BarChartHorizontal = () => {
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} top={barGroup.y}>
                 {barGroup.bars.map((bar, index) => {
                   const scaleVal = config.useLogScale ? 0.1 : 0
-                  const { suppresedBarHeight: suppresedBarWidth, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
+                  const { suppresedBarHeight: suppresedBarWidth, getIconSize, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
 
                   const conditions = {
                     barWidth: 4,
                     shoMissingDataLabel: config.xAxis.shoMissingDataLabel && !bar.value,
                     showMissingDataLine: config.xAxis.showMissingDataLine && !bar.value,
                     defaultWidth: Math.abs(xScale(bar.value) - xScale(scaleVal)),
-                    composeBarWidth: () => (isSuppressed ? conditions.barWidth : conditions.showMissingDataLine ? conditions.barWidth : conditions.defaultWidth),
+                    composeBarWidth: () => (isSuppressed ? suppresedBarWidth : conditions.showMissingDataLine ? conditions.barWidth : conditions.defaultWidth),
                     composeBarLabel: () => (isSuppressed ? '' : yAxisValue),
                     composeMissingDataLabel: () => (conditions.shoMissingDataLabel ? 'N/A' : '')
                   }
