@@ -132,6 +132,10 @@ export default function DataImport() {
       throw errorMessages.failedFetch
     }
 
+    if(config.type === 'dashboard'){
+      setExternalURL('')
+    }
+
     return responseBlob
   }
 
