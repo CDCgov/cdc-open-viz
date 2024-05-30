@@ -515,12 +515,12 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       <>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
-          <div className={`${contentClasses.join(' ')}`}>
+          <div className={`cove-component__content`}>
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
             <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
             <div className={`bite ${biteClasses.join(' ')}`}>
-              <div className={`bite-content-container  ${contentClasses.join(' ')}`}>
+              <div className={`bite-content-container ${contentClasses.join(' ')}`}>
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} />}
                 {isTop && <DataImage />}
                 <div className={`bite-content`}>

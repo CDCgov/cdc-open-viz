@@ -1,0 +1,61 @@
+{
+  "contentEditor": {
+    "inlineHTML": "<div>In the state of {{state}}, the overall rate was {{rate}} for {{location}}</div> <div>For more information visit {{url}}{{state}}/{{location}}</div>",
+    "markupVariables": [
+      {
+        "name": "state",
+        "tag": "{{state}}",
+        "columnName": "STATE",
+        "conditions": []
+      },
+      {
+        "name": "rate",
+        "tag": "{{rate}}",
+        "columnName": "Rate",
+        "conditions": []
+      },
+      {
+        "name": "location",
+        "tag": "{{location}}",
+        "columnName": "Location",
+        "conditions": []
+      },
+      {
+        "name": "url",
+        "tag": "{{url}}",
+        "columnName": "URL",
+        "conditions": []
+      }
+    ],
+    "showHeader": true,
+    "srcUrl": "#example",
+    "title": "Current Rate by Location",
+    "useInlineHTML": true
+  },
+  "data": [
+    {
+      "STATE": "Alabama",
+      "Rate": "130",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Alaska",
+      "Rate": "80",
+      "Location": "Home",
+      "URL": "https://www.cdc.gov/"
+    }
+  ],
+  "legend": {},
+  "newViz": true,
+  "theme": "theme-blue",
+  "type": "markup-include",
+  "runtime": null,
+  "visual": {
+    "border": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false
+  }
+}
