@@ -3,7 +3,9 @@
     "sharedFilters": [
       {
         "key": "Category",
-        "usedBy": ["map1"],
+        "usedBy": [
+          "map1"
+        ],
         "type": "urlfilter",
         "apiFilter": {
           "apiEndpoint": "http://test.gov/api/poc/topics",
@@ -16,7 +18,9 @@
       },
       {
         "key": "Indicator",
-        "usedBy": ["chart1"],
+        "usedBy": [
+          "chart1"
+        ],
         "type": "urlfilter",
         "apiFilter": {
           "apiEndpoint": "http://test.gov/api/poc/indicators",
@@ -30,12 +34,15 @@
       },
       {
         "key": "Year",
-        "usedBy": ["map1"],
+        "usedBy": [
+          "map1"
+        ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "http://test.gov/api/POC/Filters/Year",
+          "apiEndpoint": "http://test.gov/api/POC/Filters",
           "valueSelector": "Year",
-          "textSelector": "Year"
+          "textSelector": "Year",
+          "heirarchyLookup": "Years"
         },
         "queryParameter": "year",
         "resetLabel": "- Select -",
@@ -44,12 +51,15 @@
       },
       {
         "key": "View By",
-        "usedBy": ["map1"],
+        "usedBy": [
+          "map1"
+        ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "http://test.gov/api/POC/Filters/StratificationCategory",
-          "valueSelector": "StratificationCategory",
-          "textSelector": "StratificationCategory"
+          "apiEndpoint": "http://test.gov/api/POC/Filters",
+          "valueSelector": "StratificationCategoryId",
+          "textSelector": "StratificationCategory",
+          "heirarchyLookup": "StratificationCategories"
         },
         "resetLabel": "- Select -",
         "queryParameter": "stratificationcategoryid",
@@ -58,11 +68,13 @@
       },
       {
         "key": "Stratification",
-        "usedBy": ["map1"],
+        "usedBy": [
+          "map1"
+        ],
         "type": "urlfilter",
         "apiFilter": {
-          "apiEndpoint": "http://test.gov/api/POC/Filters/Stratification",
-          "valueSelector": "Stratification",
+          "apiEndpoint": "http://test.gov/api/POC/stratifications",
+          "valueSelector": "StratificationId",
           "textSelector": "Stratification"
         },
         "resetLabel": "- Select -",
@@ -137,8 +149,8 @@
           "suffix": "%",
           "name": "LowConfidenceLimit",
           "tooltip": true
-        },
-        "additionalColumn2": {
+      },
+      "additionalColumn2": {
           "label": "High Confidence Limit",
           "dataTable": true,
           "tooltips": false,
@@ -146,7 +158,7 @@
           "suffix": "%",
           "name": "HighConfidenceLimit",
           "tooltip": true
-        },
+      },
         "navigate": {
           "name": "link",
           "tooltip": false,
@@ -161,7 +173,9 @@
       },
       "legend": {
         "descriptions": {},
-        "specialClasses": ["NA"],
+        "specialClasses": [
+            "NA"
+        ],
         "unified": false,
         "singleColumn": false,
         "dynamicDescription": false,
