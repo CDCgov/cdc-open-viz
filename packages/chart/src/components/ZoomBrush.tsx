@@ -85,7 +85,7 @@ const ZoomBrush: FC<Props> = props => {
   }, [config.brush.active])
 
   useEffect(() => {
-    if (config.filters?.some(filter => filter.active)) {
+    if (config.filters?.some(filter => filter.active) && config.brush.active) {
       setBrushKey(prevKey => prevKey + 1)
       setBrushConfig(prev => {
         return {
@@ -101,7 +101,7 @@ const ZoomBrush: FC<Props> = props => {
           data: []
         }
       })
-  }, [config.filters])
+  }, [config.filters, config.brush.active])
 
   const calculateTop = (): number => {
     const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
