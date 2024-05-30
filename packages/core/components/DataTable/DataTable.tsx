@@ -16,7 +16,7 @@ import Table from '../Table'
 import chartCellMatrix from './helpers/chartCellMatrix'
 import regionCellMatrix from './helpers/regionCellMatrix'
 import boxplotCellMatrix from './helpers/boxplotCellMatrix'
-import customColumns from './helpers/customColumns'
+import removeNullColumns from './helpers/removeNullColumns'
 import { TableConfig } from './types/TableConfig'
 import { Column } from '../../types/Column'
 
@@ -52,7 +52,8 @@ export type DataTableProps = {
 
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = (props: DataTableProps) => {
-  const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId, wrapColumns } = props
+  const { config, dataConfig, tableTitle, vizTitle, rawData, runtimeData: parentRuntimeData, headerColor, expandDataTable, columns, viewport, formatLegendLocation, tabbingId, wrapColumns } = props
+  const runtimeData = removeNullColumns(parentRuntimeData)
   const [expanded, setExpanded] = useState(expandDataTable)
 
   const [sortBy, setSortBy] = useState<any>({ column: config.type === 'map' ? 'geo' : 'date', asc: false, colIndex: null })
@@ -98,25 +99,23 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const _runtimeData = config.table.customTableConfig ? customColumns(rawData, config.table.excludeColumns) : runtimeData
-
-  const rawRows = Object.keys(_runtimeData).filter(column => column != 'columns')
+  const rawRows = Object.keys(runtimeData).filter(column => column != 'columns')
   const rows = isVertical
     ? rawRows.sort((a, b) => {
         let dataA
         let dataB
         if (config.type === 'map' && config.columns) {
           const sortByColName = config.columns[sortBy.column].name
-          dataA = _runtimeData[a][sortByColName]
-          dataB = _runtimeData[b][sortByColName]
+          dataA = runtimeData[a][sortByColName]
+          dataB = runtimeData[b][sortByColName]
         }
         if (config.type === 'chart' || config.type === 'dashboard') {
-          dataA = _runtimeData[a][sortBy.column]
-          dataB = _runtimeData[b][sortBy.column]
+          dataA = runtimeData[a][sortBy.column]
+          dataB = runtimeData[b][sortBy.column]
         }
         if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
-          dataA = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[a][config.xAxis.dataKey])
-          dataB = timeParse(config.runtime.xAxis.dateParseFormat)(_runtimeData[b][config.xAxis.dataKey])
+          dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
+          dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
         }
         return dataA && dataB ? customSort(dataA, dataB, sortBy, config) : 0
       })
@@ -185,17 +184,17 @@ const DataTable = (props: DataTableProps) => {
         </MediaControls.Section>
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
-          <ExpandCollapse expanded={expanded} setExpanded={setExpanded} tableTitle={tableTitle} fontSize={config.fontSize} viewport={viewport} />
+          {config.table.collapsible !== false && <ExpandCollapse expanded={expanded} setExpanded={setExpanded} fontSize={config.fontSize} tableTitle={tableTitle} viewport={viewport} />}
           <div className='table-container' style={limitHeight}>
             <Table
               viewport={viewport}
               wrapColumns={wrapColumns}
-              childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData: _runtimeData, viewport }) : chartCellMatrix({ rows, ...props, runtimeData: _runtimeData, isVertical, sortBy, hasRowType, viewport })}
+              childrenMatrix={config.type === 'map' ? mapCellMatrix({ rows, wrapColumns, ...props, runtimeData, viewport }) : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })}
               tableName={config.type}
               caption={caption}
               stickyHeader
               hasRowType={hasRowType}
-              headContent={config.type === 'map' ? <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} /> : <ChartHeader data={_runtimeData} {...props} hasRowType={hasRowType} isVertical={isVertical} sortBy={sortBy} setSortBy={setSortBy} />}
+              headContent={config.type === 'map' ? <MapHeader columns={columns} {...props} sortBy={sortBy} setSortBy={setSortBy} /> : <ChartHeader data={runtimeData} {...props} hasRowType={hasRowType} isVertical={isVertical} sortBy={sortBy} setSortBy={setSortBy} />}
               tableOptions={{ className: `${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}${isVertical ? '' : ' horizontal'}`, 'aria-live': 'assertive', 'aria-rowcount': config?.data?.length ? config.data.length : -1, hidden: !expanded }}
               fontSize={config.fontSize}
             />

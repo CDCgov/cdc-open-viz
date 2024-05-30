@@ -40,7 +40,6 @@ import { capitalizeSplitAndJoin } from '@cdc/core/helpers/cove/string'
 import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import { filterData } from './helpers/filterData'
-import { getFormattedData } from './helpers/getFormattedData'
 import { getVizKeys } from './helpers/getVizKeys'
 import Title from '@cdc/core/components/ui/Title'
 import { type TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
@@ -56,13 +55,11 @@ import _ from 'lodash'
 import EditorContext from '../../editor/src/ConfigContext'
 import { getApiFilterKey } from './helpers/getApiFilterKey'
 import Filters, { APIFilterDropdowns, DropdownOptions } from './components/Filters'
-import EditorWrapper from './components/EditorWrapper/EditorWrapper'
-import DataTableEditorPanel from '@cdc/core/components/DataTable/components/DataTableEditorPanel'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import VisualizationRow from './components/VisualizationRow'
 import { getVizConfig } from './helpers/getVizConfig'
-import { getApplicableFilters, getFilteredData } from './helpers/getFilteredData'
+import { getFilteredData } from './helpers/getFilteredData'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import Layout from '@cdc/core/components/Layout'
 
@@ -307,12 +304,13 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   }
 
   useEffect(() => {
+    if (state.tabSelected && state.tabSelected !== 'Dashboard Preview') return
     const { config } = state
     if (config.filterBehavior !== FilterBehavior.Apply) {
       reloadURLData()
     }
     loadAPIFilters()
-  }, [JSON.stringify(state.config.dashboard ? state.config.dashboard.sharedFilters : undefined)])
+  }, [])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     const { config } = state
@@ -568,9 +566,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
             break
           case 'table':
             body = (
-              <EditorWrapper component={DataTableStandAlone} visualizationKey={visualizationKey} visualizationConfig={visualizationConfig} updateConfig={_updateConfig} type={'Table'} viewport={currentViewport}>
-                <DataTableEditorPanel key={visualizationKey} config={visualizationConfig} updateConfig={_updateConfig} />
-              </EditorWrapper>
+              <>
+                <Header visualizationKey={visualizationKey} subEditor='Table' />
+                <DataTableStandAlone visualizationKey={visualizationKey} config={visualizationConfig} isEditor={true} updateConfig={_updateConfig} />
+              </>
             )
             break
           default:

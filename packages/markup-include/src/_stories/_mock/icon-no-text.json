@@ -1,0 +1,59 @@
+{
+  "contentEditor": {
+    "inlineHTML": "<div>{{race}} did not have an age adjusted rate of 644.2.</div>",
+    "markupVariables": [
+      {
+        "name": "race",
+        "tag": "{{race}}",
+        "columnName": "Race",
+        "conditions": [
+          {
+            "columnName": "Age-adjusted rate",
+            "isOrIsNotEqualTo": "isNot",
+            "value": "644.2"
+          }
+        ]
+      }
+    ],
+    "showHeader": false,
+    "srcUrl": "https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/SSI-Example-Markup-Include.html",
+    "title": "",
+    "useInlineHTML": false
+  },
+  "data": [
+    {
+      "Race": "Hispanic or Latino",
+      "Age-adjusted rate": "644.2"
+    },
+    {
+      "Race": "Non-Hispanic American Indian",
+      "Age-adjusted rate": "636.1"
+    },
+    {
+      "Race": "Non-Hispanic Black",
+      "Age-adjusted rate": "563.7"
+    },
+    {
+      "Race": "Non-Hispanic Asian or Pacific Islander",
+      "Age-adjusted rate": "202.5"
+    },
+    {
+      "Race": "Non-Hispanic White",
+      "Age-adjusted rate": "183.6"
+    }
+  ],
+  "legend": {},
+  "newViz": true,
+  "theme": "theme-purple",
+  "type": "markup-include",
+  "runtime": null,
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": false,
+    "hideBackgroundColor": true,
+    "borderColorTheme": false
+  },
+  "isEditor": true,
+  "showEditorPanel": true
+}

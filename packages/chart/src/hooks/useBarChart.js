@@ -164,26 +164,13 @@ export const useBarChart = () => {
     if (!match?.color) return false
     return match
   }
-  const generateIconSize = barWidth => {
-    if (barWidth < 4) {
-      return 1
-    }
-    if (barWidth < 5) {
-      return 4
-    }
-    if (barWidth < 10) {
-      return 6
-    }
-    if (barWidth < 15) {
-      return 7
-    }
-    if (barWidth < 20) {
-      return 8
-    }
-    if (barWidth < 90) {
-      return 8
-    }
-    return 0
+
+  const shouldSuppress = bar => {
+    return config.preliminaryData?.some(pd => {
+      const matchesColumn = pd.column ? pd.column === bar.key : true
+      const matchesValue = String(bar.value) === String(pd.value) && pd.value !== ''
+      return matchesColumn && matchesValue && pd.symbol && pd.type === 'suppression'
+    })
   }
 
   const getAdditionalColumn = (series, xAxisDataValue) => {
@@ -223,14 +210,51 @@ export const useBarChart = () => {
     if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') setSeriesHighlight([])
   }
 
+  const composeSuppressionBars = ({ bar }) => {
+    const suppresedBarHeight = config.xAxis.showSuppressedLine ? 3 : 0
+    const ASTERISK = 'Asterisk'
+    const getIconPadding = symbol => (String(symbol).includes(ASTERISK) ? -5 : -suppresedBarHeight * 3)
+    const getVerticalAnchor = symbol => {
+      return String(symbol).includes(ASTERISK) ? 'middle' : 'end'
+    }
+    const getIconSize = (symbol, barWidth) => {
+      switch (symbol) {
+        case ASTERISK:
+          return barWidth * 1.2
+        case 'Double ' + ASTERISK:
+          return barWidth
+        default:
+          return barWidth / 1.5
+      }
+    }
+
+    function shouldSuppressBar() {
+      const isSuppressed = config.preliminaryData.some(pd => {
+        const selectedSuppressionColumn = !pd.column || pd.column === bar.key
+        const isValueMatch = String(pd.value) === String(bar.value) && pd.value !== '' && pd.type === 'suppression'
+
+        return isValueMatch && selectedSuppressionColumn
+      })
+
+      return isSuppressed && config.xAxis.showSuppressedSymbol
+    }
+
+    return {
+      suppresedBarHeight,
+      getIconSize,
+      getIconPadding,
+      getVerticalAnchor,
+      isSuppressed: shouldSuppressBar()
+    }
+  }
   return {
-    generateIconSize,
     isHorizontal,
     barBorderWidth,
     lollipopBarWidth,
     lollipopShapeSize,
     isLabelBelowBar,
     displayNumbersOnBar,
+    shouldSuppress,
     section,
     isRounded,
     isStacked,
@@ -249,6 +273,7 @@ export const useBarChart = () => {
     hoveredBar,
     setHoveredBar,
     onMouseOverBar,
-    onMouseLeaveBar
+    onMouseLeaveBar,
+    composeSuppressionBars
   }
 }

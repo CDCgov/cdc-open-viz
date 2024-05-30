@@ -1,0 +1,49 @@
+{
+  "contentEditor": {
+    "inlineHTML": "<div>{{state}} does have a rate 130 compared to the over all rate of {{overall-rate}}</div>",
+    "markupVariables": [
+      {
+        "name": "state",
+        "tag": "{{state}}",
+        "columnName": "STATE",
+        "conditions": [{ "columnName": "Rate", "isOrIsNotEqualTo": "is", "value": "130" }]
+      },
+      {
+        "name": "overall-rate",
+        "tag": "{{overall-rate}}",
+        "columnName": "Rate",
+        "conditions": [{ "columnName": "STATE", "isOrIsNotEqualTo": "is", "value": "Overall" }]
+      }
+    ],
+    "showHeader": true,
+    "srcUrl": "#example",
+    "title": "",
+    "useInlineHTML": true
+  },
+  "data": [
+    {
+      "STATE": "Overall",
+      "Rate": "80",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Alabama",
+      "Rate": "130",
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    }
+  ],
+  "legend": {},
+  "newViz": true,
+  "theme": "theme-amber",
+  "type": "markup-include",
+  "runtime": null,
+  "visual": {
+    "border": false,
+    "accent": true,
+    "background": true,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false
+  }
+}
