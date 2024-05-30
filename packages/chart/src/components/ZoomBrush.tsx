@@ -90,7 +90,7 @@ const ZoomBrush: FC<Props> = props => {
   useEffect(() => {
     const isFiltersActive = config.filters?.some(filter => filter.active)
     const isExclusionsActive = config.exclusions?.active
-    if (isFiltersActive || isExclusionsActive) {
+    if ((isFiltersActive || isExclusionsActive) && config.brush.active) {
       setBrushKey(prevKey => prevKey + 1)
       setBrushConfig(prev => {
         return {
@@ -106,7 +106,7 @@ const ZoomBrush: FC<Props> = props => {
           data: []
         }
       })
-  }, [config.filters, config.exclusions.active])
+  }, [config.filters, config.exclusions, config.brush.active])
 
   const calculateTop = (): number => {
     const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
