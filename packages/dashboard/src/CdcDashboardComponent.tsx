@@ -312,6 +312,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     loadAPIFilters()
   }, [])
 
+  useEffect(() => {
+    updateDataFilters()
+  }, [state.config?.activeDashboard])
+
   const updateChildConfig = (visualizationKey, newConfig) => {
     const { config } = state
     let updatedConfig = { ...config }
