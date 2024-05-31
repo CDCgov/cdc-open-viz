@@ -37,8 +37,6 @@ export type Axis = {
   sortDates?: boolean
   sortKey?: string
   showTargetLabel?: boolean
-  showSuppressedSymbol: boolean
-  shoMissingDataLabel: boolean
   size?: number
   target?: number
   targetLabel?: string
