@@ -211,10 +211,10 @@ export const useBarChart = () => {
   }
 
   const composeSuppressionBars = ({ bar }) => {
-    const suppresedBarHeight = config.xAxis.showSuppressedSymbol ? 3 : 0
-    let t = suppresedBarHeight ? suppresedBarHeight : 3
+    const suppressedBarHeight = config.general.showSuppressedSymbol ? 3 : 0
+    let height = suppressedBarHeight ? suppressedBarHeight : 3
     const ASTERISK = 'Asterisk'
-    const getIconPadding = symbol => (String(symbol).includes(ASTERISK) ? -5 : -t * 3)
+    const getIconPadding = symbol => (String(symbol).includes(ASTERISK) ? -5 : -height * 3)
     const getVerticalAnchor = symbol => {
       return String(symbol).includes(ASTERISK) ? 'middle' : 'end'
     }
@@ -241,7 +241,7 @@ export const useBarChart = () => {
     }
 
     return {
-      suppresedBarHeight,
+      suppressedBarHeight,
       getIconSize,
       getIconPadding,
       getVerticalAnchor,

@@ -5,6 +5,7 @@ import BarChartContext, { type BarChartContextValues } from './context'
 // Local hooks
 import { useBarChart } from '../../../hooks/useBarChart'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
+import { getBarY, getBarDimensions } from '../helpers'
 // VisX library imports
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -66,28 +67,21 @@ export const BarChartVertical = () => {
             return barGroups.map((barGroup, index) => (
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={barGroup.x0}>
                 {barGroup.bars.map((bar, index) => {
-                  const { suppresedBarHeight, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
+                  const { suppressedBarHeight, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
                   const scaleVal = config.useLogScale ? 0.1 : 0
-
-                  const conditions = {
-                    scaleVal: config.useLogScale ? 0.1 : 0,
-                    shoMissingDataLabel: config.xAxis.shoMissingDataLabel && !bar.value,
-                    barHeight: 4, //missingdata bars
-                    suppressedY: () => yScale(conditions.scaleVal) - suppresedBarHeight,
-                    missingDataY: () => yScale(conditions.scaleVal) - conditions.barHeight,
-                    defaultY: bar => (bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)),
-                    defaultHeight: () => Math.abs(yScale(bar.value) - yScale(scaleVal)),
-                    composeBarY: bar => (isSuppressed ? conditions.suppressedY() : conditions.shoMissingDataLabel ? conditions.missingDataY() : conditions.defaultY(bar)),
-                    composeBarHeight: () => (isSuppressed ? suppresedBarHeight : conditions.shoMissingDataLabel ? conditions.barHeight : conditions.defaultHeight()),
-                    composeLabel: () => (isSuppressed ? '' : yAxisValue),
-                    composeMissingDataLabel: () => (conditions.shoMissingDataLabel ? 'N/A' : '')
+                  const properties = {
+                    isSuppressed,
+                    bar,
+                    showMissingDataLabel: config.general.showMissingDataLabel && !bar.value,
+                    defaultBarHeight: Math.abs(yScale(bar.value) - yScale(scaleVal)),
+                    suppressedBarHeight
                   }
 
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   const displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                  const barY = conditions.composeBarY(bar)
+                  const barY = getBarY({ ...properties, scaleVal, isNumber, yScale })
 
                   let barGroupWidth = seriesScale.range()[1]
 
@@ -124,9 +118,9 @@ export const BarChartVertical = () => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  const barLabel = conditions.composeLabel()
-                  const barHeight = conditions.composeBarHeight()
-                  const missingDataLabel = conditions.composeMissingDataLabel()
+                  const barLabel = isSuppressed ? '' : yAxisValue
+                  const { barHeight } = getBarDimensions(properties)
+                  const missingDataLabel = properties.showMissingDataLabel ? 'N/A' : ''
                   let missingDataFontSize = barWidth / 2
                   let textWidth = getTextWidth(missingDataLabel, `normal ${missingDataFontSize}px sans-serif`)
                   const textFitstobar = textWidth < barWidth
@@ -213,7 +207,7 @@ export const BarChartVertical = () => {
                           const isValueMatch = String(pd.value) === String(bar.value) && pd.value !== ''
                           let isSuppressed = isValueMatch && selectedSuppressionColumn
 
-                          if (!isSuppressed || barWidth < 10 || !config.xAxis.showSuppressedSymbol) {
+                          if (!isSuppressed || barWidth < 10 || !config.general.showSuppressedSymbol) {
                             return
                           }
 

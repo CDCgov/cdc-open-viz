@@ -22,7 +22,9 @@ export default {
   tipRounding: 'top',
   isResponsiveTicks: false,
   general: {
-    showDownloadButton: false
+    showDownloadButton: false,
+    showMissingDataLabel: true,
+    showSuppressedSymbol: true
   },
   padding: {
     left: 5,
@@ -118,11 +120,7 @@ export default {
     labelOffset: 65,
     axisPadding: 200,
     target: 0,
-    maxTickRotation: 0,
-    showSuppressedSymbol: true,
-    showSuppressedLine: true,
-    shoMissingDataLabel: true,
-    showMissingDataLine: true
+    maxTickRotation: 0
   },
   table: {
     label: 'Data Table',
@@ -135,7 +133,9 @@ export default {
     indexLabel: '',
     download: false,
     showVertical: true,
-    dateDisplayFormat: ''
+    dateDisplayFormat: '',
+    showMissingDataLabel: true,
+    showSuppressedSymbol: true
   },
   orientation: 'vertical',
   color: 'pinkpurple',

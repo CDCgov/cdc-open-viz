@@ -81,9 +81,9 @@ const PanelGeneral: FC<PanelProps> = props => {
                   </Tooltip.Content>
                 </Tooltip>
               }
-              value={config.xAxis.shoMissingDataLabel}
-              section='xAxis'
-              fieldName='shoMissingDataLabel'
+              value={config.general.showMissingDataLabel}
+              section='general'
+              fieldName='showMissingDataLabel'
               label='Display "Missing Data" Label'
               updateField={updateField}
             />
@@ -99,8 +99,8 @@ const PanelGeneral: FC<PanelProps> = props => {
                   </Tooltip.Content>
                 </Tooltip>
               }
-              value={config.xAxis.showSuppressedSymbol}
-              section='xAxis'
+              value={config.general.showSuppressedSymbol}
+              section='general'
               fieldName='showSuppressedSymbol'
               label='Display "suppressed data" symbol'
               updateField={updateField}
