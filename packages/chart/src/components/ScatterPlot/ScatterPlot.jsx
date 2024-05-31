@@ -6,10 +6,10 @@ const ScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
   const { colorScale, transformedData: data, config, formatNumber, seriesHighlight, colorPalettes } = useContext(ConfigContext)
 
   // TODO: copied from line chart should probably be a constant somewhere.
-  let circleRadii = 4.5
+  const circleRadii = 4.5
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
   // tooltips for additional columns
-  let additionalColumns = Object.entries(config.columns)
+  const additionalColumns = Object.entries(config.columns)
     .filter(([_, value]) => value.tooltips)
     .map(([_, value]) => [value.label || value.name, value.name])
 
