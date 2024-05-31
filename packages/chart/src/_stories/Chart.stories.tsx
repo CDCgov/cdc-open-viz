@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react'
 import SuppressedConfig from './_mock/bar-chart-suppressed.json'
 
 import Chart from '../CdcChart'
+import lineChartTwoPointsRegressionTest from './_mock/line_Chart_Two_Points_Regression_Test.json'
+import lineChartTwoPointsNewChart from './_mock/line_Chart_Two_Points_New_Chart.json'
+import lollipop from './_mock/lollipop.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -10,179 +13,23 @@ const meta: Meta<typeof Chart> = {
 
 type Story = StoryObj<typeof Chart>
 
+export const line_Chart_Two_Points_Regression_Test: Story = {
+  args: {
+    config: lineChartTwoPointsRegressionTest,
+    isEditor: false
+  }
+}
+export const line_Chart_Two_Points_New_Chart: Story = {
+  args: {
+    config: lineChartTwoPointsNewChart,
+    isEditor: false
+  }
+}
+
 export const Lollipop: Story = {
   args: {
-    config: {
-      type: 'chart',
-      title: 'Lollipop Style Horizontal Bar Chart - Number of Spills Occurring in the Home',
-      showTitle: true,
-      showDownloadMediaButton: false,
-      theme: 'theme-blue',
-      animate: true,
-      fontSize: 'medium',
-      lineDatapointStyle: 'hover',
-      barHasBorder: 'false',
-      isLollipopChart: true,
-      lollipopShape: 'circle',
-      lollipopColorStyle: 'two-tone',
-      visualizationSubType: 'horizontal',
-      barStyle: '',
-      roundingStyle: 'standard',
-      tipRounding: 'top',
-      isResponsiveTicks: false,
-      general: { showDownloadButton: false },
-      padding: { left: 5, right: 5 },
-      yAxis: {
-        hideAxis: true,
-        displayNumbersOnBar: true,
-        hideLabel: false,
-        hideTicks: false,
-        size: '13',
-        gridLines: false,
-        enablePadding: false,
-        min: '',
-        max: '',
-        labelColor: '#333',
-        tickLabelColor: '#333',
-        tickColor: '#333',
-        rightHideAxis: true,
-        rightAxisSize: 50,
-        rightLabel: '',
-        rightLabelOffsetSize: 0,
-        rightAxisLabelColor: '#333',
-        rightAxisTickLabelColor: '#333',
-        rightAxisTickColor: '#333',
-        numTicks: '9',
-        axisPadding: 0,
-        tickRotation: 0,
-        anchors: [],
-        type: 'chart',
-        title: 'Lollipop Style Horizontal Bar Chart',
-        theme: 'theme-blue',
-        fontSize: 'medium',
-        lineDatapointStyle: 'hover',
-        barHasBorder: 'false',
-        isLollipopChart: false,
-        lollipopShape: 'circle',
-        lollipopColorStyle: 'two-tone',
-        visualizationSubType: 'horizontal',
-        padding: { left: 5, right: 5 },
-        yAxis: { size: 50, gridLines: false },
-        barThickness: 0.35,
-        height: 260,
-        xAxis: { type: 'categorical', size: 75, tickRotation: 0, dataKey: 'Vehicle' },
-        table: { label: 'Data Table', expanded: true, show: true },
-        legend: { behavior: 'isolate', position: 'right' },
-        exclusions: { active: false, keys: [] },
-        palette: 'qualitative-bold',
-        labels: false,
-        dataFormat: {},
-        confidenceKeys: {},
-        data: [
-          { Group: 'Combined Total of Group A', Vehicle: '100', Home: '120', Work: '140', Office: '120' },
-          { Group: 'Combined Total of Group B', Vehicle: '150', Home: '140', Work: '100', Office: '90' },
-          { Group: 'Combined Total of Group C', Vehicle: '90', Home: '90', Work: '80', Office: '80' },
-          { Group: 'Combined Total of Group D', Vehicle: '70', Home: '60', Work: '50', Office: '70' }
-        ],
-        dataFileName: 'CSV_Source_Example_for_Horizontal_Bar_viz-cdcwp1619811744363.csv',
-        dataFileSourceType: 'file',
-        visualizationType: 'Bar',
-        runtime: {
-          seriesLabels: { Vehicle: 'Vehicle' },
-          seriesLabelsAll: ['Vehicle'],
-          originalXAxis: { type: 'categorical', size: 75, tickRotation: 0, dataKey: 'Vehicle' },
-          seriesKeys: ['Vehicle'],
-          xAxis: { size: 50, gridLines: false },
-          yAxis: { type: 'categorical', size: 75, tickRotation: 0, dataKey: 'Vehicle' },
-          horizontal: true,
-          uniqueId: 1651765968212,
-          editorErrorMessage: ''
-        },
-        description: 'Subtext can be added here for options like citing data sources or insight into reading the bar chart.',
-        series: [{ dataKey: 'Vehicle', type: 'Bar' }],
-        barHeight: 25,
-        barPadding: 40,
-        labelPlacement: 'Below Bar',
-        label: 'Number of Accidents'
-      },
-      boxplot: [],
-      topAxis: { hasLine: false },
-      isLegendValue: false,
-      barThickness: 0.35,
-      barHeight: 6,
-      barSpace: 15,
-      heights: { vertical: 300, horizontal: 170.39999999999998 },
-      xAxis: {
-        anchors: [],
-        type: 'categorical',
-        showTargetLabel: true,
-        targetLabel: 'Target',
-        hideAxis: true,
-        hideLabel: true,
-        hideTicks: true,
-        size: '16',
-        tickRotation: 0,
-        min: '',
-        max: '160',
-        labelColor: '#333',
-        tickLabelColor: '#333',
-        tickColor: '#333',
-        numTicks: '',
-        labelOffset: 65,
-        axisPadding: 0,
-        target: 0,
-        maxTickRotation: 0,
-        dataKey: 'Group'
-      },
-      table: { label: 'Data Table', expanded: false, limitHeight: false, height: '', caption: '', showDownloadUrl: false, showDataTableLink: true, indexLabel: 'Group', download: false, showVertical: true, show: true },
-      orientation: 'horizontal',
-      color: 'pinkpurple',
-      columns: {},
-      legend: {
-        behavior: 'isolate',
-        singleRow: false,
-        colorCode: '',
-        reverseLabelOrder: false,
-        description: '',
-        dynamicLegend: false,
-        dynamicLegendDefaultText: 'Show All',
-        dynamicLegendItemLimit: 5,
-        dynamicLegendItemLimitMessage: 'Dynamic Legend Item Limit Hit.',
-        dynamicLegendChartMessage: 'Select Options from the Legend',
-        position: 'right',
-        hide: true,
-        label: 'Accident Location'
-      },
-      exclusions: { active: false, keys: [] },
-      palette: 'qualitative-bold',
-      isPaletteReversed: false,
-      twoColor: { palette: 'monochrome-1', isPaletteReversed: false },
-      labels: false,
-      dataFormat: { commas: false, prefix: '', suffix: '', abbreviated: false, bottomSuffix: '', bottomPrefix: '', bottomAbbreviated: false },
-      confidenceKeys: {},
-      visual: { border: true, accent: true, background: true, verticalHoverLine: false, horizontalHoverLine: false },
-      useLogScale: false,
-      filterBehavior: 'Filter Change',
-      highlightedBarValues: [],
-      series: [{ dataKey: 'Home', type: 'Bar', tooltip: true }],
-      tooltips: { opacity: 90 },
-      height: 212,
-      data: [
-        { Group: 'Combined Total of Group A', Vehicle: '100', Home: '120', Work: '140', Office: '120' },
-        { Group: 'Combined Total of Group B', Vehicle: '150', Home: '140', Work: '100', Office: '90' },
-        { Group: 'Combined Total of Group C', Vehicle: '90', Home: '90', Work: '80', Office: '80' },
-        { Group: 'Combined Total of Group D', Vehicle: '70', Home: '60', Work: '50', Office: '70' }
-      ],
-      dataFileName: 'CSV_Source_Example_for_Horizontal_Bar_viz-cdcwp1619811744363.csv',
-      dataFileSourceType: 'file',
-      visualizationType: 'Bar',
-      description: 'Subtext can be added here for options like citing data sources or insight into reading the bar chart.',
-      barPadding: 47,
-      filters: [],
-      lollipopSize: 'medium',
-      validated: 4.23,
-      dynamicMarginTop: 0
-    }
+    config: lollipop,
+    isEditor: false
   }
 }
 

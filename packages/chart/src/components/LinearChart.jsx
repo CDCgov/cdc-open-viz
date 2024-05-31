@@ -24,6 +24,9 @@ import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './../hooks/useIntersectionObserver'
 import Regions from './Regions'
 
+// Helpers
+import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
+
 // Hooks
 import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
@@ -41,6 +44,10 @@ const LinearChart = props => {
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
 
+  const checkLineToBarGraph = () => {
+    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
+  }
+
   // configure width
   let [width] = dimensions
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && ['lg', 'md'].includes(currentViewport)) {
@@ -52,7 +59,7 @@ const LinearChart = props => {
   const shouldAbbreviate = true
   let height = config.aspectRatio ? width * config.aspectRatio : config.visualizationType === 'Forest Plot' ? config.heights['vertical'] : config.heights[orientation]
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  let yMax = height - (orientation === 'horizontal' ? 0 : (runtime.xAxis.padding || 0))
+  let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.padding || 0)
 
   if (config.visualizationType === 'Forest Plot') {
     height = height + config.data.length * config.forestPlot.rowHeight
@@ -102,6 +109,7 @@ const LinearChart = props => {
     if (config.data && !config.data[index] && visualizationType === 'Forest Plot') return
     if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
     if (isDateScale(runtime.yAxis)) return formatDate(parseDate(tick))
+    if (orientation === 'vertical' && max - min < 3) return formatNumber(tick, 'left', shouldAbbreviate, false, false, '1')
     if (orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
   }
@@ -228,60 +236,22 @@ const LinearChart = props => {
   }
 
   const generatePairedBarAxis = () => {
-    let axisMaxHeight = 40;
+    let axisMaxHeight = 40
 
-    return <>
-      <AxisBottom top={yMax} left={Number(runtime.yAxis.size)} label={runtime.xAxis.label} tickFormat={isDateScale(runtime.xAxis) ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={runtime.xAxis.numTicks || undefined}>
-        {props => {
-          return (
-            <Group className='bottom-axis'>
-              {props.ticks.map((tick, i) => {
-                const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
-                const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
-
-                const textWidth = getTextWidth(tick.value, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25;
-
-                if(axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
-
-                return (
-                  <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                    {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
-                    {!runtime.yAxis.hideLabel && (
-                      <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
-                        {formatNumber(tick.value, 'left')}
-                      </Text>
-                    )}
-                  </Group>
-                )
-              })}
-              {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-            </Group>
-          )
-        }}
-      </AxisBottom>
-      <AxisBottom
-        top={yMax}
-        left={Number(runtime.yAxis.size)}
-        label={runtime.xAxis.label}
-        tickFormat={isDateScale(runtime.xAxis) ? formatDate : runtime.xAxis.dataKey !== 'Year' ? formatNumber : tick => tick}
-        scale={g2xScale}
-        stroke='#333'
-        tickStroke='#333'
-        numTicks={runtime.xAxis.numTicks || undefined}
-      >
-        {props => {
-          return (
-            <>
+    return (
+      <>
+        <AxisBottom top={yMax} left={Number(runtime.yAxis.size)} label={runtime.xAxis.label} tickFormat={isDateScale(runtime.xAxis) ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={runtime.xAxis.numTicks || undefined}>
+          {props => {
+            return (
               <Group className='bottom-axis'>
                 {props.ticks.map((tick, i) => {
                   const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
                   const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
 
                   const textWidth = getTextWidth(tick.value, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                  const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25;
+                  const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25
 
-                  if(axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
+                  if (axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
 
                   return (
                     <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
@@ -296,17 +266,57 @@ const LinearChart = props => {
                 })}
                 {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
               </Group>
-              <Group>
-                <Text x={xMax / 2} y={axisMaxHeight + 20} stroke='#333' textAnchor={'middle'} verticalAnchor='start'>
-                  {runtime.xAxis.label}
-                </Text>
-              </Group>
-              {svgRef.current ? svgRef.current.setAttribute('height', (Number(height) + Number(axisMaxHeight) + (runtime.xAxis.label ? 50 : 0)) + 'px') : ''}
-            </>
-          )
-        }}
-      </AxisBottom>
-    </>
+            )
+          }}
+        </AxisBottom>
+        <AxisBottom
+          top={yMax}
+          left={Number(runtime.yAxis.size)}
+          label={runtime.xAxis.label}
+          tickFormat={isDateScale(runtime.xAxis) ? formatDate : runtime.xAxis.dataKey !== 'Year' ? formatNumber : tick => tick}
+          scale={g2xScale}
+          stroke='#333'
+          tickStroke='#333'
+          numTicks={runtime.xAxis.numTicks || undefined}
+        >
+          {props => {
+            return (
+              <>
+                <Group className='bottom-axis'>
+                  {props.ticks.map((tick, i) => {
+                    const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
+                    const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
+
+                    const textWidth = getTextWidth(tick.value, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                    const axisHeight = textWidth * Math.sin(angle * (Math.PI / 180)) + 25
+
+                    if (axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
+
+                    return (
+                      <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                        {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
+                        {!runtime.yAxis.hideLabel && (
+                          <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
+                            {formatNumber(tick.value, 'left')}
+                          </Text>
+                        )}
+                      </Group>
+                    )
+                  })}
+                  {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
+                </Group>
+                <Group>
+                  <Text x={xMax / 2} y={axisMaxHeight + 20} stroke='#333' textAnchor={'middle'} verticalAnchor='start'>
+                    {runtime.xAxis.label}
+                  </Text>
+                </Group>
+                {svgRef.current ? svgRef.current.setAttribute('height', Number(height) + Number(axisMaxHeight) + (runtime.xAxis.label ? 50 : 0) + 'px') : ''}
+              </>
+            )
+          }}
+        </AxisBottom>
+      </>
+    )
   }
 
   return isNaN(width) ? (
@@ -499,62 +509,57 @@ const LinearChart = props => {
                 config.dynamicMarginTop = dynamicMarginTop
                 config.xAxis.tickWidthMax = tickWidthMax
 
-                let axisMaxHeight = 40;
+                let axisMaxHeight = 40
 
-                const axisContents = <Group className='bottom-axis' width={dimensions[0]}>
-                  {props.ticks.map((tick, i, propsTicks) => {
-                    // when using LogScale show major ticks values only
-                    const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
-                    const tickLength = showTick === 'block' ? 16 : defaultTickLength
-                    const to = { x: tick.to.x, y: tickLength }
-                    const textWidth = getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                    const limitedWidth = 100 / propsTicks.length
-                    //reset rotations by updating config
-                    config.yAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
-                    config.xAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'vertical' ? 0 : config.xAxis.tickRotation
-                    //configure rotation
+                const axisContents = (
+                  <Group className='bottom-axis' width={dimensions[0]}>
+                    {props.ticks.map((tick, i, propsTicks) => {
+                      // when using LogScale show major ticks values only
+                      const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
+                      const tickLength = showTick === 'block' ? 16 : defaultTickLength
+                      const to = { x: tick.to.x, y: tickLength }
+                      const textWidth = getTextWidth(tick.formattedValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                      const limitedWidth = 100 / propsTicks.length
+                      //reset rotations by updating config
+                      config.yAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
+                      config.xAxis.tickRotation = config.isResponsiveTicks && config.orientation === 'vertical' ? 0 : config.xAxis.tickRotation
+                      //configure rotation
 
-                    const tickRotation = config.isResponsiveTicks && areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : -Number(config.runtime.xAxis.tickRotation)
+                      const tickRotation = config.isResponsiveTicks && areTicksTouching ? -Number(config.xAxis.maxTickRotation) || -90 : -Number(config.runtime.xAxis.tickRotation)
 
-                    const axisHeight = textWidth * Math.sin(tickRotation * -1 * (Math.PI / 180)) + 25;
+                      const axisHeight = textWidth * Math.sin(tickRotation * -1 * (Math.PI / 180)) + 25
 
-                    if(axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
+                      if (axisHeight > axisMaxHeight) axisMaxHeight = axisHeight
 
-                    return (
-                      <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                        {!config.xAxis.hideTicks && <Line from={tick.from} to={orientation === 'horizontal' && config.useLogScale ? to : tick.to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' && config.useLogScale ? 1.3 : 1} />}
-                        {!config.xAxis.hideLabel && (
-                          <Text
-                            dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
-                            display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
-                            x={tick.to.x}
-                            y={tick.to.y}
-                            angle={tickRotation}
-                            verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
-                            textAnchor={tickRotation ? 'end' : 'middle'}
-                            width={areTicksTouching && !config.isResponsiveTicks && !Number(config[section].tickRotation) ? limitedWidth : undefined}
-                            fill={config.xAxis.tickLabelColor}
-                          >
-                            {tick.formattedValue}
-                          </Text>
-                        )}
-                      </Group>
-                    )
-                  })}
-                  {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                  <Text
-                    x={axisCenter}
-                    y={axisMaxHeight + 20}
-                    textAnchor='middle'
-                    verticalAnchor='start'
-                    fontWeight='bold'
-                    fill={config.xAxis.labelColor}
-                  >
-                    {props.label}
-                  </Text>
-                </Group>
+                      return (
+                        <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                          {!config.xAxis.hideTicks && <Line from={tick.from} to={orientation === 'horizontal' && config.useLogScale ? to : tick.to} stroke={config.xAxis.tickColor} strokeWidth={showTick === 'block' && config.useLogScale ? 1.3 : 1} />}
+                          {!config.xAxis.hideLabel && (
+                            <Text
+                              dy={config.orientation === 'horizontal' && config.useLogScale ? 8 : 0}
+                              display={config.orientation === 'horizontal' && config.useLogScale ? showTick : 'block'}
+                              x={tick.to.x}
+                              y={tick.to.y}
+                              angle={tickRotation}
+                              verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
+                              textAnchor={tickRotation ? 'end' : 'middle'}
+                              width={areTicksTouching && !config.isResponsiveTicks && !Number(config[section].tickRotation) ? limitedWidth : undefined}
+                              fill={config.xAxis.tickLabelColor}
+                            >
+                              {tick.formattedValue}
+                            </Text>
+                          )}
+                        </Group>
+                      )
+                    })}
+                    {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
+                    <Text x={axisCenter} y={axisMaxHeight + 20} textAnchor='middle' verticalAnchor='start' fontWeight='bold' fill={config.xAxis.labelColor}>
+                      {props.label}
+                    </Text>
+                  </Group>
+                )
 
-                if(svgRef.current) svgRef.current.setAttribute('height',(Number(height) + Number(axisMaxHeight) + (runtime.xAxis.label ? 50 : 0)) + 'px')
+                if (svgRef.current) svgRef.current.setAttribute('height', Number(height) + Number(axisMaxHeight) + (runtime.xAxis.label ? 50 : 0) + 'px')
 
                 return axisContents
               }}
@@ -585,7 +590,7 @@ const LinearChart = props => {
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') || visualizationType === 'Combo') && (
             <AreaChartStacked xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
           )}
-          {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
+          {(visualizationType === 'Bar' || visualizationType === 'Combo' || checkLineToBarGraph()) && (
             <BarChart
               xScale={xScale}
               yScale={yScale}
@@ -604,7 +609,7 @@ const LinearChart = props => {
               chartRef={svgRef}
             />
           )}
-          {(visualizationType === 'Line' || visualizationType === 'Combo') && (
+          {((visualizationType === 'Line' && !checkLineToBarGraph()) || visualizationType === 'Combo') && (
             <LineChart
               xScale={xScale}
               yScale={yScale}
@@ -667,7 +672,7 @@ const LinearChart = props => {
           {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && !isHorizontal && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
-          {visualizationType !== 'Bar' && visualizationType !== 'Paired Bar' && visualizationType !== 'Box Plot' && visualizationType !== 'Area Chart' && visualizationType !== 'Scatter Plot' && visualizationType !== 'Deviation Bar' && visualizationType !== 'Forecasting' && (
+          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(visualizationType) && !checkLineToBarGraph() && (
             <>
               <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
             </>
@@ -725,7 +730,7 @@ const LinearChart = props => {
             })}
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
           {/* prettier-ignore */}
-          {config.visualizationType !== 'Bar' && config.visualizationType !== 'Combo' && (
+          {(config.visualizationType !== 'Bar' || !checkLineToBarGraph()) && config.visualizationType !== 'Combo' && (
             <Regions xScale={xScale} handleTooltipClick={handleTooltipClick} handleTooltipMouseOff={handleTooltipMouseOff} handleTooltipMouseOver={handleTooltipMouseOver} showTooltip={showTooltip} hideTooltip={hideTooltip} tooltipData={tooltipData} yMax={yMax} width={width} />
           )}
           {chartHasTooltipGuides && showTooltip && tooltipData && config.visual.verticalHoverLine && (
@@ -743,12 +748,12 @@ const LinearChart = props => {
               {config.chartMessage.noData}
             </Text>
           )}
-          {config.visualizationType === 'Bar' && config.tooltips.singleSeries && config.visual.horizontalHoverLine && (
+          {(config.visualizationType === 'Bar' || checkLineToBarGraph()) && config.tooltips.singleSeries && config.visual.horizontalHoverLine && (
             <Group key='tooltipLine-horizontal' className='horizontal-tooltip-line' left={config.yAxis.size ? config.yAxis.size : 0}>
               <Line from={{ x: 0, y: point.y }} to={{ x: xMax, y: point.y }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='horizontal-tooltip-line' />
             </Group>
           )}
-          {config.visualizationType === 'Bar' && config.tooltips.singleSeries && config.visual.verticalHoverLine && (
+          {(config.visualizationType === 'Bar' || checkLineToBarGraph()) && config.tooltips.singleSeries && config.visual.verticalHoverLine && (
             <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
               <Line from={{ x: point.x, y: 0 }} to={{ x: point.x, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
             </Group>

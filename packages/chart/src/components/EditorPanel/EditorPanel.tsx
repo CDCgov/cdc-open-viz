@@ -26,6 +26,9 @@ import useRightAxis from '../../hooks/useRightAxis'
 import WarningImage from '../../images/warning.svg'
 import useMinMax from '../../hooks/useMinMax'
 
+// local helpers
+import { isConvertLineToBarGraph } from '../../helpers/isConvertLineToBarGraph'
+
 import { type ChartContext } from '../../types/ChartContext'
 import { type ChartConfig } from '../../types/ChartConfig'
 
@@ -48,12 +51,16 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   const hasComboLineSeries = isCombo && lineSeriesExists
   const hasComboBarSeries = isCombo && barSeriesExists
 
+  const checkLineToBarGraph = () => {
+    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
+  }
+
   const getColumnOptions = () => {
     return _.uniq(_.flatMap(data, _.keys))
   }
 
   const getTypeOptions = () => {
-    return config.visualizationType === 'Line' || hasComboLineSeries ? ['effect', 'suppression'] : ['suppression']
+    return (config.visualizationType === 'Line' && !checkLineToBarGraph()) || hasComboLineSeries ? ['effect', 'suppression'] : ['suppression']
   }
 
   const lineCodes = {
@@ -64,7 +71,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   }
 
   const getStyleOptions = type => {
-    if (config.visualizationType === 'Line' || isCombo) {
+    if ((config.visualizationType === 'Line' && !checkLineToBarGraph()) || isCombo) {
       const options = Object.keys(lineCodes)
       if (type === 'suppression') {
         return options.slice(0, -1)
@@ -75,7 +82,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   }
 
   const getSymbolOptions = () => {
-    if (config.visualizationType === 'Bar' || hasComboBarSeries) {
+    if ((config.visualizationType === 'Bar' && checkLineToBarGraph()) || hasComboBarSeries) {
       return Object.keys(symbolCodes)
     }
   }
@@ -381,7 +388,7 @@ const EditorPanel = () => {
       newSeries = config.series.map(series => {
         return {
           ...series,
-          type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
+          type: config.visualizationType === 'Combo' || isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph) ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
           axis: 'Left'
         }
       })
@@ -447,6 +454,12 @@ const EditorPanel = () => {
     }
     if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 6
+    }
+    // DEV-8008 - Remove Bar styling when Line is converted to Bar
+    if (updatedConfig.visualizationType === 'Line') {
+      updatedConfig.visualizationSubType = 'regular'
+      updatedConfig.barStyle = 'flat'
+      updatedConfig.isLollipopChart = false
     }
   }
 
