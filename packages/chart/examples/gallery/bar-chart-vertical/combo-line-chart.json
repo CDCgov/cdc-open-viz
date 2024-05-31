@@ -11,7 +11,6 @@
   "animate": false,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
-  "lineDatapointColor": "Same as Line",
   "barHasBorder": "false",
   "isLollipopChart": false,
   "lollipopShape": "circle",
@@ -28,29 +27,14 @@
     "left": 5,
     "right": 5
   },
-  "preliminaryData": [
-    {
-      "type": "suppression",
-      "seriesKey": "",
-      "label": "Suppressed",
-      "column": "",
-      "value": "110",
-      "style": "",
-      "displayTooltip": true,
-      "displayLegend": true,
-      "displayTable": true,
-      "symbol": "Section Symbol",
-      "iconCode": "§",
-      "lineCode": ""
-    }
-  ],
+  "suppressedData": [],
   "yAxis": {
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": 50,
-    "gridLines": false,
+    "size": "68",
+    "gridLines": true,
     "enablePadding": false,
     "min": "",
     "max": "",
@@ -58,7 +42,7 @@
     "tickLabelColor": "#333",
     "tickColor": "#333",
     "rightHideAxis": true,
-    "rightAxisSize": 0,
+    "rightAxisSize": 50,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
     "rightAxisLabelColor": "#333",
@@ -66,604 +50,9 @@
     "rightAxisTickColor": "#333",
     "numTicks": "",
     "axisPadding": 0,
-    "scalePadding": 10,
     "tickRotation": 0,
     "anchors": [],
-    "shoMissingDataLabel": true,
-    "showMissingDataLine": true,
-    "type": "chart",
-    "debugSvg": false,
-    "chartMessage": {
-      "noData": "No Data Available"
-    },
-    "title": "Combo Bar-Line Chart",
-    "showTitle": true,
-    "showDownloadMediaButton": false,
-    "theme": "theme-purple",
-    "animate": false,
-    "fontSize": "medium",
-    "lineDatapointStyle": "hover",
-    "lineDatapointColor": "Same as Line",
-    "barHasBorder": "false",
-    "isLollipopChart": false,
-    "lollipopShape": "circle",
-    "lollipopColorStyle": "two-tone",
-    "visualizationSubType": "regular",
-    "barStyle": "",
-    "roundingStyle": "standard",
-    "tipRounding": "top",
-    "isResponsiveTicks": false,
-    "general": {
-      "showDownloadButton": false
-    },
-    "padding": {
-      "left": 5,
-      "right": 5
-    },
-    "preliminaryData": [
-      {
-        "type": "suppression",
-        "seriesKey": "",
-        "label": "Suppressed",
-        "column": "",
-        "value": "110",
-        "style": "",
-        "displayTooltip": true,
-        "displayLegend": true,
-        "displayTable": true,
-        "symbol": "Section Symbol",
-        "iconCode": "§",
-        "lineCode": ""
-      }
-    ],
-    "yAxis": {
-      "hideAxis": false,
-      "displayNumbersOnBar": false,
-      "hideLabel": false,
-      "hideTicks": false,
-      "size": "68",
-      "gridLines": true,
-      "enablePadding": false,
-      "min": "",
-      "max": "",
-      "labelColor": "#333",
-      "tickLabelColor": "#333",
-      "tickColor": "#333",
-      "rightHideAxis": true,
-      "rightAxisSize": 50,
-      "rightLabel": "",
-      "rightLabelOffsetSize": 0,
-      "rightAxisLabelColor": "#333",
-      "rightAxisTickLabelColor": "#333",
-      "rightAxisTickColor": "#333",
-      "numTicks": "",
-      "axisPadding": 0,
-      "scalePadding": 10,
-      "tickRotation": 0,
-      "anchors": [],
-      "shoMissingDataLabel": true,
-      "showMissingDataLine": true,
-      "label": "Y-Axis Label Example"
-    },
-    "boxplot": {
-      "plots": [],
-      "borders": "true",
-      "firstQuartilePercentage": 25,
-      "thirdQuartilePercentage": 75,
-      "boxWidthPercentage": 40,
-      "plotOutlierValues": false,
-      "plotNonOutlierValues": true,
-      "legend": {
-        "showHowToReadText": false,
-        "howToReadText": ""
-      },
-      "labels": {
-        "q1": "Lower Quartile",
-        "q2": "q2",
-        "q3": "Upper Quartile",
-        "q4": "q4",
-        "minimum": "Minimum",
-        "maximum": "Maximum",
-        "mean": "Mean",
-        "median": "Median",
-        "sd": "Standard Deviation",
-        "iqr": "Interquartile Range",
-        "total": "Total",
-        "outliers": "Outliers",
-        "values": "Values"
-      }
-    },
-    "topAxis": {
-      "hasLine": false
-    },
-    "isLegendValue": false,
-    "barThickness": 0.35,
-    "barHeight": 25,
-    "barSpace": 15,
-    "heights": {
-      "vertical": 300,
-      "horizontal": 810
-    },
-    "xAxis": {
-      "sortDates": false,
-      "anchors": [],
-      "type": "date",
-      "showTargetLabel": true,
-      "targetLabel": "Target",
-      "hideAxis": false,
-      "hideLabel": false,
-      "hideTicks": false,
-      "size": "78",
-      "tickRotation": "25",
-      "min": "",
-      "max": "",
-      "labelColor": "#333",
-      "tickLabelColor": "#333",
-      "tickColor": "#333",
-      "numTicks": "",
-      "labelOffset": 65,
-      "axisPadding": 0,
-      "target": 0,
-      "maxTickRotation": 0,
-      "showSuppressedSymbol": true,
-      "showSuppressedLine": true,
-      "shoMissingDataLabel": true,
-      "showMissingDataLine": true,
-      "dataKey": "Date",
-      "label": "X-Axis Example Label",
-      "dateParseFormat": "%d/%m/%Y",
-      "dateDisplayFormat": "%d/%m/%Y",
-      "tickWidthMax": 31,
-      "padding": 6
-    },
-    "table": {
-      "label": "Data Table",
-      "expanded": true,
-      "limitHeight": false,
-      "height": "",
-      "caption": "",
-      "showDownloadUrl": false,
-      "showDataTableLink": true,
-      "indexLabel": "",
-      "download": true,
-      "showVertical": false,
-      "dateDisplayFormat": "",
-      "show": true
-    },
-    "orientation": "horizontal",
-    "color": "pinkpurple",
-    "columns": {},
-    "legend": {
-      "hide": false,
-      "behavior": "highlight",
-      "axisAlign": true,
-      "singleRow": false,
-      "colorCode": "",
-      "reverseLabelOrder": false,
-      "description": "",
-      "dynamicLegend": false,
-      "dynamicLegendDefaultText": "Show All",
-      "dynamicLegendItemLimit": 5,
-      "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
-      "dynamicLegendChartMessage": "Select Options from the Legend",
-      "lineMode": false,
-      "verticalSorted": false,
-      "highlightOnHover": false,
-      "hideSuppressedLabels": false,
-      "seriesHighlight": [],
-      "position": "right",
-      "label": "Data Type"
-    },
-    "brush": {
-      "height": 25,
-      "active": false,
-      "data": [
-        {
-          "Date": "1/15/2016",
-          "Data 1": "1000",
-          "Data 2": "110",
-          "Data 3": "100",
-          "Data 4": "90",
-          "Monthly-Goal": "100"
-        },
-        {
-          "Date": "2/15/2016",
-          "Data 1": "100",
-          "Data 2": "110",
-          "Data 3": "100",
-          "Data 4": "100",
-          "Monthly-Goal": "100"
-        },
-        {
-          "Date": "3/15/2016",
-          "Data 1": "80",
-          "Data 2": "90",
-          "Data 3": "100",
-          "Data 4": "120",
-          "Monthly-Goal": "110"
-        },
-        {
-          "Date": "4/15/2016",
-          "Data 1": "80",
-          "Data 2": "90",
-          "Data 3": "110",
-          "Data 4": "120",
-          "Monthly-Goal": "110"
-        },
-        {
-          "Date": "5/15/2016",
-          "Data 1": "70",
-          "Data 2": "90",
-          "Data 3": "110",
-          "Data 4": "130",
-          "Monthly-Goal": "120"
-        },
-        {
-          "Date": "6/15/2016",
-          "Data 1": "100",
-          "Data 2": "120",
-          "Data 3": "120",
-          "Data 4": "130",
-          "Monthly-Goal": "120"
-        },
-        {
-          "Date": "7/15/2016",
-          "Data 1": "110",
-          "Data 2": "140",
-          "Data 3": "120",
-          "Data 4": "130",
-          "Monthly-Goal": "130"
-        },
-        {
-          "Date": "8/15/2016",
-          "Data 1": "110",
-          "Data 2": "130",
-          "Data 3": "120",
-          "Data 4": "140",
-          "Monthly-Goal": "130"
-        },
-        {
-          "Date": "9/15/2016",
-          "Data 1": "120",
-          "Data 2": "130",
-          "Data 3": "120",
-          "Data 4": "150",
-          "Monthly-Goal": "140"
-        }
-      ]
-    },
-    "exclusions": {
-      "active": false,
-      "keys": []
-    },
-    "palette": "qualitative-soft",
-    "isPaletteReversed": false,
-    "twoColor": {
-      "palette": "monochrome-1",
-      "isPaletteReversed": false
-    },
-    "labels": false,
-    "dataFormat": {
-      "commas": false,
-      "prefix": "",
-      "suffix": "",
-      "abbreviated": false,
-      "bottomSuffix": "",
-      "bottomPrefix": "",
-      "bottomAbbreviated": false
-    },
-    "confidenceKeys": {},
-    "visual": {
-      "border": true,
-      "accent": true,
-      "background": true,
-      "verticalHoverLine": false,
-      "horizontalHoverLine": false
-    },
-    "useLogScale": false,
-    "filterBehavior": "Filter Change",
-    "highlightedBarValues": [],
-    "series": [
-      {
-        "dataKey": "Data 2",
-        "type": "Bar",
-        "axis": "Left",
-        "tooltip": true
-      },
-      {
-        "dataKey": "Data 3",
-        "type": "Bar",
-        "axis": "Left",
-        "tooltip": true
-      },
-      {
-        "dataKey": "Data 4",
-        "type": "Bar",
-        "axis": "Left",
-        "tooltip": true
-      }
-    ],
-    "tooltips": {
-      "opacity": 90,
-      "singleSeries": false,
-      "dateDisplayFormat": ""
-    },
-    "forestPlot": {
-      "startAt": 0,
-      "colors": {
-        "line": "",
-        "shape": ""
-      },
-      "lineOfNoEffect": {
-        "show": true
-      },
-      "type": "",
-      "pooledResult": {
-        "diamondHeight": 5,
-        "column": ""
-      },
-      "estimateField": "",
-      "estimateRadius": "",
-      "shape": "",
-      "rowHeight": 20,
-      "description": {
-        "show": true,
-        "text": "description",
-        "location": 0
-      },
-      "result": {
-        "show": true,
-        "text": "result",
-        "location": 100
-      },
-      "radius": {
-        "min": 1,
-        "max": 8,
-        "scalingColumn": ""
-      },
-      "regression": {
-        "lower": 0,
-        "upper": 0,
-        "estimateField": 0
-      },
-      "leftWidthOffset": 0,
-      "rightWidthOffset": 0,
-      "showZeroLine": false,
-      "leftLabel": "",
-      "rightLabel": "",
-      "hideDateCategoryCol": false
-    },
-    "area": {
-      "isStacked": false
-    },
-    "sankey": {
-      "title": {
-        "defaultColor": "black"
-      },
-      "iterations": 1,
-      "rxValue": 0.9,
-      "overallSize": {
-        "width": 900,
-        "height": 700
-      },
-      "margin": {
-        "margin_y": 25,
-        "margin_x": 0
-      },
-      "nodeSize": {
-        "nodeWidth": 26,
-        "nodeHeight": 40
-      },
-      "nodePadding": 55,
-      "nodeFontColor": "black",
-      "nodeColor": {
-        "default": "#ff8500",
-        "inactive": "#808080"
-      },
-      "linkColor": {
-        "default": "#ffc900",
-        "inactive": "#D3D3D3"
-      },
-      "opacity": {
-        "nodeOpacityDefault": 1,
-        "nodeOpacityInactive": 0.1,
-        "LinkOpacityDefault": 1,
-        "LinkOpacityInactive": 0.1
-      },
-      "storyNodeFontColor": "#006778",
-      "storyNodeText": [],
-      "nodeValueStyle": {
-        "textBefore": "(",
-        "textAfter": ")"
-      },
-      "data": []
-    },
-    "suppressedData": [],
-    "height": "332",
-    "data": [
-      {
-        "Date": "1/15/2016",
-        "Data 1": "$1,000",
-        "Data 2": "",
-        "Data 3": "100",
-        "Data 4": "90",
-        "Monthly-Goal": "100"
-      },
-      {
-        "Date": "2/15/2016",
-        "Data 1": "100",
-        "Data 3": "100",
-        "Data 4": "100",
-        "Monthly-Goal": "100"
-      },
-      {
-        "Date": "3/15/2016",
-        "Data 1": "80",
-        "Data 2": null,
-        "Data 3": "100",
-        "Data 4": "120",
-        "Monthly-Goal": "110"
-      },
-      {
-        "Date": "4/15/2016",
-        "Data 1": "80",
-        "Data 2": "ABC",
-        "Data 3": "110",
-        "Data 4": "120",
-        "Monthly-Goal": "110"
-      },
-      {
-        "Date": "5/15/2016",
-        "Data 1": "70",
-        "Data 2": "0",
-        "Data 3": "110",
-        "Data 4": "130",
-        "Monthly-Goal": "120"
-      },
-      {
-        "Date": "6/15/2016",
-        "Data 1": "100",
-        "Data 2": "120",
-        "Data 3": "120",
-        "Data 4": "130",
-        "Monthly-Goal": "120"
-      },
-      {
-        "Date": "7/15/2016",
-        "Data 1": "110",
-        "Data 2": "140",
-        "Data 3": "120",
-        "Data 4": "130",
-        "Monthly-Goal": "130"
-      },
-      {
-        "Date": "8/15/2016",
-        "Data 1": "110",
-        "Data 2": "130",
-        "Data 3": "120",
-        "Data 4": "140",
-        "Monthly-Goal": "130"
-      },
-      {
-        "Date": "9/15/2016",
-        "Data 1": "120",
-        "Data 2": "130",
-        "Data 3": "120",
-        "Data 4": "150",
-        "Monthly-Goal": "140"
-      }
-    ],
-    "visualizationType": "Bar",
-    "filters": [],
-    "validated": 4.23,
-    "dynamicMarginTop": 0,
-    "version": "4.24.4",
-    "runtime": {
-      "seriesLabels": {
-        "Data 2": "Data 2",
-        "Data 3": "Data 3",
-        "Data 4": "Data 4"
-      },
-      "seriesLabelsAll": ["Data 2", "Data 3", "Data 4"],
-      "originalXAxis": {
-        "sortDates": false,
-        "anchors": [],
-        "type": "date",
-        "showTargetLabel": true,
-        "targetLabel": "Target",
-        "hideAxis": false,
-        "hideLabel": false,
-        "hideTicks": false,
-        "size": "78",
-        "tickRotation": "25",
-        "min": "",
-        "max": "",
-        "labelColor": "#333",
-        "tickLabelColor": "#333",
-        "tickColor": "#333",
-        "numTicks": "",
-        "labelOffset": 65,
-        "axisPadding": 0,
-        "target": 0,
-        "maxTickRotation": 0,
-        "showSuppressedSymbol": true,
-        "showSuppressedLine": true,
-        "shoMissingDataLabel": true,
-        "showMissingDataLine": true,
-        "dataKey": "Date",
-        "label": "X-Axis Example Label",
-        "dateParseFormat": "%d/%m/%Y",
-        "dateDisplayFormat": "%d/%m/%Y",
-        "tickWidthMax": 31,
-        "padding": 6
-      },
-      "seriesKeys": ["Data 2", "Data 3", "Data 4"],
-      "xAxis": {
-        "hideAxis": false,
-        "displayNumbersOnBar": false,
-        "hideLabel": false,
-        "hideTicks": false,
-        "size": "68",
-        "gridLines": true,
-        "enablePadding": false,
-        "min": "",
-        "max": "",
-        "labelColor": "#333",
-        "tickLabelColor": "#333",
-        "tickColor": "#333",
-        "rightHideAxis": true,
-        "rightAxisSize": 50,
-        "rightLabel": "",
-        "rightLabelOffsetSize": 0,
-        "rightAxisLabelColor": "#333",
-        "rightAxisTickLabelColor": "#333",
-        "rightAxisTickColor": "#333",
-        "numTicks": "",
-        "axisPadding": 0,
-        "scalePadding": 10,
-        "tickRotation": 0,
-        "anchors": [],
-        "shoMissingDataLabel": true,
-        "showMissingDataLine": true,
-        "label": "Y-Axis Label Example"
-      },
-      "yAxis": {
-        "sortDates": false,
-        "anchors": [],
-        "type": "date",
-        "showTargetLabel": true,
-        "targetLabel": "Target",
-        "hideAxis": false,
-        "hideLabel": false,
-        "hideTicks": false,
-        "size": "78",
-        "tickRotation": "25",
-        "min": "",
-        "max": "",
-        "labelColor": "#333",
-        "tickLabelColor": "#333",
-        "tickColor": "#333",
-        "numTicks": "",
-        "labelOffset": 65,
-        "axisPadding": 0,
-        "target": 0,
-        "maxTickRotation": 0,
-        "showSuppressedSymbol": true,
-        "showSuppressedLine": true,
-        "shoMissingDataLabel": true,
-        "showMissingDataLine": true,
-        "dataKey": "Date",
-        "label": "X-Axis Example Label",
-        "dateParseFormat": "%d/%m/%Y",
-        "dateDisplayFormat": "%d/%m/%Y",
-        "tickWidthMax": 31,
-        "padding": 6
-      },
-      "horizontal": false,
-      "uniqueId": 1716990340422,
-      "editorErrorMessage": ""
-    },
-    "labelPlacement": "Below Bar"
+    "label": "Y-Axis Label Example"
   },
   "boxplot": {
     "plots": [],
@@ -702,7 +91,7 @@
   "barSpace": 15,
   "heights": {
     "vertical": 300,
-    "horizontal": 1004.4
+    "horizontal": 750
   },
   "xAxis": {
     "sortDates": false,
@@ -725,16 +114,11 @@
     "axisPadding": 0,
     "target": 0,
     "maxTickRotation": 0,
-    "showSuppressedSymbol": true,
-    "showSuppressedLine": false,
-    "shoMissingDataLabel": true,
-    "showMissingDataLine": true,
     "dataKey": "Date",
     "label": "X-Axis Example Label",
     "dateParseFormat": "%d/%m/%Y",
     "dateDisplayFormat": "%d/%m/%Y",
-    "tickWidthMax": 91,
-    "padding": 6
+    "tickWidthMax": 91
   },
   "table": {
     "label": "Data Table",
@@ -747,7 +131,6 @@
     "indexLabel": "",
     "download": true,
     "showVertical": false,
-    "dateDisplayFormat": "",
     "show": true
   },
   "orientation": "vertical",
@@ -756,7 +139,6 @@
   "legend": {
     "hide": false,
     "behavior": "highlight",
-    "axisAlign": true,
     "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
@@ -768,15 +150,11 @@
     "dynamicLegendChartMessage": "Select Options from the Legend",
     "lineMode": false,
     "verticalSorted": false,
-    "highlightOnHover": false,
-    "hideSuppressedLabels": false,
-    "seriesHighlight": [],
     "position": "right",
     "label": "Data Type"
   },
   "brush": {
     "height": 25,
-    "active": false,
     "data": [
       {
         "Date": "1/15/2016",
@@ -850,7 +228,8 @@
         "Data 4": "150",
         "Monthly-Goal": "140"
       }
-    ]
+    ],
+    "active": false
   },
   "exclusions": {
     "active": false,
@@ -862,7 +241,7 @@
     "palette": "monochrome-1",
     "isPaletteReversed": false
   },
-  "labels": false,
+  "labels": true,
   "dataFormat": {
     "commas": false,
     "prefix": "",
@@ -885,28 +264,21 @@
   "highlightedBarValues": [],
   "series": [
     {
+      "dataKey": "Monthly-Goal",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
       "dataKey": "Data 2",
-      "type": "Bar",
-      "axis": "Left",
-      "tooltip": true
-    },
-    {
-      "dataKey": "Data 3",
-      "type": "Bar",
-      "axis": "Left",
-      "tooltip": true
-    },
-    {
-      "dataKey": "Data 4",
-      "type": "Bar",
+      "type": "Line",
       "axis": "Left",
       "tooltip": true
     }
   ],
   "tooltips": {
     "opacity": 90,
-    "singleSeries": false,
-    "dateDisplayFormat": ""
+    "singleSeries": false
   },
   "forestPlot": {
     "startAt": 0,
@@ -949,62 +321,19 @@
     "leftWidthOffset": 0,
     "rightWidthOffset": 0,
     "showZeroLine": false,
+    "hideDateCategoryCol": false,
     "leftLabel": "",
-    "rightLabel": "",
-    "hideDateCategoryCol": false
+    "rightLabel": ""
   },
   "area": {
     "isStacked": false
   },
-  "sankey": {
-    "title": {
-      "defaultColor": "black"
-    },
-    "iterations": 1,
-    "rxValue": 0.9,
-    "overallSize": {
-      "width": 900,
-      "height": 700
-    },
-    "margin": {
-      "margin_y": 25,
-      "margin_x": 0
-    },
-    "nodeSize": {
-      "nodeWidth": 26,
-      "nodeHeight": 40
-    },
-    "nodePadding": 55,
-    "nodeFontColor": "black",
-    "nodeColor": {
-      "default": "#ff8500",
-      "inactive": "#808080"
-    },
-    "linkColor": {
-      "default": "#ffc900",
-      "inactive": "#D3D3D3"
-    },
-    "opacity": {
-      "nodeOpacityDefault": 1,
-      "nodeOpacityInactive": 0.1,
-      "LinkOpacityDefault": 1,
-      "LinkOpacityInactive": 0.1
-    },
-    "storyNodeFontColor": "#006778",
-    "storyNodeText": [],
-    "nodeValueStyle": {
-      "textBefore": "(",
-      "textAfter": ")"
-    },
-    "data": []
-  },
-  "suppressedData": [],
   "height": "332",
   "data": [
     {
       "Date": "1/15/2016",
       "Data 1": "$1,000",
-      "Data 2": "",
+      "Data 2": "110",
       "Data 3": "100",
       "Data 4": "90",
       "Monthly-Goal": "100"
@@ -1012,6 +341,7 @@
     {
       "Date": "2/15/2016",
       "Data 1": "100",
+      "Data 2": "110",
       "Data 3": "100",
       "Data 4": "100",
       "Monthly-Goal": "100"
@@ -1019,7 +349,7 @@
     {
       "Date": "3/15/2016",
       "Data 1": "80",
-      "Data 2": null,
+      "Data 2": "90",
       "Data 3": "100",
       "Data 4": "120",
       "Monthly-Goal": "110"
@@ -1027,7 +357,7 @@
     {
       "Date": "4/15/2016",
       "Data 1": "80",
-      "Data 2": "ABC",
+      "Data 2": "90",
       "Data 3": "110",
       "Data 4": "120",
       "Monthly-Goal": "110"
@@ -1035,7 +365,7 @@
     {
       "Date": "5/15/2016",
       "Data 1": "70",
-      "Data 2": "0",
+      "Data 2": "90",
       "Data 3": "110",
       "Data 4": "130",
       "Monthly-Goal": "120"
@@ -1073,9 +403,8 @@
       "Monthly-Goal": "140"
     }
   ],
-  "visualizationType": "Bar",
+  "visualizationType": "Line",
   "filters": [],
   "validated": 4.23,
-  "dynamicMarginTop": 0,
-  "version": "4.24.4"
+  "dynamicMarginTop": 0
 }
