@@ -15,6 +15,7 @@ import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within } from '@storybook/testing-library'
 import ToggleExampleConfig from './_mock/toggle-example.json'
 import _ from 'lodash'
+import FilteredTextDashboard from './_mock/filtered-text.json'
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -22,6 +23,13 @@ const meta: Meta<typeof Dashboard> = {
 }
 
 type Story = StoryObj<typeof Dashboard>
+
+export const Dashboard_Filtered_text: Story = {
+  args: {
+    config: FilteredTextDashboard,
+    isEditor: true
+  }
+}
 
 export const Example_1: Story = {
   args: {
