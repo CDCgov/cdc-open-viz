@@ -50,22 +50,59 @@ const PanelGeneral: FC<PanelProps> = props => {
           <CheckBox value={config.yAxis.displayNumbersOnBar} section='yAxis' fieldName='displayNumbersOnBar' label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
         ) : (
           visHasLabelOnData() && (
-            <CheckBox
-              value={config.labels}
-              fieldName='labels'
-              label='Display label on data'
-              updateField={updateField}
-              tooltip={
-                <Tooltip style={{ textTransform: 'none' }}>
-                  <Tooltip.Target>
-                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                  </Tooltip.Target>
-                  <Tooltip.Content>
-                    <p>Selecting this option will not hide the display of "zero value", "suppressed data", or "no data" indicators on the chart (if applicable).</p>
-                  </Tooltip.Content>
-                </Tooltip>
-              }
-            />
+            <>
+              <CheckBox
+                value={config.labels}
+                fieldName='labels'
+                label='Display label on data'
+                updateField={updateField}
+                tooltip={
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>Selecting this option will not hide the display of "zero value", "suppressed data", or "missing data" indicators on the chart (if applicable).</p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                }
+              />
+              <CheckBox
+                tooltip={
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p> Selecting this option will display "N/A" on the Date/Category Axis as an indication of missing or undefined data values.</p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                }
+                value={config.xAxis.shoMissingDataLabel}
+                section='xAxis'
+                fieldName='shoMissingDataLabel'
+                label='Display "Missing Data" Label'
+                updateField={updateField}
+              />
+
+              <CheckBox
+                tooltip={
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>Selecting this option will display "suppressed data symbol" on the Date/Category Axis where suppressed data values are indicated in the Data Series, unless a different symbol was chosen from the data series (e.g., suppression symbol) menu.</p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                }
+                value={config.xAxis.showSuppressedSymbol}
+                section='xAxis'
+                fieldName='showSuppressedSymbol'
+                label='Display "suppressed data" symbol'
+                updateField={updateField}
+              />
+            </>
           )
         )}
         {visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
