@@ -14,6 +14,7 @@ import EditorPanel from './components/EditorPanel'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import Layout from '@cdc/core/components/Layout'
 
 // external
 import parse from 'html-react-parser'
@@ -31,7 +32,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
   let { title, filters } = config
   const fontSize = config.fontSize === 'small' ? '16px' : config.fontSize === 'medium' ? '22px' : '27px'
 
-  const { contentClasses } = useDataVizClasses(config)
+  const { contentClasses, innerContainerClasses } = useDataVizClasses(config)
 
   // Default Functions
 
@@ -118,27 +119,29 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
   if (loading === false) {
     let body = (
       <>
-        <Title classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
-        <div className={contentClasses.join(' ')}>
-          <div className='cove-component__content-wrap'>
-            {filterByTextColumn()
-              .slice(0, 1)
-              .map((el, i) => (
-                <p style={{ fontSize }} key={i}>
-                  {' '}
-                  {parse(el[config.textColumn] || '')}{' '}
-                </p>
-              ))}
+        <Layout.Responsive isEditor={isEditor}>
+          <div className={`cove-component__content no-borders`}>
+            <Title classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
+            <div className={`${contentClasses.join(' ')} body`}>
+              {filterByTextColumn()
+                .slice(0, 1)
+                .map((el, i) => (
+                  <p style={{ fontSize }} key={i}>
+                    {' '}
+                    {parse(el[config.textColumn] || '')}{' '}
+                  </p>
+                ))}
+            </div>
           </div>
-        </div>
+        </Layout.Responsive>
       </>
     )
 
     content = (
-      <div className={`cove ${config.theme} `}>
-        {isEditor && <EditorPanel>{body}</EditorPanel>}
-        {!isEditor && body}
-      </div>
+      <>
+        {isEditor && <EditorPanel />}
+        {body}
+      </>
     )
   }
   const values = {
@@ -153,7 +156,11 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
 
   return (
     <ErrorBoundary component='CdcFilteredText'>
-      <ConfigContext.Provider value={values}>{content}</ConfigContext.Provider>
+      <ConfigContext.Provider value={values}>
+        <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
+          {content}
+        </Layout.VisualizationWrapper>
+      </ConfigContext.Provider>
     </ErrorBoundary>
   )
 }

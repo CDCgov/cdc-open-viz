@@ -46,7 +46,7 @@ const LineChart = (props: LineChartProps) => {
   let data = transformedData
   let tableD = tableData
   // if brush on use brush data and clean
-  if (brushConfig.data.length) {
+  if (brushConfig.data.length > 0 && config.brush.active) {
     data = clean(brushConfig.data)
     tableD = clean(brushConfig.data)
   }
