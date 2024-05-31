@@ -27,7 +27,19 @@ type Story = StoryObj<typeof Dashboard>
 export const Dashboard_Filtered_text: Story = {
   args: {
     config: FilteredTextDashboard,
-    isEditor: true
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+    // play is running before full rendering is complete so sleep function
+    // is needed to delay the execution.
+    // possible related bug: https://github.com/storybookjs/storybook/issues/18258
+    await sleep(1000)
+    const countryFilter = canvas.getByLabelText('Country', { selector: 'select' })
+    await user.selectOptions(countryFilter, ['Nauru'])
+    await sleep(3000)
+    await user.selectOptions(countryFilter, ['Sweden'])
   }
 }
 
