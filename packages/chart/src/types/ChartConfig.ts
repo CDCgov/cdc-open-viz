@@ -14,6 +14,7 @@ import { Region } from '@cdc/core/types/Region'
 import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 
+export type ViewportSize = 'sm' | 'xs' | 'xxs' | 'lg'
 export type ChartColumns = Record<string, Column>
 
 type DataFormat = {

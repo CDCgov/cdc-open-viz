@@ -5,7 +5,7 @@ import Button from '@cdc/core/components/elements/Button'
 import useLegendClasses from '../../hooks/useLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { handleLineType } from '../../helpers/handleLineType'
-import { useBarChart } from '../../hooks/useBarChart'
+import { getMarginTop } from './helpers/index'
 import { Line } from '@visx/shape'
 import { Label } from '../../types/Label'
 import { ChartConfig } from '../../types/ChartConfig'
@@ -30,11 +30,11 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
   const { runtime, orientation, legend } = config
 
   if (!legend) return null
-  const isBottomOrSmallViewport = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+  const isBottomOrSmallViewport = legend.position === 'bottom' || (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: isBottomOrSmallViewport ? '15px' : '0px'
+    marginTop: getMarginTop(isBottomOrSmallViewport, config.brush.active)
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)

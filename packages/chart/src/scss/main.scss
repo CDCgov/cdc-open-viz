@@ -91,6 +91,9 @@
   .subtext--responsive-ticks,
   .section-subtext {
     padding: 0 1rem;
+    &--brush-active {
+      margin-top: 2.5em;
+    }
   }
 
   .legend-container {
