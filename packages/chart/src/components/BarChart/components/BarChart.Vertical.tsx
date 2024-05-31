@@ -69,29 +69,21 @@ export const BarChartVertical = () => {
                 {barGroup.bars.map((bar, index) => {
                   const { suppressedBarHeight, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
                   const scaleVal = config.useLogScale ? 0.1 : 0
-                  const properties = {
-                    isSuppressed,
-                    bar,
-                    showMissingDataLabel: config.general.showMissingDataLabel && !bar.value,
-                    defaultBarHeight: Math.abs(yScale(bar.value) - yScale(scaleVal)),
-                    suppressedBarHeight
-                  }
-
+                  const showMissingDataLabel = config.general.showMissingDataLabel && !bar.value
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   const displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                  const barY = getBarY({ ...properties, scaleVal, isNumber, yScale })
 
                   let barGroupWidth = seriesScale.range()[1]
-
+                  const defaultBarHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
                   let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
                   let barX = bar.x + (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) - (config.xAxis.type === 'date-time' ? barGroupWidth / 2 : 0)
                   setBarWidth(barWidth)
                   setTotalBarsInGroup(barGroup.bars.length)
                   const yAxisValue = formatNumber(/[a-zA-Z]/.test(String(bar.value)) ? '' : bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
-
+                  const barY = getBarY({ bar, yScale, isSuppressed, scaleVal, showMissingDataLabel, isNumber, suppressedBarHeight })
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
                   // tooltips
@@ -119,8 +111,8 @@ export const BarChartVertical = () => {
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
                   const barLabel = isSuppressed ? '' : yAxisValue
-                  const { barHeight } = getBarDimensions(properties)
-                  const missingDataLabel = properties.showMissingDataLabel ? 'N/A' : ''
+                  const { barHeight } = getBarDimensions({ isSuppressed, showMissingDataLabel, defaultBarHeight, suppressedBarHeight })
+                  const missingDataLabel = showMissingDataLabel ? 'N/A' : ''
                   let missingDataFontSize = barWidth / 2
                   let textWidth = getTextWidth(missingDataLabel, `normal ${missingDataFontSize}px sans-serif`)
                   const textFitstobar = textWidth < barWidth
