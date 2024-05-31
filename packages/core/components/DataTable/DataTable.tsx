@@ -178,9 +178,9 @@ const DataTable = (props: DataTableProps) => {
 
     const getMediaControlsClasses = () => {
       const classes = ['download-links']
-      const isLegendOnBottom = config.legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(viewport)
-      if (config.brush.active && !isLegendOnBottom) classes.push('brush-active')
-      if (config.brush.active && config.legend.hide) classes.push('brush-active')
+      const isLegendOnBottom = config.legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(viewport)
+      if (config.brush?.active && !isLegendOnBottom) classes.push('brush-active')
+      if (config.brush?.active && config.legend.hide) classes.push('brush-active')
       return classes
     }
 
