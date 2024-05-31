@@ -73,9 +73,8 @@ export const BarChartHorizontal = () => {
                   const conditions = {
                     barWidth: 4,
                     shoMissingDataLabel: config.xAxis.shoMissingDataLabel && !bar.value,
-                    showMissingDataLine: config.xAxis.showMissingDataLine && !bar.value,
                     defaultWidth: Math.abs(xScale(bar.value) - xScale(scaleVal)),
-                    composeBarWidth: () => (isSuppressed ? suppresedBarWidth : conditions.showMissingDataLine ? conditions.barWidth : conditions.defaultWidth),
+                    composeBarWidth: () => (isSuppressed ? suppresedBarWidth : conditions.shoMissingDataLabel ? conditions.barWidth : conditions.defaultWidth),
                     composeBarLabel: () => (isSuppressed ? '' : yAxisValue),
                     composeMissingDataLabel: () => (conditions.shoMissingDataLabel ? 'N/A' : '')
                   }
@@ -91,7 +90,6 @@ export const BarChartHorizontal = () => {
                   }
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
                   const barWidthHorizontal = Math.abs(xScale(bar.value) - xScale(scaleVal))
-                  // const suppresedBarWidth = config.xAxis.showSuppressedLine ? 4 : 0
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
                   let barWidth = conditions.composeBarWidth()
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)

@@ -72,14 +72,13 @@ export const BarChartVertical = () => {
                   const conditions = {
                     scaleVal: config.useLogScale ? 0.1 : 0,
                     shoMissingDataLabel: config.xAxis.shoMissingDataLabel && !bar.value,
-                    showMissingDataLine: config.xAxis.showMissingDataLine && !bar.value,
-                    barHeight: 4, // height for suppressed & missingdata bars
+                    barHeight: 4, //missingdata bars
                     suppressedY: () => yScale(conditions.scaleVal) - suppresedBarHeight,
                     missingDataY: () => yScale(conditions.scaleVal) - conditions.barHeight,
                     defaultY: bar => (bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)),
                     defaultHeight: () => Math.abs(yScale(bar.value) - yScale(scaleVal)),
-                    composeBarY: bar => (isSuppressed ? conditions.suppressedY() : conditions.showMissingDataLine ? conditions.missingDataY() : conditions.defaultY(bar)),
-                    composeBarHeight: () => (isSuppressed ? suppresedBarHeight : conditions.showMissingDataLine ? conditions.barHeight : conditions.defaultHeight()),
+                    composeBarY: bar => (isSuppressed ? conditions.suppressedY() : conditions.shoMissingDataLabel ? conditions.missingDataY() : conditions.defaultY(bar)),
+                    composeBarHeight: () => (isSuppressed ? suppresedBarHeight : conditions.shoMissingDataLabel ? conditions.barHeight : conditions.defaultHeight()),
                     composeLabel: () => (isSuppressed ? '' : yAxisValue),
                     composeMissingDataLabel: () => (conditions.shoMissingDataLabel ? 'N/A' : '')
                   }

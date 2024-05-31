@@ -2011,41 +2011,6 @@ const EditorPanel = () => {
                         </>
                       )}
 
-                      <CheckBox
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Selecting this option will display a "thin line" slightly above the Date/Category Axis as an additional indication of missing or undefined data values.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        value={config.xAxis.showMissingDataLine}
-                        section='xAxis'
-                        fieldName='showMissingDataLine'
-                        label='Display "Missing Data" Line'
-                        updateField={updateField}
-                      />
-                      <CheckBox
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Selecting this option will display a "thin line" slightly above the Date/Category Axis to indicate "suppressed data" where "suppressed data" values are indicated in the Data Series.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        value={config.xAxis.showSuppressedLine}
-                        section='xAxis'
-                        fieldName='showSuppressedLine'
-                        label='Display  suppressed data line'
-                        updateField={updateField}
-                      />
-
                       {config.series?.length === 1 && config.visualizationType === 'Bar' && (
                         <>
                           {/* HIGHLIGHTED BARS */}

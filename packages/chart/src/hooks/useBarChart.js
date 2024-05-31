@@ -211,7 +211,7 @@ export const useBarChart = () => {
   }
 
   const composeSuppressionBars = ({ bar }) => {
-    const suppresedBarHeight = config.xAxis.showSuppressedLine ? 3 : 0
+    const suppresedBarHeight = config.xAxis.showSuppressedSymbol ? 3 : 0
     let t = suppresedBarHeight ? suppresedBarHeight : 3
     const ASTERISK = 'Asterisk'
     const getIconPadding = symbol => (String(symbol).includes(ASTERISK) ? -5 : -t * 3)
