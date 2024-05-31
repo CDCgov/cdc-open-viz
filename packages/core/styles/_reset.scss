@@ -146,4 +146,11 @@
       half as far down as the superscript moved up */
     bottom: -0.25em;
   }
+
+  ul > li:first-child {
+    margin-top: auto;
+  }
+  ul > li:last-of-type {
+    margin-bottom: auto;
+  }
 }
