@@ -4,7 +4,7 @@ export const parameters = {
   options: {
     storySort: {
       includeNames: true,
-      order: ['Guides', 'Components', ['Atoms', 'Molecules', 'Organisms', 'Templates', 'Pages']]
+      order: ['Introduction', 'Contributions', 'Guides', 'Components', ['Atoms', 'Molecules', 'Organisms', 'Templates', 'Pages']]
     }
   },
   actions: { argTypesRegex: '^on[A-Z].*' },
