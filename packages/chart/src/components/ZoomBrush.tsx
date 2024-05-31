@@ -76,7 +76,7 @@ const ZoomBrush: FC<Props> = props => {
   }
   // reset brush if brush is off.
   useEffect(() => {
-    if (!config.brush.active) {
+    if (!config.brush?.active) {
       setBrushKey(prevKey => prevKey + 1)
       setBrushConfig({
         data: [],
@@ -84,13 +84,13 @@ const ZoomBrush: FC<Props> = props => {
         isBrushing: false
       })
     }
-  }, [config.brush.active])
+  }, [config.brush?.active])
 
   // reset brush if filters or exclusions are ON each time
   useEffect(() => {
     const isFiltersActive = config.filters?.some(filter => filter.active)
     const isExclusionsActive = config.exclusions?.active
-    if ((isFiltersActive || isExclusionsActive) && config.brush.active) {
+    if ((isFiltersActive || isExclusionsActive) && config.brush?.active) {
       setBrushKey(prevKey => prevKey + 1)
       setBrushConfig(prev => {
         return {
@@ -106,7 +106,7 @@ const ZoomBrush: FC<Props> = props => {
           data: []
         }
       })
-  }, [config.filters, config.exclusions, config.brush.active])
+  }, [config.filters, config.exclusions, config.brush?.active])
 
   const calculateTop = (): number => {
     const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
@@ -147,7 +147,7 @@ const ZoomBrush: FC<Props> = props => {
   }
 
   return (
-    <Group display={config.brush.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
+    <Group display={config.brush?.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
       <rect fill='#F7F7F7  ' width={props.xMax} height={config.brush.height} rx={radius} />
       <Brush
         key={brushKey}

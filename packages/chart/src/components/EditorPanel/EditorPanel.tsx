@@ -1916,7 +1916,7 @@ const EditorPanel = () => {
                         }
                         updateField={updateField}
                       />
-                      {visHasBrushChart && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
+                      {visHasBrushChart && <CheckBox value={config.brush?.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
 
                       {config.exclusions.active && (
                         <>
@@ -2539,7 +2539,7 @@ const EditorPanel = () => {
                   {/* end: isolated values */}
 
                   <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
-                  <Select value={config.legend.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
+                  <Select value={config.legend?.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
                   {config.legend.position === 'bottom' && (
                     <>
                       <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />

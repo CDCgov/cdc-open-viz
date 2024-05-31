@@ -30,11 +30,11 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
   const { runtime, legend } = config
 
   if (!legend) return null
-  const isBottomOrSmallViewport = legend.position === 'bottom' || (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
+  const isBottomOrSmallViewport = legend?.position === 'bottom' || (['sm', 'xs', 'xxs'].includes(currentViewport) && !legend.hide)
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: getMarginTop(isBottomOrSmallViewport, config.brush.active)
+    marginTop: getMarginTop(isBottomOrSmallViewport, config.brush?.active)
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)

@@ -1110,8 +1110,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const getChartWrapperClasses = () => {
     const classes = ['chart-container', 'p-relative']
-    if (config.legend.position === 'bottom') classes.push('bottom')
-    if (config.legend.hide) classes.push('legend-hidden')
+    if (config.legend?.position === 'bottom') classes.push('bottom')
+    if (config.legend?.hide) classes.push('legend-hidden')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
     if (isDebug) classes.push('debug')
@@ -1120,11 +1120,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
   const getChartSubTextClasses = () => {
     const classes = ['subtext ']
-    const isLegendOnBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
-    if (config.brush.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
-    if (config.brush.active && config.legend.hide) classes.push('subtext--brush-active ')
+    if (config.brush?.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
+    if (config.brush?.active && config.legend.hide) classes.push('subtext--brush-active ')
     return classes
   }
 
