@@ -1,5 +1,9 @@
 @import '@cdc/core/styles/base';
 
+.cdc-open-viz-module.isEditor {
+  background: transparent;
+}
+
 .cove-accordion__panel-section {
   overflow: auto;
 

@@ -120,7 +120,7 @@ const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, is
     let body = (
       <>
         <Layout.Responsive isEditor={isEditor}>
-          <div className={`cove-component__content`}>
+          <div className={`cove-component__content no-borders`}>
             <Title classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
             <div className={`${contentClasses.join(' ')} body`}>
               {filterByTextColumn()
