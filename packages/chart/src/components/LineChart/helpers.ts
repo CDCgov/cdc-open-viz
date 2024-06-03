@@ -125,11 +125,10 @@ function handleMiddleIndices(data, seriesKey, dataKey, preliminaryData) {
   preliminaryData?.forEach(pd => {
     if (pd.type === 'effect') return
     const targetValue = pd.value
-    result.style = pd.style
 
     // Find all indices
     const matchingIndices = data.reduce((indices, item, index) => {
-      if (item[seriesKey] === targetValue && isValidMiddleIndex(index)) {
+      if (item[seriesKey] === targetValue && isValidMiddleIndex(index) && (!pd.column || pd.column === seriesKey)) {
         indices.push(index)
       }
       return indices
@@ -137,6 +136,7 @@ function handleMiddleIndices(data, seriesKey, dataKey, preliminaryData) {
 
     // Process each valid index
     matchingIndices.forEach(i => {
+      result.style = pd.style
       // Add previous object if calculable
       if (isCalculable(data[i - 1][seriesKey])) {
         result.data.push(data[i - 1])

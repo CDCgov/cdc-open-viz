@@ -1587,7 +1587,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   if (!table.label || table.label === '') table.label = 'Data Table'
 
   // Map container classes
-  let mapContainerClasses = ['map-container', state.legend.position, state.general.type, state.general.geoType, 'outline-none']
+  let mapContainerClasses = ['map-container', state.legend?.position, state.general.type, state.general.geoType, 'outline-none']
 
   if (modal) {
     mapContainerClasses.push('modal-background')

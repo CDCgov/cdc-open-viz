@@ -14,7 +14,7 @@ import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, handleTooltipMouseOff, isDebug }) => {
   // import data from context
   let { transformedData, config, seriesHighlight, colorScale, rawData } = useContext(ConfigContext)
-  const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
+  const data = config.brush?.active && config.brush.data?.length ? config.brush.data : transformedData
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
   if (!data) return

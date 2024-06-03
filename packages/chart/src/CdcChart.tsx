@@ -58,6 +58,7 @@ import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import Title from '@cdc/core/components/ui/Title'
 import { ChartConfig } from './types/ChartConfig'
 import { Label } from './types/Label'
+import { type ViewportSize } from './types/ChartConfig'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 
@@ -70,7 +71,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [excludedData, setExcludedData] = useState<Record<string, number>[] | undefined>(undefined)
   const [filteredData, setFilteredData] = useState<Record<string, any>[] | undefined>(undefined)
   const [seriesHighlight, setSeriesHighlight] = useState<string[]>(configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : [])
-  const [currentViewport, setCurrentViewport] = useState('lg')
+  const [currentViewport, setCurrentViewport] = useState<ViewportSize>('lg')
   const [dimensions, setDimensions] = useState<[number?, number?]>([])
   const [externalFilters, setExternalFilters] = useState<any[]>()
   const [container, setContainer] = useState()
@@ -1107,12 +1108,21 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const getChartWrapperClasses = () => {
     const classes = ['chart-container', 'p-relative']
-    if (config.legend.position === 'bottom') classes.push('bottom')
-    if (config.legend.hide) classes.push('legend-hidden')
+    if (config.legend?.position === 'bottom') classes.push('bottom')
+    if (config.legend?.hide) classes.push('legend-hidden')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
     if (isDebug) classes.push('debug')
     classes.push(...contentClasses)
+    return classes
+  }
+  const getChartSubTextClasses = () => {
+    const classes = ['subtext ']
+    const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+
+    if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
+    if (config.brush?.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
+    if (config.brush?.active && config.legend.hide) classes.push('subtext--brush-active ')
     return classes
   }
 
@@ -1166,7 +1176,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {/* Link */}
               {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
               {/* Description */}
-              {description && config.visualizationType !== 'Spark Line' && <div className={'column ' + config.isResponsiveTicks ? 'subtext--responsive-ticks' : 'subtext'}>{parse(description)}</div>}
+              {description && config.visualizationType !== 'Spark Line' && <div className={getChartSubTextClasses().join('')}>{parse(description)}</div>}
               {/* buttons */}
               <MediaControls.Section classes={['download-buttons']}>
                 {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
