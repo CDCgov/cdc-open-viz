@@ -1,17 +1,16 @@
-import React, { useContext, useRef, useEffect } from 'react'
+import { useContext } from 'react'
 import { useDrag } from 'react-dnd'
 
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-
-import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Icon from '@cdc/core/components/ui/Icon'
 import Modal from '@cdc/core/components/ui/Modal'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { iconHash } from '../helpers/iconHash'
+import _ from 'lodash'
+import { DataDesignerModal } from './DataDesignerModal'
 
 const labelHash = {
   'data-bite': 'Data Bite',
@@ -45,8 +44,6 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
   const visualizations = config.visualizations
   const dispatch = useContext(DashboardDispatchContext)
   const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
-  const dataRef = useRef<WidgetData>()
-  dataRef.current = data
 
   const transform = new DataTransform()
 
@@ -58,14 +55,14 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
     const { rowIdx, colIdx } = result
 
     if (undefined !== data?.rowIdx) {
-      rows[data.rowIdx][data.colIdx].widget = null // Wipe from old position
+      rows[data.rowIdx].columns[data.colIdx].widget = null // Wipe from old position
 
-      rows[rowIdx][colIdx].widget = data.uid // Add to new row and col
+      rows[rowIdx].columns[colIdx].widget = data.uid // Add to new row and col
     } else if (!!addVisualization) {
       // Item does not exist, instantiate a new one
       const newViz = addVisualization()
       visualizations[newViz.uid] = newViz // Add to widgets collection
-      rows[rowIdx][colIdx].widget = newViz.uid // Store reference in rows collection under the specific column
+      rows[rowIdx].columns[colIdx].widget = newViz.uid // Store reference in rows collection under the specific column
     }
 
     updateConfig({ ...config, rows, visualizations })
@@ -84,7 +81,7 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
 
   const deleteWidget = () => {
     if (!data) return
-    rows[data.rowIdx][data.colIdx].widget = null
+    rows[data.rowIdx].columns[data.colIdx].widget = null
 
     delete visualizations[data.uid]
 
@@ -104,78 +101,6 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
     visualizations[data.uid].editing = true
 
     updateConfig({ ...config, visualizations })
-  }
-
-  const changeDataset = (uid, value) => {
-    visualizations[uid].dataDescription = {}
-    visualizations[uid].formattedData = undefined
-
-    visualizations[uid].dataKey = value
-
-    updateConfig({ ...config, visualizations })
-  }
-
-  const updateDescriptionProp = async (visualizationKey, datasetKey, key, value) => {
-    let dataDescription = { ...(dataRef.current?.dataDescription as Object), [key]: value }
-
-    let newData
-    if (!config.datasets[datasetKey].data && config.datasets[datasetKey].dataUrl) {
-      newData = await fetchRemoteData(config.datasets[datasetKey].dataUrl)
-      newData = transform.autoStandardize(newData)
-    } else {
-      newData = config.datasets[datasetKey].data
-    }
-
-    let formattedData = transform.developerStandardize(newData, dataDescription)
-
-    let newVisualizations = { ...config.visualizations }
-    newVisualizations[visualizationKey] = { ...newVisualizations[visualizationKey], data: newData, dataDescription, formattedData }
-
-    updateConfig({ ...config, visualizations: newVisualizations })
-
-    overlay?.actions.openOverlay(dataDesignerModal(newVisualizations[visualizationKey]))
-  }
-
-  const dataDesignerModal = (configureData, dataKeyOverride?) => {
-    const dataKey = !dataKeyOverride && dataKeyOverride !== '' ? data?.dataKey || dataRef.current?.dataKey : dataKeyOverride
-
-    overlay?.actions.toggleOverlay()
-
-    return (
-      <Modal>
-        <Modal.Content>
-          <div className='dataset-selector-container'>
-            Select a dataset:&nbsp;
-            <select
-              className='dataset-selector'
-              defaultValue={dataKey}
-              onChange={e => {
-                changeDataset(data?.uid, e.target.value)
-                overlay?.actions.openOverlay(dataDesignerModal(data, e.target.value || ''))
-              }}
-            >
-              <option value=''>Select a dataset</option>
-              {config.datasets && Object.keys(config.datasets).map(datasetKey => <option key={datasetKey}>{datasetKey}</option>)}
-            </select>
-          </div>
-          {dataKey && (
-            <DataDesigner
-              {...{
-                configureData,
-                visualizationKey: data?.uid,
-                dataKey: dataKey,
-                updateDescriptionProp
-              }}
-            />
-          )}
-          {configureData.formattedData && (
-            <button style={{ margin: '1em' }} className='cove-button' onClick={() => overlay?.actions.toggleOverlay()}>
-              Continue
-            </button>
-          )}
-        </Modal.Content>
-      </Modal>
-    )
   }
 
   const FilterHideModal = configureData => {
@@ -207,8 +132,6 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
         updateConfig({ ...config, visualizations: { ...visualizations, [currentVizKey]: currentViz } })
       }
     }
-
-    overlay?.actions.toggleOverlay()
 
     const showAutoLoadCheckbox = !vizWithAutoLoad || vizWithAutoLoad === currentVizKey
     return (
@@ -243,28 +166,23 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
     )
   }
 
-  useEffect(() => {
-    if (data?.openModal) {
-      overlay?.actions.openOverlay(type === 'filter-dropdowns' ? FilterHideModal(dataRef.current) : dataDesignerModal(dataRef.current))
-
-      visualizations[data.uid].openModal = false
-
-      updateConfig({ ...config, visualizations })
-    }
-  }, [data?.openModal])
-
   let isConfigurationReady = false
-  if (type === 'markup-include' || type === 'filter-dropdowns') {
+  const dataConfiguredForRow = !!rows[data?.rowIdx]?.dataKey
+  if (dataConfiguredForRow || ['filter-dropdowns', 'markup-include'].includes(type)) {
     isConfigurationReady = true
-  } else if (data && data.formattedData) {
-    isConfigurationReady = true
-  } else if (data && data.dataKey && data.dataDescription && config.datasets[data.dataKey]) {
-    let formattedDataAttempt = transform.autoStandardize(config.datasets[data.dataKey].data)
-    formattedDataAttempt = transform.developerStandardize(formattedDataAttempt, data.dataDescription)
-    if (formattedDataAttempt) {
+  } else {
+    if (data?.formattedData) {
       isConfigurationReady = true
+    } else if (data?.dataKey && data?.dataDescription && config.datasets[data.dataKey]) {
+      const formattedDataAttempt = transform.autoStandardize(config.datasets[data.dataKey].data)
+      const canFormatData = !!transform.developerStandardize(formattedDataAttempt, data.dataDescription)
+      if (canFormatData) {
+        isConfigurationReady = true
+      }
     }
   }
+
+  const needsDataConfiguration = !dataConfiguredForRow
 
   return (
     <>
@@ -278,12 +196,12 @@ const Widget = ({ data, addVisualization, type }: WidgetProps) => {
                   {iconHash['tools']}
                 </button>
               )}
-              {type !== 'markup-include' && (
+              {needsDataConfiguration && (
                 <button
                   title='Configure Data'
                   className='btn btn-configure'
                   onClick={() => {
-                    overlay?.actions.openOverlay(type === 'filter-dropdowns' ? FilterHideModal(data) : dataDesignerModal(data))
+                    overlay?.actions.openOverlay(type === 'filter-dropdowns' ? FilterHideModal(data) : <DataDesignerModal rowIndex={data.rowIdx} vizKey={data.uid} />)
                   }}
                 >
                   {iconHash['gear']}

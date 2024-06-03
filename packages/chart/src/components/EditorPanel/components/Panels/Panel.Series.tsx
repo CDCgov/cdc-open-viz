@@ -5,15 +5,14 @@ import ConfigContext from '../../../../ConfigContext'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import Check from '@cdc/core/assets/icon-check.svg'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
-
+import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
 import Icon from '@cdc/core/components/ui/Icon'
 
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { Draggable } from '@hello-pangea/dnd'
-import { colorPalettesChart, sequentialPalettes } from '@cdc/core/data/colorPalettes'
 
-const SeriesContext = React.createContext()
+const SeriesContext = React.createContext({})
 
 const SeriesWrapper = props => {
   const { updateConfig, config, rawData } = useContext(ConfigContext)

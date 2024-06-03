@@ -24,7 +24,6 @@
   ],
   "visualizations": {
     "table1707935263149": {
-      "newViz": true,
       "openModal": false,
       "uid": "table1707935263149",
       "type": "table",
@@ -42,6 +41,8 @@
         "horizontal": false,
         "series": false
       },
+      "filters": [],
+      "filterBehavior": "Filter Change",
       "formattedData": [
         {
           "Race": "Hispanic or Latino",
@@ -115,7 +116,6 @@
     "showDownloadUrl": false,
     "showVertical": true
   },
-  "newViz": true,
   "datasets": {
     "valid-data-chart.csv": {
       "data": [

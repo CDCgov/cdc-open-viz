@@ -127,7 +127,9 @@ const CountyMap = props => {
       handleMapAriaLabels,
       runtimeLegend,
       state,
-      runtimeFilters
+      runtimeFilters,
+      tooltipId,
+      isEditor
   } = useContext(ConfigContext)
 
   // CREATE STATE LINES
@@ -138,7 +140,7 @@ const CountyMap = props => {
 
   const pathGenerator = geoPath().projection(geoAlbersUsaTerritories())
 
-  const { featureArray } = useMapLayers(state, '', pathGenerator, false)
+  const { featureArray } = useMapLayers(state, '', pathGenerator, tooltipId)
 
   useEffect(() => {
     if (containerEl) {
@@ -236,8 +238,16 @@ const CountyMap = props => {
         }
       }
 
+      let focusIndex = -1;
+      for(let i = 0; i < topoData.mapData.length; i++){
+        if(topoData.mapData[i].id === clickedState.id){
+          focusIndex = i;
+          break;
+        }
+      }
+
       // Redraw with focus on state
-      setFocus({ id: clickedState.id, center: geoCentroid(clickedState) })
+      setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState) })
     }
 
     if (state.general.type === 'us-geocode') {
@@ -269,12 +279,13 @@ const CountyMap = props => {
     const currentTooltipIndex = parseInt(tooltipRef.current.getAttribute('data-index'))
     const geoRadius = (state.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
 
+    const context = canvas.getContext('2d')
+    const path = geoPath(topoData.projection, context)
+
     // Handle standard county map hover
     if (state.general.type !== 'us-geocode') {
       //If no tooltip is shown, or if the current geo associated with the tooltip shown is no longer containing the mouse, then rerender the tooltip
       if (isNaN(currentTooltipIndex) || !geoContains(topoData.mapData[currentTooltipIndex], pointCoordinates)) {
-        const context = canvas.getContext('2d')
-        const path = geoPath(topoData.projection, context)
         if (!isNaN(currentTooltipIndex) && applyLegendToRow(data[topoData.mapData[currentTooltipIndex].id])) {
           context.fillStyle = applyLegendToRow(data[topoData.mapData[currentTooltipIndex].id])[0]
           context.strokeStyle = geoStrokeColor
@@ -322,7 +333,7 @@ const CountyMap = props => {
 
           tooltipRef.current.style.display = 'block'
           tooltipRef.current.style.top = e.clientY + 'px'
-          tooltipRef.current.style.left = e.clientX + 'px'
+          tooltipRef.current.style.left = isEditor ? Number(e.clientX - 350) + 'px' : e.clientX + 'px'
           tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), data[county.id])
           tooltipRef.current.setAttribute('data-index', countyIndex)
         } else {
@@ -374,6 +385,14 @@ const CountyMap = props => {
         tooltipRef.current.setAttribute('data-index', null)
       }
     }
+
+    if (focus.index !== -1) {
+      context.strokeStyle = 'black'
+      context.lineWidth = 1
+      context.beginPath()
+      path(topoData.mapData[focus.index])
+      context.stroke()
+    }
   }
 
   // Redraws canvas. Takes as parameters the fips id of a state to center on and the [lat,long] center of that state
@@ -409,7 +428,6 @@ const CountyMap = props => {
       context.strokeStyle = geoStrokeColor
       context.lineWidth = lineWidth
 
-      let focusIndex = -1
       // Iterates through each state/county topo and renders it
       topoData.mapData.forEach((geo, i) => {
         // If invalid geo item, don't render
@@ -422,11 +440,6 @@ const CountyMap = props => {
         // Gets numeric data associated with the topo data for this state/county
         const geoData = data[geo.id]
 
-        // Marks that the focused state was found for the logic below
-        if (geo.id === focus.id) {
-          focusIndex = i
-        }
-
         // Renders state/county
         const legendValues = geoData !== undefined ? applyLegendToRow(geoData) : false
         context.fillStyle = legendValues && state.general.type !== 'us-geocode' ? legendValues[0] : '#EEE'
@@ -437,11 +450,11 @@ const CountyMap = props => {
       })
 
       // If the focused state is found in the geo data, render it with a thicker outline
-      if (focusIndex !== -1) {
+      if (focus.index !== -1) {
         context.strokeStyle = 'black'
         context.lineWidth = 2
         context.beginPath()
-        path(topoData.mapData[focusIndex])
+        path(topoData.mapData[focus.index])
         context.stroke()
       }
 
@@ -520,8 +533,9 @@ const CountyMap = props => {
           tooltipRef.current.setAttribute('data-index', null)
         }}
         onClick={canvasClick}
+        className='county-map-canvas'
       ></canvas>
-      <div ref={tooltipRef} id='canvas-tooltip' className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})` }}></div>
+      <div ref={tooltipRef} id={`tooltip__${tooltipId}`} className='tooltip' style={{ background: `rgba(255,255,255,${state.tooltips.opacity / 100})` }}></div>
       <button className={`btn btn--reset`} onClick={onReset} ref={resetButton} tabIndex='0'>
         Reset Zoom
       </button>

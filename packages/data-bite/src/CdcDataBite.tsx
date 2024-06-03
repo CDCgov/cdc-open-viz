@@ -11,6 +11,7 @@ import Loading from '@cdc/core/components/Loading'
 import Title from '@cdc/core/components/ui/Title'
 import CircleCallout from './components/CircleCallout'
 import GradientBite from './components/GradientBite'
+import Layout from '@cdc/core/components/Layout'
 
 // external
 import ResizeObserver from 'resize-observer-polyfill'
@@ -448,13 +449,75 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         break
     }
 
-    const showBite = undefined !== dataColumn && undefined !== dataFunction
+    const missingRequiredSections = () => {
+      //Whether to show error message if something is required to show a data-bite and isn't filled in
+      return false
+    }
 
+    const Error = () => {
+      const styles = {
+        position: 'absolute',
+        background: 'white',
+        zIndex: '999',
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gridArea: 'content'
+      }
+      return (
+        <section className='waiting' style={styles}>
+          <section className='waiting-container'>
+            <h3>Error With Configuration</h3>
+            <p>{config.runtime.editorErrorMessage}</p>
+          </section>
+        </section>
+      )
+    }
+
+    const Confirm = () => {
+      const styles = {
+        position: 'absolute',
+        background: 'white',
+        zIndex: '999',
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gridArea: 'content'
+      }
+
+      return (
+        <section className='waiting' style={styles}>
+          <section className='waiting-container'>
+            <h3>Finish Configuring</h3>
+            <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
+            <button
+              className='btn'
+              style={{ margin: '1em auto' }}
+              disabled={missingRequiredSections()}
+              onClick={e => {
+                e.preventDefault()
+                updateConfig({ ...config, newViz: false })
+              }}
+            >
+              I'm Done
+            </button>
+          </section>
+        </section>
+      )
+    }
+
+    const showBite = undefined !== dataColumn && undefined !== dataFunction
     body = (
       <>
         {isEditor && <EditorPanel />}
-        <div className={isEditor ? 'spacing-wrapper' : ''}>
-          <div className={innerContainerClasses.join(' ')}>
+        <Layout.Responsive isEditor={isEditor}>
+          <div className={`cove-component__content`}>
+            {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+            {(!config.dataColumn || !config.dataFunction) && <Confirm />}
             <Title config={config} title={title} isDashboard={isDashboard} classes={['bite-header', `${config.theme}`]} />
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className={`bite-content-container ${contentClasses.join(' ')}`}>
@@ -496,30 +559,27 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             </div>
           </div>
           {link && link}
-        </div>
+        </Layout.Responsive>
       </>
     )
-  }
-
-  let classNames = ['cove', 'cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, 'font-' + config.fontSize]
-  if (isEditor) {
-    classNames.push('is-editor')
   }
 
   return (
     <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
       {biteStyle !== 'gradient' && (
-        <div className={classNames.join(' ')} ref={outerContainerRef}>
+        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
           {body}
-        </div>
+        </Layout.VisualizationWrapper>
       )}
       {'gradient' === biteStyle && (
-        <div className={classNames.join(' ')} ref={outerContainerRef}>
+        <Layout.VisualizationWrapper ref={outerContainerRef} config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
           {isEditor && <EditorPanel />}
-          <div className={isEditor ? 'spacing-wrapper' : ''}>
+          <Layout.Responsive isEditor={isEditor}>
+            {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+            {(!config.dataColumn || !config.dataFunction) && <Confirm />}
             <GradientBite label={config.title} value={calculateDataBite()} />
-          </div>
-        </div>
+          </Layout.Responsive>
+        </Layout.VisualizationWrapper>
       )}
     </Context.Provider>
   )

@@ -1,72 +1,47 @@
 import React, { useContext, useState } from 'react'
+// Local contexts
 import ConfigContext from '../../../ConfigContext'
-import { type ChartContext } from '../../../types/ChartContext'
+import BarChartContext, { type BarChartContextValues } from './context'
+// Local hooks
 import { useBarChart } from '../../../hooks/useBarChart'
+import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
+// VisX library imports
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
-import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
-import { FaStar } from 'react-icons/fa'
-import Regions from './../../Regions'
+// Local components
+import Regions from '../../Regions'
+// CDC core components and helpers
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-
 import createBarElement from '@cdc/core/components/createBarElement'
-
-// third party
+// Third party libraries
 import chroma from 'chroma-js'
-import BarChartContext, { type BarChartContextValues } from './context'
+// Types
+import { type ChartContext } from '../../../types/ChartContext'
 
 export const BarChartVertical = () => {
   const { xScale, yScale, xMax, yMax, seriesScale } = useContext<BarChartContextValues>(BarChartContext)
 
   const [barWidth, setBarWidth] = useState(0)
   const [totalBarsInGroup, setTotalBarsInGroup] = useState(0)
+  // prettier-ignore
+  const { assignColorsToValues, barBorderWidth, getAdditionalColumn, getHighlightedBarByValue, getHighlightedBarColorByValue, lollipopBarWidth, lollipopShapeSize, onMouseLeaveBar, onMouseOverBar, section, composeSuppressionBars, shouldSuppress } = useBarChart()
 
   // prettier-ignore
-  const {
-    applyRadius,
-    assignColorsToValues,
-    barBorderWidth,
-    generateIconSize,
-    getAdditionalColumn,
-    getHighlightedBarByValue,
-    getHighlightedBarColorByValue,
-    lollipopBarWidth,
-    lollipopShapeSize,
-    onMouseLeaveBar,
-    onMouseOverBar,
-    section
-  } = useBarChart()
-
-  // prettier-ignore
-  const {
-    colorScale,
-    config,
-    dashboardConfig,
-    formatDate,
-    formatNumber,
-    getXAxisData,
-    getYAxisData,
-    isNumber,
-    parseDate,
-    seriesHighlight,
-    setSharedFilter,
-    transformedData,
-  } = useContext<ChartContext>(ConfigContext)
-
+  const { colorScale, config, dashboardConfig, tableData, formatDate, formatNumber, getXAxisData, getYAxisData, isNumber, parseDate, seriesHighlight, setSharedFilter, transformedData,  brushConfig, } = useContext<ChartContext>(ConfigContext)
   const { HighLightedBarUtils } = useHighlightedBars(config)
-  const data = config.brush.active && config.brush.data?.length ? config.brush.data : transformedData
-
-  const getIcon = (bar, barWidth) => {
-    let icon = null
-    const iconSize = generateIconSize(barWidth)
-    config.suppressedData?.forEach(d => {
-      if (bar.key === d.column && String(bar.value) === String(d.value) && d.icon) {
-        icon = <FaStar color='#000' size={iconSize} />
-      }
-    })
-    return icon
+  let data = transformedData
+  // check if user add suppression
+  const isSuppressionActive = config.preliminaryData.some(pd => pd.value && pd.type === 'suppression')
+  // if suppression active use table data (filtere | excluded) but non cleaned
+  if (isSuppressionActive) {
+    data = tableData
   }
+  // if brush active use brush data (filtered|excluded) not cleaned
+  if (brushConfig.data.length) {
+    data = brushConfig.data
+  }
+
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
@@ -91,16 +66,15 @@ export const BarChartVertical = () => {
             return barGroups.map((barGroup, index) => (
               <Group className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`} key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} id={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} left={barGroup.x0}>
                 {barGroup.bars.map((bar, index) => {
+                  const { suppresedBarHeight, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
                   const scaleVal = config.useLogScale ? 0.1 : 0
-                  const suppresedBarHeight = 20
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
-                  let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
-                  let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                  let barHeightBase = Math.abs(yScale(bar.value) - yScale(scaleVal))
-                  let barYBase = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
-                  const supprssedBarY = bar.value >= 0 && isNumber(bar.value) ? yScale(scaleVal) - suppresedBarHeight : yScale(0)
-                  const barY = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? supprssedBarY : barYBase
+                  const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
+                  const displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
+                  const barHeightBase = Math.abs(yScale(bar.value) - yScale(scaleVal))
+                  const barYBase = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
+                  const barY = isSuppressed ? yScale(scaleVal) - suppresedBarHeight : barYBase
 
                   let barGroupWidth = seriesScale.range()[1]
 
@@ -108,9 +82,8 @@ export const BarChartVertical = () => {
                   let barX = bar.x + (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) - (config.xAxis.type === 'date-time' ? barGroupWidth / 2 : 0)
                   setBarWidth(barWidth)
                   setTotalBarsInGroup(barGroup.bars.length)
-
-                  let yAxisValue = formatNumber(bar.value, 'left')
-                  let xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                  const yAxisValue = formatNumber(/[a-zA-Z]/.test(String(bar.value)) ? '' : bar.value, 'left')
+                  const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
@@ -138,10 +111,10 @@ export const BarChartVertical = () => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  const barValueLabel = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? '' : yAxisValue
-                  let barHeight = config.suppressedData.some(d => bar.key === d.column && String(bar.value) === String(d.value)) ? suppresedBarHeight : barHeightBase
-                  const displaylollipopShape = config.suppressedData.some(d => bar.key === d.column && bar.value === d.value) ? 'none' : 'block'
+                  const barValueLabel = isSuppressed ? '' : yAxisValue
+                  const barHeight = isSuppressed ? suppresedBarHeight : barHeightBase
 
+                  const displaylollipopShape = isSuppressed ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
                     let _barColor = barColor
                     let _filteredOutColor = filteredOutColor || '#f2f2f2'
@@ -151,21 +124,23 @@ export const BarChartVertical = () => {
                      * color the bar that is using the filter with barColor and
                      * color the filteredOut (typically gray) bars with the filteredOutColor
                      */
-                    if (dashboardConfig && dashboardConfig.dashboard.sharedFilters) {
+                    if (dashboardConfig && dashboardConfig.dashboard.sharedFilters?.length !== 0) {
                       const { sharedFilters } = dashboardConfig.dashboard
 
-                      _barColor = sharedFilters.map(_sharedFilter => {
-                        if (_sharedFilter.setBy === config.uid) {
-                          // If the current filter is the reset filter item.
-                          if (_sharedFilter.resetLabel === _sharedFilter.active) return barColor
-                          // If the current filter is the bars
-                          if (_sharedFilter.active === transformedData[barGroup.index][config.xAxis.dataKey]) return barColor
-                          return _filteredOutColor
-                        } else {
-                          // If the setBy isn't the config.uid return the original barColor
-                          return barColor
-                        }
-                      })[0]
+                      _barColor = sharedFilters
+                        ? sharedFilters.map(_sharedFilter => {
+                            if (_sharedFilter.setBy === config.uid) {
+                              // If the current filter is the reset filter item.
+                              if (_sharedFilter.resetLabel === _sharedFilter.active) return colorScale(config.runtime.seriesLabels[bar.key])
+                              // If the current filter is the bars
+                              if (_sharedFilter.active === transformedData[barGroup.index][config.xAxis.dataKey]) return colorScale(config.runtime.seriesLabels[bar.key])
+                              return _filteredOutColor
+                            } else {
+                              // If the setBy isn't the config.uid return the original barColor
+                              return colorScale(config.runtime.seriesLabels[bar.key])
+                            }
+                          })[0]
+                        : colorScale(config.runtime.seriesLabels[bar.key])
 
                       if (isRegularLollipopColor) _barColor = barColor
                       if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
@@ -188,7 +163,7 @@ export const BarChartVertical = () => {
                           config: config,
                           index: newIndex,
                           id: `barGroup${barGroup.index}`,
-                          background: getBarBackgroundColor(barColor),
+                          background: getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key])),
                           borderColor,
                           borderStyle: 'solid',
                           borderWidth: `${borderWidth}px`,
@@ -214,24 +189,34 @@ export const BarChartVertical = () => {
                             cursor: dashboardConfig ? 'pointer' : 'default'
                           }
                         })}
-                        <g
-                          transform={`translate(${barX},${yMax - suppresedBarHeight})`}
-                          onMouseOver={() => onMouseOverBar(xAxisValue, bar.key)}
-                          onMouseLeave={onMouseLeaveBar}
-                          opacity={transparentBar ? 0.2 : 1}
-                          display={displayBar ? 'block' : 'none'}
-                          data-tooltip-html={tooltip}
-                          data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                          onClick={e => {
-                            e.preventDefault()
-                            if (setSharedFilter) {
-                              bar[config.xAxis.dataKey] = xAxisValue
-                              setSharedFilter(config.uid, bar)
-                            }
-                          }}
-                        >
-                          {getIcon(bar, barWidth)}
-                        </g>
+                        {config.preliminaryData.map((pd, index) => {
+                          // check if user selected column
+                          const selectedSuppressionColumn = !pd.column || pd.column === bar.key
+                          // compare entered suppressed value with data value
+                          const isValueMatch = String(pd.value) === String(bar.value) && pd.value !== ''
+                          let isSuppressed = isValueMatch && selectedSuppressionColumn
+
+                          if (!isSuppressed || barWidth < 10 || !config.xAxis.showSuppressedSymbol) {
+                            return
+                          }
+
+                          return (
+                            <Text // prettier-ignore
+                              key={index}
+                              dy={getIconPadding(pd.symbol)}
+                              display={displayBar ? 'block' : 'none'}
+                              opacity={transparentBar ? 0.5 : 1}
+                              x={barX + barWidth / 2}
+                              y={barY}
+                              verticalAnchor={getVerticalAnchor(pd.symbol)}
+                              fill={labelColor}
+                              textAnchor='middle'
+                              fontSize={`${getIconSize(pd.symbol, barWidth)}px`}
+                            >
+                              {pd.iconCode}
+                            </Text>
+                          )
+                        })}
 
                         <Text // prettier-ignore
                           display={config.labels && displayBar ? 'block' : 'none'}
