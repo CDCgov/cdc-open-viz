@@ -1,27 +1,40 @@
-import React, { useState, useEffect, memo, useContext } from 'react'
+import React, { useState, useEffect, memo, useContext, useRef, useMemo, useReducer } from 'react'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+// Third Party
+import _ from 'lodash'
 
+// Context
+import { Variable } from '../types/Variable'
 import ConfigContext from '../ConfigContext'
 
-import Accordion from '@cdc/core/components/ui/Accordion'
-import InputText from '@cdc/core/components/inputs/InputText'
+// Helpers
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
+
+// Components
+import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import Icon from '@cdc/core/components/ui/Icon'
+import InputText from '@cdc/core/components/inputs/InputText'
 import Layout from '@cdc/core/components/Layout'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Accordion from '@cdc/core/components/ui/Accordion'
+
+// styles
 import '@cdc/core/styles/v2/components/editor.scss'
+import './editorPanel.style.css'
+import VariableSection from './Variables'
 
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
-const EditorPanel = memo(props => {
-  const { config, updateConfig, loading, data, setParentConfig, isDashboard, showConfigConfirm } = useContext(ConfigContext)
-
+const EditorPanel: React.FC = () => {
+  const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
+  const { contentEditor, theme, visual } = config
+  const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML } = contentEditor
   const [displayPanel, setDisplayPanel] = useState(true)
-
   const updateField = updateFieldFactory(config, updateConfig, true)
+  const hasData = data?.[0] !== undefined ?? false
 
-  const missingRequiredSections = () => {
-    return false
-  }
+  const openVariableControls = useState<boolean[]>([])
 
   useEffect(() => {
     // Pass up to Editor if needed
@@ -33,11 +46,9 @@ const EditorPanel = memo(props => {
   }, [config])
 
   useEffect(() => {
-    if (!showConfigConfirm) {
-      let newConfig = { ...config }
-      delete newConfig.newViz
-      updateConfig(newConfig)
-    }
+    const newConfig = { ...config }
+    delete newConfig.newViz
+    updateConfig(newConfig)
   }, [])
 
   const onBackClick = () => {
@@ -46,76 +57,108 @@ const EditorPanel = memo(props => {
       ...config,
       showEditorPanel: !displayPanel
     })
-
-    // if (isDashboard) {
-    //   updateConfig({ ...config, editing: false })
-    // } else {
-    //   setDisplayPanel(!displayPanel)
-    // }
-  }
-
-  const Error = () => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
-  const Confirm = () => {
-    const confirmDone = e => {
-      e.preventDefault()
-      let newConfig = { ...config }
-      delete newConfig.newViz
-      updateConfig(newConfig)
-    }
-
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the markup.</p>
-          <button className='btn' style={{ margin: '1em auto' }} onClick={confirmDone}>
-            I'm Done
-          </button>
-        </section>
-      </section>
-    )
   }
 
   const convertStateToConfig = () => {
-    let strippedState = JSON.parse(JSON.stringify(config))
+    const strippedState = JSON.parse(JSON.stringify(config))
     delete strippedState.newViz
     delete strippedState.runtime
 
     return strippedState
   }
 
-  const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-    <label className='checkbox'>
-      <input
-        type='checkbox'
-        name={fieldName}
-        checked={value}
-        onChange={() => {
-          updateField(section, subsection, fieldName, !value)
-        }}
-        {...attributes}
-      />
-      <span className='edit-label column-heading'>{label}</span>
-      <span className='cove-icon'>{tooltip}</span>
-    </label>
-  ))
+  const [variableArray, setVariableArray] = useState<Variable[]>([...markupVariables])
+  const [isCreatingVariable, setIsCreatingVariable] = useState(false)
+
+  const textAreaInEditorContainer = useRef(null)
+  const [controls, setControls] = openVariableControls
+
+  const handleCreateNewVariableButtonClick = () => {
+    const newVariableArray = [..._.cloneDeep(variableArray)]
+    const newVariable = {
+      columnName: '',
+      conditions: [],
+      name: '',
+      tag: ''
+    }
+
+    setControls({ ...controls, [variableArray.length + 1]: true })
+
+    newVariableArray.push(newVariable)
+    setVariableArray(newVariableArray)
+    setIsCreatingVariable(!isCreatingVariable)
+  }
+
+  const updateVariableArray = (newVariable: Variable, variableIndex: number) => {
+    const newVariableArray = _.cloneDeep(variableArray)
+    newVariableArray[variableIndex] = newVariable
+    setVariableArray(newVariableArray)
+    updateField('contentEditor', null, 'markupVariables', newVariableArray)
+    return
+  }
+
+  const deleteVariable = (variableIndex: number) => {
+    const newVariableArray = _.cloneDeep(variableArray)
+    newVariableArray.splice(variableIndex, 1)
+    setVariableArray(newVariableArray)
+    updateField('contentEditor', null, 'markupVariables', newVariableArray)
+
+    const newControls = _.cloneDeep(controls)
+    delete newControls[variableIndex]
+    setControls(newControls)
+  }
 
   const editorContent = (
     <Accordion>
       <Accordion.Section title='General'>
-        <InputText value={config.title || ''} fieldName='title' label='Title' placeholder='Markup Include Title' updateField={updateField} />
+        <InputText value={title || ''} section='contentEditor' fieldName='title' label='Title' placeholder='Markup Include Title' updateField={updateField} />
+      </Accordion.Section>
+      <Accordion.Section title='Content Editor'>
+        <span className='divider-heading'>Enter Markup</span>
+        <InputCheckbox inline value={useInlineHTML} section='contentEditor' fieldName='useInlineHTML' label='Use Inline HTML&nbsp;' updateField={updateField} />
+        <div className='column-edit'>
+          {useInlineHTML ? (
+            <>
+              {/* HTML Textbox */}
+              <div ref={textAreaInEditorContainer}>
+                <InputText value={inlineHTML} section='contentEditor' fieldName='inlineHTML' label='HTML' placeholder='Add HTML here' type='textarea' rows={10} updateField={updateField} />
 
-        <InputText value={config.srcUrl || ''} fieldName='srcUrl' label='Source URL' placeholder='https://www.example.com/file.html' updateField={updateField} />
+                <hr className='accordion__divider' />
+              </div>
+              {/* Create New Variable*/}
+
+              {/* Variable Options List */}
+              <fieldset>
+                <label>
+                  <span className='edit-label'>
+                    Variables
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>{`To use created variables wrap the variable name in curly brackets, e.g. {{some_variable}}, and place the variable directly in your Inline HTML`}</Tooltip.Content>
+                    </Tooltip>
+                  </span>
+                </label>
+                {hasData === false && <span className='need-data-source-prompt'>To use variables, add data source.</span>}
+                {variableArray && variableArray.length > 0 && (
+                  <div className='section-border'>
+                    {variableArray?.map((variableObject, index) => {
+                      return <VariableSection key={`${variableObject.name}-${index}`} controls={openVariableControls} data={data} deleteVariable={deleteVariable} updateVariableArray={updateVariableArray} variableConfig={variableObject} variableIndex={index} />
+                    })}
+                  </div>
+                )}
+                <div className='mb-1 d-flex'>
+                  <button className={'btn btn-primary'} onClick={handleCreateNewVariableButtonClick} disabled={!hasData}>
+                    Create New Variable
+                  </button>
+                </div>
+              </fieldset>
+            </>
+          ) : (
+            <InputText value={srcUrl || ''} section='contentEditor' fieldName='srcUrl' label='Source URL;' placeholder='https://www.example.com/file.html' updateField={updateField} />
+          )}
+        </div>
       </Accordion.Section>
       <Accordion.Section title='Visual'>
         <div className='input-group'>
@@ -128,32 +171,31 @@ const EditorPanel = memo(props => {
                 onClick={() => {
                   updateConfig({ ...config, theme: palette })
                 }}
-                className={config.theme === palette ? 'selected ' + palette : palette}
+                className={theme === palette ? 'selected ' + palette : palette}
               ></li>
             ))}
           </ul>
         </div>
-
         <div className='cove-accordion__panel-section checkbox-group'>
-          <CheckBox value={config.visual.border} section='visual' fieldName='border' label='Display Border' updateField={updateField} />
-          <CheckBox value={config.visual.borderColorTheme} section='visual' fieldName='borderColorTheme' label='Use Border Color Theme' updateField={updateField} />
-          <CheckBox value={config.visual.accent} section='visual' fieldName='accent' label='Use Accent Style' updateField={updateField} />
-          <CheckBox value={config.visual.background} section='visual' fieldName='background' label='Use Theme Background Color' updateField={updateField} />
-          <CheckBox value={config.visual.hideBackgroundColor} section='visual' fieldName='hideBackgroundColor' label='Hide Background Color' updateField={updateField} />
+          <InputCheckbox value={visual.border} section='visual' fieldName='border' label='Display Border&nbsp;' updateField={updateField} />
+          <InputCheckbox value={visual.borderColorTheme} section='visual' fieldName='borderColorTheme' label='Use Border Color Theme&nbsp;' updateField={updateField} />
+          <InputCheckbox value={visual.accent} section='visual' fieldName='accent' label='Use Accent Style&nbsp;' updateField={updateField} />
+          <InputCheckbox value={visual.background} section='visual' fieldName='background' label='Use Theme Background Color&nbsp;' updateField={updateField} />
+          <InputCheckbox value={visual.hideBackgroundColor} section='visual' fieldName='hideBackgroundColor' label='Hide Background Color&nbsp;' updateField={updateField} />
         </div>
       </Accordion.Section>
     </Accordion>
   )
 
-  if (loading) return null
+  if (loading && !config?.showEditorPanel) return null
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <Layout.Sidebar displayPanel={displayPanel} onBackClick={onBackClick} isDashboard={isDashboard} title='Configure Markup Include'>
+      <Layout.Sidebar displayPanel={displayPanel} isDashboard={isDashboard} title={'Configure Markup Include'} onBackClick={onBackClick}>
         {editorContent}
       </Layout.Sidebar>
     </ErrorBoundary>
   )
-})
+}
 
 export default EditorPanel

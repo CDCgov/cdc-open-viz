@@ -4,13 +4,15 @@ import React, { forwardRef, useRef } from 'react'
 import { Config as DataBiteConfig } from '@cdc/data-bite/src/types/Config'
 import './visualizations.scss'
 import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
+import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 
 type VisualizationWrapper = {
-  config: ChartConfig | DataBiteConfig | WaffleChartConfig
-  isEditor: boolean
+  children: React.ReactNode
+  config: ChartConfig | DataBiteConfig | WaffleChartConfig | MarkupIncludeConfig
   currentViewport: string
   imageId: string
-  children: React.ReactNode
+  isEditor: boolean
+  showEditorPanel: boolean
 }
 
 const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) => {
@@ -29,6 +31,12 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
     if (isEditor && !showEditorPanel) {
       classes = classes.filter(item => item !== 'editor-panel--visible')
       classes.push('editor-panel--hidden')
+    }
+
+    if (config.type === 'filtered-text') {
+      classes.push('type-filtered-text')
+      classes = classes.filter(item => item !== 'cove-component__content')
+      return classes
     }
 
     if (config.type === 'chart') {

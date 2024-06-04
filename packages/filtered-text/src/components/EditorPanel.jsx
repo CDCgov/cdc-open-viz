@@ -1,9 +1,8 @@
 import React, { useState, useEffect, memo, useContext } from 'react'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-
 import ConfigContext from '../ConfigContext'
 
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import InputText from '@cdc/core/components/inputs/InputText'
 import Button from '@cdc/core/components/elements/Button'
@@ -11,6 +10,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
+import Layout from '@cdc/core/components/Layout'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 import '@cdc/core/styles/v2/components/editor.scss'
@@ -97,6 +97,10 @@ const EditorPanel = memo(props => {
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
+    updateConfig({
+      ...config,
+      showEditorPanel: !displayPanel
+    })
   }
 
   const Error = () => {
@@ -248,20 +252,11 @@ const EditorPanel = memo(props => {
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <div className='cove-editor'>
+      <Layout.Sidebar displayPanel={displayPanel} isDashboard={isDashboard} title={'Configure Filtered Text'} onBackClick={onBackClick}>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
         {config.newViz && showConfigConfirm && <Confirm />}
-        <button className={`cove-editor--toggle` + (!displayPanel ? ` collapsed` : ``)} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
-        <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
-          <div className='cove-editor__panel-container'>
-            <h2 className='cove-editor__heading'>Configure Filtered Text</h2>
-            <section className='cove-editor__content'>{editorContent}</section>
-          </div>
-        </section>
-        <div className='cove-editor__content'>
-          <div className='cove-editor__content-wrap'>{props.children}</div>
-        </div>
-      </div>
+        {editorContent}
+      </Layout.Sidebar>
     </ErrorBoundary>
   )
 })
