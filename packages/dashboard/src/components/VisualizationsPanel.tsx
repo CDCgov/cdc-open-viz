@@ -7,6 +7,8 @@ import { Table } from '@cdc/core/types/Table'
 const addVisualization = (type, subType) => {
   const modalWillOpen = type !== 'markup-include'
   const newVisualizationConfig: Partial<Visualization> = {
+    filters: [],
+    filterBehavior: 'Filter Change',
     newViz: type !== 'table',
     openModal: modalWillOpen,
     uid: type + Date.now(),
@@ -21,15 +23,36 @@ const addVisualization = (type, subType) => {
       newVisualizationConfig.general = {}
       newVisualizationConfig.general.geoType = subType
       break
-    case 'data-bite' || 'waffle-chart' || 'markup-include' || 'filtered-text':
+    case 'data-bite' || 'waffle-chart' || 'filtered-text':
       newVisualizationConfig.visualizationType = type
       break
     case 'table':
-      const tableConfig: Table = { label: 'Data Table', show: true, showDownloadUrl: false, showVertical: true, expanded: true }
+      const tableConfig: Table = { label: 'Data Table', show: true, showDownloadUrl: false, showVertical: true, expanded: true, collapsible: true }
       newVisualizationConfig.table = tableConfig
       newVisualizationConfig.columns = {}
       newVisualizationConfig.dataFormat = {}
       newVisualizationConfig.visualizationType = type
+      break
+    case 'markup-include':
+      newVisualizationConfig.contentEditor = {
+        inlineHTML: '<h2>Inline HTML</h2>',
+        markupVariables: [],
+        showHeader: true,
+        srcUrl: '#example',
+        title: 'Markup Include',
+        useInlineHTML: true
+      }
+      newVisualizationConfig.theme = 'theme-blue'
+      newVisualizationConfig.visual = {
+        border: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false,
+        borderColorTheme: false
+      }
+      newVisualizationConfig.showEditorPanel = true
+      newVisualizationConfig.visualizationType = type
+
       break
     default:
       newVisualizationConfig.visualizationType = type
@@ -65,7 +88,7 @@ const VisualizationsPanel = ({ loadConfig, config }) => (
       <Widget addVisualization={() => addVisualization('table', '')} type='table' />
     </div>
     <span className='subheading-3'>Advanced</span>
-    <AdvancedEditor loadConfig={loadConfig} state={config} convertStateToConfig={undefined} />
+    <AdvancedEditor loadConfig={loadConfig} state={config} convertStateToConfig={() => undefined} />
   </div>
 )
 

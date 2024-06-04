@@ -2,9 +2,7 @@ import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAl
 import React, { MouseEventHandler, useContext, useMemo } from 'react'
 import Toggle from './Toggle'
 import _ from 'lodash'
-import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
-import DataTransform from '@cdc/core/helpers/DataTransform'
 import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
@@ -16,6 +14,7 @@ import { FilterBehavior } from './Header/Header'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { getVizConfig } from '../helpers/getVizConfig'
+import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 
 type VizRowProps = {
   filteredDataOverride?: Object[]
@@ -134,12 +133,12 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                   <CdcMarkupInclude
                     key={col.widget}
                     config={visualizationConfig}
+                    configUrl={undefined}
+                    isDashboard={true}
                     isEditor={false}
                     setConfig={newConfig => {
                       updateChildConfig(col.widget, newConfig)
                     }}
-                    isDashboard={true}
-                    configUrl={undefined}
                   />
                 )}
                 {visualizationConfig.type === 'filtered-text' && (
@@ -160,7 +159,17 @@ const VisualizationRow: React.FC<VizRowProps> = ({ filteredDataOverride, row, ro
                     <GoButton autoLoad={visualizationConfig.autoLoad} />
                   </React.Fragment>
                 )}
-                {visualizationConfig.type === 'table' && <DataTableStandAlone key={col.widget} visualizationKey={col.widget} config={visualizationConfig} viewport={currentViewport} />}
+                {visualizationConfig.type === 'table' && (
+                  <DataTableStandAlone
+                    key={col.widget}
+                    updateConfig={newConfig => {
+                      updateChildConfig(col.widget, newConfig)
+                    }}
+                    visualizationKey={col.widget}
+                    config={visualizationConfig as TableConfig}
+                    viewport={currentViewport}
+                  />
+                )}
               </div>
             </React.Fragment>
           )
