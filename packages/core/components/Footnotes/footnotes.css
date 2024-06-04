@@ -1,4 +1,4 @@
-:is(ul) {
+:is(ul).cove-footnotes {
   :is(li) {
     list-style: none;
   }

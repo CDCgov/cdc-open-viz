@@ -192,7 +192,7 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
             ))}
         </div>
         <button className='btn btn-primary footnotes' onClick={configureFootnotes}>
-          Configure Footnotes
+          {row.footnotesId ? 'Edit' : 'Add'} Footnotes
         </button>
       </div>
     </>
