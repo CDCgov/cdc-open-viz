@@ -34,7 +34,7 @@ const Legend: React.FC<LegendProps> = forwardRef(({ config, colorScale, seriesHi
 
   const legendClasses = {
     marginBottom: isBottomOrSmallViewport ? '15px' : '0px',
-    marginTop: getMarginTop(isBottomOrSmallViewport, config.brush?.active)
+    marginTop: isBottomOrSmallViewport && orientation === 'horizontal' ? `${config.yAxis.label && config.isResponsiveTicks ? config.dynamicMarginTop : config.runtime.xAxis.size}px` : `${isBottomOrSmallViewport ? (config.dynamicMarginTop || 0) + 15 : 0}px`
   }
 
   const { HighLightedBarUtils } = useHighlightedBars(config)

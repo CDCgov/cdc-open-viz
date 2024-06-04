@@ -1108,6 +1108,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Prevent render if loading
   let body = <Loading />
 
+  const makeClassName = (string) => {
+    if(!string || !string.toLowerCase) return 
+    return string.toLowerCase().replaceAll(/ /g, '-')
+  }
+
   const getChartWrapperClasses = () => {
     const classes = ['chart-container', 'p-relative']
     if (config.legend?.position === 'bottom') classes.push('bottom')
@@ -1141,7 +1146,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           {config.newViz && <Confirm />}
           {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && <Error />}
           {!missingRequiredSections() && !config.newViz && (
-            <div className='cdc-chart-inner-container cove-component__content' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
+            <div className={`cdc-chart-inner-container cove-component__content type-${makeClassName(config.visualizationType)}`} aria-label={handleChartAriaLabels(config)} tabIndex={0}>
               <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
 
               {/* Filters */}
