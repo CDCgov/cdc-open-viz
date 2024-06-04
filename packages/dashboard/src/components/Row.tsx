@@ -17,6 +17,7 @@ import { DataDesignerModal } from './DataDesignerModal'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import { iconHash } from '../helpers/iconHash'
 import _ from 'lodash'
+import { Visualization } from '@cdc/core/types/Visualization'
 
 type RowMenuProps = {
   rowIdx: number
@@ -149,31 +150,52 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   )
 }
 
-const Row = ({ row, idx: rowIdx, uuid }) => {
-  const { overlay } = useGlobalContext()
-  return (
-    <div className='builder-row' data-row-id={rowIdx}>
-      <RowMenu rowIdx={rowIdx} />
-      <div className='column-container'>
-        <>
-          <button
-            title='Configure Data'
-            className='btn btn-configure-row'
-            onClick={() => {
-              overlay?.actions.openOverlay(<DataDesignerModal rowIndex={rowIdx} />)
-            }}
-          >
-            {iconHash['gear']}
-          </button>
+type RowProps = { row: ConfigRow; idx: number; uuid: number | string }
 
+const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
+  const { overlay } = useGlobalContext()
+  const dispatch = useContext(DashboardDispatchContext)
+
+  const configureFootnotes = () => {
+    if (!row.footnotesId) {
+      const type = 'footnotes'
+      const uid = type + Date.now()
+      const newVisualizationConfig = {
+        uid,
+        type,
+        visualizationType: type,
+        editing: true
+      }
+      dispatch({ type: 'ADD_FOOTNOTE', payload: { id: uid, rowIndex: rowIdx, config: newVisualizationConfig as Visualization } })
+    } else {
+      dispatch({ type: 'UPDATE_VISUALIZATION', payload: { vizKey: row.footnotesId, configureData: { editing: true } } })
+    }
+  }
+  return (
+    <>
+      <div className='builder-row' data-row-id={rowIdx}>
+        <RowMenu rowIdx={rowIdx} />
+        <button
+          title='Configure Data'
+          className='btn btn-configure-row'
+          onClick={() => {
+            overlay?.actions.openOverlay(<DataDesignerModal rowIndex={rowIdx} />)
+          }}
+        >
+          {iconHash['gear']}
+        </button>
+        <div className='column-container'>
           {row.columns
             .filter(column => column.width)
             .map((column, colIdx) => (
               <Column data={column} key={`row-${uuid}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />
             ))}
-        </>
+        </div>
+        <button className='btn btn-primary footnotes' onClick={configureFootnotes}>
+          {row.footnotesId ? 'Edit' : 'Add'} Footnotes
+        </button>
       </div>
-    </div>
+    </>
   )
 }
 

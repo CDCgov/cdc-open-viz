@@ -49,7 +49,7 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
     const rowOptions: number[] = []
 
     config.rows.forEach((row, rowIndex) => {
-      if (!!row.multiVizColumn) {
+      if (!!row.dataKey) {
         nameLookup[rowIndex] = `Row ${rowIndex + 1}`
         rowOptions.push(rowIndex)
       }

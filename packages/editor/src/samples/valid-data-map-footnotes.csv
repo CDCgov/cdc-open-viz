@@ -1,0 +1,8 @@
+Location,symbolCol,textCol,orderCol
+School,¶,Footnote 4,4
+School,§,Footnote 3,3
+School,†,Footnote 2,2
+School,*,Footnote 1,1
+Vehicle,*,Some Vehicle Footnote,1
+Work,*,Some Work Footnote,1
+Home,*,Some Home Footnote,1
