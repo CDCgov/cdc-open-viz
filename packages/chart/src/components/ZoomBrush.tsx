@@ -136,7 +136,7 @@ const ZoomBrush: FC<Props> = props => {
       }
 
       if (config.isResponsiveTicks && !tickRotation) {
-        top = Number(config.dynamicMarginTop ? config.dynamicMarginTop : config.xAxis.labelOffset) + offSet
+        top = Number(config.dynamicMarginTop ? config.dynamicMarginTop : config.xAxis.labelOffset) + offSet * 2
       }
     }
 

@@ -78,7 +78,7 @@ export const useEditorPermissions = () => {
 
   const visHasaAdditionalLabelsOnBars = () => {
     if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') return false
-    if (['Bar', 'Line', 'Combo'].includes(config.visualizationType)) return true
+    if (['Bar', 'Combo'].includes(config.visualizationType)) return true
     return false
   }
 
