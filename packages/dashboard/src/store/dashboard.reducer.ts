@@ -37,6 +37,11 @@ export type DashboardState = {
 
 const reducer = (state: DashboardState, action: DashboardActions): DashboardState => {
   switch (action.type) {
+    case 'ADD_FOOTNOTE': {
+      const { id, rowIndex, config } = action.payload
+      const newRows = state.config.rows.map((row, i) => (i === rowIndex ? { ...row, footnotesId: id } : row))
+      return { ...state, config: { ...state.config, rows: newRows, visualizations: { ...state.config.visualizations, [id]: config } } }
+    }
     case 'ADD_NEW_DASHBOARD': {
       const currentMultiDashboards = state.config.multiDashboards
       const label = 'New Dashboard ' + (currentMultiDashboards.length + 1)

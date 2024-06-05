@@ -208,8 +208,8 @@ const PieChart = props => {
   return (
     <>
       <ErrorBoundary component='PieChart'>
-        <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
-          <Group top={centerY} left={centerX}>
+        <svg width={radius * 2} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
+          <Group top={centerY} left={radius}>
             {/* prettier-ignore */}
             <Pie
             data={filteredData || _data}

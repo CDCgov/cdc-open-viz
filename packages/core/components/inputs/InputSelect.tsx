@@ -3,7 +3,7 @@ import '../../styles/v2/components/input/index.scss'
 interface InputProps {
   label?
   value?
-  options: string[] | { [key: string]: string }
+  options: string[] | Record<string, any> | [any, string][]
   fieldName
   section?
   subsection?
@@ -17,11 +17,22 @@ const InputSelect = ({ label, value, options, fieldName, section = null, subsect
 
   if (Array.isArray(options)) {
     //Handle basic array
-    optionsJsx = options.map(optionName => (
-      <option value={optionName} key={optionName}>
-        {optionName}
-      </option>
-    ))
+    optionsJsx = options.map(option => {
+      if (typeof option === 'string') {
+        return (
+          <option value={option} key={option}>
+            {option}
+          </option>
+        )
+      } else {
+        const [value, name] = option
+        return (
+          <option value={value} key={name}>
+            {name}
+          </option>
+        )
+      }
+    })
   } else {
     //Handle object with value/name pairs
     optionsJsx = []

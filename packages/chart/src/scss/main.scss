@@ -96,6 +96,12 @@
     }
   }
 
+  .type-pie {
+    svg.animated-pie {
+      width: auto !important;
+    }
+  }
+
   .legend-container {
     background: #fff;
     width: 100%;

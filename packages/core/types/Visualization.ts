@@ -9,6 +9,7 @@ import { ConfigureData } from './ConfigureData'
 import { VizFilter } from './VizFilter'
 import { FilterBehavior } from './FilterBehavior'
 import { General } from './General'
+import { Runtime } from './Runtime'
 
 export type Visualization = ConfigureData & {
   autoLoad: boolean
@@ -29,6 +30,7 @@ export type Visualization = ConfigureData & {
   openModal: boolean
   orientation: 'vertical' | 'horizontal'
   originalFormattedData: any
+  runtime?: Runtime
   series: Series
   showEditorPanel: boolean
   table: Table

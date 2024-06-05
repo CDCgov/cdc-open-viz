@@ -62,6 +62,7 @@ import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import Layout from '@cdc/core/components/Layout'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -312,9 +313,10 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     loadAPIFilters()
   }, [])
 
-  useEffect(() => {
-    updateDataFilters()
-  }, [state.config?.activeDashboard])
+  // THIS CODE WAS REVERTED
+  // useEffect(() => {
+  //   updateDataFilters()
+  // }, [state.config?.activeDashboard])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     const { config } = state
@@ -573,6 +575,14 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               <>
                 <Header visualizationKey={visualizationKey} subEditor='Table' />
                 <DataTableStandAlone visualizationKey={visualizationKey} config={visualizationConfig} isEditor={true} updateConfig={_updateConfig} />
+              </>
+            )
+            break
+          case 'footnotes':
+            body = (
+              <>
+                <Header visualizationKey={visualizationKey} subEditor='Footnotes' />
+                <FootnotesStandAlone visualizationKey={visualizationKey} config={{ ...visualizationConfig, datasets: state.config.datasets }} isEditor={true} updateConfig={_updateConfig} />
               </>
             )
             break

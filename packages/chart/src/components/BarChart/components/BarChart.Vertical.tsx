@@ -6,6 +6,7 @@ import BarChartContext, { type BarChartContextValues } from './context'
 import { useBarChart } from '../../../hooks/useBarChart'
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { getBarY, getBarDimensions } from '../helpers'
+import { isConvertLineToBarGraph } from '../../../helpers/isConvertLineToBarGraph'
 // VisX library imports
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -45,7 +46,7 @@ export const BarChartVertical = () => {
 
   return (
     config.visualizationSubType !== 'stacked' &&
-    (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') &&
+    (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)) &&
     config.orientation === 'vertical' && (
       <Group>
         <BarGroup

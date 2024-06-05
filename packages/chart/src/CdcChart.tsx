@@ -50,6 +50,7 @@ import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 
 import './scss/main.scss'
 // load both then config below determines which to use
@@ -103,6 +104,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
   const handleChartTabbing = !config.legend?.hide ? legendId : config?.title ? `dataTableSection__${config.title.replace(/\s/g, '')}` : `dataTableSection`
+
+  const checkLineToBarGraph = () => {
+    return isConvertLineToBarGraph(config.visualizationType, filterData, config.allowLineToBarGraph)
+  }
 
   const reloadURLData = async () => {
     if (config.dataUrl) {
@@ -488,7 +493,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'
-    } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType)) {
+    } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) && !checkLineToBarGraph()) {
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
       newConfig.runtime.horizontal = false
@@ -914,7 +919,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   // Select appropriate chart type
-  const chartComponents = {
+  const ChartComponents = {
     'Paired Bar': <LinearChart />,
     Forecasting: <LinearChart />,
     Bar: <LinearChart />,
@@ -1108,10 +1113,15 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Prevent render if loading
   let body = <Loading />
 
+  const makeClassName = (string) => {
+    if(!string || !string.toLowerCase) return 
+    return string.toLowerCase().replaceAll(/ /g, '-')
+  }
+
   const getChartWrapperClasses = () => {
     const classes = ['chart-container', 'p-relative']
-    if (config.legend.position === 'bottom') classes.push('bottom')
-    if (config.legend.hide) classes.push('legend-hidden')
+    if (config.legend?.position === 'bottom') classes.push('bottom')
+    if (config.legend?.hide) classes.push('legend-hidden')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
     if (isDebug) classes.push('debug')
@@ -1120,11 +1130,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
   const getChartSubTextClasses = () => {
     const classes = ['subtext ']
-    const isLegendOnBottom = legend.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
+    const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
-    if (config.brush.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
-    if (config.brush.active && config.legend.hide) classes.push('subtext--brush-active ')
+    if (config.brush?.active && !isLegendOnBottom) classes.push('subtext--brush-active ')
+    if (config.brush?.active && config.legend.hide) classes.push('subtext--brush-active ')
     return classes
   }
 
@@ -1141,7 +1151,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           {config.newViz && <Confirm />}
           {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && <Error />}
           {!missingRequiredSections() && !config.newViz && (
-            <div className='cdc-chart-inner-container cove-component__content' aria-label={handleChartAriaLabels(config)} tabIndex={0}>
+            <div className={`cdc-chart-inner-container cove-component__content type-${makeClassName(config.visualizationType)}`} aria-label={handleChartAriaLabels(config)} tabIndex={0}>
               <Title showTitle={config.showTitle} isDashboard={isDashboard} title={title} superTitle={config.superTitle} classes={['chart-title', `${config.theme}`, 'cove-component__header']} style={undefined} />
 
               {/* Filters */}
@@ -1149,9 +1159,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               <SkipTo skipId={handleChartTabbing} skipMessage='Skip Over Chart Container' />
               {/* Visualization */}
               {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
+
               <div className={getChartWrapperClasses().join(' ')}>
-                {/* All charts except sparkline */}
-                {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
+                {/* All charts except line and sparkline */}
+                {config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Line' && ChartComponents[config.visualizationType]}
+
+                {/* Line Chart */}
+                {config.visualizationType === 'Line' && (checkLineToBarGraph() ? ChartComponents['Bar'] : ChartComponents['Line'])}
+
                 {/* Sparkline */}
                 {config.visualizationType === 'Spark Line' && (
                   <>
