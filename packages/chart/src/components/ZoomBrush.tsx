@@ -16,7 +16,6 @@ interface Props {
 const ZoomBrush: FC<Props> = props => {
   const { tableData, config, parseDate, formatDate, setBrushConfig, getTextWidth, dashboardConfig } = useContext(ConfigContext)
   const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []
-  // console.log(dashboardConfig, 'dashboardConfig')
   const { fontSize } = useBarChart()
   const [brushKey, setBrushKey] = useState(0)
   const brushRef = useRef(null)
@@ -140,9 +139,6 @@ const ZoomBrush: FC<Props> = props => {
         top = Number(config.dynamicMarginTop ? config.dynamicMarginTop : config.xAxis.labelOffset) + offSet
       }
     }
-    // if (dashboardConfig?.type === '"dashboard"') {
-    //   top = top + 10
-    // }
 
     return top
   }
@@ -151,7 +147,7 @@ const ZoomBrush: FC<Props> = props => {
   }
 
   return (
-    <Group style={{ marginBottom: '55px' }} display={config.brush?.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
+    <Group display={config.brush?.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
       <rect fill='#949494' width={props.xMax} height={config.brush.height} rx={radius} />
       <Brush
         key={brushKey}
