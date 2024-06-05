@@ -1113,8 +1113,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Prevent render if loading
   let body = <Loading />
 
-  const makeClassName = (string) => {
-    if(!string || !string.toLowerCase) return 
+  const makeClassName = string => {
+    if (!string || !string.toLowerCase) return
     return string.toLowerCase().replaceAll(/ /g, '-')
   }
 
@@ -1124,10 +1124,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     if (config.legend?.hide) classes.push('legend-hidden')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
-    if (isDebug) classes.push('debug')
+    if (config.brush?.active && dashboardConfig?.type === 'dashboard') classes.push('dashboard-brush')
     classes.push(...contentClasses)
     return classes
   }
+
   const getChartSubTextClasses = () => {
     const classes = ['subtext ']
     const isLegendOnBottom = legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(currentViewport)

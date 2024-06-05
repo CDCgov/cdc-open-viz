@@ -14,7 +14,9 @@ interface Props {
   yMax: number
 }
 const ZoomBrush: FC<Props> = props => {
-  const { tableData, config, parseDate, formatDate, setBrushConfig, getTextWidth } = useContext(ConfigContext)
+  const { tableData, config, parseDate, formatDate, setBrushConfig, getTextWidth, dashboardConfig } = useContext(ConfigContext)
+  const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []
+  // console.log(dashboardConfig, 'dashboardConfig')
   const { fontSize } = useBarChart()
   const [brushKey, setBrushKey] = useState(0)
   const brushRef = useRef(null)
@@ -27,14 +29,12 @@ const ZoomBrush: FC<Props> = props => {
     endValue: ''
   })
 
-  console.log(textProps, 'text')
-
   const initialPosition = {
     start: { x: 0 },
     end: { x: props.xMax }
   }
   const style = {
-    fill: '#AFA6A5 ',
+    fill: '#474747 ',
     stroke: 'blue',
     fillOpacity: 0.8,
     strokeOpacity: 0,
@@ -90,7 +90,8 @@ const ZoomBrush: FC<Props> = props => {
   useEffect(() => {
     const isFiltersActive = config.filters?.some(filter => filter.active)
     const isExclusionsActive = config.exclusions?.active
-    if ((isFiltersActive || isExclusionsActive) && config.brush?.active) {
+    const isDashboardFilters = sharedFilters?.length > 0
+    if ((isFiltersActive || isExclusionsActive || isDashboardFilters) && config.brush?.active) {
       setBrushKey(prevKey => prevKey + 1)
       setBrushConfig(prev => {
         return {
@@ -106,7 +107,7 @@ const ZoomBrush: FC<Props> = props => {
           data: []
         }
       })
-  }, [config.filters, config.exclusions, config.brush?.active])
+  }, [config.filters, config.exclusions, config.brush?.active, sharedFilters])
 
   const calculateTop = (): number => {
     const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
@@ -139,6 +140,9 @@ const ZoomBrush: FC<Props> = props => {
         top = Number(config.dynamicMarginTop ? config.dynamicMarginTop : config.xAxis.labelOffset) + offSet
       }
     }
+    // if (dashboardConfig?.type === '"dashboard"') {
+    //   top = top + 10
+    // }
 
     return top
   }
@@ -147,8 +151,8 @@ const ZoomBrush: FC<Props> = props => {
   }
 
   return (
-    <Group display={config.brush?.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
-      <rect fill='#F7F7F7  ' width={props.xMax} height={config.brush.height} rx={radius} />
+    <Group style={{ marginBottom: '55px' }} display={config.brush?.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
+      <rect fill='#949494' width={props.xMax} height={config.brush.height} rx={radius} />
       <Brush
         key={brushKey}
         disableDraggingOverlay={true}
@@ -185,7 +189,7 @@ const BrushHandle = props => {
 
   return (
     <Group left={x + pathWidth / 2} top={-2}>
-      <Text pointerEvents='visiblePainted' dominantBaseline='hanging' x={isLeft ? 55 : -50} y={30} verticalAnchor='start' textAnchor={textAnchor} fontSize={fontSize / 1.4}>
+      <Text pointerEvents='visiblePainted' dominantBaseline='hanging' x={isLeft ? 55 : -50} y={25} verticalAnchor='start' textAnchor={textAnchor} fontSize={fontSize / 1.4}>
         {isLeft ? textProps.startValue : textProps.endValue}
       </Text>
       <path cursor='ew-resize' d='M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12' fill={!isBrushing ? '#000' : '#297EF1'} strokeWidth='1' transform={transform}></path>
