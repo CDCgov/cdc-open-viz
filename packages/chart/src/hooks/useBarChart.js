@@ -212,7 +212,7 @@ export const useBarChart = () => {
 
   const composeSuppressionBars = ({ bar }) => {
     const suppressedBarHeight = config.general.showSuppressedSymbol ? 3 : 0
-    let height = suppressedBarHeight ? suppressedBarHeight : 3
+    const height = suppressedBarHeight ? suppressedBarHeight : 3
     const ASTERISK = 'Asterisk'
     const getIconPadding = symbol => (String(symbol).includes(ASTERISK) ? -5 : -height * 3)
     const getVerticalAnchor = symbol => {
