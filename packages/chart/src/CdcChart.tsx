@@ -50,6 +50,7 @@ import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+import { isConvertLineToBarGraph } from './helpers/isConvertLineToBarGraph'
 
 import './scss/main.scss'
 // load both then config below determines which to use
@@ -103,6 +104,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const { barBorderClass, lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
   const handleChartTabbing = !config.legend?.hide ? legendId : config?.title ? `dataTableSection__${config.title.replace(/\s/g, '')}` : `dataTableSection`
+
+  const checkLineToBarGraph = () => {
+    return isConvertLineToBarGraph(config.visualizationType, filterData, config.allowLineToBarGraph)
+  }
 
   const reloadURLData = async () => {
     if (config.dataUrl) {
@@ -488,7 +493,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'
-    } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType)) {
+    } else if (['Box Plot', 'Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) && !checkLineToBarGraph()) {
       newConfig.runtime.xAxis = newConfig.xAxis
       newConfig.runtime.yAxis = newConfig.yAxis
       newConfig.runtime.horizontal = false
@@ -914,7 +919,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   // Select appropriate chart type
-  const chartComponents = {
+  const ChartComponents = {
     'Paired Bar': <LinearChart />,
     Forecasting: <LinearChart />,
     Bar: <LinearChart />,
@@ -1154,9 +1159,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               <SkipTo skipId={handleChartTabbing} skipMessage='Skip Over Chart Container' />
               {/* Visualization */}
               {config?.introText && config.visualizationType !== 'Spark Line' && <section className='introText'>{parse(config.introText)}</section>}
+
               <div className={getChartWrapperClasses().join(' ')}>
-                {/* All charts except sparkline */}
-                {config.visualizationType !== 'Spark Line' && chartComponents[config.visualizationType]}
+                {/* All charts except line and sparkline */}
+                {config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Line' && ChartComponents[config.visualizationType]}
+
+                {/* Line Chart */}
+                {config.visualizationType === 'Line' && (checkLineToBarGraph() ? ChartComponents['Bar'] : ChartComponents['Line'])}
+
                 {/* Sparkline */}
                 {config.visualizationType === 'Spark Line' && (
                   <>

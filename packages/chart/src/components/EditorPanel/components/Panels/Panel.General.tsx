@@ -69,6 +69,24 @@ const PanelGeneral: FC<PanelProps> = props => {
           )
         )}
         {visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
+        {visualizationType === 'Line' && (
+          <CheckBox
+            value={config.allowLineToBarGraph}
+            fieldName='allowLineToBarGraph'
+            label='Convert to Bar Graph'
+            updateField={updateField}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>Switch to bar graph when less than 3 data points available.</p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+          />
+        )}
 
         <TextField
           value={config.title || 'Chart Title'}
