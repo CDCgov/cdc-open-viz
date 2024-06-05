@@ -6,6 +6,7 @@ import { FC, useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { ScaleLinear, ScaleBand } from 'd3-scale'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 interface Props {
   xScaleBrush: ScaleLinear<number, number>
@@ -33,7 +34,7 @@ const ZoomBrush: FC<Props> = props => {
     end: { x: props.xMax }
   }
   const style = {
-    fill: '#474747 ',
+    fill: '#474747',
     stroke: 'blue',
     fillOpacity: 0.8,
     strokeOpacity: 0,
@@ -41,19 +42,18 @@ const ZoomBrush: FC<Props> = props => {
   }
 
   const onBrushChange = event => {
-    if (!event || !event.xValues) return
-
-    const { xValues } = event
+    const filteredValues = event?.xValues?.filter(val => val !== undefined)
+    if (filteredValues?.length === 0) return
 
     const dataKey = config.xAxis?.dataKey
 
-    const brushedData = tableData.filter(item => xValues.includes(item[dataKey]))
+    const brushedData = tableData.filter(item => filteredValues.includes(item[dataKey]))
 
-    const endValue = xValues
+    const endValue = filteredValues
       .slice()
       .reverse()
       .find(item => item !== undefined)
-    const startValue = xValues.find(item => item !== undefined)
+    const startValue = filteredValues.find(item => item !== undefined)
 
     const formatIfDate = value => (isDateScale(config.runtime.xAxis) ? formatDate(parseDate(value)) : value)
 
@@ -136,7 +136,7 @@ const ZoomBrush: FC<Props> = props => {
       }
 
       if (config.isResponsiveTicks && !tickRotation) {
-        top = Number(config.dynamicMarginTop ? config.dynamicMarginTop : config.xAxis.labelOffset) + offSet
+        top = Number(config.dynamicMarginTop ? config.dynamicMarginTop : config.xAxis.labelOffset) + offSet * 2
       }
     }
 
@@ -147,26 +147,28 @@ const ZoomBrush: FC<Props> = props => {
   }
 
   return (
-    <Group display={config.brush?.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
-      <rect fill='#949494' width={props.xMax} height={config.brush.height} rx={radius} />
-      <Brush
-        key={brushKey}
-        disableDraggingOverlay={true}
-        renderBrushHandle={props => <BrushHandle getTextWidth={getTextWidth} pixelDistance={textProps.endPosition - textProps.startPosition} textProps={textProps} fontSize={fontSize[config.fontSize]} {...props} isBrushing={brushRef.current?.state.isBrushing} />}
-        innerRef={brushRef}
-        useWindowMoveEvents={true}
-        selectedBoxStyle={style}
-        xScale={props.xScaleBrush}
-        yScale={props.yScale}
-        width={props.xMax}
-        resizeTriggerAreas={['left', 'right']}
-        height={config.brush.height}
-        handleSize={8}
-        brushDirection='horizontal'
-        initialBrushPosition={initialPosition}
-        onChange={onBrushChange}
-      />
-    </Group>
+    <ErrorBoundary component='Brush Chart'>
+      <Group display={config.brush?.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
+        <rect fill='#949494' width={props.xMax} height={config.brush.height} rx={radius} />
+        <Brush
+          key={brushKey}
+          disableDraggingOverlay={true}
+          renderBrushHandle={props => <BrushHandle getTextWidth={getTextWidth} pixelDistance={textProps.endPosition - textProps.startPosition} textProps={textProps} fontSize={fontSize[config.fontSize]} {...props} isBrushing={brushRef.current?.state.isBrushing} />}
+          innerRef={brushRef}
+          useWindowMoveEvents={true}
+          selectedBoxStyle={style}
+          xScale={props.xScaleBrush}
+          yScale={props.yScale}
+          width={props.xMax}
+          resizeTriggerAreas={['left', 'right']}
+          height={config.brush.height}
+          handleSize={8}
+          brushDirection='horizontal'
+          initialBrushPosition={initialPosition}
+          onChange={onBrushChange}
+        />
+      </Group>
+    </ErrorBoundary>
   )
 }
 
