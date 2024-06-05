@@ -27,9 +27,6 @@ import useRightAxis from '../../hooks/useRightAxis'
 import WarningImage from '../../images/warning.svg'
 import useMinMax from '../../hooks/useMinMax'
 
-// local helpers
-import { isConvertLineToBarGraph } from '../../helpers/isConvertLineToBarGraph'
-
 import { type ChartContext } from '../../types/ChartContext'
 import { type ChartConfig } from '../../types/ChartConfig'
 
@@ -52,16 +49,12 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   const hasComboLineSeries = isCombo && lineSeriesExists
   const hasComboBarSeries = isCombo && barSeriesExists
 
-  const checkLineToBarGraph = () => {
-    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
-  }
-
   const getColumnOptions = () => {
     return _.uniq(_.flatMap(data, _.keys))
   }
 
   const getTypeOptions = () => {
-    return (config.visualizationType === 'Line' && !checkLineToBarGraph()) || hasComboLineSeries ? ['effect', 'suppression'] : ['suppression']
+    return config.visualizationType === 'Line' || hasComboLineSeries ? ['effect', 'suppression'] : ['suppression']
   }
 
   const lineCodes = {
@@ -72,7 +65,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   }
 
   const getStyleOptions = type => {
-    if ((config.visualizationType === 'Line' && !checkLineToBarGraph()) || isCombo) {
+    if (config.visualizationType === 'Line' || isCombo) {
       const options = Object.keys(lineCodes)
       if (type === 'suppression') {
         return options.slice(0, -1)
@@ -83,7 +76,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   }
 
   const getSymbolOptions = () => {
-    if ((config.visualizationType === 'Bar' && checkLineToBarGraph()) || hasComboBarSeries) {
+    if (config.visualizationType === 'Bar' || hasComboBarSeries) {
       return Object.keys(symbolCodes)
     }
   }
@@ -389,7 +382,7 @@ const EditorPanel = () => {
       newSeries = config.series.map(series => {
         return {
           ...series,
-          type: config.visualizationType === 'Combo' || isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph) ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
+          type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
           axis: 'Left'
         }
       })
@@ -1037,9 +1030,9 @@ const EditorPanel = () => {
   }
 
   const updateViewportOverrides = (property, viewport, numTicks) => {
-    const propertyObject = {...config.xAxis[property]}
+    const propertyObject = { ...config.xAxis[property] }
     propertyObject[viewport] = numTicks
-    const updatedConfig = {...config, xAxis: {...config.xAxis, [property]: propertyObject}}
+    const updatedConfig = { ...config, xAxis: { ...config.xAxis, [property]: propertyObject } }
 
     updateConfig(updatedConfig)
   }
@@ -1980,7 +1973,16 @@ const EditorPanel = () => {
 
                       {visSupportsDateCategoryNumTicks() && config.xAxis.type !== 'date-time' && config.xAxis.manual && (
                         <>
-                          <TextField value={config.xAxis.manualStep} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='manualStep' label='Step count' className='number-narrow' updateField={updateField} 
+                          <TextField
+                            value={config.xAxis.manualStep}
+                            placeholder='Auto'
+                            type='number'
+                            min={1}
+                            section='xAxis'
+                            fieldName='manualStep'
+                            label='Step count'
+                            className='number-narrow'
+                            updateField={updateField}
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
@@ -1990,22 +1992,44 @@ const EditorPanel = () => {
                                   <p>Number of data points which are assigned a tick, starting from the right most data point. Value of 1 will show a tick at every data point, value of 2 will show a tick for every other, etc.</p>
                                 </Tooltip.Content>
                               </Tooltip>
-                            }/>
-                          <div className="viewport-overrides">
+                            }
+                          />
+                          <div className='viewport-overrides'>
                             <label>
-                              <button onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)} className="edit-label">Step Count: viewport overrides <span style={{transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})`}}>&gt;</span></button>
+                              <button onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)} className='edit-label'>
+                                Step Count: viewport overrides <span style={{ transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})` }}>&gt;</span>
+                              </button>
                             </label>
-                            {displayViewportOverrides && <div className="edit-block">
-                              {Object.keys(viewports).map(viewport => (
-                                <TextField key={`viewport-step-count-input-${viewport}`} value={config.xAxis.viewportStepCount ? config.xAxis.viewportStepCount[viewport] : undefined} placeholder='Auto' type='number' label={viewport} className='number-narrow' updateField={(section, fieldName, label, val) => updateViewportOverrides('viewportStepCount', viewport, val)} />
-                              ))}
-                            </div>}
+                            {displayViewportOverrides && (
+                              <div className='edit-block'>
+                                {Object.keys(viewports).map(viewport => (
+                                  <TextField
+                                    key={`viewport-step-count-input-${viewport}`}
+                                    value={config.xAxis.viewportStepCount ? config.xAxis.viewportStepCount[viewport] : undefined}
+                                    placeholder='Auto'
+                                    type='number'
+                                    label={viewport}
+                                    className='number-narrow'
+                                    updateField={(section, fieldName, label, val) => updateViewportOverrides('viewportStepCount', viewport, val)}
+                                  />
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </>
                       )}
                       {visSupportsDateCategoryNumTicks() && (config.xAxis.type === 'date-time' || !config.xAxis.manual) && (
                         <>
-                          <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} 
+                          <TextField
+                            value={config.xAxis.numTicks}
+                            placeholder='Auto'
+                            type='number'
+                            min={1}
+                            section='xAxis'
+                            fieldName='numTicks'
+                            label='Number of ticks'
+                            className='number-narrow'
+                            updateField={updateField}
                             tooltip={
                               <Tooltip style={{ textTransform: 'none' }}>
                                 <Tooltip.Target>
@@ -2015,16 +2039,29 @@ const EditorPanel = () => {
                                   <p>Apporoximate number of ticks. Other factors such as space available and data may change the exact number of ticks used. To enforce an exact number of ticks, check "Manual Ticks" above.</p>
                                 </Tooltip.Content>
                               </Tooltip>
-                            }/>
-                          <div className="viewport-overrides">
+                            }
+                          />
+                          <div className='viewport-overrides'>
                             <label>
-                              <button onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)} className="edit-label">Number of ticks: viewport overrides <span style={{transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})`}}>&gt;</span></button>
+                              <button onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)} className='edit-label'>
+                                Number of ticks: viewport overrides <span style={{ transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})` }}>&gt;</span>
+                              </button>
                             </label>
-                            {displayViewportOverrides && <div className="edit-block">
-                              {Object.keys(viewports).map(viewport => (
-                                <TextField key={`viewport-num-ticks-input-${viewport}`} value={config.xAxis.viewportNumTicks ? config.xAxis.viewportNumTicks[viewport] : undefined} placeholder='Auto' type='number' label={viewport} className='number-narrow' updateField={(section, fieldName, label, val) => updateViewportOverrides('viewportNumTicks', viewport, val)} />
-                              ))}
-                            </div>}
+                            {displayViewportOverrides && (
+                              <div className='edit-block'>
+                                {Object.keys(viewports).map(viewport => (
+                                  <TextField
+                                    key={`viewport-num-ticks-input-${viewport}`}
+                                    value={config.xAxis.viewportNumTicks ? config.xAxis.viewportNumTicks[viewport] : undefined}
+                                    placeholder='Auto'
+                                    type='number'
+                                    label={viewport}
+                                    className='number-narrow'
+                                    updateField={(section, fieldName, label, val) => updateViewportOverrides('viewportNumTicks', viewport, val)}
+                                  />
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </>
                       )}
