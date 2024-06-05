@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react'
 import SuppressedConfig from './_mock/bar-chart-suppressed.json'
 
 import Chart from '../CdcChart'
-import lineChartTwoPointsRegressionTest from './_mock/line_Chart_Two_Points_Regression_Test.json'
-import lineChartTwoPointsNewChart from './_mock/line_Chart_Two_Points_New_Chart.json'
+import lineChartTwoPointsRegressionTest from './_mock/line_chart_two_points_regression_test.json'
+import lineChartTwoPointsNewChart from './_mock/line_chart_two_points_new_chart.json'
 import lollipop from './_mock/lollipop.json'
 
 const meta: Meta<typeof Chart> = {
