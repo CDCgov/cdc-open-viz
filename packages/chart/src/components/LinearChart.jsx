@@ -24,6 +24,9 @@ import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './../hooks/useIntersectionObserver'
 import Regions from './Regions'
 
+// Helpers
+import { isConvertLineToBarGraph } from '../helpers/isConvertLineToBarGraph'
+
 // Hooks
 import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
@@ -40,6 +43,10 @@ const LinearChart = props => {
   const { transformedData: data, tableData, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth, brushConfig } = useContext(ConfigContext)
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
+
+  const checkLineToBarGraph = () => {
+    return isConvertLineToBarGraph(config.visualizationType, data, config.allowLineToBarGraph)
+  }
 
   // configure width
   let [width] = dimensions
@@ -102,6 +109,7 @@ const LinearChart = props => {
     if (config.data && !config.data[index] && visualizationType === 'Forest Plot') return
     if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
     if (isDateScale(runtime.yAxis)) return formatDate(parseDate(tick))
+    if (orientation === 'vertical' && max - min < 3) return formatNumber(tick, 'left', shouldAbbreviate, false, false, '1')
     if (orientation === 'vertical') return formatNumber(tick, 'left', shouldAbbreviate)
     return tick
   }
@@ -593,7 +601,7 @@ const LinearChart = props => {
           {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') || visualizationType === 'Combo') && (
             <AreaChartStacked xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} width={xMax} height={yMax} handleTooltipMouseOver={handleTooltipMouseOver} handleTooltipMouseOff={handleTooltipMouseOff} tooltipData={tooltipData} showTooltip={showTooltip} />
           )}
-          {(visualizationType === 'Bar' || visualizationType === 'Combo') && (
+          {(visualizationType === 'Bar' || visualizationType === 'Combo' || checkLineToBarGraph()) && (
             <BarChart
               xScale={xScale}
               yScale={yScale}
@@ -612,7 +620,7 @@ const LinearChart = props => {
               chartRef={svgRef}
             />
           )}
-          {(visualizationType === 'Line' || visualizationType === 'Combo') && (
+          {((visualizationType === 'Line' && !checkLineToBarGraph()) || visualizationType === 'Combo') && (
             <LineChart
               xScale={xScale}
               yScale={yScale}
@@ -675,7 +683,7 @@ const LinearChart = props => {
           {['Line', 'Bar', 'Combo', 'Area Chart'].includes(config.visualizationType) && !isHorizontal && <ZoomBrush xScaleBrush={xScaleBrush} yScale={yScale} xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
-          {visualizationType !== 'Bar' && visualizationType !== 'Paired Bar' && visualizationType !== 'Box Plot' && visualizationType !== 'Area Chart' && visualizationType !== 'Scatter Plot' && visualizationType !== 'Deviation Bar' && visualizationType !== 'Forecasting' && (
+          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(visualizationType) && !checkLineToBarGraph() && (
             <>
               <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
             </>
@@ -733,7 +741,7 @@ const LinearChart = props => {
             })}
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
           {/* prettier-ignore */}
-          {config.visualizationType !== 'Bar' && config.visualizationType !== 'Combo' && (
+          {(config.visualizationType !== 'Bar' || !checkLineToBarGraph()) && config.visualizationType !== 'Combo' && (
             <Regions xScale={xScale} handleTooltipClick={handleTooltipClick} handleTooltipMouseOff={handleTooltipMouseOff} handleTooltipMouseOver={handleTooltipMouseOver} showTooltip={showTooltip} hideTooltip={hideTooltip} tooltipData={tooltipData} yMax={yMax} width={width} />
           )}
           {chartHasTooltipGuides && showTooltip && tooltipData && config.visual.verticalHoverLine && (
@@ -751,12 +759,12 @@ const LinearChart = props => {
               {config.chartMessage.noData}
             </Text>
           )}
-          {config.visualizationType === 'Bar' && config.tooltips.singleSeries && config.visual.horizontalHoverLine && (
+          {(config.visualizationType === 'Bar' || checkLineToBarGraph()) && config.tooltips.singleSeries && config.visual.horizontalHoverLine && (
             <Group key='tooltipLine-horizontal' className='horizontal-tooltip-line' left={config.yAxis.size ? config.yAxis.size : 0}>
               <Line from={{ x: 0, y: point.y }} to={{ x: xMax, y: point.y }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='horizontal-tooltip-line' />
             </Group>
           )}
-          {config.visualizationType === 'Bar' && config.tooltips.singleSeries && config.visual.verticalHoverLine && (
+          {(config.visualizationType === 'Bar' || checkLineToBarGraph()) && config.tooltips.singleSeries && config.visual.verticalHoverLine && (
             <Group key='tooltipLine-vertical' className='vertical-tooltip-line'>
               <Line from={{ x: point.x, y: 0 }} to={{ x: point.x, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
             </Group>

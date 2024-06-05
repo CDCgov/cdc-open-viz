@@ -1,4 +1,5 @@
 export default {
+  allowLineToBarGraph: undefined,
   type: 'chart',
   debugSvg: false,
   chartMessage: {

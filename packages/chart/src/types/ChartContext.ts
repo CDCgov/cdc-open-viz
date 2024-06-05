@@ -29,6 +29,7 @@ type SharedChartContext = {
 
 // Line Chart Specific Context
 type LineChartContext = SharedChartContext & {
+  convertLineToBarGraph: boolean
   dimensions: [screenWidth: number, screenHeight: number]
   formatDate: Function
   formatTooltipsDate: Function
