@@ -325,10 +325,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       setFilteredData(currentData)
     }
 
-    if (newConfig.xAxis.type === 'date-time' && newConfig.barThickness > 0.1) {
-      newConfig.barThickness = 0.035
-    } else if (newConfig.xAxis.type !== 'date-time' && newConfig.barThickness < 0.1) {
-      newConfig.barThickness = 0.35
+    if (newConfig.xAxis.type === 'date-time' && config.orientation === 'horizontal') {
+      newConfig.xAxis.type = 'date'
     }
 
     //Enforce default values that need to be calculated at runtime

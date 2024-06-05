@@ -76,9 +76,9 @@ export const BarChartVertical = () => {
                   const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   const displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
 
-                  let barGroupWidth = seriesScale.range()[1]
+                  let barGroupWidth = seriesScale.range()[1] - seriesScale.range()[0]
                   const defaultBarHeight = Math.abs(yScale(bar.value) - yScale(scaleVal))
-                  let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length
+                  let barWidth = config.isLollipopChart ? lollipopBarWidth : config.barThickness * seriesScale.bandwidth()
                   let barX = bar.x + (config.isLollipopChart ? (barGroupWidth / barGroup.bars.length - lollipopBarWidth) / 2 : 0) - (config.xAxis.type === 'date-time' ? barGroupWidth / 2 : 0)
                   setBarWidth(barWidth)
                   setTotalBarsInGroup(barGroup.bars.length)
