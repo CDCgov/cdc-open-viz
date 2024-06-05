@@ -101,7 +101,7 @@ const PreviewDataTable = () => {
     } else {
       setTableData(previewData)
     }
-  }, [config.data]) // eslint-disable-line
+  }, [config.data, previewData]) // eslint-disable-line
 
   const tableColumns = useMemo(() => {
     if (!tableData) return []
