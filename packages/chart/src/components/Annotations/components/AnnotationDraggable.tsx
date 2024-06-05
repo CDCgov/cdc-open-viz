@@ -29,60 +29,26 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
 
   const restrictedArea = { xMin: 0 + config.yAxis.size, xMax: xMax - config.yAxis.size / 2, yMax: config.heights.vertical - config.xAxis.size, yMin: 0 }
 
-  // Store the initial SVG dimensions and the initial relative position of the annotation
-  const initialRelativePositions = useRef(
-    annotations.map(annotation => ({
-      dx: annotation.dx / dimensions.width,
-      dy: annotation.dy / dimensions.height
-    }))
-  )
-
   useEffect(() => {
-    // Here it seems "dimensions" is calculated wrong or a different dimension is used.
-    // Use the true svgRef for width and height calculations.
-    const trueDimensions = [svgRef.current.getBoundingClientRect().width, svgRef.current.getBoundingClientRect().height]
-    const [width, height] = trueDimensions
-
-    if (config.annotations.length < 1) return
-    const threshold: number = 0.5
-    const widthChange: number = Math.abs(width - prevDimensions.current[0])
-    const heightChange: number = Math.abs(height - prevDimensions.current[1])
+    /*
+     * This useEffect hook adjusts annotation positions when SVG dimensions change.
+     * It calculates the difference between current and previous SVG dimensions.
+     * If the change exceeds a threshold, it scales annotation positions accordingly.
+     * The hook is triggered by changes in dimensions, annotations, config, viewport, SVG reference, or editor mode.
+     */
+    if (config.annotations.length < 1 || isEditor) return
+    const threshold: number = 0.05
+    const trueDimensions = [svgRef.current.getBoundingClientRect().width, Number(svgRef.current.getBoundingClientRect().height)]
+    const widthChange: number = Math.abs(trueDimensions[0] - prevDimensions.current[0])
+    const heightChange: number = Math.abs(trueDimensions[1] - prevDimensions.current[1])
 
     // Only update if the dimensions have changed significantly
     if (widthChange > threshold || heightChange > threshold) {
-      const updatedAnnotations: Annotation[] = annotations.map((annotation: Annotation, index: number) => {
-        // Calculate new dx based on the initial relative position and the new dimensions
-        let newDx: number
-        let newX: number
-
-        if (prevDimensions.current[0] !== 0) {
-          // If the previous width is not 0, scale the dx (label) value to the new width
-          const oldWidth: number = prevDimensions.current[0]
-          const newWidth: number = width
-          const oldDx: number = annotation.dx
-          const oldX: number = annotation.x
-
-          newDx = (oldDx / oldWidth) * newWidth
-          newX = (oldX / oldWidth) * newWidth
-        } else {
-          // If the previous width is 0, use the current dx value
-          newDx = annotation.dx
-          newX = annotation.x
-        }
-
-        // If the initial relative dx position is less than config.yAxis.size, add a buffer to newDx
-        if (initialRelativePositions.current[index]?.dx < config.yAxis.size) {
-          // Calculate the buffer based on the new dimensions of the SVG
-          const annotationWidthBuffer: number = width * 0.1 // 10% of the SVG's width
-          newDx += Number(config.yAxis.size) + annotationWidthBuffer + 200
-          newX += Number(config.yAxis.size) + annotationWidthBuffer + 200
-        }
+      const updatedAnnotations = annotations.map((annotation, idx) => {
+        const newX = (annotation.originalX * trueDimensions[0]) / Number(annotation.savedDimensions[0])
         return {
           ...annotation,
-          dx: newDx,
-          dy: annotation.dy,
-          x: newX,
-          y: annotation.y
+          x: newX - 17 // 17 is 1rem in pixels for the margin offset.
         }
       })
 
@@ -90,11 +56,9 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
         ...config,
         annotations: updatedAnnotations
       })
-
-      // Update the previous dimensions to the current dimensions
-      prevDimensions.current = trueDimensions
+      prevDimensions.current = [trueDimensions[0], trueDimensions[1]]
     }
-  }, [dimensions, annotations, updateConfig, config, currentViewport, svgRef])
+  }, [dimensions, annotations, updateConfig, config, currentViewport, svgRef, isEditor])
 
   const handleMobileXPosition = annotation => {
     if (annotation.snapToNearestPoint) {
@@ -175,8 +139,11 @@ const Annotations = ({ xScale, yScale, xMax, svgRef }) => {
                             ...annotation,
                             xKey: nearestDatum.x,
                             yKey: nearestDatum.y,
-                            x: annotation.snapToNearestPoint && nearestDatum.x ? xScale(nearestDatum.x) : props.x ? props.x : 0,
-                            y: annotation.snapToNearestPoint && nearestDatum.y ? yScale(nearestDatum.y) : props.y ? props.y : 0,
+                            x: annotation.snapToNearestPoint && nearestDatum.x ? xScale(nearestDatum.x) : Number(props.x) ? Number(props.x) : 0,
+                            originalX: annotation.snapToNearestPoint && nearestDatum.x ? xScale(nearestDatum.x) : Number(props.x) ? Number(props.x) : 0,
+                            originalDX: props.dx,
+                            originalY: annotation.snapToNearestPoint && nearestDatum.y ? yScale(nearestDatum.y) : Number(props.y) ? Number(props.y) : 0,
+                            y: annotation.snapToNearestPoint && nearestDatum.y ? yScale(nearestDatum.y) : Number(props.y) ? Number(props.y) : 0,
                             dx: props.dx,
                             dy: props.dy
                           }

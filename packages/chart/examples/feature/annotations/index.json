@@ -2,6 +2,7 @@
   "annotations": [
     {
       "text": "New Annotation",
+      "snapToNearestPoint": false,
       "fontSize": 16,
       "show": {
         "desktop": true,
@@ -20,27 +21,26 @@
         "vertical": false,
         "horizontal": false
       },
-      "connectionType": "curve",
+      "connectionType": "line",
       "marker": "arrow",
       "edit": {
         "subject": true,
         "label": true
       },
-      "seriesKey": "Data 1",
-      "x": 385.9947755084422,
-      "y": 136.7603673712623,
+      "seriesKey": "",
+      "x": 356.69140625,
+      "y": 244.7265625,
       "xKey": 1458025200000,
-      "yKey": "50",
-      "dx": -40.19667473151664,
-      "dy": -40.50825533704912,
+      "dx": -50,
+      "dy": -41,
       "opacity": 100,
       "savedDimensions": [
-        660.65,
-        344.546875
+        761.39,
+        559.1875
       ],
-      "bezier": "13",
-      "connectionLocation": "bottom",
-      "snapToNearestPoint": false
+      "originalX": 356.69140625,
+      "originalDX": -50,
+      "originalY": 244.7265625
     }
   ],
   "type": "chart",

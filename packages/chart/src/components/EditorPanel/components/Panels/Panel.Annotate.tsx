@@ -34,7 +34,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   const handleAnnotationUpdate = (value, property, index) => {
     const annotations = [...config?.annotations]
     annotations[index][property] = value
-    annotations[index].savedDimensions = [dimensions[0] * 0.73, dimensions[1]]
+    annotations[index].savedDimensions = [dimensions[0], dimensions[1]]
 
     updateConfig({
       ...config,
