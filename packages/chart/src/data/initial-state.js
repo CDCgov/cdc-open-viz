@@ -23,7 +23,9 @@ export default {
   tipRounding: 'top',
   isResponsiveTicks: false,
   general: {
-    showDownloadButton: false
+    showDownloadButton: false,
+    showMissingDataLabel: true,
+    showSuppressedSymbol: true
   },
   padding: {
     left: 5,
@@ -54,7 +56,9 @@ export default {
     axisPadding: 0,
     scalePadding: 10,
     tickRotation: 0,
-    anchors: []
+    anchors: [],
+    shoMissingDataLabel: true,
+    showMissingDataLine: true
   },
   boxplot: {
     plots: [],
@@ -117,9 +121,7 @@ export default {
     labelOffset: 65,
     axisPadding: 200,
     target: 0,
-    maxTickRotation: 0,
-    showSuppressedSymbol: true,
-    showSuppressedLine: true
+    maxTickRotation: 0
   },
   table: {
     label: 'Data Table',
@@ -132,7 +134,9 @@ export default {
     indexLabel: '',
     download: false,
     showVertical: true,
-    dateDisplayFormat: ''
+    dateDisplayFormat: '',
+    showMissingDataLabel: true,
+    showSuppressedSymbol: true
   },
   orientation: 'vertical',
   color: 'pinkpurple',
