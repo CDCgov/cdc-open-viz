@@ -27,8 +27,6 @@ const ZoomBrush: FC<Props> = props => {
     endValue: ''
   })
 
-  console.log(textProps, 'text')
-
   const initialPosition = {
     start: { x: 0 },
     end: { x: props.xMax }
