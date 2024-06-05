@@ -23,22 +23,22 @@ import "./sb-preview/runtime.js";
     fetch(s.href, t);
   }
 })();
-const { createBrowserChannel: a } = __STORYBOOK_MODULE_CHANNELS__, { addons: p } = __STORYBOOK_MODULE_PREVIEW_API__, i = a({ page: "preview" });
-p.setChannel(i);
+const { createBrowserChannel: a } = __STORYBOOK_MODULE_CHANNELS__, { addons: _ } = __STORYBOOK_MODULE_PREVIEW_API__, i = a({ page: "preview" });
+_.setChannel(i);
 window.__STORYBOOK_ADDONS_CHANNEL__ = i;
 window.CONFIG_TYPE === "DEVELOPMENT" && (window.__STORYBOOK_SERVER_CHANNEL__ = i);
-const _ = {
+const p = {
   "./_stories/Guide.NewComponents.stories.mdx": async () => import("./storybook-Guide.NewComponents.stories-95a83e7d.es.js"),
   "./_stories/Guide.NewIcons.stories.mdx": async () => import("./storybook-Guide.NewIcons.stories-14e57e74.es.js"),
   "./_stories/Guide.NewStories.stories.mdx": async () => import("./storybook-Guide.NewStories.stories-6f253e6a.es.js"),
-  "./packages/chart/src/_stories/Chart.stories.tsx": async () => import("./storybook-Chart.stories-33cbadc6.es.js"),
-  "./packages/chart/src/_stories/Chart.tooltip.stories.tsx": async () => import("./storybook-Chart.tooltip.stories-10b628aa.es.js"),
-  "./packages/chart/src/_stories/ChartBrush.stories.tsx": async () => import("./storybook-ChartBrush.stories-def76ff5.es.js"),
-  "./packages/chart/src/_stories/ChartEditor.stories.tsx": async () => import("./storybook-ChartEditor.stories-679f6eb4.es.js"),
-  "./packages/chart/src/_stories/ChartSuppress.stories.tsx": async () => import("./storybook-ChartSuppress.stories-ffaf5ec5.es.js"),
-  "./packages/core/components/_stories/DataTable.stories.tsx": async () => import("./storybook-DataTable.stories-477b5ff9.es.js"),
+  "./packages/chart/src/_stories/Chart.stories.tsx": async () => import("./storybook-Chart.stories-70647a1e.es.js"),
+  "./packages/chart/src/_stories/Chart.tooltip.stories.tsx": async () => import("./storybook-Chart.tooltip.stories-5c42a47c.es.js"),
+  "./packages/chart/src/_stories/ChartBrush.stories.tsx": async () => import("./storybook-ChartBrush.stories-3208586a.es.js"),
+  "./packages/chart/src/_stories/ChartEditor.stories.tsx": async () => import("./storybook-ChartEditor.stories-0efe2c12.es.js"),
+  "./packages/core/components/_stories/DataTable.stories.tsx": async () => import("./storybook-DataTable.stories-3db50ebb.es.js"),
   "./packages/core/components/_stories/EditorPanel.stories.tsx": async () => import("./storybook-EditorPanel.stories-89f6b939.es.js"),
-  "./packages/core/components/_stories/Inputs.stories.tsx": async () => import("./storybook-Inputs.stories-dbfcbb9b.es.js"),
+  "./packages/core/components/_stories/Footnotes.stories.tsx": async () => import("./storybook-Footnotes.stories-89fc11aa.es.js"),
+  "./packages/core/components/_stories/Inputs.stories.tsx": async () => import("./storybook-Inputs.stories-596a5a5d.es.js"),
   "./packages/core/components/_stories/MultiSelect.stories.tsx": async () => import("./storybook-MultiSelect.stories-818d27b0.es.js"),
   "./packages/core/components/_stories/NestedDropdown.stories.tsx": async () => import("./storybook-NestedDropdown.stories-3202a11a.es.js"),
   "./packages/core/components/_stories/Table.stories.tsx": async () => import("./storybook-Table.stories-1af45a26.es.js"),
@@ -49,15 +49,15 @@ const _ = {
   "./packages/core/components/ui/_stories/Colors.stories.tsx": async () => import("./storybook-Colors.stories-849ebf3c.es.js"),
   "./packages/core/components/ui/_stories/Icon.stories.tsx": async () => import("./storybook-Icon.stories-877b00ef.es.js"),
   "./packages/core/components/ui/_stories/Title.stories.tsx": async () => import("./storybook-Title.stories-0a9ecc18.es.js"),
-  "./packages/dashboard/src/_stories/Dashboard.stories.tsx": async () => import("./storybook-Dashboard.stories-b7b20c6b.es.js"),
-  "./packages/data-bite/src/_stories/DataBite.stories.tsx": async () => import("./storybook-DataBite.stories-7468d72c.es.js"),
-  "./packages/editor/src/_stories/Editor.stories.tsx": async () => import("./storybook-Editor.stories-fa2a7cc5.es.js"),
-  "./packages/map/src/_stories/CdcMap.stories.tsx": async () => import("./storybook-CdcMap.stories-fe8b277f.es.js"),
-  "./packages/markup-include/src/_stories/MarkupInclude.stories.tsx": async () => import("./storybook-MarkupInclude.stories-441e6e3e.es.js"),
-  "./packages/waffle-chart/src/_stories/WaffleChart.stories.tsx": async () => import("./storybook-WaffleChart.stories-427d00d2.es.js")
+  "./packages/dashboard/src/_stories/Dashboard.stories.tsx": async () => import("./storybook-Dashboard.stories-63677064.es.js"),
+  "./packages/data-bite/src/_stories/DataBite.stories.tsx": async () => import("./storybook-DataBite.stories-2362c4cd.es.js"),
+  "./packages/editor/src/_stories/Editor.stories.tsx": async () => import("./storybook-Editor.stories-419b26cb.es.js"),
+  "./packages/map/src/_stories/CdcMap.stories.tsx": async () => import("./storybook-CdcMap.stories-bd4c6bcc.es.js"),
+  "./packages/markup-include/src/_stories/MarkupInclude.stories.tsx": async () => import("./storybook-MarkupInclude.stories-c4d33837.es.js"),
+  "./packages/waffle-chart/src/_stories/WaffleChart.stories.tsx": async () => import("./storybook-WaffleChart.stories-0110e6ac.es.js")
 };
 async function m(e) {
-  return _[e]();
+  return p[e]();
 }
 const { composeConfigs: O, PreviewWeb: d, ClientApi: l } = __STORYBOOK_MODULE_PREVIEW_API__, u = async () => {
   const e = await Promise.all([
