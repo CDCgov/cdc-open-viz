@@ -2077,40 +2077,6 @@ const EditorPanel = () => {
                           {visSupportsDateCategoryAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
                         </>
                       )}
-                      <CheckBox
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Selecting this option will display a "thin line" slightly above the Date/Category Axis to indicate "suppressed data" where "suppressed data" values are indicated in the Data Series.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        value={config.xAxis.showSuppressedLine}
-                        section='xAxis'
-                        fieldName='showSuppressedLine'
-                        label='Display  suppressed data line'
-                        updateField={updateField}
-                      />
-                      <CheckBox
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Selecting this option will display "suppressed data symbol" on the Date/Category Axis where suppressed data values are indicated in the Data Series, unless a different symbol was chosen from the data series (e.g., suppression symbol) menu.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        value={config.xAxis.showSuppressedSymbol}
-                        section='xAxis'
-                        fieldName='showSuppressedSymbol'
-                        label='Display  suppressed data symbol'
-                        updateField={updateField}
-                      />
 
                       {config.series?.length === 1 && config.visualizationType === 'Bar' && (
                         <>

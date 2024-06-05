@@ -6,4 +6,6 @@ export type General = {
   type: string
   showDownloadButton: boolean
   allowMapZoom?: boolean
+  showMissingDataLabel: boolean
+  showSuppressedSymbol: boolean
 }

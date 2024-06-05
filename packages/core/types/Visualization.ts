@@ -42,4 +42,5 @@ export type Visualization = ConfigureData & {
   visualizationSubType: string
   visualizationType: string
   xAxis: Axis
+  preliminaryData: { type: 'effect' | 'suppression'; value: string }[]
 }
