@@ -78,19 +78,18 @@ const useScales = (properties: useScaleProps) => {
     seriesScale = composeScaleBand(seriesDomain, [0, config.barThickness * xMax], 0)
   }
 
+
+
   // // handle Bump chart
   // if (config.visualizationType === 'Bump Chart') {
-  //   let xAxisMin = Math.min(...xAxisDataMapped)
-  //   let xAxisMax = Math.max(...xAxisDataMapped)
-  //   xAxisMin -= (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
-  //   xAxisMax += (config.xAxis.padding ? config.xAxis.padding * 0.01 : 0) * (xAxisMax - xAxisMin)
-  //   xScale = scaleTime({
-  //     domain: [xAxisMin, xAxisMax],
-  //     range: [-50, xMax-50]
+  //   min = config.useLogScale && min >= 0 && min < 1 ? min + 0.1 : min
+
+  //   xScale = scaleLinear({
+  //     domain: [min, max],
+  //     range: [0, xMax],
+  //     round: true,
+  //     nice: true  
   //   })
-  //   xScaleBrush = xScale
-  //   xScale.type = scaleTypes.TIME
-  //   seriesScale = composeScaleBand(seriesDomain, [0, config.barThickness * xMax], 0)
   // }
 
   // handle Deviation bar
@@ -183,7 +182,7 @@ const useScales = (properties: useScaleProps) => {
       nice: true
     })
   }
-
+  
   if (visualizationType === 'Forest Plot') {
     const resolvedYRange = () => {
       if (config.forestPlot.regression.showDiamond || config.forestPlot.regression.description) {
@@ -309,7 +308,7 @@ const composeYScale = ({ min, max, yMax, config, leftMax }) => {
 
   if (config.visualizationType === 'Combo') max = leftMax
 
-  const yRange = config.visualizationType === 'Bump Chart' ?  [20,yMax] : [yMax,0]
+  const yRange = config.visualizationType === 'Bump Chart' ?  [30,yMax] : [yMax,1]
   const domainSet = config.visualizationType === 'Bump Chart' ?  [1, max] : [min, max]
   // Return the configured scale function
   return scaleFunc({
