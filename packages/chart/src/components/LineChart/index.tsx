@@ -208,6 +208,7 @@ const LineChart = (props: LineChartProps) => {
                   <LinePath
                     curve={allCurves[seriesData[0].lineType]}
                     data={
+                      config.visualizationType == "Bump Chart" ? data : 
                       config.xAxis.type === 'date-time'
                         ? data.sort((d1, d2) => {
                             let x1 = getXAxisData(d1)

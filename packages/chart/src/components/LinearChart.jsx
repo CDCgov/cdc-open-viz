@@ -37,7 +37,7 @@ import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import ZoomBrush from './ZoomBrush'
 
 const LinearChart = props => {
-  const { transformedData: data, tableData, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth, brushConfig } = useContext(ConfigContext)
+  const { transformedData: data, tableData, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, getTextWidth, brushConfig, colorScale } = useContext(ConfigContext)
   // todo: start destructuring this file for conciseness
   const { visualizationType, visualizationSubType, orientation, xAxis, yAxis, runtime, debugSvg } = config
 
@@ -378,11 +378,12 @@ const LinearChart = props => {
                           )}
 
                           {orientation === 'vertical' && visualizationType === 'Bump Chart' && !config.yAxis.hideLabel && (
+                            <>
                             <Text
                               display={config.useLogScale ? showTicks : 'block'}
                               dx={config.useLogScale ? -6 : 0}
                               x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
-                              y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                              y={tick.to.y - 12 + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                               angle={-Number(config.yAxis.tickRotation) || 0}
                               verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
                               textAnchor={config.runtime.horizontal ? 'start' : 'end'}
@@ -390,6 +391,8 @@ const LinearChart = props => {
                             >
                               {config.runtime.seriesLabelsAll[tick.formattedValue - 1]}
                             </Text>
+                            <rect x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x - 115} y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)} width="170" height="2" fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}/>
+                            </>
                           )}
 
                           {orientation === 'vertical' && visualizationType !== 'Paired Bar' && visualizationType !== 'Bump Chart' && !config.yAxis.hideLabel && (

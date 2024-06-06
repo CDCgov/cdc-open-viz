@@ -78,20 +78,6 @@ const useScales = (properties: useScaleProps) => {
     seriesScale = composeScaleBand(seriesDomain, [0, config.barThickness * xMax], 0)
   }
 
-
-
-  // // handle Bump chart
-  // if (config.visualizationType === 'Bump Chart') {
-  //   min = config.useLogScale && min >= 0 && min < 1 ? min + 0.1 : min
-
-  //   xScale = scaleLinear({
-  //     domain: [min, max],
-  //     range: [0, xMax],
-  //     round: true,
-  //     nice: true  
-  //   })
-  // }
-
   // handle Deviation bar
   if (config.visualizationType === 'Deviation Bar') {
     const leftOffset = config.isLollipopChart ? 1.05 : 1.03
