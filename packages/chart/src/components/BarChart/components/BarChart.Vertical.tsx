@@ -71,6 +71,8 @@ export const BarChartVertical = () => {
                   const { suppressedBarHeight, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
                   const scaleVal = config.useLogScale ? 0.1 : 0
                   const showMissingDataLabel = config.general.showMissingDataLabel && !bar.value
+                  const showZeroValueDataLabel = config.general.showZeroValueDataLabel && bar.value && Number(bar.value) === 0
+
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
@@ -84,7 +86,7 @@ export const BarChartVertical = () => {
                   setTotalBarsInGroup(barGroup.bars.length)
                   const yAxisValue = formatNumber(/[a-zA-Z]/.test(String(bar.value)) ? '' : bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                  const barY = getBarY({ bar, yScale, isSuppressed, scaleVal, showMissingDataLabel, isNumber, suppressedBarHeight })
+                  const barY = getBarY({ bar, yScale, isSuppressed, scaleVal, showMissingDataLabel, isNumber, suppressedBarHeight, showZeroValueDataLabel })
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
                   // tooltips
@@ -111,9 +113,10 @@ export const BarChartVertical = () => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  const barLabel = isSuppressed ? '' : yAxisValue
-                  const { barHeight } = getBarDimensions({ isSuppressed, showMissingDataLabel, defaultBarHeight, suppressedBarHeight })
+                  const barLabel = isSuppressed ? '' : Number(yAxisValue) === 0 ? '' : yAxisValue
+                  const { barHeight } = getBarDimensions({ isSuppressed, showMissingDataLabel, defaultBarHeight, suppressedBarHeight, showZeroValueDataLabel })
                   const missingDataLabel = showMissingDataLabel ? 'N/A' : ''
+                  const zeroValueDataLabel = showZeroValueDataLabel ? '0' : ''
                   let missingDataFontSize = barWidth / 2
                   let textWidth = getTextWidth(missingDataLabel, `normal ${missingDataFontSize}px sans-serif`)
                   const textFitstobar = textWidth < barWidth
@@ -242,6 +245,17 @@ export const BarChartVertical = () => {
                           textAnchor='middle'
                         >
                           {missingDataLabel}
+                        </Text>
+                        <Text // prettier-ignore
+                          display={textFitstobar ? 'block' : 'none'}
+                          opacity={transparentBar ? 0.5 : 1}
+                          x={barX + barWidth / 2}
+                          y={barY - 5}
+                          fill={labelColor}
+                          textAnchor='middle'
+                          fontSize={missingDataFontSize}
+                        >
+                          {zeroValueDataLabel}
                         </Text>
 
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
