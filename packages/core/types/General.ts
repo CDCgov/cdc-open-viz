@@ -8,4 +8,5 @@ export type General = {
   allowMapZoom?: boolean
   showMissingDataLabel: boolean
   showSuppressedSymbol: boolean
+  showZeroValueDataLabel: boolean
 }

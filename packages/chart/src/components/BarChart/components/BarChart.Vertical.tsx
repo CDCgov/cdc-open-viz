@@ -70,7 +70,10 @@ export const BarChartVertical = () => {
                 {barGroup.bars.map((bar, index) => {
                   const { suppressedBarHeight, getIconSize, getIconPadding, getVerticalAnchor, isSuppressed } = composeSuppressionBars({ bar })
                   const scaleVal = config.useLogScale ? 0.1 : 0
-                  const showMissingDataLabel = config.general.showMissingDataLabel && !bar.value
+
+                  const showMissingDataLabel = config.general.showMissingDataLabel && !isNumber(bar.value)
+                  const showZeroValueDataLabel = config.general.showZeroValueDataLabel && bar.value && Number(bar.value) === 0
+
                   let highlightedBarValues = config.highlightedBarValues.map(item => item.value).filter(item => item !== ('' || undefined))
                   highlightedBarValues = config.xAxis.type === 'date' ? HighLightedBarUtils.formatDates(highlightedBarValues) : highlightedBarValues
                   const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
@@ -84,7 +87,7 @@ export const BarChartVertical = () => {
                   setTotalBarsInGroup(barGroup.bars.length)
                   const yAxisValue = formatNumber(/[a-zA-Z]/.test(String(bar.value)) ? '' : bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                  const barY = getBarY({ bar, yScale, isSuppressed, scaleVal, showMissingDataLabel, isNumber, suppressedBarHeight })
+                  const barY = getBarY({ bar, yScale, isSuppressed, scaleVal, showMissingDataLabel, isNumber, suppressedBarHeight, showZeroValueDataLabel })
                   // create new Index for bars with negative values
                   const newIndex = bar.value < 0 ? -1 : index
                   // tooltips
@@ -111,12 +114,13 @@ export const BarChartVertical = () => {
                   const highlightedBar = getHighlightedBarByValue(xAxisValue)
                   const borderColor = isHighlightedBar ? highlightedBarColor : config.barHasBorder === 'true' ? '#000' : 'transparent'
                   const borderWidth = isHighlightedBar ? highlightedBar.borderWidth : config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0
-                  const barLabel = isSuppressed ? '' : yAxisValue
-                  const { barHeight } = getBarDimensions({ isSuppressed, showMissingDataLabel, defaultBarHeight, suppressedBarHeight })
+                  const barLabel = isSuppressed ? '' : Number(yAxisValue) === 0 ? '' : yAxisValue
                   const missingDataLabel = showMissingDataLabel ? 'N/A' : ''
+                  const zeroValueDataLabel = showZeroValueDataLabel ? '0' : ''
                   let missingDataFontSize = barWidth / 2
                   let textWidth = getTextWidth(missingDataLabel, `normal ${missingDataFontSize}px sans-serif`)
-                  const textFitstobar = textWidth < barWidth
+                  const textFitstobar = textWidth < barWidth && barWidth > 10
+                  const { barHeight } = getBarDimensions({ isSuppressed, showMissingDataLabel, defaultBarHeight, suppressedBarHeight, showZeroValueDataLabel, textFitstobar })
 
                   const displaylollipopShape = isSuppressed ? 'none' : 'block'
                   const getBarBackgroundColor = (barColor: string, filteredOutColor?: string): string => {
@@ -159,6 +163,13 @@ export const BarChartVertical = () => {
                     if (isHighlightedBar) _barColor = 'transparent'
                     return _barColor
                   }
+                  // check if missing data label overlap suppressed data
+                  let hasMatch = true
+                  config.preliminaryData.forEach(pd => {
+                    if (pd.value && String(pd.value) === String(bar.value) && pd.type === 'suppression') {
+                      hasMatch = false
+                    }
+                  })
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -232,17 +243,32 @@ export const BarChartVertical = () => {
                         >
                           {barLabel}
                         </Text>
-                        <Text // prettier-ignore
-                          display={textFitstobar ? 'block' : 'none'}
-                          opacity={transparentBar ? 0.5 : 1}
-                          x={barX + barWidth / 2}
-                          y={barY - 5}
-                          fontSize={missingDataFontSize}
-                          fill={labelColor}
-                          textAnchor='middle'
-                        >
-                          {missingDataLabel}
-                        </Text>
+                        {hasMatch && (
+                          <Text // prettier-ignore
+                            display={textFitstobar && displayBar ? 'block' : 'none'}
+                            opacity={transparentBar ? 0.5 : 1}
+                            x={barX + barWidth / 2}
+                            y={barY - 5}
+                            fontSize={missingDataFontSize}
+                            fill={labelColor}
+                            textAnchor='middle'
+                          >
+                            {missingDataLabel}
+                          </Text>
+                        )}
+                        {hasMatch && (
+                          <Text // prettier-ignore
+                            display={textFitstobar && displayBar ? 'block' : 'none'}
+                            opacity={transparentBar ? 0.5 : 1}
+                            x={barX + barWidth / 2}
+                            y={barY - 5}
+                            fill={labelColor}
+                            textAnchor='middle'
+                            fontSize={missingDataFontSize}
+                          >
+                            {zeroValueDataLabel}
+                          </Text>
+                        )}
 
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
                           <circle
