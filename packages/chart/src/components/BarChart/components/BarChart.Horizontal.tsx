@@ -212,7 +212,9 @@ export const BarChartHorizontal = () => {
                         })}
 
                         <Text // prettier-ignore
+                          display={displayBar ? 'block' : 'none'}
                           x={bar.y}
+                          opacity={transparentBar ? 0.5 : 1}
                           y={config.barHeight / 2 + config.barHeight * bar.index}
                           fill={labelColor}
                           dx={10}
@@ -222,12 +224,12 @@ export const BarChartHorizontal = () => {
                           {showMissingDataLabel ? 'N/A' : ''}
                         </Text>
                         <Text // prettier-ignore
+                          display={displayBar ? 'block' : 'none'}
                           x={bar.y}
+                          opacity={transparentBar ? 0.5 : 1}
                           y={config.barHeight / 2 + config.barHeight * bar.index}
                           fill={labelColor}
-                          dy={-barWidth}
                           dx={15}
-                          angle={90}
                           verticalAnchor='middle'
                           textAnchor={'start'}
                         >

@@ -7,6 +7,7 @@ interface BarConfigProps {
   defaultBarHeight?: number
   suppressedBarWidth?: number
   suppressedBarHeight?: number
+  textFitstobar?: boolean
   bar?: { [key: string]: any }
   yScale?: Function
   scaleVal?: number
@@ -14,7 +15,7 @@ interface BarConfigProps {
 }
 
 // Function to create bar width based on suppression status and missing data label
-export const getBarDimensions = ({ isSuppressed, showMissingDataLabel, defaultBarWidth, suppressedBarWidth, defaultBarHeight, suppressedBarHeight, showZeroValueDataLabel }: BarConfigProps) => {
+export const getBarDimensions = ({ isSuppressed, showMissingDataLabel, defaultBarWidth, suppressedBarWidth, defaultBarHeight, suppressedBarHeight, showZeroValueDataLabel, textFitstobar }: BarConfigProps) => {
   let barWidth = defaultBarWidth
   let barHeight = defaultBarHeight
   const showMissingBarHeight = showMissingDataLabel ? 3 : 0
@@ -29,6 +30,9 @@ export const getBarDimensions = ({ isSuppressed, showMissingDataLabel, defaultBa
   if (showZeroValueDataLabel) {
     barHeight = showZeroValueDataLabel ? 3 : 0
     barWidth = suppressedBarWidth
+  }
+  if ((showMissingDataLabel || showZeroValueDataLabel || isSuppressed) && !textFitstobar) {
+    barHeight = 0
   }
 
   return { barWidth, barHeight }
