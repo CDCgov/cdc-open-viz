@@ -17,6 +17,7 @@ interface Props {
 const ZoomBrush: FC<Props> = props => {
   const { tableData, config, parseDate, formatDate, setBrushConfig, getTextWidth, dashboardConfig } = useContext(ConfigContext)
   const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []
+  const isDashboardFilters = sharedFilters?.length > 0
   const { fontSize } = useBarChart()
   const [brushKey, setBrushKey] = useState(0)
   const brushRef = useRef(null)
@@ -86,10 +87,11 @@ const ZoomBrush: FC<Props> = props => {
   }, [config.brush?.active])
 
   // reset brush if filters or exclusions are ON each time
+
   useEffect(() => {
     const isFiltersActive = config.filters?.some(filter => filter.active)
     const isExclusionsActive = config.exclusions?.active
-    const isDashboardFilters = sharedFilters?.length > 0
+
     if ((isFiltersActive || isExclusionsActive || isDashboardFilters) && config.brush?.active) {
       setBrushKey(prevKey => prevKey + 1)
       setBrushConfig(prev => {
@@ -106,7 +108,7 @@ const ZoomBrush: FC<Props> = props => {
           data: []
         }
       })
-  }, [config.filters, config.exclusions, config.brush?.active, sharedFilters])
+  }, [config.filters, config.exclusions, config.brush?.active, isDashboardFilters])
 
   const calculateTop = (): number => {
     const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
