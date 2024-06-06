@@ -108,7 +108,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     return sharedFilter
   }
 
-  const loadAPIFilters = (sharedFilters: SharedFilter[], dropdowns = apiFilterDropdowns, recursiveLimit = 3) => {
+  const loadAPIFilters = (sharedFilters: SharedFilter[], dropdowns = apiFilterDropdowns, recursiveLimit = 3): Promise<SharedFilter[]> => {
     if (!sharedFilters) return
     sharedFilters = sharedFilters.map((filter, index) => setAutoLoadDefaultValue(index, dropdowns[filter.apiFilter?.apiEndpoint], sharedFilters))
     const sharedAPIFilters = sharedFilters.filter(f => f.apiFilter)
@@ -131,6 +131,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 newDropdowns[_key] = _filterValues
                 const newDefaultSelectedFilter = setAutoLoadDefaultValue(index, _filterValues, sharedFilters)
                 sharedFilters[index] = newDefaultSelectedFilter
+                //resolve([index, newDefaultSelectedFilter])
               })
               .catch(console.error)
               .finally(() => {
@@ -138,7 +139,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               })
           })
       )
-    ).finally(() => {
+    ).then(() => {
       const finishedLoading = sharedFilters.reduce((acc, curr, index) => {
         if (autoLoadFilterIndexes.includes(index) && !curr.active) return false
         return acc
@@ -146,8 +147,9 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       if (finishedLoading || recursiveLimit === 0) {
         setAPIFilterDropdowns(dropdowns => ({ ...dropdowns, ...newDropdowns }))
         dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFilters })
+        return sharedFilters
       } else {
-        loadAPIFilters(sharedFilters, newDropdowns, recursiveLimit - 1)
+        return loadAPIFilters(sharedFilters, newDropdowns, recursiveLimit - 1)
       }
     })
   }
@@ -321,8 +323,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
       updateFilteredData()
       loadAPIFilters(dashboardConfig.sharedFilters)
-        .then(() => {
-          reloadURLData(dashboardConfig.sharedFilters)
+        .then(newFilters => {
+          reloadURLData(newFilters)
         })
         .catch(e => {
           console.error(e)
@@ -349,8 +351,8 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       if (isAutoSelectFilter && !missingFilterSelections) {
         // a dropdown has been selected that doesn't
         // require the Go Button
-        loadAPIFilters(newSharedFilters).then(() => {
-          reloadURLData(newSharedFilters)
+        loadAPIFilters(newSharedFilters).then(filters => {
+          reloadURLData(filters)
         })
       } else {
         if (Array.isArray(value)) throw Error(`Cannot set active values on urlfilters. expected: ${JSON.stringify(value)} to be a single value.`)
