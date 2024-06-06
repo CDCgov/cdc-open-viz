@@ -82,7 +82,7 @@ const useScales = (properties: useScaleProps) => {
       if(distance < minDistance) minDistance = distance;
     }
 
-    seriesScale = composeScaleBand(seriesDomain, [0, minDistance], 0)
+    seriesScale = composeScaleBand(seriesDomain, [0, (config.barThickness || 1) * minDistance], 0)
   }
 
   // handle Deviation bar
