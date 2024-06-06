@@ -83,13 +83,15 @@ export const BarChartHorizontal = () => {
                   const defaultBarWidth = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
                   const showMissingDataLabel = config.general.showMissingDataLabel && !bar.value
-                  const { barWidth } = getBarDimensions({ isSuppressed, defaultBarWidth, suppressedBarWidth, showMissingDataLabel })
+                  const showZeroValueDataLabel = config.general.showZeroValueDataLabel && bar.value && Number(bar.value) === 0
+
+                  const { barWidth } = getBarDimensions({ isSuppressed, defaultBarWidth, suppressedBarWidth, showMissingDataLabel, showZeroValueDataLabel })
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
                   const xAxisValue = config.runtime[section].type === 'date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
-                  const barLabel = isSuppressed ? '' : yAxisValue
+                  const barLabel = isSuppressed ? '' : Number(yAxisValue) === 0 ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
                   let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
@@ -210,7 +212,9 @@ export const BarChartHorizontal = () => {
                         })}
 
                         <Text // prettier-ignore
+                          display={displayBar ? 'block' : 'none'}
                           x={bar.y}
+                          opacity={transparentBar ? 0.5 : 1}
                           y={config.barHeight / 2 + config.barHeight * bar.index}
                           fill={labelColor}
                           dx={10}
@@ -218,6 +222,18 @@ export const BarChartHorizontal = () => {
                           textAnchor={'start'}
                         >
                           {showMissingDataLabel ? 'N/A' : ''}
+                        </Text>
+                        <Text // prettier-ignore
+                          display={displayBar ? 'block' : 'none'}
+                          x={bar.y}
+                          opacity={transparentBar ? 0.5 : 1}
+                          y={config.barHeight / 2 + config.barHeight * bar.index}
+                          fill={labelColor}
+                          dx={15}
+                          verticalAnchor='middle'
+                          textAnchor={'start'}
+                        >
+                          {showZeroValueDataLabel ? '0' : ''}
                         </Text>
 
                         {!config.isLollipopChart && displayNumbersOnBar && (

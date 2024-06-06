@@ -42,7 +42,25 @@ const PanelGeneral: FC<PanelProps> = props => {
         {visualizationType === 'Area Chart' && visualizationSubType === 'stacked' && <Select value={config.stackedAreaChartLineType || 'Linear'} fieldName='stackedAreaChartLineType' label='Stacked Area Chart Line Type' updateField={updateField} options={Object.keys(approvedCurveTypes)} />}
         {visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
         {visualizationType === 'Deviation Bar' && <Select label='Orientation' options={['horizontal']} />}
-        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && <Select value={config.isLollipopChart ? 'lollipop' : barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
+        {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && (
+          <Select
+            value={config.isLollipopChart ? 'lollipop' : barStyle || 'flat'}
+            fieldName='barStyle'
+            label='bar style'
+            updateField={updateField}
+            options={showBarStyleOptions()}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>Consider using the 'Flat' bar style when presenting data that includes '0' values.</p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+          />
+        )}
         {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && barStyle === 'rounded' && <Select value={config.tipRounding || 'top'} fieldName='tipRounding' label='tip rounding' updateField={updateField} options={['top', 'full']} />}
         {(visualizationType === 'Bar' || visualizationType === 'Deviation Bar') && barStyle === 'rounded' && <Select value={config.roundingStyle || 'standard'} fieldName='roundingStyle' label='rounding style' updateField={updateField} options={['standard', 'shallow', 'finger']} />}
         {visualizationType === 'Bar' && config.orientation === 'horizontal' && <Select value={config.yAxis.labelPlacement || 'Below Bar'} section='yAxis' fieldName='labelPlacement' label='Label Placement' updateField={updateField} options={['Below Bar', 'On Date/Category Axis']} />}
@@ -85,6 +103,23 @@ const PanelGeneral: FC<PanelProps> = props => {
               section='general'
               fieldName='showMissingDataLabel'
               label='Display "Missing Data" Label'
+              updateField={updateField}
+            />
+            <CheckBox
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p> Selecting this option will display a thin line slightly above the Date/Category Axis to indicate "zero value" where zero values are indicated in the Data Series.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+              value={config.general.showZeroValueDataLabel}
+              section='general'
+              fieldName='showZeroValueDataLabel'
+              label='Display "Zero Value Data" Label'
               updateField={updateField}
             />
 

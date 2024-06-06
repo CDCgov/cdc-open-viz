@@ -25,7 +25,8 @@ export default {
   general: {
     showDownloadButton: false,
     showMissingDataLabel: true,
-    showSuppressedSymbol: true
+    showSuppressedSymbol: true,
+    showZeroValueDataLabel: true
   },
   padding: {
     left: 5,
