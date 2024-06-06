@@ -19,6 +19,8 @@ export type Annotation = {
   xKey: string
   // y value for scaling
   yKey: string
+  // orignal x value of subject
+  originalX: number
   // x of subject
   x: number
   // y of object
@@ -37,4 +39,6 @@ export type Annotation = {
   marker: 'arrow' | 'circle'
   // should the item be snapped to the subject?
   snapToSubject: boolean
+  // savedDimensions - the original dimensions of the svg when the svg was saved
+  savedDimensions: [width: number, height: number]
 }

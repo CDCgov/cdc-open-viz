@@ -28,6 +28,7 @@
         "label": true
       },
       "seriesKey": "Radius",
+      "originalX": 235.39284974093266,
       "x": 235.39284974093266,
       "y": 118.7374749498998,
       "xKey": "Neptune",

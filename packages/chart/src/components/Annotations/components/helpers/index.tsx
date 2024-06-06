@@ -45,4 +45,32 @@ const createPoints = (annotation, xScale, yScale, config) => {
   return points
 }
 
-export { applyBandScaleOffset, handleConnectionHorizontalType, handleConnectionVerticalType, createPoints }
+const handleMobileXPosition = (annotation, xScale, config) => {
+  if (annotation.snapToNearestPoint) {
+    return Number(annotation.dx) + xScale(annotation.xKey) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size)
+  }
+  return Number(annotation.x) + Number(annotation.dx)
+}
+
+const handleMobileYPosition = (annotation, yScale, config) => {
+  if (annotation.snapToNearestPoint) {
+    return yScale(annotation.yKey) + Number(annotation.dy)
+  }
+  return Number(annotation.dy) + Number(annotation.y)
+}
+
+const handleTextX = (annotation, xScale, config) => {
+  if (annotation.snapToNearestPoint) {
+    return Number(annotation.dx) + Number(xScale(annotation.xKey)) + (config.xAxis.type !== 'date-time' ? xScale.bandwidth() / 2 : 0) + Number(config.yAxis.size) - 16 / 3
+  }
+  return Number(annotation.dx) + Number(annotation.x) - 16 / 3
+}
+
+const handleTextY = (annotation, yScale, config) => {
+  if (annotation.snapToNearestPoint) {
+    return yScale(annotation.yKey) + Number(annotation.dy) + 5
+  }
+  return Number(annotation.y) + Number(annotation.dy) + 16 / 3
+}
+
+export { applyBandScaleOffset, handleConnectionHorizontalType, handleConnectionVerticalType, createPoints, handleMobileXPosition, handleMobileYPosition, handleTextX, handleTextY }
