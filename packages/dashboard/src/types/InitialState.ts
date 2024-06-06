@@ -3,7 +3,7 @@ import { Tab } from './Tab'
 
 export type InitialState = {
   config: DashboardConfig
-  data: Object
+  data: Record<string, any[]>
   loading: boolean
   filteredData: Object
   preview: boolean
