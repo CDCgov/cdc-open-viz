@@ -280,6 +280,9 @@
     &.legend-hidden > svg {
       width: 100% !important;
     }
+    &.dashboard-brush {
+      margin-bottom: 2.5em;
+    }
 
     > svg {
       overflow: visible;
