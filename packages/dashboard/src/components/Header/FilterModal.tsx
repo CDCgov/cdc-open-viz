@@ -49,7 +49,7 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
     const rowOptions: number[] = []
 
     config.rows.forEach((row, rowIndex) => {
-      if (!!row.multiVizColumn) {
+      if (!!row.dataKey) {
         nameLookup[rowIndex] = `Row ${rowIndex + 1}`
         rowOptions.push(rowIndex)
       }
@@ -137,7 +137,7 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
         <fieldset className='shared-filter-modal shared-filter-modal__fieldset' key={filter.columnName + index}>
           <label>
             <span className='edit-label column-heading'>Filter Type: </span>
-            <select defaultValue={filter.type || ''} onChange={e => updateFilterProp('type', e.target.value)} disabled={!!filter.type}>
+            <select defaultValue={filter.type || ''} onChange={e => updateFilterProp('type', e.target.value)}>
               <option value=''>- Select Option -</option>
               <option value='urlfilter'>URL</option>
               <option value='datafilter'>Data</option>

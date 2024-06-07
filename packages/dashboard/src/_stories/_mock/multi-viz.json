@@ -164,7 +164,7 @@
       },
       "table": {
         "label": "Data Table",
-        "expanded": true,
+        "expanded": false,
         "limitHeight": false,
         "height": "",
         "caption": "",
@@ -366,11 +366,10 @@
   },
   "table": {
     "label": "Data Table",
-    "show": true,
+    "show": false,
     "showDownloadUrl": false,
     "showVertical": true
   },
-  "newViz": true,
   "datasets": {},
   "type": "dashboard",
   "runtime": {},

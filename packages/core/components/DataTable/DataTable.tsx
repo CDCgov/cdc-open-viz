@@ -176,9 +176,17 @@ const DataTable = (props: DataTableProps) => {
       }
     }
 
+    const getMediaControlsClasses = () => {
+      const classes = ['download-links']
+      const isLegendOnBottom = config?.legend?.position === 'bottom' || ['sm', 'xs', 'xxs'].includes(viewport)
+      if (config.brush?.active && !isLegendOnBottom) classes.push('brush-active')
+      if (config.brush?.active && config.legend.hide) classes.push('brush-active')
+      return classes
+    }
+
     return (
       <ErrorBoundary component='DataTable'>
-        <MediaControls.Section classes={['download-links']}>
+        <MediaControls.Section classes={getMediaControlsClasses()}>
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} />
           {(config.table.download || config.general?.showDownloadButton) && <DownloadButton rawData={getDownloadData()} fileName={`${vizTitle || 'data-table'}.csv`} headerColor={headerColor} />}
         </MediaControls.Section>

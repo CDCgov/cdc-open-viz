@@ -13,6 +13,7 @@ import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import { viewports } from '@cdc/core/helpers/getViewport'
 
 // chart components
 import Panels from './components/Panels'
@@ -136,6 +137,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
         config.preliminaryData?.map(({ column, displayLegend, displayTable, displayTooltip, label, seriesKey, style, symbol, type, value }, i) => {
           return (
             <div key={`preliminaryData-${i}`} className='edit-block'>
+              <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
               <button
                 type='button'
                 className='remove-column'
@@ -146,6 +148,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
               >
                 Remove
               </button>
+
               <Select value={type} initial={config.visualizationType == 'Bar' ? '' : 'Select'} fieldName='type' label='Type' updateField={(_, __, fieldName, value) => update(fieldName, value, i)} options={getTypeOptions()} />
               {type === 'suppression' ? (
                 <>
@@ -176,14 +179,14 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>The suggested method for presenting suppressed data is to use "double asterisks". If "double asterisks" are already used elsewhere (e.g., footnotes), please select an alternative symbol from the menu to denote data suppression.</p>
+                            <p>The recommended approach for presenting data is to include a footnote indicating any data suppression.</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
                       value={style}
                       initial='Select'
                       fieldName='style'
-                      label={config.visualizationType === 'Combo' ? 'suppression line symbol' : 'suppression symbol'}
+                      label={'suppression line style'}
                       updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                       options={getStyleOptions(type)}
                     />
@@ -240,7 +243,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                     }
                     value={displayTooltip}
                     fieldName='displayTooltip'
-                    label='Display on tooltips'
+                    label='Display in tooltips'
                     updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                   />
                   <CheckBox
@@ -256,7 +259,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                     }
                     value={displayLegend}
                     fieldName='displayLegend'
-                    label='Display on legend'
+                    label='Display in legend'
                     updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                   />
                   <CheckBox
@@ -272,7 +275,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                     }
                     value={displayTable}
                     fieldName='displayTable'
-                    label='Display on data table'
+                    label='Display in table'
                     updateField={(_, __, fieldName, value) => update(fieldName, value, i)}
                   />
                 </>
@@ -290,7 +293,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
         })}
 
       <button type='button' onClick={addColumn} className='btn full-width'>
-        {config.visualizationType === 'Line' || config.visualizationType === 'Combo' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Line/Bar'}
+        {config.visualizationType === 'Line' ? 'Add Special Line' : config.visualizationType === 'Bar' ? ' Add Special Bar' : 'Add Special Bar/Line'}
       </button>
     </>
   )
@@ -447,6 +450,12 @@ const EditorPanel = () => {
     if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 6
     }
+    // DEV-8008 - Remove Bar styling when Line is converted to Bar
+    if (updatedConfig.visualizationType === 'Line') {
+      updatedConfig.visualizationSubType = 'regular'
+      updatedConfig.barStyle = 'flat'
+      updatedConfig.isLollipopChart = false
+    }
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
@@ -530,6 +539,7 @@ const EditorPanel = () => {
   }
 
   const [displayPanel, setDisplayPanel] = useState(true)
+  const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
 
   if (loading) {
     return null
@@ -1020,6 +1030,14 @@ const EditorPanel = () => {
     updateConfig(updatedConfig)
   }
 
+  const updateViewportOverrides = (property, viewport, numTicks) => {
+    const propertyObject = { ...config.xAxis[property] }
+    propertyObject[viewport] = numTicks
+    const updatedConfig = { ...config, xAxis: { ...config.xAxis, [property]: propertyObject } }
+
+    updateConfig(updatedConfig)
+  }
+
   const editorContextValues = {
     addNewExclusion,
     data,
@@ -1288,7 +1306,7 @@ const EditorPanel = () => {
                   {config.orientation === 'horizontal' ? ( // horizontal - x is vertical y is horizontal
                     <>
                       {visSupportsValueAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
-                      {visSupportsValueAxisLabels() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
+                      {visSupportsValueAxisLabels() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />}
                       {visSupportsValueAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
                       {visSupportsValueAxisMax() && <TextField value={config.xAxis.max} section='xAxis' fieldName='max' label='max value' type='number' placeholder='Auto' updateField={updateField} />}
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
@@ -1306,7 +1324,7 @@ const EditorPanel = () => {
                     config.visualizationType !== 'Pie' && (
                       <>
                         <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />
-                        <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />
+                        <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />
                         <CheckBox value={config.yAxis.hideTicks} section='yAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />
 
                         <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='left axis max value' placeholder='Auto' updateField={updateField} />
@@ -1628,7 +1646,7 @@ const EditorPanel = () => {
                   </div>
 
                   <CheckBox value={config.yAxis.rightHideAxis} section='yAxis' fieldName='rightHideAxis' label='Hide Axis' updateField={updateField} />
-                  <CheckBox value={config.yAxis.rightHideLabel} section='yAxis' fieldName='rightHideLabel' label='Hide Label' updateField={updateField} />
+                  <CheckBox value={config.yAxis.rightHideLabel} section='yAxis' fieldName='rightHideLabel' label='Hide Tick Labels' updateField={updateField} />
                   <CheckBox value={config.yAxis.rightHideTicks} section='yAxis' fieldName='rightHideTicks' label='Hide Ticks' updateField={updateField} />
 
                   <TextField value={config.yAxis.max} section='yAxis' fieldName='rightMax' type='number' label='right axis max value' placeholder='Auto' updateField={updateField} />
@@ -1915,7 +1933,7 @@ const EditorPanel = () => {
                         }
                         updateField={updateField}
                       />
-                      {/* {visHasBrushChart && <CheckBox value={config.brush.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />} */}
+                      {visHasBrushChart && <CheckBox value={config.brush?.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
 
                       {config.exclusions.active && (
                         <>
@@ -1955,10 +1973,98 @@ const EditorPanel = () => {
                       )}
 
                       {visSupportsDateCategoryNumTicks() && config.xAxis.type !== 'date-time' && config.xAxis.manual && (
-                        <TextField value={config.xAxis.manualStep} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='manualStep' label='Step count' className='number-narrow' updateField={updateField} />
+                        <>
+                          <TextField
+                            value={config.xAxis.manualStep}
+                            placeholder='Auto'
+                            type='number'
+                            min={1}
+                            section='xAxis'
+                            fieldName='manualStep'
+                            label='Step count'
+                            className='number-narrow'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Number of data points which are assigned a tick, starting from the right most data point. Value of 1 will show a tick at every data point, value of 2 will show a tick for every other, etc.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          <div className='viewport-overrides'>
+                            <label>
+                              <button onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)} className='edit-label'>
+                                Step Count: viewport overrides <span style={{ transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})` }}>&gt;</span>
+                              </button>
+                            </label>
+                            {displayViewportOverrides && (
+                              <div className='edit-block'>
+                                {Object.keys(viewports).map(viewport => (
+                                  <TextField
+                                    key={`viewport-step-count-input-${viewport}`}
+                                    value={config.xAxis.viewportStepCount ? config.xAxis.viewportStepCount[viewport] : undefined}
+                                    placeholder='Auto'
+                                    type='number'
+                                    label={viewport}
+                                    className='number-narrow'
+                                    updateField={(section, fieldName, label, val) => updateViewportOverrides('viewportStepCount', viewport, val)}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </>
                       )}
                       {visSupportsDateCategoryNumTicks() && (config.xAxis.type === 'date-time' || !config.xAxis.manual) && (
-                        <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min={1} section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
+                        <>
+                          <TextField
+                            value={config.xAxis.numTicks}
+                            placeholder='Auto'
+                            type='number'
+                            min={1}
+                            section='xAxis'
+                            fieldName='numTicks'
+                            label='Number of ticks'
+                            className='number-narrow'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Apporoximate number of ticks. Other factors such as space available and data may change the exact number of ticks used. To enforce an exact number of ticks, check "Manual Ticks" above.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          <div className='viewport-overrides'>
+                            <label>
+                              <button onClick={() => setDisplayViewportOverrides(!displayViewportOverrides)} className='edit-label'>
+                                Number of ticks: viewport overrides <span style={{ transform: `rotate(${displayViewportOverrides ? '90deg' : '0deg'})` }}>&gt;</span>
+                              </button>
+                            </label>
+                            {displayViewportOverrides && (
+                              <div className='edit-block'>
+                                {Object.keys(viewports).map(viewport => (
+                                  <TextField
+                                    key={`viewport-num-ticks-input-${viewport}`}
+                                    value={config.xAxis.viewportNumTicks ? config.xAxis.viewportNumTicks[viewport] : undefined}
+                                    placeholder='Auto'
+                                    type='number'
+                                    label={viewport}
+                                    className='number-narrow'
+                                    updateField={(section, fieldName, label, val) => updateViewportOverrides('viewportNumTicks', viewport, val)}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </>
                       )}
                       {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.padding} type='number' min={0} section='xAxis' fieldName='padding' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
 
@@ -2000,49 +2106,15 @@ const EditorPanel = () => {
                       {config.orientation === 'horizontal' ? (
                         <>
                           {visSupportsDateCategoryAxisLine() && <CheckBox value={config.yAxis.hideAxis} section='yAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
-                          {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
+                          {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.yAxis.hideLabel} section='yAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />}
                         </>
                       ) : (
                         <>
                           {visSupportsDateCategoryAxisLine() && <CheckBox value={config.xAxis.hideAxis} section='xAxis' fieldName='hideAxis' label='Hide Axis' updateField={updateField} />}
-                          {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Label' updateField={updateField} />}
+                          {visSupportsDateCategoryAxisLabel() && <CheckBox value={config.xAxis.hideLabel} section='xAxis' fieldName='hideLabel' label='Hide Tick Labels' updateField={updateField} />}
                           {visSupportsDateCategoryAxisTicks() && <CheckBox value={config.xAxis.hideTicks} section='xAxis' fieldName='hideTicks' label='Hide Ticks' updateField={updateField} />}
                         </>
                       )}
-                      <CheckBox
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Selecting this option will display a "thin line" slightly above the Date/Category Axis to indicate "suppressed data" where "suppressed data" values are indicated in the Data Series.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        value={config.xAxis.showSuppressedLine}
-                        section='xAxis'
-                        fieldName='showSuppressedLine'
-                        label='Display  suppressed data line'
-                        updateField={updateField}
-                      />
-                      <CheckBox
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Selecting this option will display "suppressed data symbol" on the Date/Category Axis where suppressed data values are indicated in the Data Series, unless a different symbol was chosen from the data series (e.g., suppression symbol) menu.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                        value={config.xAxis.showSuppressedSymbol}
-                        section='xAxis'
-                        fieldName='showSuppressedSymbol'
-                        label='Display  suppressed data symbol'
-                        updateField={updateField}
-                      />
 
                       {config.series?.length === 1 && config.visualizationType === 'Bar' && (
                         <>
@@ -2538,7 +2610,7 @@ const EditorPanel = () => {
                   {/* end: isolated values */}
 
                   <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
-                  <Select value={config.legend.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
+                  <Select value={config.legend?.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
                   {config.legend.position === 'bottom' && (
                     <>
                       <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />

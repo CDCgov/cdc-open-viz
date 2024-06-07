@@ -33,6 +33,12 @@ const Visualization: React.FC<VisualizationWrapper> = forwardRef((props, ref) =>
       classes.push('editor-panel--hidden')
     }
 
+    if (config.type === 'filtered-text') {
+      classes.push('type-filtered-text')
+      classes = classes.filter(item => item !== 'cove-component__content')
+      return classes
+    }
+
     if (config.type === 'chart') {
       classes.push('type-chart')
       config?.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)

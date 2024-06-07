@@ -15,6 +15,7 @@ import { type PreliminaryDataItem } from '../components/LineChart/LineChartProps
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 
+export type ViewportSize = 'sm' | 'xs' | 'xxs' | 'lg'
 export type ChartColumns = Record<string, Column>
 
 type DataFormat = {
@@ -190,8 +191,10 @@ export type ForestPlotConfig = {
 } & AllChartsConfig
 
 export type LineChartConfig = {
-  visualizationType: 'Line'
+  allowLineToBarGraph: boolean
+  convertLineToBarGraph: boolean
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
+  visualizationType: 'Line'
 } & AllChartsConfig
 
 export type ChartConfig = LineChartConfig | ForestPlotConfig | AllChartsConfig
