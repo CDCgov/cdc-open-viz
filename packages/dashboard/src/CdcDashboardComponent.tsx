@@ -363,9 +363,12 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
         loadAPIFilters(newSharedFilters)
       }
     } else {
-      updateFilteredData(newSharedFilters)
-      reloadURLData(newSharedFilters)
-      dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+      if (newSharedFilters[index].apiFilter) {
+        reloadURLData(newSharedFilters)
+      } else {
+        updateFilteredData(newSharedFilters)
+        dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+      }
     }
   }
 

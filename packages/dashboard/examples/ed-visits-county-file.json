@@ -89,7 +89,7 @@
         "values": ["All"],
         "active": "All",
         "tier": 2,
-        "parents": ["Dashboard Filter 3"]
+        "parents": ["State"]
       }
     ]
   },
