@@ -118,7 +118,7 @@ const UsaMap = () => {
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
-  const territories = territoriesData.map(territory => {
+  const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = isHex ? Territory.Hexagon : Territory.Rectangle
 
     const territoryData = data[territory]
@@ -163,22 +163,20 @@ const UsaMap = () => {
       }
 
       return (
-        <>
-          <Shape
-            key={label}
-            label={label}
-            style={styles}
-            text={styles.color}
-            strokeWidth={1.5}
-            textColor={textColor}
-            onClick={() => geoClickHandler(territory, territoryData)}
-            data-tooltip-id={`tooltip__${tooltipId}`}
-            data-tooltip-html={toolTip}
-            territory={territory}
-            territoryData={territoryData}
-            tabIndex={-1}
-          />
-        </>
+        <Shape
+          key={`label__${territoryIndex}`}
+          label={label}
+          style={styles}
+          text={styles.color}
+          strokeWidth={1.5}
+          textColor={textColor}
+          onClick={() => geoClickHandler(territory, territoryData)}
+          data-tooltip-id={`tooltip__${tooltipId}`}
+          data-tooltip-html={toolTip}
+          territory={territory}
+          // territoryData={territoryData}
+          tabIndex={-1}
+        />
       )
     }
   })
