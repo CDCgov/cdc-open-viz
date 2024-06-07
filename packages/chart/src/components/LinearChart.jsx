@@ -59,7 +59,7 @@ const LinearChart = props => {
   const shouldAbbreviate = true
   let height = config.aspectRatio ? width * config.aspectRatio : config.visualizationType === 'Forest Plot' ? config.heights['vertical'] : config.heights[orientation]
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.padding || 0)
+  let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.size || 0)
 
   if (config.visualizationType === 'Forest Plot') {
     height = height + config.data.length * config.forestPlot.rowHeight
@@ -218,7 +218,7 @@ const LinearChart = props => {
     return false
   }
 
-  const padding = orientation === 'horizontal' ? Number(config.xAxis.padding) : Number(config.yAxis.size)
+  const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const fontSize = { small: 16, medium: 18, large: 20 }
 
   const handleNumTicks = () => {
