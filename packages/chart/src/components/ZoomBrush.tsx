@@ -19,6 +19,8 @@ const ZoomBrush: FC<Props> = props => {
   const sharedFilters = dashboardConfig?.dashboard?.sharedFilters ?? []
   const isDashboardFilters = sharedFilters?.length > 0
   const { fontSize } = useBarChart()
+  const [showTooltip, setShowTooltip] = useState(false)
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
   const [brushKey, setBrushKey] = useState(0)
   const brushRef = useRef(null)
   const radius = 15
@@ -27,7 +29,8 @@ const ZoomBrush: FC<Props> = props => {
     startPosition: 0,
     endPosition: 0,
     startValue: '',
-    endValue: ''
+    endValue: '',
+    xMax: props.xMax
   })
 
   const initialPosition = {
@@ -43,6 +46,7 @@ const ZoomBrush: FC<Props> = props => {
   }
 
   const onBrushChange = event => {
+    setShowTooltip(false)
     const filteredValues = event?.xValues?.filter(val => val !== undefined)
     if (filteredValues?.length === 0) return
 
@@ -63,7 +67,8 @@ const ZoomBrush: FC<Props> = props => {
       startPosition: brushRef.current?.state.start.x,
       endPosition: brushRef.current?.state.end.x,
       endValue: formatIfDate(endValue),
-      startValue: formatIfDate(startValue)
+      startValue: formatIfDate(startValue),
+      xMax: props.xMax
     }))
 
     setBrushConfig(prev => {
@@ -113,7 +118,7 @@ const ZoomBrush: FC<Props> = props => {
   const calculateTop = (): number => {
     const tickRotation = Number(config.xAxis.tickRotation) > 0 ? Number(config.xAxis.tickRotation) : 0
     let top = 0
-    const offSet = 20
+    const offSet = 30
     if (!config.xAxis.label) {
       if (!config.isResponsiveTicks && tickRotation) {
         top = Number(tickRotation + config.xAxis.tickWidthMax) / 1.6
@@ -130,7 +135,7 @@ const ZoomBrush: FC<Props> = props => {
     }
     if (config.xAxis.label) {
       if (!config.isResponsiveTicks && tickRotation) {
-        top = Number(config.xAxis.tickWidthMax + tickRotation)
+        top = Number(config.xAxis.tickWidthMax + tickRotation) + offSet
       }
 
       if (!config.isResponsiveTicks && !tickRotation) {
@@ -150,12 +155,36 @@ const ZoomBrush: FC<Props> = props => {
 
   return (
     <ErrorBoundary component='Brush Chart'>
-      <Group display={config.brush?.active ? 'block' : 'none'} top={Number(props.yMax) + calculateTop()} left={Number(config.runtime.yAxis.size)} pointerEvents='fill'>
+      <Group
+        onMouseMove={event => {
+          // show tooltip only once before brush started
+          if (textProps.startPosition === 0 && (textProps.endPosition === 0 || textProps.endPosition === props.xMax)) {
+            setShowTooltip(true)
+          }
+          setTooltipPosition({ x: event?.clientX, y: event?.clientY })
+        }}
+        onMouseLeave={() => setShowTooltip(false)}
+        display={config.brush?.active ? 'block' : 'none'}
+        top={Number(props.yMax) + calculateTop()}
+        left={Number(config.runtime.yAxis.size)}
+        pointerEvents='fill'
+      >
         <rect fill='#949494' width={props.xMax} height={config.brush.height} rx={radius} />
         <Brush
           key={brushKey}
           disableDraggingOverlay={true}
-          renderBrushHandle={props => <BrushHandle getTextWidth={getTextWidth} pixelDistance={textProps.endPosition - textProps.startPosition} textProps={textProps} fontSize={fontSize[config.fontSize]} {...props} isBrushing={brushRef.current?.state.isBrushing} />}
+          renderBrushHandle={props => (
+            <BrushHandle
+              left={Number(config.runtime.yAxis.size)}
+              showTooltip={showTooltip}
+              getTextWidth={getTextWidth}
+              pixelDistance={textProps.endPosition - textProps.startPosition}
+              textProps={textProps}
+              fontSize={fontSize[config.fontSize]}
+              {...props}
+              isBrushing={brushRef.current?.state.isBrushing}
+            />
+          )}
           innerRef={brushRef}
           useWindowMoveEvents={true}
           selectedBoxStyle={style}
@@ -175,7 +204,7 @@ const ZoomBrush: FC<Props> = props => {
 }
 
 const BrushHandle = props => {
-  const { x, isBrushActive, isBrushing, className, textProps, pixelDistance, getTextWidth, fontSize } = props
+  const { x, isBrushActive, isBrushing, className, textProps, fontSize, showTooltip, left, getTextWidth } = props
   const pathWidth = 8
   if (!isBrushActive) {
     return null
@@ -184,16 +213,30 @@ const BrushHandle = props => {
   const isLeft = className.includes('left')
   const transform = isLeft ? 'scale(-1, 1)' : 'translate(0,0)'
   const textAnchor = isLeft ? 'end' : 'start'
-  let textWidth = getTextWidth(textProps.startValue, `normal ${props.fontSize / 1.4}px sans-serif`)
-  const displayLabels = textWidth * 2 > pixelDistance
+  const tooltipText = isLeft ? ` Drag to focus on a specific data segment ` : ''
+  const textWidth = getTextWidth(tooltipText, `normal ${fontSize / 1.1}px sans-serif`)
+  const arrowWidth = getTextWidth('\u2190', `normal ${fontSize * 3}px sans-serif`)
+  console.log(textWidth, 'textWidth')
 
   return (
-    <Group left={x + pathWidth / 2} top={-2}>
-      <Text pointerEvents='visiblePainted' dominantBaseline='hanging' x={isLeft ? 55 : -50} y={25} verticalAnchor='start' textAnchor={textAnchor} fontSize={fontSize / 1.4}>
-        {isLeft ? textProps.startValue : textProps.endValue}
-      </Text>
-      <path cursor='ew-resize' d='M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12' fill={!isBrushing ? '#000' : '#297EF1'} strokeWidth='1' transform={transform}></path>
-    </Group>
+    <>
+      {showTooltip && (
+        <>
+          <Text x={(Number(textProps.xMax) - textWidth) / 2} dy={-12} pointerEvents='visiblePainted' fontSize={fontSize / 1.1}>
+            {tooltipText}
+          </Text>
+          <Text fill={'#297EF1'} x={isLeft ? (Number(textProps.xMax) - textWidth - arrowWidth) / 2 : Number(textProps.xMax) / 2 + Number(360)/2} dy={-9} dx={3} pointerEvents='visiblePainted' fontSize={fontSize * 1.3}>
+            {isLeft ? '\u2190' : '\u2192'}
+          </Text>
+        </>
+      )}
+      <Group left={x + pathWidth / 2} top={-2}>
+        <Text pointerEvents='visiblePainted' dominantBaseline='hanging' x={isLeft ? 55 : -50} y={25} verticalAnchor='start' textAnchor={textAnchor} fontSize={fontSize / 1.4}>
+          {isLeft ? textProps.startValue : textProps.endValue}
+        </Text>
+        <path cursor='ew-resize' d='M0.5,10A6,6 0 0 1 6.5,16V14A6,6 0 0 1 0.5,20ZM2.5,18V12M4.5,18V12' fill={'#297EF1'} strokeWidth='1' transform={transform}></path>
+      </Group>
+    </>
   )
 }
 
