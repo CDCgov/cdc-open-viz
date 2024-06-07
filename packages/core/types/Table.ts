@@ -14,6 +14,7 @@ export type Table = {
   indexLabel?: string
   label?: string
   limitHeight?: boolean
+  freezeDataTableHeader?: boolean
   show?: boolean
   showDataTableLink?: boolean
   showDownloadImgButton?: boolean

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { timeParse } from 'd3-time-format'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -125,6 +125,16 @@ const DataTable = (props: DataTableProps) => {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
     OverflowY: 'scroll'
   }
+  const [height, getTableHeight] = useState(0)
+  const tableHgt = useRef(null)
+  useEffect(() => {
+    getTableHeight(tableHgt.current.clientHeight)
+  }, [])
+
+  const fixedHeight = {
+    maxHeight: config.table.freezeDataTableHeader && `${height / 2}px`,
+    OverflowY: 'scroll'
+  }
 
   const hasRowType = !!Object.keys(rawData?.[0] || {}).find((v: string) => v.match(/row[_-]?type/i))
 
@@ -185,7 +195,7 @@ const DataTable = (props: DataTableProps) => {
         <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
           <SkipTo skipId={skipId} skipMessage='Skip Data Table' />
           {config.table.collapsible !== false && <ExpandCollapse expanded={expanded} setExpanded={setExpanded} fontSize={config.fontSize} tableTitle={tableTitle} viewport={viewport} />}
-          <div className='table-container' style={limitHeight}>
+          <div className='table-container' style={config.table.limitHeight === true ? limitHeight : fixedHeight} ref={tableHgt}>
             <Table
               viewport={viewport}
               wrapColumns={wrapColumns}

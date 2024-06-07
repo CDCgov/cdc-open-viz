@@ -760,6 +760,15 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
           }
         })
         break
+      case 'freezeTableHeader':
+        setState({
+          ...state,
+          table: {
+            ...state.table,
+            freezeDataTableHeader: value
+          }
+        })
+        break
       case 'chooseState':
         let fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === value)
         let stateName = value
@@ -2676,6 +2685,18 @@ const EditorPanel = ({ columnsRequiredChecker }) => {
                       />
                       <span className='edit-label'>Enable Pdf Download</span>
                     </label> */}
+                <label className='checkbox'>
+                  <input
+                    type='checkbox'
+                    id='freezeHeader'
+                    checked={state.table.freezeDataTableHeader}
+                    onChange={event => {
+                      handleEditorChanges('freezeTableHeader', event.target.checked)
+                    }}
+                    disabled={state.table.limitHeight === true}
+                  />
+                  <span className='edit-label'>Freeze Data Table Header</span>
+                </label>
               </AccordionItemPanel>
             </AccordionItem>
           )}
