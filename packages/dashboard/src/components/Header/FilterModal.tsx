@@ -13,6 +13,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getVizRowColumnLocator } from '../../helpers/getVizRowColumnLocator'
 import _ from 'lodash'
+import MultiSelect from '@cdc/core/components/MultiSelect'
 
 type ModalProps = {
   config: MultiDashboardConfig
@@ -27,6 +28,8 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
   const [filter, setFilter] = useState<SharedFilter>(filterState)
   const [columns, setColumns] = useState<string[]>([])
   const transform = new DataTransform()
+
+  const parentFilters: string[] = (config.dashboard.sharedFilters || []).filter(({ key, type }) => key !== filter.key && type !== 'datafilter').map(({ key }) => key)
 
   const vizRowColumnLocator = getVizRowColumnLocator(config.rows)
 
@@ -137,7 +140,7 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
         <fieldset className='shared-filter-modal shared-filter-modal__fieldset' key={filter.columnName + index}>
           <label>
             <span className='edit-label column-heading'>Filter Type: </span>
-            <select defaultValue={filter.type || ''} onChange={e => updateFilterProp('type', e.target.value)}>
+            <select defaultValue={filter.type || ''} onChange={e => updateFilterProp('type', e.target.value)} disabled={!!filter.type}>
               <option value=''>- Select Option -</option>
               <option value='urlfilter'>URL</option>
               <option value='datafilter'>Data</option>
@@ -254,9 +257,10 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                       <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                     </Tooltip.Target>
                     <Tooltip.Content>
-                      <p>Text to use in the html option element</p>
+                      <p>Text to use in the html option element. If none is applied value selector will be used.</p>
                     </Tooltip.Content>
                   </Tooltip>
+                  {` * Optional`}
                 </span>
                 <input
                   type='text'
@@ -277,6 +281,7 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                       <p>Value to use in the html option element</p>
                     </Tooltip.Content>
                   </Tooltip>
+                  {` * Required`}
                 </span>
                 <input
                   type='text'
@@ -286,30 +291,35 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                   }}
                 />
               </label>
-              <label>
-                <span className='edit-label column-heading'>Parent Filter: </span>
-                <select
-                  value={filter.parents || []}
-                  onChange={e => {
-                    updateFilterProp('parents', e.target.value)
+              {!!parentFilters.length && (
+                <MultiSelect
+                  label='Parent Filter(s): '
+                  options={parentFilters.map(key => ({ value: key, label: key }))}
+                  fieldName='parents'
+                  selected={filter.parents}
+                  updateField={(_section, _subsection, fieldname, newItems) => {
+                    updateFilterProp(fieldname, newItems)
                   }}
-                >
-                  <option value=''>Select a filter</option>
-                  {config.dashboard.sharedFilters &&
-                    config.dashboard.sharedFilters.map(sharedFilter => {
-                      if (sharedFilter.key !== filter.key && sharedFilter.type !== 'datafilter') {
-                        return <option value={sharedFilter.key}>{sharedFilter.key}</option>
-                      }
-                    })}
-                </select>
-              </label>
+                />
+              )}
+
               <label>
-                <span className='edit-label column-heading'>Auto Load: </span>
+                <span className='edit-label column-heading col-2'>Auto Load: </span>
                 <input
                   type='checkbox'
                   checked={filter.apiFilter?.autoLoad}
                   onChange={e => {
                     updateAPIFilter('autoLoad', !filter.apiFilter?.autoLoad)
+                  }}
+                />
+              </label>
+              <label>
+                <span className='edit-label column-heading'>Reset Label: </span>
+                <input
+                  type='text'
+                  value={filter.resetLabel || ''}
+                  onChange={e => {
+                    updateFilterProp('resetLabel', e.target.value)
                   }}
                 />
               </label>
@@ -465,7 +475,7 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
                   {config.dashboard.sharedFilters &&
                     config.dashboard.sharedFilters.map(sharedFilter => {
                       if (sharedFilter.key !== filter.key) {
-                        return <option>{sharedFilter.key}</option>
+                        return <option key={sharedFilter.key}>{sharedFilter.key}</option>
                       }
                     })}
                 </select>

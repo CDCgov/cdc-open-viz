@@ -4,14 +4,16 @@ import { Tab } from '../types/Tab'
 import { ConfigRow } from '../types/ConfigRow'
 import { Visualization } from '@cdc/core/types/Visualization'
 import Footnotes from '@cdc/core/types/Footnotes'
+import { SharedFilter } from '../types/SharedFilter'
 
 type ADD_FOOTNOTE = Action<'ADD_FOOTNOTE', { id: string; rowIndex: number; config: Footnotes }>
 type SET_CONFIG = Action<'SET_CONFIG', Partial<Config>>
 type UPDATE_CONFIG = Action<'UPDATE_CONFIG', [Config, Object?]>
-type SET_DATA = Action<'SET_DATA', Object>
+type SET_DATA = Action<'SET_DATA', Record<string, any[]>>
 type SET_LOADING = Action<'SET_LOADING', boolean>
 type SET_PREVIEW = Action<'SET_PREVIEW', boolean>
 type SET_FILTERED_DATA = Action<'SET_FILTERED_DATA', Object>
+type SET_SHARED_FILTERS = Action<'SET_SHARED_FILTERS', SharedFilter[]>
 type SET_TAB_SELECTED = Action<'SET_TAB_SELECTED', Tab>
 type RENAME_DASHBOARD_TAB = Action<'RENAME_DASHBOARD_TAB', { current: string; new: string }>
 type INITIALIZE_MULTIDASHBOARDS = Action<'INITIALIZE_MULTIDASHBOARDS', undefined>
@@ -37,6 +39,7 @@ type DashboardActions =
   | SET_LOADING
   | SET_PREVIEW
   | SET_FILTERED_DATA
+  | SET_SHARED_FILTERS
   | SET_TAB_SELECTED
   | SWITCH_CONFIG
   | INITIALIZE_MULTIDASHBOARDS

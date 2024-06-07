@@ -1,5 +1,4 @@
 import MultiSelect from '@cdc/core/components/MultiSelect'
-import { getApiFilterKey } from '../helpers/getApiFilterKey'
 import { SharedFilter } from '../types/SharedFilter'
 
 export type DropdownOptions = Record<'value' | 'text', string>[]
@@ -20,6 +19,11 @@ const Filters: React.FC<FilterProps> = ({ hide, filters, apiFilterDropdowns, han
   const updateField = (_section, _subsection, fieldName, value) => {
     handleOnChange(fieldName, value)
   }
+
+  const nullVal = (singleFilter: SharedFilter) => {
+    const val = singleFilter.queuedActive || singleFilter.active
+    return val === null || val === undefined || val === ''
+  }
   return (
     <>
       {filters.map((singleFilter, filterIndex) => {
@@ -33,7 +37,7 @@ const Filters: React.FC<FilterProps> = ({ hide, filters, apiFilterDropdowns, han
             </option>
           )
         }
-        const _key = singleFilter.apiFilter ? getApiFilterKey(singleFilter.apiFilter) : undefined
+        const _key = singleFilter.apiFilter?.apiEndpoint
         if (_key && apiFilterDropdowns[_key]) {
           // URL Filter
           apiFilterDropdowns[_key].forEach(({ text, value }, index) => {
@@ -71,6 +75,11 @@ const Filters: React.FC<FilterProps> = ({ hide, filters, apiFilterDropdowns, han
                       handleOnChange(filterIndex, val.target.value)
                     }}
                   >
+                    {nullVal(singleFilter) && !singleFilter.resetLabel && (
+                      <option value='' key='select'>
+                        {'-Select-'}
+                      </option>
+                    )}
                     {values}
                   </select>
                 </>

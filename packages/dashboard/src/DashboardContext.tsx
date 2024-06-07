@@ -2,6 +2,7 @@ import { Dispatch, createContext } from 'react'
 import { DashboardState } from './store/dashboard.reducer'
 import DashboardActions from './store/dashboard.actions'
 import { Tab } from './types/Tab'
+import { MultiDashboardConfig } from './types/MultiDashboard'
 
 type ConfigCTX = DashboardState & {
   outerContainerRef: (node: any) => void
@@ -12,7 +13,7 @@ type ConfigCTX = DashboardState & {
 const firstTab: Tab = 'Dashboard Description'
 
 export const initialState = {
-  data: {},
+  data: {} as Record<string, any[]>,
   loading: false,
   filteredData: {},
   preview: false,
@@ -23,6 +24,7 @@ const initialContext: ConfigCTX = {
   outerContainerRef: () => {},
   setParentConfig: () => {},
   isDebug: false,
+  config: {} as MultiDashboardConfig,
   ...initialState
 }
 
