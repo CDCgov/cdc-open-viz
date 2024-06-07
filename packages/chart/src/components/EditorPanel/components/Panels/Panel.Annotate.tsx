@@ -2,9 +2,9 @@ import React, { useContext } from 'react'
 import ConfigContext from '../../../../ConfigContext.js'
 
 // CDC Core
-import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
+import _ from 'lodash'
 
 // types
 import { type PanelProps } from './../PanelProps'
@@ -50,6 +50,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       text: 'New Annotation',
       snapToNearestPoint: false,
       fontSize: 16,
+      bezier: 10,
       show: {
         desktop: true,
         tablet: true,
@@ -67,7 +68,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         vertical: false,
         horizontal: false
       },
-      connectionType: 'line',
       marker: 'arrow',
       edit: {
         subject: true,
@@ -81,7 +81,8 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       dx: 0,
       dy: 0,
       opacity: 100,
-      savedDimensions: [dimensions[0] * 0.73, dimensions[1]]
+      savedDimensions: [dimensions[0] * 0.73, dimensions[1]],
+      connectionType: 'line'
     }
 
     const annotations = Array.isArray(config.annotations) ? config.annotations : []
@@ -112,44 +113,13 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     Annotation Text:
                     <textarea rows={5} value={annotation.text} onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)} />
                   </label>
-                  {/* <label>
-                      Vertical Anchor
-                      <input
-                        type='checkbox'
-                        checked={config?.annotations[index].anchor.vertical}
-                        onClick={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].anchor.vertical = e.target.checked
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      />
-                    </label>
-                    <label>
-                      Horizontal Anchor
-                      <input
-                        type='checkbox'
-                        checked={config?.annotations[index].anchor.horizontal}
-                        onClick={e => {
-                          const updatedAnnotations = [...config?.annotations]
-                          updatedAnnotations[index].anchor.horizontal = e.target.checked
-                          updateConfig({
-                            ...config,
-                            annotations: updatedAnnotations
-                          })
-                        }}
-                      />
-                    </label> */}
-
                   <label>
                     Opacity
                     <br />
                     <input
                       type='range'
                       onClick={e => {
-                        const updatedAnnotations = [...config?.annotations]
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
                         updatedAnnotations[index].opacity = e.target.value
                         updateConfig({
                           ...config,
@@ -165,7 +135,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       type='checkbox'
                       checked={config?.annotations[index]?.edit?.subject}
                       onClick={e => {
-                        const updatedAnnotations = [...config?.annotations]
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
                         updatedAnnotations[index].edit.subject = e.target.checked
                         updateConfig({
                           ...config,
@@ -180,7 +150,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       type='checkbox'
                       checked={config?.annotations[index]?.edit?.label}
                       onClick={e => {
-                        const updatedAnnotations = [...config?.annotations]
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
                         updatedAnnotations[index].edit.label = e.target.checked
                         updateConfig({
                           ...config,
@@ -194,13 +164,14 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     Connection Type:
                     <select
                       onChange={e => {
-                        const updatedAnnotations = [...config?.annotations]
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
                         updatedAnnotations[index].connectionType = e.target.value
                         updateConfig({
                           ...config,
                           annotations: updatedAnnotations
                         })
                       }}
+                      value={config?.annotations[index]?.connectionType}
                     >
                       <option key='select' value='select'>
                         Select
@@ -215,25 +186,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
 
                   {annotation.connectionType === 'curve' && (
                     <>
-                      {/* <label>
-                        Line Type:
-                        <select
-                          onChange={e => {
-                            const updatedAnnotations = [...config?.annotations]
-                            updatedAnnotations[index].lineType = e.target.value
-                            updateConfig({
-                              ...config,
-                              annotations: updatedAnnotations
-                            })
-                          }}
-                        >
-                          {Object.entries(approvedCurveTypes).map(([value, key]) => (
-                            <option key={key} value={key}>
-                              {value}
-                            </option>
-                          ))}
-                        </select>
-                      </label> */}
                       <label>
                         Curve Control
                         {/* create a range input */}
@@ -241,9 +193,9 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                           type='range'
                           min='-20'
                           max='20'
-                          value={config?.annotations[index]?.bezier}
+                          value={config?.annotations[index]?.bezier || 0}
                           onChange={e => {
-                            const updatedAnnotations = [...config?.annotations]
+                            const updatedAnnotations = _.cloneDeep(config?.annotations)
                             updatedAnnotations[index].bezier = e.target.value
                             updateConfig({
                               ...config,
@@ -259,7 +211,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     Connection Location:
                     <select
                       onChange={e => {
-                        const updatedAnnotations = [...config?.annotations]
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
                         updatedAnnotations[index].connectionLocation = e.target.value
                         updateConfig({
                           ...config,
@@ -279,7 +231,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     Marker
                     <select
                       onChange={e => {
-                        const updatedAnnotations = [...config?.annotations]
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
                         updatedAnnotations[index].marker = e.target.value
                         updateConfig({
                           ...config,
@@ -299,7 +251,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       type='checkbox'
                       checked={config?.annotations[index]?.snapToNearestPoint}
                       onClick={e => {
-                        const updatedAnnotations = [...config?.annotations]
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
                         updatedAnnotations[index].snapToNearestPoint = e.target.checked
                         updateConfig({
                           ...config,
@@ -314,7 +266,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       Associated Series:
                       <select
                         onChange={e => {
-                          const updatedAnnotations = [...config?.annotations]
+                          const updatedAnnotations = _.cloneDeep(config?.annotations)
                           updatedAnnotations[index].seriesKey = e.target.value
                           updateConfig({
                             ...config,
