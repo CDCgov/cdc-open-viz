@@ -321,7 +321,7 @@ const LinearChart = props => {
                   {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                 </Group>
                 <Group>
-                  <Text x={xMax / 2} y={axisMaxHeight + 20} stroke='#333' textAnchor={'middle'} verticalAnchor='start'>
+                  <Text x={xMax / 2} y={axisMaxHeight + 20 + xLabelOffset} stroke='#333' textAnchor={'middle'} verticalAnchor='start'>
                     {runtime.xAxis.label}
                   </Text>
                 </Group>
