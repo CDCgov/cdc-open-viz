@@ -57,9 +57,13 @@ const LinearChart = props => {
   const { horizontal: heightHorizontal } = config.heights
   const isHorizontal = orientation === 'horizontal' || config.visualizationType === 'Forest Plot'
   const shouldAbbreviate = true
+  const xLabelOffset = isNaN(parseInt(runtime.xAxis.labelOffset)) ? 0 : parseInt(runtime.xAxis.labelOffset)
+  const yLabelOffset = isNaN(parseInt(runtime.yAxis.labelOffset)) ? 0 : parseInt(runtime.yAxis.labelOffset)
+  const xAxisSize = isNaN(parseInt(runtime.xAxis.size)) ? 0 : parseInt(runtime.xAxis.size)
   let height = config.aspectRatio ? width * config.aspectRatio : config.visualizationType === 'Forest Plot' ? config.heights['vertical'] : config.heights[orientation]
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
-  let yMax = height - (orientation === 'horizontal' ? 0 : runtime.xAxis.size || 0)
+  let yMax = height - (orientation === 'horizontal' ? 0 : xAxisSize)
+  height += (orientation === 'horizontal' ? xAxisSize : 0)
 
   if (config.visualizationType === 'Forest Plot') {
     height = height + config.data.length * config.forestPlot.rowHeight
@@ -416,7 +420,7 @@ const LinearChart = props => {
                     {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={runtime.horizontal ? { x: 0, y: config.visualizationType === 'Forest Plot' ? height : Number(heightHorizontal) } : props.axisToPoint} stroke='#000' />}
                     {yScale.domain()[0] < 0 && <Line from={{ x: props.axisFromPoint.x, y: yScale(0) }} to={{ x: xMax, y: yScale(0) }} stroke='#333' />}
                     {visualizationType === 'Bar' && orientation === 'horizontal' && xScale.domain()[0] < 0 && <Line from={{ x: xScale(0), y: 0 }} to={{ x: xScale(0), y: yMax }} stroke='#333' strokeWidth={2} />}
-                    <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${-1 * runtime.yAxis.size}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
+                    <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${(-1 * runtime.yAxis.size) + yLabelOffset}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
                       {props.label}
                     </Text>
                   </Group>
@@ -564,7 +568,7 @@ const LinearChart = props => {
                       )
                     })}
                     {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                    <Text x={axisCenter} y={axisMaxHeight + 20} textAnchor='middle' verticalAnchor='start' fontWeight='bold' fill={config.xAxis.labelColor}>
+                    <Text x={axisCenter} y={axisMaxHeight + 20 + xLabelOffset} textAnchor='middle' verticalAnchor='start' fontWeight='bold' fill={config.xAxis.labelColor}>
                       {props.label}
                     </Text>
                   </Group>
