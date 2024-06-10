@@ -1193,6 +1193,7 @@ const EditorPanel = () => {
                           </Tooltip>
                         }
                       />
+                      <TextField value={config.yAxis.labelOffset} section='yAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />
                       {config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && <CheckBox value={config.isResponsiveTicks} fieldName='isResponsiveTicks' label='Use Responsive Ticks' updateField={updateField} />}
                       {(config.orientation === 'vertical' || !config.isResponsiveTicks) && <TextField value={config.yAxis.tickRotation || 0} type='number' min={0} section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       {config.isResponsiveTicks && config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar' && (
@@ -1220,7 +1221,6 @@ const EditorPanel = () => {
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                       {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
-                      {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
                       {visSupportsValueAxisGridLines() && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Show Gridlines' updateField={updateField} />}
                       <CheckBox value={config.yAxis.enablePadding} section='yAxis' fieldName='enablePadding' label='Add Padding to Value Axis Scale' updateField={updateField} />
                       {config.yAxis.enablePadding && <TextField type='number' section='yAxis' fieldName='scalePadding' label='Padding Percentage' className='number-narrow' updateField={updateField} value={config.yAxis.scalePadding} />}
@@ -2083,7 +2083,8 @@ const EditorPanel = () => {
                           </div>
                         </>
                       )}
-                      {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.padding} type='number' min={0} section='xAxis' fieldName='padding' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
+                      {visSupportsDateCategoryHeight() && <TextField value={config.xAxis.size} type='number' min={0} section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />}
+                      <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />
 
                       {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                       {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
