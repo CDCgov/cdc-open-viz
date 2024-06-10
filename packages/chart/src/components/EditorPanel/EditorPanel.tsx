@@ -1932,7 +1932,25 @@ const EditorPanel = () => {
                         }
                         updateField={updateField}
                       />
-                      {visHasBrushChart && <CheckBox value={config.brush?.active} section='brush' fieldName='active' label='Brush Slider ' updateField={updateField} />}
+                      {visHasBrushChart && (
+                        <CheckBox
+                          value={config.brush?.active}
+                          section='brush'
+                          fieldName='active'
+                          label='Brush Slider '
+                          updateField={updateField}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Use the brush slider to narrow down your data view to specific values along the axis. This tool is useful for examining detailed data segments within the larger dataset. </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      )}
 
                       {config.exclusions.active && (
                         <>
