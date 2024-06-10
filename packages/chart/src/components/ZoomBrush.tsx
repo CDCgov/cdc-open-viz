@@ -20,7 +20,6 @@ const ZoomBrush: FC<Props> = props => {
   const isDashboardFilters = sharedFilters?.length > 0
   const { fontSize } = useBarChart()
   const [showTooltip, setShowTooltip] = useState(false)
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
   const [brushKey, setBrushKey] = useState(0)
   const brushRef = useRef(null)
   const radius = 15
@@ -156,12 +155,11 @@ const ZoomBrush: FC<Props> = props => {
   return (
     <ErrorBoundary component='Brush Chart'>
       <Group
-        onMouseMove={event => {
+        onMouseMove={() => {
           // show tooltip only once before brush started
           if (textProps.startPosition === 0 && (textProps.endPosition === 0 || textProps.endPosition === props.xMax)) {
             setShowTooltip(true)
           }
-          setTooltipPosition({ x: event?.clientX, y: event?.clientY })
         }}
         onMouseLeave={() => setShowTooltip(false)}
         display={config.brush?.active ? 'block' : 'none'}
@@ -213,22 +211,15 @@ const BrushHandle = props => {
   const isLeft = className.includes('left')
   const transform = isLeft ? 'scale(-1, 1)' : 'translate(0,0)'
   const textAnchor = isLeft ? 'end' : 'start'
-  const tooltipText = isLeft ? ` Drag to focus on a specific data segment ` : ''
+  const tooltipText = isLeft ? ` Drag edges to focus on a specific segment ` : ''
   const textWidth = getTextWidth(tooltipText, `normal ${fontSize / 1.1}px sans-serif`)
-  const arrowWidth = getTextWidth('\u2190', `normal ${fontSize * 3}px sans-serif`)
-  console.log(textWidth, 'textWidth')
 
   return (
     <>
       {showTooltip && (
-        <>
-          <Text x={(Number(textProps.xMax) - textWidth) / 2} dy={-12} pointerEvents='visiblePainted' fontSize={fontSize / 1.1}>
-            {tooltipText}
-          </Text>
-          <Text fill={'#297EF1'} x={isLeft ? (Number(textProps.xMax) - textWidth - arrowWidth) / 2 : Number(textProps.xMax) / 2 + Number(360)/2} dy={-9} dx={3} pointerEvents='visiblePainted' fontSize={fontSize * 1.3}>
-            {isLeft ? '\u2190' : '\u2192'}
-          </Text>
-        </>
+        <Text x={(Number(textProps.xMax) - textWidth) / 2} dy={-12} pointerEvents='visiblePainted' fontSize={fontSize / 1.1}>
+          {tooltipText}
+        </Text>
       )}
       <Group left={x + pathWidth / 2} top={-2}>
         <Text pointerEvents='visiblePainted' dominantBaseline='hanging' x={isLeft ? 55 : -50} y={25} verticalAnchor='start' textAnchor={textAnchor} fontSize={fontSize / 1.4}>
