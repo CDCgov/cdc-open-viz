@@ -44,7 +44,6 @@ const BarChartStackedHorizontal = () => {
                 const transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                 const displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                 config.barHeight = Number(config.barHeight)
-                console.log(colorScale(config.runtime.seriesLabels[bar.key], 'cesLabels[bar.key]'))
                 const labelColor = getContrastColor('#000', colorScale(config.runtime.seriesLabels[bar.key]))
                 // tooltips
                 const xAxisValue = formatNumber(data[bar.index][bar.key], 'left')
