@@ -142,7 +142,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           label='Display "Missing Data" Label'
           updateField={updateField}
         />
-        {config.preliminaryData.some(pd => pd.value && pd.type === 'suppression') && (
+        {config?.preliminaryData?.some(pd => pd.value && pd.type === 'suppression') && (
           <CheckBox
             tooltip={
               <Tooltip style={{ textTransform: 'none' }}>
