@@ -3,6 +3,8 @@ import _ from 'lodash'
 import { Column } from '../../../types/Column'
 
 export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, runtimeData: Object[]): string[] => {
+  if (config.visualizationType === 'Sankey') return Object.keys(config?.data?.[0]?.tableData[0])
+
   const configColumns: Record<string, Column> = _.cloneDeep(config.columns) || {}
   const excludeColumns = Object.values(configColumns)
     .filter(column => column.dataTable === false)
