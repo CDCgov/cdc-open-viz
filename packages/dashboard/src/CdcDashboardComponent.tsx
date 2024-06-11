@@ -21,7 +21,7 @@ import getViewport from '@cdc/core/helpers/getViewport'
 import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
 
 import CdcMap from '@cdc/map'
-import CdcChart from '../../chart/src/CdcChart'
+import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
@@ -76,7 +76,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
   const [currentViewport, setCurrentViewport] = useState<ViewPort>('lg')
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
-  const isPreview = useMemo(() => state.tabSelected === 'Dashboard Preview', [state.tabSelected])
+  const isPreview = state.tabSelected === 'Dashboard Preview'
 
   const inNoDataState = useMemo(() => {
     const vals = Object.values(state.data)
@@ -264,7 +264,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
       reloadURLData()
     }
     loadAPIFilters(config.dashboard.sharedFilters)
-  }, [isEditor, isPreview, state.tabSelected])
+  }, [isEditor, isPreview])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     const config = _.cloneDeep(state.config)
@@ -567,7 +567,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
                 .map((row, index) => {
                   if (row.multiVizColumn) {
                     const filteredData = getFilteredData(state, state.data)
-                    const data = filteredData[index] ?? row.formattedData ?? []
+                    const data = filteredData[index] ?? row.formattedData
                     const dataGroups = {}
                     data.forEach(d => {
                       const groupKey = d[row.multiVizColumn]
