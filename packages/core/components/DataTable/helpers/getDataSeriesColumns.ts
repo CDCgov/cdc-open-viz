@@ -4,7 +4,8 @@ import { Column } from '../../../types/Column'
 
 export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, runtimeData: Object[]): string[] => {
   if (config.visualizationType === 'Sankey') return Object.keys(config?.data?.[0]?.tableData[0])
-  const configColumns = _.cloneDeep(config.columns) || ({} as Record<string, Column>)
+
+  const configColumns: Record<string, Column> = _.cloneDeep(config.columns) || {}
   const excludeColumns = Object.values(configColumns)
     .filter(column => column.dataTable === false)
     .map(column => column.name)
@@ -22,15 +23,12 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
     tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey, config.yAxis?.dataKey] : [config.yAxis?.dataKey]
   }
 
-  const dataColumns = Object.keys(runtimeData[0] || {})
-
   // then add the additional Columns
-  Object.values(configColumns).forEach(function (value) {
-    if (!value.name) return
+  Object.keys(configColumns).forEach(function (key) {
+    var value = configColumns[key]
     // add if not the index AND it is enabled to be added to data table
     const alreadyAdded = tmpSeriesColumns.includes(value.name)
-    const columnIsInData = dataColumns.includes(value.name) // null columns are excluded from data
-    if (value.name !== config.xAxis?.dataKey && value.dataTable === true && !alreadyAdded && columnIsInData) {
+    if (value.name !== config.xAxis?.dataKey && value.dataTable === true && !alreadyAdded) {
       tmpSeriesColumns.push(value.name)
     }
   })
@@ -57,5 +55,6 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
   })
 
   tmpSeriesColumns.sort((a, b) => columnOrderingHash[a] - columnOrderingHash[b])
+
   return tmpSeriesColumns
 }

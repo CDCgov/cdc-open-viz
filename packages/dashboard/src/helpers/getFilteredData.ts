@@ -32,8 +32,6 @@ export const getFilteredData = (state: DashboardState, initialFilteredData = {},
         const formattedData = dataOverride?.[dataKey] ?? dataDescription ? getFormattedData(_data, dataDescription) : _data
 
         newFilteredData[index] = filterData(applicableFilters, formattedData)
-      } else {
-        newFilteredData[index] = state.data[row.dataKey] || row.data
       }
     }
   })
