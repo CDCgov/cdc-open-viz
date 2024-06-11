@@ -94,7 +94,7 @@ export const BarChartHorizontal = () => {
                   const barLabel = isSuppressed ? '' : Number(yAxisValue) === 0 ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
-                  let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  let textWidth = (getTextWidth as any)(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
                   let textFits = Number(textWidth) < defaultBarWidth - 5
 
                   // control text position
@@ -149,7 +149,7 @@ export const BarChartHorizontal = () => {
                     return barColor
                   }
 
-                  const iconPadding = symbol => (symbol === 'Asterisk' ? '3px' : symbol === 'Double Asterisks' ? '4px' : '12px')
+                  const iconPadding = 12 + suppressedBarWidth
 
                   return (
                     <Group key={`${barGroup.index}--${index}`}>
@@ -196,13 +196,13 @@ export const BarChartHorizontal = () => {
                             <Text // prettier-ignore
                               key={index}
                               fontSize={getIconSize(pd.symbol, barHeight)}
-                              angle={90}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX}
                               y={config.barHeight / 2 + config.barHeight * bar.index}
                               fill={'#000'}
-                              dx={iconPadding(pd.symbol)}
+                              dy={config.barHeight / 5}
+                              dx={`${iconPadding}px`}
                               verticalAnchor={getVerticalAnchor(pd.symbol)}
                               textAnchor={'middle'}
                             >
