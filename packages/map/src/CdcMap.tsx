@@ -1727,9 +1727,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                       {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
                     </>
                   )}
-                  {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
-                    <ReactTooltip id={`tooltip__${tooltipId}`} float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip tooltip-test' : 'tooltip tooltip-test'}`} style={{ background: `rgba(255,255,255, ${state.tooltips.opacity / 100})`, color: 'black' }} />
-                  )}
                 </section>
 
                 {general.showSidebar && 'navigation' !== general.type && <Legend ref={legendRef} skipId={tabId} />}
