@@ -6,6 +6,7 @@ import { getChartCellValue } from './getChartCellValue'
 import { getDataSeriesColumns } from './getDataSeriesColumns'
 import { ReactNode } from 'react'
 import { CellMatrix, GroupCellMatrix } from '../../Table/types/CellMatrix'
+import { getRowType } from './getRowType'
 
 type ChartRowsProps = DataTableProps & {
   rows: string[]
@@ -58,15 +59,8 @@ const chartCellArray = ({ rows, runtimeData, config, isVertical, sortBy, colorSc
     } else {
       return rows.map(row => {
         if (hasRowType) {
-          let rowType
-          let rowValues = []
-          dataSeriesColumns.forEach((column, j) => {
-            if (column.match(/row[_-]?type/i)) {
-              rowType = getChartCellValue(row, column, config, runtimeData)
-            } else {
-              rowValues.push(getChartCellValue(row, column, config, runtimeData))
-            }
-          })
+          const rowType = getRowType(runtimeData[row])
+          const rowValues = dataSeriesColumns.map(column => getChartCellValue(row, column, config, runtimeData))
           return [rowType, ...rowValues]
         } else {
           return dataSeriesColumns.map((column, j) => getChartCellValue(row, column, config, runtimeData))

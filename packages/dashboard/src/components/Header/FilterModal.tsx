@@ -37,9 +37,11 @@ const FilterModal: React.FC<ModalProps> = ({ config, filterState, index, removeF
     const nameLookup = {}
     const vizOptions = Object.keys(config.visualizations)
       .filter(vizKey => {
+        const viz = vizRowColumnLocator[vizKey]
+        if (!viz) return false
         const notAdded = !filter.usedBy || filter.usedBy.indexOf(vizKey) === -1
         const usesSharedFilter = config.visualizations[vizKey].usesSharedFilter
-        const row = vizRowColumnLocator[vizKey].row
+        const row = viz.row
         const dataConfiguredOnRow = config.rows[row].dataKey
         return filter.setBy !== vizKey && notAdded && !usesSharedFilter && !dataConfiguredOnRow
       })
