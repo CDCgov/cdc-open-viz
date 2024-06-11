@@ -1173,7 +1173,17 @@ const EditorPanel = () => {
                       {config.runtime.seriesKeys && config.runtime.seriesKeys.length === 1 && !['Box Plot', 'Deviation Bar', 'Forest Plot'].includes(config.visualizationType) && (
                         <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                       )}
-                      <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
+                      <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' 
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Apporoximate number of ticks. Other factors such as space available and data may change the exact number of ticks used.</p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            } updateField={updateField} />
                       <TextField
                         value={config.yAxis.size}
                         type='number'
