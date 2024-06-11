@@ -404,7 +404,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
     getVizKeys(state.config).forEach(visualizationKey => {
       const rowNumber = vizRowColumnLocator[visualizationKey]?.row
       const visualizationConfig = getVizConfig(visualizationKey, rowNumber, state.config, state.data, state.filteredData)
-
+      if (visualizationConfig.type === 'footnotes') visualizationConfig.formattedData = undefined
       const setsSharedFilter = state.config.dashboard.sharedFilters && state.config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0
       const setSharedFilterValue = setsSharedFilter ? state.config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey)[0].active : undefined
 
@@ -565,7 +565,7 @@ export default function CdcDashboard({ initialState, isEditor = false, isDebug =
               config.rows
                 .filter(row => row.columns.filter(col => col.widget).length !== 0)
                 .map((row, index) => {
-                  if (row.multiVizColumn) {
+                  if (row.multiVizColumn && (isPreview || !isEditor)) {
                     const filteredData = getFilteredData(state, state.data)
                     const data = filteredData[index] ?? row.formattedData
                     const dataGroups = {}
