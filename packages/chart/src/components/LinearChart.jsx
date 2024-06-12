@@ -133,8 +133,8 @@ const LinearChart = props => {
 
   const countNumOfTicks = axis => {
     let { numTicks } = runtime[axis]
-    if(runtime[axis].viewportNumTicks && runtime[axis].viewportNumTicks[currentViewport]){
-      numTicks = runtime[axis].viewportNumTicks[currentViewport];
+    if (runtime[axis].viewportNumTicks && runtime[axis].viewportNumTicks[currentViewport]) {
+      numTicks = runtime[axis].viewportNumTicks[currentViewport]
     }
     let tickCount = undefined
 
@@ -233,10 +233,10 @@ const LinearChart = props => {
 
   const getManualStep = () => {
     let manualStep = config.xAxis.manualStep
-    if(config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[currentViewport]){
-      manualStep = config.xAxis.viewportStepCount[currentViewport];
+    if (config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[currentViewport]) {
+      manualStep = config.xAxis.viewportStepCount[currentViewport]
     }
-    return manualStep;
+    return manualStep
   }
 
   const onMouseMove = event => {
@@ -366,12 +366,13 @@ const LinearChart = props => {
                       const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
                       const tickLength = showTicks === 'block' ? 7 : 0
                       const to = { x: tick.to.x - tickLength, y: tick.to.y }
+                      const displayFirstGridLine = tick.index !== 0 || config.xAxis.hideAxis
 
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {!runtime.yAxis.hideTicks && <Line key={`${tick.value}--hide-hideTicks`} from={tick.from} to={config.useLogScale ? to : tick.to} stroke={config.yAxis.tickColor} display={orientation === 'horizontal' ? 'none' : 'block'} />}
 
-                          {runtime.yAxis.gridLines ? <Line key={`${tick.value}--hide-hideGridLines`} display={(config.useLogScale && showTicks).toString()} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
+                          {runtime.yAxis.gridLines && displayFirstGridLine ? <Line key={`${tick.value}--hide-hideGridLines`} display={(config.useLogScale && showTicks).toString()} from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
                           {orientation === 'horizontal' && visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
                             <Text
