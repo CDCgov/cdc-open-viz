@@ -1,4 +1,5 @@
 export default {
+  annotations: [],
   general: {
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',

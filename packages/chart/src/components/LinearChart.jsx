@@ -35,6 +35,7 @@ import useScales, { getTickValues } from '../hooks/useScales'
 import useTopAxis from '../hooks/useTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
+import Annotation from './Annotations'
 
 // styles
 import ZoomBrush from './ZoomBrush'
@@ -80,6 +81,7 @@ const LinearChart = props => {
   const { hasTopAxis } = useTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
+  const annotationRefs = useRef(null)
 
   // refs
   const triggerRef = useRef()
@@ -707,13 +709,13 @@ const LinearChart = props => {
               return (
                 // prettier-ignore
                 <Line
-                key={`yAxis-${anchor.value}--${index}`}
-                strokeDasharray={handleLineType(anchor.lineStyle)}
-                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                className='anchor-y'
-                from={{ x: 0 + padding, y: anchorPosition - middleOffset}}
-                to={{ x: width - config.yAxis.rightAxisSize, y: anchorPosition - middleOffset }}
-              />
+                  key={`yAxis-${anchor.value}--${index}`}
+                  strokeDasharray={handleLineType(anchor.lineStyle)}
+                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  className='anchor-y'
+                  from={{ x: 0 + padding, y: anchorPosition - middleOffset}}
+                  to={{ x: width - config.yAxis.rightAxisSize, y: anchorPosition - middleOffset }}
+                />
               )
             })}
           {/* x anchors */}
@@ -774,6 +776,7 @@ const LinearChart = props => {
               <Line from={{ x: point.x, y: 0 }} to={{ x: point.x, y: yMax }} stroke={'black'} strokeWidth={1} pointerEvents='none' strokeDasharray='5,5' className='vertical-tooltip-line' />
             </Group>
           )}
+          <Annotation.Draggable xScale={xScale} yScale={yScale} xMax={xMax} svgRef={svgRef} />
         </svg>
         {tooltipData && Object.entries(tooltipData.data).length > 0 && tooltipOpen && showTooltip && tooltipData.dataYPosition && tooltipData.dataXPosition && !config.tooltips.singleSeries && (
           <>

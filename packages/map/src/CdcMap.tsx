@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import * as d3 from 'd3'
 import Layout from '@cdc/core/components/Layout'
 import Waiting from '@cdc/core/components/Waiting'
+import Annotation from './components/Annotation'
 import Error from './components/EditorPanel/components/Error'
 
 // IE11
@@ -1607,6 +1608,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     content: modal,
     currentViewport,
     data: runtimeData,
+    dimensions,
     displayDataAsText,
     displayGeoName,
     filteredCountryCode,

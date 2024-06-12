@@ -3,5 +3,6 @@ export const approvedCurveTypes = {
   Cardinal: 'curveCardinal',
   Natural: 'curveNatural',
   'Monotone X': 'curveMonotoneX',
-  Step: 'curveStep'
+  Step: 'curveStep',
+  'Curve Basis': 'curveBasis'
 }

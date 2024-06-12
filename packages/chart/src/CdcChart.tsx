@@ -39,6 +39,7 @@ import { generateColorsArray } from './helpers/generateColorsArray'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
+import Annotation from './components/Annotations'
 
 // Helpers
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
@@ -1193,7 +1194,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {/* Link */}
               {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
               {/* Description */}
+
               {description && config.visualizationType !== 'Spark Line' && <div className={getChartSubTextClasses().join('')}>{parse(description)}</div>}
+              <Annotation.List />
+
               {/* buttons */}
               <MediaControls.Section classes={['download-buttons']}>
                 {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
@@ -1236,54 +1240,55 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const contextValues = {
     brushConfig,
-    setBrushConfig,
     capitalize,
-    getXAxisData,
-    getYAxisData,
-    config,
-    setConfig,
-    rawData: stateData ?? {},
-    excludedData: excludedData,
-    transformedData: clean(filteredData || excludedData), // do this right before passing to components
-    tableData: filteredData || excludedData, // do not clean table data
-    unfilteredData: stateData,
-    seriesHighlight,
-    colorScale,
-    dimensions,
-    currentViewport,
-    parseDate,
-    formatDate,
-    formatTooltipsDate,
-    formatNumber,
-    loading,
-    updateConfig,
+    clean,
     colorPalettes,
-    isDashboard,
-    setParentConfig,
-    missingRequiredSections,
-    setEditing,
-    setFilteredData,
-    handleChartAriaLabels,
-    highlight,
-    highlightReset,
-    legend,
-    setSeriesHighlight,
-    dynamicLegendItems,
-    setDynamicLegendItems,
-    filterData,
-    imageId,
-    handleLineType,
-    lineOptions,
-    isNumber,
-    getTextWidth,
-    twoColorPalette,
-    isEditor,
-    isDebug,
-    setSharedFilter,
-    setSharedFilterValue,
+    colorScale,
+    config,
+    currentViewport,
     dashboardConfig,
     debugSvg: isDebug,
-    clean
+    dimensions,
+    dynamicLegendItems,
+    excludedData: excludedData,
+    filterData,
+    formatDate,
+    formatNumber,
+    formatTooltipsDate,
+    getTextWidth,
+    getXAxisData,
+    getYAxisData,
+    handleChartAriaLabels,
+    handleLineType,
+    highlight,
+    highlightReset,
+    imageId,
+    isDashboard,
+    isDebug,
+    isEditor,
+    isNumber,
+    legend,
+    lineOptions,
+    loading,
+    missingRequiredSections,
+    outerContainerRef,
+    parseDate,
+    rawData: stateData ?? {},
+    seriesHighlight,
+    setBrushConfig,
+    setConfig,
+    setDynamicLegendItems,
+    setEditing,
+    setFilteredData,
+    setParentConfig,
+    setSeriesHighlight,
+    setSharedFilter,
+    setSharedFilterValue,
+    tableData: filteredData || excludedData, // do not clean table data
+    transformedData: clean(filteredData || excludedData), // do this right before passing to components
+    twoColorPalette,
+    unfilteredData: stateData,
+    updateConfig
   }
 
   return (

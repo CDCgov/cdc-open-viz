@@ -1,0 +1,50 @@
+.cdc-open-viz-module {
+  .annotation__title-circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    padding: 8px;
+    width: 16px;
+    height: 16px;
+
+    border: 2px solid #666;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .annotation__title-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .annotation__title-wrapper .annotation__title-text {
+    margin-left: 5px;
+    font-size: 16px;
+  }
+
+  .annotation__subtext {
+    font-size: 12px;
+  }
+
+  .annotation-list {
+    margin: 0 1rem;
+    list-style: none;
+  }
+
+  .annotation-list li {
+    margin-top: 16px;
+  }
+
+  .cove-component__content {
+    container-type: inline-size;
+    container-name: content;
+  }
+}
+
+@container content (min-width: 700px) {
+  .cdc-open-viz-module .annotation-list {
+    display: none;
+  }
+}

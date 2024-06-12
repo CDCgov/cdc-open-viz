@@ -319,7 +319,8 @@ const EditorPanel = () => {
     lineOptions,
     rawData,
     highlight,
-    highlightReset
+    highlightReset,
+    dimensions
   } = useContext<ChartContext>(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
@@ -2671,6 +2672,7 @@ const EditorPanel = () => {
                 </AccordionItemPanel>
               </AccordionItem>
             )}
+            <Panels.Annotate name='Text Annotations' />
             {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
           </Accordion>
           {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
