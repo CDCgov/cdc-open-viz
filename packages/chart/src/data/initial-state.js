@@ -1,4 +1,5 @@
 export default {
+  annotations: [],
   allowLineToBarGraph: undefined,
   type: 'chart',
   debugSvg: false,

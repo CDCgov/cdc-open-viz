@@ -10,6 +10,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
+import Annotation from '../../Annotation'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`

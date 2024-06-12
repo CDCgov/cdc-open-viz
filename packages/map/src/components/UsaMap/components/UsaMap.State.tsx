@@ -16,6 +16,7 @@ import { geoAlbersUsa } from 'd3-composite-projections'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import HexIcon from './HexIcon'
 import { patternSizes } from '../helpers/patternSizes'
+import Annotation from '../../Annotation'
 
 import Territory from './Territory'
 
@@ -445,6 +446,7 @@ const UsaMap = () => {
             {({ features, projection }) => constructGeoJsx(features, projection)}
           </AlbersUsa>
         )}
+        {state.annotations.length > 0 && <Annotation.Draggable />}
       </svg>
 
       {territories.length > 0 && (
