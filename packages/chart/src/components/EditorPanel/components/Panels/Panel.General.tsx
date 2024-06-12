@@ -137,7 +137,7 @@ const PanelGeneral: FC<PanelProps> = props => {
               value={config.general.showSuppressedSymbol}
               section='general'
               fieldName='showSuppressedSymbol'
-              label='Display "suppressed data" symbol'
+              label='Display "suppressed data" label'
               updateField={updateField}
             />
           </>
