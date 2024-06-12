@@ -80,7 +80,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       yKey: '',
       dx: 0,
       dy: 0,
-      opacity: 100,
+      opacity: '100',
       savedDimensions: [dimensions[0] * 0.73, dimensions[1]],
       connectionType: 'line'
     }
@@ -118,7 +118,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     <br />
                     <input
                       type='range'
-                      onClick={e => {
+                      onChange={e => {
                         const updatedAnnotations = _.cloneDeep(config?.annotations)
                         updatedAnnotations[index].opacity = e.target.value
                         updateConfig({
@@ -126,6 +126,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                           annotations: updatedAnnotations
                         })
                       }}
+                      value={config?.annotations?.[index]?.opacity || '100'}
                     />
                   </label>
 
@@ -207,7 +208,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     </>
                   )}
 
-                  <label>
+                  {/* <label>
                     Connection Location:
                     <select
                       onChange={e => {
@@ -225,7 +226,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                         </option>
                       ))}
                     </select>
-                  </label>
+                  </label> */}
 
                   <label>
                     Marker
