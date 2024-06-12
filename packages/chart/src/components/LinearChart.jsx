@@ -382,7 +382,7 @@ const LinearChart = props => {
                             <Text
                               display={config.useLogScale ? showTicks : 'block'}
                               dx={config.useLogScale ? -6 : 0}
-                              x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
+                              x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x - 32}
                               y={tick.to.y - 12 + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                               angle={-Number(config.yAxis.tickRotation) || 0}
                               verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
@@ -392,7 +392,7 @@ const LinearChart = props => {
                               {config.runtime.seriesLabelsAll[tick.formattedValue - 1]}
                             </Text>
                             {(seriesHighlight.length === 0 || seriesHighlight.includes(config.runtime.seriesLabelsAll[tick.formattedValue - 1])) && 
-                              <rect x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x - 115} y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)} width="225" height="2" fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}/>
+                              <rect display={config.useLogScale ? showTicks : 'block'} x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x - 123} y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)} width="130" height="2" fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}/>
                             }
                             </>
                             
