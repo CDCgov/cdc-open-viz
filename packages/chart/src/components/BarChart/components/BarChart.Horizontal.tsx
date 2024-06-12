@@ -94,8 +94,8 @@ export const BarChartHorizontal = () => {
                   const barLabel = isSuppressed ? '' : Number(yAxisValue) === 0 ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
-                  let textWidth = (getTextWidth as any)(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                  let textFits = Number(textWidth) < defaultBarWidth - 5
+                  const textWidth = (getTextWidth as any)(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                  const textFits = Number(textWidth) < defaultBarWidth - 5
 
                   // control text position
                   let textAnchor = textFits ? 'end' : 'start'
